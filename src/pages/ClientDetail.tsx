@@ -94,6 +94,7 @@ const ClientDetail = () => {
               <TabsTrigger value="activity" className="flex-1">Activity</TabsTrigger>
               <TabsTrigger value="documents" className="flex-1">Documents</TabsTrigger>
             </TabsList>
+            
             <TabsContent value="notes" className="space-y-4 mt-6">
               <Textarea
                 value={notes}
@@ -105,6 +106,7 @@ const ClientDetail = () => {
                 <Button className="bg-blue-600 hover:bg-blue-700">Save Notes</Button>
               </div>
             </TabsContent>
+            
             <TabsContent value="activity">
               <Card>
                 <CardHeader>
@@ -115,6 +117,7 @@ const ClientDetail = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+            
             <TabsContent value="documents">
               <Card>
                 <CardHeader>
