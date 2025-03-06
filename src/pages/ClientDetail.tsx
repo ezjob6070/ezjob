@@ -1,12 +1,13 @@
 
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeftIcon, MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, ClockIcon } from "lucide-react";
+import { ArrowLeftIcon, MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 // Mock client data - this would typically come from an API
 const clientData = {
@@ -21,6 +22,13 @@ const clientData = {
   notes: "Meeting scheduled for next quarter planning. Interested in expanding service package.",
   createdAt: new Date("2023-03-15"),
   lastContact: new Date("2023-08-22"),
+  paymentStatus: "current" as const,
+  paymentAmount: 2500,
+  paymentHistory: [
+    { id: "p1", amount: 1500, date: new Date("2023-07-15"), status: "paid" },
+    { id: "p2", amount: 1500, date: new Date("2023-06-15"), status: "paid" },
+    { id: "p3", amount: 1500, date: new Date("2023-05-15"), status: "paid" },
+  ]
 };
 
 const ClientDetail = () => {
@@ -34,6 +42,12 @@ const ClientDetail = () => {
   if (!client) {
     return <div>Client not found</div>;
   }
+
+  const paymentStatusColors = {
+    current: "bg-green-100 text-green-800",
+    pending: "bg-yellow-100 text-yellow-800",
+    overdue: "bg-red-100 text-red-800",
+  };
 
   return (
     <div className="space-y-6">
@@ -78,6 +92,19 @@ const ClientDetail = () => {
               <ClockIcon className="h-4 w-4 text-muted-foreground" />
               <span>Last contact: {client.lastContact.toLocaleDateString()}</span>
             </div>
+            <div className="flex items-center gap-2 text-sm">
+              <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
+              <span>Payment Amount: ${client.paymentAmount.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-4 h-4" />
+              <span>
+                Payment Status: 
+                <Badge variant="outline" className={`ml-2 ${paymentStatusColors[client.paymentStatus]}`}>
+                  {client.paymentStatus.charAt(0).toUpperCase() + client.paymentStatus.slice(1)}
+                </Badge>
+              </span>
+            </div>
           </CardContent>
           <CardFooter>
             <div className="flex w-full justify-between">
@@ -93,6 +120,7 @@ const ClientDetail = () => {
               <TabsTrigger value="notes" className="flex-1">Notes</TabsTrigger>
               <TabsTrigger value="activity" className="flex-1">Activity</TabsTrigger>
               <TabsTrigger value="documents" className="flex-1">Documents</TabsTrigger>
+              <TabsTrigger value="payments" className="flex-1">Payments</TabsTrigger>
             </TabsList>
             
             <TabsContent value="notes" className="space-y-4 mt-6">
@@ -128,6 +156,38 @@ const ClientDetail = () => {
                 </CardContent>
                 <CardFooter>
                   <Button className="bg-blue-600 hover:bg-blue-700">Upload Document</Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="payments">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment History</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {client.paymentHistory && client.paymentHistory.length > 0 ? (
+                    <div className="space-y-4">
+                      {client.paymentHistory.map((payment) => (
+                        <div key={payment.id} className="flex justify-between items-center p-3 border rounded-md">
+                          <div>
+                            <p className="font-medium">${payment.amount.toLocaleString()}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {payment.date.toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="bg-green-100 text-green-800">
+                            {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No payment history found.</p>
+                  )}
+                </CardContent>
+                <CardFooter>
+                  <Button className="bg-blue-600 hover:bg-blue-700">Record Payment</Button>
                 </CardFooter>
               </Card>
             </TabsContent>

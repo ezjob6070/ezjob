@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -13,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ChevronUpIcon, ChevronDownIcon, SearchIcon } from "lucide-react";
+import { ChevronUpIcon, ChevronDownIcon, SearchIcon, DollarSignIcon } from "lucide-react";
 
 type Client = {
   id: string;
@@ -24,6 +23,8 @@ type Client = {
   status: "active" | "inactive" | "lead";
   avatar?: string;
   initials: string;
+  paymentStatus?: "current" | "pending" | "overdue";
+  paymentAmount?: number;
 };
 
 type ClientsTableProps = {
@@ -34,6 +35,12 @@ const statusColors = {
   active: "bg-green-100 text-green-800 hover:bg-green-200",
   inactive: "bg-gray-100 text-gray-800 hover:bg-gray-200",
   lead: "bg-blue-100 text-blue-800 hover:bg-blue-200",
+};
+
+const paymentStatusColors = {
+  current: "bg-green-100 text-green-800 hover:bg-green-200",
+  pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+  overdue: "bg-red-100 text-red-800 hover:bg-red-200",
 };
 
 const ClientsTable = ({ clients: initialClients }: ClientsTableProps) => {
@@ -88,6 +95,11 @@ const ClientsTable = ({ clients: initialClients }: ClientsTableProps) => {
     );
   };
 
+  const formatCurrency = (amount?: number) => {
+    if (amount === undefined) return '-';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center">
@@ -102,7 +114,6 @@ const ClientsTable = ({ clients: initialClients }: ClientsTableProps) => {
         </div>
         <div className="flex items-center ml-auto space-x-2">
           <Button variant="outline">Export</Button>
-          <Button>Add Client</Button>
         </div>
       </div>
       
@@ -143,13 +154,22 @@ const ClientsTable = ({ clients: initialClients }: ClientsTableProps) => {
                   Status {getSortIcon("status")}
                 </button>
               </TableHead>
+              <TableHead>
+                <button
+                  className="flex items-center font-medium"
+                  onClick={() => handleSort("paymentAmount")}
+                >
+                  <DollarSignIcon className="mr-1 h-4 w-4" /> Payment {getSortIcon("paymentAmount")}
+                </button>
+              </TableHead>
+              <TableHead>Payment Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {clients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   No clients found
                 </TableCell>
               </TableRow>
@@ -182,6 +202,19 @@ const ClientsTable = ({ clients: initialClients }: ClientsTableProps) => {
                     >
                       {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {formatCurrency(client.paymentAmount)}
+                  </TableCell>
+                  <TableCell>
+                    {client.paymentStatus && (
+                      <Badge
+                        variant="outline"
+                        className={paymentStatusColors[client.paymentStatus]}
+                      >
+                        {client.paymentStatus.charAt(0).toUpperCase() + client.paymentStatus.slice(1)}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
