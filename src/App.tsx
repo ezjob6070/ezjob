@@ -11,6 +11,7 @@ import ClientDetail from "./pages/ClientDetail";
 import Tasks from "./pages/Tasks";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import QuickActions from "./components/QuickActions";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <QuickActions />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
