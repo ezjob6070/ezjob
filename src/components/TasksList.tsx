@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -51,6 +52,7 @@ const statusColors = {
 };
 
 const TasksList = ({ tasks, onStatusChange }: TasksListProps) => {
+  const navigate = useNavigate();
   const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>(
     tasks.reduce((acc, task) => {
       acc[task.id] = task.status === "completed";
@@ -58,11 +60,17 @@ const TasksList = ({ tasks, onStatusChange }: TasksListProps) => {
     }, {} as Record<string, boolean>)
   );
 
-  const handleStatusChange = (taskId: string, completed: boolean) => {
+  const handleStatusChange = (e: React.MouseEvent, taskId: string, completed: boolean) => {
+    e.stopPropagation(); // Prevent triggering the task click when clicking checkbox
     setCompletedTasks((prev) => ({ ...prev, [taskId]: completed }));
     if (onStatusChange) {
       onStatusChange(taskId, completed);
     }
+  };
+
+  const handleTaskClick = (taskId: string) => {
+    // Navigate to a task detail page (we'll create this route next)
+    navigate(`/tasks/${taskId}`);
   };
 
   const isOverdue = (date: Date) => {
@@ -74,15 +82,16 @@ const TasksList = ({ tasks, onStatusChange }: TasksListProps) => {
       {tasks.map((task) => (
         <div
           key={task.id}
-          className={`border rounded-lg p-4 transition-all duration-200 hover:shadow-sm ${
+          className={`border rounded-lg p-4 transition-all duration-200 hover:shadow-md cursor-pointer ${
             completedTasks[task.id] ? "bg-muted/50" : ""
           }`}
+          onClick={() => handleTaskClick(task.id)}
         >
           <div className="flex items-start gap-3">
             <Checkbox
               checked={completedTasks[task.id]}
-              onCheckedChange={(checked) =>
-                handleStatusChange(task.id, checked as boolean)
+              onCheckedChange={(checked) => 
+                handleStatusChange(event as React.MouseEvent, task.id, checked as boolean)
               }
               className="mt-1"
             />
@@ -125,7 +134,11 @@ const TasksList = ({ tasks, onStatusChange }: TasksListProps) => {
                 <div className="mt-2">
                   <span className="text-xs text-muted-foreground">
                     Related to client:{" "}
-                    <a href={`/clients/${task.client.id}`} className="text-primary hover:underline">
+                    <a 
+                      href={`/clients/${task.client.id}`} 
+                      className="text-primary hover:underline"
+                      onClick={(e) => e.stopPropagation()} // Prevent triggering the task click
+                    >
                       {task.client.name}
                     </a>
                   </span>

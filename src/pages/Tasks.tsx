@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PlusIcon, FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -207,6 +206,39 @@ const Tasks = () => {
               )}
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="all" className="mt-4">
+            <TasksList tasks={filteredTasks} />
+          </TabsContent>
+          
+          <TabsContent value="today" className="mt-4">
+            <TasksList
+              tasks={filteredTasks.filter(
+                (task) => task.dueDate.toDateString() === new Date().toDateString()
+              )}
+            />
+          </TabsContent>
+          
+          <TabsContent value="upcoming" className="mt-4">
+            <TasksList
+              tasks={filteredTasks.filter(
+                (task) =>
+                  task.dueDate > new Date() &&
+                  task.dueDate.toDateString() !== new Date().toDateString()
+              )}
+            />
+          </TabsContent>
+          
+          <TabsContent value="overdue" className="mt-4">
+            <TasksList
+              tasks={filteredTasks.filter(
+                (task) =>
+                  task.dueDate < new Date() &&
+                  task.dueDate.toDateString() !== new Date().toDateString() &&
+                  task.status !== "completed"
+              )}
+            />
+          </TabsContent>
         </Tabs>
 
         <DropdownMenu>
@@ -274,36 +306,6 @@ const Tasks = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
-      <TabsContent value="all" className="mt-0">
-        <TasksList tasks={filteredTasks} />
-      </TabsContent>
-      <TabsContent value="today" className="mt-0">
-        <TasksList
-          tasks={filteredTasks.filter(
-            (task) => task.dueDate.toDateString() === new Date().toDateString()
-          )}
-        />
-      </TabsContent>
-      <TabsContent value="upcoming" className="mt-0">
-        <TasksList
-          tasks={filteredTasks.filter(
-            (task) =>
-              task.dueDate > new Date() &&
-              task.dueDate.toDateString() !== new Date().toDateString()
-          )}
-        />
-      </TabsContent>
-      <TabsContent value="overdue" className="mt-0">
-        <TasksList
-          tasks={filteredTasks.filter(
-            (task) =>
-              task.dueDate < new Date() &&
-              task.dueDate.toDateString() !== new Date().toDateString() &&
-              task.status !== "completed"
-          )}
-        />
-      </TabsContent>
     </div>
   );
 };
