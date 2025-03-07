@@ -25,14 +25,15 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   const totalRevenue = filteredJobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
   const totalProfit = filteredJobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
   const totalExpenses = filteredJobSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
+  const netProfit = totalRevenue - totalExpenses;
 
   // Calculate expense categories
   const expenseCategories = [
-    { name: "Marketing", value: totalExpenses * 0.4, color: "#8b5cf6" },
-    { name: "Platform Fees", value: totalExpenses * 0.3, color: "#ec4899" },
+    { name: "Marketing", value: totalExpenses * 0.4, color: "#f87171" },
+    { name: "Platform Fees", value: totalExpenses * 0.3, color: "#22c55e" },
     { name: "Referral Costs", value: totalExpenses * 0.15, color: "#f97316" },
-    { name: "Advertising", value: totalExpenses * 0.1, color: "#22c55e" },
-    { name: "Other", value: totalExpenses * 0.05, color: "#3b82f6" },
+    { name: "Advertising", value: totalExpenses * 0.1, color: "#3b82f6" },
+    { name: "Other", value: totalExpenses * 0.05, color: "#8b5cf6" },
   ];
 
   // Sort job sources for top performers
@@ -42,115 +43,129 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      <Card className="mb-4">
+      <Input
+        className="mb-4"
+        placeholder="Search job sources..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Profit Breakdown Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Profit Breakdown</CardTitle>
+            <CardDescription>Distribution of revenue and costs</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DonutChart
+              data={[
+                { name: "Company Profit", value: totalProfit, color: "#8b5cf6" },
+                { name: "Expenses", value: totalExpenses, color: "#f87171" },
+              ]}
+              title={formatCurrency(totalProfit)}
+              subtitle="Company Profit"
+            />
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">Net Profit</p>
+              <p className="text-xl font-bold">{formatCurrency(netProfit)}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Expense Breakdown Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Expenses Breakdown</CardTitle>
+            <CardDescription>Distribution of expenses by type</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DonutChart
+              data={expenseCategories}
+              title={formatCurrency(totalExpenses)}
+              subtitle="Total Expenses"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Top Job Sources Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Top Job Sources</CardTitle>
+            <CardDescription>Best performing job sources by revenue</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {topJobSources.map((source) => (
+                <div key={source.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="font-medium">{source.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-muted-foreground">
+                      {source.totalJobs || 0} jobs
+                    </div>
+                    <div className="font-medium">
+                      {formatCurrency(source.totalRevenue || 0)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Detailed Job Sources Table */}
+      <Card>
         <CardHeader>
           <CardTitle>Job Sources Performance</CardTitle>
           <CardDescription>Revenue and profit by job source</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <h3 className="text-sm font-medium mb-4">Revenue Distribution</h3>
-              <DonutChart
-                data={filteredJobSources.map((source, index) => ({
-                  name: source.name,
-                  value: source.totalRevenue || 0,
-                  color: [`#8b5cf6`, `#ec4899`, `#f97316`, `#22c55e`, `#3b82f6`][index % 5]
-                }))}
-                title={formatCurrency(totalRevenue)}
-                subtitle="Total Revenue"
-              />
-            </div>
-            <div>
-              <h3 className="text-sm font-medium mb-4">Profit Distribution</h3>
-              <DonutChart
-                data={filteredJobSources.map((source, index) => ({
-                  name: source.name,
-                  value: source.companyProfit || 0,
-                  color: [`#8b5cf6`, `#ec4899`, `#f97316`, `#22c55e`, `#3b82f6`][index % 5]
-                }))}
-                title={formatCurrency(totalProfit)}
-                subtitle="Total Profit"
-              />
-            </div>
-          </div>
-          
-          {/* Additional breakdown charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <h3 className="text-sm font-medium mb-4">Profit Breakdown</h3>
-              <DonutChart
-                data={[
-                  { name: "Company Profit", value: totalProfit, color: "#22c55e" },
-                  { name: "Expenses", value: totalExpenses, color: "#f87171" },
-                ]}
-                title={formatCurrency(totalProfit + totalExpenses)}
-                subtitle="Total Revenue"
-              />
-            </div>
-            <div>
-              <h3 className="text-sm font-medium mb-4">Expense Breakdown</h3>
-              <DonutChart
-                data={expenseCategories}
-                title={formatCurrency(totalExpenses)}
-                subtitle="Total Expenses"
-              />
-            </div>
-          </div>
-          
-          <Input
-            className="mb-4"
-            placeholder="Search job sources..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          
-          {/* Top Job Sources Table */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-4">Top Performing Job Sources</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Source Name</TableHead>
-                  <TableHead className="text-right">Total Jobs</TableHead>
-                  <TableHead className="text-right">Revenue</TableHead>
-                  <TableHead className="text-right">Expenses</TableHead>
-                  <TableHead className="text-right">Profit</TableHead>
-                  <TableHead className="text-right">Profit Margin</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {topJobSources.map((source) => {
-                  const profit = source.companyProfit || 0;
-                  const revenue = source.totalRevenue || 0;
-                  const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
-                  
-                  return (
-                    <TableRow key={source.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-primary"></div>
-                          <span>{source.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">{source.totalJobs}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(revenue)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(source.expenses || 0)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(profit)}</TableCell>
-                      <TableCell className="text-right">{profitMargin.toFixed(1)}%</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-          
-          <JobSourceFinanceSection 
-            jobSources={filteredJobSources} 
-            filteredTransactions={filteredTransactions} 
-          />
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Source Name</TableHead>
+                <TableHead className="text-right">Total Jobs</TableHead>
+                <TableHead className="text-right">Revenue</TableHead>
+                <TableHead className="text-right">Expenses</TableHead>
+                <TableHead className="text-right">Profit</TableHead>
+                <TableHead className="text-right">Profit Margin</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredJobSources.map((source) => {
+                const profit = source.companyProfit || 0;
+                const revenue = source.totalRevenue || 0;
+                const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
+                
+                return (
+                  <TableRow key={source.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary"></div>
+                        <span>{source.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">{source.totalJobs}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(revenue)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(source.expenses || 0)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(profit)}</TableCell>
+                    <TableCell className="text-right">{profitMargin.toFixed(1)}%</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
+      
+      <JobSourceFinanceSection 
+        jobSources={filteredJobSources} 
+        filteredTransactions={filteredTransactions} 
+      />
     </div>
   );
 };
