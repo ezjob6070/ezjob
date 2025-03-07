@@ -1,12 +1,13 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
-import TechnicianFinanceSection from "@/components/finance/TechnicianFinanceSection";
 import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel";
 import { DateRange } from "react-day-picker";
+import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -176,7 +177,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         </CardContent>
       </Card>
       
-      <TechnicianFinanceSection 
+      <TechnicianInvoiceSection 
         activeTechnicians={filteredTechnicians} 
       />
     </div>
