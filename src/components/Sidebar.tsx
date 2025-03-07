@@ -53,6 +53,11 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       href: "/tasks",
     },
     {
+      label: "Jobs",
+      icon: <BriefcaseIcon size={20} />,
+      href: "/jobs",
+    },
+    {
       label: "Estimates",
       icon: <FileTextIcon size={20} />,
       href: "/estimates",
