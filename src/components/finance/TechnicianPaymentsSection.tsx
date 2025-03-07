@@ -51,10 +51,18 @@ const TechnicianPaymentsSection: React.FC<TechnicianPaymentsSectionProps> = ({ t
     return bEarnings - aEarnings;
   });
 
-  // Calculate total payments
+  // Calculate total payments and metrics
   const totalPayments = sortedTechnicians.reduce((sum, tech) => {
     return sum + tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1);
   }, 0);
+  
+  const totalRevenue = sortedTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
+  
+  // Estimate expenses as 33% of revenue
+  const totalExpenses = totalRevenue * 0.33;
+  
+  // Calculate net profit
+  const netProfit = totalRevenue - totalPayments - totalExpenses;
 
   return (
     <Card className="mt-8">
@@ -64,13 +72,48 @@ const TechnicianPaymentsSection: React.FC<TechnicianPaymentsSectionProps> = ({ t
             <CardTitle className="text-xl">Technician Payments</CardTitle>
             <CardDescription>Manage and track technician payment details</CardDescription>
           </div>
-          <div className="flex items-center text-xl font-bold">
-            <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
-            <span>Payment Period: {totalPayments > 0 ? formatCurrency(totalPayments) : "No payments"}</span>
-          </div>
         </div>
       </CardHeader>
       <CardContent>
+        {/* Payment Summary Cards - NEW SECTION AT TOP */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm">Total Income</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm">Technician Payments</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-2xl font-bold">{formatCurrency(totalPayments)}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm">Total Expenses</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm">Net Profit</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-2xl font-bold">{formatCurrency(netProfit)}</div>
+            </CardContent>
+          </Card>
+        </div>
+      
         {/* Filters Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-4">
