@@ -2,19 +2,10 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
 
 interface TechnicianCircleChartsProps {
   filteredTechnicians: Technician[];
@@ -24,7 +15,6 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   filteredTechnicians 
 }) => {
   const [techSearchQuery, setTechSearchQuery] = useState("");
-  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   
   // Calculate total revenue from technicians
   const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
@@ -40,71 +30,24 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   // Calculate net profit
   const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
   
-  // Get unique specialties for filtering
-  const specialties = [...new Set(filteredTechnicians.map(tech => tech.specialty))];
-  
-  // Filter technicians based on search query and specialties
-  const searchFilteredTechnicians = filteredTechnicians.filter(tech => {
-    const matchesSearch = 
-      techSearchQuery === "" || 
-      tech.name.toLowerCase().includes(techSearchQuery.toLowerCase()) ||
-      tech.specialty.toLowerCase().includes(techSearchQuery.toLowerCase());
-    
-    const matchesSpecialty = 
-      selectedSpecialties.length === 0 || 
-      selectedSpecialties.includes(tech.specialty);
-    
-    return matchesSearch && matchesSpecialty;
-  });
-  
-  const toggleSpecialty = (specialty: string) => {
-    setSelectedSpecialties(prev => 
-      prev.includes(specialty) 
-        ? prev.filter(s => s !== specialty)
-        : [...prev, specialty]
-    );
-  };
-  
-  const clearSpecialtyFilters = () => {
-    setSelectedSpecialties([]);
-  };
+  // Filter technicians based on search query
+  const searchFilteredTechnicians = filteredTechnicians.filter(tech => 
+    techSearchQuery === "" || 
+    tech.name.toLowerCase().includes(techSearchQuery.toLowerCase()) ||
+    tech.specialty.toLowerCase().includes(techSearchQuery.toLowerCase())
+  );
   
   return (
     <div className="space-y-6">
-      {/* Search Bar with Filter */}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-8"
-            placeholder="Search technicians..."
-            value={techSearchQuery}
-            onChange={(e) => setTechSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={clearSpecialtyFilters}>
-              Clear filters
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {specialties.map(specialty => (
-              <DropdownMenuCheckboxItem
-                key={specialty}
-                checked={selectedSpecialties.includes(specialty)}
-                onCheckedChange={() => toggleSpecialty(specialty)}
-              >
-                {specialty}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-8"
+          placeholder="Search technicians..."
+          value={techSearchQuery}
+          onChange={(e) => setTechSearchQuery(e.target.value)}
+        />
       </div>
       
       {/* Payment Breakdown Simple Cards */}
