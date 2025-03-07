@@ -59,34 +59,24 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardDescription>Source of revenue streams</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-center">
-              <DonutChart
-                data={revenueBreakdown}
-                title={formatCurrency(totalRevenue)}
-                subtitle="Total Revenue"
-              />
-            </div>
+            <div className="text-xl font-bold mb-4">{formatCurrency(totalRevenue)}</div>
             
-            {/* Payment method breakdown list */}
-            <div className="mt-4 space-y-2">
-              <div className="flex flex-col space-y-1">
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  {revenueBreakdown.map((item) => (
-                    <div key={item.name} className="flex flex-col items-center">
-                      <div className="flex items-center mb-1">
-                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
-                      </div>
-                      <div className="text-center">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {totalRevenue > 0 ? ((item.value / totalRevenue) * 100).toFixed(1) : "0"}%
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+            {/* Payment method breakdown list without donut chart */}
+            <div className="space-y-4">
+              {revenueBreakdown.map((item) => (
+                <div key={item.name} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                    <span className="font-medium">{item.name}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span>{formatCurrency(item.value)}</span>
+                    <span className="text-sm text-muted-foreground">
+                      ({totalRevenue > 0 ? ((item.value / totalRevenue) * 100).toFixed(1) : "0"}%)
+                    </span>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>
