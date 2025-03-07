@@ -1,8 +1,5 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import TechnicianFinanceSection from "@/components/finance/TechnicianFinanceSection";
@@ -116,16 +113,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="relative flex-1">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          className="pl-8"
-          placeholder="Search technicians..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      
       <TechnicianFiltersPanel 
         showFilters={true}
         technicianNames={technicianNames}
