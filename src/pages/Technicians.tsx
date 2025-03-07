@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Technician } from "@/types/technician";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
+import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import { initialTechnicians } from "@/data/technicians";
@@ -12,6 +13,8 @@ import { initialTechnicians } from "@/data/technicians";
 const Technicians = () => {
   const { toast } = useToast();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
 
   const handleAddTechnician = (newTechnician: Technician) => {
@@ -19,6 +22,23 @@ const Technicians = () => {
     toast({
       title: "Success",
       description: "New technician added successfully",
+    });
+  };
+
+  const handleEditTechnician = (technician: Technician) => {
+    setSelectedTechnician(technician);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateTechnician = (updatedTechnician: Technician) => {
+    setTechnicians((prevTechnicians) => 
+      prevTechnicians.map((tech) => 
+        tech.id === updatedTechnician.id ? updatedTechnician : tech
+      )
+    );
+    toast({
+      title: "Success",
+      description: "Technician updated successfully",
     });
   };
 
@@ -42,12 +62,22 @@ const Technicians = () => {
       </div>
 
       <TechnicianStats technicians={technicians} />
-      <TechniciansList technicians={technicians} />
+      <TechniciansList 
+        technicians={technicians} 
+        onEditTechnician={handleEditTechnician}
+      />
       
       <AddTechnicianModal 
         open={showAddModal}
         onOpenChange={setShowAddModal}
         onAddTechnician={handleAddTechnician}
+      />
+
+      <EditTechnicianModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        onUpdateTechnician={handleUpdateTechnician}
+        technician={selectedTechnician}
       />
     </div>
   );

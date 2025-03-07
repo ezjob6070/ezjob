@@ -5,13 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
-import { BarChartIcon, BriefcaseIcon, DollarSignIcon, PercentIcon, StarIcon } from "lucide-react";
+import { BarChartIcon, BriefcaseIcon, DollarSignIcon, EditIcon, PercentIcon, StarIcon } from "lucide-react";
 
 type TechnicianCardProps = {
   technician: Technician;
+  onEdit: (technician: Technician) => void;
 };
 
-const TechnicianCard = ({ technician }: TechnicianCardProps) => {
+const TechnicianCard = ({ technician, onEdit }: TechnicianCardProps) => {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -74,9 +75,19 @@ const TechnicianCard = ({ technician }: TechnicianCardProps) => {
           </div>
         </div>
 
-        <Button variant="outline" className="w-full mt-4">
-          View Details
-        </Button>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" className="w-full">
+            View Details
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="flex-shrink-0"
+            onClick={() => onEdit(technician)}
+          >
+            <EditIcon className="h-4 w-4" />
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
