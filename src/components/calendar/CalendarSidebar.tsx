@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { format, isSameDay } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -20,7 +19,6 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
 
-  // Update jobs for selected date when date changes
   useEffect(() => {
     const filtered = jobs.filter(job => 
       isSameDay(job.date, selectedDate)
@@ -28,13 +26,11 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
     setJobsForSelectedDate(filtered);
   }, [selectedDate, jobs]);
 
-  // Function to determine the color for each day based on job status
   const getDayColor = (day: Date) => {
     const dayJobs = jobs.filter(job => isSameDay(job.date, day));
     
     if (!dayJobs.length) return "";
     
-    // Priority: scheduled > in_progress > completed > cancelled
     if (dayJobs.some(job => job.status === "scheduled")) {
       return "bg-blue-100 text-blue-800";
     } else if (dayJobs.some(job => job.status === "in_progress")) {
@@ -102,7 +98,7 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
             components={{
               Day: (props: DayProps) => {
                 const date = props.date;
-                const isSelected = props.day.isSelected;
+                const isSelected = props.selected;
                 const isOutsideMonth = date.getMonth() !== props.displayMonth.getMonth();
                 const dayColor = getDayColor(date);
                 
