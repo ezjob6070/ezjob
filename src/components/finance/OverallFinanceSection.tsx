@@ -28,9 +28,9 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
 }) => {
   return (
     <div className="mb-8">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold">Overall Finance</h3>
-        <div className="flex-shrink-0">
+      <div className="flex flex-col items-center mb-6">
+        <h3 className="text-xl font-bold mb-3">Overall Finance</h3>
+        <div className="w-full max-w-md">
           <DateRangeSelector date={date} setDate={setDate} />
         </div>
       </div>
