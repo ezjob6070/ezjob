@@ -205,7 +205,7 @@ const TechnicianPaymentsSection: React.FC<TechnicianPaymentsSectionProps> = ({ t
             <CardContent className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-base font-bold mb-2">Filter by Technician</h3>
+                  <h3 className="text-lg font-bold mb-3">Filter by Technician</h3>
                   <div className="space-y-2">
                     <div className="relative mb-3">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -217,7 +217,7 @@ const TechnicianPaymentsSection: React.FC<TechnicianPaymentsSectionProps> = ({ t
                       />
                     </div>
                     
-                    <div className="flex items-center space-x-2 pb-1 border-b mb-2">
+                    <div className="flex items-center space-x-2 pb-2 border-b mb-2">
                       <Checkbox 
                         id="select-all-technicians" 
                         checked={allSelected}
@@ -234,7 +234,7 @@ const TechnicianPaymentsSection: React.FC<TechnicianPaymentsSectionProps> = ({ t
                     
                     <div className="max-h-40 overflow-y-auto">
                       {technicianNames.map((techName) => (
-                        <div key={techName} className="flex items-center space-x-2">
+                        <div key={techName} className="flex items-center space-x-2 py-1">
                           <Checkbox 
                             id={`tech-${techName}`} 
                             checked={selectedTechnicians.includes(techName)}
@@ -253,7 +253,7 @@ const TechnicianPaymentsSection: React.FC<TechnicianPaymentsSectionProps> = ({ t
                 </div>
                 
                 <div>
-                  <h3 className="text-base font-bold mb-2">Filter by Date Range</h3>
+                  <h3 className="text-lg font-bold mb-3">Filter by Date Range</h3>
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       <DropdownMenu>
