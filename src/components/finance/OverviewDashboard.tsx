@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DonutChart } from "@/components/DonutChart";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { JobSource, FinancialTransaction } from "@/types/finance";
+import { JobSource, FinancialTransaction, ProfitBreakdownItem } from "@/types/finance";
 import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
 import TransactionsSection from "@/components/finance/TransactionsSection";
 
@@ -29,6 +29,14 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   filteredTransactions,
   expenseCategories
 }) => {
+  // Generate the profit breakdown data
+  const profitBreakdown: ProfitBreakdownItem[] = [
+    { name: "Operating Costs", value: totalProfit * 0.3, color: "#3b82f6" }, // blue
+    { name: "Reinvestment", value: totalProfit * 0.25, color: "#10b981" },   // green
+    { name: "Owner Dividends", value: totalProfit * 0.30, color: "#f59e0b" }, // amber
+    { name: "Taxes", value: totalProfit * 0.15, color: "#ef4444" },          // red
+  ];
+
   return (
     <div className="space-y-8">
       <OverallFinanceSection 
@@ -37,10 +45,10 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         totalProfit={totalProfit} 
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Profit Breakdown</CardTitle>
+            <CardTitle>Revenue vs. Expense</CardTitle>
             <CardDescription>Distribution of revenue and costs</CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center">
@@ -51,6 +59,20 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               ]}
               title={formatCurrency(totalProfit)}
               subtitle="Company Profit"
+            />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Net Profit Breakdown</CardTitle>
+            <CardDescription>How profit is distributed</CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <DonutChart
+              data={profitBreakdown}
+              title={formatCurrency(totalProfit)}
+              subtitle="Net Profit"
             />
           </CardContent>
         </Card>

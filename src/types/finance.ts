@@ -39,3 +39,10 @@ export type JobSource = {
   companyProfit?: number;
   createdAt?: Date;
 };
+
+export type ProfitBreakdownItem = {
+  name: string;
+  value: number;
+  color: string;
+};
+
