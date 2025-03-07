@@ -39,9 +39,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
   // Revenue breakdown data
   const revenueBreakdown = [
-    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" }, // sky blue
-    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" }, // pink
-    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },  // indigo
+    { name: "Credit Card", value: totalRevenue * 0.45, color: "#0ea5e9" }, // sky blue
+    { name: "Cash", value: totalRevenue * 0.35, color: "#ec4899" }, // pink
+    { name: "Check", value: totalRevenue * 0.20, color: "#6366f1" },  // indigo
   ];
 
   return (
@@ -58,12 +58,36 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardTitle>Revenue Breakdown</CardTitle>
             <CardDescription>Source of revenue streams</CardDescription>
           </CardHeader>
-          <CardContent className="flex justify-center">
-            <DonutChart
-              data={revenueBreakdown}
-              title={formatCurrency(totalRevenue)}
-              subtitle="Total Revenue"
-            />
+          <CardContent>
+            <div className="flex justify-center">
+              <DonutChart
+                data={revenueBreakdown}
+                title={formatCurrency(totalRevenue)}
+                subtitle="Total Revenue"
+              />
+            </div>
+            
+            {/* Payment method breakdown list */}
+            <div className="mt-4 space-y-2">
+              <div className="flex flex-col space-y-1">
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  {revenueBreakdown.map((item) => (
+                    <div key={item.name} className="flex flex-col items-center">
+                      <div className="flex items-center mb-1">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {totalRevenue > 0 ? ((item.value / totalRevenue) * 100).toFixed(1) : "0"}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
         
@@ -72,12 +96,36 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardTitle>Expense Breakdown</CardTitle>
             <CardDescription>Distribution of expenses by type</CardDescription>
           </CardHeader>
-          <CardContent className="flex justify-center">
-            <DonutChart
-              data={expenseCategories}
-              title={formatCurrency(totalExpenses)}
-              subtitle="Total Expenses"
-            />
+          <CardContent>
+            <div className="flex justify-center">
+              <DonutChart
+                data={expenseCategories}
+                title={formatCurrency(totalExpenses)}
+                subtitle="Total Expenses"
+              />
+            </div>
+            
+            {/* Expense breakdown list */}
+            <div className="mt-4 space-y-2">
+              <div className="flex flex-col space-y-1">
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  {expenseCategories.map((item) => (
+                    <div key={item.name} className="flex flex-col items-center">
+                      <div className="flex items-center mb-1">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {totalExpenses > 0 ? ((item.value / totalExpenses) * 100).toFixed(1) : "0"}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
         
@@ -86,12 +134,36 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardTitle>Net Profit Breakdown</CardTitle>
             <CardDescription>How profit is distributed</CardDescription>
           </CardHeader>
-          <CardContent className="flex justify-center">
-            <DonutChart
-              data={profitBreakdown}
-              title={formatCurrency(totalProfit)}
-              subtitle="Net Profit"
-            />
+          <CardContent>
+            <div className="flex justify-center">
+              <DonutChart
+                data={profitBreakdown}
+                title={formatCurrency(totalProfit)}
+                subtitle="Net Profit"
+              />
+            </div>
+            
+            {/* Profit allocation breakdown list */}
+            <div className="mt-4 space-y-2">
+              <div className="flex flex-col space-y-1">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {profitBreakdown.map((item) => (
+                    <div key={item.name} className="flex flex-col items-center">
+                      <div className="flex items-center mb-1">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {totalProfit > 0 ? ((item.value / totalProfit) * 100).toFixed(1) : "0"}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
