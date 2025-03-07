@@ -1,5 +1,5 @@
 
-export type LeadStatus = "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "closed-won" | "closed-lost";
+export type LeadStatus = "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost";
 
 export type Lead = {
   id: string;
@@ -7,12 +7,10 @@ export type Lead = {
   company: string;
   email: string;
   phone: string;
-  source: string;
-  value: number;
   status: LeadStatus;
+  value: number;
+  source: string;
   notes: string;
-  assignedTo?: string;
   createdAt: Date;
-  lastContactedAt: Date | null;
-  nextFollowUp?: Date;
+  lastContact: Date;
 };
