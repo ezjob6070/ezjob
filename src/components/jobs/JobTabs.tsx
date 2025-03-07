@@ -1,22 +1,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import JobsTable from "./JobsTable";
-
-// Using a local job interface instead of importing from Jobs page
-type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
-
-interface Job {
-  id: string;
-  clientName: string;
-  title: string;
-  status: JobStatus;
-  date: Date;
-  technicianName?: string;
-  address: string;
-  amount: number;
-  description?: string;
-  notes?: string;
-}
+import { Job } from "./JobTypes";
 
 interface JobTabsProps {
   jobs: Job[];
