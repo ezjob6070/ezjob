@@ -3,6 +3,7 @@ export type EstimateStatus = "sent" | "in-process" | "completed";
 
 export type Estimate = {
   id: string;
+  jobTitle: string;
   clientName: string;
   clientEmail: string;
   clientPhone: string;

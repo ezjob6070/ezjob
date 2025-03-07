@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Estimate, EstimateStatus } from "@/types/estimate";
 import { format } from "date-fns";
-import { CheckCircleIcon, ClockIcon, MailIcon, PhoneIcon, SendIcon } from "lucide-react";
+import { CheckCircleIcon, ClockIcon, MailIcon, PhoneIcon, SendIcon, ImageIcon } from "lucide-react";
 
 interface EstimateCardProps {
   estimate: Estimate;
@@ -36,7 +36,10 @@ const EstimateCard = ({ estimate, onStatusChange }: EstimateCardProps) => {
     <Card>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold">{estimate.clientName}</CardTitle>
+          <div>
+            <CardTitle className="text-lg font-semibold">{estimate.jobTitle}</CardTitle>
+            <p className="text-sm text-muted-foreground">{estimate.clientName}</p>
+          </div>
           <div className="flex items-center gap-1 text-sm">
             {statusIcons[estimate.status]}
             <span>{statusText[estimate.status]}</span>
@@ -57,6 +60,29 @@ const EstimateCard = ({ estimate, onStatusChange }: EstimateCardProps) => {
             <div className="font-medium">Description</div>
             <p className="text-muted-foreground">{estimate.description}</p>
           </div>
+          {estimate.images.length > 0 && (
+            <div className="mt-2">
+              <div className="flex items-center gap-1 font-medium">
+                <ImageIcon className="h-4 w-4" />
+                <span>Images ({estimate.images.length})</span>
+              </div>
+              <div className="grid grid-cols-3 gap-1 mt-1">
+                {estimate.images.slice(0, 3).map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`Job image ${index + 1}`}
+                    className="w-full h-16 object-cover rounded"
+                  />
+                ))}
+                {estimate.images.length > 3 && (
+                  <div className="w-full h-16 bg-muted flex items-center justify-center rounded">
+                    <span className="text-xs">+{estimate.images.length - 3} more</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           <div className="mt-2">
             <div className="flex justify-between">
               <span>Price</span>
@@ -83,7 +109,7 @@ const EstimateCard = ({ estimate, onStatusChange }: EstimateCardProps) => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Estimate Details</DialogTitle>
+              <DialogTitle>{estimate.jobTitle}</DialogTitle>
               <DialogDescription>
                 View and update the estimate for {estimate.clientName}
               </DialogDescription>

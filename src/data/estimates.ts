@@ -4,6 +4,7 @@ import { Estimate } from "@/types/estimate";
 export const initialEstimates: Estimate[] = [
   {
     id: "est1",
+    jobTitle: "HVAC Installation",
     clientName: "John Doe",
     clientEmail: "john.doe@example.com",
     clientPhone: "(555) 123-4567",
@@ -18,6 +19,7 @@ export const initialEstimates: Estimate[] = [
   },
   {
     id: "est2",
+    jobTitle: "Electrical Rewiring",
     clientName: "Jane Smith",
     clientEmail: "jane.smith@example.com",
     clientPhone: "(555) 987-6543",
@@ -32,6 +34,7 @@ export const initialEstimates: Estimate[] = [
   },
   {
     id: "est3",
+    jobTitle: "Plumbing Repair",
     clientName: "Robert Johnson",
     clientEmail: "robert@example.com",
     clientPhone: "(555) 555-5555",

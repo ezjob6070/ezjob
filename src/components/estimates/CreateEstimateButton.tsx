@@ -5,7 +5,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Estimate } from "@/types/estimate";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, ImageIcon, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ interface CreateEstimateButtonProps {
 }
 
 const formSchema = z.object({
+  jobTitle: z.string().min(1, "Job title is required"),
   clientName: z.string().min(1, "Client name is required"),
   clientEmail: z.string().email("Invalid email address"),
   clientPhone: z.string().min(1, "Phone number is required"),
@@ -28,10 +29,12 @@ const formSchema = z.object({
 
 const CreateEstimateButton = ({ onEstimateCreate }: CreateEstimateButtonProps) => {
   const [open, setOpen] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      jobTitle: "",
       clientName: "",
       clientEmail: "",
       clientPhone: "",
@@ -42,11 +45,30 @@ const CreateEstimateButton = ({ onEstimateCreate }: CreateEstimateButtonProps) =
     },
   });
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setImages((prev) => [...prev, event.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const newEstimate: Estimate = {
       id: `est${Date.now()}`,
       ...values,
-      images: [], // No images initially
+      images: images,
       status: "in-process", // Start as in-process
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -55,6 +77,7 @@ const CreateEstimateButton = ({ onEstimateCreate }: CreateEstimateButtonProps) =
     onEstimateCreate(newEstimate);
     setOpen(false);
     form.reset();
+    setImages([]);
     
     toast({
       title: "Estimate created",
@@ -80,6 +103,20 @@ const CreateEstimateButton = ({ onEstimateCreate }: CreateEstimateButtonProps) =
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="jobTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="HVAC Installation" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -155,6 +192,52 @@ const CreateEstimateButton = ({ onEstimateCreate }: CreateEstimateButtonProps) =
                 </FormItem>
               )}
             />
+            
+            <div>
+              <FormLabel className="block mb-2">Job Images</FormLabel>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                    <div className="flex items-center gap-2 text-sm px-4 py-2 border border-input bg-background hover:bg-accent rounded-md">
+                      <ImageIcon className="h-4 w-4" />
+                      <span>Add Images</span>
+                    </div>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Attach photos of the job site
+                  </p>
+                </div>
+                
+                {images.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {images.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={image} 
+                          alt={`Job image ${index + 1}`} 
+                          className="h-24 w-full object-cover rounded-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
