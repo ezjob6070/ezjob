@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ const AddTechnicianModal = ({ open, onOpenChange, onAddTechnician }: AddTechnici
     email: "",
     phone: "",
     specialty: "",
+    address: "",
     paymentType: "percentage",
     paymentRate: "",
   });
@@ -84,6 +86,7 @@ const AddTechnicianModal = ({ open, onOpenChange, onAddTechnician }: AddTechnici
       email: "",
       phone: "",
       specialty: "",
+      address: "",
       paymentType: "percentage",
       paymentRate: "",
     });
@@ -132,6 +135,17 @@ const AddTechnicianModal = ({ open, onOpenChange, onAddTechnician }: AddTechnici
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="(555) 123-4567"
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="123 Main St, City, State, ZIP"
               />
             </div>
             

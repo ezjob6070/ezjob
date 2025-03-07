@@ -4,13 +4,14 @@ export type LeadStatus = "new" | "contacted" | "qualified" | "proposal" | "negot
 export type Lead = {
   id: string;
   name: string;
-  company: string;
+  company?: string;
   email: string;
   phone: string;
   status: LeadStatus;
-  value: number;
   source: string;
-  notes: string;
+  notes?: string;
+  value: number;
   createdAt: Date;
-  lastContact: Date;
+  assignedTo?: string;
+  nextFollowUp?: Date;
 };

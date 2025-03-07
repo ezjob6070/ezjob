@@ -1,5 +1,5 @@
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,9 @@ const TechnicianCard = ({ technician }: TechnicianCardProps) => {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12">
+              {technician.imageUrl ? (
+                <AvatarImage src={technician.imageUrl} alt={technician.name} />
+              ) : null}
               <AvatarFallback className="bg-blue-600 text-white">
                 {technician.initials}
               </AvatarFallback>

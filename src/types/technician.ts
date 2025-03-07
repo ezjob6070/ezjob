@@ -10,8 +10,13 @@ export type Technician = {
   status: "active" | "inactive";
   paymentType: TechnicianPaymentType;
   paymentRate: number;
+  startDate?: Date;
+  endDate?: Date;
   completedJobs: number;
   totalRevenue: number;
   rating: number;
+  address?: string;
+  imageUrl?: string;
   initials: string;
+  notes?: string;
 };
