@@ -10,6 +10,8 @@ export type FinancialTransaction = {
   technicianName?: string;
   technicianRate?: number;
   technicianRateIsPercentage?: boolean;
+  jobSourceId?: string;
+  jobSourceName?: string;
   category: "payment" | "expense" | "refund";
   status: "pending" | "completed" | "failed";
   notes?: string;

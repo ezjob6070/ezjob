@@ -64,7 +64,7 @@ const TransactionHistory = ({ transactions, formatCurrency }: TransactionHistory
                   <TableCell>{transaction.job}</TableCell>
                   <TableCell>{formatCurrency(transaction.amount)}</TableCell>
                   <TableCell>
-                    <Badge variant={transaction.status === "completed" ? "success" : "outline"}>
+                    <Badge variant={transaction.status === "completed" ? "default" : "outline"}>
                       {transaction.status === "completed" ? "Completed" : "Pending"}
                     </Badge>
                   </TableCell>
