@@ -41,6 +41,9 @@ const LeftCalendarSidebar = ({ isOpen }: LeftCalendarSidebarProps) => {
     setCurrentMonth(prev => addMonths(prev, 1));
   };
 
+  // Added console log to debug visibility
+  console.log("LeftCalendarSidebar isOpen:", isOpen);
+
   if (!isOpen) return null;
 
   return (

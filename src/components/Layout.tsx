@@ -36,6 +36,11 @@ const Layout = () => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  const toggleLeftCalendar = () => {
+    console.log("Toggling left calendar:", !isLeftCalendarOpen);
+    setIsLeftCalendarOpen(!isLeftCalendarOpen);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-blue-700">
       <Header
@@ -56,7 +61,7 @@ const Layout = () => {
             <div className="flex justify-between mb-4">
               <Button
                 variant="outline"
-                onClick={() => setIsLeftCalendarOpen(!isLeftCalendarOpen)}
+                onClick={toggleLeftCalendar}
                 className="gap-2"
               >
                 <CalendarIcon size={16} />
