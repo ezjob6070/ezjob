@@ -15,4 +15,5 @@ export interface Job {
   amount: number;
   description?: string;
   notes?: string;
+  createdAt?: Date;
 }

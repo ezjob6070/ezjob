@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { SearchIcon, ArrowUpDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { SearchIcon, ArrowUpDown, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,15 @@ import { FinancialTransaction, JobSource } from "@/types/finance";
 import { JobSource as JobSourceType } from "@/types/jobSource";
 import { DonutChart } from "@/components/DonutChart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import EntityFilter, { Entity } from "@/components/finance/EntityFilter";
+import { X } from "lucide-react";
 
 type JobSourceFinanceRecord = {
   jobSource: JobSourceType | { id: string; name: string };
@@ -28,46 +37,86 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
   const [searchTerm, setSearchTerm] = useState("");
   const [sortColumn, setSortColumn] = useState<keyof JobSourceFinanceRecord>("totalRevenue");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+  });
+  const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>(transactions);
 
-  // Calculate financial metrics for each job source
-  const jobSourceFinances: JobSourceFinanceRecord[] = jobSources.map(jobSource => {
-    // Filter transactions for this job source
-    const jobSourceTransactions = transactions.filter(
-      t => t.jobSourceId === jobSource.id && t.status === "completed"
-    );
+  // Convert job sources to Entity type for the filter component
+  const sourceEntities: Entity[] = jobSources.map(source => ({
+    id: source.id,
+    name: source.name,
+  }));
+
+  // Apply filters when selection or date range changes
+  useEffect(() => {
+    let filtered = [...transactions];
     
-    // Payment transactions
-    const paymentTransactions = jobSourceTransactions.filter(t => t.category === "payment");
-    
-    // Expense transactions
-    const expenseTransactions = jobSourceTransactions.filter(t => t.category === "expense");
-    
-    const totalJobs = paymentTransactions.length;
-    const totalRevenue = paymentTransactions.reduce((sum, t) => sum + t.amount, 0);
-    const expenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
-    
-    // Calculate job source cost - assuming 5% of revenue as default if not available
-    let sourceCost = 0;
-    if ('paymentType' in jobSource && 'paymentValue' in jobSource) {
-      sourceCost = jobSource.paymentType === "percentage" 
-        ? totalRevenue * (jobSource.paymentValue / 100)
-        : totalJobs * jobSource.paymentValue;
-    } else {
-      // Default calculation for basic job sources without payment structure
-      sourceCost = totalRevenue * 0.05;
+    // Filter by selected job sources
+    if (selectedSourceIds.length > 0) {
+      filtered = filtered.filter(transaction => 
+        transaction.jobSourceId && selectedSourceIds.includes(transaction.jobSourceId)
+      );
     }
     
-    const companyProfit = totalRevenue - sourceCost - expenses;
+    // Filter by date range
+    if (dateRange.from && dateRange.to) {
+      filtered = filtered.filter(transaction => {
+        const transactionDate = new Date(transaction.date);
+        return transactionDate >= dateRange.from! && 
+               transactionDate <= dateRange.to!;
+      });
+    }
     
-    return {
-      jobSource,
-      totalJobs,
-      totalRevenue,
-      sourceCost,
-      companyProfit,
-      expenses
-    };
-  });
+    setFilteredTransactions(filtered);
+  }, [selectedSourceIds, dateRange, transactions]);
+
+  // Calculate financial metrics for each job source
+  const jobSourceFinances: JobSourceFinanceRecord[] = jobSources
+    .filter(jobSource => selectedSourceIds.length === 0 || selectedSourceIds.includes(jobSource.id))
+    .map(jobSource => {
+      // Filter transactions for this job source
+      const jobSourceTransactions = filteredTransactions.filter(
+        t => t.jobSourceId === jobSource.id && t.status === "completed"
+      );
+      
+      // Payment transactions
+      const paymentTransactions = jobSourceTransactions.filter(t => t.category === "payment");
+      
+      // Expense transactions
+      const expenseTransactions = jobSourceTransactions.filter(t => t.category === "expense");
+      
+      const totalJobs = paymentTransactions.length;
+      const totalRevenue = paymentTransactions.reduce((sum, t) => sum + t.amount, 0);
+      const expenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
+      
+      // Calculate job source cost - assuming 5% of revenue as default if not available
+      let sourceCost = 0;
+      if ('paymentType' in jobSource && 'paymentValue' in jobSource) {
+        sourceCost = jobSource.paymentType === "percentage" 
+          ? totalRevenue * (jobSource.paymentValue / 100)
+          : totalJobs * jobSource.paymentValue;
+      } else {
+        // Default calculation for basic job sources without payment structure
+        sourceCost = totalRevenue * 0.05;
+      }
+      
+      const companyProfit = totalRevenue - sourceCost - expenses;
+      
+      return {
+        jobSource,
+        totalJobs,
+        totalRevenue,
+        sourceCost,
+        companyProfit,
+        expenses
+      };
+    });
 
   // Calculate totals for profit visualization
   const totalRevenue = jobSourceFinances.reduce((sum, source) => sum + source.totalRevenue, 0);
@@ -108,8 +157,68 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
     }
   };
 
+  const formatDateRange = () => {
+    if (dateRange.from && dateRange.to) {
+      return `${format(dateRange.from, "MMM d, yyyy")} - ${format(dateRange.to, "MMM d, yyyy")}`;
+    }
+    return "Select date range";
+  };
+
+  const handleClearFilters = () => {
+    setSelectedSourceIds([]);
+    setDateRange({ from: undefined, to: undefined });
+    setSearchTerm("");
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap gap-2 mb-4">
+        <div className="relative flex-1 min-w-[180px]">
+          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search job sources..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <EntityFilter
+          entities={sourceEntities}
+          selectedEntityIds={selectedSourceIds}
+          onSelectionChange={setSelectedSourceIds}
+          title="Select Job Sources"
+          buttonText="Job Sources"
+        />
+        
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              <span className="hidden md:inline">{formatDateRange()}</span>
+              <span className="md:hidden">Date Range</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <CalendarComponent
+              initialFocus
+              mode="range"
+              selected={dateRange as any}
+              onSelect={setDateRange as any}
+              numberOfMonths={2}
+              className="p-3 pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
+        
+        {(selectedSourceIds.length > 0 || dateRange.from || searchTerm) && (
+          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1">
+            <X className="h-4 w-4" />
+            Clear Filters
+          </Button>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
         {/* Profit Breakdown Chart */}
         <Card className="lg:col-span-1">
@@ -207,18 +316,6 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search job sources..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
       </div>
       
       <div className="rounded-md border overflow-hidden">

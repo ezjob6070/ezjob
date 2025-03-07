@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { SearchIcon, ArrowUpDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { SearchIcon, ArrowUpDown, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,14 @@ import { FinancialTransaction } from "@/types/finance";
 import { calculateTechnicianProfit } from "@/components/dashboard/DashboardUtils";
 import { DonutChart } from "@/components/DonutChart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import EntityFilter, { Entity } from "@/components/finance/EntityFilter";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
@@ -29,47 +37,91 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   const [searchTerm, setSearchTerm] = useState("");
   const [sortColumn, setSortColumn] = useState<keyof TechnicianFinanceRecord>("totalRevenue");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [selectedTechnicianIds, setSelectedTechnicianIds] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+  });
+  const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>(transactions);
+
+  // Convert technicians to Entity type for the filter component
+  const technicianEntities: Entity[] = technicians.map(tech => ({
+    id: tech.id,
+    name: tech.name,
+  }));
+
+  // Apply filters when selection or date range changes
+  useEffect(() => {
+    let filtered = [...transactions];
+    
+    // Filter by selected technicians
+    if (selectedTechnicianIds.length > 0) {
+      filtered = filtered.filter(transaction => 
+        transaction.technicianName && 
+        technicians.some(tech => 
+          tech.name === transaction.technicianName && 
+          selectedTechnicianIds.includes(tech.id)
+        )
+      );
+    }
+    
+    // Filter by date range
+    if (dateRange.from && dateRange.to) {
+      filtered = filtered.filter(transaction => {
+        const transactionDate = new Date(transaction.date);
+        return transactionDate >= dateRange.from! && 
+               transactionDate <= dateRange.to!;
+      });
+    }
+    
+    setFilteredTransactions(filtered);
+  }, [selectedTechnicianIds, dateRange, transactions, technicians]);
 
   // Calculate financial metrics for each technician
-  const technicianFinances: TechnicianFinanceRecord[] = technicians.map(technician => {
-    // Filter transactions for this technician
-    const technicianTransactions = transactions.filter(
-      t => t.technicianName === technician.name && t.status === "completed"
-    );
-    
-    // Payment transactions
-    const paymentTransactions = technicianTransactions.filter(t => t.category === "payment");
-    
-    // Expense transactions
-    const expenseTransactions = technicianTransactions.filter(t => t.category === "expense");
-    
-    const totalJobs = paymentTransactions.length;
-    const totalRevenue = paymentTransactions.reduce((sum, t) => sum + t.amount, 0);
-    const expenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
-    
-    // Calculate technician payment based on their payment structure
-    const technicianPayment = paymentTransactions.reduce((sum, t) => {
-      if (t.technicianRate !== undefined) {
-        return sum + calculateTechnicianProfit(
-          t.amount, 
-          t.technicianRate, 
-          !!t.technicianRateIsPercentage
-        );
-      }
-      return sum;
-    }, 0);
-    
-    const companyProfit = totalRevenue - technicianPayment - expenses;
-    
-    return {
-      technician,
-      totalJobs,
-      totalRevenue,
-      technicianPayment,
-      companyProfit,
-      expenses
-    };
-  });
+  const technicianFinances: TechnicianFinanceRecord[] = technicians
+    .filter(technician => selectedTechnicianIds.length === 0 || selectedTechnicianIds.includes(technician.id))
+    .map(technician => {
+      // Filter transactions for this technician
+      const technicianTransactions = filteredTransactions.filter(
+        t => t.technicianName === technician.name && t.status === "completed"
+      );
+      
+      // Payment transactions
+      const paymentTransactions = technicianTransactions.filter(t => t.category === "payment");
+      
+      // Expense transactions
+      const expenseTransactions = technicianTransactions.filter(t => t.category === "expense");
+      
+      const totalJobs = paymentTransactions.length;
+      const totalRevenue = paymentTransactions.reduce((sum, t) => sum + t.amount, 0);
+      const expenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
+      
+      // Calculate technician payment based on their payment structure
+      const technicianPayment = paymentTransactions.reduce((sum, t) => {
+        if (t.technicianRate !== undefined) {
+          return sum + calculateTechnicianProfit(
+            t.amount, 
+            t.technicianRate, 
+            !!t.technicianRateIsPercentage
+          );
+        }
+        return sum;
+      }, 0);
+      
+      const companyProfit = totalRevenue - technicianPayment - expenses;
+      
+      return {
+        technician,
+        totalJobs,
+        totalRevenue,
+        technicianPayment,
+        companyProfit,
+        expenses
+      };
+    });
 
   // Calculate totals for profit visualization
   const totalRevenue = technicianFinances.reduce((sum, record) => sum + record.totalRevenue, 0);
@@ -110,8 +162,68 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     }
   };
 
+  const formatDateRange = () => {
+    if (dateRange.from && dateRange.to) {
+      return `${format(dateRange.from, "MMM d, yyyy")} - ${format(dateRange.to, "MMM d, yyyy")}`;
+    }
+    return "Select date range";
+  };
+
+  const handleClearFilters = () => {
+    setSelectedTechnicianIds([]);
+    setDateRange({ from: undefined, to: undefined });
+    setSearchTerm("");
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap gap-2 mb-4">
+        <div className="relative flex-1 min-w-[180px]">
+          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search technicians..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <EntityFilter
+          entities={technicianEntities}
+          selectedEntityIds={selectedTechnicianIds}
+          onSelectionChange={setSelectedTechnicianIds}
+          title="Select Technicians"
+          buttonText="Technicians"
+        />
+        
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              <span className="hidden md:inline">{formatDateRange()}</span>
+              <span className="md:hidden">Date Range</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <CalendarComponent
+              initialFocus
+              mode="range"
+              selected={dateRange as any}
+              onSelect={setDateRange as any}
+              numberOfMonths={2}
+              className="p-3 pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
+        
+        {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm) && (
+          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1">
+            <X className="h-4 w-4" />
+            Clear Filters
+          </Button>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
         {/* Profit Breakdown Chart */}
         <Card className="lg:col-span-1">
@@ -209,18 +321,6 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search technicians..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
       </div>
       
       <div className="rounded-md border overflow-hidden">
