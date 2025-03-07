@@ -1,37 +1,15 @@
 
 import { useState, useEffect } from "react";
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DateRange } from "react-day-picker";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 import { FinancialTransaction, JobSource } from "@/types/finance";
 import { sampleTransactions, generateFinancialReport, getDateRangeForTimeFrame } from "@/data/finances";
-import JobSourceFinance from "@/components/finance/JobSourceFinance";
-import TransactionHistory from "@/components/payments/TransactionHistory";
-import PaymentForm from "@/components/payments/PaymentForm";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { initialTechnicians } from "@/data/technicians";
-import DashboardMetricCard from "@/components/DashboardMetricCard";
+import DateRangeSelector from "@/components/finance/DateRangeSelector";
+import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
+import JobSourceFinanceSection from "@/components/finance/JobSourceFinanceSection";
+import TechnicianFinanceSection from "@/components/finance/TechnicianFinanceSection";
+import TransactionsSection from "@/components/finance/TransactionsSection";
 
 const Finance = () => {
   const [date, setDate] = useState<DateRange | undefined>({
@@ -120,157 +98,31 @@ const Finance = () => {
             Track your company finances and generate reports.
           </p>
         </div>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={
-                "w-[300px] justify-start text-left font-normal" +
-                (date?.from ? "pl-3.5" : "")
-              }
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date?.from ? (
-                date.to ? (
-                  <>
-                    {format(date.from, "LLL dd, y")} -{" "}
-                    {format(date.to, "LLL dd, y")}
-                  </>
-                ) : (
-                  format(date.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Pick a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
-            <Calendar
-              mode="range"
-              defaultMonth={date?.from}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={2}
-            />
-          </PopoverContent>
-        </Popover>
+        <DateRangeSelector date={date} setDate={setDate} />
       </div>
 
       {/* Overall Finance Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-bold mb-4">Overall Finance</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Revenue</CardTitle>
-              <CardDescription>Revenue from all sources</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Expenses</CardTitle>
-              <CardDescription>Expenses across all categories</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Net Profit</CardTitle>
-              <CardDescription>Revenue after expenses</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(totalProfit)}</div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <OverallFinanceSection 
+        totalRevenue={totalRevenue} 
+        totalExpenses={totalExpenses} 
+        totalProfit={totalProfit} 
+      />
 
       {/* Job Source Finance Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-bold mb-4">Job Source Finance</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
-          <JobSourceFinance jobSources={jobSources} transactions={filteredTransactions} />
-        </div>
-      </div>
+      <JobSourceFinanceSection 
+        jobSources={jobSources} 
+        filteredTransactions={filteredTransactions} 
+      />
 
       {/* Technician Finance Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-bold mb-4">Technician Finance</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Technician</TableHead>
-                      <TableHead>Specialty</TableHead>
-                      <TableHead>Completed Jobs</TableHead>
-                      <TableHead>Total Revenue</TableHead>
-                      <TableHead>Payment Type</TableHead>
-                      <TableHead>Earnings</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {activeTechnicians.map((tech) => (
-                      <TableRow key={tech.id}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">
-                              {tech.initials}
-                            </div>
-                            <span>{tech.name}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{tech.specialty}</TableCell>
-                        <TableCell>{tech.completedJobs}</TableCell>
-                        <TableCell>{formatCurrency(tech.totalRevenue)}</TableCell>
-                        <TableCell>{tech.paymentType === "percentage" ? `${tech.paymentRate}%` : "Flat"}</TableCell>
-                        <TableCell>
-                          {formatCurrency(tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1))}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <TechnicianFinanceSection 
+        activeTechnicians={activeTechnicians} 
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div>
-          <h3 className="text-xl font-bold mb-4">Recent Transactions</h3>
-          <TransactionHistory 
-            transactions={filteredTransactions.slice(0, 5).map(t => ({
-              id: t.id,
-              date: t.date,
-              amount: t.amount,
-              client: t.clientName,
-              job: t.jobTitle,
-              status: t.status
-            }))} 
-            formatCurrency={formatCurrency} 
-          />
-        </div>
-        
-        <div>
-          <h3 className="text-xl font-bold mb-4">Process Payment</h3>
-          <Card>
-            <CardContent className="p-6">
-              <PaymentForm />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Transactions Section */}
+      <TransactionsSection 
+        filteredTransactions={filteredTransactions} 
+      />
     </div>
   );
 };
