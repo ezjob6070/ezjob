@@ -15,6 +15,8 @@ interface TechnicianFiltersPanelProps {
   applyFilters: () => void;
   date: DateRange | undefined;
   setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  selectAllTechnicians?: () => void;
+  deselectAllTechnicians?: () => void;
 }
 
 const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
@@ -25,9 +27,22 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
   clearFilters,
   applyFilters,
   date,
-  setDate
+  setDate,
+  selectAllTechnicians,
+  deselectAllTechnicians
 }) => {
   if (!showFilters) return null;
+  
+  const allSelected = technicianNames.length > 0 && selectedTechnicians.length === technicianNames.length;
+  const someSelected = selectedTechnicians.length > 0 && selectedTechnicians.length < technicianNames.length;
+  
+  const handleSelectAllChange = () => {
+    if (allSelected) {
+      deselectAllTechnicians?.();
+    } else {
+      selectAllTechnicians?.();
+    }
+  };
   
   return (
     <Card className="mb-4">
@@ -35,22 +50,40 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-sm font-medium mb-2">Filter by Technician</h3>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {technicianNames.map((techName) => (
-                <div key={techName} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={`tech-${techName}`} 
-                    checked={selectedTechnicians.includes(techName)}
-                    onCheckedChange={() => toggleTechnician(techName)}
-                  />
-                  <label 
-                    htmlFor={`tech-${techName}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {techName}
-                  </label>
-                </div>
-              ))}
+            <div className="space-y-2">
+              {/* Select All Checkbox */}
+              <div className="flex items-center space-x-2 pb-1 border-b mb-2">
+                <Checkbox 
+                  id="select-all-technicians" 
+                  checked={allSelected}
+                  indeterminate={someSelected && !allSelected}
+                  onCheckedChange={handleSelectAllChange}
+                />
+                <label 
+                  htmlFor="select-all-technicians"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Select All Technicians
+                </label>
+              </div>
+              
+              <div className="max-h-40 overflow-y-auto">
+                {technicianNames.map((techName) => (
+                  <div key={techName} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`tech-${techName}`} 
+                      checked={selectedTechnicians.includes(techName)}
+                      onCheckedChange={() => toggleTechnician(techName)}
+                    />
+                    <label 
+                      htmlFor={`tech-${techName}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {techName}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           

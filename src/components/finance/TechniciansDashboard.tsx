@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -94,6 +95,14 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     );
   };
 
+  const selectAllTechnicians = () => {
+    setSelectedTechnicians([...technicianNames]);
+  };
+
+  const deselectAllTechnicians = () => {
+    setSelectedTechnicians([]);
+  };
+
   const clearFilters = () => {
     setSelectedTechnicians([]);
     setDate({
@@ -138,6 +147,8 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         applyFilters={applyFilters}
         date={date}
         setDate={setDate}
+        selectAllTechnicians={selectAllTechnicians}
+        deselectAllTechnicians={deselectAllTechnicians}
       />
       
       <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
