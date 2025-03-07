@@ -12,7 +12,7 @@ import {
   WalletIcon,
   DollarSignIcon,
   BarChartIcon,
-  ToolIcon
+  WrenchIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +58,7 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
     },
     {
       label: "Technicians",
-      icon: <ToolIcon size={20} />,
+      icon: <WrenchIcon size={20} />,
       href: "/technicians",
     },
     {
