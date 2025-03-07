@@ -1,92 +1,93 @@
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { Pencil } from "lucide-react";
 import { Technician } from "@/types/technician";
-import { BarChartIcon, BriefcaseIcon, DollarSignIcon, EditIcon, PercentIcon, StarIcon } from "lucide-react";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 
-type TechnicianCardProps = {
+interface TechnicianCardProps {
   technician: Technician;
   onEdit: (technician: Technician) => void;
-};
+}
 
 const TechnicianCard = ({ technician, onEdit }: TechnicianCardProps) => {
+  const {
+    name,
+    email,
+    phone,
+    specialty,
+    status,
+    paymentType,
+    paymentRate,
+    completedJobs,
+    totalRevenue,
+    rating,
+    initials,
+  } = technician;
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
-              {technician.imageUrl ? (
-                <AvatarImage src={technician.imageUrl} alt={technician.name} />
-              ) : null}
-              <AvatarFallback className="bg-blue-600 text-white">
-                {technician.initials}
-              </AvatarFallback>
-            </Avatar>
+    <Card className="h-full">
+      <CardContent className="p-6 h-full flex flex-col">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground mr-3">
+              {initials}
+            </div>
             <div>
-              <p className="font-medium">{technician.name}</p>
-              <p className="text-sm text-muted-foreground">{technician.specialty}</p>
+              <h3 className="font-medium">{name}</h3>
+              <Badge variant={status === "active" ? "outline" : "destructive"}>
+                {status === "active" ? "Active" : "Inactive"}
+              </Badge>
             </div>
           </div>
-          <Badge variant={technician.status === "active" ? "success" : "outline"}>
-            {technician.status}
-          </Badge>
-        </div>
-
-        <div className="mt-5 pt-4 border-t grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-2">
-            <BriefcaseIcon className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Jobs</p>
-              <p className="font-medium">{technician.completedJobs}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <BarChartIcon className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Revenue</p>
-              <p className="font-medium">{formatCurrency(technician.totalRevenue)}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <StarIcon className="h-4 w-4 text-amber-500" />
-            <div>
-              <p className="text-xs text-muted-foreground">Rating</p>
-              <p className="font-medium">{technician.rating.toFixed(1)}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {technician.paymentType === "percentage" ? (
-              <PercentIcon className="h-4 w-4 text-blue-600" />
-            ) : (
-              <DollarSignIcon className="h-4 w-4 text-green-600" />
-            )}
-            <div>
-              <p className="text-xs text-muted-foreground">Rate</p>
-              <p className="font-medium">
-                {technician.paymentType === "percentage" 
-                  ? `${technician.paymentRate}%` 
-                  : `$${technician.paymentRate}`}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-2 mt-4">
-          <Button variant="outline" className="w-full">
-            View Details
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="flex-shrink-0"
+          <Button
+            size="icon"
+            variant="ghost"
             onClick={() => onEdit(technician)}
+            className="h-8 w-8"
           >
-            <EditIcon className="h-4 w-4" />
+            <Pencil className="h-4 w-4" />
           </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 text-sm">
+          <div>
+            <p className="text-muted-foreground">Email</p>
+            <p className="truncate">{email}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Phone</p>
+            <p>{phone}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Specialty</p>
+            <p>{specialty}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Payment</p>
+            <p>
+              {paymentType === "percentage"
+                ? `${paymentRate}% of job`
+                : `${formatCurrency(paymentRate)} flat`}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-auto grid grid-cols-3 gap-2 pt-4 border-t">
+          <div className="text-center">
+            <p className="text-muted-foreground text-xs">Jobs</p>
+            <p className="font-medium">{completedJobs}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-muted-foreground text-xs">Revenue</p>
+            <p className="font-medium">{formatCurrency(totalRevenue)}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-muted-foreground text-xs">Rating</p>
+            <p className="font-medium">{rating}/5</p>
+          </div>
         </div>
       </CardContent>
     </Card>

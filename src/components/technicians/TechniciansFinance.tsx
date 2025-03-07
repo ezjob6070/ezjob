@@ -8,6 +8,8 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { FinancialTransaction } from "@/types/finance";
 import { calculateTechnicianProfit } from "@/components/dashboard/DashboardUtils";
+import { DonutChart } from "@/components/DonutChart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
@@ -60,6 +62,11 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     };
   });
 
+  // Calculate totals for profit visualization
+  const totalRevenue = technicianFinances.reduce((sum, record) => sum + record.totalRevenue, 0);
+  const totalTechnicianPayment = technicianFinances.reduce((sum, record) => sum + record.technicianPayment, 0);
+  const totalCompanyProfit = technicianFinances.reduce((sum, record) => sum + record.companyProfit, 0);
+
   // Filter by search term
   const filteredRecords = technicianFinances.filter(record => 
     record.technician.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -94,7 +101,67 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Add visualization section */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Profit Breakdown</CardTitle>
+            <CardDescription>
+              Distribution of revenue and technician payments
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center items-center pt-4">
+            <DonutChart
+              data={[
+                {
+                  name: "Company Profit",
+                  value: totalCompanyProfit,
+                  color: "#8B5CF6"
+                },
+                {
+                  name: "Technician Payments",
+                  value: totalTechnicianPayment,
+                  color: "#F97316"
+                }
+              ]}
+              title={formatCurrency(totalCompanyProfit)}
+              subtitle="Company Profit"
+              size={220}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Top Technicians</CardTitle>
+            <CardDescription>
+              Best performing technicians by revenue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {sortedRecords.slice(0, 5).map((record) => (
+                <div key={record.technician.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                    <span className="font-medium">{record.technician.name}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-muted-foreground">
+                      {record.totalJobs} jobs
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(record.totalRevenue)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="flex gap-2">
         <div className="relative flex-1">
           <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />

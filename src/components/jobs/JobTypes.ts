@@ -1,16 +1,15 @@
 
-export type JobStatus = "scheduled" | "in-progress" | "completed" | "cancelled";
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
 
-export type Job = {
+export interface Job {
   id: string;
-  title: string;
   clientName: string;
-  clientId: string;
-  technicianName: string;
-  technicianId: string;
-  scheduledDate: Date;
+  title: string;
   status: JobStatus;
+  date: Date;
+  technicianName?: string;
+  address: string;
   amount: number;
-  description: string;
-  createdAt: Date;
-};
+  description?: string;
+  notes?: string;
+}

@@ -1,227 +1,189 @@
-import React from 'react';
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar, DollarSign, FileText, Mail, Phone, User } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Search, X, CheckCircle, Clock, AlertTriangle, Ban } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type DashboardDetailDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description?: string;
-  children?: React.ReactNode;
-  data?: any[];
-  type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics';
+  type: "tasks" | "leads" | "clients" | "revenue" | "metrics";
+  data: any[];
 };
 
 const DashboardDetailDialog = ({
   open,
   onOpenChange,
   title,
-  description,
-  children,
-  data = [],
-  type
+  type,
+  data,
 }: DashboardDetailDialogProps) => {
-  const renderContent = () => {
-    switch (type) {
-      case 'tasks':
-        return (
-          <ScrollArea className="h-[400px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Priority</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((task, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{task.title}</TableCell>
-                    <TableCell>{task.client}</TableCell>
-                    <TableCell>{task.dueDate}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        task.status === 'Completed' ? 'success' : 
-                        task.status === 'In Progress' ? 'default' : 
-                        task.status === 'Pending' ? 'secondary' : 
-                        'destructive'
-                      }>
-                        {task.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        task.priority === 'High' ? 'destructive' : 
-                        task.priority === 'Medium' ? 'default' : 
-                        'secondary'
-                      }>
-                        {task.priority}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+
+  // Filter data by search term
+  const filteredData = data.filter((item) => {
+    if (searchTerm === "") return true;
+    const searchFields = type === "tasks" 
+      ? [item.title, item.client]
+      : type === "leads" 
+      ? [item.name, item.source, item.status]
+      : type === "clients" 
+      ? [item.name, item.location, item.type]
+      : Object.values(item);
+    
+    return searchFields.some(field => 
+      field && field.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  // Render different content based on type
+  const renderRow = (item: any, index: number) => {
+    if (type === "tasks") {
+      const statusVariant = 
+        item.status === "completed" ? "outline" :
+        item.status === "in_progress" ? "default" :
+        item.status === "to_do" ? "secondary" :
+        "destructive";
       
-      case 'leads':
-        return (
-          <ScrollArea className="h-[400px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((lead, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{lead.name}</TableCell>
-                    <TableCell>{lead.company}</TableCell>
-                    <TableCell>{lead.email}</TableCell>
-                    <TableCell>${lead.value}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        lead.status === 'Qualified' ? 'success' : 
-                        lead.status === 'New' ? 'default' : 
-                        lead.status === 'Contacting' ? 'secondary' : 
-                        'outline'
-                      }>
-                        {lead.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        );
-      
-      case 'revenue':
-        return (
-          <ScrollArea className="h-[400px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((invoice, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{invoice.number}</TableCell>
-                    <TableCell>{invoice.client}</TableCell>
-                    <TableCell>{invoice.date}</TableCell>
-                    <TableCell>${invoice.amount}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        invoice.status === 'Paid' ? 'success' : 
-                        invoice.status === 'Pending' ? 'warning' : 
-                        'destructive'
-                      }>
-                        {invoice.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        );
-      
-      case 'clients':
-        return (
-          <ScrollArea className="h-[400px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Projects</TableHead>
-                  <TableHead>Total Value</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((client, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{client.name}</TableCell>
-                    <TableCell>{client.email}</TableCell>
-                    <TableCell>{client.projects}</TableCell>
-                    <TableCell>${client.totalValue}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        client.status === 'Active' ? 'success' : 
-                        client.status === 'Inactive' ? 'secondary' : 
-                        'outline'
-                      }>
-                        {client.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        );
-      
-      case 'metrics':
-        return (
-          <div className="grid grid-cols-2 gap-4">
-            {data.map((metric, index) => (
-              <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-sm text-muted-foreground">{metric.label}</h3>
-                <div className="text-2xl font-bold mt-1">{metric.value}</div>
-                {metric.change && (
-                  <div className={cn(
-                    "text-xs font-medium mt-1",
-                    metric.change > 0 ? "text-green-500" : "text-red-500"
-                  )}>
-                    {metric.change > 0 ? "↑" : "↓"} {Math.abs(metric.change)}%
-                  </div>
-                )}
-              </div>
-            ))}
+      return (
+        <div key={index} className="py-3 border-b last:border-b-0">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-medium">{item.title}</h3>
+            <Badge variant={statusVariant}>
+              {item.status.replace("_", " ")}
+            </Badge>
           </div>
-        );
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <div>Client: {item.client}</div>
+            <div>Due: {item.due}</div>
+          </div>
+        </div>
+      );
+    } else if (type === "leads") {
+      const statusVariant = 
+        item.status === "converted" ? "outline" :
+        item.status === "active" ? "secondary" :
+        "destructive";
       
-      default:
-        return children;
+      return (
+        <div key={index} className="py-3 border-b last:border-b-0">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-medium">{item.name}</h3>
+            <Badge variant={statusVariant}>
+              {item.status}
+            </Badge>
+          </div>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <div>Source: {item.source}</div>
+            <div>Value: ${item.value}</div>
+          </div>
+        </div>
+      );
+    } else if (type === "clients") {
+      const statusIcon = 
+        item.status === "active" ? <CheckCircle className="h-4 w-4 text-green-500" /> :
+        item.status === "pending" ? <Clock className="h-4 w-4 text-amber-500" /> :
+        <Ban className="h-4 w-4 text-red-500" />;
+      
+      const statusVariant = 
+        item.status === "active" ? "outline" :
+        item.status === "pending" ? "secondary" :
+        "destructive";
+      
+      return (
+        <div key={index} className="py-3 border-b last:border-b-0">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-medium">{item.name}</h3>
+            <Badge variant={statusVariant} className="flex items-center gap-1">
+              {statusIcon}
+              {item.status}
+            </Badge>
+          </div>
+          <div className="grid grid-cols-2 gap-x-2 text-sm text-muted-foreground">
+            <div>Jobs: {item.jobs}</div>
+            <div>Revenue: ${item.revenue}</div>
+            <div>Location: {item.location}</div>
+            <div>Type: {item.type}</div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div key={index} className="py-3 border-b last:border-b-0">
+          {Object.entries(item).map(([key, value]) => (
+            <div key={key} className="mb-1">
+              <span className="font-medium mr-2">{key}:</span>
+              <span>{String(value)}</span>
+            </div>
+          ))}
+        </div>
+      );
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         
-        {renderContent()}
+        <div className="flex items-center gap-2 my-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full"
+                onClick={() => setSearchTerm("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {type === "tasks" && (
+          <Tabs onValueChange={setActiveTab} value={activeTab} className="w-full">
+            <TabsList className="grid grid-cols-4 mb-4">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="to_do">To Do</TabsTrigger>
+              <TabsTrigger value="in_progress">In Progress</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+        
+        <ScrollArea className="flex-1 -mx-6 px-6">
+          <div className="divide-y">
+            {filteredData.length > 0 ? (
+              filteredData.map((item, index) => renderRow(item, index))
+            ) : (
+              <div className="py-8 text-center text-muted-foreground">
+                No data found
+              </div>
+            )}
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
