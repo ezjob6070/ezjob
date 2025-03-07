@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -10,6 +9,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar, DollarSign, FileText, Mail, Phone, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type DashboardDetailDialogProps = {
   open: boolean;
