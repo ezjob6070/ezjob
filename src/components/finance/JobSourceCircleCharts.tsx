@@ -6,7 +6,6 @@ import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { JobSource } from "@/types/finance";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DonutChart } from "@/components/DonutChart";
 
 interface JobSourceCircleChartsProps {
   filteredJobSources: JobSource[];
@@ -25,29 +24,6 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
   
   // Calculate net profit
   const companyProfit = filteredJobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
-  const companyProfitPercentage = totalRevenue > 0 ? ((companyProfit / totalRevenue) * 100).toFixed(1) : "0.0";
-  
-  // Revenue breakdown data
-  const revenueBreakdown = [
-    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" }, // sky blue
-    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" }, // pink
-    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },  // indigo
-  ];
-
-  // Job source expense breakdown
-  const jobSourceExpenseBreakdown = [
-    { name: "Operating Expenses", value: totalExpenses, color: "#f87171" },    // red
-    { name: "Marketing Costs", value: totalRevenue * 0.15, color: "#22c55e" },    // green
-    { name: "Company Profit", value: companyProfit, color: "#3b82f6" },       // blue
-  ];
-
-  // Net profit breakdown data
-  const profitBreakdown = [
-    { name: "Operating Costs", value: companyProfit * 0.3, color: "#3b82f6" }, // blue
-    { name: "Reinvestment", value: companyProfit * 0.25, color: "#10b981" },   // green
-    { name: "Owner Dividends", value: companyProfit * 0.30, color: "#f59e0b" }, // amber
-    { name: "Taxes", value: companyProfit * 0.15, color: "#ef4444" },          // red
-  ];
   
   // Filter job sources based on search query
   const searchFilteredJobSources = filteredJobSources.filter(source => 
@@ -57,116 +33,35 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
   
   return (
     <div className="space-y-6">
-      {/* Payment Breakdown Circles */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Revenue Breakdown Card */}
+      {/* Payment Breakdown Simple Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Total Income Breakdown</CardTitle>
-            <CardDescription>Source of income streams</CardDescription>
+          <CardHeader>
+            <CardTitle>Total Income</CardTitle>
+            <CardDescription>Revenue from all sources</CardDescription>
           </CardHeader>
           <CardContent>
-            <DonutChart
-              data={revenueBreakdown}
-              title={formatCurrency(totalRevenue)}
-              subtitle="Total Income"
-            />
-            
-            {/* Payment method breakdown list */}
-            <div className="mt-4 space-y-2">
-              <div className="flex flex-col space-y-1">
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  {revenueBreakdown.map((item) => (
-                    <div key={item.name} className="flex flex-col items-center">
-                      <div className="flex items-center mb-1">
-                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
-                      </div>
-                      <div className="text-center">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {totalRevenue > 0 ? ((item.value / totalRevenue) * 100).toFixed(1) : "0"}%
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
           </CardContent>
         </Card>
 
-        {/* Expense Distribution Card */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle>Total Expenses</CardTitle>
-            <CardDescription>Distribution of costs and profit</CardDescription>
+            <CardDescription>Costs and operating expenses</CardDescription>
           </CardHeader>
           <CardContent>
-            <DonutChart
-              data={jobSourceExpenseBreakdown}
-              title={formatCurrency(companyProfit)}
-              subtitle="Company Profit"
-            />
-            
-            {/* Expense breakdown list */}
-            <div className="mt-4 space-y-2">
-              <div className="flex flex-col space-y-1">
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  {jobSourceExpenseBreakdown.map((item) => (
-                    <div key={item.name} className="flex flex-col items-center">
-                      <div className="flex items-center mb-1">
-                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
-                      </div>
-                      <div className="text-center">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {totalExpenses + companyProfit > 0 ? ((item.value / (totalExpenses + companyProfit)) * 100).toFixed(1) : "0"}%
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
           </CardContent>
         </Card>
 
-        {/* Net Profit Breakdown Card */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle>Net Company Profit</CardTitle>
-            <CardDescription>How profit is distributed</CardDescription>
+            <CardDescription>Revenue after all expenses</CardDescription>
           </CardHeader>
           <CardContent>
-            <DonutChart
-              data={profitBreakdown}
-              title={formatCurrency(companyProfit)}
-              subtitle="Net Company Profit"
-            />
-            
-            {/* Profit allocation breakdown list */}
-            <div className="mt-4 space-y-2">
-              <div className="flex flex-col space-y-1">
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {profitBreakdown.map((item) => (
-                    <div key={item.name} className="flex flex-col items-center">
-                      <div className="flex items-center mb-1">
-                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
-                      </div>
-                      <div className="text-center">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {companyProfit > 0 ? ((item.value / companyProfit) * 100).toFixed(1) : "0"}%
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(companyProfit)}</div>
           </CardContent>
         </Card>
       </div>
