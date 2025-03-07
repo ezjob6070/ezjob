@@ -17,3 +17,16 @@ export interface Job {
   notes?: string;
   createdAt?: Date;
 }
+
+// Utility types for job filtering
+export type JobsByDate = {
+  [date: string]: Job[];
+};
+
+export type FilteredJobs = {
+  scheduled: Job[];
+  in_progress: Job[];
+  completed: Job[];
+  cancelled: Job[];
+  all: Job[];
+};
