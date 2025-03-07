@@ -1,0 +1,47 @@
+
+import { Estimate } from "@/types/estimate";
+
+export const initialEstimates: Estimate[] = [
+  {
+    id: "est1",
+    clientName: "John Doe",
+    clientEmail: "john.doe@example.com",
+    clientPhone: "(555) 123-4567",
+    clientAddress: "123 Main St, Anytown, USA",
+    description: "HVAC installation for master bedroom",
+    images: [],
+    price: 2500,
+    tax: 8.25,
+    status: "sent",
+    createdAt: new Date(2023, 5, 15),
+    updatedAt: new Date(2023, 5, 15),
+  },
+  {
+    id: "est2",
+    clientName: "Jane Smith",
+    clientEmail: "jane.smith@example.com",
+    clientPhone: "(555) 987-6543",
+    clientAddress: "456 Oak Ave, Somewhere, USA",
+    description: "Electrical rewiring for home office",
+    images: [],
+    price: 1800,
+    tax: 8.25,
+    status: "in-process",
+    createdAt: new Date(2023, 5, 20),
+    updatedAt: new Date(2023, 5, 22),
+  },
+  {
+    id: "est3",
+    clientName: "Robert Johnson",
+    clientEmail: "robert@example.com",
+    clientPhone: "(555) 555-5555",
+    clientAddress: "789 Pine St, Elsewhere, USA",
+    description: "Plumbing repair for kitchen sink",
+    images: [],
+    price: 750,
+    tax: 8.25,
+    status: "completed",
+    createdAt: new Date(2023, 5, 10),
+    updatedAt: new Date(2023, 5, 18),
+  },
+];

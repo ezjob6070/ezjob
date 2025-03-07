@@ -6,7 +6,11 @@ import {
   ClipboardListIcon, 
   SettingsIcon, 
   LogOutIcon,
-  UserPlusIcon
+  UserPlusIcon,
+  FileTextIcon,
+  SendIcon,
+  ClockIcon,
+  CheckCircleIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -44,6 +48,11 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       label: "Tasks",
       icon: <ClipboardListIcon size={20} />,
       href: "/tasks",
+    },
+    {
+      label: "Estimates",
+      icon: <FileTextIcon size={20} />,
+      href: "/estimates",
     },
     {
       label: "Settings",
