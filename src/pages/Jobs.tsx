@@ -1,31 +1,12 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusIcon, CalendarIcon, ClipboardListIcon, UsersIcon, FileTextIcon, AlertTriangleIcon } from "lucide-react";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import JobsTable from "@/components/jobs/JobsTable";
+import JobHeader from "@/components/jobs/JobHeader";
+import JobStats from "@/components/jobs/JobStats";
+import JobTabs from "@/components/jobs/JobTabs";
 import CreateJobModal from "@/components/jobs/CreateJobModal";
 import { initialTechnicians } from "@/data/technicians";
-
-// Job types
-export type JobStatus = "scheduled" | "in-progress" | "completed" | "cancelled";
-
-export type Job = {
-  id: string;
-  title: string;
-  clientName: string;
-  clientId: string;
-  technicianName: string;
-  technicianId: string;
-  scheduledDate: Date;
-  status: JobStatus;
-  amount: number;
-  description: string;
-  createdAt: Date;
-};
+import { Job, JobStatus } from "@/components/jobs/JobTypes";
 
 const Jobs = () => {
   const { toast } = useToast();
@@ -99,14 +80,6 @@ const Jobs = () => {
     ));
   };
 
-  // Stats calculation
-  const totalJobs = jobs.length;
-  const completedJobs = jobs.filter(job => job.status === "completed").length;
-  const inProgressJobs = jobs.filter(job => job.status === "in-progress").length;
-  const scheduledJobs = jobs.filter(job => job.status === "scheduled").length;
-  const cancelledJobs = jobs.filter(job => job.status === "cancelled").length;
-  const totalRevenue = jobs.reduce((total, job) => total + job.amount, 0);
-
   // Extract technicians for the filter
   const technicians = initialTechnicians.map(tech => ({
     id: tech.id,
@@ -115,149 +88,15 @@ const Jobs = () => {
 
   return (
     <div className="space-y-8 py-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-            Jobs Management
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Create, schedule, and manage jobs and technicians
-          </p>
-        </div>
-        <Button 
-          onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
-        >
-          <PlusIcon className="mr-2 h-4 w-4" /> Create Job
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-blue-100 rounded-full">
-                <ClipboardListIcon className="h-5 w-5 text-blue-700" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Jobs</p>
-                <p className="text-2xl font-bold">{totalJobs}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-green-100 rounded-full">
-                <UsersIcon className="h-5 w-5 text-green-700" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold">{completedJobs}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-yellow-100 rounded-full">
-                <CalendarIcon className="h-5 w-5 text-yellow-700" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">In Progress</p>
-                <p className="text-2xl font-bold">{inProgressJobs}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-red-100 rounded-full">
-                <AlertTriangleIcon className="h-5 w-5 text-red-700" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Cancelled</p>
-                <p className="text-2xl font-bold">{cancelledJobs}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-purple-100 rounded-full">
-                <FileTextIcon className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Revenue</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="all-jobs">
-        <TabsList className="grid grid-cols-5 max-w-xl">
-          <TabsTrigger value="all-jobs">All Jobs</TabsTrigger>
-          <TabsTrigger value="scheduled">Scheduled ({scheduledJobs})</TabsTrigger>
-          <TabsTrigger value="in-progress">In Progress ({inProgressJobs})</TabsTrigger>
-          <TabsTrigger value="completed">Completed ({completedJobs})</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled ({cancelledJobs})</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all-jobs" className="mt-6">
-          <JobsTable 
-            jobs={jobs} 
-            formatCurrency={formatCurrency} 
-            technicians={technicians}
-            onCancelJob={handleCancelJob}
-          />
-        </TabsContent>
-        
-        <TabsContent value="scheduled" className="mt-6">
-          <JobsTable 
-            jobs={jobs.filter(job => job.status === "scheduled")} 
-            formatCurrency={formatCurrency} 
-            technicians={technicians}
-            onCancelJob={handleCancelJob}
-          />
-        </TabsContent>
-        
-        <TabsContent value="in-progress" className="mt-6">
-          <JobsTable 
-            jobs={jobs.filter(job => job.status === "in-progress")} 
-            formatCurrency={formatCurrency} 
-            technicians={technicians}
-            onCancelJob={handleCancelJob}
-          />
-        </TabsContent>
-        
-        <TabsContent value="completed" className="mt-6">
-          <JobsTable 
-            jobs={jobs.filter(job => job.status === "completed")} 
-            formatCurrency={formatCurrency} 
-            technicians={technicians}
-            onCancelJob={handleCancelJob}
-          />
-        </TabsContent>
-        
-        <TabsContent value="cancelled" className="mt-6">
-          <JobsTable 
-            jobs={jobs.filter(job => job.status === "cancelled")} 
-            formatCurrency={formatCurrency} 
-            technicians={technicians}
-            onCancelJob={handleCancelJob}
-          />
-        </TabsContent>
-      </Tabs>
+      <JobHeader onCreateJob={() => setShowCreateModal(true)} />
+      
+      <JobStats jobs={jobs} />
+      
+      <JobTabs 
+        jobs={jobs} 
+        technicians={technicians} 
+        onCancelJob={handleCancelJob} 
+      />
       
       <CreateJobModal 
         open={showCreateModal} 

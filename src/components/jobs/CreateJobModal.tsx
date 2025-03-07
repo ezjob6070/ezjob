@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { v4 as uuidv4 } from "uuid";
-import { Job, JobStatus } from "@/pages/Jobs";
+import { Job, JobStatus } from "@/components/jobs/JobTypes";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -29,7 +28,6 @@ const CreateJobModal = ({ open, onOpenChange, onAddJob }: CreateJobModalProps) =
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<JobStatus>("scheduled");
 
-  // Mock data for dropdowns
   const clients = [
     { id: "client1", name: "Acme Corp" },
     { id: "client2", name: "Tech Solutions Inc." },
