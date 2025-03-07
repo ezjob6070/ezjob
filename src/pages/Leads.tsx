@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, PencilIcon, UserIcon, CheckSquareIcon } from "lucide-react";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -55,6 +54,15 @@ const Leads = () => {
     // In a real application, you would fetch the leads here
     // and update the state with the fetched data
   }, []);
+
+  useEffect(() => {
+    if (activeLeadDetailsDialog) {
+      const lead = leads.find(lead => lead.id === activeLeadDetailsDialog);
+      if (lead) {
+        setSelectedLead(lead);
+      }
+    }
+  }, [activeLeadDetailsDialog, leads]);
 
   const handleAddLead = (newLead: Lead) => {
     setLeads((prevLeads) => [newLead, ...prevLeads]);
@@ -162,14 +170,19 @@ const Leads = () => {
 
       <LeadsTable
         leads={filteredLeads}
-        onEditLead={(lead) => {
-          setSelectedLead(lead);
-          setShowEditLeadModal(true);
-        }}
+        onEditLead={handleEditLead}
         onViewDetails={(lead) => setActiveLeadDetailsDialog(lead.id)}
       />
 
-      <Dialog open={activeLeadDetailsDialog !== null} onOpenChange={() => setActiveLeadDetailsDialog(null)}>
+      <Dialog 
+        open={activeLeadDetailsDialog !== null} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveLeadDetailsDialog(null);
+            setSelectedLead(null);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
