@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
 import { Estimate, EstimateStatus } from "@/types/estimate";
 import { format } from "date-fns";
 import { CheckCircleIcon, ClockIcon, MailIcon, PhoneIcon, SendIcon, ImageIcon } from "lucide-react";
@@ -16,6 +17,20 @@ interface EstimateCardProps {
 const EstimateCard = ({ estimate, onStatusChange }: EstimateCardProps) => {
   const handleStatusChange = (status: EstimateStatus) => {
     onStatusChange(estimate.id, status);
+  };
+
+  const handleSendEmail = () => {
+    // In a real application, this would connect to an email service
+    // For now, we'll simulate the email sending with a toast notification
+    toast({
+      title: "Email Sent",
+      description: `Estimate for ${estimate.jobTitle} has been sent to ${estimate.clientEmail}`,
+    });
+    
+    // If the estimate was new, automatically change status to "sent"
+    if (estimate.status !== "sent") {
+      onStatusChange(estimate.id, "sent");
+    }
   };
 
   const statusIcons = {
@@ -195,7 +210,7 @@ const EstimateCard = ({ estimate, onStatusChange }: EstimateCardProps) => {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={handleSendEmail}>
                 Send Email
               </Button>
               <Button size="sm">

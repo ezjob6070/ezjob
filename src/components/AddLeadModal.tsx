@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog, 
@@ -12,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { type Lead, type LeadStatus } from "@/pages/Leads";
+import { Lead, LeadStatus } from "@/types/lead";
 
 type AddLeadModalProps = {
   open: boolean;
@@ -55,7 +54,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
     status: "new" as LeadStatus,
     source: "website",
     value: "0",
-    assignedTo: "Sarah Miller", // Default assignee
+    assignedTo: "Sarah Miller",
     notes: ""
   });
 
@@ -87,7 +86,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
       value: parseFloat(formData.value) || 0,
       createdAt: new Date(),
       lastContact: new Date(),
-      nextFollowUp: new Date(new Date().setDate(new Date().getDate() + 3)), // Default follow-up in 3 days
+      nextFollowUp: new Date(new Date().setDate(new Date().getDate() + 3)),
     };
 
     onAddLead(newLead);

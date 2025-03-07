@@ -67,8 +67,15 @@ const CreateEstimateButton = ({ onEstimateCreate }: CreateEstimateButtonProps) =
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const newEstimate: Estimate = {
       id: `est${Date.now()}`,
-      ...values,
+      jobTitle: values.jobTitle,
+      clientName: values.clientName,
+      clientEmail: values.clientEmail,
+      clientPhone: values.clientPhone,
+      clientAddress: values.clientAddress,
+      description: values.description,
       images: images,
+      price: values.price,
+      tax: values.tax,
       status: "in-process", // Start as in-process
       createdAt: new Date(),
       updatedAt: new Date(),

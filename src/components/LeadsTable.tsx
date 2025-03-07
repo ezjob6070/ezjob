@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -31,7 +30,7 @@ import {
   DollarSignIcon,
   ArrowUpRightIcon
 } from "lucide-react";
-import { type Lead, type LeadStatus } from "@/pages/Leads";
+import { type Lead, type LeadStatus } from "@/types/lead";
 import { useToast } from "@/hooks/use-toast";
 
 type LeadsTableProps = {
@@ -73,7 +72,6 @@ const LeadsTable = ({ leads }: LeadsTableProps) => {
     setSortConfig({ key, direction });
   };
 
-  // Sort leads based on current sort configuration
   const sortedLeads = [...leads].sort((a, b) => {
     if (!sortConfig) return 0;
 
