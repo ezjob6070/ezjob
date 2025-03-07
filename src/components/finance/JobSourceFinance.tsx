@@ -19,7 +19,7 @@ interface JobSourceFinanceProps {
   transactions: Array<any>;
 }
 
-export const JobSourceFinance: React.FC<JobSourceFinanceProps> = ({ jobSources }) => {
+export const JobSourceFinance: React.FC<JobSourceFinanceProps> = ({ jobSources, transactions }) => {
   // Fix arithmetic operation errors by ensuring we're working with numbers
   const fixArithmeticOperations = () => {
     // Calculate totals with proper null checking

@@ -196,34 +196,7 @@ const Finance = () => {
       <div className="mb-8">
         <h3 className="text-xl font-bold mb-4">Job Source Finance</h3>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Job Source</TableHead>
-                      <TableHead>Total Jobs</TableHead>
-                      <TableHead>Total Revenue</TableHead>
-                      <TableHead>Expenses</TableHead>
-                      <TableHead>Profit</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {jobSources.map((source) => (
-                      <TableRow key={source.id}>
-                        <TableCell className="font-medium">{source.name}</TableCell>
-                        <TableCell>{source.totalJobs}</TableCell>
-                        <TableCell>{formatCurrency(source.totalRevenue || 0)}</TableCell>
-                        <TableCell>{formatCurrency(source.expenses || 0)}</TableCell>
-                        <TableCell>{formatCurrency(source.companyProfit || 0)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+          <JobSourceFinance jobSources={jobSources} transactions={filteredTransactions} />
         </div>
       </div>
 
