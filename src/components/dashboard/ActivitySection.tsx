@@ -28,10 +28,19 @@ type ActivitySectionProps = {
 };
 
 const ActivitySection = ({ activities, events }: ActivitySectionProps) => {
+  // Filter activities for the most recent ones
+  const recentActivities = activities.slice(0, 5);
+  
+  // Filter upcoming events for the nearest ones
+  const upcomingEvents = events
+    .filter(event => event.datetime > new Date())
+    .sort((a, b) => a.datetime.getTime() - b.datetime.getTime())
+    .slice(0, 5);
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <RecentActivityCard activities={activities} />
-      <UpcomingEvents events={events} />
+      <RecentActivityCard activities={recentActivities} />
+      <UpcomingEvents events={upcomingEvents} />
     </div>
   );
 };
