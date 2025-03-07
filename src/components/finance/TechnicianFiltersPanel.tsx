@@ -1,8 +1,10 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import { DateRange } from "react-day-picker";
 
@@ -31,6 +33,8 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
   selectAllTechnicians,
   deselectAllTechnicians
 }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
   if (!showFilters) return null;
   
   const allSelected = technicianNames.length > 0 && selectedTechnicians.length === technicianNames.length;
@@ -43,6 +47,10 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
       selectAllTechnicians?.();
     }
   };
+
+  const filteredTechnicians = technicianNames.filter(name =>
+    name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   
   return (
     <Card className="mb-4">
@@ -51,12 +59,23 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
           <div>
             <h3 className="text-sm font-medium mb-2">Filter by Technician</h3>
             <div className="space-y-2">
+              {/* Search Bar */}
+              <div className="relative mb-3">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search technicians..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
               {/* Select All Checkbox */}
               <div className="flex items-center space-x-2 pb-1 border-b mb-2">
                 <Checkbox 
                   id="select-all-technicians" 
                   checked={allSelected}
-                  indeterminate={someSelected && !allSelected}
+                  data-state={someSelected ? "indeterminate" : allSelected ? "checked" : "unchecked"}
                   onCheckedChange={handleSelectAllChange}
                 />
                 <label 
@@ -68,7 +87,7 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
               </div>
               
               <div className="max-h-40 overflow-y-auto">
-                {technicianNames.map((techName) => (
+                {filteredTechnicians.map((techName) => (
                   <div key={techName} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`tech-${techName}`} 
