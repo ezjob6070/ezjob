@@ -37,7 +37,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Total Company Income</CardTitle>
+            <CardTitle>Total Income</CardTitle>
             <CardDescription>Revenue from all sources</CardDescription>
           </CardHeader>
           <CardContent>
@@ -47,7 +47,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Total Company Expenses</CardTitle>
+            <CardTitle>Total Expenses</CardTitle>
             <CardDescription>Expenses across all categories</CardDescription>
           </CardHeader>
           <CardContent>
