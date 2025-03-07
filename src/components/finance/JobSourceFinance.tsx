@@ -1,5 +1,18 @@
 
 import React from 'react';
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 
 interface JobSourceFinanceProps {
   jobSources: Array<any>;
@@ -26,19 +39,44 @@ export const JobSourceFinance: React.FC<JobSourceFinanceProps> = ({ jobSources }
   const { totalExpenses, totalCompanyProfit } = fixArithmeticOperations();
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <h3 className="text-lg font-medium mb-4">Job Source Finance Summary</h3>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-blue-50 p-3 rounded">
-          <p className="text-sm text-gray-500">Total Expenses</p>
-          <p className="text-xl font-semibold">${totalExpenses.toFixed(2)}</p>
+    <Card>
+      <CardContent className="p-6">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Job Source</TableHead>
+                <TableHead>Total Jobs</TableHead>
+                <TableHead>Total Revenue</TableHead>
+                <TableHead>Expenses</TableHead>
+                <TableHead>Profit</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {jobSources.map((source) => (
+                <TableRow key={source.id}>
+                  <TableCell className="font-medium">{source.name}</TableCell>
+                  <TableCell>{source.totalJobs}</TableCell>
+                  <TableCell>{formatCurrency(source.totalRevenue || 0)}</TableCell>
+                  <TableCell>{formatCurrency(source.expenses || 0)}</TableCell>
+                  <TableCell>{formatCurrency(source.companyProfit || 0)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-        <div className="bg-green-50 p-3 rounded">
-          <p className="text-sm text-gray-500">Total Company Profit</p>
-          <p className="text-xl font-semibold">${totalCompanyProfit.toFixed(2)}</p>
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="bg-blue-50 p-3 rounded">
+            <p className="text-sm text-gray-500">Total Expenses</p>
+            <p className="text-xl font-semibold">{formatCurrency(totalExpenses)}</p>
+          </div>
+          <div className="bg-green-50 p-3 rounded">
+            <p className="text-sm text-gray-500">Total Company Profit</p>
+            <p className="text-xl font-semibold">{formatCurrency(totalCompanyProfit)}</p>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
