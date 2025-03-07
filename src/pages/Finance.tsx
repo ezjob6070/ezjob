@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, FilterIcon, Calendar, Download, Users } from "lucide-react";
+import { Calendar as CalendarIcon, Download, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,27 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { 
   sampleTransactions, 
   getDateRangeForTimeFrame,
-  generateFinancialReport
+  generateFinancialReport,
+  filterTransactionsByDateRange
 } from "@/data/finances";
 import { TimeFrame, FinancialReport } from "@/types/finance";
-import { Input } from "@/components/ui/input";
 import { DonutChart } from "@/components/DonutChart";
 import FinancialMetricsCards from "@/components/finance/FinancialMetricsCards";
 import FinancialTransactionsTable from "@/components/finance/FinancialTransactionsTable";
 import TechniciansFinance from "@/components/technicians/TechniciansFinance";
 import { initialTechnicians } from "@/data/technicians";
 import { cn } from "@/lib/utils";
+import { useFinanceFilters } from "@/components/finance/useFinanceFilters";
+import FinanceFilters from "@/components/finance/FinanceFilters";
+
+// Sample job sources for the filters
+const sampleJobSources = [
+  { id: "js1", name: "Website" },
+  { id: "js2", name: "Referral" },
+  { id: "js3", name: "Google Ads" },
+  { id: "js4", name: "Social Media" },
+  { id: "js5", name: "Direct Call" },
+];
 
 const Finance = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -33,12 +44,31 @@ const Finance = () => {
     from: undefined,
     to: undefined,
   });
-  const [searchTerm, setSearchTerm] = useState("");
+
+  // Use the new finance filters hook
+  const {
+    filters,
+    setFilters,
+    filteredTransactions,
+    resetFilters
+  } = useFinanceFilters(sampleTransactions);
 
   useEffect(() => {
     if (timeFrame !== "custom") {
       const { startDate, endDate } = getDateRangeForTimeFrame(timeFrame as Exclude<TimeFrame, "custom">);
       setDateRange({ from: startDate, to: endDate });
+      
+      // Set the date filter in our filters state
+      if (timeFrame === "day") {
+        setFilters({ ...filters, dateFilter: "today" });
+      } else if (timeFrame === "week") {
+        setFilters({ ...filters, dateFilter: "thisWeek" });
+      } else if (timeFrame === "month") {
+        setFilters({ ...filters, dateFilter: "thisMonth" });
+      } else if (timeFrame === "year") {
+        setFilters({ ...filters, dateFilter: "all" });
+      }
+      
       const generatedReport = generateFinancialReport(
         sampleTransactions,
         startDate,
@@ -47,6 +77,13 @@ const Finance = () => {
       );
       setReport(generatedReport);
     } else if (dateRange.from && dateRange.to) {
+      // When using custom date range
+      setFilters({
+        ...filters,
+        dateFilter: "custom",
+        customDateRange: { from: dateRange.from, to: dateRange.to }
+      });
+      
       const generatedReport = generateFinancialReport(
         sampleTransactions,
         dateRange.from,
@@ -56,6 +93,52 @@ const Finance = () => {
       setReport(generatedReport);
     }
   }, [timeFrame, dateRange.from, dateRange.to]);
+
+  // Update report when filters change
+  useEffect(() => {
+    if (report) {
+      // Create a new report with filtered transactions
+      const updatedReport = {
+        ...report,
+        transactions: filteredTransactions
+      };
+      
+      // Recalculate financial metrics based on filtered transactions
+      let totalRevenue = 0;
+      let totalExpenses = 0;
+      let technicianPayments = 0;
+      
+      filteredTransactions.forEach(transaction => {
+        if (transaction.status === "completed") {
+          if (transaction.category === "payment") {
+            totalRevenue += transaction.amount;
+            
+            if (transaction.technicianName && transaction.technicianRate !== undefined) {
+              const technicianProfit = transaction.technicianRateIsPercentage
+                ? transaction.amount * (transaction.technicianRate / 100)
+                : transaction.technicianRate;
+              
+              technicianPayments += technicianProfit;
+            }
+          } else if (transaction.category === "expense") {
+            totalExpenses += transaction.amount;
+          } else if (transaction.category === "refund") {
+            totalRevenue -= transaction.amount;
+          }
+        }
+      });
+      
+      const companyProfit = totalRevenue - totalExpenses - technicianPayments;
+      
+      setReport({
+        ...updatedReport,
+        totalRevenue,
+        totalExpenses,
+        companyProfit,
+        technicianPayments
+      });
+    }
+  }, [filteredTransactions]);
 
   const handleTabChange = (value: string) => {
     setTimeFrame(value as TimeFrame);
@@ -129,29 +212,29 @@ const Finance = () => {
         <TabsContent value="overview">
           {report && (
             <>
-              <FinancialMetricsCards report={report} />
+              <FinanceFilters 
+                filters={filters}
+                setFilters={setFilters}
+                jobSources={sampleJobSources}
+                resetFilters={resetFilters}
+              />
               
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="mt-6">
+                <FinancialMetricsCards report={report} />
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                 <Card className="lg:col-span-2">
                   <CardHeader>
                     <CardTitle>Transactions</CardTitle>
                     <CardDescription>
                       Transaction history for the selected period
                     </CardDescription>
-                    <div className="mt-2 relative">
-                      <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search transactions..."
-                        className="pl-9"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </div>
                   </CardHeader>
                   <CardContent>
                     <FinancialTransactionsTable 
                       transactions={report.transactions} 
-                      searchTerm={searchTerm}
+                      searchTerm={filters.searchTerm}
                     />
                   </CardContent>
                 </Card>
@@ -208,7 +291,7 @@ const Finance = () => {
               {report && (
                 <TechniciansFinance 
                   technicians={initialTechnicians} 
-                  transactions={sampleTransactions} 
+                  transactions={filteredTransactions} 
                 />
               )}
             </CardContent>

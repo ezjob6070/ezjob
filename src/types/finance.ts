@@ -27,3 +27,8 @@ export type FinancialReport = {
   technicianPayments: number;
   transactions: FinancialTransaction[];
 };
+
+export type JobSource = {
+  id: string;
+  name: string;
+};
