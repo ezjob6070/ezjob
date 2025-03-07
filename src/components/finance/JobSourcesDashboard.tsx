@@ -5,6 +5,7 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { JobSource, FinancialTransaction } from "@/types/finance";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import JobSourceInvoiceSection from "@/components/finance/JobSourceInvoiceSection";
+import JobSourceCircleCharts from "@/components/finance/JobSourceCircleCharts";
 
 interface JobSourcesDashboardProps {
   filteredJobSources: JobSource[];
@@ -21,6 +22,8 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
 }) => {
   return (
     <div className="space-y-8">
+      <JobSourceCircleCharts filteredJobSources={filteredJobSources} />
+      
       <Card>
         <CardHeader>
           <CardTitle>Job Sources Performance</CardTitle>
