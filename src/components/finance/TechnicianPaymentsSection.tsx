@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, Clock, Filter, Calendar } from "lucide-react";
+import { Search, Filter, Calendar, BriefcaseIcon, UsersIcon, DollarSign } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -75,41 +75,47 @@ const TechnicianPaymentsSection: React.FC<TechnicianPaymentsSectionProps> = ({ t
         </div>
       </CardHeader>
       <CardContent>
-        {/* Payment Summary Cards - TOP SECTION */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {/* Payment Summary Cards - TOP SECTION (styled like JobStats) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm">Total Income</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Income</p>
+                  <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
+                </div>
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <BriefcaseIcon className="h-5 w-5 text-blue-700" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm">Technician Payments</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold">{formatCurrency(totalPayments)}</div>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Expenses</p>
+                  <p className="text-2xl font-bold">{formatCurrency(totalExpenses + totalPayments)}</p>
+                </div>
+                <div className="p-2 bg-green-100 rounded-full">
+                  <UsersIcon className="h-5 w-5 text-green-700" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm">Total Expenses</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm">Net Profit</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-2xl font-bold">{formatCurrency(netProfit)}</div>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Net Profit</p>
+                  <p className="text-2xl font-bold">{formatCurrency(netProfit)}</p>
+                </div>
+                <div className="p-2 bg-purple-100 rounded-full">
+                  <DollarSign className="h-5 w-5 text-purple-700" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
