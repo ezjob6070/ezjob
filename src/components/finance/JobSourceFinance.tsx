@@ -13,10 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { JobSource, FinancialTransaction } from "@/types/finance";
 
 interface JobSourceFinanceProps {
-  jobSources: Array<any>;
-  transactions: Array<any>;
+  jobSources: JobSource[];
+  transactions: FinancialTransaction[];
 }
 
 export const JobSourceFinance: React.FC<JobSourceFinanceProps> = ({ jobSources, transactions }) => {
