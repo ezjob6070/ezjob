@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -75,11 +76,8 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     .sort((a, b) => b.totalRevenue - a.totalRevenue)
     .slice(0, 5);
 
-  const filteredTopTechnicians = topTechnicians.filter(tech => 
-    profitSearchQuery === "" || 
-    tech.name.toLowerCase().includes(profitSearchQuery.toLowerCase()) ||
-    tech.specialty.toLowerCase().includes(profitSearchQuery.toLowerCase())
-  );
+  // Removing references to profitSearchQuery which doesn't exist
+  const filteredTopTechnicians = topTechnicians;
 
   const toggleTechnician = (techName: string) => {
     setSelectedTechnicians(prev => 
