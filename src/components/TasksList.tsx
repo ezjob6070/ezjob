@@ -90,9 +90,14 @@ const TasksList = ({ tasks, onStatusChange }: TasksListProps) => {
           <div className="flex items-start gap-3">
             <Checkbox
               checked={completedTasks[task.id]}
-              onCheckedChange={(checked) => 
-                handleStatusChange(event as React.MouseEvent, task.id, checked as boolean)
-              }
+              onCheckedChange={(checked) => {
+                // Create a synthetic MouseEvent to pass to handleStatusChange
+                const syntheticEvent = {
+                  stopPropagation: () => {},
+                } as React.MouseEvent;
+                
+                handleStatusChange(syntheticEvent, task.id, checked as boolean);
+              }}
               className="mt-1"
             />
             <div className="flex-1 min-w-0">
