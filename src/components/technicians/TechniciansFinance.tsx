@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { SearchIcon, ArrowUpDown, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -18,6 +17,7 @@ import {
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import EntityFilter, { Entity } from "@/components/finance/EntityFilter";
+import { X } from "lucide-react";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
