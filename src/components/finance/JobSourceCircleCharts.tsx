@@ -33,6 +33,17 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
   
   return (
     <div className="space-y-6">
+      {/* Search Bar - Moved to top */}
+      <div className="relative">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-8"
+          placeholder="Search job sources..."
+          value={jobSourceSearchQuery}
+          onChange={(e) => setJobSourceSearchQuery(e.target.value)}
+        />
+      </div>
+      
       {/* Payment Breakdown Simple Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
@@ -66,24 +77,13 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
         </Card>
       </div>
       
-      {/* Job Sources List Table with Search Bar */}
+      {/* Job Sources List Table */}
       <Card>
         <CardHeader>
           <CardTitle>Job Source Financial Performance</CardTitle>
           <CardDescription>Revenue and profit metrics for each source</CardDescription>
         </CardHeader>
-        <CardContent>
-          {/* Search Bar */}
-          <div className="mb-4 relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              className="pl-8"
-              placeholder="Search job sources..."
-              value={jobSourceSearchQuery}
-              onChange={(e) => setJobSourceSearchQuery(e.target.value)}
-            />
-          </div>
-          
+        <CardContent>          
           <Table>
             <TableHeader>
               <TableRow>
