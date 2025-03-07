@@ -143,8 +143,8 @@ const TechnicianInvoiceSection: React.FC<TechnicianInvoiceSectionProps> = ({
       case "last-30-days":
         setDate({ from: subDays(today, 30), to: today });
         break;
-      case "this-year":
-        setDate({ from: startOfYear(today), to: today });
+      case "last-90-days":
+        setDate({ from: subDays(today, 90), to: today });
         break;
       case "last-year":
         setDate({ from: startOfYear(subDays(startOfYear(today), 1)), to: endOfYear(subDays(startOfYear(today), 1)) });
@@ -227,7 +227,7 @@ const TechnicianInvoiceSection: React.FC<TechnicianInvoiceSectionProps> = ({
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" size="sm" className="h-8">
                             <Calendar className="mr-2 h-4 w-4" />
-                            <span>Quick Select</span>
+                            <span>Past Periods</span>
                             <ChevronDown className="ml-2 h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -253,8 +253,8 @@ const TechnicianInvoiceSection: React.FC<TechnicianInvoiceSectionProps> = ({
                           <DropdownMenuItem onClick={() => handleDatePresetSelection("last-30-days")}>
                             Last 30 Days
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDatePresetSelection("this-year")}>
-                            This Year
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("last-90-days")}>
+                            Last 90 Days
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleDatePresetSelection("last-year")}>
                             Last Year
