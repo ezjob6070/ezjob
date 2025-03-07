@@ -1,447 +1,331 @@
 
 import React, { useState } from "react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Technician } from "@/types/technician";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
+import { Button } from "@/components/ui/button";
+import { Search, Calendar, ChevronDown, FileText, Download } from "lucide-react";
+import { 
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { FilePlus, Download, Printer, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import DateRangeSelector from "@/components/finance/DateRangeSelector";
+import { addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, format } from "date-fns";
+import { toast } from "sonner";
 
 interface TechnicianInvoiceSectionProps {
   activeTechnicians: Technician[];
 }
 
-type InvoiceFormValues = {
-  technicianId: string;
-  invoiceDate: string;
-  dueDate: string;
-  invoiceNumber: string;
-  clientName: string;
-  clientEmail: string;
-  clientAddress: string;
-  notes: string;
-  items: InvoiceItem[];
-};
-
-type InvoiceItem = {
-  description: string;
-  quantity: number;
-  rate: number;
-  amount: number;
-};
-
 const TechnicianInvoiceSection: React.FC<TechnicianInvoiceSectionProps> = ({
-  activeTechnicians,
+  activeTechnicians
 }) => {
-  const { toast } = useToast();
-  const [selectedTechnician, setSelectedTechnician] = useState<string>("");
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([
-    { description: "", quantity: 1, rate: 0, amount: 0 },
-  ]);
+  const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>(activeTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  const form = useForm<InvoiceFormValues>({
-    defaultValues: {
-      technicianId: "",
-      invoiceDate: format(new Date(), "yyyy-MM-dd"),
-      dueDate: format(new Date(new Date().setDate(new Date().getDate() + 30)), "yyyy-MM-dd"),
-      invoiceNumber: `INV-${Math.floor(100000 + Math.random() * 900000)}`,
-      clientName: "",
-      clientEmail: "",
-      clientAddress: "",
-      notes: "Thank you for your business!",
-      items: [{ description: "", quantity: 1, rate: 0, amount: 0 }],
-    },
+  const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // First day of current month
+    to: new Date(),
   });
 
-  const filteredTechnicians = activeTechnicians.filter(tech => 
-    searchQuery === "" || 
-    tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tech.specialty.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const form = useForm({
+    defaultValues: {
+      invoiceNumber: generateInvoiceNumber(),
+      paymentTerms: "30",
+      notes: "",
+    }
+  });
 
-  const handleTechnicianSelect = (techId: string) => {
-    setSelectedTechnician(techId);
-    form.setValue("technicianId", techId);
-    const tech = activeTechnicians.find(t => t.id === techId);
-    if (tech) {
-      // Pre-fill some invoice data based on the technician
-      setInvoiceItems([
-        { 
-          description: `${tech.specialty} Services`, 
-          quantity: 1, 
-          rate: tech.totalRevenue / tech.completedJobs, 
-          amount: tech.totalRevenue / tech.completedJobs 
-        },
-      ]);
-      form.setValue("items", invoiceItems);
+  function generateInvoiceNumber() {
+    const prefix = "INV";
+    const timestamp = new Date().getTime().toString().slice(-6);
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `${prefix}-${timestamp}-${random}`;
+  }
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    if (query.trim() === "") {
+      setFilteredTechnicians(activeTechnicians);
+    } else {
+      const filtered = activeTechnicians.filter(tech => 
+        tech.name.toLowerCase().includes(query.toLowerCase()) ||
+        tech.specialty.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredTechnicians(filtered);
     }
   };
 
-  const updateItemAmount = (index: number, quantity: number, rate: number) => {
-    const newItems = [...invoiceItems];
-    newItems[index].quantity = quantity;
-    newItems[index].rate = rate;
-    newItems[index].amount = quantity * rate;
-    setInvoiceItems(newItems);
+  const selectTechnician = (technician: Technician) => {
+    setSelectedTechnician(technician);
   };
 
-  const addInvoiceItem = () => {
-    setInvoiceItems([...invoiceItems, { description: "", quantity: 1, rate: 0, amount: 0 }]);
-  };
-
-  const removeInvoiceItem = (index: number) => {
-    if (invoiceItems.length > 1) {
-      const newItems = invoiceItems.filter((_, i) => i !== index);
-      setInvoiceItems(newItems);
+  const generateInvoice = () => {
+    if (!selectedTechnician || !date?.from || !date?.to) {
+      toast.error("Please select a technician and date range");
+      return;
     }
+
+    const invoiceData = {
+      invoiceNumber: form.getValues("invoiceNumber"),
+      technician: selectedTechnician,
+      dateRange: {
+        from: date.from,
+        to: date.to
+      },
+      paymentTerms: form.getValues("paymentTerms"),
+      notes: form.getValues("notes"),
+      createdAt: new Date()
+    };
+
+    // In a real app, we would save the invoice to the database
+    console.log("Generated invoice:", invoiceData);
+    toast.success("Invoice generated successfully!");
   };
 
-  const calculateTotal = () => {
-    return invoiceItems.reduce((total, item) => total + item.amount, 0);
-  };
-
-  const onSubmit = (data: InvoiceFormValues) => {
-    // In a real app, you would send this data to your backend
-    // For now, we'll just show a success message
+  const downloadInvoicePdf = () => {
+    if (!selectedTechnician) {
+      toast.error("Please select a technician first");
+      return;
+    }
     
-    toast({
-      title: "Invoice Created",
-      description: "Your invoice has been created successfully",
-    });
-    
-    // In a real application, you would redirect to the generated PDF
-    // For now, we'll just close the dialog
-    setDialogOpen(false);
+    // In a real app, we would generate a PDF and download it
+    console.log("Downloading invoice as PDF...");
+    toast.success("Invoice PDF downloaded successfully!");
   };
 
-  const generatePDF = () => {
-    // In a real application, this would generate a PDF
-    toast({
-      title: "PDF Generated",
-      description: "Your invoice PDF has been generated and is ready to download",
-    });
+  const handleDatePresetSelection = (preset: string) => {
+    const today = new Date();
+    
+    switch (preset) {
+      case "today":
+        setDate({ from: today, to: today });
+        break;
+      case "yesterday":
+        const yesterday = subDays(today, 1);
+        setDate({ from: yesterday, to: yesterday });
+        break;
+      case "this-week":
+        setDate({ from: startOfWeek(today, { weekStartsOn: 1 }), to: today });
+        break;
+      case "last-week":
+        const lastWeekStart = startOfWeek(subDays(today, 7), { weekStartsOn: 1 });
+        const lastWeekEnd = endOfWeek(subDays(today, 7), { weekStartsOn: 1 });
+        setDate({ from: lastWeekStart, to: lastWeekEnd });
+        break;
+      case "this-month":
+        setDate({ from: startOfMonth(today), to: today });
+        break;
+      case "last-month":
+        const lastMonthDate = subDays(startOfMonth(today), 1);
+        setDate({ from: startOfMonth(lastMonthDate), to: endOfMonth(lastMonthDate) });
+        break;
+      case "last-30-days":
+        setDate({ from: subDays(today, 30), to: today });
+        break;
+      case "this-year":
+        setDate({ from: startOfYear(today), to: today });
+        break;
+      case "last-year":
+        setDate({ from: startOfYear(subDays(startOfYear(today), 1)), to: endOfYear(subDays(startOfYear(today), 1)) });
+        break;
+      default:
+        break;
+    }
   };
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold">Create Invoice</h3>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900">
-              <FilePlus className="mr-2 h-4 w-4" /> Create New Invoice
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>Create New Invoice</DialogTitle>
-            </DialogHeader>
+    <Card>
+      <CardHeader>
+        <CardTitle>Technician Invoices</CardTitle>
+        <CardDescription>Generate and manage technician invoices</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium mb-2">Select Technician</h3>
+            <div className="relative mb-4">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search technicians..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+            </div>
+            
+            <div className="grid gap-2 max-h-[200px] overflow-y-auto">
+              {filteredTechnicians.map(tech => (
+                <div 
+                  key={tech.id}
+                  className={`p-3 rounded-md border cursor-pointer hover:bg-slate-50 transition-colors
+                    ${selectedTechnician?.id === tech.id ? 'bg-blue-50 border-blue-300' : ''}`}
+                  onClick={() => selectTechnician(tech)}
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">
+                      {tech.initials}
+                    </div>
+                    <div>
+                      <div className="font-medium">{tech.name}</div>
+                      <div className="text-sm text-muted-foreground">{tech.specialty}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {filteredTechnicians.length === 0 && (
+                <div className="p-4 text-center text-muted-foreground">
+                  No technicians found matching your search.
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium mb-2">Invoice Details</h3>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="technicianId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Technician</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select technician" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {activeTechnicians.map((tech) => (
-                              <SelectItem key={tech.id} value={tech.id}>
-                                {tech.name} - {tech.specialty}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="invoiceNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="invoiceDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dueDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Due Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="clientName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Client Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="clientEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Client Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="clientAddress"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Client Address</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="invoiceNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Invoice Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} readOnly className="bg-slate-50" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-sm font-medium">Invoice Items</h4>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={addInvoiceItem}
-                    >
-                      Add Item
-                    </Button>
-                  </div>
-                  
-                  {invoiceItems.map((item, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-2 items-center">
-                      <div className="col-span-5">
-                        <Input 
-                          placeholder="Description" 
-                          value={item.description}
-                          onChange={(e) => {
-                            const newItems = [...invoiceItems];
-                            newItems[index].description = e.target.value;
-                            setInvoiceItems(newItems);
-                          }}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Input 
-                          type="number" 
-                          placeholder="Qty" 
-                          value={item.quantity}
-                          onChange={(e) => {
-                            updateItemAmount(index, Number(e.target.value), item.rate);
-                          }}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Input 
-                          type="number" 
-                          placeholder="Rate" 
-                          value={item.rate}
-                          onChange={(e) => {
-                            updateItemAmount(index, item.quantity, Number(e.target.value));
-                          }}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Input 
-                          readOnly 
-                          value={formatCurrency(item.amount)}
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => removeInvoiceItem(index)}
-                          disabled={invoiceItems.length === 1}
-                        >
-                          &times;
-                        </Button>
-                      </div>
+                  <FormLabel>Date Range</FormLabel>
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-8">
+                            <Calendar className="mr-2 h-4 w-4" />
+                            <span>Quick Select</span>
+                            <ChevronDown className="ml-2 h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("today")}>
+                            Today
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("yesterday")}>
+                            Yesterday
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("this-week")}>
+                            This Week
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("last-week")}>
+                            Last Week
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("this-month")}>
+                            This Month
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("last-month")}>
+                            Last Month
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("last-30-days")}>
+                            Last 30 Days
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("this-year")}>
+                            This Year
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDatePresetSelection("last-year")}>
+                            Last Year
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  ))}
-                  
-                  <div className="flex justify-end pt-4">
-                    <div className="w-1/3">
-                      <div className="flex justify-between py-1">
-                        <span className="font-medium">Total:</span>
-                        <span>{formatCurrency(calculateTotal())}</span>
-                      </div>
-                    </div>
+                    <DateRangeSelector date={date} setDate={setDate} />
                   </div>
                 </div>
-
+                
+                <FormField
+                  control={form.control}
+                  name="paymentTerms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Payment Terms</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select payment terms" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="0">Due on receipt</SelectItem>
+                          <SelectItem value="7">Net 7 days</SelectItem>
+                          <SelectItem value="15">Net 15 days</SelectItem>
+                          <SelectItem value="30">Net 30 days</SelectItem>
+                          <SelectItem value="60">Net 60 days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                
                 <FormField
                   control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notes</FormLabel>
+                      <FormLabel>Invoice Notes</FormLabel>
                       <FormControl>
-                        <Textarea {...field} />
+                        <Input {...field} placeholder="Add any additional notes..." />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    Create Invoice
-                  </Button>
-                </div>
-              </form>
+              </div>
             </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Invoice Management</CardTitle>
-          <CardDescription>Create and manage technician invoices</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                className="pl-8"
-                placeholder="Search technicians..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            
+            <div className="flex space-x-2 pt-4">
+              <Button 
+                onClick={generateInvoice} 
+                className="flex items-center"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Generate Invoice
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={downloadInvoicePdf}
+                className="flex items-center"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredTechnicians.map((tech) => (
-              <Card key={tech.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-1 text-sm">
-                      {tech.initials}
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{tech.name}</h3>
-                      <p className="text-sm text-muted-foreground">{tech.specialty}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1 mb-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Completed Jobs:</span>
-                      <span>{tech.completedJobs}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Revenue:</span>
-                      <span>{formatCurrency(tech.totalRevenue)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Payment Rate:</span>
-                      <span>{tech.paymentType === "percentage" ? `${tech.paymentRate}%` : "Flat"}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => {
-                        handleTechnicianSelect(tech.id);
-                        setDialogOpen(true);
-                      }}
-                    >
-                      <FilePlus className="mr-1 h-4 w-4" /> New Invoice
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={generatePDF}
-                    >
-                      <Download className="mr-1 h-4 w-4" /> PDF
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

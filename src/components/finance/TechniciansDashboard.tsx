@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -21,7 +20,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   setSearchQuery
 }) => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
-  const [profitSearchQuery, setProfitSearchQuery] = useState("");
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
     to: new Date(),
