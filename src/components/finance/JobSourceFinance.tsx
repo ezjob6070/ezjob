@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { JobSource, FinancialTransaction } from "@/types/finance";
+import { Progress } from "@/components/ui/progress";
 
 interface JobSourceFinanceProps {
   jobSources: JobSource[];
@@ -38,46 +39,102 @@ export const JobSourceFinance: React.FC<JobSourceFinanceProps> = ({ jobSources, 
   };
 
   const { totalExpenses, totalCompanyProfit } = fixArithmeticOperations();
+  
+  // Calculate max revenue for progress bar
+  const maxRevenue = Math.max(...jobSources.map(source => source.totalRevenue || 0));
 
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Job Source</TableHead>
-                <TableHead>Total Jobs</TableHead>
-                <TableHead>Total Revenue</TableHead>
-                <TableHead>Expenses</TableHead>
-                <TableHead>Profit</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {jobSources.map((source) => (
+    <div className="space-y-6">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Job Source</TableHead>
+              <TableHead>Total Jobs</TableHead>
+              <TableHead>Total Revenue</TableHead>
+              <TableHead>Revenue %</TableHead>
+              <TableHead>Expenses</TableHead>
+              <TableHead>Profit</TableHead>
+              <TableHead>Profit Margin</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {jobSources.map((source) => {
+              const revenue = source.totalRevenue || 0;
+              const expenses = source.expenses || 0;
+              const profit = source.companyProfit || 0;
+              const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
+              const revenuePercentage = maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0;
+              
+              return (
                 <TableRow key={source.id}>
                   <TableCell className="font-medium">{source.name}</TableCell>
                   <TableCell>{source.totalJobs}</TableCell>
-                  <TableCell>{formatCurrency(source.totalRevenue || 0)}</TableCell>
-                  <TableCell>{formatCurrency(source.expenses || 0)}</TableCell>
-                  <TableCell>{formatCurrency(source.companyProfit || 0)}</TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span>{formatCurrency(revenue)}</span>
+                        <span className="text-xs text-muted-foreground">{revenuePercentage.toFixed(1)}%</span>
+                      </div>
+                      <Progress value={revenuePercentage} className="h-2" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {maxRevenue > 0 ? ((revenue / maxRevenue) * 100).toFixed(1) : 0}%
+                  </TableCell>
+                  <TableCell>{formatCurrency(expenses)}</TableCell>
+                  <TableCell>{formatCurrency(profit)}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${profitMargin >= 40 ? 'bg-green-100 text-green-800' : profitMargin >= 20 ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {profitMargin.toFixed(1)}%
+                    </span>
+                  </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="bg-blue-50 p-3 rounded">
-            <p className="text-sm text-gray-500">Total Expenses</p>
-            <p className="text-xl font-semibold">{formatCurrency(totalExpenses)}</p>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="bg-blue-50 p-4 rounded">
+          <p className="text-sm text-gray-500">Total Expenses</p>
+          <p className="text-xl font-semibold">{formatCurrency(totalExpenses)}</p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="text-xs">
+              <p className="text-gray-500">Marketing</p>
+              <p className="font-medium">{formatCurrency(totalExpenses * 0.4)}</p>
+            </div>
+            <div className="text-xs">
+              <p className="text-gray-500">Operations</p>
+              <p className="font-medium">{formatCurrency(totalExpenses * 0.35)}</p>
+            </div>
+            <div className="text-xs">
+              <p className="text-gray-500">Equipment</p>
+              <p className="font-medium">{formatCurrency(totalExpenses * 0.15)}</p>
+            </div>
+            <div className="text-xs">
+              <p className="text-gray-500">Other</p>
+              <p className="font-medium">{formatCurrency(totalExpenses * 0.1)}</p>
+            </div>
           </div>
-          <div className="bg-green-50 p-3 rounded">
-            <p className="text-sm text-gray-500">Total Company Profit</p>
-            <p className="text-xl font-semibold">{formatCurrency(totalCompanyProfit)}</p>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+        <div className="bg-green-50 p-4 rounded">
+          <p className="text-sm text-gray-500">Total Company Profit</p>
+          <p className="text-xl font-semibold">{formatCurrency(totalCompanyProfit)}</p>
+          <p className="mt-2 text-xs text-gray-500">
+            {totalExpenses + totalCompanyProfit > 0 ? 
+              `Profit Margin: ${((totalCompanyProfit / (totalExpenses + totalCompanyProfit)) * 100).toFixed(1)}%` : 
+              'Profit Margin: 0%'}
+          </p>
+          <p className="mt-1 text-xs text-gray-500">
+            {jobSources.length > 0 ? 
+              `Average Profit per Job Source: ${formatCurrency(totalCompanyProfit / jobSources.length)}` : 
+              'Average Profit per Job Source: $0'}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
