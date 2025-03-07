@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DayProps } from "react-day-picker";
 
 interface CalendarSidebarProps {
   isOpen: boolean;
@@ -99,10 +100,9 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
               hasJobs: "font-bold",
             }}
             components={{
-              Day: (props) => {
-                // Fixed: Use proper typing for the props
+              Day: (props: DayProps) => {
                 const date = props.date;
-                const isSelected = props.selected;
+                const isSelected = props.day.isSelected;
                 const isOutsideMonth = date.getMonth() !== props.displayMonth.getMonth();
                 const dayColor = getDayColor(date);
                 
