@@ -42,6 +42,15 @@ const generateTransactions = (): FinancialTransaction[] => {
     "Tom Anderson"
   ];
   
+  // Job sources
+  const jobSources = [
+    { id: "js1", name: "Website" },
+    { id: "js2", name: "Referral" },
+    { id: "js3", name: "Google Ads" },
+    { id: "js4", name: "Social Media" },
+    { id: "js5", name: "Direct Call" },
+  ];
+  
   // Generate random transactions for last 90 days
   for (let i = 0; i < 150; i++) {
     const dayOffset = Math.floor(Math.random() * 90);
@@ -56,6 +65,9 @@ const generateTransactions = (): FinancialTransaction[] => {
     const technicianRate = technicianRateIsPercentage ? 
       Math.floor(Math.random() * 30) + 20 : // 20% to 50%
       Math.floor(Math.random() * 500) + 100; // $100 to $600 flat rate
+    
+    // Add job source
+    const jobSource = jobSources[Math.floor(Math.random() * jobSources.length)];
 
     transactions.push({
       id: `tr-${i}-${Date.now()}`,
@@ -66,6 +78,8 @@ const generateTransactions = (): FinancialTransaction[] => {
       technicianName,
       technicianRate,
       technicianRateIsPercentage,
+      jobSourceId: jobSource.id,
+      jobSourceName: jobSource.name,
       category: Math.random() > 0.1 ? "payment" : (Math.random() > 0.5 ? "expense" : "refund"),
       status: Math.random() > 0.2 ? "completed" : (Math.random() > 0.5 ? "pending" : "failed"),
       notes: Math.random() > 0.7 ? "Customer requested special service" : undefined

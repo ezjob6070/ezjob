@@ -1,76 +1,88 @@
 
-import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Job } from "@/pages/Jobs";
-import JobsTable from "@/components/jobs/JobsTable";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import JobsTable from "./JobsTable";
+
+// Using a local job interface instead of importing from Jobs page
+type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
+
+interface Job {
+  id: string;
+  clientName: string;
+  title: string;
+  status: JobStatus;
+  date: Date;
+  technicianName?: string;
+  address: string;
+  amount: number;
+  description?: string;
+  notes?: string;
+}
 
 interface JobTabsProps {
   jobs: Job[];
-  technicians: { id: string; name: string }[];
-  onCancelJob: (jobId: string) => void;
+  searchTerm: string;
 }
 
-const JobTabs = ({ jobs, technicians, onCancelJob }: JobTabsProps) => {
-  // Stats for tabs
-  const scheduledJobs = jobs.filter(job => job.status === "scheduled").length;
-  const inProgressJobs = jobs.filter(job => job.status === "in-progress").length;
-  const completedJobs = jobs.filter(job => job.status === "completed").length;
-  const cancelledJobs = jobs.filter(job => job.status === "cancelled").length;
-
+const JobTabs = ({ jobs, searchTerm }: JobTabsProps) => {
+  // Filter jobs by status
+  const scheduledJobs = jobs.filter(job => job.status === "scheduled");
+  const inProgressJobs = jobs.filter(job => job.status === "in_progress");
+  const completedJobs = jobs.filter(job => job.status === "completed");
+  const cancelledJobs = jobs.filter(job => job.status === "cancelled");
+  
   return (
-    <Tabs defaultValue="all-jobs">
-      <TabsList className="grid grid-cols-5 max-w-xl">
-        <TabsTrigger value="all-jobs">All Jobs</TabsTrigger>
-        <TabsTrigger value="scheduled">Scheduled ({scheduledJobs})</TabsTrigger>
-        <TabsTrigger value="in-progress">In Progress ({inProgressJobs})</TabsTrigger>
-        <TabsTrigger value="completed">Completed ({completedJobs})</TabsTrigger>
-        <TabsTrigger value="cancelled">Cancelled ({cancelledJobs})</TabsTrigger>
+    <Tabs defaultValue="all" className="w-full">
+      <TabsList className="grid w-full grid-cols-5">
+        <TabsTrigger value="all">
+          All
+          <span className="ml-1 text-xs rounded-full bg-muted px-2 py-0.5">
+            {jobs.length}
+          </span>
+        </TabsTrigger>
+        <TabsTrigger value="scheduled">
+          Scheduled
+          <span className="ml-1 text-xs rounded-full bg-muted px-2 py-0.5">
+            {scheduledJobs.length}
+          </span>
+        </TabsTrigger>
+        <TabsTrigger value="inProgress">
+          In Progress
+          <span className="ml-1 text-xs rounded-full bg-muted px-2 py-0.5">
+            {inProgressJobs.length}
+          </span>
+        </TabsTrigger>
+        <TabsTrigger value="completed">
+          Completed
+          <span className="ml-1 text-xs rounded-full bg-muted px-2 py-0.5">
+            {completedJobs.length}
+          </span>
+        </TabsTrigger>
+        <TabsTrigger value="cancelled">
+          Cancelled
+          <span className="ml-1 text-xs rounded-full bg-muted px-2 py-0.5">
+            {cancelledJobs.length}
+          </span>
+        </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="all-jobs" className="mt-6">
-        <JobsTable 
-          jobs={jobs} 
-          formatCurrency={formatCurrency} 
-          technicians={technicians}
-          onCancelJob={onCancelJob}
-        />
+      <TabsContent value="all">
+        <JobsTable jobs={jobs} searchTerm={searchTerm} />
       </TabsContent>
       
-      <TabsContent value="scheduled" className="mt-6">
-        <JobsTable 
-          jobs={jobs.filter(job => job.status === "scheduled")} 
-          formatCurrency={formatCurrency} 
-          technicians={technicians}
-          onCancelJob={onCancelJob}
-        />
+      <TabsContent value="scheduled">
+        <JobsTable jobs={scheduledJobs} searchTerm={searchTerm} />
       </TabsContent>
       
-      <TabsContent value="in-progress" className="mt-6">
-        <JobsTable 
-          jobs={jobs.filter(job => job.status === "in-progress")} 
-          formatCurrency={formatCurrency} 
-          technicians={technicians}
-          onCancelJob={onCancelJob}
-        />
+      <TabsContent value="inProgress">
+        <JobsTable jobs={inProgressJobs} searchTerm={searchTerm} />
       </TabsContent>
       
-      <TabsContent value="completed" className="mt-6">
-        <JobsTable 
-          jobs={jobs.filter(job => job.status === "completed")} 
-          formatCurrency={formatCurrency} 
-          technicians={technicians}
-          onCancelJob={onCancelJob}
-        />
+      <TabsContent value="completed">
+        <JobsTable jobs={completedJobs} searchTerm={searchTerm} />
       </TabsContent>
       
-      <TabsContent value="cancelled" className="mt-6">
-        <JobsTable 
-          jobs={jobs.filter(job => job.status === "cancelled")} 
-          formatCurrency={formatCurrency} 
-          technicians={technicians}
-          onCancelJob={onCancelJob}
-        />
+      <TabsContent value="cancelled">
+        <JobsTable jobs={cancelledJobs} searchTerm={searchTerm} />
       </TabsContent>
     </Tabs>
   );

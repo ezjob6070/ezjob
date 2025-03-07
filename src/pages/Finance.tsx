@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Download, Users } from "lucide-react";
+import { Calendar as CalendarIcon, Download, Users, BriefcaseIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import { DonutChart } from "@/components/DonutChart";
 import FinancialMetricsCards from "@/components/finance/FinancialMetricsCards";
 import FinancialTransactionsTable from "@/components/finance/FinancialTransactionsTable";
 import TechniciansFinance from "@/components/technicians/TechniciansFinance";
+import JobSourceFinance from "@/components/finance/JobSourceFinance";
 import { initialTechnicians } from "@/data/technicians";
 import { cn } from "@/lib/utils";
 import { useFinanceFilters } from "@/components/finance/useFinanceFilters";
@@ -26,11 +27,11 @@ import FinanceFilters from "@/components/finance/FinanceFilters";
 
 // Sample job sources for the filters
 const sampleJobSources = [
-  { id: "js1", name: "Website" },
-  { id: "js2", name: "Referral" },
-  { id: "js3", name: "Google Ads" },
-  { id: "js4", name: "Social Media" },
-  { id: "js5", name: "Direct Call" },
+  { id: "js1", name: "Website", paymentType: "percentage", paymentValue: 5, isActive: true, totalJobs: 45, totalRevenue: 56000, profit: 48000 },
+  { id: "js2", name: "Referral", paymentType: "fixed", paymentValue: 50, isActive: true, totalJobs: 32, totalRevenue: 42000, profit: 38000 },
+  { id: "js3", name: "Google Ads", paymentType: "percentage", paymentValue: 10, isActive: true, totalJobs: 28, totalRevenue: 35000, profit: 25000 },
+  { id: "js4", name: "Social Media", paymentType: "percentage", paymentValue: 7, isActive: true, totalJobs: 22, totalRevenue: 28000, profit: 22000 },
+  { id: "js5", name: "Direct Call", paymentType: "fixed", paymentValue: 0, isActive: true, totalJobs: 15, totalRevenue: 18000, profit: 18000 },
 ];
 
 const Finance = () => {
@@ -204,9 +205,10 @@ const Finance = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="technicians">Technicians Finance</TabsTrigger>
+          <TabsTrigger value="jobSources">Job Sources Finance</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -291,6 +293,28 @@ const Finance = () => {
               {report && (
                 <TechniciansFinance 
                   technicians={initialTechnicians} 
+                  transactions={filteredTransactions} 
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="jobSources">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BriefcaseIcon className="h-5 w-5" />
+                Job Sources Financial Performance
+              </CardTitle>
+              <CardDescription>
+                Track revenue, costs, and company profit per job source
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {report && (
+                <JobSourceFinance 
+                  jobSources={sampleJobSources} 
                   transactions={filteredTransactions} 
                 />
               )}
