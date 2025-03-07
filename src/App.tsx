@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
+import Leads from "./pages/Leads";
 import ClientDetail from "./pages/ClientDetail";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
@@ -27,6 +28,7 @@ const App = () => (
             <Route index element={<Dashboard />} />
             <Route path="clients" element={<Clients />} />
             <Route path="clients/:id" element={<ClientDetail />} />
+            <Route path="leads" element={<Leads />} />
             <Route path="tasks" element={<Tasks />} />
             <Route path="tasks/:id" element={<TaskDetail />} />
             <Route path="settings" element={<Settings />} />
