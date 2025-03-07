@@ -37,6 +37,13 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     { name: "Taxes", value: totalProfit * 0.15, color: "#ef4444" },          // red
   ];
 
+  // Revenue breakdown data
+  const revenueBreakdown = [
+    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" }, // sky blue
+    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" }, // pink
+    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },  // indigo
+  ];
+
   return (
     <div className="space-y-8">
       <OverallFinanceSection 
@@ -48,17 +55,28 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Revenue vs. Expense</CardTitle>
-            <CardDescription>Distribution of revenue and costs</CardDescription>
+            <CardTitle>Revenue Breakdown</CardTitle>
+            <CardDescription>Source of revenue streams</CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center">
             <DonutChart
-              data={[
-                { name: "Company Profit", value: totalProfit, color: "#8b5cf6" },
-                { name: "Expenses", value: totalExpenses, color: "#f87171" },
-              ]}
-              title={formatCurrency(totalProfit)}
-              subtitle="Company Profit"
+              data={revenueBreakdown}
+              title={formatCurrency(totalRevenue)}
+              subtitle="Total Revenue"
+            />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Expense Breakdown</CardTitle>
+            <CardDescription>Distribution of expenses by type</CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <DonutChart
+              data={expenseCategories}
+              title={formatCurrency(totalExpenses)}
+              subtitle="Total Expenses"
             />
           </CardContent>
         </Card>
@@ -73,20 +91,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               data={profitBreakdown}
               title={formatCurrency(totalProfit)}
               subtitle="Net Profit"
-            />
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Expenses Breakdown</CardTitle>
-            <CardDescription>Distribution of expenses by type</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <DonutChart
-              data={expenseCategories}
-              title={formatCurrency(totalExpenses)}
-              subtitle="Total Expenses"
             />
           </CardContent>
         </Card>
