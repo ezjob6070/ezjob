@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Eye, EyeOff } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 interface TechnicianCircleChartsProps {
   filteredTechnicians: Technician[];
@@ -15,6 +16,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   filteredTechnicians 
 }) => {
   const [techSearchQuery, setTechSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(true);
   
   // Calculate total revenue from technicians
   const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
@@ -39,6 +41,41 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   
   return (
     <div className="space-y-6">
+      {/* Toggle Search Bar Button */}
+      <div className="flex justify-end">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setShowSearch(!showSearch)}
+          className="flex items-center gap-1"
+        >
+          {showSearch ? (
+            <>
+              <EyeOff className="h-4 w-4" />
+              <span>Hide Search</span>
+            </>
+          ) : (
+            <>
+              <Eye className="h-4 w-4" />
+              <span>Show Search</span>
+            </>
+          )}
+        </Button>
+      </div>
+
+      {/* Search Bar */}
+      {showSearch && (
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-8"
+            placeholder="Search technicians..."
+            value={techSearchQuery}
+            onChange={(e) => setTechSearchQuery(e.target.value)}
+          />
+        </div>
+      )}
+      
       {/* Payment Breakdown Simple Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
@@ -72,24 +109,13 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         </Card>
       </div>
       
-      {/* Technicians List Table with Search Bar */}
+      {/* Technicians List Table */}
       <Card>
         <CardHeader>
           <CardTitle>Technician Financial Performance</CardTitle>
           <CardDescription>Earnings and profit metrics for each technician</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Search Bar */}
-          <div className="mb-4 relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              className="pl-8"
-              placeholder="Search technicians..."
-              value={techSearchQuery}
-              onChange={(e) => setTechSearchQuery(e.target.value)}
-            />
-          </div>
-          
           <Table>
             <TableHeader>
               <TableRow>
