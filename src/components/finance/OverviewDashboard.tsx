@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -6,6 +7,7 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { JobSource, FinancialTransaction, ProfitBreakdownItem } from "@/types/finance";
 import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
 import TransactionsSection from "@/components/finance/TransactionsSection";
+import { DateRange } from "react-day-picker";
 
 interface OverviewDashboardProps {
   totalRevenue: number;
@@ -18,6 +20,8 @@ interface OverviewDashboardProps {
     value: number;
     color: string;
   }>;
+  date: DateRange | undefined;
+  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
 
 const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
@@ -26,7 +30,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   totalProfit,
   jobSources,
   filteredTransactions,
-  expenseCategories
+  expenseCategories,
+  date,
+  setDate
 }) => {
   // Generate the profit breakdown data
   const profitBreakdown: ProfitBreakdownItem[] = [
@@ -48,7 +54,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       <OverallFinanceSection 
         totalRevenue={totalRevenue} 
         totalExpenses={totalExpenses} 
-        totalProfit={totalProfit} 
+        totalProfit={totalProfit}
+        date={date}
+        setDate={setDate}
       />
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

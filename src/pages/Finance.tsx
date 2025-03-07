@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BarChart3, Users, FileText, CreditCard } from "lucide-react";
 import { DateRange } from "react-day-picker";
@@ -205,6 +204,8 @@ const Finance = () => {
           jobSources={jobSources}
           filteredTransactions={filteredTransactions}
           expenseCategories={expenseCategories}
+          date={date}
+          setDate={setDate}
         />
       )}
 
