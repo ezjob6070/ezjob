@@ -71,6 +71,28 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
               title={formatCurrency(totalRevenue)}
               subtitle="Total Income"
             />
+            
+            {/* Payment method breakdown list */}
+            <div className="mt-4 space-y-2">
+              <div className="flex flex-col space-y-1">
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  {revenueBreakdown.map((item) => (
+                    <div key={item.name} className="flex flex-col items-center">
+                      <div className="flex items-center mb-1">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {totalRevenue > 0 ? ((item.value / totalRevenue) * 100).toFixed(1) : "0"}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -86,6 +108,28 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
               title={formatCurrency(companyProfit)}
               subtitle="Company Profit"
             />
+            
+            {/* Expense breakdown list */}
+            <div className="mt-4 space-y-2">
+              <div className="flex flex-col space-y-1">
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  {jobSourceExpenseBreakdown.map((item) => (
+                    <div key={item.name} className="flex flex-col items-center">
+                      <div className="flex items-center mb-1">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {totalExpenses + companyProfit > 0 ? ((item.value / (totalExpenses + companyProfit)) * 100).toFixed(1) : "0"}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -101,6 +145,28 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
               title={formatCurrency(companyProfit)}
               subtitle="Net Company Profit"
             />
+            
+            {/* Profit allocation breakdown list */}
+            <div className="mt-4 space-y-2">
+              <div className="flex flex-col space-y-1">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {profitBreakdown.map((item) => (
+                    <div key={item.name} className="flex flex-col items-center">
+                      <div className="flex items-center mb-1">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-muted-foreground">{formatCurrency(item.value)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {companyProfit > 0 ? ((item.value / companyProfit) * 100).toFixed(1) : "0"}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
