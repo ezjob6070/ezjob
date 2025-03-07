@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, FilterIcon, Calendar, Download } from "lucide-react";
+import { Calendar as CalendarIcon, FilterIcon, Calendar, Download, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,12 @@ import { Input } from "@/components/ui/input";
 import { DonutChart } from "@/components/DonutChart";
 import FinancialMetricsCards from "@/components/finance/FinancialMetricsCards";
 import FinancialTransactionsTable from "@/components/finance/FinancialTransactionsTable";
+import TechniciansFinance from "@/components/technicians/TechniciansFinance";
+import { initialTechnicians } from "@/data/technicians";
 import { cn } from "@/lib/utils";
 
 const Finance = () => {
+  const [activeTab, setActiveTab] = useState("overview");
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("month");
   const [report, setReport] = useState<FinancialReport | null>(null);
   const [dateRange, setDateRange] = useState<{
@@ -117,70 +120,101 @@ const Finance = () => {
         </div>
       </div>
       
-      {report && (
-        <>
-          <FinancialMetricsCards report={report} />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Transactions</CardTitle>
-                <CardDescription>
-                  Transaction history for the selected period
-                </CardDescription>
-                <div className="mt-2 relative">
-                  <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search transactions..."
-                    className="pl-9"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <FinancialTransactionsTable 
-                  transactions={report.transactions} 
-                  searchTerm={searchTerm}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="technicians">Technicians Finance</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview">
+          {report && (
+            <>
+              <FinancialMetricsCards report={report} />
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle>Transactions</CardTitle>
+                    <CardDescription>
+                      Transaction history for the selected period
+                    </CardDescription>
+                    <div className="mt-2 relative">
+                      <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search transactions..."
+                        className="pl-9"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <FinancialTransactionsTable 
+                      transactions={report.transactions} 
+                      searchTerm={searchTerm}
+                    />
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Profit Breakdown</CardTitle>
+                    <CardDescription>
+                      Distribution of revenue and expenses
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex justify-center items-center pt-4">
+                    <DonutChart
+                      data={[
+                        {
+                          name: "Company Profit",
+                          value: report.companyProfit,
+                          color: "#8B5CF6"
+                        },
+                        {
+                          name: "Technician Payments",
+                          value: report.technicianPayments,
+                          color: "#F97316"
+                        },
+                        {
+                          name: "Expenses",
+                          value: report.totalExpenses,
+                          color: "#EF4444"
+                        }
+                      ]}
+                      title={formatCurrency(report.companyProfit)}
+                      subtitle="Company Profit"
+                      size={220}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="technicians">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Technicians Financial Performance
+              </CardTitle>
+              <CardDescription>
+                Track revenue, payments, and company profit per technician
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {report && (
+                <TechniciansFinance 
+                  technicians={initialTechnicians} 
+                  transactions={sampleTransactions} 
                 />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Profit Breakdown</CardTitle>
-                <CardDescription>
-                  Distribution of revenue and expenses
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center items-center pt-4">
-                <DonutChart
-                  data={[
-                    {
-                      name: "Company Profit",
-                      value: report.companyProfit,
-                      color: "#8B5CF6"
-                    },
-                    {
-                      name: "Technician Payments",
-                      value: report.technicianPayments,
-                      color: "#F97316"
-                    },
-                    {
-                      name: "Expenses",
-                      value: report.totalExpenses,
-                      color: "#EF4444"
-                    }
-                  ]}
-                  title={formatCurrency(report.companyProfit)}
-                  subtitle="Company Profit"
-                  size={220}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </>
-      )}
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
