@@ -137,6 +137,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
                 <TableHead>Technician Earnings</TableHead>
                 <TableHead>Company Earnings</TableHead>
                 <TableHead>Profit Ratio</TableHead>
+                <TableHead>Parts</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -144,6 +145,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
                 const techEarnings = tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1);
                 const companyEarnings = tech.totalRevenue - techEarnings - (tech.totalRevenue * 0.33);
                 const profitRatio = ((companyEarnings / tech.totalRevenue) * 100).toFixed(1);
+                const partsValue = tech.totalRevenue * 0.2; // Assuming parts are 20% of total revenue
                 
                 return (
                   <TableRow key={tech.id}>
@@ -159,6 +161,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
                     <TableCell>{formatCurrency(techEarnings)}</TableCell>
                     <TableCell>{formatCurrency(companyEarnings)}</TableCell>
                     <TableCell>{profitRatio}%</TableCell>
+                    <TableCell>{formatCurrency(partsValue)}</TableCell>
                   </TableRow>
                 );
               })}
