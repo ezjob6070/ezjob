@@ -6,7 +6,6 @@ import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DonutChart } from "@/components/DonutChart";
 
 interface TechnicianCircleChartsProps {
   filteredTechnicians: Technician[];
@@ -30,29 +29,6 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   
   // Calculate net profit
   const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
-  const companyProfitPercentage = ((companyProfit / totalRevenue) * 100).toFixed(1);
-  
-  // Revenue breakdown data
-  const revenueBreakdown = [
-    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" }, // sky blue
-    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" }, // pink
-    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },  // indigo
-  ];
-
-  // Technician earnings breakdown
-  const technicianExpenseBreakdown = [
-    { name: "Technician Payments", value: technicianEarnings, color: "#22c55e" },    // green
-    { name: "Operating Expenses", value: totalExpenses, color: "#f87171" },    // red
-    { name: "Company Profit", value: companyProfit, color: "#3b82f6" },       // blue
-  ];
-
-  // Net profit breakdown data
-  const profitBreakdown = [
-    { name: "Operating Costs", value: companyProfit * 0.3, color: "#3b82f6" }, // blue
-    { name: "Reinvestment", value: companyProfit * 0.25, color: "#10b981" },   // green
-    { name: "Owner Dividends", value: companyProfit * 0.30, color: "#f59e0b" }, // amber
-    { name: "Taxes", value: companyProfit * 0.15, color: "#ef4444" },          // red
-  ];
   
   // Filter technicians based on search query
   const searchFilteredTechnicians = filteredTechnicians.filter(tech => 
@@ -63,50 +39,35 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   
   return (
     <div className="space-y-6">
-      {/* Payment Breakdown Circles */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Revenue Breakdown Card */}
+      {/* Payment Breakdown Simple Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Total Income Breakdown</CardTitle>
-            <CardDescription>Source of income streams</CardDescription>
+          <CardHeader>
+            <CardTitle>Total Income</CardTitle>
+            <CardDescription>Revenue from all technicians</CardDescription>
           </CardHeader>
           <CardContent>
-            <DonutChart
-              data={revenueBreakdown}
-              title={formatCurrency(totalRevenue)}
-              subtitle="Total Income"
-            />
+            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
           </CardContent>
         </Card>
 
-        {/* Expense Distribution Card */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Total Payment and Expenses</CardTitle>
-            <CardDescription>Distribution of earnings between technicians and company</CardDescription>
+          <CardHeader>
+            <CardTitle>Total Expenses</CardTitle>
+            <CardDescription>Technician payments and costs</CardDescription>
           </CardHeader>
           <CardContent>
-            <DonutChart
-              data={technicianExpenseBreakdown}
-              title={formatCurrency(companyProfit)}
-              subtitle="Company Profit"
-            />
+            <div className="text-2xl font-bold">{formatCurrency(technicianEarnings + totalExpenses)}</div>
           </CardContent>
         </Card>
 
-        {/* Net Profit Breakdown Card */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle>Net Company Profit</CardTitle>
-            <CardDescription>How profit is distributed</CardDescription>
+            <CardDescription>Revenue after all expenses</CardDescription>
           </CardHeader>
           <CardContent>
-            <DonutChart
-              data={profitBreakdown}
-              title={formatCurrency(companyProfit)}
-              subtitle="Net Company Profit"
-            />
+            <div className="text-2xl font-bold">{formatCurrency(companyProfit)}</div>
           </CardContent>
         </Card>
       </div>
