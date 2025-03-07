@@ -1,7 +1,20 @@
 
 import { Job } from "@/components/jobs/JobTypes";
 
-export type DateFilterType = "all" | "today" | "week" | "month" | "custom";
+export type DateFilterType = 
+  | "all" 
+  | "today" 
+  | "tomorrow"
+  | "yesterday" 
+  | "thisWeek" 
+  | "nextWeek"
+  | "lastWeek" 
+  | "thisMonth" 
+  | "nextMonth" 
+  | "lastMonth" 
+  | "custom";
+
+export type DateFilterCategory = "current" | "past" | "future" | "custom";
 
 export type JobFilters = {
   searchTerm: string;
