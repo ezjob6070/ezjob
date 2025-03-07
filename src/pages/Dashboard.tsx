@@ -1,4 +1,3 @@
-
 import { 
   UsersIcon, 
   ClipboardListIcon, 
@@ -7,14 +6,24 @@ import {
   BriefcaseIcon,
   PhoneCallIcon,
   CalculatorIcon,
-  DollarSignIcon
+  DollarSignIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  PercentIcon,
+  PieChartIcon,
+  TargetIcon,
+  MailIcon,
+  CheckCircleIcon,
+  XCircleIcon
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import StatCard from "@/components/StatCard";
 import RecentActivityCard from "@/components/RecentActivityCard";
 import UpcomingEvents from "@/components/UpcomingEvents";
+import { DonutChart } from "@/components/DonutChart";
 
 const Dashboard = () => {
   const activities = [
@@ -98,27 +107,82 @@ const Dashboard = () => {
 
   // Task status counts
   const taskCounts = {
-    joby: 0,
+    joby: 5,
     inProgress: 21,
-    submitted: 0,
-    draft: 1,
-    completed: 0,
+    submitted: 8,
+    draft: 12,
+    completed: 19,
     canceled: 3
   };
 
   // Total tasks
   const totalTasks = Object.values(taskCounts).reduce((sum, count) => sum + count, 0);
 
+  // Financial metrics - sample data
+  const financialMetrics = {
+    totalRevenue: 125000,
+    companysCut: 25000,
+    pendingInvoices: 15000,
+    avgJobValue: 2500,
+    monthlyGrowth: 8.5,
+    conversionRate: 24
+  };
+
+  // Lead sources data
+  const leadSources = [
+    { name: "Website", value: 35 },
+    { name: "Referrals", value: 25 },
+    { name: "Social Media", value: 20 },
+    { name: "Direct", value: 15 },
+    { name: "Other", value: 5 }
+  ];
+
+  // Performance by job type
+  const jobTypePerformance = [
+    { name: "Maintenance", value: 45 },
+    { name: "Installation", value: 30 },
+    { name: "Consulting", value: 15 },
+    { name: "Emergency", value: 10 }
+  ];
+
+  // Top performing technicians
+  const topTechnicians = [
+    { name: "Sarah Miller", jobs: 45, revenue: 78500, rating: 4.9 },
+    { name: "Alex Johnson", jobs: 38, revenue: 62000, rating: 4.8 },
+    { name: "James Wilson", jobs: 36, revenue: 59000, rating: 4.7 },
+    { name: "Emily Brown", jobs: 32, revenue: 53000, rating: 4.9 }
+  ];
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   return (
     <div className="space-y-6 py-6">
       <div className="bg-blue-600 -mx-6 -mt-6 px-6 pt-6 pb-8 text-white">
-        <div className="flex items-center mb-2">
-          <div className="mr-3">
-            <span className="text-yellow-200 text-3xl">👋</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <div className="mr-3">
+              <span className="text-yellow-200 text-3xl">👋</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Hello, Alex Johnson</h1>
+              <p className="text-blue-100">Welcome to your Uleadz CRM dashboard</p>
+            </div>
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Hello, Alex Johnson</h1>
-            <p className="text-blue-100">Have a great day!</p>
+            <Button 
+              variant="secondary" 
+              className="bg-white/20 text-white hover:bg-white/30 border-none"
+            >
+              <MailIcon className="mr-2 h-4 w-4" />
+              <span>Send Reports</span>
+            </Button>
           </div>
         </div>
         
@@ -136,6 +200,12 @@ const Dashboard = () => {
             >
               Statistics
             </TabsTrigger>
+            <TabsTrigger 
+              value="analytics" 
+              className="data-[state=active]:bg-white data-[state=active]:text-blue-600"
+            >
+              Analytics
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -143,56 +213,63 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Calls"
-          value="0"
+          value="28"
           icon={<PhoneCallIcon size={20} />}
+          description="Total calls this month"
+          trend={{ value: "12%", isPositive: true }}
           className="bg-white hover:shadow-md"
         />
         <StatCard
           title="Jobs"
-          value="25"
+          value="68"
           icon={<BriefcaseIcon size={20} />}
+          description="Active jobs in progress"
+          trend={{ value: "8%", isPositive: true }}
           className="bg-white hover:shadow-md"
         />
         <StatCard
-          title="Total"
-          value="$0"
+          title="Total Revenue"
+          value={formatCurrency(financialMetrics.totalRevenue)}
           icon={<CalculatorIcon size={20} />}
+          description="Revenue this month"
+          trend={{ value: "5%", isPositive: false }}
           className="bg-white hover:shadow-md"
         />
         <StatCard
           title="Company's Cut"
-          value="$0"
+          value={formatCurrency(financialMetrics.companysCut)}
           icon={<DollarSignIcon size={20} />}
+          description="Commission earned"
+          trend={{ value: "7%", isPositive: true }}
           className="bg-white hover:shadow-md"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="overflow-hidden">
-          <CardContent className="p-0">
-            <div className="p-4 border-b">
-              <h3 className="font-medium text-lg">Tickets By</h3>
-              <div className="flex mt-2 space-x-2">
-                <Badge variant="secondary" className="bg-gray-700 text-white rounded-full">Status</Badge>
-                <Badge variant="outline" className="rounded-full">Map</Badge>
-                <Badge variant="outline" className="rounded-full">Time</Badge>
-              </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium">Tickets By Status</CardTitle>
+            <div className="flex mt-2 space-x-2">
+              <Badge variant="secondary" className="bg-gray-700 text-white rounded-full">Status</Badge>
+              <Badge variant="outline" className="rounded-full">Map</Badge>
+              <Badge variant="outline" className="rounded-full">Time</Badge>
             </div>
-            
-            <div className="p-6 flex">
-              <div className="flex-1 flex justify-center">
-                <div className="relative h-48 w-48">
-                  <div className="absolute inset-0 rounded-full border-[20px] border-purple-100 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-sm font-medium text-gray-500">Tickets</div>
-                      <div className="text-4xl font-bold">{totalTasks}</div>
-                    </div>
-                  </div>
-                  <div 
-                    className="absolute inset-0 rounded-full border-[20px] border-t-purple-500 border-r-transparent border-b-transparent border-l-transparent"
-                    style={{ transform: 'rotate(-45deg)' }}
-                  ></div>
-                </div>
+          </CardHeader>
+          <CardContent className="pb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <DonutChart 
+                  data={[
+                    { name: "Joby", value: taskCounts.joby, color: "#3b82f6" },
+                    { name: "In Progress", value: taskCounts.inProgress, color: "#8b5cf6" },
+                    { name: "Submitted", value: taskCounts.submitted, color: "#6b7280" },
+                    { name: "Draft", value: taskCounts.draft, color: "#f97316" },
+                    { name: "Completed", value: taskCounts.completed, color: "#22c55e" },
+                    { name: "Canceled", value: taskCounts.canceled, color: "#ef4444" }
+                  ]}
+                  title={`${totalTasks}`}
+                  subtitle="Total Tickets"
+                />
               </div>
               
               <div className="flex-1 space-y-4">
@@ -225,20 +302,20 @@ const Dashboard = () => {
                     <div className="text-xl font-bold">{taskCounts.submitted}</div>
                   </div>
                 </div>
+                
+                <div className="flex items-center mt-4">
+                  <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white mr-3">
+                    <ClipboardListIcon />
+                  </div>
+                  <div>
+                    <div className="font-medium">Draft</div>
+                    <div className="text-xl font-bold">{taskCounts.draft}</div>
+                  </div>
+                </div>
               </div>
             </div>
             
-            <div className="grid grid-cols-2 p-4">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white mr-3">
-                  <ClipboardListIcon />
-                </div>
-                <div>
-                  <div className="font-medium">Draft</div>
-                  <div className="text-xl font-bold">{taskCounts.draft}</div>
-                </div>
-              </div>
-              
+            <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white mr-3">
                   <CheckCircleIcon />
@@ -249,7 +326,7 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              <div className="flex items-center mt-4">
+              <div className="flex items-center">
                 <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center text-white mr-3">
                   <XCircleIcon />
                 </div>
@@ -263,87 +340,126 @@ const Dashboard = () => {
         </Card>
         
         <Card className="overflow-hidden">
-          <CardContent className="p-0">
-            <div className="p-4 border-b">
-              <h3 className="font-medium text-lg">Top Performance By</h3>
-              <div className="flex mt-2 space-x-2">
-                <Badge variant="secondary" className="bg-gray-700 text-white rounded-full">Job Source</Badge>
-                <Badge variant="outline" className="rounded-full">Job Type</Badge>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium">Top Performance By Job Source</CardTitle>
+            <div className="flex mt-2 space-x-2">
+              <Badge variant="secondary" className="bg-gray-700 text-white rounded-full">Job Source</Badge>
+              <Badge variant="outline" className="rounded-full">Job Type</Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">Lead Sources</h4>
+                <div className="space-y-3">
+                  {leadSources.map((source) => (
+                    <div key={source.name} className="flex items-center">
+                      <div className="w-32 mr-2">
+                        <span className="text-sm font-medium">{source.name}</span>
+                      </div>
+                      <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-blue-500 rounded-full" 
+                          style={{ width: `${source.value}%` }}
+                        ></div>
+                      </div>
+                      <span className="ml-2 text-sm font-medium">{source.value}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">Job Types</h4>
+                <div className="space-y-3">
+                  {jobTypePerformance.map((jobType) => (
+                    <div key={jobType.name} className="flex items-center">
+                      <div className="w-32 mr-2">
+                        <span className="text-sm font-medium">{jobType.name}</span>
+                      </div>
+                      <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-purple-500 rounded-full" 
+                          style={{ width: `${jobType.value}%` }}
+                        ></div>
+                      </div>
+                      <span className="ml-2 text-sm font-medium">{jobType.value}%</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             
-            <div className="p-6 flex flex-col items-center justify-center min-h-[300px] text-center text-muted-foreground">
-              <div className="mb-4">
-                <img 
-                  src="public/lovable-uploads/d0bf8818-71ce-4aa6-91a7-c18dcfaef0a3.png" 
-                  alt="Performance chart" 
-                  className="w-32 opacity-20"
-                />
+            <div className="mt-6">
+              <h4 className="text-sm font-medium text-muted-foreground mb-3">Business Metrics</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="flex flex-col p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-muted-foreground">Avg. Job Value</span>
+                  <span className="text-xl font-bold mt-1">{formatCurrency(financialMetrics.avgJobValue)}</span>
+                </div>
+                <div className="flex flex-col p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-muted-foreground">Monthly Growth</span>
+                  <div className="flex items-center mt-1">
+                    <span className="text-xl font-bold">{financialMetrics.monthlyGrowth}%</span>
+                    <ArrowUpIcon className="h-4 w-4 text-green-500 ml-1" />
+                  </div>
+                </div>
+                <div className="flex flex-col p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-muted-foreground">Conversion Rate</span>
+                  <div className="flex items-center mt-1">
+                    <span className="text-xl font-bold">{financialMetrics.conversionRate}%</span>
+                    <PercentIcon className="h-4 w-4 text-blue-500 ml-1" />
+                  </div>
+                </div>
               </div>
-              <p>Here you will see your job performance by job source</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       <Card className="overflow-hidden">
-        <CardContent className="p-0">
-          <div className="p-4 border-b">
-            <h3 className="font-medium text-lg">Top Technicians</h3>
-          </div>
-          
-          <div className="p-6 flex flex-col items-center justify-center min-h-[200px] text-center text-muted-foreground">
-            <div className="mb-4">
-              <img 
-                src="public/lovable-uploads/d0bf8818-71ce-4aa6-91a7-c18dcfaef0a3.png" 
-                alt="Technician performance" 
-                className="w-32 opacity-20"
-              />
-            </div>
-            <p>Here you will see your technician performance by jobs</p>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg font-medium">Top Technicians</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {topTechnicians.map((technician, index) => (
+              <Card key={technician.name} className="border-none shadow-sm bg-gray-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center mb-3">
+                    <div className={`w-10 h-10 rounded-full bg-blue-${index === 0 ? '600' : '500'} flex items-center justify-center text-white mr-3`}>
+                      {technician.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <div className="font-medium">{technician.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Rating: {technician.rating}/5
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Jobs</span>
+                      <span className="font-bold">{technician.jobs}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Revenue</span>
+                      <span className="font-bold">{formatCurrency(technician.revenue)}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </CardContent>
       </Card>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RecentActivityCard activities={activities} />
+        <UpcomingEvents events={events} />
+      </div>
     </div>
   );
 };
-
-// Additional icon components needed
-const CheckCircleIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <polyline points="22 4 12 14.01 9 11.01" />
-  </svg>
-);
-
-const XCircleIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="12" cy="12" r="10" />
-    <line x1="15" y1="9" x2="9" y2="15" />
-    <line x1="9" y1="9" x2="15" y2="15" />
-  </svg>
-);
 
 export default Dashboard;
