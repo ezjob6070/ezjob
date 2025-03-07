@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,10 +33,8 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   });
   const [appliedFilters, setAppliedFilters] = useState(false);
 
-  // Get all job source names
   const jobSourceNames = filteredJobSources.map(source => source.name);
-  
-  // Filter job sources based on filters
+
   const visibleJobSources = filteredJobSources.filter(source => {
     const matchesSelected = 
       !appliedFilters || 
@@ -47,13 +44,11 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     return matchesSelected;
   });
 
-  // Calculate total revenue and profit for donut charts
   const totalRevenue = visibleJobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
   const totalProfit = visibleJobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
   const totalExpenses = visibleJobSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
 
-  // Calculate expense categories
   const expenseCategories = [
     { name: "Marketing", value: totalExpenses * 0.4, color: "#f87171" },
     { name: "Platform Fees", value: totalExpenses * 0.3, color: "#22c55e" },
@@ -62,18 +57,28 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     { name: "Other", value: totalExpenses * 0.05, color: "#8b5cf6" },
   ];
 
-  // Sort job sources for top performers
+  const revenueBreakdown = [
+    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" },
+    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" },
+    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },
+  ];
+
+  const profitBreakdown = [
+    { name: "Operating Costs", value: totalProfit * 0.3, color: "#3b82f6" },
+    { name: "Reinvestment", value: totalProfit * 0.25, color: "#10b981" },
+    { name: "Owner Dividends", value: totalProfit * 0.30, color: "#f59e0b" },
+    { name: "Taxes", value: totalProfit * 0.15, color: "#ef4444" },
+  ];
+
   const topJobSources = [...visibleJobSources]
     .sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0))
     .slice(0, 5);
 
-  // Filter top job sources by search query
   const filteredTopJobSources = topJobSources.filter(source =>
     profitSearchQuery === "" ||
     source.name.toLowerCase().includes(profitSearchQuery.toLowerCase())
   );
 
-  // Toggle job source selection
   const toggleJobSource = (sourceName: string) => {
     setSelectedJobSources(prev => 
       prev.includes(sourceName) 
@@ -82,7 +87,6 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     );
   };
 
-  // Clear all filters
   const clearFilters = () => {
     setSelectedJobSources([]);
     setDate({
@@ -92,7 +96,6 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     setAppliedFilters(false);
   };
 
-  // Apply filters
   const applyFilters = () => {
     setAppliedFilters(true);
   };
@@ -119,7 +122,6 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
         </Button>
       </div>
 
-      {/* Job Sources Filters Panel */}
       <FinanceFiltersPanel 
         showFilters={showFilters}
         technicianNames={[]}
@@ -135,14 +137,13 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Profit Breakdown Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Profit Breakdown</CardTitle>
-            <CardDescription>Distribution of revenue and costs</CardDescription>
+            <CardTitle>Revenue Breakdown</CardTitle>
+            <CardDescription>Source of revenue streams</CardDescription>
             <div className="mt-2">
               <Input
-                placeholder="Search in profit breakdown..."
+                placeholder="Search in revenue breakdown..."
                 value={profitSearchQuery}
                 onChange={(e) => setProfitSearchQuery(e.target.value)}
                 className="text-sm"
@@ -151,24 +152,16 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <DonutChart
-              data={[
-                { name: "Company Profit", value: totalProfit, color: "#8b5cf6" },
-                { name: "Expenses", value: totalExpenses, color: "#f87171" },
-              ]}
-              title={formatCurrency(totalProfit)}
-              subtitle="Company Profit"
+              data={revenueBreakdown}
+              title={formatCurrency(totalRevenue)}
+              subtitle="Total Revenue"
             />
-            <div className="mt-4 text-center">
-              <p className="text-sm text-muted-foreground">Net Profit</p>
-              <p className="text-xl font-bold">{formatCurrency(netProfit)}</p>
-            </div>
           </CardContent>
         </Card>
 
-        {/* Expense Breakdown Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Expenses Breakdown</CardTitle>
+            <CardTitle>Expense Breakdown</CardTitle>
             <CardDescription>Distribution of expenses by type</CardDescription>
           </CardHeader>
           <CardContent>
@@ -180,36 +173,25 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
           </CardContent>
         </Card>
 
-        {/* Top Job Sources Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Top Job Sources</CardTitle>
-            <CardDescription>Best performing job sources by revenue</CardDescription>
+            <CardTitle>Net Profit Breakdown</CardTitle>
+            <CardDescription>How profit is distributed</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {filteredTopJobSources.map((source) => (
-                <div key={source.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-primary"></div>
-                    <span className="font-medium">{source.name}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">
-                      {source.totalJobs || 0} jobs
-                    </div>
-                    <div className="font-medium">
-                      {formatCurrency(source.totalRevenue || 0)}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <DonutChart
+              data={profitBreakdown}
+              title={formatCurrency(totalProfit)}
+              subtitle="Net Profit"
+            />
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">Total Net Profit</p>
+              <p className="text-xl font-bold">{formatCurrency(netProfit)}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Detailed Job Sources Table */}
       <Card>
         <CardHeader>
           <CardTitle>Job Sources Performance</CardTitle>

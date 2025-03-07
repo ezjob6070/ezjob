@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -66,6 +65,21 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     { name: "Training", value: totalExpenses * 0.15, color: "#f97316" },
     { name: "Insurance", value: totalExpenses * 0.1, color: "#3b82f6" },
     { name: "Other", value: totalExpenses * 0.05, color: "#8b5cf6" },
+  ];
+
+  // Revenue breakdown data
+  const revenueBreakdown = [
+    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" }, // sky blue
+    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" }, // pink
+    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },  // indigo
+  ];
+
+  // Net profit breakdown data
+  const profitBreakdown = [
+    { name: "Operating Costs", value: companyProfit * 0.3, color: "#3b82f6" }, // blue
+    { name: "Reinvestment", value: companyProfit * 0.25, color: "#10b981" },   // green
+    { name: "Owner Dividends", value: companyProfit * 0.30, color: "#f59e0b" }, // amber
+    { name: "Taxes", value: companyProfit * 0.15, color: "#ef4444" },          // red
   ];
   
   // Sort technicians by revenue for top performers
@@ -139,14 +153,14 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       />
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Profit Breakdown Card */}
+        {/* Revenue Breakdown Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Profit Breakdown</CardTitle>
-            <CardDescription>Distribution of revenue and costs</CardDescription>
+            <CardTitle>Revenue Breakdown</CardTitle>
+            <CardDescription>Source of revenue streams</CardDescription>
             <div className="mt-2">
               <Input
-                placeholder="Search in profit breakdown..."
+                placeholder="Search in revenue breakdown..."
                 value={profitSearchQuery}
                 onChange={(e) => setProfitSearchQuery(e.target.value)}
                 className="text-sm"
@@ -155,25 +169,17 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <DonutChart
-              data={[
-                { name: "Company Profit", value: companyProfit, color: "#8b5cf6" },
-                { name: "Technician Earnings", value: technicianEarnings, color: "#22c55e" },
-                { name: "Expenses", value: totalExpenses, color: "#f87171" },
-              ]}
-              title={formatCurrency(companyProfit)}
-              subtitle="Company Profit"
+              data={revenueBreakdown}
+              title={formatCurrency(totalRevenue)}
+              subtitle="Total Revenue"
             />
-            <div className="mt-4 text-center">
-              <p className="text-sm text-muted-foreground">Net Profit</p>
-              <p className="text-xl font-bold">{formatCurrency(netProfit)}</p>
-            </div>
           </CardContent>
         </Card>
 
         {/* Expense Breakdown Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Expenses Breakdown</CardTitle>
+            <CardTitle>Expense Breakdown</CardTitle>
             <CardDescription>Distribution of expenses by type</CardDescription>
           </CardHeader>
           <CardContent>
@@ -185,32 +191,21 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           </CardContent>
         </Card>
 
-        {/* Top Technicians Card */}
+        {/* Net Profit Breakdown Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Top Technicians</CardTitle>
-            <CardDescription>Best performing technicians by revenue</CardDescription>
+            <CardTitle>Net Profit Breakdown</CardTitle>
+            <CardDescription>How profit is distributed</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {filteredTopTechnicians.map((tech) => (
-                <div key={tech.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">
-                      {tech.initials}
-                    </div>
-                    <span className="font-medium">{tech.name}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">
-                      {tech.completedJobs} jobs
-                    </div>
-                    <div className="font-medium">
-                      {formatCurrency(tech.totalRevenue)}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <DonutChart
+              data={profitBreakdown}
+              title={formatCurrency(companyProfit)}
+              subtitle="Net Profit"
+            />
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">Total Net Profit</p>
+              <p className="text-xl font-bold">{formatCurrency(netProfit)}</p>
             </div>
           </CardContent>
         </Card>
