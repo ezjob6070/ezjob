@@ -6,7 +6,7 @@ import { Search, Filter } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import TechnicianFinanceSection from "@/components/finance/TechnicianFinanceSection";
-import { DonutChart } from "@/components/DonutChart";
+import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel";
 import { DateRange } from "react-day-picker";
@@ -31,10 +31,8 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   });
   const [appliedFilters, setAppliedFilters] = useState(false);
 
-  // Get all technician names
   const technicianNames = activeTechnicians.map(tech => tech.name);
 
-  // Filter technicians based on search query and selected technicians
   const filteredTechnicians = activeTechnicians.filter(tech => {
     const matchesSearch = 
       searchQuery === "" || 
@@ -48,17 +46,15 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     
     return matchesSearch && matchesSelectedTechnicians;
   });
-  
-  // Calculate total earnings for technicians
+
   const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
   const technicianEarnings = filteredTechnicians.reduce((sum, tech) => 
     sum + tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1), 0
   );
-  const totalExpenses = totalRevenue * 0.33; // Estimate expenses as 33% of revenue
+  const totalExpenses = totalRevenue * 0.33;
   const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
   const netProfit = totalRevenue - totalExpenses;
-  
-  // Calculate expense categories
+
   const expenseCategories = [
     { name: "Equipment", value: totalExpenses * 0.4, color: "#f87171" },
     { name: "Travel", value: totalExpenses * 0.3, color: "#22c55e" },
@@ -67,34 +63,29 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     { name: "Other", value: totalExpenses * 0.05, color: "#8b5cf6" },
   ];
 
-  // Revenue breakdown data
   const revenueBreakdown = [
-    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" }, // sky blue
-    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" }, // pink
-    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },  // indigo
+    { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" },
+    { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" },
+    { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },
   ];
 
-  // Net profit breakdown data
   const profitBreakdown = [
-    { name: "Operating Costs", value: companyProfit * 0.3, color: "#3b82f6" }, // blue
-    { name: "Reinvestment", value: companyProfit * 0.25, color: "#10b981" },   // green
-    { name: "Owner Dividends", value: companyProfit * 0.30, color: "#f59e0b" }, // amber
-    { name: "Taxes", value: companyProfit * 0.15, color: "#ef4444" },          // red
+    { name: "Operating Costs", value: companyProfit * 0.3, color: "#3b82f6" },
+    { name: "Reinvestment", value: companyProfit * 0.25, color: "#10b981" },
+    { name: "Owner Dividends", value: companyProfit * 0.30, color: "#f59e0b" },
+    { name: "Taxes", value: companyProfit * 0.15, color: "#ef4444" },
   ];
-  
-  // Sort technicians by revenue for top performers
+
   const topTechnicians = [...filteredTechnicians]
     .sort((a, b) => b.totalRevenue - a.totalRevenue)
     .slice(0, 5);
 
-  // Further filter top technicians by profit search query
   const filteredTopTechnicians = topTechnicians.filter(tech => 
     profitSearchQuery === "" || 
     tech.name.toLowerCase().includes(profitSearchQuery.toLowerCase()) ||
     tech.specialty.toLowerCase().includes(profitSearchQuery.toLowerCase())
   );
-  
-  // Toggle technician selection
+
   const toggleTechnician = (techName: string) => {
     setSelectedTechnicians(prev => 
       prev.includes(techName) 
@@ -103,7 +94,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     );
   };
 
-  // Clear all filters
   const clearFilters = () => {
     setSelectedTechnicians([]);
     setDate({
@@ -113,11 +103,10 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     setAppliedFilters(false);
   };
 
-  // Apply filters
   const applyFilters = () => {
     setAppliedFilters(true);
   };
-  
+
   return (
     <div className="space-y-8">
       <div className="flex items-center space-x-2">
@@ -140,7 +129,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         </Button>
       </div>
       
-      {/* Technician Filters Panel */}
       <TechnicianFiltersPanel 
         showFilters={showFilters}
         technicianNames={technicianNames}
@@ -152,66 +140,8 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         setDate={setDate}
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Revenue Breakdown Card */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Revenue Breakdown</CardTitle>
-            <CardDescription>Source of revenue streams</CardDescription>
-            <div className="mt-2">
-              <Input
-                placeholder="Search in revenue breakdown..."
-                value={profitSearchQuery}
-                onChange={(e) => setProfitSearchQuery(e.target.value)}
-                className="text-sm"
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <DonutChart
-              data={revenueBreakdown}
-              title={formatCurrency(totalRevenue)}
-              subtitle="Total Revenue"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Expense Breakdown Card */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Expense Breakdown</CardTitle>
-            <CardDescription>Distribution of expenses by type</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DonutChart
-              data={expenseCategories}
-              title={formatCurrency(totalExpenses)}
-              subtitle="Total Expenses"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Net Profit Breakdown Card */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Net Profit Breakdown</CardTitle>
-            <CardDescription>How profit is distributed</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DonutChart
-              data={profitBreakdown}
-              title={formatCurrency(companyProfit)}
-              subtitle="Net Profit"
-            />
-            <div className="mt-4 text-center">
-              <p className="text-sm text-muted-foreground">Total Net Profit</p>
-              <p className="text-xl font-bold">{formatCurrency(netProfit)}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
       
-      {/* Detailed Technicians Table */}
       <Card>
         <CardHeader>
           <CardTitle>Technician Performance</CardTitle>
