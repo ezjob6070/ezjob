@@ -43,9 +43,9 @@ const Layout = () => {
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         isMobile={isMobile}
       />
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden pt-16"> {/* Added pt-16 to account for the fixed header */}
         <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
-        {isLeftCalendarOpen && <LeftCalendarSidebar isOpen={isLeftCalendarOpen} />}
+        <LeftCalendarSidebar isOpen={isLeftCalendarOpen} />
         <main 
           className={`flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg
             ${isSidebarOpen && !isMobile ? 'ml-64' : 'ml-0'}
