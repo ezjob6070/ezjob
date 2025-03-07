@@ -4,9 +4,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Calendar, ChevronDown } from "lucide-react";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import { DateRange } from "react-day-picker";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 
 interface TechnicianFiltersPanelProps {
   showFilters: boolean;
@@ -51,6 +58,40 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
   const filteredTechnicians = technicianNames.filter(name =>
     name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  const handleDatePresetSelection = (preset: string) => {
+    const today = new Date();
+    
+    switch (preset) {
+      case "today":
+        setDate({ from: today, to: today });
+        break;
+      case "yesterday":
+        const yesterday = subDays(today, 1);
+        setDate({ from: yesterday, to: yesterday });
+        break;
+      case "last-week":
+        const lastWeekStart = startOfWeek(subDays(today, 7), { weekStartsOn: 1 });
+        const lastWeekEnd = endOfWeek(subDays(today, 7), { weekStartsOn: 1 });
+        setDate({ from: lastWeekStart, to: lastWeekEnd });
+        break;
+      case "this-month":
+        setDate({ from: startOfMonth(today), to: today });
+        break;
+      case "last-month":
+        const lastMonthDate = subDays(startOfMonth(today), 1);
+        setDate({ from: startOfMonth(lastMonthDate), to: endOfMonth(lastMonthDate) });
+        break;
+      case "last-30-days":
+        setDate({ from: subDays(today, 30), to: today });
+        break;
+      case "last-year":
+        setDate({ from: startOfYear(subDays(startOfYear(today), 1)), to: endOfYear(subDays(startOfYear(today), 1)) });
+        break;
+      default:
+        break;
+    }
+  };
   
   return (
     <Card className="mb-4">
@@ -108,7 +149,43 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
           
           <div>
             <h3 className="text-sm font-medium mb-2">Filter by Date Range</h3>
-            <DateRangeSelector date={date} setDate={setDate} />
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      <span>Quick Select</span>
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem onClick={() => handleDatePresetSelection("today")}>
+                      Today
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDatePresetSelection("yesterday")}>
+                      Yesterday
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDatePresetSelection("last-week")}>
+                      Last Week
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDatePresetSelection("this-month")}>
+                      This Month
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDatePresetSelection("last-month")}>
+                      Last Month
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDatePresetSelection("last-30-days")}>
+                      Last 30 Days
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDatePresetSelection("last-year")}>
+                      Last Year
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <DateRangeSelector date={date} setDate={setDate} />
+            </div>
           </div>
         </div>
         
