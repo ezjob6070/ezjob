@@ -31,4 +31,11 @@ export type FinancialReport = {
 export type JobSource = {
   id: string;
   name: string;
+  website?: string;
+  logoUrl?: string;
+  totalJobs?: number;
+  totalRevenue?: number;
+  expenses?: number;
+  companyProfit?: number;
+  createdAt?: Date;
 };

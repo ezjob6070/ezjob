@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { format, subMonths, addMonths } from 'date-fns';
+import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,22 +15,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 import { FinancialTransaction, JobSource } from "@/types/finance";
 import { sampleTransactions, generateFinancialReport, getDateRangeForTimeFrame } from "@/data/finances";
 import JobSourceFinance from "@/components/finance/JobSourceFinance";
+import TransactionHistory from "@/components/payments/TransactionHistory";
+import PaymentForm from "@/components/payments/PaymentForm";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { initialTechnicians } from "@/data/technicians";
 
 const Finance = () => {
   const [date, setDate] = useState<DateRange | undefined>({
@@ -38,13 +39,8 @@ const Finance = () => {
   });
   const [transactions, setTransactions] = useState<FinancialTransaction[]>(sampleTransactions);
   const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>([]);
-  const [jobSources, setJobSources] = useState<JobSource[]>([
-    { id: "1", name: "Website" },
-    { id: "2", name: "Referral" },
-    { id: "3", name: "Google Ads" },
-  ] as JobSource[]);
-  const [filteredJobSources, setFilteredJobSources] = useState<JobSource[]>([]);
-  const [timeFrame, setTimeFrame] = useState<"month" | "year" | "custom">("month");
+  const [jobSources, setJobSources] = useState<JobSource[]>([]);
+  const [activeTechnicians, setActiveTechnicians] = useState(initialTechnicians.filter(tech => tech.status === "active"));
 
   useEffect(() => {
     if (date?.from && date?.to) {
@@ -57,36 +53,62 @@ const Finance = () => {
   }, [date, transactions]);
 
   useEffect(() => {
-    // Simulate fetching job sources and their finances
-    // In a real application, you would fetch this data from an API or database
-    const simulatedJobSources: JobSource[] = [
+    // Prepare job sources with financial data
+    const sources: JobSource[] = [
       {
-        id: "1",
+        id: "js1",
         name: "Website",
         totalJobs: 120,
         totalRevenue: 55000,
-        profit: 23000,
+        expenses: 12000,
+        companyProfit: 23000,
         createdAt: new Date(),
-      } as JobSource,
+      },
       {
-        id: "2",
+        id: "js2", 
         name: "Referral",
         totalJobs: 80,
         totalRevenue: 40000,
-        profit: 18000,
+        expenses: 8000,
+        companyProfit: 18000,
         createdAt: new Date(),
-      } as JobSource,
+      },
       {
-        id: "3",
+        id: "js3",
         name: "Google Ads",
         totalJobs: 150,
         totalRevenue: 70000,
-        profit: 30000,
+        expenses: 25000,
+        companyProfit: 30000,
         createdAt: new Date(),
-      } as JobSource,
-    ];
-    setFilteredJobSources(simulatedJobSources);
+      },
+      {
+        id: "js4",
+        name: "Social Media",
+        totalJobs: 65,
+        totalRevenue: 32000,
+        expenses: 10000,
+        companyProfit: 12000,
+        createdAt: new Date(),
+      },
+      {
+        id: "js5",
+        name: "Direct Call",
+        totalJobs: 95,
+        totalRevenue: 48000,
+        expenses: 9000,
+        companyProfit: 22000,
+        createdAt: new Date(),
+      },
+    ] as JobSource[];
+    
+    setJobSources(sources);
   }, []);
+
+  // Calculate total metrics
+  const totalRevenue = jobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
+  const totalExpenses = jobSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
+  const totalProfit = jobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
 
   return (
     <div className="container py-8">
@@ -133,16 +155,14 @@ const Finance = () => {
         </Popover>
       </div>
 
-      <JobSourceFinance jobSources={filteredJobSources} transactions={filteredTransactions} />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
         <Card>
           <CardHeader>
             <CardTitle>Total Revenue</CardTitle>
             <CardDescription>Revenue from all sources</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$55,000</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
           </CardContent>
         </Card>
 
@@ -152,7 +172,7 @@ const Finance = () => {
             <CardDescription>Expenses across all categories</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$15,000</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
           </CardContent>
         </Card>
 
@@ -162,36 +182,72 @@ const Finance = () => {
             <CardDescription>Revenue after expenses</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$40,000</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalProfit)}</div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="mt-8">
-        <h3 className="text-xl font-bold mb-4">Recent Transactions</h3>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Job</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>{format(transaction.date, "MMM d, yyyy")}</TableCell>
-                  <TableCell>{transaction.clientName}</TableCell>
-                  <TableCell>{transaction.jobTitle}</TableCell>
-                  <TableCell>${transaction.amount}</TableCell>
-                  <TableCell>{transaction.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div>
+          <h3 className="text-xl font-bold mb-4">Job Source Finances</h3>
+          <JobSourceFinance jobSources={jobSources} transactions={filteredTransactions} />
+        </div>
+        
+        <div>
+          <h3 className="text-xl font-bold mb-4">Technician Earnings</h3>
+          <Card>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {activeTechnicians.map((tech) => (
+                  <div key={tech.id} className="flex items-center justify-between border-b pb-3">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-3">
+                        {tech.initials}
+                      </div>
+                      <div>
+                        <div className="font-medium">{tech.name}</div>
+                        <div className="text-sm text-muted-foreground">{tech.specialty}</div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="font-medium">{formatCurrency(tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1))}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {tech.paymentType === "percentage" ? 
+                          `${tech.paymentRate}% of ${formatCurrency(tech.totalRevenue)}` : 
+                          `Flat fee: ${formatCurrency(tech.paymentRate * tech.completedJobs)}`}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div>
+          <h3 className="text-xl font-bold mb-4">Recent Transactions</h3>
+          <TransactionHistory 
+            transactions={filteredTransactions.slice(0, 5).map(t => ({
+              id: t.id,
+              date: t.date,
+              amount: t.amount,
+              client: t.clientName,
+              job: t.jobTitle,
+              status: t.status
+            }))} 
+            formatCurrency={formatCurrency} 
+          />
+        </div>
+        
+        <div>
+          <h3 className="text-xl font-bold mb-4">Process Payment</h3>
+          <Card>
+            <CardContent className="p-6">
+              <PaymentForm />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

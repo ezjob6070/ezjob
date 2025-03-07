@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import CalendarSidebar from "./calendar/CalendarSidebar";
@@ -13,6 +13,7 @@ const Layout = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLeftCalendarOpen, setIsLeftCalendarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -41,6 +42,9 @@ const Layout = () => {
     setIsLeftCalendarOpen(!isLeftCalendarOpen);
   };
 
+  // Hide calendar buttons on Finance page
+  const isFinancePage = location.pathname === "/finance";
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-blue-700">
       <Header
@@ -58,25 +62,27 @@ const Layout = () => {
             ${isCalendarOpen && !isMobile ? 'mr-80' : 'mr-0'}`}
         >
           <div className="max-w-6xl mx-auto animate-fade-in rounded-xl bg-white/80 backdrop-blur-sm p-6 shadow-lg">
-            <div className="flex justify-between mb-4">
-              <Button
-                variant="outline"
-                onClick={toggleLeftCalendar}
-                className="gap-2"
-              >
-                <CalendarIcon size={16} />
-                {isLeftCalendarOpen ? "Hide Calendar" : "Show Calendar"}
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-                className="gap-2"
-              >
-                <CalendarIcon size={16} />
-                {isCalendarOpen ? "Hide Schedule" : "Show Schedule"}
-              </Button>
-            </div>
+            {!isFinancePage && (
+              <div className="flex justify-between mb-4">
+                <Button
+                  variant="outline"
+                  onClick={toggleLeftCalendar}
+                  className="gap-2"
+                >
+                  <CalendarIcon size={16} />
+                  {isLeftCalendarOpen ? "Hide Calendar" : "Show Calendar"}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                  className="gap-2"
+                >
+                  <CalendarIcon size={16} />
+                  {isCalendarOpen ? "Hide Schedule" : "Show Schedule"}
+                </Button>
+              </div>
+            )}
             <Outlet />
           </div>
         </main>
