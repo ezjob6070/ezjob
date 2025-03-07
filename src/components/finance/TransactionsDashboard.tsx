@@ -12,6 +12,17 @@ interface TransactionsDashboardProps {
 const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
   filteredTransactions
 }) => {
+  // Calculate totals for the dashboard cards
+  const totalTransactions = filteredTransactions.length;
+  
+  const totalRevenue = filteredTransactions
+    .filter(t => t.category === "payment" && t.status === "completed")
+    .reduce((sum, t) => sum + t.amount, 0);
+    
+  const totalExpenses = filteredTransactions
+    .filter(t => t.category === "expense" && t.status === "completed")
+    .reduce((sum, t) => sum + t.amount, 0);
+
   return (
     <div className="space-y-8">
       <Card>
@@ -24,7 +35,7 @@ const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
             <Card className="bg-blue-50">
               <CardContent className="p-4">
                 <h3 className="text-lg font-medium">Total Transactions</h3>
-                <p className="text-3xl font-bold mt-2">{filteredTransactions.length}</p>
+                <p className="text-3xl font-bold mt-2">{totalTransactions}</p>
                 <p className="text-sm text-muted-foreground mt-1">in selected period</p>
               </CardContent>
             </Card>
@@ -32,11 +43,7 @@ const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
               <CardContent className="p-4">
                 <h3 className="text-lg font-medium">Total Revenue</h3>
                 <p className="text-3xl font-bold mt-2">
-                  {formatCurrency(
-                    filteredTransactions
-                      .filter(t => t.category === "payment" && t.status === "completed")
-                      .reduce((sum, t) => sum + t.amount, 0)
-                  )}
+                  {formatCurrency(totalRevenue)}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">from completed payments</p>
               </CardContent>
@@ -45,11 +52,7 @@ const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
               <CardContent className="p-4">
                 <h3 className="text-lg font-medium">Total Expenses</h3>
                 <p className="text-3xl font-bold mt-2">
-                  {formatCurrency(
-                    filteredTransactions
-                      .filter(t => t.category === "expense" && t.status === "completed")
-                      .reduce((sum, t) => sum + t.amount, 0)
-                  )}
+                  {formatCurrency(totalExpenses)}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">from expense transactions</p>
               </CardContent>

@@ -20,6 +20,10 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
+  // Calculate total revenue and profit for donut charts
+  const totalRevenue = filteredJobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
+  const totalProfit = filteredJobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
+
   return (
     <div className="space-y-8">
       <Card className="mb-4">
@@ -37,7 +41,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
                   value: source.totalRevenue || 0,
                   color: [`#8b5cf6`, `#ec4899`, `#f97316`, `#22c55e`, `#3b82f6`][index % 5]
                 }))}
-                title={formatCurrency(filteredJobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0))}
+                title={formatCurrency(totalRevenue)}
                 subtitle="Total Revenue"
               />
             </div>
@@ -49,7 +53,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
                   value: source.companyProfit || 0,
                   color: [`#8b5cf6`, `#ec4899`, `#f97316`, `#22c55e`, `#3b82f6`][index % 5]
                 }))}
-                title={formatCurrency(filteredJobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0))}
+                title={formatCurrency(totalProfit)}
                 subtitle="Total Profit"
               />
             </div>
