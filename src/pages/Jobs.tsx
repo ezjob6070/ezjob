@@ -4,10 +4,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusIcon, CalendarIcon, ClipboardListIcon, UsersIcon, FileTextIcon } from "lucide-react";
+import { PlusIcon, CalendarIcon, ClipboardListIcon, UsersIcon, FileTextIcon, AlertTriangleIcon } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import JobsTable from "@/components/jobs/JobsTable";
 import CreateJobModal from "@/components/jobs/CreateJobModal";
+import { initialTechnicians } from "@/data/technicians";
 
 // Job types
 export type JobStatus = "scheduled" | "in-progress" | "completed" | "cancelled";
@@ -69,6 +70,19 @@ const Jobs = () => {
       description: "Install security cameras and alarm system",
       createdAt: new Date("2023-09-05"),
     },
+    {
+      id: "job4",
+      title: "Plumbing Repair",
+      clientName: "City Hospital",
+      clientId: "client4",
+      technicianName: "Michael Brown",
+      technicianId: "tech3",
+      scheduledDate: new Date("2023-10-05"),
+      status: "cancelled",
+      amount: 350,
+      description: "Fix leaking pipes in the basement",
+      createdAt: new Date("2023-09-12"),
+    },
   ]);
 
   const handleAddJob = (newJob: Job) => {
@@ -79,12 +93,25 @@ const Jobs = () => {
     });
   };
 
+  const handleCancelJob = (jobId: string) => {
+    setJobs((prevJobs) => prevJobs.map(job => 
+      job.id === jobId ? { ...job, status: "cancelled" as JobStatus } : job
+    ));
+  };
+
   // Stats calculation
   const totalJobs = jobs.length;
   const completedJobs = jobs.filter(job => job.status === "completed").length;
   const inProgressJobs = jobs.filter(job => job.status === "in-progress").length;
   const scheduledJobs = jobs.filter(job => job.status === "scheduled").length;
+  const cancelledJobs = jobs.filter(job => job.status === "cancelled").length;
   const totalRevenue = jobs.reduce((total, job) => total + job.amount, 0);
+
+  // Extract technicians for the filter
+  const technicians = initialTechnicians.map(tech => ({
+    id: tech.id,
+    name: tech.name
+  }));
 
   return (
     <div className="space-y-8 py-8">
@@ -105,7 +132,7 @@ const Jobs = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -151,6 +178,20 @@ const Jobs = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
+              <div className="p-2 bg-red-100 rounded-full">
+                <AlertTriangleIcon className="h-5 w-5 text-red-700" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Cancelled</p>
+                <p className="text-2xl font-bold">{cancelledJobs}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
               <div className="p-2 bg-purple-100 rounded-full">
                 <FileTextIcon className="h-5 w-5 text-purple-700" />
               </div>
@@ -164,21 +205,29 @@ const Jobs = () => {
       </div>
 
       <Tabs defaultValue="all-jobs">
-        <TabsList className="grid grid-cols-4 max-w-md">
+        <TabsList className="grid grid-cols-5 max-w-xl">
           <TabsTrigger value="all-jobs">All Jobs</TabsTrigger>
           <TabsTrigger value="scheduled">Scheduled ({scheduledJobs})</TabsTrigger>
           <TabsTrigger value="in-progress">In Progress ({inProgressJobs})</TabsTrigger>
           <TabsTrigger value="completed">Completed ({completedJobs})</TabsTrigger>
+          <TabsTrigger value="cancelled">Cancelled ({cancelledJobs})</TabsTrigger>
         </TabsList>
         
         <TabsContent value="all-jobs" className="mt-6">
-          <JobsTable jobs={jobs} formatCurrency={formatCurrency} />
+          <JobsTable 
+            jobs={jobs} 
+            formatCurrency={formatCurrency} 
+            technicians={technicians}
+            onCancelJob={handleCancelJob}
+          />
         </TabsContent>
         
         <TabsContent value="scheduled" className="mt-6">
           <JobsTable 
             jobs={jobs.filter(job => job.status === "scheduled")} 
             formatCurrency={formatCurrency} 
+            technicians={technicians}
+            onCancelJob={handleCancelJob}
           />
         </TabsContent>
         
@@ -186,6 +235,8 @@ const Jobs = () => {
           <JobsTable 
             jobs={jobs.filter(job => job.status === "in-progress")} 
             formatCurrency={formatCurrency} 
+            technicians={technicians}
+            onCancelJob={handleCancelJob}
           />
         </TabsContent>
         
@@ -193,6 +244,17 @@ const Jobs = () => {
           <JobsTable 
             jobs={jobs.filter(job => job.status === "completed")} 
             formatCurrency={formatCurrency} 
+            technicians={technicians}
+            onCancelJob={handleCancelJob}
+          />
+        </TabsContent>
+        
+        <TabsContent value="cancelled" className="mt-6">
+          <JobsTable 
+            jobs={jobs.filter(job => job.status === "cancelled")} 
+            formatCurrency={formatCurrency} 
+            technicians={technicians}
+            onCancelJob={handleCancelJob}
           />
         </TabsContent>
       </Tabs>
