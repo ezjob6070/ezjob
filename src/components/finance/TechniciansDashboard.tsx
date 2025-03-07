@@ -2,8 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import TechnicianFinanceSection from "@/components/finance/TechnicianFinanceSection";
@@ -23,7 +22,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [profitSearchQuery, setProfitSearchQuery] = useState("");
   const [date, setDate] = useState<DateRange | undefined>({
@@ -118,28 +116,18 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center space-x-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-8"
-            placeholder="Search technicians..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <Button 
-          variant="outline" 
-          size="icon"
-          onClick={() => setShowFilters(!showFilters)}
-          className={showFilters ? "bg-muted" : ""}
-        >
-          <Filter className="h-4 w-4" />
-        </Button>
+      <div className="relative flex-1">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-8"
+          placeholder="Search technicians..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </div>
       
       <TechnicianFiltersPanel 
-        showFilters={showFilters}
+        showFilters={true}
         technicianNames={technicianNames}
         selectedTechnicians={selectedTechnicians}
         toggleTechnician={toggleTechnician}
@@ -166,6 +154,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                 <TableHead>Specialty</TableHead>
                 <TableHead className="text-right">Completed Jobs</TableHead>
                 <TableHead className="text-right">Revenue Generated</TableHead>
+                <TableHead className="text-right">Parts</TableHead>
                 <TableHead className="text-right">Earnings</TableHead>
                 <TableHead className="text-right">Profit Margin</TableHead>
               </TableRow>
@@ -174,6 +163,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
               {filteredTechnicians.map((tech) => {
                 const earnings = tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1);
                 const profitMargin = ((tech.totalRevenue - earnings) / tech.totalRevenue * 100).toFixed(1);
+                const partsValue = tech.totalRevenue * 0.2;
                 
                 return (
                   <TableRow key={tech.id}>
@@ -188,6 +178,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                     <TableCell>{tech.specialty}</TableCell>
                     <TableCell className="text-right">{tech.completedJobs}</TableCell>
                     <TableCell className="text-right">{formatCurrency(tech.totalRevenue)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(partsValue)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(earnings)}</TableCell>
                     <TableCell className="text-right">{profitMargin}%</TableCell>
                   </TableRow>

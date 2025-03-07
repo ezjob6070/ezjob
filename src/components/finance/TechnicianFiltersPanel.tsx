@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,6 @@ interface TechnicianFiltersPanelProps {
 }
 
 const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
-  showFilters,
   technicianNames,
   selectedTechnicians,
   toggleTechnician,
@@ -41,8 +39,6 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
   deselectAllTechnicians
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  
-  if (!showFilters) return null;
   
   const allSelected = technicianNames.length > 0 && selectedTechnicians.length === technicianNames.length;
   const someSelected = selectedTechnicians.length > 0 && selectedTechnicians.length < technicianNames.length;
@@ -100,7 +96,6 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
           <div>
             <h3 className="text-sm font-medium mb-2">Filter by Technician</h3>
             <div className="space-y-2">
-              {/* Search Bar */}
               <div className="relative mb-3">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -111,7 +106,6 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
                 />
               </div>
 
-              {/* Select All Checkbox */}
               <div className="flex items-center space-x-2 pb-1 border-b mb-2">
                 <Checkbox 
                   id="select-all-technicians" 
