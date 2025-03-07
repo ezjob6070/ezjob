@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -101,7 +100,9 @@ const FinanceOverview = () => {
       <OverallFinanceSection 
         totalRevenue={totalRevenue} 
         totalExpenses={totalExpenses} 
-        totalProfit={totalProfit} 
+        totalProfit={totalProfit}
+        date={date}
+        setDate={setDate}
       />
     </div>
   );
