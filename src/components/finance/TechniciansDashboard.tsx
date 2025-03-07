@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel";
 import { DateRange } from "react-day-picker";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
+import TechnicianPaymentsSection from "@/components/finance/TechnicianPaymentsSection";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -124,6 +125,8 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       />
       
       <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
+      
+      <TechnicianPaymentsSection technicians={filteredTechnicians} />
       
       <Card>
         <CardHeader>
