@@ -99,22 +99,25 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
               hasJobs: "font-bold",
             }}
             components={{
-              Day: (props) => {
-                const dayColor = getDayColor(props.date);
+              Day: ({ date, selected, disabled, ...props }) => {
+                const dayColor = getDayColor(date);
                 return (
-                  <div 
-                    onClick={() => props.onClick?.()} 
+                  <button 
+                    type="button"
+                    disabled={disabled}
                     className={cn(
-                      props.className,
+                      "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
                       dayColor,
+                      selected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                       "relative"
                     )}
+                    {...props}
                   >
-                    {props.children}
-                    {jobs.some(job => isSameDay(job.date, props.date)) && (
+                    {format(date, "d")}
+                    {jobs.some(job => isSameDay(job.date, date)) && (
                       <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div>
                     )}
-                  </div>
+                  </button>
                 );
               }
             }}

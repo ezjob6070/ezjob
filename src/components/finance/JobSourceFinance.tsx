@@ -1,14 +1,21 @@
 
-// Fix arithmetic operation errors on lines 102-103
-// Ensure we're working with numbers instead of potential undefined/null values
-// Replace the problematic section with:
+// Replace the buggy arithmetic operations with proper null checking
 
-const totalExpenses = jobSourceFinances.reduce((sum, source) => {
-  const expenseValue = typeof source.expenses === 'number' ? source.expenses : 0;
-  return sum + expenseValue;
-}, 0);
+export const fixArithmeticOperations = () => {
+  // Fix arithmetic operation errors on lines 102-103
+  // Ensure we're working with numbers instead of potential undefined/null values
+  // Replace the problematic section with:
 
-const totalCompanyProfit = jobSourceFinances.reduce((sum, source) => {
-  const profitValue = typeof source.companyProfit === 'number' ? source.companyProfit : 0;
-  return sum + profitValue;
-}, 0);
+  const totalExpenses = jobSourceFinances.reduce((sum, source) => {
+    const expenseValue = typeof source.expenses === 'number' ? source.expenses : 0;
+    return sum + expenseValue;
+  }, 0);
+
+  const totalCompanyProfit = jobSourceFinances.reduce((sum, source) => {
+    const profitValue = typeof source.companyProfit === 'number' ? source.companyProfit : 0;
+    return sum + profitValue;
+  }, 0);
+};
+
+// Export the function as a named export
+export { fixArithmeticOperations as default };
