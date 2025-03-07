@@ -4,12 +4,14 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import CalendarSidebar from "./calendar/CalendarSidebar";
+import LeftCalendarSidebar from "./calendar/LeftCalendarSidebar";
 import { Button } from "./ui/button";
 import { CalendarIcon } from "lucide-react";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isLeftCalendarOpen, setIsLeftCalendarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -18,6 +20,7 @@ const Layout = () => {
       if (window.innerWidth < 1024) {
         setIsSidebarOpen(false);
         setIsCalendarOpen(false);
+        setIsLeftCalendarOpen(false);
       } else {
         setIsSidebarOpen(true);
       }
@@ -42,20 +45,31 @@ const Layout = () => {
       />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
+        {isLeftCalendarOpen && <LeftCalendarSidebar isOpen={isLeftCalendarOpen} />}
         <main 
           className={`flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg
             ${isSidebarOpen && !isMobile ? 'ml-64' : 'ml-0'}
+            ${isLeftCalendarOpen && !isMobile ? 'ml-80' : ''}
             ${isCalendarOpen && !isMobile ? 'mr-80' : 'mr-0'}`}
         >
           <div className="max-w-6xl mx-auto animate-fade-in rounded-xl bg-white/80 backdrop-blur-sm p-6 shadow-lg">
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-between mb-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsLeftCalendarOpen(!isLeftCalendarOpen)}
+                className="gap-2"
+              >
+                <CalendarIcon size={16} />
+                {isLeftCalendarOpen ? "Hide Calendar" : "Show Calendar"}
+              </Button>
+              
               <Button
                 variant="outline"
                 onClick={() => setIsCalendarOpen(!isCalendarOpen)}
                 className="gap-2"
               >
                 <CalendarIcon size={16} />
-                {isCalendarOpen ? "Hide Calendar" : "Show Calendar"}
+                {isCalendarOpen ? "Hide Schedule" : "Show Schedule"}
               </Button>
             </div>
             <Outlet />
