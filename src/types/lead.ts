@@ -11,6 +11,8 @@ export type Lead = {
   value: number;
   status: LeadStatus;
   notes: string;
+  assignedTo?: string;
   createdAt: Date;
   lastContactedAt: Date | null;
+  nextFollowUp?: Date;
 };
