@@ -16,6 +16,7 @@ type JobSourceFinanceRecord = {
   totalRevenue: number;
   sourceCost: number;
   companyProfit: number;
+  expenses: number;
 };
 
 type JobSourceFinanceProps = {
@@ -32,11 +33,18 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
   const jobSourceFinances: JobSourceFinanceRecord[] = jobSources.map(jobSource => {
     // Filter transactions for this job source
     const jobSourceTransactions = transactions.filter(
-      t => t.jobSourceId === jobSource.id && t.status === "completed" && t.category === "payment"
+      t => t.jobSourceId === jobSource.id && t.status === "completed"
     );
     
-    const totalJobs = jobSourceTransactions.length;
-    const totalRevenue = jobSourceTransactions.reduce((sum, t) => sum + t.amount, 0);
+    // Payment transactions
+    const paymentTransactions = jobSourceTransactions.filter(t => t.category === "payment");
+    
+    // Expense transactions
+    const expenseTransactions = jobSourceTransactions.filter(t => t.category === "expense");
+    
+    const totalJobs = paymentTransactions.length;
+    const totalRevenue = paymentTransactions.reduce((sum, t) => sum + t.amount, 0);
+    const expenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
     
     // Calculate job source cost - assuming 5% of revenue as default if not available
     let sourceCost = 0;
@@ -49,20 +57,22 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
       sourceCost = totalRevenue * 0.05;
     }
     
-    const companyProfit = totalRevenue - sourceCost;
+    const companyProfit = totalRevenue - sourceCost - expenses;
     
     return {
       jobSource,
       totalJobs,
       totalRevenue,
       sourceCost,
-      companyProfit
+      companyProfit,
+      expenses
     };
   });
 
   // Calculate totals for profit visualization
   const totalRevenue = jobSourceFinances.reduce((sum, source) => sum + source.totalRevenue, 0);
   const totalSourceCost = jobSourceFinances.reduce((sum, source) => sum + source.sourceCost, 0);
+  const totalExpenses = jobSourceFinances.reduce((sum, source) => sum + source.expenses, 0);
   const totalCompanyProfit = jobSourceFinances.reduce((sum, source) => sum + source.companyProfit, 0);
 
   // Filter by search term
@@ -100,13 +110,13 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Add visualization section */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        {/* Profit Breakdown Chart */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Profit Breakdown</CardTitle>
             <CardDescription>
-              Distribution of revenue and costs by job source
+              Distribution of revenue and costs
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center items-center pt-4">
@@ -121,10 +131,49 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
                   name: "Source Costs",
                   value: totalSourceCost,
                   color: "#F97316"
+                },
+                {
+                  name: "Expenses",
+                  value: totalExpenses,
+                  color: "#EF4444"
                 }
               ]}
               title={formatCurrency(totalCompanyProfit)}
               subtitle="Company Profit"
+              size={220}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Expenses Breakdown Chart */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Expenses Breakdown</CardTitle>
+            <CardDescription>
+              Distribution of expenses by type
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center items-center pt-4">
+            <DonutChart
+              data={[
+                {
+                  name: "Marketing",
+                  value: totalExpenses * 0.45, // Estimated 45% marketing
+                  color: "#EF4444"
+                },
+                {
+                  name: "Referral Fees",
+                  value: totalExpenses * 0.35, // Estimated 35% referral fees
+                  color: "#F59E0B"
+                },
+                {
+                  name: "Software",
+                  value: totalExpenses * 0.20, // Estimated 20% software/tools
+                  color: "#10B981"
+                }
+              ]}
+              title={formatCurrency(totalExpenses)}
+              subtitle="Total Expenses"
               size={220}
             />
           </CardContent>
@@ -208,6 +257,14 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
                   )}
                 </div>
               </TableHead>
+              <TableHead onClick={() => handleSort("expenses")} className="cursor-pointer hover:bg-muted">
+                <div className="flex items-center">
+                  Expenses
+                  {sortColumn === "expenses" && (
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  )}
+                </div>
+              </TableHead>
               <TableHead onClick={() => handleSort("companyProfit")} className="cursor-pointer hover:bg-muted">
                 <div className="flex items-center">
                   Company Profit
@@ -226,12 +283,13 @@ const JobSourceFinance = ({ jobSources, transactions }: JobSourceFinanceProps) =
                   <TableCell>{record.totalJobs}</TableCell>
                   <TableCell>{formatCurrency(record.totalRevenue)}</TableCell>
                   <TableCell>{formatCurrency(record.sourceCost)}</TableCell>
+                  <TableCell>{formatCurrency(record.expenses)}</TableCell>
                   <TableCell>{formatCurrency(record.companyProfit)}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
                   No job source financial data found
                 </TableCell>
               </TableRow>

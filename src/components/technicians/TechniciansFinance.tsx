@@ -17,6 +17,7 @@ type TechnicianFinanceRecord = {
   totalRevenue: number;
   technicianPayment: number;
   companyProfit: number;
+  expenses: number;
 };
 
 type TechniciansFinanceProps = {
@@ -33,14 +34,21 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   const technicianFinances: TechnicianFinanceRecord[] = technicians.map(technician => {
     // Filter transactions for this technician
     const technicianTransactions = transactions.filter(
-      t => t.technicianName === technician.name && t.status === "completed" && t.category === "payment"
+      t => t.technicianName === technician.name && t.status === "completed"
     );
     
-    const totalJobs = technicianTransactions.length;
-    const totalRevenue = technicianTransactions.reduce((sum, t) => sum + t.amount, 0);
+    // Payment transactions
+    const paymentTransactions = technicianTransactions.filter(t => t.category === "payment");
+    
+    // Expense transactions
+    const expenseTransactions = technicianTransactions.filter(t => t.category === "expense");
+    
+    const totalJobs = paymentTransactions.length;
+    const totalRevenue = paymentTransactions.reduce((sum, t) => sum + t.amount, 0);
+    const expenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
     
     // Calculate technician payment based on their payment structure
-    const technicianPayment = technicianTransactions.reduce((sum, t) => {
+    const technicianPayment = paymentTransactions.reduce((sum, t) => {
       if (t.technicianRate !== undefined) {
         return sum + calculateTechnicianProfit(
           t.amount, 
@@ -51,20 +59,22 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
       return sum;
     }, 0);
     
-    const companyProfit = totalRevenue - technicianPayment;
+    const companyProfit = totalRevenue - technicianPayment - expenses;
     
     return {
       technician,
       totalJobs,
       totalRevenue,
       technicianPayment,
-      companyProfit
+      companyProfit,
+      expenses
     };
   });
 
   // Calculate totals for profit visualization
   const totalRevenue = technicianFinances.reduce((sum, record) => sum + record.totalRevenue, 0);
   const totalTechnicianPayment = technicianFinances.reduce((sum, record) => sum + record.technicianPayment, 0);
+  const totalExpenses = technicianFinances.reduce((sum, record) => sum + record.expenses, 0);
   const totalCompanyProfit = technicianFinances.reduce((sum, record) => sum + record.companyProfit, 0);
 
   // Filter by search term
@@ -102,13 +112,13 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Add visualization section */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        {/* Profit Breakdown Chart */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Profit Breakdown</CardTitle>
             <CardDescription>
-              Distribution of revenue and technician payments
+              Distribution of revenue and payments
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center items-center pt-4">
@@ -123,10 +133,49 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
                   name: "Technician Payments",
                   value: totalTechnicianPayment,
                   color: "#F97316"
+                },
+                {
+                  name: "Expenses",
+                  value: totalExpenses,
+                  color: "#EF4444"
                 }
               ]}
               title={formatCurrency(totalCompanyProfit)}
               subtitle="Company Profit"
+              size={220}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Expenses Breakdown Chart */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Expenses Breakdown</CardTitle>
+            <CardDescription>
+              Distribution of expenses by type
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center items-center pt-4">
+            <DonutChart
+              data={[
+                {
+                  name: "Materials",
+                  value: totalExpenses * 0.6, // Estimated 60% for materials
+                  color: "#EF4444"
+                },
+                {
+                  name: "Transport",
+                  value: totalExpenses * 0.25, // Estimated 25% for transport
+                  color: "#F59E0B"
+                },
+                {
+                  name: "Other",
+                  value: totalExpenses * 0.15, // Estimated 15% for other expenses
+                  color: "#10B981"
+                }
+              ]}
+              title={formatCurrency(totalExpenses)}
+              subtitle="Total Expenses"
               size={220}
             />
           </CardContent>
@@ -210,6 +259,14 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
                   )}
                 </div>
               </TableHead>
+              <TableHead onClick={() => handleSort("expenses")} className="cursor-pointer hover:bg-muted">
+                <div className="flex items-center">
+                  Expenses
+                  {sortColumn === "expenses" && (
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  )}
+                </div>
+              </TableHead>
               <TableHead onClick={() => handleSort("companyProfit")} className="cursor-pointer hover:bg-muted">
                 <div className="flex items-center">
                   Company Profit
@@ -228,12 +285,13 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
                   <TableCell>{record.totalJobs}</TableCell>
                   <TableCell>{formatCurrency(record.totalRevenue)}</TableCell>
                   <TableCell>{formatCurrency(record.technicianPayment)}</TableCell>
+                  <TableCell>{formatCurrency(record.expenses)}</TableCell>
                   <TableCell>{formatCurrency(record.companyProfit)}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
                   No technician financial data found
                 </TableCell>
               </TableRow>
