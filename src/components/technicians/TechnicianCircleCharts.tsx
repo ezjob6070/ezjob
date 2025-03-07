@@ -57,8 +57,8 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         {/* Revenue Breakdown Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Revenue Breakdown</CardTitle>
-            <CardDescription>Source of revenue streams</CardDescription>
+            <CardTitle>Total Income Breakdown</CardTitle>
+            <CardDescription>Source of income streams</CardDescription>
           </CardHeader>
           <CardContent>
             <DonutChart
@@ -72,14 +72,14 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         {/* Expense Distribution Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Income Distribution</CardTitle>
+            <CardTitle>Total Payment and Expenses</CardTitle>
             <CardDescription>Distribution of earnings between technicians and company</CardDescription>
           </CardHeader>
           <CardContent>
             <DonutChart
               data={technicianExpenseBreakdown}
-              title={`${companyProfitPercentage}%`}
-              subtitle="Company Profit Margin"
+              title={formatCurrency(companyProfit)}
+              subtitle="Company Profit"
             />
           </CardContent>
         </Card>
