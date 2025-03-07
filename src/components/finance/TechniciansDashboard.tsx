@@ -1,14 +1,16 @@
 
-import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, Filter } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import TechnicianFinanceSection from "@/components/finance/TechnicianFinanceSection";
 import { DonutChart } from "@/components/DonutChart";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel";
+import { DateRange } from "react-day-picker";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -21,11 +23,32 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
-  const filteredTechnicians = activeTechnicians.filter(tech => 
-    searchQuery === "" || 
-    tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tech.specialty.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
+  const [profitSearchQuery, setProfitSearchQuery] = useState("");
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
+    to: new Date(),
+  });
+  const [appliedFilters, setAppliedFilters] = useState(false);
+
+  // Get all technician names
+  const technicianNames = activeTechnicians.map(tech => tech.name);
+
+  // Filter technicians based on search query and selected technicians
+  const filteredTechnicians = activeTechnicians.filter(tech => {
+    const matchesSearch = 
+      searchQuery === "" || 
+      tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tech.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesSelectedTechnicians = 
+      !appliedFilters || 
+      selectedTechnicians.length === 0 || 
+      selectedTechnicians.includes(tech.name);
+    
+    return matchesSearch && matchesSelectedTechnicians;
+  });
   
   // Calculate total earnings for technicians
   const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
@@ -49,14 +72,70 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const topTechnicians = [...filteredTechnicians]
     .sort((a, b) => b.totalRevenue - a.totalRevenue)
     .slice(0, 5);
+
+  // Further filter top technicians by profit search query
+  const filteredTopTechnicians = topTechnicians.filter(tech => 
+    profitSearchQuery === "" || 
+    tech.name.toLowerCase().includes(profitSearchQuery.toLowerCase()) ||
+    tech.specialty.toLowerCase().includes(profitSearchQuery.toLowerCase())
+  );
+  
+  // Toggle technician selection
+  const toggleTechnician = (techName: string) => {
+    setSelectedTechnicians(prev => 
+      prev.includes(techName) 
+        ? prev.filter(t => t !== techName)
+        : [...prev, techName]
+    );
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSelectedTechnicians([]);
+    setDate({
+      from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
+      to: new Date(),
+    });
+    setAppliedFilters(false);
+  };
+
+  // Apply filters
+  const applyFilters = () => {
+    setAppliedFilters(true);
+  };
   
   return (
     <div className="space-y-8">
-      <Input
-        className="mb-4"
-        placeholder="Search technicians..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-8"
+            placeholder="Search technicians..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => setShowFilters(!showFilters)}
+          className={showFilters ? "bg-muted" : ""}
+        >
+          <Filter className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      {/* Technician Filters Panel */}
+      <TechnicianFiltersPanel 
+        showFilters={showFilters}
+        technicianNames={technicianNames}
+        selectedTechnicians={selectedTechnicians}
+        toggleTechnician={toggleTechnician}
+        clearFilters={clearFilters}
+        applyFilters={applyFilters}
+        date={date}
+        setDate={setDate}
       />
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -65,6 +144,14 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           <CardHeader className="pb-2">
             <CardTitle>Profit Breakdown</CardTitle>
             <CardDescription>Distribution of revenue and costs</CardDescription>
+            <div className="mt-2">
+              <Input
+                placeholder="Search in profit breakdown..."
+                value={profitSearchQuery}
+                onChange={(e) => setProfitSearchQuery(e.target.value)}
+                className="text-sm"
+              />
+            </div>
           </CardHeader>
           <CardContent>
             <DonutChart
@@ -106,7 +193,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topTechnicians.map((tech) => (
+              {filteredTopTechnicians.map((tech) => (
                 <div key={tech.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">

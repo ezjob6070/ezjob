@@ -1,12 +1,16 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, Filter } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { JobSource, FinancialTransaction } from "@/types/finance";
 import { DonutChart } from "@/components/DonutChart";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import JobSourceFinanceSection from "@/components/finance/JobSourceFinanceSection";
+import FinanceFiltersPanel from "@/components/finance/FinanceFiltersPanel";
+import { DateRange } from "react-day-picker";
 
 interface JobSourcesDashboardProps {
   filteredJobSources: JobSource[];
@@ -21,10 +25,32 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
+  const [profitSearchQuery, setProfitSearchQuery] = useState("");
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
+    to: new Date(),
+  });
+  const [appliedFilters, setAppliedFilters] = useState(false);
+
+  // Get all job source names
+  const jobSourceNames = filteredJobSources.map(source => source.name);
+  
+  // Filter job sources based on filters
+  const visibleJobSources = filteredJobSources.filter(source => {
+    const matchesSelected = 
+      !appliedFilters || 
+      selectedJobSources.length === 0 || 
+      selectedJobSources.includes(source.name);
+    
+    return matchesSelected;
+  });
+
   // Calculate total revenue and profit for donut charts
-  const totalRevenue = filteredJobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
-  const totalProfit = filteredJobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
-  const totalExpenses = filteredJobSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
+  const totalRevenue = visibleJobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
+  const totalProfit = visibleJobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
+  const totalExpenses = visibleJobSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
 
   // Calculate expense categories
@@ -37,17 +63,75 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   ];
 
   // Sort job sources for top performers
-  const topJobSources = [...filteredJobSources]
+  const topJobSources = [...visibleJobSources]
     .sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0))
     .slice(0, 5);
 
+  // Filter top job sources by search query
+  const filteredTopJobSources = topJobSources.filter(source =>
+    profitSearchQuery === "" ||
+    source.name.toLowerCase().includes(profitSearchQuery.toLowerCase())
+  );
+
+  // Toggle job source selection
+  const toggleJobSource = (sourceName: string) => {
+    setSelectedJobSources(prev => 
+      prev.includes(sourceName) 
+        ? prev.filter(s => s !== sourceName)
+        : [...prev, sourceName]
+    );
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSelectedJobSources([]);
+    setDate({
+      from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
+      to: new Date(),
+    });
+    setAppliedFilters(false);
+  };
+
+  // Apply filters
+  const applyFilters = () => {
+    setAppliedFilters(true);
+  };
+
   return (
     <div className="space-y-8">
-      <Input
-        className="mb-4"
-        placeholder="Search job sources..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-8"
+            placeholder="Search job sources..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => setShowFilters(!showFilters)}
+          className={showFilters ? "bg-muted" : ""}
+        >
+          <Filter className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Job Sources Filters Panel */}
+      <FinanceFiltersPanel 
+        showFilters={showFilters}
+        technicianNames={[]}
+        jobSourceNames={jobSourceNames}
+        selectedTechnicians={[]}
+        selectedJobSources={selectedJobSources}
+        toggleTechnician={() => {}}
+        toggleJobSource={toggleJobSource}
+        clearFilters={clearFilters}
+        date={date}
+        setDate={setDate}
+        applyFilters={applyFilters}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -56,6 +140,14 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
           <CardHeader className="pb-2">
             <CardTitle>Profit Breakdown</CardTitle>
             <CardDescription>Distribution of revenue and costs</CardDescription>
+            <div className="mt-2">
+              <Input
+                placeholder="Search in profit breakdown..."
+                value={profitSearchQuery}
+                onChange={(e) => setProfitSearchQuery(e.target.value)}
+                className="text-sm"
+              />
+            </div>
           </CardHeader>
           <CardContent>
             <DonutChart
@@ -96,7 +188,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topJobSources.map((source) => (
+              {filteredTopJobSources.map((source) => (
                 <div key={source.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-primary"></div>
@@ -136,7 +228,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredJobSources.map((source) => {
+              {visibleJobSources.map((source) => {
                 const profit = source.companyProfit || 0;
                 const revenue = source.totalRevenue || 0;
                 const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
@@ -163,7 +255,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
       </Card>
       
       <JobSourceFinanceSection 
-        jobSources={filteredJobSources} 
+        jobSources={visibleJobSources} 
         filteredTransactions={filteredTransactions} 
       />
     </div>
