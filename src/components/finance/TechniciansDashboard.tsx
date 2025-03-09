@@ -9,6 +9,7 @@ import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel"
 import { DateRange } from "react-day-picker";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
+import IndustryFilter from "@/components/finance/technician-filters/IndustryFilter";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -24,6 +25,11 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [appliedFilters, setAppliedFilters] = useState(false);
+  // Add industry filter state
+  const [industries, setIndustries] = useState<string[]>([
+    "Garage Door", "HVAC", "Electrical", "Plumbing", "Construction", "Others"
+  ]);
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
 
   const technicianNames = activeTechnicians.map(tech => tech.name);
 
@@ -37,8 +43,15 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       !appliedFilters || 
       selectedTechnicians.length === 0 || 
       selectedTechnicians.includes(tech.name);
+
+    // Add industry filter matching
+    const matchesIndustry = 
+      selectedIndustries.length === 0 || 
+      (tech.industry && selectedIndustries.includes(tech.industry)) ||
+      // If tech doesn't have an industry assigned, include it in "Others"
+      (!tech.industry && selectedIndustries.includes("Others"));
     
-    return matchesSearch && matchesSelectedTechnicians;
+    return matchesSearch && matchesSelectedTechnicians && matchesIndustry;
   });
 
   const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
@@ -87,6 +100,20 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     );
   };
 
+  // Add industry filter toggle
+  const toggleIndustry = (industry: string) => {
+    setSelectedIndustries(prev => 
+      prev.includes(industry) 
+        ? prev.filter(i => i !== industry)
+        : [...prev, industry]
+    );
+  };
+
+  // Add new industry function
+  const addIndustry = (industry: string) => {
+    setIndustries(prev => [...prev, industry]);
+  };
+
   const selectAllTechnicians = () => {
     setSelectedTechnicians([...technicianNames]);
   };
@@ -97,6 +124,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   const clearFilters = () => {
     setSelectedTechnicians([]);
+    setSelectedIndustries([]);
     setDate(undefined);
     setAppliedFilters(false);
   };
@@ -123,10 +151,18 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             compact={true}
           />
           
+          {/* Add Industry Filter */}
+          <IndustryFilter 
+            selectedIndustries={selectedIndustries}
+            toggleIndustry={toggleIndustry}
+            industries={industries}
+            addIndustry={addIndustry}
+          />
+          
           <CompactDateRangeSelector date={date} setDate={setDate} />
         </div>
         
-        {selectedTechnicians.length > 0 && (
+        {(selectedTechnicians.length > 0 || selectedIndustries.length > 0) && (
           <div className="text-sm text-muted-foreground">
             Showing {filteredTechnicians.length} of {activeTechnicians.length} technicians
           </div>
@@ -155,6 +191,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
               <TableRow>
                 <TableHead>Technician</TableHead>
                 <TableHead>Specialty</TableHead>
+                <TableHead>Industry</TableHead>
                 <TableHead className="text-right">Completed Jobs</TableHead>
                 <TableHead className="text-right">Revenue Generated</TableHead>
                 <TableHead className="text-right">Parts</TableHead>
@@ -179,6 +216,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                       </div>
                     </TableCell>
                     <TableCell>{tech.specialty}</TableCell>
+                    <TableCell>{tech.industry || "Others"}</TableCell>
                     <TableCell className="text-right">{tech.completedJobs}</TableCell>
                     <TableCell className="text-right text-sky-600">{formatCurrency(tech.totalRevenue)}</TableCell>
                     <TableCell className="text-right text-red-600">-{formatCurrency(partsValue)}</TableCell>
