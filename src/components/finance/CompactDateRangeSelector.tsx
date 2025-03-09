@@ -25,11 +25,11 @@ interface CompactDateRangeSelectorProps {
 }
 
 const CompactDateRangeSelector: React.FC<CompactDateRangeSelectorProps> = ({ date, setDate }) => {
-  // Set default to today when component mounts
+  // Set default to "this month" when component mounts
   useEffect(() => {
     if (!date?.from) {
       const today = new Date();
-      setDate({ from: today, to: today });
+      setDate({ from: startOfMonth(today), to: today });
     }
   }, []);
 
@@ -78,9 +78,9 @@ const CompactDateRangeSelector: React.FC<CompactDateRangeSelectorProps> = ({ dat
 
   return (
     <div className="flex items-center space-x-2">
-      <Select onValueChange={handleDatePresetSelection} defaultValue="today">
+      <Select onValueChange={handleDatePresetSelection} defaultValue="this-month">
         <SelectTrigger className="w-auto px-3 py-5 text-base font-medium">
-          <SelectValue placeholder="Today" />
+          <SelectValue placeholder="This Month" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="today">Today</SelectItem>
