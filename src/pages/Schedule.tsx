@@ -9,6 +9,8 @@ import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
 import TasksView from "@/components/schedule/TasksView";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon } from "lucide-react";
 
 const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -46,15 +48,21 @@ const Schedule = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Schedule</h1>
-        <p className="text-muted-foreground">
-          Manage your appointments, jobs, and tasks in one place.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Schedule</h1>
+          <p className="text-muted-foreground">
+            Manage your appointments, jobs, and tasks in one place.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" className="gap-2">
+          <CalendarIcon className="h-4 w-4" />
+          Show Calendar
+        </Button>
       </div>
 
       <Tabs defaultValue="calendar" className="w-full">
-        <TabsList>
+        <TabsList className="mb-4">
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="jobs">Jobs</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>

@@ -21,7 +21,7 @@ const TasksView = ({
   onNextDay 
 }: TasksViewProps) => {
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
           <Button 
@@ -49,7 +49,7 @@ const TasksView = ({
         ) : (
           <div className="space-y-4">
             {tasksForSelectedDate.map(task => (
-              <Card key={task.id} className="overflow-hidden">
+              <Card key={task.id} className="overflow-hidden shadow-sm">
                 <CardContent className="p-4">
                   <div className="grid grid-cols-2 gap-2">
                     <div>

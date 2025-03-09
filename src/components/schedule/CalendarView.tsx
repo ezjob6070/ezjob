@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, isSameDay } from "date-fns";
@@ -64,13 +63,13 @@ const CalendarView = ({
           <CardHeader>
             <CardTitle>Calendar</CardTitle>
           </CardHeader>
-          <CardContent className="p-0 pb-6">
-            <div className="flex justify-end items-center px-2 w-full">
+          <CardContent className="pb-6">
+            <div className="flex justify-center items-center w-full mb-4">
               <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={(date) => date && updateSelectedDateItems(date)}
-                className="w-full scale-125 transform origin-right mr-12"
+                className="border rounded-md shadow-sm"
                 modifiers={{
                   hasEvents: (date) => 
                     jobs.some(job => isSameDay(job.date, date)) || 
