@@ -3,11 +3,9 @@ import React from "react";
 import { 
   ArrowLeft, 
   ArrowRight, 
-  Search, 
   SlidersHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
@@ -87,16 +85,6 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search transactions..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
           <Button 
             variant="outline" 
             size="icon"

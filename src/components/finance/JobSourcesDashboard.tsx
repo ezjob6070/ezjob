@@ -34,10 +34,6 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   const jobSourceNames = filteredJobSources.map(source => source.name);
 
   const filteredSources = filteredJobSources.filter(source => {
-    const matchesSearch = 
-      searchQuery === "" || 
-      source.name.toLowerCase().includes(searchQuery.toLowerCase());
-    
     const matchesSelectedSources = 
       !appliedFilters || 
       selectedJobSources.length === 0 || 
@@ -48,7 +44,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
       (source.category && selectedCategories.includes(source.category)) ||
       (!source.category && selectedCategories.includes("Others"));
     
-    return matchesSearch && matchesSelectedSources && matchesCategory;
+    return matchesSelectedSources && matchesCategory;
   });
 
   const totalRevenue = filteredSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);

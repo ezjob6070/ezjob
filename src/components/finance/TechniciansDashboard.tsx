@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -33,11 +32,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const technicianNames = activeTechnicians.map(tech => tech.name);
 
   const filteredTechnicians = activeTechnicians.filter(tech => {
-    const matchesSearch = 
-      searchQuery === "" || 
-      tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tech.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    
     const matchesSelectedTechnicians = 
       !appliedFilters || 
       selectedTechnicians.length === 0 || 
@@ -48,7 +42,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       (tech.category && selectedCategories.includes(tech.category)) ||
       (!tech.category && selectedCategories.includes("Others"));
     
-    return matchesSearch && matchesSelectedTechnicians && matchesCategory;
+    return matchesSelectedTechnicians && matchesCategory;
   });
 
   const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
