@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
 
 interface TechnicianCircleChartsProps {
   filteredTechnicians: Technician[];
@@ -20,6 +21,8 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
 }) => {
   const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>("all");
   const [selectedTechnicianNames, setSelectedTechnicianNames] = useState<string[]>([]);
+  const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
+  const [localDateRange, setLocalDateRange] = useState<DateRange | undefined>(dateRange);
   
   const technicianNames = filteredTechnicians.map(tech => tech.name);
   
@@ -69,17 +72,39 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   const applyFilters = () => {
     // Filters are applied instantly
   };
+  
+  // Handle row click
+  const handleRowClick = (tech: Technician) => {
+    setSelectedTechnician(selectedTechnician?.id === tech.id ? null : tech);
+  };
 
   // Format date range for display
   const getDateRangeText = () => {
-    if (!dateRange?.from) return "";
+    if (!localDateRange?.from) return "";
     
-    return dateRange.to
-      ? `${format(dateRange.from, "MMM d, yyyy")} - ${format(dateRange.to, "MMM d, yyyy")}`
-      : `${format(dateRange.from, "MMM d, yyyy")}`;
+    return localDateRange.to
+      ? `${format(localDateRange.from, "MMM d, yyyy")} - ${format(localDateRange.to, "MMM d, yyyy")}`
+      : `${format(localDateRange.from, "MMM d, yyyy")}`;
   };
   
   const dateRangeText = getDateRangeText();
+
+  // Calculate metrics for selected technician
+  const getSelectedTechnicianMetrics = () => {
+    if (!selectedTechnician) return null;
+    
+    const revenue = selectedTechnician.totalRevenue;
+    const earnings = revenue * (selectedTechnician.paymentType === "percentage" 
+      ? selectedTechnician.paymentRate / 100 
+      : 1);
+    const expenses = revenue * 0.33;
+    const profit = revenue - earnings - expenses;
+    const partsValue = revenue * 0.2; // Assuming parts are 20% of total revenue
+    
+    return { revenue, earnings, expenses, profit, partsValue };
+  };
+  
+  const selectedTechMetrics = getSelectedTechnicianMetrics();
   
   return (
     <div className="space-y-6">
@@ -131,6 +156,61 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         </Card>
       </div>
       
+      {/* Selected Technician Metrics */}
+      {selectedTechnician && selectedTechMetrics && (
+        <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-6">
+          <div className="flex items-center mb-4">
+            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white mr-3">
+              {selectedTechnician.initials}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">{selectedTechnician.name}</h3>
+              <p className="text-sm text-slate-500">
+                {selectedTechnician.specialty} • {selectedTechnician.paymentType === "percentage" 
+                  ? `${selectedTechnician.paymentRate}% commission` 
+                  : `Flat rate: ${formatCurrency(selectedTechnician.paymentRate)}`}
+              </p>
+            </div>
+            <div className="ml-auto text-sm text-slate-500">
+              {dateRangeText || "All time"}
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="pt-6">
+                <div className="text-sm text-slate-500 mb-1">Total Revenue</div>
+                <div className="text-2xl font-bold text-sky-600">{formatCurrency(selectedTechMetrics.revenue)}</div>
+                <div className="text-xs text-slate-400 mt-1">From {selectedTechnician.completedJobs} completed jobs</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="pt-6">
+                <div className="text-sm text-slate-500 mb-1">Total Expenses</div>
+                <div className="text-2xl font-bold text-red-600">
+                  -{formatCurrency(selectedTechMetrics.earnings + selectedTechMetrics.expenses - selectedTechMetrics.partsValue)}
+                </div>
+                <div className="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>Technician: -{formatCurrency(selectedTechMetrics.earnings)}</span>
+                  <span>Parts: -{formatCurrency(selectedTechMetrics.partsValue)}</span>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="pt-6">
+                <div className="text-sm text-slate-500 mb-1">Company Profit</div>
+                <div className="text-2xl font-bold text-emerald-600">{formatCurrency(selectedTechMetrics.profit)}</div>
+                <div className="text-xs text-slate-400 mt-1">
+                  Profit margin: {((selectedTechMetrics.profit / selectedTechMetrics.revenue) * 100).toFixed(1)}%
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+      
       {/* Technicians List Table */}
       <Card>
         <CardHeader>
@@ -161,8 +241,12 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
               </Select>
             </div>
 
+            <div className="ml-auto">
+              <CompactDateRangeSelector date={localDateRange} setDate={setLocalDateRange} />
+            </div>
+
             {(selectedTechnicianNames.length > 0 || paymentTypeFilter !== "all") && (
-              <div className="text-sm text-muted-foreground ml-auto">
+              <div className="text-sm text-muted-foreground">
                 Showing {displayedTechnicians.length} of {filteredTechnicians.length} technicians
               </div>
             )}
@@ -187,10 +271,14 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
                 const partsValue = tech.totalRevenue * 0.2; // Assuming parts are 20% of total revenue
                 
                 return (
-                  <TableRow key={tech.id}>
+                  <TableRow 
+                    key={tech.id}
+                    className={`cursor-pointer hover:bg-slate-50 ${selectedTechnician?.id === tech.id ? 'bg-indigo-50' : ''}`}
+                    onClick={() => handleRowClick(tech)}
+                  >
                     <TableCell className="font-medium">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 mr-2 text-xs">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white mr-2 text-xs ${selectedTechnician?.id === tech.id ? 'bg-indigo-600' : 'bg-indigo-400'}`}>
                           {tech.initials}
                         </div>
                         <span>{tech.name}</span>

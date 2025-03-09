@@ -1,3 +1,4 @@
+<lov-codelov-code>
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -241,3 +242,4 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 };
 
 export default TechniciansDashboard;
+</lov-code>
