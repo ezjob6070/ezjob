@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
@@ -102,12 +103,12 @@ const Schedule = () => {
                 <CardTitle>Calendar</CardTitle>
               </CardHeader>
               <CardContent className="p-0 pb-6">
-                <div className="w-full flex justify-end items-center px-6">
+                <div className="flex justify-center items-center px-2 w-full">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && updateSelectedDateItems(date)}
-                    className="w-[120%] scale-115 transform origin-center mx-auto"
+                    className="w-full scale-125 transform origin-center"
                     modifiers={{
                       hasEvents: (date) => 
                         jobs.some(job => isSameDay(job.date, date)) || 
