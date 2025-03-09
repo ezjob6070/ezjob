@@ -103,12 +103,12 @@ const Schedule = () => {
                 <CardTitle>Calendar</CardTitle>
               </CardHeader>
               <CardContent className="p-0 pb-6">
-                <div className="flex justify-center items-center px-2 w-full">
+                <div className="flex justify-end items-center px-2 w-full">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && updateSelectedDateItems(date)}
-                    className="w-full scale-125 transform origin-center"
+                    className="w-full scale-125 transform origin-right"
                     modifiers={{
                       hasEvents: (date) => 
                         jobs.some(job => isSameDay(job.date, date)) || 
