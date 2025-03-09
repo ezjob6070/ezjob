@@ -96,7 +96,17 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-2 flex justify-between border-b">
+        <CalendarComponent
+          initialFocus
+          mode="range"
+          defaultMonth={date?.from}
+          selected={date}
+          onSelect={setDate}
+          numberOfMonths={2}
+          className="p-3 pointer-events-auto"
+        />
+        
+        <div className="p-2 flex justify-between border-t">
           <div className="space-y-1">
             <div className="text-xs font-semibold mb-1">Past</div>
             <div className="grid grid-cols-1 gap-1">
@@ -139,16 +149,6 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
             </div>
           </div>
         </div>
-        
-        <CalendarComponent
-          initialFocus
-          mode="range"
-          defaultMonth={date?.from}
-          selected={date}
-          onSelect={setDate}
-          numberOfMonths={2}
-          className="p-3 pointer-events-auto"
-        />
       </PopoverContent>
     </Popover>
   );
