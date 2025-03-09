@@ -103,7 +103,7 @@ const CompactDateRangeSelector: React.FC<CompactDateRangeSelectorProps> = ({ dat
             className="w-auto justify-between px-3 py-5 text-base font-medium"
           >
             <div className="flex flex-col items-center w-full">
-              <span className="text-xs font-semibold text-black uppercase mb-1">CUSTOM RANGE</span>
+              <span className="text-xs font-semibold text-black uppercase mt-1 mb-2">CUSTOM RANGE</span>
               <div className="flex items-center">
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {date?.from ? (
