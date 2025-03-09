@@ -26,32 +26,33 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash, Download } from "lucide-react";
+import { Plus, Edit, Trash, Download, Home, User, Tool, Package, Boxes, Warehouse, FolderPlus } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
 
-// Define expense categories
+// Define expense categories with icons and colors
 const EXPENSE_CATEGORIES = [
-  { id: "rent", label: "Office Rent & Utilities" },
-  { id: "equipment", label: "Office Equipment" },
-  { id: "supplies", label: "Office Supplies" },
-  { id: "software", label: "Software & Subscriptions" },
-  { id: "staff", label: "Administrative Staff" },
-  { id: "insurance", label: "Business Insurance" },
-  { id: "maintenance", label: "Maintenance & Repairs" },
-  { id: "travel", label: "Business Travel" },
-  { id: "meals", label: "Meals & Entertainment" },
-  { id: "professional", label: "Professional Services" },
-  { id: "other", label: "Other Expenses" },
+  { id: "rent", label: "Office Rent & Utilities", icon: <Home className="h-4 w-4" />, color: "#8B5CF6" },
+  { id: "secretary", label: "Secretary & Admin", icon: <User className="h-4 w-4" />, color: "#F97316" },
+  { id: "equipment", label: "Office Equipment", icon: <Tool className="h-4 w-4" />, color: "#10B981" },
+  { id: "inventory", label: "Equipment Inventory", icon: <Package className="h-4 w-4" />, color: "#0EA5E9" },
+  { id: "warehouse", label: "Warehouse Expenses", icon: <Warehouse className="h-4 w-4" />, color: "#D946EF" },
+  { id: "supplies", label: "Office Supplies", icon: <Boxes className="h-4 w-4" />, color: "#F43F5E" },
+  { id: "software", label: "Software & Subscriptions", icon: <FolderPlus className="h-4 w-4" />, color: "#EAB308" },
+  { id: "travel", label: "Travel & Transportation", icon: <FolderPlus className="h-4 w-4" />, color: "#6366F1" },
+  { id: "meals", label: "Meals & Entertainment", icon: <FolderPlus className="h-4 w-4" />, color: "#14B8A6" },
+  { id: "professional", label: "Professional Services", icon: <FolderPlus className="h-4 w-4" />, color: "#EC4899" },
+  { id: "other", label: "Other Expenses", icon: <FolderPlus className="h-4 w-4" />, color: "#64748B" },
 ];
 
 // Define colors for charts
 const COLORS = [
-  "#10b981", "#f97316", "#f43f5e", "#8b5cf6", "#64748b", 
-  "#0ea5e9", "#ec4899", "#14b8a6", "#eab308", "#0891b2", "#6366f1"
+  "#8B5CF6", "#F97316", "#10B981", "#0EA5E9", "#D946EF", 
+  "#F43F5E", "#EAB308", "#6366F1", "#14B8A6", "#EC4899", "#64748B"
 ];
 
 interface OfficeExpense {
@@ -85,50 +86,50 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
     {
       id: "exp2",
       date: new Date(2023, 8, 20),
+      amount: 850,
+      description: "Secretary salary",
+      category: "secretary",
+      paymentMethod: "Bank Transfer"
+    },
+    {
+      id: "exp3",
+      date: new Date(2023, 8, 25),
       amount: 1200,
       description: "New office computers",
       category: "equipment",
       paymentMethod: "Credit Card"
     },
     {
-      id: "exp3",
-      date: new Date(2023, 8, 25),
+      id: "exp4",
+      date: new Date(2023, 9, 1),
+      amount: 2000,
+      description: "Inventory restock - tools",
+      category: "inventory",
+      paymentMethod: "Credit Card"
+    },
+    {
+      id: "exp5",
+      date: new Date(2023, 9, 5),
+      amount: 1500,
+      description: "Warehouse rent - October",
+      category: "warehouse",
+      paymentMethod: "Bank Transfer"
+    },
+    {
+      id: "exp6",
+      date: new Date(2023, 9, 10),
       amount: 350,
       description: "Office supplies - paper, ink, etc.",
       category: "supplies",
       paymentMethod: "Credit Card"
     },
     {
-      id: "exp4",
-      date: new Date(2023, 9, 1),
+      id: "exp7",
+      date: new Date(2023, 9, 15),
       amount: 200,
       description: "Software subscriptions",
       category: "software",
       paymentMethod: "Credit Card"
-    },
-    {
-      id: "exp5",
-      date: new Date(2023, 9, 5),
-      amount: 3000,
-      description: "Administrative assistant salary",
-      category: "staff",
-      paymentMethod: "Bank Transfer"
-    },
-    {
-      id: "exp6",
-      date: new Date(2023, 9, 10),
-      amount: 800,
-      description: "Business insurance premium",
-      category: "insurance",
-      paymentMethod: "Bank Transfer"
-    },
-    {
-      id: "exp7",
-      date: new Date(2023, 9, 15),
-      amount: 450,
-      description: "Office AC repair",
-      category: "maintenance",
-      paymentMethod: "Cash"
     },
     {
       id: "exp8",
@@ -150,12 +151,16 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
   });
   
   const [editExpenseId, setEditExpenseId] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
-  // Filter expenses based on date range
+  // Filter expenses based on date range and selected category
   const filteredExpenses = expenses.filter(
-    (expense) => date?.from && date?.to && 
-    expense.date >= date.from && 
-    expense.date <= date.to
+    (expense) => 
+      date?.from && 
+      date?.to && 
+      expense.date >= date.from && 
+      expense.date <= date.to &&
+      (selectedCategory === null || expense.category === selectedCategory)
   );
   
   // Calculate totals by category for the pie chart
@@ -167,7 +172,8 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
     return {
       name: category.label,
       value: total,
-      id: category.id
+      id: category.id,
+      color: category.color
     };
   }).filter(item => item.value > 0);
   
@@ -176,7 +182,7 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
     const monthlyData: { [key: string]: number } = {};
     
     filteredExpenses.forEach(expense => {
-      const monthYear = `${expense.date.getMonth() + 1}/${expense.date.getFullYear()}`;
+      const monthYear = `${expense.date.toLocaleString('default', { month: 'short' })} ${expense.date.getFullYear()}`;
       if (!monthlyData[monthYear]) {
         monthlyData[monthYear] = 0;
       }
@@ -271,11 +277,43 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
       currency: 'USD'
     }).format(amount);
   };
+
+  // Get category details
+  const getCategoryDetails = (categoryId: string) => {
+    return EXPENSE_CATEGORIES.find(cat => cat.id === categoryId);
+  };
   
   return (
     <div className="space-y-8">
-      {/* Date Range Picker */}
-      <div className="flex justify-end mb-6">
+      {/* Date Range Picker and Category Filter */}
+      <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            variant={selectedCategory === null ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSelectedCategory(null)}
+            className="h-9"
+          >
+            All Categories
+          </Button>
+          {EXPENSE_CATEGORIES.map((category) => (
+            <Button
+              key={category.id}
+              variant={selectedCategory === category.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(category.id)}
+              className="h-9 flex items-center gap-1"
+              style={{ 
+                backgroundColor: selectedCategory === category.id ? category.color : 'transparent',
+                borderColor: category.color,
+                color: selectedCategory === category.id ? 'white' : 'inherit'
+              }}
+            >
+              {category.icon}
+              <span className="hidden md:inline">{category.label}</span>
+            </Button>
+          ))}
+        </div>
         <CompactDateRangePicker date={date} setDate={setDate} />
       </div>
       
@@ -298,13 +336,23 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
           </CardHeader>
           <CardContent>
             {expensesByCategory.length > 0 ? (
-              <div>
-                <div className="text-2xl font-bold">
-                  {expensesByCategory.sort((a, b) => b.value - a.value)[0]?.name || "N/A"}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {formatCurrency(expensesByCategory.sort((a, b) => b.value - a.value)[0]?.value || 0)}
-                </div>
+              <div className="flex items-center gap-2">
+                {expensesByCategory.sort((a, b) => b.value - a.value)[0] && (
+                  <>
+                    <div 
+                      className="w-3 h-3 rounded-full flex-shrink-0" 
+                      style={{ backgroundColor: expensesByCategory.sort((a, b) => b.value - a.value)[0].color }}
+                    ></div>
+                    <div>
+                      <div className="text-2xl font-bold">
+                        {expensesByCategory.sort((a, b) => b.value - a.value)[0]?.name || "N/A"}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatCurrency(expensesByCategory.sort((a, b) => b.value - a.value)[0]?.value || 0)}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <div className="text-2xl font-bold">N/A</div>
@@ -335,14 +383,49 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList>
+        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="expenses">Expense List</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="expenses">Expense List</TabsTrigger>
         </TabsList>
         
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
+          {/* Category Cards Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {EXPENSE_CATEGORIES.slice(0, 6).map((category) => {
+              const categoryExpenses = filteredExpenses.filter(exp => exp.category === category.id);
+              const totalAmount = categoryExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+              
+              return (
+                <Card key={category.id} className="overflow-hidden border-t-4" style={{ borderTopColor: category.color }}>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <div className="p-1.5 rounded-md" style={{ backgroundColor: `${category.color}20` }}>
+                          {category.icon}
+                        </div>
+                        {category.label}
+                      </CardTitle>
+                      <Badge variant="outline" className="ml-2" style={{ color: category.color, borderColor: category.color }}>
+                        {categoryExpenses.length} items
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-xl font-bold">{formatCurrency(totalAmount)}</div>
+                    {categoryExpenses.length > 0 && (
+                      <div className="text-sm text-muted-foreground mt-1">
+                        Latest: {categoryExpenses.sort((a, b) => b.date.getTime() - a.date.getTime())[0]?.description.substring(0, 20)}
+                        {categoryExpenses[0]?.description.length > 20 ? '...' : ''}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+          
           <div className="grid gap-4 md:grid-cols-2">
             {/* Monthly Expenses Chart */}
             <Card className="col-span-2">
@@ -365,7 +448,7 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
                       />
                       <Bar 
                         dataKey="amount" 
-                        fill="#10b981" 
+                        fill="#8B5CF6" 
                         name="Monthly Expenses" 
                       />
                     </BarChart>
@@ -395,13 +478,13 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
                           cy="50%"
                           outerRadius={80}
                           label={({ name, percent }) => 
-                            `${name}: ${(percent * 100).toFixed(0)}%`
+                            `${name.split(' ')[0]}: ${(percent * 100).toFixed(0)}%`
                           }
                         >
                           {expensesByCategory.map((entry, index) => (
                             <Cell 
                               key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]} 
+                              fill={entry.color} 
                             />
                           ))}
                         </Pie>
@@ -438,24 +521,31 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
                   {filteredExpenses
                     .sort((a, b) => b.date.getTime() - a.date.getTime())
                     .slice(0, 5)
-                    .map((expense) => (
-                      <div key={expense.id} className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium">{expense.description}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {expense.date.toLocaleDateString()} - {
-                              EXPENSE_CATEGORIES.find(cat => cat.id === expense.category)?.label
-                            }
+                    .map((expense) => {
+                      const category = getCategoryDetails(expense.category);
+                      return (
+                        <div key={expense.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+                          <div 
+                            className="p-2 rounded-md flex-shrink-0" 
+                            style={{ backgroundColor: `${category?.color}20` }}
+                          >
+                            {category?.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{expense.description}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              {expense.date.toLocaleDateString()} - {category?.label}
+                            </div>
+                          </div>
+                          <div className="font-medium">
+                            {formatCurrency(expense.amount)}
                           </div>
                         </div>
-                        <div className="font-medium">
-                          {formatCurrency(expense.amount)}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   
                   {filteredExpenses.length === 0 && (
-                    <div className="text-center text-muted-foreground py-4">
+                    <div className="text-center text-muted-foreground py-8">
                       No expenses in the selected period
                     </div>
                   )}
@@ -463,6 +553,113 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+        
+        {/* Categories Tab */}
+        <TabsContent value="categories" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Expense Categories Breakdown</CardTitle>
+              <CardDescription>
+                Detailed analysis of expense categories
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6">
+                {/* Category Breakdown */}
+                <div className="md:grid-cols-2">
+                  <div className="h-[400px]">
+                    {expensesByCategory.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart 
+                          data={expensesByCategory}
+                          layout="vertical"
+                          margin={{ top: 20, right: 30, left: 150, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis type="number" tickFormatter={(value) => `$${value}`} />
+                          <YAxis 
+                            dataKey="name" 
+                            type="category" 
+                            width={140}
+                            tick={{ fontSize: 12 }}
+                          />
+                          <Tooltip 
+                            formatter={(value) => [formatCurrency(value as number), "Amount"]}
+                          />
+                          <Bar dataKey="value" name="Amount">
+                            {expensesByCategory.map((entry) => (
+                              <Cell 
+                                key={`cell-${entry.id}`} 
+                                fill={entry.color} 
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-muted-foreground">
+                        No data available for the selected period
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Category Details */}
+                <div className="space-y-6">
+                  {EXPENSE_CATEGORIES.map((category) => {
+                    const categoryExpenses = filteredExpenses.filter(exp => exp.category === category.id);
+                    const totalAmount = categoryExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+                    
+                    if (totalAmount === 0) return null;
+                    
+                    return (
+                      <div key={category.id} className="border rounded-lg overflow-hidden">
+                        <div 
+                          className="p-4 flex justify-between items-center" 
+                          style={{ backgroundColor: `${category.color}10` }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-md" style={{ backgroundColor: `${category.color}20` }}>
+                              {category.icon}
+                            </div>
+                            <div>
+                              <h3 className="font-medium">{category.label}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {categoryExpenses.length} expenses - {((totalAmount / totalExpenses) * 100).toFixed(1)}% of total
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-xl font-bold">{formatCurrency(totalAmount)}</div>
+                        </div>
+                        
+                        {categoryExpenses.length > 0 && (
+                          <div className="p-4">
+                            <h4 className="text-sm font-medium mb-2">Recent Expenses</h4>
+                            <div className="space-y-2">
+                              {categoryExpenses
+                                .sort((a, b) => b.date.getTime() - a.date.getTime())
+                                .slice(0, 3)
+                                .map(expense => (
+                                  <div key={expense.id} className="flex justify-between items-center text-sm">
+                                    <div className="flex-1">
+                                      <div className="font-medium">{expense.description}</div>
+                                      <div className="text-muted-foreground">{expense.date.toLocaleDateString()}</div>
+                                    </div>
+                                    <div>{formatCurrency(expense.amount)}</div>
+                                  </div>
+                                ))
+                              }
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
         
         {/* Expenses List Tab */}
@@ -491,7 +688,7 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
                       Add Expense
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle>
                         {editExpenseId ? "Edit Expense" : "Add New Expense"}
@@ -561,7 +758,10 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
                             <SelectContent>
                               {EXPENSE_CATEGORIES.map((category) => (
                                 <SelectItem key={category.id} value={category.id}>
-                                  {category.label}
+                                  <div className="flex items-center gap-2">
+                                    {category.icon}
+                                    <span>{category.label}</span>
+                                  </div>
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -644,39 +844,50 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
                     {filteredExpenses.length > 0 ? (
                       filteredExpenses
                         .sort((a, b) => b.date.getTime() - a.date.getTime())
-                        .map((expense) => (
-                          <TableRow key={expense.id}>
-                            <TableCell>{expense.date.toLocaleDateString()}</TableCell>
-                            <TableCell>{expense.description}</TableCell>
-                            <TableCell>
-                              {EXPENSE_CATEGORIES.find(cat => cat.id === expense.category)?.label}
-                            </TableCell>
-                            <TableCell>{expense.paymentMethod}</TableCell>
-                            <TableCell className="text-right font-medium">
-                              {formatCurrency(expense.amount)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button 
-                                  variant="outline" 
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleEditExpense(expense.id)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="outline" 
-                                  size="icon"
-                                  className="h-8 w-8 text-red-500 hover:text-red-600"
-                                  onClick={() => handleDeleteExpense(expense.id)}
-                                >
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
+                        .map((expense) => {
+                          const category = getCategoryDetails(expense.category);
+                          return (
+                            <TableRow key={expense.id}>
+                              <TableCell>{expense.date.toLocaleDateString()}</TableCell>
+                              <TableCell>{expense.description}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="p-1 rounded-md"
+                                    style={{ backgroundColor: `${category?.color}20` }}
+                                  >
+                                    {category?.icon}
+                                  </div>
+                                  <span>{category?.label}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{expense.paymentMethod}</TableCell>
+                              <TableCell className="text-right font-medium">
+                                {formatCurrency(expense.amount)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Button 
+                                    variant="outline" 
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handleEditExpense(expense.id)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="icon"
+                                    className="h-8 w-8 text-red-500 hover:text-red-600"
+                                    onClick={() => handleDeleteExpense(expense.id)}
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
                     ) : (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center h-24">
@@ -686,105 +897,6 @@ const OfficeDashboard: React.FC<OfficeDashboardProps> = ({ date, setDate }) => {
                     )}
                   </TableBody>
                 </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        {/* Categories Tab */}
-        <TabsContent value="categories" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Expense Categories</CardTitle>
-              <CardDescription>
-                Breakdown of expenses by category
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                {/* Category chart */}
-                <div className="md:col-span-2">
-                  <div className="h-[400px]">
-                    {expensesByCategory.length > 0 ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart 
-                          data={expensesByCategory}
-                          layout="vertical"
-                          margin={{ top: 20, right: 30, left: 150, bottom: 5 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis type="number" tickFormatter={(value) => `$${value}`} />
-                          <YAxis 
-                            dataKey="name" 
-                            type="category" 
-                            width={140}
-                            tick={{ fontSize: 12 }}
-                          />
-                          <Tooltip 
-                            formatter={(value) => [formatCurrency(value as number), "Amount"]}
-                          />
-                          <Bar 
-                            dataKey="value" 
-                            name="Amount" 
-                          >
-                            {expensesByCategory.map((entry, index) => (
-                              <Cell 
-                                key={`cell-${index}`} 
-                                fill={COLORS[index % COLORS.length]} 
-                              />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-muted-foreground">
-                        No data available for the selected period
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Category breakdown table */}
-                <div className="md:col-span-2">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Category</TableHead>
-                        <TableHead className="text-right">Total Amount</TableHead>
-                        <TableHead className="text-right">% of Total</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {expensesByCategory.length > 0 ? (
-                        expensesByCategory
-                          .sort((a, b) => b.value - a.value)
-                          .map((category, index) => (
-                            <TableRow key={category.id}>
-                              <TableCell className="flex items-center gap-2">
-                                <div 
-                                  className="w-3 h-3 rounded-full" 
-                                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                                ></div>
-                                {category.name}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                {formatCurrency(category.value)}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                {((category.value / totalExpenses) * 100).toFixed(1)}%
-                              </TableCell>
-                            </TableRow>
-                          ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={3} className="text-center h-24">
-                            No expenses found for the selected period
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
               </div>
             </CardContent>
           </Card>
