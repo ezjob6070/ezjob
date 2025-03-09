@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
@@ -22,7 +21,6 @@ const Schedule = () => {
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
 
-  // Filter jobs and tasks whenever the selected date changes
   const updateSelectedDateItems = (date: Date) => {
     const filteredJobs = jobs.filter(job => isSameDay(job.date, date));
     setJobsForSelectedDate(filteredJobs);
@@ -33,7 +31,6 @@ const Schedule = () => {
     setSelectedDate(date);
   };
 
-  // Create events for upcoming events component
   const upcomingEvents = [
     ...jobs.map(job => ({
       id: job.id,
@@ -64,7 +61,6 @@ const Schedule = () => {
     updateSelectedDateItems(nextDay);
   };
 
-  // Helper function to determine day color based on events
   const getDayClassName = (date: Date) => {
     const hasJobs = jobs.some(job => isSameDay(job.date, date));
     const hasTasks = tasks.some(task => isSameDay(task.dueDate, date));
@@ -79,7 +75,6 @@ const Schedule = () => {
     return "";
   };
 
-  // Update selected items when date changes
   useState(() => {
     updateSelectedDateItems(selectedDate);
   });
@@ -107,12 +102,12 @@ const Schedule = () => {
                 <CardTitle>Calendar</CardTitle>
               </CardHeader>
               <CardContent className="p-0 pb-6">
-                <div className="w-full flex justify-center items-center px-2">
+                <div className="w-full flex justify-end items-center px-6">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && updateSelectedDateItems(date)}
-                    className="w-full scale-110 transform origin-center mx-auto"
+                    className="w-[120%] scale-115 transform origin-center mx-auto"
                     modifiers={{
                       hasEvents: (date) => 
                         jobs.some(job => isSameDay(job.date, date)) || 
