@@ -8,7 +8,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel";
 import { DateRange } from "react-day-picker";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
-import TechnicianPaymentsSection from "@/components/finance/TechnicianPaymentsSection";
 import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
 
 interface TechniciansDashboardProps {
@@ -134,12 +133,12 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         )}
       </div>
       
-      <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
+      <TechnicianCircleCharts 
+        filteredTechnicians={filteredTechnicians} 
+        dateRange={date}
+      />
       
-      {/* Payment section first */}
-      <TechnicianPaymentsSection technicians={filteredTechnicians} />
-      
-      {/* Invoice section second */}
+      {/* Invoice section */}
       <TechnicianInvoiceSection 
         activeTechnicians={filteredTechnicians} 
       />
@@ -182,7 +181,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                     <TableCell>{tech.specialty}</TableCell>
                     <TableCell className="text-right">{tech.completedJobs}</TableCell>
                     <TableCell className="text-right text-sky-600">{formatCurrency(tech.totalRevenue)}</TableCell>
-                    <TableCell className="text-right text-pink-600">{formatCurrency(partsValue)}</TableCell>
+                    <TableCell className="text-right text-red-600">-{formatCurrency(partsValue)}</TableCell>
                     <TableCell className="text-right text-emerald-600">{formatCurrency(earnings)}</TableCell>
                     <TableCell className="text-right">{profitMargin}%</TableCell>
                   </TableRow>

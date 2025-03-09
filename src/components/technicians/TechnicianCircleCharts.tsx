@@ -6,13 +6,17 @@ import { Technician } from "@/types/technician";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 interface TechnicianCircleChartsProps {
   filteredTechnicians: Technician[];
+  dateRange?: DateRange;
 }
 
 const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({ 
-  filteredTechnicians 
+  filteredTechnicians,
+  dateRange
 }) => {
   const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>("all");
   const [selectedTechnicianNames, setSelectedTechnicianNames] = useState<string[]>([]);
@@ -65,6 +69,17 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   const applyFilters = () => {
     // Filters are applied instantly
   };
+
+  // Format date range for display
+  const getDateRangeText = () => {
+    if (!dateRange?.from) return "";
+    
+    return dateRange.to
+      ? `${format(dateRange.from, "MMM d, yyyy")} - ${format(dateRange.to, "MMM d, yyyy")}`
+      : `${format(dateRange.from, "MMM d, yyyy")}`;
+  };
+  
+  const dateRangeText = getDateRangeText();
   
   return (
     <div className="space-y-6">
@@ -73,7 +88,12 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle>Total Income</CardTitle>
-            <CardDescription>Revenue from all technicians</CardDescription>
+            <CardDescription>
+              Revenue from all technicians
+              {dateRangeText && (
+                <div className="text-xs mt-1 text-muted-foreground">{dateRangeText}</div>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-sky-600">{formatCurrency(totalRevenue)}</div>
@@ -83,7 +103,12 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle>Total Expenses</CardTitle>
-            <CardDescription>Technician payments and costs</CardDescription>
+            <CardDescription>
+              Technician payments and costs
+              {dateRangeText && (
+                <div className="text-xs mt-1 text-muted-foreground">{dateRangeText}</div>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">-{formatCurrency(technicianEarnings + totalExpenses)}</div>
@@ -93,7 +118,12 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle>Net Company Profit</CardTitle>
-            <CardDescription>Revenue after all expenses</CardDescription>
+            <CardDescription>
+              Revenue after all expenses
+              {dateRangeText && (
+                <div className="text-xs mt-1 text-muted-foreground">{dateRangeText}</div>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
