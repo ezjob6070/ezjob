@@ -23,6 +23,7 @@ import JobSources from "./pages/JobSources";
 import GPSTracking from "./pages/GPSTracking";
 import Employed from "./pages/Employed";
 import EmployeeDetail from "./pages/EmployeeDetail";
+import Schedule from "./pages/Schedule";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="tasks" element={<Tasks />} />
             <Route path="tasks/:id" element={<TaskDetail />} />
             <Route path="jobs" element={<Jobs />} />
+            <Route path="schedule" element={<Schedule />} />
             <Route path="payments" element={<Payments />} />
             <Route path="technicians" element={<Technicians />} />
             <Route path="estimates" element={<Estimates />} />
