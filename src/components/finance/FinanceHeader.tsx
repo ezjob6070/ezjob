@@ -4,20 +4,12 @@ import {
   ArrowLeft, 
   ArrowRight, 
   Search, 
-  SlidersHorizontal,
-  Calendar
+  SlidersHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DateRange } from "react-day-picker";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 
 interface TabOption {
   id: string;
@@ -104,40 +96,6 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 flex-col items-start justify-center p-2">
-                <div className="flex w-full flex-col items-start">
-                  <span className="text-[10px] uppercase font-semibold text-muted-foreground mb-0.5">CUSTOM RANGE</span>
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    {date?.from ? (
-                      date.to ? (
-                        <span className="text-sm">
-                          {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-                        </span>
-                      ) : (
-                        <span className="text-sm">{format(date.from, "LLL dd, y")}</span>
-                      )
-                    ) : (
-                      <span className="text-sm">Date Range</span>
-                    )}
-                  </div>
-                </div>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <CalendarComponent
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={2}
-              />
-            </PopoverContent>
-          </Popover>
           
           <Button 
             variant="outline" 
