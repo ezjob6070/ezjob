@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, ListChecks } from "lucide-react";
 import { Technician } from "@/types/technician";
+import { Link } from "react-router-dom";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
@@ -67,12 +68,20 @@ const Technicians = () => {
             Manage your technicians and their payment structures
           </p>
         </div>
-        <Button 
-          onClick={() => setShowAddModal(true)}
-          className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900"
-        >
-          <PlusIcon className="mr-2 h-4 w-4" /> Add Technician
-        </Button>
+        <div className="flex space-x-2">
+          <Link to="/technician-altercation">
+            <Button variant="outline" className="gap-2">
+              <ListChecks className="h-4 w-4" />
+              Technician Altercation
+            </Button>
+          </Link>
+          <Button 
+            onClick={() => setShowAddModal(true)}
+            className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900"
+          >
+            <PlusIcon className="mr-2 h-4 w-4" /> Add Technician
+          </Button>
+        </div>
       </div>
 
       <TechnicianStats technicians={technicians} />

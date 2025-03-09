@@ -15,6 +15,7 @@ export const initialTechnicians: Technician[] = [
     totalRevenue: 24500,
     rating: 4.8,
     initials: "JS",
+    category: "HVAC"
   },
   {
     id: "tech2",
@@ -29,6 +30,7 @@ export const initialTechnicians: Technician[] = [
     totalRevenue: 19800,
     rating: 4.9,
     initials: "SJ",
+    category: "Electrical"
   },
   {
     id: "tech3",
@@ -43,6 +45,7 @@ export const initialTechnicians: Technician[] = [
     totalRevenue: 14300,
     rating: 4.5,
     initials: "MB",
+    category: "Plumbing"
   },
   {
     id: "tech4",
@@ -57,6 +60,7 @@ export const initialTechnicians: Technician[] = [
     totalRevenue: 5800,
     rating: 4.2,
     initials: "ED",
+    category: "Maintenance"
   },
   {
     id: "tech5",
@@ -71,6 +75,7 @@ export const initialTechnicians: Technician[] = [
     totalRevenue: 18750,
     rating: 4.7,
     initials: "DW",
+    category: "HVAC"
   },
   {
     id: "tech6",
@@ -85,6 +90,7 @@ export const initialTechnicians: Technician[] = [
     totalRevenue: 16500,
     rating: 4.6,
     initials: "JT",
+    category: "Electrical"
   },
   {
     id: "tech7",
@@ -99,5 +105,6 @@ export const initialTechnicians: Technician[] = [
     totalRevenue: 22000,
     rating: 4.8,
     initials: "RM",
+    category: "Plumbing"
   }
 ];

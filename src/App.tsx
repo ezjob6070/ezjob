@@ -24,6 +24,7 @@ import GPSTracking from "./pages/GPSTracking";
 import Employed from "./pages/Employed";
 import EmployeeDetail from "./pages/EmployeeDetail";
 import Schedule from "./pages/Schedule";
+import TechnicianAltercation from "./pages/TechnicianAltercation";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="schedule" element={<Schedule />} />
             <Route path="payments" element={<Payments />} />
             <Route path="technicians" element={<Technicians />} />
+            <Route path="technician-altercation" element={<TechnicianAltercation />} />
             <Route path="estimates" element={<Estimates />} />
             <Route path="finance" element={<Finance />} />
             <Route path="gps-tracking" element={<GPSTracking />} />
