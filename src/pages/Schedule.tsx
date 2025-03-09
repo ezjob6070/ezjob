@@ -108,7 +108,7 @@ const Schedule = () => {
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && updateSelectedDateItems(date)}
-                    className="w-full scale-125 transform origin-right"
+                    className="w-full scale-125 transform origin-right mr-6"
                     modifiers={{
                       hasEvents: (date) => 
                         jobs.some(job => isSameDay(job.date, date)) || 
