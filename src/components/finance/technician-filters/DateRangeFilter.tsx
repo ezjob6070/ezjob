@@ -1,15 +1,10 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, ChevronDown } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
 import { 
   Popover,
   PopoverContent,
@@ -25,13 +20,11 @@ interface DateRangeFilterProps {
 }
 
 const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compact = false }) => {
-  const handleDatePresetSelection = (preset: string) => {
-    const today = new Date();
-    
+  const today = new Date();
+  
+  // Past presets
+  const handlePastDatePreset = (preset: string) => {
     switch (preset) {
-      case "today":
-        setDate({ from: today, to: today });
-        break;
       case "yesterday":
         const yesterday = subDays(today, 1);
         setDate({ from: yesterday, to: yesterday });
@@ -41,167 +34,123 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
         const lastWeekEnd = endOfWeek(subDays(today, 7), { weekStartsOn: 1 });
         setDate({ from: lastWeekStart, to: lastWeekEnd });
         break;
-      case "this-month":
-        setDate({ from: startOfMonth(today), to: today });
-        break;
       case "last-month":
         const lastMonthDate = subDays(startOfMonth(today), 1);
         setDate({ from: startOfMonth(lastMonthDate), to: endOfMonth(lastMonthDate) });
         break;
-      case "last-30-days":
-        setDate({ from: subDays(today, 30), to: today });
+      case "last-60-days":
+        setDate({ from: subDays(today, 60), to: today });
         break;
       case "last-year":
         setDate({ from: startOfYear(subDays(startOfYear(today), 1)), to: endOfYear(subDays(startOfYear(today), 1)) });
         break;
-      default:
+    }
+  };
+  
+  // Future and current presets
+  const handleFutureDatePreset = (preset: string) => {
+    switch (preset) {
+      case "today":
+        setDate({ from: today, to: today });
+        break;
+      case "this-week":
+        const thisWeekStart = startOfWeek(today, { weekStartsOn: 1 });
+        const thisWeekEnd = endOfWeek(today, { weekStartsOn: 1 });
+        setDate({ from: thisWeekStart, to: thisWeekEnd });
+        break;
+      case "next-week":
+        const nextWeekStart = addDays(startOfWeek(today, { weekStartsOn: 1 }), 7);
+        const nextWeekEnd = addDays(endOfWeek(today, { weekStartsOn: 1 }), 7);
+        setDate({ from: nextWeekStart, to: nextWeekEnd });
+        break;
+      case "this-month":
+        setDate({ from: startOfMonth(today), to: endOfMonth(today) });
+        break;
+      case "next-month":
+        const nextMonthStart = addDays(endOfMonth(today), 1);
+        const nextMonthEnd = endOfMonth(addDays(endOfMonth(today), 1));
+        setDate({ from: nextMonthStart, to: nextMonthEnd });
         break;
     }
   };
 
-  if (compact) {
-    return (
-      <>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-auto justify-between px-3 py-5 text-base font-medium">
-              <Calendar className="mr-2 h-4 w-4" />
-              <span>Quick Select</span>
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("today")}>
-              Today
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("yesterday")}>
-              Yesterday
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-week")}>
-              Last Week
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("this-month")}>
-              This Month
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-month")}>
-              Last Month
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-30-days")}>
-              Last 30 Days
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-year")}>
-              Last Year
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="w-auto justify-between px-3 py-5 text-base font-medium"
-            >
-              <Calendar className="mr-2 h-4 w-4" />
-              {date?.from ? (
-                date.to ? (
-                  <>
-                    {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-                  </>
-                ) : (
-                  format(date.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Pick a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              initialFocus
-              mode="range"
-              defaultMonth={date?.from}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={2}
-            />
-          </PopoverContent>
-        </Popover>
-      </>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8">
-              <Calendar className="mr-2 h-4 w-4" />
-              <span>Quick Select</span>
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("today")}>
-              Today
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("yesterday")}>
-              Yesterday
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-week")}>
-              Last Week
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("this-month")}>
-              This Month
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-month")}>
-              Last Month
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-30-days")}>
-              Last 30 Days
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-year")}>
-              Last Year
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            className={cn(
-              "w-full justify-start text-left font-normal", 
-              !date && "text-muted-foreground"
-            )}
-          >
-            <Calendar className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date.to ? (
-                <>
-                  {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-                </>
-              ) : (
-                format(date.from, "LLL dd, y")
-              )
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button 
+          variant="outline" 
+          className="w-auto justify-between px-3 py-2 text-base font-medium"
+        >
+          <Calendar className="mr-2 h-4 w-4" />
+          {date?.from ? (
+            date.to ? (
+              <>
+                {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+              </>
             ) : (
-              <span>Pick a date</span>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <CalendarComponent
-            initialFocus
-            mode="range"
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
-            numberOfMonths={2}
-          />
-        </PopoverContent>
-      </Popover>
-    </div>
+              format(date.from, "LLL dd, y")
+            )
+          ) : (
+            <span>Date Range</span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <div className="p-2 flex justify-between border-b">
+          <div className="space-y-1">
+            <div className="text-xs font-semibold mb-1">Past</div>
+            <div className="grid grid-cols-1 gap-1">
+              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("yesterday")}>
+                Yesterday
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-week")}>
+                Last Week
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-month")}>
+                Last Month
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-60-days")}>
+                Last 60 Days
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-year")}>
+                Last Year
+              </Button>
+            </div>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="text-xs font-semibold mb-1">Present / Future</div>
+            <div className="grid grid-cols-1 gap-1">
+              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("today")}>
+                Today
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("this-week")}>
+                This Week
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("next-week")}>
+                Next Week
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("this-month")}>
+                This Month
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("next-month")}>
+                Next Month
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <CalendarComponent
+          initialFocus
+          mode="range"
+          defaultMonth={date?.from}
+          selected={date}
+          onSelect={setDate}
+          numberOfMonths={2}
+          className="p-3 pointer-events-auto"
+        />
+      </PopoverContent>
+    </Popover>
   );
 };
 
