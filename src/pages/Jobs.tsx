@@ -14,7 +14,7 @@ import { addDays, isSameDay, isWithinInterval, startOfDay } from "date-fns";
 const JOB_CATEGORIES = [
   "Plumbing",
   "HVAC",
-  "Electrical",
+  "Electrical", 
   "General Maintenance",
 ];
 
@@ -125,6 +125,29 @@ const Jobs = () => {
     setAppliedFilters(true);
   };
 
+  const renderFiltersComponent = () => {
+    return (
+      <div className="flex flex-wrap gap-2 mb-4">
+        <CategoryFilter 
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          categories={categories}
+          addCategory={addCategory}
+        />
+        
+        <CompactTechnicianFilter 
+          technicianNames={technicianNames}
+          selectedTechnicians={selectedTechnicians}
+          toggleTechnician={toggleTechnician}
+          clearFilters={clearFilters}
+          applyFilters={applyFilters}
+          selectAllTechnicians={selectAllTechnicians}
+          deselectAllTechnicians={deselectAllTechnicians}
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6 py-8">
       <div className="flex justify-between items-center">
@@ -136,31 +159,6 @@ const Jobs = () => {
             Manage and monitor all jobs
           </p>
         </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <CategoryFilter 
-            selectedCategories={selectedCategories}
-            toggleCategory={toggleCategory}
-            categories={categories}
-            addCategory={addCategory}
-          />
-          
-          <CompactTechnicianFilter 
-            technicianNames={technicianNames}
-            selectedTechnicians={selectedTechnicians}
-            toggleTechnician={toggleTechnician}
-            clearFilters={clearFilters}
-            applyFilters={applyFilters}
-            selectAllTechnicians={selectAllTechnicians}
-            deselectAllTechnicians={deselectAllTechnicians}
-          />
-        </div>
-      </div>
-      
-      <div className="mb-6">
-        <DateRangeFilter date={date} setDate={setDate} />
       </div>
 
       <JobStats jobs={filteredJobs} />
@@ -184,6 +182,8 @@ const Jobs = () => {
         searchTerm={searchTerm}
         onCancelJob={handleCancelJob} 
         onSearchChange={setSearchTerm}
+        filtersComponent={renderFiltersComponent()}
+        dateRangeComponent={<DateRangeFilter date={date} setDate={setDate} compact />}
       />
     </div>
   );

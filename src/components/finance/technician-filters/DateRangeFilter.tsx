@@ -22,9 +22,10 @@ import { addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, sta
 interface DateRangeFilterProps {
   date: DateRange | undefined;
   setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  compact?: boolean;
 }
 
-const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate }) => {
+const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compact = false }) => {
   const handleDatePresetSelection = (preset: string) => {
     const today = new Date();
     
@@ -58,6 +59,80 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate }) => {
         break;
     }
   };
+
+  if (compact) {
+    return (
+      <div className="flex flex-wrap gap-2 items-center mb-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="h-10 px-3 py-5 text-base font-medium">
+              <Calendar className="mr-2 h-4 w-4" />
+              <span>Quick Select</span>
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => handleDatePresetSelection("today")}>
+              Today
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDatePresetSelection("yesterday")}>
+              Yesterday
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-week")}>
+              Last Week
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDatePresetSelection("this-month")}>
+              This Month
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-month")}>
+              Last Month
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-30-days")}>
+              Last 30 Days
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDatePresetSelection("last-year")}>
+              Last Year
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              className={cn(
+                "h-10 px-3 py-5 text-base font-medium", 
+                !date && "text-muted-foreground"
+              )}
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd, y")
+                )
+              ) : (
+                <span>Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <CalendarComponent
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={setDate}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

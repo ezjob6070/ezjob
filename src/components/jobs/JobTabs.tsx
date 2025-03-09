@@ -11,9 +11,18 @@ export interface JobTabsProps {
   searchTerm: string;
   onCancelJob: (jobId: string) => void;
   onSearchChange?: (term: string) => void;
+  dateRangeComponent?: React.ReactNode;
+  filtersComponent?: React.ReactNode;
 }
 
-const JobTabs = ({ jobs, searchTerm, onCancelJob, onSearchChange }: JobTabsProps) => {
+const JobTabs = ({ 
+  jobs, 
+  searchTerm, 
+  onCancelJob, 
+  onSearchChange,
+  dateRangeComponent,
+  filtersComponent
+}: JobTabsProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
   const filteredJobs = (status: string) => {
@@ -33,6 +42,9 @@ const JobTabs = ({ jobs, searchTerm, onCancelJob, onSearchChange }: JobTabsProps
           <TabsTrigger value="completed">Completed</TabsTrigger>
           <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
         </TabsList>
+        
+        {filtersComponent}
+        {dateRangeComponent}
         
         <div className="relative mb-4">
           <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
