@@ -17,7 +17,7 @@ const TechnicianTabs = ({ currentTab }: TechnicianTabsProps) => {
           <TabsTrigger 
             value="list" 
             className="text-lg py-3 font-medium"
-            onClick={() => navigate("/technicians/list")}
+            onClick={() => navigate("/technicians")}
           >
             <List className="mr-2 h-5 w-5" />
             Technician List
