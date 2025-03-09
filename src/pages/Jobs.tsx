@@ -1,17 +1,16 @@
+
 import { useState, useEffect } from "react";
 import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
 import JobTabs from "@/components/jobs/JobTabs";
 import JobStats from "@/components/jobs/JobStats";
 import { initialJobs } from "@/data/jobs";
 import { initialTechnicians } from "@/data/technicians";
-import TechnicianCheckboxList from "@/components/finance/technician-filters/TechnicianCheckboxList";
-import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
-import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
-import DateRangeFilter from "@/components/finance/technician-filters/DateRangeFilter";
-import AmountFilter, { AmountRange } from "@/components/jobs/AmountFilter";
-import PaymentMethodFilter from "@/components/jobs/PaymentMethodFilter";
 import { DateRange } from "react-day-picker";
 import { addDays, isSameDay, isWithinInterval, startOfDay } from "date-fns";
+import JobFiltersSection from "@/components/jobs/JobFiltersSection";
+import JobFilterInfoBar from "@/components/jobs/JobFilterInfoBar";
+import JobsPageHeader from "@/components/jobs/JobsPageHeader";
+import { AmountRange } from "@/components/jobs/AmountFilter";
 
 const JOB_CATEGORIES = [
   "Plumbing",
@@ -143,68 +142,56 @@ const Jobs = () => {
   const applyFilters = () => {
     setAppliedFilters(true);
   };
+  
+  const hasActiveFilters = appliedFilters || 
+    selectedCategories.length > 0 || 
+    date?.from || 
+    amountRange || 
+    paymentMethod;
 
-  const renderFiltersComponent = () => {
-    return (
-      <>
-        <CategoryFilter 
-          selectedCategories={selectedCategories}
-          toggleCategory={toggleCategory}
-          categories={categories}
-          addCategory={addCategory}
-        />
-        
-        <CompactTechnicianFilter 
-          technicianNames={technicianNames}
-          selectedTechnicians={selectedTechnicians}
-          toggleTechnician={toggleTechnician}
-          clearFilters={clearFilters}
-          applyFilters={applyFilters}
-          selectAllTechnicians={selectAllTechnicians}
-          deselectAllTechnicians={deselectAllTechnicians}
-        />
-      </>
-    );
-  };
+  const filterComponents = JobFiltersSection({
+    technicianNames,
+    selectedTechnicians,
+    selectedCategories,
+    date,
+    amountRange,
+    paymentMethod,
+    categories,
+    appliedFilters,
+    toggleTechnician,
+    toggleCategory,
+    setDate,
+    setAmountRange,
+    setPaymentMethod,
+    addCategory,
+    selectAllTechnicians,
+    deselectAllTechnicians,
+    clearFilters,
+    applyFilters
+  });
 
   return (
     <div className="space-y-6 py-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-            Jobs
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage and monitor all jobs
-          </p>
-        </div>
-      </div>
+      <JobsPageHeader />
 
       <JobStats jobs={filteredJobs} />
       
-      {appliedFilters || selectedCategories.length > 0 || date?.from || amountRange || paymentMethod ? (
-        <div className="flex justify-between items-center mb-4">
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredJobs.length} of {jobs.length} jobs
-          </p>
-          <button 
-            onClick={clearFilters}
-            className="text-sm text-primary hover:underline"
-          >
-            Clear all filters
-          </button>
-        </div>
-      ) : null}
+      <JobFilterInfoBar 
+        filteredCount={filteredJobs.length}
+        totalCount={jobs.length}
+        hasActiveFilters={Boolean(hasActiveFilters)}
+        clearFilters={clearFilters}
+      />
       
       <JobTabs 
         jobs={filteredJobs} 
         searchTerm={searchTerm}
         onCancelJob={handleCancelJob} 
         onSearchChange={setSearchTerm}
-        filtersComponent={renderFiltersComponent()}
-        dateRangeComponent={<DateRangeFilter date={date} setDate={setDate} compact />}
-        amountFilterComponent={<AmountFilter selectedRange={amountRange} onRangeChange={setAmountRange} />}
-        paymentMethodComponent={<PaymentMethodFilter selectedMethod={paymentMethod} onMethodChange={setPaymentMethod} />}
+        filtersComponent={filterComponents.filtersComponent}
+        dateRangeComponent={filterComponents.dateRangeComponent}
+        amountFilterComponent={filterComponents.amountFilterComponent}
+        paymentMethodComponent={filterComponents.paymentMethodComponent}
       />
     </div>
   );
