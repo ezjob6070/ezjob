@@ -20,6 +20,7 @@ import Technicians from "./pages/Technicians";
 import Estimates from "./pages/Estimates";
 import Finance from "./pages/Finance";
 import JobSources from "./pages/JobSources";
+import GPSTracking from "./pages/GPSTracking";
 
 const queryClient = new QueryClient();
 
@@ -42,8 +43,9 @@ const App = () => (
             <Route path="technicians" element={<Technicians />} />
             <Route path="estimates" element={<Estimates />} />
             <Route path="finance" element={<Finance />} />
+            <Route path="gps-tracking" element={<GPSTracking />} />
+            <Route path="job-sources" element={<JobSources />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="/job-sources" element={<JobSources />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
