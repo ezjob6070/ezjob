@@ -43,6 +43,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
     if (!date.to) return `${format(date.from, "MMM dd, yyyy")}`;
     return (
       <div className="flex items-center text-sm text-muted-foreground">
+        <span className="text-[10px] uppercase font-semibold mr-2">CUSTOM RANGE</span>
         <CalendarIcon className="h-4 w-4 mr-1" />
         <span>{format(date.from, "MMM dd, yyyy")}</span>
         <ArrowRightIcon className="h-3 w-3 mx-1" />
