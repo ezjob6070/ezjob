@@ -46,7 +46,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
             <CardDescription>Technician payments and costs</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-pink-600">{formatCurrency(technicianEarnings + totalExpenses)}</div>
+            <div className="text-2xl font-bold text-red-600">-{formatCurrency(technicianEarnings + totalExpenses)}</div>
           </CardContent>
         </Card>
 
@@ -97,10 +97,10 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
                       </div>
                     </TableCell>
                     <TableCell className="text-sky-600">{formatCurrency(tech.totalRevenue)}</TableCell>
-                    <TableCell className="text-emerald-600">{formatCurrency(techEarnings)}</TableCell>
+                    <TableCell className="text-red-600">-{formatCurrency(techEarnings)}</TableCell>
                     <TableCell className="text-violet-600">{formatCurrency(companyEarnings)}</TableCell>
                     <TableCell>{profitRatio}%</TableCell>
-                    <TableCell className="text-pink-600">{formatCurrency(partsValue)}</TableCell>
+                    <TableCell className="text-red-600">-{formatCurrency(partsValue)}</TableCell>
                   </TableRow>
                 );
               })}
