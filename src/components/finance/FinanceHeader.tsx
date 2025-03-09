@@ -107,21 +107,23 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
           
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9">
-                <Calendar className="h-4 w-4 mr-2" />
-                <div className="flex flex-col items-start">
-                  <span className="text-[10px] uppercase font-semibold text-muted-foreground">CUSTOM RANGE</span>
-                  {date?.from ? (
-                    date.to ? (
-                      <span>
-                        {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-                      </span>
+              <Button variant="outline" size="sm" className="h-9 flex-col items-start justify-center p-2">
+                <div className="flex w-full flex-col items-start">
+                  <span className="text-[10px] uppercase font-semibold text-muted-foreground mb-0.5">CUSTOM RANGE</span>
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    {date?.from ? (
+                      date.to ? (
+                        <span className="text-sm">
+                          {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                        </span>
+                      ) : (
+                        <span className="text-sm">{format(date.from, "LLL dd, y")}</span>
+                      )
                     ) : (
-                      format(date.from, "LLL dd, y")
-                    )
-                  ) : (
-                    <span>Date Range</span>
-                  )}
+                      <span className="text-sm">Date Range</span>
+                    )}
+                  </div>
                 </div>
               </Button>
             </PopoverTrigger>
