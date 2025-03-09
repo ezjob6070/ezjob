@@ -83,7 +83,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
             <CardDescription>Revenue from all sources</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(totalRevenue)}</div>
+            <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalRevenue)}</div>
           </CardContent>
         </Card>
 
