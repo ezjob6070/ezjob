@@ -47,6 +47,7 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
             nextDay.setDate(nextDay.getDate() + 1);
             setSelectedDate(nextDay);
           }}
+          allJobs={jobs}
         />
       </div>
     </aside>
