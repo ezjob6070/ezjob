@@ -1,5 +1,6 @@
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
+export type PaymentMethod = "credit_card" | "check" | "cash" | "zelle" | "other" | string;
 
 export interface Job {
   id: string;
@@ -13,6 +14,7 @@ export interface Job {
   technicianId?: string;
   address: string;
   amount: number;
+  paymentMethod?: PaymentMethod;
   description?: string;
   notes?: string;
   createdAt?: Date;

@@ -14,6 +14,7 @@ export interface JobTabsProps {
   dateRangeComponent?: React.ReactNode;
   filtersComponent?: React.ReactNode;
   amountFilterComponent?: React.ReactNode;
+  paymentMethodComponent?: React.ReactNode;
 }
 
 const JobTabs = ({ 
@@ -23,7 +24,8 @@ const JobTabs = ({
   onSearchChange,
   dateRangeComponent,
   filtersComponent,
-  amountFilterComponent
+  amountFilterComponent,
+  paymentMethodComponent
 }: JobTabsProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
@@ -40,6 +42,7 @@ const JobTabs = ({
         {dateRangeComponent}
         {filtersComponent}
         {amountFilterComponent}
+        {paymentMethodComponent}
       </div>
       
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>

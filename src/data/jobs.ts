@@ -12,6 +12,7 @@ export const initialJobs: Job[] = [
     technicianName: "Mike Johnson",
     address: "123 Main St, Anytown, CA 90210",
     amount: 450,
+    paymentMethod: "credit_card",
     description: "Fix leaking pipe under sink and replace bathroom faucet",
     notes: "Customer prefers afternoon appointment"
   },
@@ -24,6 +25,7 @@ export const initialJobs: Job[] = [
     technicianName: "David Wilson",
     address: "456 Oak Ave, Springfield, CA 92831",
     amount: 250,
+    paymentMethod: "check",
     description: "Annual AC system maintenance and filter replacement",
     notes: "Customer is a VIP, extra attention to detail"
   },
@@ -36,6 +38,7 @@ export const initialJobs: Job[] = [
     technicianName: "Tom Garcia",
     address: "789 Pine St, Riverside, CA 92501",
     amount: 1750,
+    paymentMethod: "zelle",
     description: "Upgrade electrical panel from 100A to 200A service",
     notes: "Need to coordinate with utility company for shutdown"
   },
@@ -48,6 +51,7 @@ export const initialJobs: Job[] = [
     technicianName: "Mike Johnson",
     address: "321 Elm St, Lakeside, CA 92040",
     amount: 175,
+    paymentMethod: "cash",
     description: "Clear clogged kitchen sink drain",
     notes: ""
   },
@@ -60,6 +64,7 @@ export const initialJobs: Job[] = [
     technicianName: "David Wilson",
     address: "567 Maple Dr, Highland, CA 92346",
     amount: 5250,
+    paymentMethod: "credit_card",
     description: "Install new high-efficiency HVAC system",
     notes: "Customer requested no-contact service"
   }
