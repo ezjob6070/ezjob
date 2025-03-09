@@ -106,56 +106,58 @@ const Schedule = () => {
               <CardHeader>
                 <CardTitle>Calendar</CardTitle>
               </CardHeader>
-              <CardContent className="p-0 pb-6">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => date && updateSelectedDateItems(date)}
-                  className="w-full mx-auto scale-110 transform origin-top p-0"
-                  modifiers={{
-                    hasEvents: (date) => 
-                      jobs.some(job => isSameDay(job.date, date)) || 
-                      tasks.some(task => isSameDay(task.dueDate, date)),
-                  }}
-                  modifiersClassNames={{
-                    hasEvents: "font-bold",
-                  }}
-                  components={{
-                    Day: ({ date, displayMonth, ...props }) => {
-                      const isSelected = isSameDay(date, selectedDate);
-                      const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
-                      
-                      return (
-                        <button 
-                          type="button"
-                          className={cn(
-                            "h-9 w-9 p-0 aria-selected:opacity-100 rounded-md relative",
-                            getDayClassName(date),
-                            isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                            isOutsideMonth && "text-muted-foreground opacity-50"
-                          )}
-                          disabled={isOutsideMonth}
-                          {...props}
-                        >
-                          {format(date, "d")}
-                          {(jobs.some(job => isSameDay(job.date, date)) || 
-                            tasks.some(task => isSameDay(task.dueDate, date))) && 
-                            !isSelected && (
-                            <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-0.5">
-                              {jobs.some(job => isSameDay(job.date, date)) && (
-                                <div className="w-1 h-1 rounded-full bg-blue-500"></div>
-                              )}
-                              {tasks.some(task => isSameDay(task.dueDate, date)) && (
-                                <div className="w-1 h-1 rounded-full bg-red-500"></div>
-                              )}
-                            </div>
-                          )}
-                        </button>
-                      );
-                    }
-                  }}
-                />
-                <div className="flex justify-center gap-6 mt-4 px-4">
+              <CardContent className="p-0 pb-6 flex justify-center">
+                <div className="w-full max-w-3xl">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => date && updateSelectedDateItems(date)}
+                    className="mx-auto scale-110 transform origin-top p-0"
+                    modifiers={{
+                      hasEvents: (date) => 
+                        jobs.some(job => isSameDay(job.date, date)) || 
+                        tasks.some(task => isSameDay(task.dueDate, date)),
+                    }}
+                    modifiersClassNames={{
+                      hasEvents: "font-bold",
+                    }}
+                    components={{
+                      Day: ({ date, displayMonth, ...props }) => {
+                        const isSelected = isSameDay(date, selectedDate);
+                        const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+                        
+                        return (
+                          <button 
+                            type="button"
+                            className={cn(
+                              "h-9 w-9 p-0 aria-selected:opacity-100 rounded-md relative",
+                              getDayClassName(date),
+                              isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                              isOutsideMonth && "text-muted-foreground opacity-50"
+                            )}
+                            disabled={isOutsideMonth}
+                            {...props}
+                          >
+                            {format(date, "d")}
+                            {(jobs.some(job => isSameDay(job.date, date)) || 
+                              tasks.some(task => isSameDay(task.dueDate, date))) && 
+                              !isSelected && (
+                              <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-0.5">
+                                {jobs.some(job => isSameDay(job.date, date)) && (
+                                  <div className="w-1 h-1 rounded-full bg-blue-500"></div>
+                                )}
+                                {tasks.some(task => isSameDay(task.dueDate, date)) && (
+                                  <div className="w-1 h-1 rounded-full bg-red-500"></div>
+                                )}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex justify-center gap-6 mt-4 px-4 w-full">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
                     <span className="text-xs">Jobs</span>
