@@ -8,6 +8,7 @@ import TechnicianCheckboxList from "@/components/finance/technician-filters/Tech
 import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import DateRangeFilter from "@/components/finance/technician-filters/DateRangeFilter";
+import AmountFilter, { AmountRange } from "@/components/jobs/AmountFilter";
 import { DateRange } from "react-day-picker";
 import { addDays, isSameDay, isWithinInterval, startOfDay } from "date-fns";
 
@@ -25,6 +26,7 @@ const Jobs = () => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [date, setDate] = useState<DateRange | undefined>(undefined);
+  const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
   const [appliedFilters, setAppliedFilters] = useState(false);
 
@@ -77,8 +79,21 @@ const Jobs = () => {
       });
     }
 
+    if (amountRange) {
+      result = result.filter(job => {
+        if (amountRange.min !== undefined && amountRange.max !== undefined) {
+          return job.amount >= amountRange.min && job.amount <= amountRange.max;
+        } else if (amountRange.min !== undefined) {
+          return job.amount >= amountRange.min;
+        } else if (amountRange.max !== undefined) {
+          return job.amount <= amountRange.max;
+        }
+        return true;
+      });
+    }
+
     setFilteredJobs(result);
-  }, [jobs, searchTerm, selectedTechnicians, selectedCategories, date, appliedFilters]);
+  }, [jobs, searchTerm, selectedTechnicians, selectedCategories, date, amountRange, appliedFilters]);
 
   const toggleTechnician = (techName: string) => {
     setSelectedTechnicians(prev => 
@@ -112,6 +127,7 @@ const Jobs = () => {
     setSelectedTechnicians([]);
     setSelectedCategories([]);
     setDate(undefined);
+    setAmountRange(null);
     setAppliedFilters(false);
   };
 
@@ -157,7 +173,7 @@ const Jobs = () => {
 
       <JobStats jobs={filteredJobs} />
       
-      {appliedFilters || selectedCategories.length > 0 || date?.from ? (
+      {appliedFilters || selectedCategories.length > 0 || date?.from || amountRange ? (
         <div className="flex justify-between items-center mb-4">
           <p className="text-sm text-muted-foreground">
             Showing {filteredJobs.length} of {jobs.length} jobs
@@ -178,6 +194,7 @@ const Jobs = () => {
         onSearchChange={setSearchTerm}
         filtersComponent={renderFiltersComponent()}
         dateRangeComponent={<DateRangeFilter date={date} setDate={setDate} compact />}
+        amountFilterComponent={<AmountFilter selectedRange={amountRange} onRangeChange={setAmountRange} />}
       />
     </div>
   );

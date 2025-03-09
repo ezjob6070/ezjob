@@ -13,6 +13,7 @@ export interface JobTabsProps {
   onSearchChange?: (term: string) => void;
   dateRangeComponent?: React.ReactNode;
   filtersComponent?: React.ReactNode;
+  amountFilterComponent?: React.ReactNode;
 }
 
 const JobTabs = ({ 
@@ -21,7 +22,8 @@ const JobTabs = ({
   onCancelJob, 
   onSearchChange,
   dateRangeComponent,
-  filtersComponent
+  filtersComponent,
+  amountFilterComponent
 }: JobTabsProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
@@ -37,6 +39,7 @@ const JobTabs = ({
       <div className="flex flex-wrap items-center gap-2 mb-4">
         {dateRangeComponent}
         {filtersComponent}
+        {amountFilterComponent}
       </div>
       
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
