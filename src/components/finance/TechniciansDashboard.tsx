@@ -50,20 +50,23 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
   const netProfit = totalRevenue - totalExpenses;
 
+  // Adding color-matched expense categories
   const expenseCategories = [
-    { name: "Equipment", value: totalExpenses * 0.4, color: "#f87171" },
-    { name: "Travel", value: totalExpenses * 0.3, color: "#22c55e" },
+    { name: "Equipment", value: totalExpenses * 0.4, color: "#ef4444" },
+    { name: "Travel", value: totalExpenses * 0.3, color: "#10b981" },
     { name: "Training", value: totalExpenses * 0.15, color: "#f97316" },
     { name: "Insurance", value: totalExpenses * 0.1, color: "#3b82f6" },
     { name: "Other", value: totalExpenses * 0.05, color: "#8b5cf6" },
   ];
 
+  // Updated colors to match payment overview
   const revenueBreakdown = [
     { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" },
     { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" },
     { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },
   ];
 
+  // Updated colors to match payment overview
   const profitBreakdown = [
     { name: "Operating Costs", value: companyProfit * 0.3, color: "#3b82f6" },
     { name: "Reinvestment", value: companyProfit * 0.25, color: "#10b981" },
@@ -178,9 +181,9 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                     </TableCell>
                     <TableCell>{tech.specialty}</TableCell>
                     <TableCell className="text-right">{tech.completedJobs}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(tech.totalRevenue)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(partsValue)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(earnings)}</TableCell>
+                    <TableCell className="text-right text-blue-600">{formatCurrency(tech.totalRevenue)}</TableCell>
+                    <TableCell className="text-right text-pink-500">{formatCurrency(partsValue)}</TableCell>
+                    <TableCell className="text-right text-green-600">{formatCurrency(earnings)}</TableCell>
                     <TableCell className="text-right">{profitMargin}%</TableCell>
                   </TableRow>
                 );
