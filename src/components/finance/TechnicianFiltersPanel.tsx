@@ -1,10 +1,8 @@
-
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Search, Calendar, ChevronDown, X } from "lucide-react";
+import { Search, Calendar, ChevronDown, X, Users } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { 
   DropdownMenu, 
@@ -21,6 +19,13 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TechnicianFiltersPanelProps {
   showFilters: boolean;
@@ -34,6 +39,7 @@ interface TechnicianFiltersPanelProps {
   selectAllTechnicians?: () => void;
   deselectAllTechnicians?: () => void;
   setShowFilters?: (show: boolean) => void;
+  compact?: boolean;
 }
 
 const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
@@ -47,7 +53,8 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
   setDate,
   selectAllTechnicians,
   deselectAllTechnicians,
-  setShowFilters
+  setShowFilters,
+  compact = false
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -99,6 +106,83 @@ const TechnicianFiltersPanel: React.FC<TechnicianFiltersPanelProps> = ({
         break;
     }
   };
+  
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 gap-2"
+            >
+              <Users className="h-4 w-4" />
+              <span>Technicians</span>
+              <span className="ml-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-600">
+                {selectedTechnicians.length || "All"}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-72 p-0" align="end">
+            <div className="p-3 space-y-3">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search technicians..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2 pb-2 border-b border-gray-200">
+                <Checkbox 
+                  id="select-all-technicians-compact" 
+                  checked={allSelected}
+                  data-state={someSelected ? "indeterminate" : allSelected ? "checked" : "unchecked"}
+                  onCheckedChange={handleSelectAllChange}
+                />
+                <label 
+                  htmlFor="select-all-technicians-compact"
+                  className="text-sm font-medium leading-none"
+                >
+                  Select All Technicians
+                </label>
+              </div>
+              
+              <div className="max-h-52 overflow-y-auto pt-2 space-y-1">
+                {filteredTechnicians.map((techName) => (
+                  <div key={techName} className="flex items-center space-x-2 py-1">
+                    <Checkbox 
+                      id={`tech-compact-${techName}`} 
+                      checked={selectedTechnicians.includes(techName)}
+                      onCheckedChange={() => toggleTechnician(techName)}
+                    />
+                    <label 
+                      htmlFor={`tech-compact-${techName}`}
+                      className="text-sm font-medium leading-none"
+                    >
+                      {techName}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex justify-between pt-2 border-t border-gray-200">
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  Clear all
+                </Button>
+                <Button size="sm" onClick={applyFilters}>
+                  Apply
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
   
   if (!showFilters) return null;
   

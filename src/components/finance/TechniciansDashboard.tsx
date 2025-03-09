@@ -9,6 +9,8 @@ import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel"
 import { DateRange } from "react-day-picker";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 import TechnicianPaymentsSection from "@/components/finance/TechnicianPaymentsSection";
+import { Button } from "@/components/ui/button";
+import { SlidersHorizontal } from "lucide-react";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -27,6 +29,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     to: new Date(),
   });
   const [appliedFilters, setAppliedFilters] = useState(false);
+  const [showFullFilters, setShowFullFilters] = useState(false);
 
   const technicianNames = activeTechnicians.map(tech => tech.name);
 
@@ -107,22 +110,60 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   const applyFilters = () => {
     setAppliedFilters(true);
+    setShowFullFilters(false);
   };
 
   return (
     <div className="space-y-8">
-      <TechnicianFiltersPanel 
-        showFilters={true}
-        technicianNames={technicianNames}
-        selectedTechnicians={selectedTechnicians}
-        toggleTechnician={toggleTechnician}
-        clearFilters={clearFilters}
-        applyFilters={applyFilters}
-        date={date}
-        setDate={setDate}
-        selectAllTechnicians={selectAllTechnicians}
-        deselectAllTechnicians={deselectAllTechnicians}
-      />
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <TechnicianFiltersPanel 
+            showFilters={true}
+            technicianNames={technicianNames}
+            selectedTechnicians={selectedTechnicians}
+            toggleTechnician={toggleTechnician}
+            clearFilters={clearFilters}
+            applyFilters={applyFilters}
+            date={date}
+            setDate={setDate}
+            selectAllTechnicians={selectAllTechnicians}
+            deselectAllTechnicians={deselectAllTechnicians}
+            compact={true}
+          />
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9"
+            onClick={() => setShowFullFilters(!showFullFilters)}
+          >
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            Advanced Filters
+          </Button>
+        </div>
+        
+        {selectedTechnicians.length > 0 && (
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredTechnicians.length} of {activeTechnicians.length} technicians
+          </div>
+        )}
+      </div>
+      
+      {showFullFilters && (
+        <TechnicianFiltersPanel 
+          showFilters={true}
+          technicianNames={technicianNames}
+          selectedTechnicians={selectedTechnicians}
+          toggleTechnician={toggleTechnician}
+          clearFilters={clearFilters}
+          applyFilters={applyFilters}
+          date={date}
+          setDate={setDate}
+          selectAllTechnicians={selectAllTechnicians}
+          deselectAllTechnicians={deselectAllTechnicians}
+          setShowFilters={setShowFullFilters}
+        />
+      )}
       
       <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
       
