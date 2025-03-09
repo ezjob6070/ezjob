@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import DateRangeSelector from "@/components/finance/DateRangeSelector";
 
 type ReportType = "financial" | "technician" | "jobSource" | "transaction";
 
@@ -30,11 +31,12 @@ interface ReportGeneratorProps {
   dateRange: DateRange | undefined;
 }
 
-const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange }) => {
+const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange: initialDateRange }) => {
   const [selectedReportType, setSelectedReportType] = useState<ReportType>("financial");
   const [notes, setNotes] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [reportFormat, setReportFormat] = useState("json");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(initialDateRange);
   
   // Report content selections
   const [includeRevenue, setIncludeRevenue] = useState(true);
@@ -142,6 +144,11 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange }) => {
             </div>
           </div>
           
+          <div>
+            <h3 className="text-sm font-medium mb-3">Date Range</h3>
+            <DateRangeSelector date={dateRange} setDate={setDateRange} />
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-sm font-medium mb-3">Report Content</h3>
@@ -223,13 +230,6 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange }) => {
                 placeholder="Add any notes or context for this report..."
                 className="resize-none h-[120px]"
               />
-              
-              <div className="mt-4 p-3 bg-muted rounded-md">
-                <h4 className="text-sm font-medium mb-1">Date Range</h4>
-                <p className="text-sm text-muted-foreground mb-0">
-                  {getDateRangeDisplayText()}
-                </p>
-              </div>
             </div>
           </div>
           
