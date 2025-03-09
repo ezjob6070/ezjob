@@ -1,9 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
 
 interface TechnicianCircleChartsProps {
   filteredTechnicians: Technician[];
@@ -12,11 +14,31 @@ interface TechnicianCircleChartsProps {
 const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({ 
   filteredTechnicians 
 }) => {
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>("all");
+  const [selectedTechnicianNames, setSelectedTechnicianNames] = useState<string[]>([]);
+  
+  const technicianNames = filteredTechnicians.map(tech => tech.name);
+  
+  // Apply filters
+  const displayedTechnicians = filteredTechnicians.filter(tech => {
+    // Filter by payment type
+    const matchesPaymentType = 
+      paymentTypeFilter === "all" || 
+      tech.paymentType === paymentTypeFilter;
+    
+    // Filter by selected technicians
+    const matchesTechnician = 
+      selectedTechnicianNames.length === 0 || 
+      selectedTechnicianNames.includes(tech.name);
+    
+    return matchesPaymentType && matchesTechnician;
+  });
+  
   // Calculate total revenue from technicians
-  const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
+  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
   
   // Calculate total technician payments
-  const technicianEarnings = filteredTechnicians.reduce((sum, tech) => 
+  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => 
     sum + tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1), 0
   );
   
@@ -26,8 +48,56 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   // Calculate net profit
   const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
   
+  // Handle technician selection
+  const toggleTechnician = (techName: string) => {
+    setSelectedTechnicianNames(prev => 
+      prev.includes(techName) 
+        ? prev.filter(t => t !== techName)
+        : [...prev, techName]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedTechnicianNames([]);
+    setPaymentTypeFilter("all");
+  };
+
+  const applyFilters = () => {
+    // Filters are applied instantly
+  };
+  
   return (
     <div className="space-y-6">
+      {/* Filters Row */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <CompactTechnicianFilter 
+          technicianNames={technicianNames}
+          selectedTechnicians={selectedTechnicianNames}
+          toggleTechnician={toggleTechnician}
+          clearFilters={clearFilters}
+          applyFilters={applyFilters}
+        />
+        
+        <div className="w-56">
+          <Select value={paymentTypeFilter} onValueChange={setPaymentTypeFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Payment Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Payment Types</SelectItem>
+              <SelectItem value="percentage">Percentage Based</SelectItem>
+              <SelectItem value="flat">Flat Rate</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {(selectedTechnicianNames.length > 0 || paymentTypeFilter !== "all") && (
+          <div className="text-sm text-muted-foreground">
+            Showing {displayedTechnicians.length} of {filteredTechnicians.length} technicians
+          </div>
+        )}
+      </div>
+      
       {/* Payment Breakdown Simple Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
@@ -80,7 +150,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTechnicians.map((tech) => {
+              {displayedTechnicians.map((tech) => {
                 const techEarnings = tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1);
                 const companyEarnings = tech.totalRevenue - techEarnings - (tech.totalRevenue * 0.33);
                 const profitRatio = ((companyEarnings / tech.totalRevenue) * 100).toFixed(1);
@@ -94,6 +164,9 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
                           {tech.initials}
                         </div>
                         <span>{tech.name}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          ({tech.paymentType === "percentage" ? `${tech.paymentRate}%` : "Flat Rate"})
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-sky-600">{formatCurrency(tech.totalRevenue)}</TableCell>

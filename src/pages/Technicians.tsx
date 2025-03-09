@@ -8,6 +8,7 @@ import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
+import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
 import { initialTechnicians } from "@/data/technicians";
 
 const Technicians = () => {
@@ -16,6 +17,15 @@ const Technicians = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredTechnicians = technicians.filter(tech => {
+    if (searchQuery === "") return true;
+    
+    return tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           tech.email.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   const handleAddTechnician = (newTechnician: Technician) => {
     setTechnicians((prevTechnicians) => [newTechnician, ...prevTechnicians]);
@@ -42,6 +52,10 @@ const Technicians = () => {
     });
   };
 
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
   return (
     <div className="space-y-8 py-8">
       <div className="flex justify-between items-center">
@@ -62,9 +76,16 @@ const Technicians = () => {
       </div>
 
       <TechnicianStats technicians={technicians} />
+      
+      {/* Financial Performance with Charts and Filters */}
+      <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
+      
+      {/* Technicians List */}
       <TechniciansList 
-        technicians={technicians} 
+        technicians={filteredTechnicians} 
         onEditTechnician={handleEditTechnician}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
       />
       
       <AddTechnicianModal 
