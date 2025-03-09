@@ -1,8 +1,7 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus, FileBadge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Employee, EmployeeNote } from "@/types/employee";
 import { initialEmployees } from "@/data/employees";
+import EmployeeDocuments from "@/components/employed/EmployeeDocuments";
 
 const EmployeeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,9 +24,12 @@ const EmployeeDetail = () => {
     // In a real app, fetch employee data from API
     const foundEmployee = initialEmployees.find(emp => emp.id === id);
     if (foundEmployee) {
-      // Initialize notes array if it doesn't exist
+      // Initialize notes and documents arrays if they don't exist
       if (!foundEmployee.notes) {
         foundEmployee.notes = [];
+      }
+      if (!foundEmployee.documents) {
+        foundEmployee.documents = [];
       }
       setEmployee(foundEmployee);
     }
@@ -55,6 +58,10 @@ const EmployeeDetail = () => {
       title: "Note Added",
       description: "Employee note has been added successfully",
     });
+  };
+  
+  const handleUpdateEmployee = (updatedEmployee: Employee) => {
+    setEmployee(updatedEmployee);
   };
   
   if (!employee) {
@@ -168,10 +175,11 @@ const EmployeeDetail = () => {
         
         <div className="md:col-span-2">
           <Tabs defaultValue="background" className="w-full">
-            <TabsList className="grid grid-cols-4 mb-8">
+            <TabsList className="grid grid-cols-5 mb-8">
               <TabsTrigger value="background">Background</TabsTrigger>
               <TabsTrigger value="skills">Skills</TabsTrigger>
               <TabsTrigger value="education">Education</TabsTrigger>
+              <TabsTrigger value="documents">Documents</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
             
@@ -284,6 +292,13 @@ const EmployeeDetail = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            <TabsContent value="documents" className="space-y-6">
+              <EmployeeDocuments 
+                employee={employee}
+                onUpdateEmployee={handleUpdateEmployee}
+              />
             </TabsContent>
             
             <TabsContent value="notes" className="space-y-6">

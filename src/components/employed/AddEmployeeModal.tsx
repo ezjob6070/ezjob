@@ -1,11 +1,12 @@
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Employee, EmployeeStatus } from "@/types/employee";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ImagePlus, User } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -35,6 +36,7 @@ const DEPARTMENTS = [
 
 const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModalProps) => {
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -47,9 +49,27 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
     skills: "",
   });
 
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // For real implementation, you'd upload this to a server/storage
+      // Here we just create a local URL for preview
+      const imageUrl = URL.createObjectURL(file);
+      setProfileImage(imageUrl);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -78,6 +98,8 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
       salary: parseInt(formData.salary) || 0,
       address: formData.address,
       skills: formData.skills.split(",").map(skill => skill.trim()).filter(Boolean),
+      profileImage: profileImage || undefined,
+      documents: [],
     };
 
     onAddEmployee(newEmployee);
@@ -93,6 +115,7 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
       salary: "",
       skills: "",
     });
+    setProfileImage(null);
     
     onOpenChange(false);
   };
@@ -104,6 +127,33 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
           <DialogTitle>Add New Employee</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="flex justify-center mb-4">
+            <div 
+              className="relative cursor-pointer group"
+              onClick={handleImageClick}
+            >
+              <Avatar className="h-24 w-24">
+                {profileImage ? (
+                  <AvatarImage src={profileImage} alt="Profile preview" />
+                ) : (
+                  <AvatarFallback className="bg-muted">
+                    <User className="h-12 w-12 text-muted-foreground" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ImagePlus className="h-8 w-8 text-white" />
+              </div>
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                className="hidden" 
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </div>
+          </div>
+          
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Full Name *</Label>

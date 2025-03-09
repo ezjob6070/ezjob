@@ -11,6 +11,24 @@ export enum ResumeStatus {
   REJECTED = "rejected",
 }
 
+export enum DocumentType {
+  ID = "id",
+  PASSPORT = "passport",
+  DRIVERS_LICENSE = "drivers_license",
+  WORK_PERMIT = "work_permit",
+  OTHER = "other"
+}
+
+export interface EmployeeDocument {
+  id: string;
+  type: DocumentType;
+  name: string;
+  url: string;
+  dateUploaded: Date;
+  expiryDate?: Date;
+  notes?: string;
+}
+
 export interface Resume {
   id: string;
   name: string;
@@ -52,6 +70,7 @@ export interface Employee {
   certifications?: string[];
   performanceRating?: number;
   notes?: EmployeeNote[];
+  documents?: EmployeeDocument[];
 }
 
 export interface Report {
