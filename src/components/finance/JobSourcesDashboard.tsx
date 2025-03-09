@@ -1,8 +1,7 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { JobSource } from "@/types/finance";
+import { JobSource, FinancialTransaction } from "@/types/finance";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import JobSourceInvoiceSection from "@/components/finance/JobSourceInvoiceSection";
 import JobSourceCircleCharts from "@/components/finance/JobSourceCircleCharts";
@@ -13,12 +12,14 @@ import JobSourceCategoryFilter from "@/components/finance/jobsource-filters/JobS
 
 interface JobSourcesDashboardProps {
   filteredJobSources: JobSource[];
+  filteredTransactions: FinancialTransaction[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
 
 const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   filteredJobSources,
+  filteredTransactions,
   searchQuery,
   setSearchQuery
 }) => {
