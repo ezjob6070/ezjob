@@ -22,10 +22,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   setSearchQuery
 }) => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
-    to: new Date(),
-  });
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [appliedFilters, setAppliedFilters] = useState(false);
 
   const technicianNames = activeTechnicians.map(tech => tech.name);
@@ -97,10 +94,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   const clearFilters = () => {
     setSelectedTechnicians([]);
-    setDate({
-      from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
-      to: new Date(),
-    });
+    setDate(undefined);
     setAppliedFilters(false);
   };
 
