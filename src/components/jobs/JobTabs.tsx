@@ -39,6 +39,8 @@ const JobTabs = ({
 
   const getTabTriggerClass = (value: string) => {
     switch (value) {
+      case "all":
+        return "data-[state=active]:bg-blue-500 data-[state=active]:text-white";
       case "scheduled":
         return "data-[state=active]:bg-yellow-500 data-[state=active]:text-white";
       case "in_progress":
