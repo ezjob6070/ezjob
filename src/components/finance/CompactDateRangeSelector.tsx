@@ -102,18 +102,23 @@ const CompactDateRangeSelector: React.FC<CompactDateRangeSelectorProps> = ({ dat
             variant="outline"
             className="w-auto justify-between px-3 py-5 text-base font-medium"
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date.to ? (
-                <span>
-                  {format(date.from, "MMM dd, yyyy")} - {format(date.to, "MMM dd, yyyy")}
-                </span>
-              ) : (
-                format(date.from, "MMM dd, yyyy")
-              )
-            ) : (
-              <span>Select date range</span>
-            )}
+            <div className="flex flex-col items-start">
+              <span className="text-xs font-semibold text-blue-600 uppercase mb-1">Custom Range</span>
+              <div className="flex items-center">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <span>
+                      {format(date.from, "MMM dd, yyyy")} - {format(date.to, "MMM dd, yyyy")}
+                    </span>
+                  ) : (
+                    format(date.from, "MMM dd, yyyy")
+                  )
+                ) : (
+                  <span>Select date range</span>
+                )}
+              </div>
+            </div>
             <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>

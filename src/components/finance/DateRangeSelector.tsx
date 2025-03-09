@@ -1,16 +1,9 @@
-
 import React from "react";
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronDown, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
 import { addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import { DateRange } from "react-day-picker";
 
@@ -72,18 +65,23 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) 
               variant="outline"
               className="w-full justify-between px-3 py-5 text-base font-medium"
             >
-              <CalendarRange className="mr-2 h-4 w-4" />
-              {date?.from ? (
-                date.to ? (
-                  <span>
-                    {format(date.from, "MMM dd, yyyy")} - {format(date.to, "MMM dd, yyyy")}
-                  </span>
-                ) : (
-                  format(date.from, "MMM dd, yyyy")
-                )
-              ) : (
-                <span>Select date range</span>
-              )}
+              <div className="flex flex-col items-start">
+                <span className="text-xs font-semibold text-blue-600 uppercase mb-1">Custom Range</span>
+                <div className="flex items-center">
+                  <CalendarRange className="mr-2 h-4 w-4" />
+                  {date?.from ? (
+                    date.to ? (
+                      <span>
+                        {format(date.from, "MMM dd, yyyy")} - {format(date.to, "MMM dd, yyyy")}
+                      </span>
+                    ) : (
+                      format(date.from, "MMM dd, yyyy")
+                    )
+                  ) : (
+                    <span>Select date range</span>
+                  )}
+                </div>
+              </div>
               <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
             </Button>
           </PopoverTrigger>
