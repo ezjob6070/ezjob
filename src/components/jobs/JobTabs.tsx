@@ -5,6 +5,7 @@ import JobsTable from "./JobsTable";
 import { Job } from "./JobTypes";
 import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface JobTabsProps {
   jobs: Job[];
@@ -36,6 +37,21 @@ const JobTabs = ({
     return jobs.filter(job => job.status === status);
   };
 
+  const getTabTriggerClass = (value: string) => {
+    switch (value) {
+      case "scheduled":
+        return "data-[state=active]:bg-yellow-500 data-[state=active]:text-white";
+      case "in_progress":
+        return "data-[state=active]:bg-black data-[state=active]:text-white";
+      case "completed":
+        return "data-[state=active]:bg-green-500 data-[state=active]:text-white";
+      case "cancelled":
+        return "data-[state=active]:bg-red-500 data-[state=active]:text-white";
+      default:
+        return "data-[state=active]:bg-primary";
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -47,11 +63,36 @@ const JobTabs = ({
       
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 mb-4">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-          <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+          <TabsTrigger 
+            value="all"
+            className={getTabTriggerClass("all")}
+          >
+            All
+          </TabsTrigger>
+          <TabsTrigger 
+            value="scheduled"
+            className={getTabTriggerClass("scheduled")}
+          >
+            Scheduled
+          </TabsTrigger>
+          <TabsTrigger 
+            value="in_progress"
+            className={getTabTriggerClass("in_progress")}
+          >
+            In Progress
+          </TabsTrigger>
+          <TabsTrigger 
+            value="completed"
+            className={getTabTriggerClass("completed")}
+          >
+            Completed
+          </TabsTrigger>
+          <TabsTrigger 
+            value="cancelled"
+            className={getTabTriggerClass("cancelled")}
+          >
+            Cancelled
+          </TabsTrigger>
         </TabsList>
         
         <div className="relative mb-4">
