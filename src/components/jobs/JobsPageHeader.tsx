@@ -1,4 +1,7 @@
 
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+
 const JobsPageHeader = () => {
   return (
     <div className="flex justify-between items-center">
@@ -10,6 +13,11 @@ const JobsPageHeader = () => {
           Manage and monitor all jobs
         </p>
       </div>
+
+      <Button className="ml-auto">
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Add New Job
+      </Button>
     </div>
   );
 };
