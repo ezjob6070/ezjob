@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Search, FileText, Trophy, TrendingUp, Package, Award } from "lucide-react";
+import { Search, FileText, BarChart2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,7 +11,6 @@ import { Technician } from "@/types/technician";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
 
 const TechnicianAltercation = () => {
   const { toast } = useToast();
@@ -57,15 +56,9 @@ const TechnicianAltercation = () => {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/technicians/analytics">
-            <Button variant="outline" className="gap-2">
-              <FileText className="h-4 w-4" />
+            <Button variant="outline" size="lg" className="gap-2">
+              <BarChart2 className="h-5 w-5" />
               Technician Analytics
-            </Button>
-          </Link>
-          <Link to="/technicians/dashboard">
-            <Button variant="outline" className="gap-2">
-              <FileText className="h-4 w-4" />
-              Technician Dashboard
             </Button>
           </Link>
         </div>
@@ -107,12 +100,12 @@ const TechnicianAltercation = () => {
       </Card>
 
       <Tabs defaultValue="all" className="mb-8">
-        <TabsList>
-          <TabsTrigger value="all">All Technicians</TabsTrigger>
-          <TabsTrigger value="hvac">HVAC</TabsTrigger>
-          <TabsTrigger value="electrical">Electrical</TabsTrigger>
-          <TabsTrigger value="plumbing">Plumbing</TabsTrigger>
-          <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+        <TabsList className="w-full">
+          <TabsTrigger value="all" className="flex-1 text-lg py-3">All Technicians</TabsTrigger>
+          <TabsTrigger value="hvac" className="flex-1 text-lg py-3">HVAC</TabsTrigger>
+          <TabsTrigger value="electrical" className="flex-1 text-lg py-3">Electrical</TabsTrigger>
+          <TabsTrigger value="plumbing" className="flex-1 text-lg py-3">Plumbing</TabsTrigger>
+          <TabsTrigger value="maintenance" className="flex-1 text-lg py-3">Maintenance</TabsTrigger>
         </TabsList>
         <TabsContent value="all">
           <TechniciansList 

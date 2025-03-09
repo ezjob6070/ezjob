@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileText, Trophy, TrendingUp, Package, Award } from "lucide-react";
+import { FileText, Trophy, TrendingUp, Package, Award, List } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { initialTechnicians } from "@/data/technicians";
@@ -36,15 +36,9 @@ const TechnicianAnalytics = () => {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/technicians">
-            <Button variant="outline" className="gap-2">
-              <FileText className="h-4 w-4" />
+            <Button variant="outline" size="lg" className="gap-2">
+              <List className="h-5 w-5" />
               Technician List
-            </Button>
-          </Link>
-          <Link to="/technicians/dashboard">
-            <Button variant="outline" className="gap-2">
-              <FileText className="h-4 w-4" />
-              Technician Dashboard
             </Button>
           </Link>
         </div>
