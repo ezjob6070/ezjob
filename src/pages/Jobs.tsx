@@ -72,7 +72,7 @@ const Jobs = () => {
     <div className="space-y-6 py-8">
       <JobsPageHeader />
 
-      <JobStats jobs={filteredJobs} />
+      <JobStats jobs={filteredJobs} date={date} />
       
       <JobFilterInfoBar 
         filteredCount={filteredJobs.length}
