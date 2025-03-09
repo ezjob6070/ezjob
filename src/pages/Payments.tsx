@@ -6,10 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCardIcon, DollarSignIcon, FileTextIcon, CheckCircleIcon } from "lucide-react";
+import { CreditCardIcon, DollarSignIcon, FileTextIcon, CheckCircleIcon, ReceiptIcon } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import PaymentForm from "@/components/payments/PaymentForm";
 import TransactionHistory from "@/components/payments/TransactionHistory";
+import InvoiceForm from "@/components/payments/InvoiceForm";
+import InvoiceList from "@/components/payments/InvoiceList";
 
 const Payments = () => {
   const { toast } = useToast();
@@ -47,10 +49,10 @@ const Payments = () => {
     <div className="space-y-8 py-8">
       <div>
         <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-          Payments & Transactions
+          Payments & Invoices
         </h1>
         <p className="text-muted-foreground mt-1">
-          Process payments, create estimates, and view transaction history
+          Process payments, create invoices, and view transaction history
         </p>
       </div>
 
@@ -58,7 +60,7 @@ const Payments = () => {
         <TabsList className="grid grid-cols-4 w-full max-w-3xl">
           <TabsTrigger value="process">Process Payment</TabsTrigger>
           <TabsTrigger value="transactions">Transaction History</TabsTrigger>
-          <TabsTrigger value="estimates">Estimates</TabsTrigger>
+          <TabsTrigger value="invoices">Invoices</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -134,57 +136,37 @@ const Payments = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="estimates" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileTextIcon className="h-5 w-5 text-blue-600" />
-                <span>Create Estimate</span>
-              </CardTitle>
-              <CardDescription>
-                Create and send job estimates to clients
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="estimate-client">Client</Label>
-                  <select 
-                    id="estimate-client"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    <option value="" disabled selected>Select a client</option>
-                    <option value="client1">Acme Corp</option>
-                    <option value="client2">Tech Solutions Inc.</option>
-                    <option value="client3">Global Industries</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="estimate-title">Job Title</Label>
-                  <Input id="estimate-title" placeholder="HVAC Maintenance" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="estimate-amount">Estimated Amount</Label>
-                  <Input id="estimate-amount" placeholder="0.00" type="number" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="estimate-description">Description</Label>
-                  <Input id="estimate-description" placeholder="Job details and scope" />
-                </div>
-                <Button 
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900"
-                  onClick={() => {
-                    toast({
-                      title: "Estimate Created",
-                      description: "The estimate has been sent to the client.",
-                    });
-                  }}
-                >
-                  Create & Send Estimate
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="invoices" className="mt-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileTextIcon className="h-5 w-5 text-blue-600" />
+                  <span>Create Invoice</span>
+                </CardTitle>
+                <CardDescription>
+                  Create and send professional invoices to clients
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <InvoiceForm />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ReceiptIcon className="h-5 w-5 text-purple-600" />
+                  <span>Recent Invoices</span>
+                </CardTitle>
+                <CardDescription>
+                  View and manage recent invoices
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <InvoiceList />
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">

@@ -14,7 +14,9 @@ import {
   BarChartIcon,
   WrenchIcon,
   BriefcaseIcon,
-  MapIcon
+  MapIcon,
+  CreditCardIcon,
+  ReceiptIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +64,11 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       label: "Estimates",
       icon: <FileTextIcon size={20} />,
       href: "/estimates",
+    },
+    {
+      label: "Payments & Invoices",
+      icon: <CreditCardIcon size={20} />,
+      href: "/payments",
     },
     {
       label: "Technicians",
