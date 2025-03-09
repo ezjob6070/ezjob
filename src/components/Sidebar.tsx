@@ -79,7 +79,7 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       href: "/job-sources",
     },
     {
-      label: "Finance",
+      label: "Finance & Reports",
       icon: <WalletIcon size={20} />,
       href: "/finance",
     },
