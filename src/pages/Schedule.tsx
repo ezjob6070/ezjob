@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
@@ -86,7 +87,7 @@ const Schedule = () => {
         
         <TabsContent value="calendar" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="md:col-span-1">
+            <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle>Calendar</CardTitle>
               </CardHeader>
@@ -95,7 +96,7 @@ const Schedule = () => {
                   mode="single"
                   selected={selectedDate}
                   onSelect={(date) => date && updateSelectedDateItems(date)}
-                  className="mx-auto"
+                  className="mx-auto w-full scale-110 transform origin-top"
                   modifiers={{
                     hasEvents: (date) => 
                       jobs.some(job => isSameDay(job.date, date)) || 
@@ -108,7 +109,7 @@ const Schedule = () => {
               </CardContent>
             </Card>
             
-            <Card className="md:col-span-2">
+            <Card className="md:col-span-1">
               <CardHeader>
                 <CardTitle>
                   {format(selectedDate, "EEEE, MMMM d, yyyy")}
@@ -229,9 +230,6 @@ const Schedule = () => {
                             <p className="text-sm text-muted-foreground mt-1 capitalize">{task.status}</p>
                           </div>
                         </div>
-                        {task.description && (
-                          <p className="text-sm mt-2 text-muted-foreground">{task.description}</p>
-                        )}
                       </CardContent>
                     </Card>
                   ))}
