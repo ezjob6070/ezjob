@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, ChevronDown } from "lucide-react";
@@ -62,7 +61,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
 
   if (compact) {
     return (
-      <div className="flex flex-wrap gap-2 items-center mb-4">
+      <>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="h-10 px-3 py-5 text-base font-medium">
@@ -100,10 +99,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
           <PopoverTrigger asChild>
             <Button 
               variant="outline" 
-              className={cn(
-                "h-10 px-3 py-5 text-base font-medium", 
-                !date && "text-muted-foreground"
-              )}
+              className="h-10 px-3 py-5 text-base font-medium"
             >
               <Calendar className="mr-2 h-4 w-4" />
               {date?.from ? (
@@ -130,7 +126,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
             />
           </PopoverContent>
         </Popover>
-      </div>
+      </>
     );
   }
 

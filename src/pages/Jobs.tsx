@@ -30,7 +30,6 @@ const Jobs = () => {
 
   const technicianNames = initialTechnicians.map(tech => tech.name);
 
-  // Function to handle job cancellation
   const handleCancelJob = (jobId: string) => {
     setJobs(prevJobs =>
       prevJobs.map(job =>
@@ -39,11 +38,9 @@ const Jobs = () => {
     );
   };
 
-  // Filter jobs based on search term and other filters
   useEffect(() => {
     let result = jobs;
 
-    // Apply search term filter
     if (searchTerm) {
       result = result.filter(job =>
         job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -51,14 +48,12 @@ const Jobs = () => {
       );
     }
 
-    // Apply technician filter
     if (appliedFilters && selectedTechnicians.length > 0) {
       result = result.filter(job => 
         job.technicianName && selectedTechnicians.includes(job.technicianName)
       );
     }
 
-    // Apply category filter (assuming job titles contain the category)
     if (selectedCategories.length > 0) {
       result = result.filter(job => 
         selectedCategories.some(category => 
@@ -67,7 +62,6 @@ const Jobs = () => {
       );
     }
 
-    // Apply date range filter
     if (date?.from) {
       const fromDate = startOfDay(date.from);
       const toDate = date.to ? startOfDay(date.to) : fromDate;
@@ -127,7 +121,7 @@ const Jobs = () => {
 
   const renderFiltersComponent = () => {
     return (
-      <div className="flex flex-wrap gap-2 mb-4">
+      <>
         <CategoryFilter 
           selectedCategories={selectedCategories}
           toggleCategory={toggleCategory}
@@ -144,7 +138,7 @@ const Jobs = () => {
           selectAllTechnicians={selectAllTechnicians}
           deselectAllTechnicians={deselectAllTechnicians}
         />
-      </div>
+      </>
     );
   };
 

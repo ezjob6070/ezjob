@@ -43,8 +43,10 @@ const JobTabs = ({
           <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
         </TabsList>
         
-        {filtersComponent}
-        {dateRangeComponent}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          {filtersComponent}
+          {dateRangeComponent}
+        </div>
         
         <div className="relative mb-4">
           <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
