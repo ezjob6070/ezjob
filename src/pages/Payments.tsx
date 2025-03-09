@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCardIcon, DollarSignIcon, FileTextIcon, CheckCircleIcon, ReceiptIcon } from "lucide-react";
+import { CreditCardIcon, DollarSignIcon, FileTextIcon, CheckCircleIcon, ReceiptIcon, PhoneIcon } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import PaymentForm from "@/components/payments/PaymentForm";
 import TransactionHistory from "@/components/payments/TransactionHistory";
@@ -96,6 +96,15 @@ const Payments = () => {
                   <div className="space-y-2">
                     <Label htmlFor="customer-email">Customer Email</Label>
                     <Input id="customer-email" placeholder="customer@example.com" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="customer-phone">
+                      <span className="flex items-center gap-1">
+                        <PhoneIcon size={16} />
+                        Customer Phone
+                      </span>
+                    </Label>
+                    <Input id="customer-phone" placeholder="(555) 123-4567" type="tel" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="payment-amount">Amount</Label>
