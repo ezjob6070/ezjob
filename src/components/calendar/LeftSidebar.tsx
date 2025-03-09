@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format, isSameDay, addMonths, subMonths } from "date-fns";
 import { CalendarIcon, ChevronLeft, ChevronRight, Users, Briefcase, CheckSquare } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -25,7 +25,7 @@ const LeftSidebar = ({ isOpen }: LeftSidebarProps) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   // Filter jobs and tasks whenever the selected date changes
-  React.useEffect(() => {
+  useEffect(() => {
     const filteredJobs = jobs.filter(job => 
       isSameDay(job.date, selectedDate)
     );
@@ -221,7 +221,9 @@ const LeftSidebar = ({ isOpen }: LeftSidebarProps) => {
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="text-sm font-medium">{task.title}</h4>
-                            <p className="text-xs text-muted-foreground">{task.description?.substring(0, 50)}{task.description?.length > 50 ? '...' : ''}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {task.client.name}
+                            </p>
                           </div>
                           <Badge 
                             className={cn(
