@@ -21,6 +21,7 @@ import Estimates from "./pages/Estimates";
 import Finance from "./pages/Finance";
 import JobSources from "./pages/JobSources";
 import GPSTracking from "./pages/GPSTracking";
+import Employed from "./pages/Employed";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="finance" element={<Finance />} />
             <Route path="gps-tracking" element={<GPSTracking />} />
             <Route path="job-sources" element={<JobSources />} />
+            <Route path="employed" element={<Employed />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />

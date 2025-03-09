@@ -16,7 +16,8 @@ import {
   BriefcaseIcon,
   MapIcon,
   CreditCardIcon,
-  ReceiptIcon
+  ReceiptIcon,
+  UserRoundIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +75,11 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       label: "Technicians",
       icon: <WrenchIcon size={20} />,
       href: "/technicians",
+    },
+    {
+      label: "Employed",
+      icon: <UserRoundIcon size={20} />,
+      href: "/employed",
     },
     {
       label: "GPS Tracking",
