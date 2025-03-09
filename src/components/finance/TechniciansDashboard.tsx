@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -169,9 +170,21 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       />
       
       <Card>
-        <CardHeader>
-          <CardTitle>Technician Performance</CardTitle>
-          <CardDescription>Financial metrics for technicians</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div>
+            <CardTitle>Technician Performance</CardTitle>
+            <CardDescription>Financial metrics for technicians</CardDescription>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {selectedCategories.length > 0 && (
+              <div className="text-sm px-3 py-1 rounded-full bg-slate-100 text-slate-700">
+                {selectedCategories.length === 1 
+                  ? `Category: ${selectedCategories[0]}` 
+                  : `${selectedCategories.length} categories`}
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -204,7 +217,11 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                       </div>
                     </TableCell>
                     <TableCell>{tech.specialty}</TableCell>
-                    <TableCell>{tech.category || "Others"}</TableCell>
+                    <TableCell>
+                      <div className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                        {tech.category || "Others"}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-right">{tech.completedJobs}</TableCell>
                     <TableCell className="text-right text-sky-600">{formatCurrency(tech.totalRevenue)}</TableCell>
                     <TableCell className="text-right text-red-600">-{formatCurrency(partsValue)}</TableCell>
@@ -213,6 +230,14 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                   </TableRow>
                 );
               })}
+              
+              {filteredTechnicians.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={8} className="h-24 text-center">
+                    No technicians match the selected filters
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
