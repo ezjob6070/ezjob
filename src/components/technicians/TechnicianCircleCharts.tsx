@@ -68,36 +68,6 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   
   return (
     <div className="space-y-6">
-      {/* Filters Row */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <CompactTechnicianFilter 
-          technicianNames={technicianNames}
-          selectedTechnicians={selectedTechnicianNames}
-          toggleTechnician={toggleTechnician}
-          clearFilters={clearFilters}
-          applyFilters={applyFilters}
-        />
-        
-        <div className="w-56">
-          <Select value={paymentTypeFilter} onValueChange={setPaymentTypeFilter}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Payment Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Payment Types</SelectItem>
-              <SelectItem value="percentage">Percentage Based</SelectItem>
-              <SelectItem value="flat">Flat Rate</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {(selectedTechnicianNames.length > 0 || paymentTypeFilter !== "all") && (
-          <div className="text-sm text-muted-foreground">
-            Showing {displayedTechnicians.length} of {filteredTechnicians.length} technicians
-          </div>
-        )}
-      </div>
-      
       {/* Payment Breakdown Simple Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
@@ -138,6 +108,36 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
           <CardDescription>Earnings and profit metrics for each technician</CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Filters moved inside the card */}
+          <div className="flex flex-wrap items-center gap-3 mb-4 p-3 bg-gray-50 rounded-md border border-gray-100">
+            <CompactTechnicianFilter 
+              technicianNames={technicianNames}
+              selectedTechnicians={selectedTechnicianNames}
+              toggleTechnician={toggleTechnician}
+              clearFilters={clearFilters}
+              applyFilters={applyFilters}
+            />
+            
+            <div className="w-56">
+              <Select value={paymentTypeFilter} onValueChange={setPaymentTypeFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Payment Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Payment Types</SelectItem>
+                  <SelectItem value="percentage">Percentage Based</SelectItem>
+                  <SelectItem value="flat">Flat Rate</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {(selectedTechnicianNames.length > 0 || paymentTypeFilter !== "all") && (
+              <div className="text-sm text-muted-foreground ml-auto">
+                Showing {displayedTechnicians.length} of {filteredTechnicians.length} technicians
+              </div>
+            )}
+          </div>
+
           <Table>
             <TableHeader>
               <TableRow>
