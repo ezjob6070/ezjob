@@ -66,7 +66,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardDescription>Source of revenue streams</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold mb-4">{formatCurrency(totalRevenue)}</div>
+            <div className="text-xl font-bold mb-4 text-green-600">{formatCurrency(totalRevenue)}</div>
             
             {/* Payment method breakdown list without donut chart */}
             <div className="space-y-4">
@@ -77,7 +77,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                     <span className="font-medium">{item.name}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span>{formatCurrency(item.value)}</span>
+                    <span className="text-green-600">{formatCurrency(item.value)}</span>
                     <span className="text-sm text-muted-foreground">
                       ({totalRevenue > 0 ? ((item.value / totalRevenue) * 100).toFixed(1) : "0"}%)
                     </span>
@@ -94,7 +94,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardDescription>Distribution of expenses by type</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold mb-4">{formatCurrency(totalExpenses)}</div>
+            <div className="text-xl font-bold mb-4 text-red-600">-{formatCurrency(totalExpenses)}</div>
             
             {/* Expense breakdown list without donut chart */}
             <div className="space-y-4">
@@ -105,7 +105,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                     <span className="font-medium">{item.name}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span>{formatCurrency(item.value)}</span>
+                    <span className="text-red-600">-{formatCurrency(item.value)}</span>
                     <span className="text-sm text-muted-foreground">
                       ({totalExpenses > 0 ? ((item.value / totalExpenses) * 100).toFixed(1) : "0"}%)
                     </span>
@@ -122,7 +122,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardDescription>How profit is distributed</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold mb-4">{formatCurrency(totalProfit)}</div>
+            <div className={`text-xl font-bold mb-4 ${totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {totalProfit >= 0 ? formatCurrency(totalProfit) : `-${formatCurrency(Math.abs(totalProfit))}`}
+            </div>
             
             {/* Profit allocation breakdown list without donut chart */}
             <div className="space-y-4">
@@ -133,9 +135,13 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                     <span className="font-medium">{item.name}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span>{formatCurrency(item.value)}</span>
+                    <span className={totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      {totalProfit >= 0 
+                        ? formatCurrency(item.value) 
+                        : `-${formatCurrency(Math.abs(item.value))}`}
+                    </span>
                     <span className="text-sm text-muted-foreground">
-                      ({totalProfit > 0 ? ((item.value / totalProfit) * 100).toFixed(1) : "0"}%)
+                      ({totalProfit !== 0 ? ((item.value / Math.abs(totalProfit)) * 100).toFixed(1) : "0"}%)
                     </span>
                   </div>
                 </div>
@@ -175,10 +181,10 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                       </div>
                     </TableCell>
                     <TableCell className="text-right">{source.totalJobs}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(source.totalRevenue || 0)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency((source.expenses || 0) * 0.4)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(source.expenses || 0)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(source.companyProfit || 0)}</TableCell>
+                    <TableCell className="text-right text-green-600">{formatCurrency(source.totalRevenue || 0)}</TableCell>
+                    <TableCell className="text-right text-red-600">-{formatCurrency((source.expenses || 0) * 0.4)}</TableCell>
+                    <TableCell className="text-right text-red-600">-{formatCurrency(source.expenses || 0)}</TableCell>
+                    <TableCell className="text-right text-green-600">{formatCurrency(source.companyProfit || 0)}</TableCell>
                   </TableRow>
                 ))}
             </TableBody>

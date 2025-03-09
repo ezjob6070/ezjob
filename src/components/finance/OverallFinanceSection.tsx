@@ -83,7 +83,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
             <CardDescription>Revenue from all sources</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(totalRevenue)}</div>
           </CardContent>
         </Card>
 
@@ -93,7 +93,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
             <CardDescription>Expenses across all categories</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
+            <div className="text-2xl font-bold text-red-600">-{formatCurrency(totalExpenses)}</div>
           </CardContent>
         </Card>
 
@@ -103,7 +103,9 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
             <CardDescription>Revenue after expenses</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalProfit)}</div>
+            <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {totalProfit >= 0 ? formatCurrency(totalProfit) : `-${formatCurrency(Math.abs(totalProfit))}`}
+            </div>
           </CardContent>
         </Card>
       </div>
