@@ -1,8 +1,6 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,8 +12,6 @@ interface TechnicianCircleChartsProps {
 const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({ 
   filteredTechnicians 
 }) => {
-  const [techSearchQuery, setTechSearchQuery] = useState("");
-  
   // Calculate total revenue from technicians
   const totalRevenue = filteredTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
   
@@ -30,26 +26,8 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   // Calculate net profit
   const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
   
-  // Filter technicians based on search query
-  const searchFilteredTechnicians = filteredTechnicians.filter(tech => 
-    techSearchQuery === "" || 
-    tech.name.toLowerCase().includes(techSearchQuery.toLowerCase()) ||
-    tech.specialty.toLowerCase().includes(techSearchQuery.toLowerCase())
-  );
-  
   return (
     <div className="space-y-6">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          className="pl-8"
-          placeholder="Search technicians..."
-          value={techSearchQuery}
-          onChange={(e) => setTechSearchQuery(e.target.value)}
-        />
-      </div>
-      
       {/* Payment Breakdown Simple Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
@@ -102,7 +80,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {searchFilteredTechnicians.map((tech) => {
+              {filteredTechnicians.map((tech) => {
                 const techEarnings = tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1);
                 const companyEarnings = tech.totalRevenue - techEarnings - (tech.totalRevenue * 0.33);
                 const profitRatio = ((companyEarnings / tech.totalRevenue) * 100).toFixed(1);
