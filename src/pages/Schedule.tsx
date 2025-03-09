@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/components/jobs/JobTypes";
 import { initialJobs } from "@/data/jobs";
@@ -39,9 +39,10 @@ const Schedule = () => {
     updateSelectedDateItems(nextDay);
   };
 
-  useState(() => {
+  // Use useEffect instead of useState for initial loading
+  useEffect(() => {
     updateSelectedDateItems(selectedDate);
-  });
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -76,6 +77,7 @@ const Schedule = () => {
             jobsForSelectedDate={jobsForSelectedDate}
             onPreviousDay={handlePreviousDay}
             onNextDay={handleNextDay}
+            allJobs={jobs}
           />
         </TabsContent>
         

@@ -5,15 +5,31 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Job } from "@/components/jobs/JobTypes";
+import { useState, useEffect } from "react";
+import JobFilterBar from "@/components/jobs/JobFilterBar";
 
 interface JobsListProps {
   selectedDate: Date;
   jobsForSelectedDate: Job[];
   onPreviousDay: () => void;
   onNextDay: () => void;
+  allJobs: Job[];
 }
 
-const JobsList = ({ selectedDate, jobsForSelectedDate, onPreviousDay, onNextDay }: JobsListProps) => {
+const JobsList = ({ 
+  selectedDate, 
+  jobsForSelectedDate: initialJobsForSelectedDate, 
+  onPreviousDay, 
+  onNextDay,
+  allJobs
+}: JobsListProps) => {
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobsForSelectedDate);
+
+  // Update filtered jobs when selected date changes
+  useEffect(() => {
+    setFilteredJobs(initialJobsForSelectedDate);
+  }, [initialJobsForSelectedDate]);
+
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "scheduled":
@@ -27,6 +43,12 @@ const JobsList = ({ selectedDate, jobsForSelectedDate, onPreviousDay, onNextDay 
       default:
         return "bg-gray-500 hover:bg-gray-600";
     }
+  };
+
+  const handleFilterChange = (jobs: Job[]) => {
+    // Filter jobs for the selected date
+    const jobsForDate = jobs.filter(job => isSameDay(job.date, selectedDate));
+    setFilteredJobs(jobsForDate);
   };
 
   return (
@@ -53,15 +75,17 @@ const JobsList = ({ selectedDate, jobsForSelectedDate, onPreviousDay, onNextDay 
         </Button>
       </div>
       
+      <JobFilterBar onFilterChange={handleFilterChange} allJobs={allJobs} />
+      
       <div className="space-y-4">
         <h3 className="font-medium">
-          Jobs ({jobsForSelectedDate.length})
+          Jobs ({filteredJobs.length})
         </h3>
         
-        {jobsForSelectedDate.length === 0 ? (
+        {filteredJobs.length === 0 ? (
           <p className="text-sm text-muted-foreground">No jobs scheduled for this day.</p>
         ) : (
-          jobsForSelectedDate.map((job) => (
+          filteredJobs.map((job) => (
             <Card key={job.id} className="overflow-hidden">
               <CardHeader className="p-4 pb-2">
                 <div className="flex justify-between items-start">
