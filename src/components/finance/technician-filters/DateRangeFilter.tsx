@@ -64,7 +64,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
       <>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-10 px-3 py-5 text-base font-medium">
+            <Button variant="outline" className="w-auto justify-between px-3 py-5 text-base font-medium">
               <Calendar className="mr-2 h-4 w-4" />
               <span>Quick Select</span>
               <ChevronDown className="ml-2 h-4 w-4" />
@@ -99,7 +99,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
           <PopoverTrigger asChild>
             <Button 
               variant="outline" 
-              className="h-10 px-3 py-5 text-base font-medium"
+              className="w-auto justify-between px-3 py-5 text-base font-medium"
             >
               <Calendar className="mr-2 h-4 w-4" />
               {date?.from ? (

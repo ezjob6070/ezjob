@@ -34,6 +34,11 @@ const JobTabs = ({
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        {dateRangeComponent}
+        {filtersComponent}
+      </div>
+      
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger value="all">All</TabsTrigger>
@@ -42,11 +47,6 @@ const JobTabs = ({
           <TabsTrigger value="completed">Completed</TabsTrigger>
           <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
         </TabsList>
-        
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          {filtersComponent}
-          {dateRangeComponent}
-        </div>
         
         <div className="relative mb-4">
           <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
