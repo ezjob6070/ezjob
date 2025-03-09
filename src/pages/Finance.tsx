@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { BarChart3, Users, FileText, CreditCard } from "lucide-react";
 import { DateRange } from "react-day-picker";
@@ -12,6 +13,7 @@ import OverviewDashboard from "@/components/finance/OverviewDashboard";
 import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
 import TechniciansDashboard from "@/components/finance/TechniciansDashboard";
 import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
+import CompactDateRangePicker from "@/components/finance/CompactDateRangePicker";
 
 const tabOptions = [
   { id: "overview", label: "Overview", icon: <BarChart3 className="h-5 w-5" /> },
@@ -166,13 +168,18 @@ const Finance = () => {
 
   return (
     <div className="container py-8">
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold tracking-tight">Finance</h2>
           <p className="text-muted-foreground">
             Track your company finances and generate reports.
           </p>
         </div>
+      </div>
+
+      {/* Date Filter at the top of the page */}
+      <div className="mb-6 flex justify-end">
+        <CompactDateRangePicker date={date} setDate={setDate} />
       </div>
 
       {/* Top Navigation */}
