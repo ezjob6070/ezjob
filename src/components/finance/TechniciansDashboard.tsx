@@ -173,7 +173,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                   <TableRow key={tech.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 mr-2 text-xs">
                           {tech.initials}
                         </div>
                         <span>{tech.name}</span>
@@ -181,9 +181,9 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                     </TableCell>
                     <TableCell>{tech.specialty}</TableCell>
                     <TableCell className="text-right">{tech.completedJobs}</TableCell>
-                    <TableCell className="text-right text-blue-600">{formatCurrency(tech.totalRevenue)}</TableCell>
-                    <TableCell className="text-right text-pink-500">{formatCurrency(partsValue)}</TableCell>
-                    <TableCell className="text-right text-green-600">{formatCurrency(earnings)}</TableCell>
+                    <TableCell className="text-right text-sky-600">{formatCurrency(tech.totalRevenue)}</TableCell>
+                    <TableCell className="text-right text-pink-600">{formatCurrency(partsValue)}</TableCell>
+                    <TableCell className="text-right text-emerald-600">{formatCurrency(earnings)}</TableCell>
                     <TableCell className="text-right">{profitMargin}%</TableCell>
                   </TableRow>
                 );

@@ -55,7 +55,7 @@ const Technicians = () => {
         </div>
         <Button 
           onClick={() => setShowAddModal(true)}
-          className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
+          className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900"
         >
           <PlusIcon className="mr-2 h-4 w-4" /> Add Technician
         </Button>

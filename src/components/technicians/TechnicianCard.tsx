@@ -32,7 +32,7 @@ const TechnicianCard = ({ technician, onEdit }: TechnicianCardProps) => {
       <CardContent className="p-6 h-full flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-primary-foreground mr-3">
+            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-primary-foreground mr-3">
               {initials}
             </div>
             <div>
@@ -78,11 +78,11 @@ const TechnicianCard = ({ technician, onEdit }: TechnicianCardProps) => {
         <div className="mt-auto grid grid-cols-3 gap-2 pt-4 border-t">
           <div className="text-center">
             <p className="text-muted-foreground text-xs">Jobs</p>
-            <p className="font-medium text-blue-600">{completedJobs}</p>
+            <p className="font-medium text-sky-600">{completedJobs}</p>
           </div>
           <div className="text-center">
             <p className="text-muted-foreground text-xs">Revenue</p>
-            <p className="font-medium text-green-600">{formatCurrency(totalRevenue)}</p>
+            <p className="font-medium text-emerald-600">{formatCurrency(totalRevenue)}</p>
           </div>
           <div className="text-center">
             <p className="text-muted-foreground text-xs">Rating</p>

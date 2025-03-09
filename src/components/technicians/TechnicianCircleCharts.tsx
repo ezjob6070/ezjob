@@ -36,7 +36,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
             <CardDescription>Revenue from all technicians</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+            <div className="text-2xl font-bold text-sky-600">{formatCurrency(totalRevenue)}</div>
           </CardContent>
         </Card>
 
@@ -46,7 +46,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
             <CardDescription>Technician payments and costs</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(technicianEarnings + totalExpenses)}</div>
+            <div className="text-2xl font-bold text-pink-600">{formatCurrency(technicianEarnings + totalExpenses)}</div>
           </CardContent>
         </Card>
 
@@ -56,7 +56,7 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
             <CardDescription>Revenue after all expenses</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(companyProfit)}</div>
+            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
           </CardContent>
         </Card>
       </div>
@@ -90,17 +90,17 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
                   <TableRow key={tech.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 mr-2 text-xs">
                           {tech.initials}
                         </div>
                         <span>{tech.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{formatCurrency(tech.totalRevenue)}</TableCell>
-                    <TableCell>{formatCurrency(techEarnings)}</TableCell>
-                    <TableCell>{formatCurrency(companyEarnings)}</TableCell>
+                    <TableCell className="text-sky-600">{formatCurrency(tech.totalRevenue)}</TableCell>
+                    <TableCell className="text-emerald-600">{formatCurrency(techEarnings)}</TableCell>
+                    <TableCell className="text-violet-600">{formatCurrency(companyEarnings)}</TableCell>
                     <TableCell>{profitRatio}%</TableCell>
-                    <TableCell>{formatCurrency(partsValue)}</TableCell>
+                    <TableCell className="text-pink-600">{formatCurrency(partsValue)}</TableCell>
                   </TableRow>
                 );
               })}
