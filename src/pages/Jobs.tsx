@@ -1,7 +1,4 @@
-
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { SearchIcon } from "lucide-react";
 import { Job } from "@/components/jobs/JobTypes";
 import JobTabs from "@/components/jobs/JobTabs";
 import JobStats from "@/components/jobs/JobStats";
@@ -142,16 +139,6 @@ const Jobs = () => {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search jobs..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
         <div className="flex flex-wrap items-center gap-2">
           <CategoryFilter 
             selectedCategories={selectedCategories}
@@ -196,6 +183,7 @@ const Jobs = () => {
         jobs={filteredJobs} 
         searchTerm={searchTerm}
         onCancelJob={handleCancelJob} 
+        onSearchChange={setSearchTerm}
       />
     </div>
   );
