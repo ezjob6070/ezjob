@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChartIcon, BriefcaseIcon, UsersIcon, DollarSign } from "lucide-react";
+import { BarChartIcon, BriefcaseIcon, UsersIcon, DollarSign, XCircle } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Job } from "./JobTypes";
 import { DateRange } from "react-day-picker";
@@ -15,6 +15,7 @@ const JobStats = ({ jobs, date }: JobStatsProps) => {
   // Stats
   const scheduledJobs = jobs.filter(job => job.status === "scheduled").length;
   const completedJobs = jobs.filter(job => job.status === "completed").length;
+  const cancelledJobs = jobs.filter(job => job.status === "cancelled").length;
   const totalRevenue = jobs.reduce((sum, job) => sum + job.amount, 0);
 
   // Format date range for display
@@ -37,7 +38,7 @@ const JobStats = ({ jobs, date }: JobStatsProps) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
@@ -78,6 +79,21 @@ const JobStats = ({ jobs, date }: JobStatsProps) => {
             </div>
             <div className="p-2 bg-purple-100 rounded-full">
               <DollarSign className="h-5 w-5 text-purple-700" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-red-500">Cancelled Jobs</p>
+              <p className="text-2xl font-bold">{cancelledJobs}</p>
+              {getDateRangeText()}
+            </div>
+            <div className="p-2 bg-red-100 rounded-full">
+              <XCircle className="h-5 w-5 text-red-700" />
             </div>
           </div>
         </CardContent>
