@@ -33,6 +33,7 @@ export type JobSource = {
   name: string;
   website?: string;
   logoUrl?: string;
+  category?: string;
   totalJobs?: number;
   totalRevenue?: number;
   expenses?: number;
