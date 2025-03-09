@@ -4,12 +4,20 @@ import {
   ArrowLeft, 
   ArrowRight, 
   Search, 
-  SlidersHorizontal 
+  SlidersHorizontal,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import { DateRange } from "react-day-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface TabOption {
   id: string;
@@ -96,15 +104,44 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Calendar className="h-4 w-4 mr-2" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Date Range</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <CalendarComponent
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+          
           <Button 
             variant="outline" 
             size="icon"
             onClick={() => setShowFilters(!showFilters)}
-            className={showFilters ? "bg-blue-50" : ""}
+            className={cn("h-9 w-9", showFilters ? "bg-blue-50 text-blue-600" : "")}
           >
             <SlidersHorizontal className="h-4 w-4" />
           </Button>
-          <DateRangeSelector date={date} setDate={setDate} />
         </div>
       </div>
     </div>

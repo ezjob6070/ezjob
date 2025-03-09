@@ -159,6 +159,11 @@ const Finance = () => {
     setSearchQuery("");
   };
 
+  // Apply filters
+  const applyFilters = () => {
+    setShowFilters(false);
+  };
+
   return (
     <div className="container py-8">
       <div className="mb-8">
@@ -193,6 +198,8 @@ const Finance = () => {
         toggleTechnician={toggleTechnician}
         toggleJobSource={toggleJobSource}
         clearFilters={clearFilters}
+        setShowFilters={setShowFilters}
+        applyFilters={applyFilters}
       />
 
       {/* Active Tab Content */}
