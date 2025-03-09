@@ -1,14 +1,11 @@
 
-import { useNavigate } from "react-router-dom";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { List, BarChart2 } from "lucide-react";
-import TechniciansList from "@/components/technicians/TechniciansList";
 import { useState } from "react";
 import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
+import TechniciansList from "@/components/technicians/TechniciansList";
+import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 
 const TechnicianAltercation = () => {
-  const navigate = useNavigate();
   const [technicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -32,28 +29,7 @@ const TechnicianAltercation = () => {
   return (
     <div className="container py-8">
       {/* Main Technician Navigation Tabs */}
-      <div className="mb-6">
-        <Tabs defaultValue="list" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger 
-              value="list" 
-              className="text-lg py-3 font-medium"
-              onClick={() => navigate("/technicians")}
-            >
-              <List className="mr-2 h-5 w-5" />
-              Technician List
-            </TabsTrigger>
-            <TabsTrigger 
-              value="analytics" 
-              className="text-lg py-3 font-medium"
-              onClick={() => navigate("/technicians/analytics")}
-            >
-              <BarChart2 className="mr-2 h-5 w-5" />
-              Technician Analytics
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      <TechnicianTabs currentTab="list" />
 
       <div className="mb-8 flex justify-between items-center">
         <div>
