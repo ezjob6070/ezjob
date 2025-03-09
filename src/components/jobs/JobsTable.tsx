@@ -32,7 +32,7 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-1/3">Client / Title / Technician</TableHead>
+            <TableHead>Client</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead className="text-right">Status</TableHead>
@@ -42,11 +42,7 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
           {filteredJobs.map((job) => (
             <TableRow key={job.id}>
               <TableCell className="font-medium">
-                <div>
-                  <span className="font-semibold">{job.clientName}</span> • 
-                  <span className="mx-2">{job.title}</span> • 
-                  <span className="text-muted-foreground">{job.technicianName}</span>
-                </div>
+                {job.clientName}
               </TableCell>
               <TableCell>{job.date.toLocaleDateString()}</TableCell>
               <TableCell>{formatCurrency(job.amount)}</TableCell>
