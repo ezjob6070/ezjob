@@ -80,7 +80,7 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+            <div className="text-2xl font-bold text-sky-600">{formatCurrency(totalRevenue)}</div>
           </CardContent>
         </Card>
 
@@ -108,7 +108,7 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
+            <div className="text-2xl font-bold text-red-600">-{formatCurrency(totalExpenses)}</div>
           </CardContent>
         </Card>
 
@@ -136,7 +136,7 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(companyProfit)}</div>
+            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
           </CardContent>
         </Card>
       </div>
@@ -177,11 +177,11 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
                         <span>{source.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{formatCurrency(totalRevenue)}</TableCell>
-                    <TableCell>{formatCurrency(expenses)}</TableCell>
-                    <TableCell>{formatCurrency(profit)}</TableCell>
+                    <TableCell className="text-sky-600">{formatCurrency(totalRevenue)}</TableCell>
+                    <TableCell className="text-red-600">-{formatCurrency(expenses)}</TableCell>
+                    <TableCell className="text-emerald-600">{formatCurrency(profit)}</TableCell>
                     <TableCell>{profitRatio}%</TableCell>
-                    <TableCell>{formatCurrency(partsValue)}</TableCell>
+                    <TableCell className="text-red-600">-{formatCurrency(partsValue)}</TableCell>
                   </TableRow>
                 );
               })}
