@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
@@ -9,7 +9,6 @@ import { DateRange } from "react-day-picker";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
-import { startOfMonth, endOfMonth } from "date-fns";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -29,14 +28,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     "Garage Door", "HVAC", "Electrical", "Plumbing", "Construction", "Others"
   ]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  useEffect(() => {
-    const today = new Date();
-    setDate({
-      from: startOfMonth(today),
-      to: today
-    });
-  }, []);
 
   const technicianNames = activeTechnicians.map(tech => tech.name);
 
@@ -130,18 +121,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-2">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold mb-1">Technician Financial Dashboard</h2>
-            <p className="text-sm text-slate-500">View and analyze technician performance metrics</p>
-          </div>
-          <div className="w-full sm:w-auto">
-            <CompactDateRangeSelector date={date} setDate={setDate} />
-          </div>
-        </div>
-      </div>
-      
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-wrap items-center gap-2">
           <CategoryFilter 
@@ -164,6 +143,8 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             deselectAllTechnicians={deselectAllTechnicians}
             compact={true}
           />
+          
+          <CompactDateRangeSelector date={date} setDate={setDate} />
         </div>
         
         {(selectedTechnicians.length > 0 || selectedCategories.length > 0) && (

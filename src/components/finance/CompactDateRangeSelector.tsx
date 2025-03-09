@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,14 +25,6 @@ interface CompactDateRangeSelectorProps {
 }
 
 const CompactDateRangeSelector: React.FC<CompactDateRangeSelectorProps> = ({ date, setDate }) => {
-  // Set default to "this month" when component mounts
-  useEffect(() => {
-    if (!date?.from) {
-      const today = new Date();
-      setDate({ from: startOfMonth(today), to: today });
-    }
-  }, []);
-
   const handleDatePresetSelection = (preset: string) => {
     const today = new Date();
     
