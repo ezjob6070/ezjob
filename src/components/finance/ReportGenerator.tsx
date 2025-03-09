@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
+import { Label } from "@/components/ui/label";
 
 type ReportType = "financial" | "technician" | "jobSource" | "transaction";
 
@@ -32,7 +33,8 @@ interface ReportGeneratorProps {
 }
 
 const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange: initialDateRange }) => {
-  const [selectedReportType, setSelectedReportType] = useState<ReportType>("financial");
+  // Changed from single selection to an array for multiple selections
+  const [selectedReportTypes, setSelectedReportTypes] = useState<ReportType[]>(["financial"]);
   const [notes, setNotes] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [reportFormat, setReportFormat] = useState("json");
@@ -43,6 +45,15 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange: initialDat
   const [includeExpenses, setIncludeExpenses] = useState(true);
   const [includeProfit, setIncludeProfit] = useState(true);
   const [includeTransactions, setIncludeTransactions] = useState(true);
+  
+  // Function to toggle report type selection
+  const toggleReportType = (type: ReportType) => {
+    setSelectedReportTypes(prev => 
+      prev.includes(type) 
+        ? prev.filter(t => t !== type) 
+        : [...prev, type]
+    );
+  };
   
   // Format date range for display and filename
   const getDateRangeText = () => {
@@ -69,7 +80,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange: initialDat
       setIsGenerating(false);
       // In a real implementation, this would create an actual report file
       const dummyReportData = {
-        type: selectedReportType,
+        types: selectedReportTypes,
         dateRange: getDateRangeText(),
         notes,
         generatedAt: new Date().toISOString(),
@@ -87,7 +98,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange: initialDat
       // Create a link and trigger download
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${selectedReportType}-report-${getDateRangeText()}.${reportFormat}`;
+      a.download = `financial-report-${getDateRangeText()}.${reportFormat}`;
       a.click();
       
       // Clean up
@@ -107,40 +118,67 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange: initialDat
       <CardContent>
         <div className="space-y-6">
           <div>
-            <h3 className="text-sm font-medium mb-2">Report Type</h3>
+            <h3 className="text-sm font-medium mb-2">Report Types</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <Button
-                variant={selectedReportType === "financial" ? "default" : "outline"}
-                onClick={() => setSelectedReportType("financial")}
-                className="flex items-center justify-center gap-2"
-              >
-                <BarChart3 className="h-4 w-4" />
-                Financial
-              </Button>
-              <Button
-                variant={selectedReportType === "technician" ? "default" : "outline"}
-                onClick={() => setSelectedReportType("technician")}
-                className="flex items-center justify-center gap-2"
-              >
-                <FileCheck className="h-4 w-4" />
-                Technician
-              </Button>
-              <Button
-                variant={selectedReportType === "jobSource" ? "default" : "outline"}
-                onClick={() => setSelectedReportType("jobSource")}
-                className="flex items-center justify-center gap-2"
-              >
-                <PieChart className="h-4 w-4" />
-                Job Source
-              </Button>
-              <Button
-                variant={selectedReportType === "transaction" ? "default" : "outline"}
-                onClick={() => setSelectedReportType("transaction")}
-                className="flex items-center justify-center gap-2"
-              >
-                <DollarSign className="h-4 w-4" />
-                Transactions
-              </Button>
+              <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-accent cursor-pointer" 
+                   onClick={() => toggleReportType("financial")}>
+                <Checkbox 
+                  id="financial-report" 
+                  checked={selectedReportTypes.includes("financial")}
+                  onCheckedChange={() => toggleReportType("financial")}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="financial-report" className="cursor-pointer flex items-center">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Financial
+                  </Label>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-accent cursor-pointer"
+                   onClick={() => toggleReportType("technician")}>
+                <Checkbox 
+                  id="technician-report" 
+                  checked={selectedReportTypes.includes("technician")}
+                  onCheckedChange={() => toggleReportType("technician")}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="technician-report" className="cursor-pointer flex items-center">
+                    <FileCheck className="h-4 w-4 mr-2" />
+                    Technician
+                  </Label>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-accent cursor-pointer"
+                   onClick={() => toggleReportType("jobSource")}>
+                <Checkbox 
+                  id="jobSource-report" 
+                  checked={selectedReportTypes.includes("jobSource")}
+                  onCheckedChange={() => toggleReportType("jobSource")}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="jobSource-report" className="cursor-pointer flex items-center">
+                    <PieChart className="h-4 w-4 mr-2" />
+                    Job Source
+                  </Label>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-accent cursor-pointer"
+                   onClick={() => toggleReportType("transaction")}>
+                <Checkbox 
+                  id="transaction-report" 
+                  checked={selectedReportTypes.includes("transaction")}
+                  onCheckedChange={() => toggleReportType("transaction")}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="transaction-report" className="cursor-pointer flex items-center">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    Transactions
+                  </Label>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -236,7 +274,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange: initialDat
           <Button 
             onClick={handleGenerateReport} 
             className="w-full flex items-center justify-center gap-2"
-            disabled={isGenerating}
+            disabled={isGenerating || selectedReportTypes.length === 0}
           >
             {isGenerating ? (
               <>Generating<span className="animate-pulse">...</span></>
