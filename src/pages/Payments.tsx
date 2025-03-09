@@ -25,7 +25,8 @@ const Payments = () => {
       amount: 1250, 
       client: "Acme Corp", 
       job: "HVAC Installation",
-      status: "completed" 
+      status: "completed",
+      technician: "John Smith"
     },
     { 
       id: "tx2", 
@@ -33,7 +34,8 @@ const Payments = () => {
       amount: 750, 
       client: "Tech Solutions Inc.", 
       job: "Network Setup",
-      status: "completed" 
+      status: "completed",
+      technician: "Maria Rodriguez"
     },
     { 
       id: "tx3", 
@@ -41,7 +43,26 @@ const Payments = () => {
       amount: 500, 
       client: "Global Industries", 
       job: "Security System Install",
-      status: "pending" 
+      status: "pending",
+      technician: "John Smith"
+    },
+    { 
+      id: "tx4", 
+      date: new Date("2023-10-05"), 
+      amount: 800, 
+      client: "Metro Hospital", 
+      job: "Medical Equipment Setup",
+      status: "completed",
+      technician: "Sarah Johnson"
+    },
+    { 
+      id: "tx5", 
+      date: new Date("2023-10-12"), 
+      amount: 350, 
+      client: "Downtown Restaurant", 
+      job: "Kitchen Repair",
+      status: "pending",
+      technician: "David Williams"
     },
   ];
 
