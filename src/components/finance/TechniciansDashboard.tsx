@@ -8,7 +8,7 @@ import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel"
 import { DateRange } from "react-day-picker";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 import TechnicianPaymentsSection from "@/components/finance/TechnicianPaymentsSection";
-import DateRangeSelector from "@/components/finance/DateRangeSelector";
+import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -126,7 +126,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             compact={true}
           />
           
-          <DateRangeSelector date={date} setDate={setDate} />
+          <CompactDateRangeSelector date={date} setDate={setDate} />
         </div>
         
         {selectedTechnicians.length > 0 && (
