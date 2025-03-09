@@ -7,6 +7,7 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { JobSource, FinancialTransaction, ProfitBreakdownItem } from "@/types/finance";
 import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
 import TransactionsSection from "@/components/finance/TransactionsSection";
+import ReportGenerator from "@/components/finance/ReportGenerator";
 import { DateRange } from "react-day-picker";
 
 interface OverviewDashboardProps {
@@ -68,7 +69,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardContent>
             <div className="text-xl font-bold mb-4 text-blue-600">{formatCurrency(totalRevenue)}</div>
             
-            {/* Payment method breakdown list without donut chart */}
+            {/* Revenue breakdown list without donut chart */}
             <div className="space-y-4">
               {revenueBreakdown.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
@@ -151,6 +152,10 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
       </div>
       
+      {/* Report Generator - Added here as requested */}
+      <ReportGenerator dateRange={date} />
+      
+      {/* Top Job Sources moved down */}
       <Card>
         <CardHeader>
           <CardTitle>Top Job Sources</CardTitle>
