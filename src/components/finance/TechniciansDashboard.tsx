@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -132,8 +133,15 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       
       <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
       
+      {/* Payment section first */}
       <TechnicianPaymentsSection technicians={filteredTechnicians} />
       
+      {/* Invoice section second */}
+      <TechnicianInvoiceSection 
+        activeTechnicians={filteredTechnicians} 
+      />
+      
+      {/* Technician Performance table last */}
       <Card>
         <CardHeader>
           <CardTitle>Technician Performance</CardTitle>
@@ -181,10 +189,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           </Table>
         </CardContent>
       </Card>
-      
-      <TechnicianInvoiceSection 
-        activeTechnicians={filteredTechnicians} 
-      />
     </div>
   );
 };
