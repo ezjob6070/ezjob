@@ -2,18 +2,19 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Search, FileText, BarChart2 } from "lucide-react";
+import { Search, List, BarChart2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { initialTechnicians } from "@/data/technicians";
 import { Technician } from "@/types/technician";
 import TechniciansList from "@/components/technicians/TechniciansList";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const TechnicianAltercation = () => {
+const TechnicianList = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
@@ -47,20 +48,36 @@ const TechnicianAltercation = () => {
 
   return (
     <div className="container py-8">
+      {/* Main Technician Navigation Tabs */}
+      <div className="mb-6">
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger 
+              value="list" 
+              className="text-lg py-3 font-medium"
+              onClick={() => navigate("/technicians/list")}
+            >
+              <List className="mr-2 h-5 w-5" />
+              Technician List
+            </TabsTrigger>
+            <TabsTrigger 
+              value="analytics" 
+              className="text-lg py-3 font-medium"
+              onClick={() => navigate("/technicians/analytics")}
+            >
+              <BarChart2 className="mr-2 h-5 w-5" />
+              Technician Analytics
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Technicians</h1>
           <p className="text-muted-foreground mt-1">
             View and manage all technicians and their performance records
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link to="/technicians/analytics">
-            <Button variant="outline" size="lg" className="gap-2">
-              <BarChart2 className="h-5 w-5" />
-              Technician Analytics
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -142,4 +159,4 @@ const TechnicianAltercation = () => {
   );
 };
 
-export default TechnicianAltercation;
+export default TechnicianList;
