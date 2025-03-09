@@ -24,6 +24,13 @@ export interface Resume {
   notes: string;
 }
 
+export interface EmployeeNote {
+  id: string;
+  content: string;
+  createdAt: Date;
+  createdBy: string;
+}
+
 export interface Employee {
   id: string;
   name: string;
@@ -38,6 +45,13 @@ export interface Employee {
   address: string;
   profileImage?: string;
   skills: string[];
+  dateOfBirth?: Date;
+  emergencyContact?: string;
+  background?: string;
+  education?: string[];
+  certifications?: string[];
+  performanceRating?: number;
+  notes?: EmployeeNote[];
 }
 
 export interface Report {

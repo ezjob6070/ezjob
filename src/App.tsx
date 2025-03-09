@@ -22,6 +22,7 @@ import Finance from "./pages/Finance";
 import JobSources from "./pages/JobSources";
 import GPSTracking from "./pages/GPSTracking";
 import Employed from "./pages/Employed";
+import EmployeeDetail from "./pages/EmployeeDetail";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="gps-tracking" element={<GPSTracking />} />
             <Route path="job-sources" element={<JobSources />} />
             <Route path="employed" element={<Employed />} />
+            <Route path="employed/employee/:id" element={<EmployeeDetail />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />

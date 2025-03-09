@@ -12,7 +12,7 @@ import UploadResumeModal from "@/components/employed/UploadResumeModal";
 import ReportsSection from "@/components/employed/ReportsSection";
 
 import { initialEmployees, initialResumes, employeeReports } from "@/data/employees";
-import { Employee, Resume, Report } from "@/types/employee";
+import { Employee, Resume, Report, ResumeStatus } from "@/types/employee";
 
 const Employed = () => {
   const { toast } = useToast();
@@ -44,7 +44,7 @@ const Employed = () => {
     setResumes((prev) => 
       prev.map((resume) => 
         resume.id === id 
-          ? { ...resume, status: status === "approved" ? "approved" : "rejected" } 
+          ? { ...resume, status: status === "approved" ? ResumeStatus.APPROVED : ResumeStatus.REJECTED } 
           : resume
       )
     );

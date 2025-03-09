@@ -1,5 +1,4 @@
-
-import { Employee, EmployeeStatus, Report, Resume, ResumeStatus } from "@/types/employee";
+import { Employee, EmployeeStatus, Report, Resume, ResumeStatus, EmployeeNote } from "@/types/employee";
 
 export const initialEmployees: Employee[] = [
   {
@@ -14,6 +13,22 @@ export const initialEmployees: Employee[] = [
     salary: 75000,
     address: "123 Main St, Anytown, CA 12345",
     skills: ["Recruitment", "Employee Relations", "Conflict Resolution", "Policy Development"],
+    dateOfBirth: new Date("1985-06-15"),
+    background: "John has over 10 years of experience in Human Resources Management. He previously worked at XYZ Corp where he implemented numerous employee wellness programs that reduced turnover by 15%.",
+    education: [
+      "MBA in Human Resource Management, University of California, 2010",
+      "Bachelor's in Business Administration, State University, 2007"
+    ],
+    certifications: ["PHR (Professional in Human Resources)", "SHRM-CP"],
+    performanceRating: 4,
+    notes: [
+      {
+        id: "note-1",
+        content: "John successfully led the implementation of the new HRIS system, completing the project under budget and ahead of schedule.",
+        createdAt: new Date("2022-05-20"),
+        createdBy: "Michael Davis"
+      }
+    ]
   },
   {
     id: "emp-2",
@@ -28,6 +43,13 @@ export const initialEmployees: Employee[] = [
     salary: 62000,
     address: "456 Oak Ave, Anytown, CA 12345",
     skills: ["Social Media Marketing", "Content Creation", "SEO", "Analytics"],
+    dateOfBirth: new Date("1992-11-30"),
+    background: "Sarah specializes in digital marketing with a focus on social media campaigns. She has experience in both B2B and B2C marketing environments and has managed campaigns with budgets exceeding $500,000.",
+    education: [
+      "Bachelor's in Marketing, Pacific University, 2015"
+    ],
+    emergencyContact: "Robert Johnson (Brother): (555) 987-6543",
+    performanceRating: 5
   },
   {
     id: "emp-3",
@@ -42,6 +64,9 @@ export const initialEmployees: Employee[] = [
     salary: 85000,
     address: "789 Pine St, Anytown, CA 12345",
     skills: ["JavaScript", "React", "Node.js", "TypeScript"],
+    background: "David is a full-stack developer with particular expertise in React and Node.js. He previously worked at a fintech startup where he built scalable APIs and microservices.",
+    certifications: ["AWS Certified Developer", "MongoDB Certified Developer"],
+    performanceRating: 4
   },
   {
     id: "emp-4",
@@ -56,6 +81,12 @@ export const initialEmployees: Employee[] = [
     salary: 68000,
     address: "321 Elm St, Anytown, CA 12345",
     skills: ["Financial Analysis", "Budgeting", "Tax Preparation", "Reconciliation"],
+    dateOfBirth: new Date("1988-04-10"),
+    background: "Emily has 10 years of experience in accounting and finance. She has worked in both public and private sectors and has a strong track record of financial reporting and analysis.",
+    education: [
+      "Bachelor's in Accounting, University of California, 2012"
+    ],
+    performanceRating: 4
   },
   {
     id: "emp-5",
@@ -69,6 +100,12 @@ export const initialEmployees: Employee[] = [
     salary: 95000,
     address: "654 Maple Ave, Anytown, CA 12345",
     skills: ["Brand Strategy", "Marketing Campaigns", "Team Management", "Budget Planning"],
+    dateOfBirth: new Date("1979-02-12"),
+    background: "Michael has over 15 years of experience in marketing. He has worked in both B2B and B2C industries and has a proven track record of driving sales and increasing brand awareness.",
+    education: [
+      "MBA in Marketing, Stanford University, 2014"
+    ],
+    performanceRating: 5
   },
   {
     id: "emp-6",
@@ -82,6 +119,12 @@ export const initialEmployees: Employee[] = [
     salary: 110000,
     address: "987 Cedar St, Anytown, CA 12345",
     skills: ["Project Management", "Software Architecture", "Team Leadership", "Agile Methodologies"],
+    dateOfBirth: new Date("1980-09-18"),
+    background: "Jennifer has over 10 years of experience in engineering management. She has worked in both startups and established companies and has a strong track record of leading teams to success.",
+    education: [
+      "Bachelor's in Computer Science, University of California, 2008"
+    ],
+    performanceRating: 4
   },
   {
     id: "emp-7",
@@ -95,6 +138,12 @@ export const initialEmployees: Employee[] = [
     salary: 105000,
     address: "159 Birch St, Anytown, CA 12345",
     skills: ["Financial Planning", "Risk Management", "Strategic Planning", "Investment Analysis"],
+    dateOfBirth: new Date("1976-03-25"),
+    background: "Robert has over 12 years of experience in finance. He has worked in both public and private sectors and has a strong track record of financial analysis and risk management.",
+    education: [
+      "Bachelor's in Finance, University of California, 2009"
+    ],
+    performanceRating: 5
   },
   {
     id: "emp-8",
@@ -109,6 +158,12 @@ export const initialEmployees: Employee[] = [
     salary: 45000,
     address: "753 Willow St, Anytown, CA 12345",
     skills: ["Communication", "Problem Solving", "Customer Relations", "CRM Software"],
+    dateOfBirth: new Date("1982-07-14"),
+    background: "Lisa has 8 years of experience in customer service. She has worked in both retail and hospitality industries and has a strong track record of resolving customer complaints and providing excellent customer service.",
+    education: [
+      "Bachelor's in Business Administration, University of California, 2010"
+    ],
+    performanceRating: 4
   },
   {
     id: "emp-9",
@@ -122,6 +177,12 @@ export const initialEmployees: Employee[] = [
     salary: 72000,
     address: "852 Spruce St, Anytown, CA 12345",
     skills: ["Team Management", "Customer Experience", "Conflict Resolution", "Support Metrics"],
+    dateOfBirth: new Date("1984-01-05"),
+    background: "Thomas has over 10 years of experience in customer support. He has worked in both retail and hospitality industries and has a strong track record of managing teams and resolving customer complaints.",
+    education: [
+      "Bachelor's in Business Administration, University of California, 2011"
+    ],
+    performanceRating: 5
   }
 ];
 

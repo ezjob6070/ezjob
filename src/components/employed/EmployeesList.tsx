@@ -1,8 +1,9 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Employee } from "@/types/employee";
 import { Input } from "@/components/ui/input";
-import { Search, User } from "lucide-react";
+import { Search, User, ExternalLink } from "lucide-react";
 import { 
   Table, 
   TableBody, 
@@ -12,6 +13,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   Select,
   SelectContent,
@@ -88,6 +90,7 @@ const EmployeesList = ({ employees }: EmployeesListProps) => {
               <TableHead>Status</TableHead>
               <TableHead>Date Hired</TableHead>
               <TableHead>Salary</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -125,11 +128,19 @@ const EmployeesList = ({ employees }: EmployeesListProps) => {
                   </TableCell>
                   <TableCell>{format(employee.dateHired, "MMM d, yyyy")}</TableCell>
                   <TableCell>${employee.salary.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">
+                    <Button asChild size="sm" variant="ghost">
+                      <Link to={`/employed/employee/${employee.id}`}>
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        View Details
+                      </Link>
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={7} className="text-center py-8">
                   No employees found. Try adjusting your filters.
                 </TableCell>
               </TableRow>
