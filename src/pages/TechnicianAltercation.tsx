@@ -1,20 +1,44 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechnicianTabs from "@/components/technicians/TechnicianTabs";
+import TechnicianFilters from "@/components/technicians/TechnicianFilters";
+import { useToast } from "@/components/ui/use-toast";
 
 const TechnicianAltercation = () => {
+  const { toast } = useToast();
   const [technicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Extract unique categories from technicians
+  const categories = useMemo(() => {
+    const allCategories = technicians
+      .map(tech => tech.category || "Uncategorized")
+      .filter((value, index, self) => self.indexOf(value) === index);
+    return allCategories;
+  }, [technicians]);
 
   const filteredTechnicians = technicians.filter(tech => {
-    if (searchQuery === "") return true;
+    // Text search filter
+    const matchesSearch = searchQuery === "" || 
+      tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    return tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           tech.email.toLowerCase().includes(searchQuery.toLowerCase());
+    // Category filter
+    const matchesCategory = selectedCategories.length === 0 || 
+      selectedCategories.includes(tech.category || "Uncategorized");
+    
+    // Status filter
+    const matchesStatus = statusFilter === "all" || 
+      tech.status === statusFilter;
+    
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
   const handleEditTechnician = (technician: Technician) => {
@@ -24,6 +48,24 @@ const TechnicianAltercation = () => {
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(category)) {
+        return prev.filter(c => c !== category);
+      } else {
+        return [...prev, category];
+      }
+    });
+  };
+
+  const addCategory = (category: string) => {
+    toast({
+      title: "Category Added",
+      description: `New category "${category}" has been added.`,
+    });
+    // In a real app, you would update the database here
   };
 
   return (
@@ -40,12 +82,24 @@ const TechnicianAltercation = () => {
         </div>
       </div>
 
+      {/* Technician Filters */}
+      <TechnicianFilters 
+        categories={categories}
+        selectedCategories={selectedCategories}
+        toggleCategory={toggleCategory}
+        addCategory={addCategory}
+        status={statusFilter}
+        onStatusChange={setStatusFilter}
+      />
+
       {/* Technicians List */}
       <TechniciansList 
         technicians={filteredTechnicians} 
         onEditTechnician={handleEditTechnician}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
+        selectedCategories={selectedCategories}
+        selectedStatus={statusFilter}
       />
     </div>
   );

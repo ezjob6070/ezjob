@@ -10,25 +10,33 @@ interface TechniciansListProps {
   onEditTechnician: (technician: Technician) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  selectedCategories?: string[];
+  selectedStatus?: string;
+  onCategoryChange?: (categories: string[]) => void;
+  onStatusChange?: (status: string) => void;
 }
 
 const TechniciansList: React.FC<TechniciansListProps> = ({ 
   technicians, 
   onEditTechnician,
   searchQuery = "",
-  onSearchChange
+  onSearchChange,
+  selectedCategories = [],
+  selectedStatus = "all",
+  onCategoryChange,
+  onStatusChange
 }) => {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-col sm:flex-row gap-3">
         <h2 className="text-xl font-semibold">All Technicians</h2>
         
         {onSearchChange && (
-          <div className="relative w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <div className="relative w-full sm:w-80 md:w-96">
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Search technicians..."
-              className="pl-8"
+              placeholder="Search by name, email, phone, specialty..."
+              className="pl-10"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
             />
@@ -47,7 +55,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
         
         {technicians.length === 0 && (
           <div className="col-span-3 p-4 text-center text-muted-foreground">
-            No technicians found. Try adjusting your search.
+            No technicians found. Try adjusting your search or filters.
           </div>
         )}
       </div>
