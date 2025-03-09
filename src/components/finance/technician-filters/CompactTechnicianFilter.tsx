@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Users } from "lucide-react";
+import { Users, ChevronDown } from "lucide-react";
 import { 
   Popover,
   PopoverContent,
@@ -46,17 +46,18 @@ const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
       <PopoverTrigger asChild>
         <Button 
           variant="outline" 
-          size="sm" 
-          className="h-9 gap-2"
+          className="w-auto justify-between px-3 py-5 text-base font-medium"
         >
-          <Users className="h-4 w-4" />
-          <span>Technicians</span>
-          <span className="ml-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-600">
-            {selectedTechnicians.length || "All"}
+          <Users className="mr-2 h-4 w-4" />
+          <span>
+            {selectedTechnicians.length === 0 ? "All Technicians" : 
+              selectedTechnicians.length === 1 ? `${selectedTechnicians[0]}` :
+              `${selectedTechnicians.length} Technicians`}
           </span>
+          <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72 p-0" align="end">
+      <PopoverContent className="w-72 p-0" align="start">
         <div className="p-3 space-y-3">
           <TechnicianCheckboxList 
             technicianNames={technicianNames}
