@@ -129,7 +129,10 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
         )}
       </div>
       
-      <JobSourceCircleCharts filteredJobSources={filteredSources} />
+      <JobSourceCircleCharts 
+        filteredJobSources={filteredSources} 
+        date={date}
+      />
       
       <JobSourceInvoiceSection 
         jobSources={filteredSources} 

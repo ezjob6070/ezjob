@@ -6,13 +6,23 @@ import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { JobSource } from "@/types/finance";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface JobSourceCircleChartsProps {
   filteredJobSources: JobSource[];
+  date?: DateRange;
 }
 
 const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({ 
-  filteredJobSources 
+  filteredJobSources,
+  date
 }) => {
   const [jobSourceSearchQuery, setJobSourceSearchQuery] = useState("");
   
@@ -49,7 +59,25 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle>Total Income</CardTitle>
-            <CardDescription>Revenue from all sources</CardDescription>
+            <CardDescription>
+              Revenue from all sources
+              {date && date.from && date.to && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        <span>
+                          {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Data for selected date range</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
@@ -59,7 +87,25 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle>Total Expenses</CardTitle>
-            <CardDescription>Costs and operating expenses</CardDescription>
+            <CardDescription>
+              Costs and operating expenses
+              {date && date.from && date.to && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        <span>
+                          {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Data for selected date range</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
@@ -69,7 +115,25 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
         <Card>
           <CardHeader>
             <CardTitle>Net Company Profit</CardTitle>
-            <CardDescription>Revenue after all expenses</CardDescription>
+            <CardDescription>
+              Revenue after all expenses
+              {date && date.from && date.to && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        <span>
+                          {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Data for selected date range</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(companyProfit)}</div>
