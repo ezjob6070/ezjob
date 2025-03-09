@@ -106,13 +106,13 @@ const Schedule = () => {
               <CardHeader>
                 <CardTitle>Calendar</CardTitle>
               </CardHeader>
-              <CardContent className="p-0 pb-6 flex justify-center">
-                <div className="w-full max-w-3xl">
+              <CardContent className="p-0 pb-6">
+                <div className="w-full flex justify-center items-center px-2">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && updateSelectedDateItems(date)}
-                    className="mx-auto scale-110 transform origin-top p-0"
+                    className="w-full scale-110 transform origin-center mx-auto"
                     modifiers={{
                       hasEvents: (date) => 
                         jobs.some(job => isSameDay(job.date, date)) || 
