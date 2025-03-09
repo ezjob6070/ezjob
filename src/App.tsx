@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
@@ -45,8 +45,9 @@ const App = () => (
             <Route path="jobs" element={<Jobs />} />
             <Route path="schedule" element={<Schedule />} />
             <Route path="payments" element={<Payments />} />
-            <Route path="technicians" element={<Technicians />} />
-            <Route path="technician-altercation" element={<TechnicianAltercation />} />
+            <Route path="technicians" element={<TechnicianAltercation />} />
+            <Route path="technicians/dashboard" element={<Technicians />} />
+            <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
             <Route path="estimates" element={<Estimates />} />
             <Route path="finance" element={<Finance />} />
             <Route path="gps-tracking" element={<GPSTracking />} />

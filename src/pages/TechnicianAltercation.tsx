@@ -12,12 +12,13 @@ import { Technician } from "@/types/technician";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
 import { Link } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const TechnicianAltercation = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
-  const [showInactive, setShowInactive] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -27,10 +28,13 @@ const TechnicianAltercation = () => {
     // Filter by search query
     const matchesSearch = tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          tech.email.toLowerCase().includes(searchQuery.toLowerCase());
+                          tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          tech.phone.toLowerCase().includes(searchQuery.toLowerCase());
     
     // Filter by active/inactive status
-    const matchesStatus = showInactive ? true : tech.status === "active";
+    const matchesStatus = statusFilter === "all" 
+                        ? true 
+                        : tech.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -43,49 +47,56 @@ const TechnicianAltercation = () => {
     });
   };
 
-  const toggleShowInactive = () => {
-    setShowInactive(!showInactive);
-  };
-
   return (
     <div className="container py-8">
       <div className="mb-8 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Technician Altercation</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Technicians</h1>
           <p className="text-muted-foreground mt-1">
             View and manage all technicians and their performance records
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link to="/technicians">
+          <Link to="/technicians/dashboard">
             <Button variant="outline" className="gap-2">
               <FileText className="h-4 w-4" />
               Technician Dashboard
             </Button>
           </Link>
-          <Button 
-            variant="outline" 
-            onClick={toggleShowInactive}
-          >
-            {showInactive ? "Hide Inactive" : "Show Inactive"}
-          </Button>
         </div>
       </div>
 
       <Card className="mb-8">
         <CardHeader className="pb-3">
           <CardTitle>Search Technicians</CardTitle>
-          <CardDescription>Find technicians by name, specialty, or email</CardDescription>
+          <CardDescription>Find technicians by name, specialty, email or phone number</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search technicians..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-            />
+          <div className="flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search technicians..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+              />
+            </div>
+            <div className="w-48">
+              <Select 
+                value={statusFilter} 
+                onValueChange={(value) => setStatusFilter(value as "all" | "active" | "inactive")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Technicians</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="inactive">Inactive Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { 
   HomeIcon, 
@@ -84,9 +83,9 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       href: "/technicians",
     },
     {
-      label: "Technician Altercation",
+      label: "Technician Dashboard",
       icon: <ListChecksIcon size={20} />,
-      href: "/technician-altercation",
+      href: "/technicians/dashboard",
     },
     {
       label: "Employed",
