@@ -7,7 +7,7 @@ export type Technician = {
   email: string;
   phone: string;
   specialty: string;
-  industry?: string; // Add industry field
+  category?: string; // Renamed from industry to category
   status: "active" | "inactive";
   paymentType: TechnicianPaymentType;
   paymentRate: number;

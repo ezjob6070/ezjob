@@ -18,37 +18,37 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-interface IndustryFilterProps {
-  selectedIndustries: string[];
-  toggleIndustry: (industry: string) => void;
-  industries: string[];
-  addIndustry: (industry: string) => void;
+interface CategoryFilterProps {
+  selectedCategories: string[];
+  toggleCategory: (category: string) => void;
+  categories: string[];
+  addCategory: (category: string) => void;
 }
 
-const IndustryFilter: React.FC<IndustryFilterProps> = ({
-  selectedIndustries,
-  toggleIndustry,
-  industries,
-  addIndustry
+const CategoryFilter: React.FC<CategoryFilterProps> = ({
+  selectedCategories,
+  toggleCategory,
+  categories,
+  addCategory
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newIndustry, setNewIndustry] = useState("");
+  const [newCategory, setNewCategory] = useState("");
 
-  const handleAddIndustry = () => {
-    if (!newIndustry.trim()) {
-      toast.error("Industry name cannot be empty");
+  const handleAddCategory = () => {
+    if (!newCategory.trim()) {
+      toast.error("Category name cannot be empty");
       return;
     }
 
-    if (industries.includes(newIndustry.trim())) {
-      toast.error("This industry already exists");
+    if (categories.includes(newCategory.trim())) {
+      toast.error("This category already exists");
       return;
     }
 
-    addIndustry(newIndustry.trim());
-    setNewIndustry("");
+    addCategory(newCategory.trim());
+    setNewCategory("");
     setIsDialogOpen(false);
-    toast.success("Industry added successfully");
+    toast.success("Category added successfully");
   };
 
   return (
@@ -61,27 +61,27 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
           >
             <Filter className="mr-2 h-4 w-4" />
             <span>
-              {selectedIndustries.length === 0 ? "All Industries" : 
-                selectedIndustries.length === 1 ? `${selectedIndustries[0]}` :
-                `${selectedIndustries.length} Industries`}
+              {selectedCategories.length === 0 ? "All Categories" : 
+                selectedCategories.length === 1 ? `${selectedCategories[0]}` :
+                `${selectedCategories.length} Categories`}
             </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-72 p-0" align="start">
           <div className="p-3 space-y-3">
             <div className="space-y-2 max-h-48 overflow-y-auto">
-              {industries.map((industry) => (
-                <div key={industry} className="flex items-center space-x-2">
+              {categories.map((category) => (
+                <div key={category} className="flex items-center space-x-2">
                   <Checkbox 
-                    id={`industry-${industry}`} 
-                    checked={selectedIndustries.includes(industry)}
-                    onCheckedChange={() => toggleIndustry(industry)}
+                    id={`category-${category}`} 
+                    checked={selectedCategories.includes(category)}
+                    onCheckedChange={() => toggleCategory(category)}
                   />
                   <label 
-                    htmlFor={`industry-${industry}`}
+                    htmlFor={`category-${category}`}
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    {industry}
+                    {category}
                   </label>
                 </div>
               ))}
@@ -94,7 +94,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
               onClick={() => setIsDialogOpen(true)}
             >
               <Plus className="h-4 w-4 mr-1" />
-              Add New Industry
+              Add New Category
             </Button>
           </div>
         </PopoverContent>
@@ -103,21 +103,21 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add New Industry</DialogTitle>
+            <DialogTitle>Add New Category</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input
-              placeholder="Industry name"
-              value={newIndustry}
-              onChange={(e) => setNewIndustry(e.target.value)}
+              placeholder="Category name"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
             />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddIndustry}>
-              Add Industry
+            <Button onClick={handleAddCategory}>
+              Add Category
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -126,4 +126,4 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
   );
 };
 
-export default IndustryFilter;
+export default CategoryFilter;
