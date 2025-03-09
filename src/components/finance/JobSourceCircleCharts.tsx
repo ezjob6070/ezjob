@@ -66,7 +66,6 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="text-xs text-muted-foreground mt-1">
-                        <div className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">Custom Range</div>
                         <span>
                           {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
                         </span>
@@ -95,7 +94,6 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="text-xs text-muted-foreground mt-1">
-                        <div className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">Custom Range</div>
                         <span>
                           {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
                         </span>
@@ -124,7 +122,6 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="text-xs text-muted-foreground mt-1">
-                        <div className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">Custom Range</div>
                         <span>
                           {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
                         </span>
