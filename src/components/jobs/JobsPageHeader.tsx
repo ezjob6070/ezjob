@@ -14,8 +14,8 @@ const JobsPageHeader = () => {
         </p>
       </div>
 
-      <Button className="ml-auto">
-        <PlusCircle className="mr-2 h-4 w-4" />
+      <Button variant="outline" className="ml-auto gap-2">
+        <PlusCircle className="h-4 w-4" />
         Add New Job
       </Button>
     </div>
