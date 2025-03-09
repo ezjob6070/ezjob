@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Table,
@@ -31,9 +32,7 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Client</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Technician</TableHead>
+            <TableHead className="w-1/3">Client / Title / Technician</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead className="text-right">Status</TableHead>
@@ -42,9 +41,13 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
         <TableBody>
           {filteredJobs.map((job) => (
             <TableRow key={job.id}>
-              <TableCell className="font-medium">{job.clientName}</TableCell>
-              <TableCell>{job.title}</TableCell>
-              <TableCell>{job.technicianName}</TableCell>
+              <TableCell className="font-medium">
+                <div>
+                  <span className="font-semibold">{job.clientName}</span> • 
+                  <span className="mx-2">{job.title}</span> • 
+                  <span className="text-muted-foreground">{job.technicianName}</span>
+                </div>
+              </TableCell>
               <TableCell>{job.date.toLocaleDateString()}</TableCell>
               <TableCell>{formatCurrency(job.amount)}</TableCell>
               <TableCell className="text-right">{job.status}</TableCell>
@@ -52,7 +55,7 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
           ))}
           {filteredJobs.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={4} className="text-center py-4">
                 No jobs found.
               </TableCell>
             </TableRow>
