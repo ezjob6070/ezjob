@@ -33,6 +33,8 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead>Client</TableHead>
+            <TableHead>Technician</TableHead>
+            <TableHead>Payment Method</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead className="text-right">Status</TableHead>
@@ -44,6 +46,12 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
               <TableCell className="font-medium">
                 {job.clientName}
               </TableCell>
+              <TableCell>
+                {job.technicianName || "Unassigned"}
+              </TableCell>
+              <TableCell>
+                {job.paymentMethod ? job.paymentMethod.replace("_", " ") : "Not specified"}
+              </TableCell>
               <TableCell>{job.date.toLocaleDateString()}</TableCell>
               <TableCell>{formatCurrency(job.amount)}</TableCell>
               <TableCell className="text-right">{job.status}</TableCell>
@@ -51,7 +59,7 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
           ))}
           {filteredJobs.length === 0 && (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-4">
                 No jobs found.
               </TableCell>
             </TableRow>
