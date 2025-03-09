@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -25,7 +24,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [appliedFilters, setAppliedFilters] = useState(false);
-  // Rename industry to category
   const [categories, setCategories] = useState<string[]>([
     "Garage Door", "HVAC", "Electrical", "Plumbing", "Construction", "Others"
   ]);
@@ -44,11 +42,9 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       selectedTechnicians.length === 0 || 
       selectedTechnicians.includes(tech.name);
 
-    // Update category filter matching
     const matchesCategory = 
       selectedCategories.length === 0 || 
       (tech.category && selectedCategories.includes(tech.category)) ||
-      // If tech doesn't have a category assigned, include it in "Others"
       (!tech.category && selectedCategories.includes("Others"));
     
     return matchesSearch && matchesSelectedTechnicians && matchesCategory;
@@ -62,7 +58,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
   const netProfit = totalRevenue - totalExpenses;
 
-  // Adding color-matched expense categories
   const expenseCategories = [
     { name: "Equipment", value: totalExpenses * 0.4, color: "#ef4444" },
     { name: "Travel", value: totalExpenses * 0.3, color: "#10b981" },
@@ -71,14 +66,12 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     { name: "Other", value: totalExpenses * 0.05, color: "#8b5cf6" },
   ];
 
-  // Updated colors to match payment overview
   const revenueBreakdown = [
     { name: "Service Revenue", value: totalRevenue * 0.75, color: "#0ea5e9" },
     { name: "Parts & Materials", value: totalRevenue * 0.20, color: "#ec4899" },
     { name: "Diagnostic Fees", value: totalRevenue * 0.05, color: "#6366f1" },
   ];
 
-  // Updated colors to match payment overview
   const profitBreakdown = [
     { name: "Operating Costs", value: companyProfit * 0.3, color: "#3b82f6" },
     { name: "Reinvestment", value: companyProfit * 0.25, color: "#10b981" },
@@ -100,7 +93,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     );
   };
 
-  // Update category filter toggle
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => 
       prev.includes(category) 
@@ -109,7 +101,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     );
   };
 
-  // Update add category function
   const addCategory = (category: string) => {
     setCategories(prev => [...prev, category]);
   };
@@ -137,6 +128,13 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     <div className="space-y-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-wrap items-center gap-2">
+          <CategoryFilter 
+            selectedCategories={selectedCategories}
+            toggleCategory={toggleCategory}
+            categories={categories}
+            addCategory={addCategory}
+          />
+          
           <TechnicianFiltersPanel 
             showFilters={true}
             technicianNames={technicianNames}
@@ -149,14 +147,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             selectAllTechnicians={selectAllTechnicians}
             deselectAllTechnicians={deselectAllTechnicians}
             compact={true}
-          />
-          
-          {/* Replace Industry Filter with Category Filter */}
-          <CategoryFilter 
-            selectedCategories={selectedCategories}
-            toggleCategory={toggleCategory}
-            categories={categories}
-            addCategory={addCategory}
           />
           
           <CompactDateRangeSelector date={date} setDate={setDate} />
@@ -174,12 +164,10 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         dateRange={date}
       />
       
-      {/* Invoice section */}
       <TechnicianInvoiceSection 
         activeTechnicians={filteredTechnicians} 
       />
       
-      {/* Technician Performance table last */}
       <Card>
         <CardHeader>
           <CardTitle>Technician Performance</CardTitle>
