@@ -36,20 +36,9 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
   onCategoryChange,
   onStatusChange
 }) => {
-  const [technicianSearchQuery, setTechnicianSearchQuery] = useState("");
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [technicianDropdownOpen, setTechnicianDropdownOpen] = useState(false);
   const [technicianFilterQuery, setTechnicianFilterQuery] = useState("");
-
-  // Filter technicians based on technician search query
-  const filteredByTechnicianSearch = technicianSearchQuery
-    ? technicians.filter(tech => 
-        tech.name.toLowerCase().includes(technicianSearchQuery.toLowerCase()) ||
-        tech.specialty.toLowerCase().includes(technicianSearchQuery.toLowerCase()) ||
-        (tech.email && tech.email.toLowerCase().includes(technicianSearchQuery.toLowerCase())) ||
-        (tech.phone && tech.phone.toLowerCase().includes(technicianSearchQuery.toLowerCase()))
-      )
-    : technicians;
 
   // Filter technicians for the dropdown based on filter query
   const filteredTechniciansForDropdown = technicians.filter(tech => 
@@ -78,6 +67,21 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
       <div className="flex items-center justify-between flex-col sm:flex-row gap-3">
         <div className="flex items-center space-x-2">
           <h2 className="text-xl font-semibold">All Technicians</h2>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          {onSearchChange && (
+            <div className="relative w-full sm:w-96">
+              <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search technicians by name, email, or phone..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+              />
+            </div>
+          )}
+          
           {onAddTechnician && (
             <Button onClick={onAddTechnician} size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900">
               <UserPlus className="h-4 w-4 mr-2" />
@@ -85,18 +89,6 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
             </Button>
           )}
         </div>
-        
-        {onSearchChange && (
-          <div className="relative w-full sm:w-96 md:w-[32rem]">
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder="Search technicians by name, email, or phone..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-        )}
       </div>
       
       {/* Filters section */}
@@ -177,22 +169,8 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
         )}
       </div>
       
-      {/* Additional search bar for finding technicians */}
-      <div className="bg-muted p-3 rounded-md">
-        <h3 className="text-sm font-medium mb-2">Find and Select Technicians</h3>
-        <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-          <Input
-            placeholder="Find technicians by name, specialty, email or phone..."
-            className="pl-10"
-            value={technicianSearchQuery}
-            onChange={(e) => setTechnicianSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredByTechnicianSearch.map((technician) => (
+        {technicians.map((technician) => (
           <TechnicianCard
             key={technician.id}
             technician={technician}
@@ -202,7 +180,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
           />
         ))}
         
-        {filteredByTechnicianSearch.length === 0 && (
+        {technicians.length === 0 && (
           <div className="col-span-3 p-4 text-center text-muted-foreground">
             No technicians found. Try adjusting your search or filters.
           </div>
