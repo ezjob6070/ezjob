@@ -136,8 +136,8 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
-                          {technician.profileImage && (
-                            <AvatarImage src={technician.profileImage} alt={technician.name} />
+                          {technician.image && (
+                            <AvatarImage src={technician.image} alt={technician.name} />
                           )}
                           <AvatarFallback className="bg-indigo-100 text-indigo-600">
                             {technician.name.split(' ').map(part => part[0]).join('').toUpperCase()}

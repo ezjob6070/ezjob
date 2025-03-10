@@ -10,6 +10,7 @@ import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
 import TechniciansDashboard from "@/components/finance/TechniciansDashboard";
 import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
 import OfficeDashboard from "@/components/finance/OfficeDashboard";
+import SalariesDashboard from "@/components/finance/SalariesDashboard";
 import { useFinanceData } from "@/hooks/useFinanceData";
 
 const Finance = () => {
@@ -107,6 +108,13 @@ const Finance = () => {
       {activeTab === "transactions" && (
         <TransactionsDashboard 
           filteredTransactions={filteredTransactions}
+        />
+      )}
+
+      {activeTab === "salaries" && (
+        <SalariesDashboard
+          dateRange={date}
+          setDateRange={setDate}
         />
       )}
 
