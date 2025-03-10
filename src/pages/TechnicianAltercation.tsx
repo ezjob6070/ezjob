@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
@@ -8,10 +9,11 @@ import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import { useToast } from "@/components/ui/use-toast";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Clock, DollarSign } from "lucide-react";
+import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 // Define the type for sort options
-type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
+type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low" | "hourly-high" | "hourly-low";
 
 const TechnicianAltercation = () => {
   const { toast } = useToast();
@@ -23,6 +25,7 @@ const TechnicianAltercation = () => {
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [salaryView, setSalaryView] = useState<boolean>(false);
 
   const categories = useMemo(() => {
     const allCategories = technicians
@@ -68,6 +71,10 @@ const TechnicianAltercation = () => {
           return (b.totalRevenue || 0) - (a.totalRevenue || 0);
         case "revenue-low":
           return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+        case "hourly-high":
+          return (b.hourlyRate || 0) - (a.hourlyRate || 0);
+        case "hourly-low":
+          return (a.hourlyRate || 0) - (b.hourlyRate || 0);
         default:
           return 0;
       }
@@ -131,6 +138,17 @@ const TechnicianAltercation = () => {
     // In a real app, you would update the database here
   };
 
+  // Function to toggle between regular view and salary view
+  const toggleSalaryView = () => {
+    setSalaryView(!salaryView);
+  };
+
+  const calculateHourlyRate = (tech: Technician) => {
+    if (tech.hourlyRate) return tech.hourlyRate;
+    // Default estimation if no hourly rate is set
+    return tech.totalRevenue / (1500); // Rough estimation based on revenue
+  };
+
   return (
     <div className="container py-8">
       <TechnicianTabs currentTab="list" />
@@ -143,14 +161,37 @@ const TechnicianAltercation = () => {
           </p>
         </div>
         
-        <Button onClick={handleAddTechnician} size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900">
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Technician
-        </Button>
+        <div className="flex space-x-2">
+          <Button 
+            onClick={toggleSalaryView} 
+            variant="outline" 
+            size="sm" 
+            className={salaryView ? "bg-blue-100" : ""}
+          >
+            {salaryView ? (
+              <>
+                <DollarSign className="h-4 w-4 mr-2" />
+                Performance View
+              </>
+            ) : (
+              <>
+                <Clock className="h-4 w-4 mr-2" />
+                Salary View
+              </>
+            )}
+          </Button>
+          <Button onClick={handleAddTechnician} size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900">
+            <UserPlus className="h-4 w-4 mr-2" />
+            Add Technician
+          </Button>
+        </div>
       </div>
 
       {/* Technician Stats Section */}
-      <TechnicianStats technicians={technicians} />
+      <TechnicianStats 
+        technicians={technicians} 
+        showSalaryStats={salaryView}
+      />
 
       <div className="mb-6">
         <TechnicianFilters 
@@ -167,6 +208,7 @@ const TechnicianAltercation = () => {
           onSearchChange={handleSearchChange}
           sortOption={sortOption}
           onSortChange={handleSortChange}
+          showSalaryOptions={salaryView}
         />
       </div>
 
@@ -175,6 +217,8 @@ const TechnicianAltercation = () => {
         selectedTechnicians={selectedTechnicians}
         onToggleSelect={toggleTechnician}
         onEditTechnician={handleEditTechnician}
+        displayMode={salaryView ? "card" : "table"}
+        showSalaryData={salaryView}
       />
 
       <EditTechnicianModal

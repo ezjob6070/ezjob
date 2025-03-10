@@ -20,9 +20,16 @@ export enum DocumentType {
 }
 
 export enum SalaryBasis {
+  HOURLY = "hourly",
   WEEKLY = "weekly",
   MONTHLY = "monthly",
   YEARLY = "yearly"
+}
+
+export enum IncentiveType {
+  HOURLY = "hourly",
+  WEEKLY = "weekly",
+  MONTHLY = "monthly"
 }
 
 export interface EmployeeDocument {
@@ -67,6 +74,9 @@ export interface Employee {
   reportsTo?: string;
   salary: number;
   salaryBasis?: SalaryBasis;
+  hourlyRate?: number;
+  incentiveType?: IncentiveType;
+  incentiveAmount?: number;
   taxPercentage?: number;
   address: string;
   profileImage?: string;

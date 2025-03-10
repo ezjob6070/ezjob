@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Technician } from "@/types/technician";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Image, FileImage, Upload } from "lucide-react";
+import { Image, FileImage, Upload, DollarSign, Clock, Calendar } from "lucide-react";
+import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 type EditTechnicianModalProps = {
   open: boolean;
@@ -43,6 +44,11 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
     paymentRate: 0,
     notes: "",
     imageUrl: "",
+    // New salary fields
+    salaryBasis: SalaryBasis.HOURLY,
+    hourlyRate: 0,
+    incentiveType: IncentiveType.HOURLY,
+    incentiveAmount: 0,
   });
   
   // For image handling
@@ -63,6 +69,11 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
         paymentRate: technician.paymentRate,
         notes: technician.notes || "",
         imageUrl: technician.imageUrl || "",
+        // New salary fields
+        salaryBasis: technician.salaryBasis || SalaryBasis.HOURLY,
+        hourlyRate: technician.hourlyRate || 0,
+        incentiveType: technician.incentiveType || IncentiveType.HOURLY,
+        incentiveAmount: technician.incentiveAmount || 0,
       });
       
       // Set preview if image exists
@@ -119,6 +130,15 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
       paymentType: formData.paymentType as "percentage" | "flat",
       status: formData.status as "active" | "inactive",
       imageUrl: formData.imageUrl || undefined,
+      // New salary fields
+      salaryBasis: formData.salaryBasis as SalaryBasis,
+      hourlyRate: typeof formData.hourlyRate === 'string'
+        ? parseFloat(formData.hourlyRate)
+        : formData.hourlyRate || 0,
+      incentiveType: formData.incentiveType as IncentiveType,
+      incentiveAmount: typeof formData.incentiveAmount === 'string'
+        ? parseFloat(formData.incentiveAmount)
+        : formData.incentiveAmount || 0,
     };
 
     onUpdateTechnician(updatedTechnician);
@@ -127,7 +147,7 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Technician</DialogTitle>
         </DialogHeader>
@@ -265,6 +285,110 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+            </div>
+            
+            {/* Salary Settings Section */}
+            <div className="bg-slate-50 p-4 rounded-md mt-4 border">
+              <h3 className="font-medium text-md flex items-center mb-3">
+                <DollarSign className="h-4 w-4 mr-1" />
+                Salary Settings
+              </h3>
+              
+              <div className="grid gap-2 mb-3">
+                <Label htmlFor="salaryBasis">Salary Basis *</Label>
+                <select
+                  id="salaryBasis"
+                  name="salaryBasis"
+                  value={formData.salaryBasis}
+                  onChange={handleChange}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value={SalaryBasis.HOURLY}>Hourly</option>
+                  <option value={SalaryBasis.WEEKLY}>Weekly</option>
+                  <option value={SalaryBasis.MONTHLY}>Monthly</option>
+                  <option value={SalaryBasis.YEARLY}>Yearly</option>
+                </select>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="hourlyRate" className="flex items-center">
+                    <Clock className="h-4 w-4 mr-1" />
+                    Hourly Rate ($)
+                  </Label>
+                  <Input
+                    id="hourlyRate"
+                    name="hourlyRate"
+                    type="number"
+                    value={formData.hourlyRate}
+                    onChange={handleChange}
+                    placeholder="25.00"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                
+                {formData.salaryBasis !== SalaryBasis.HOURLY && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="salary" className="flex items-center">
+                      <DollarSign className="h-4 w-4 mr-1" />
+                      {formData.salaryBasis === SalaryBasis.WEEKLY 
+                        ? "Weekly Salary ($)" 
+                        : formData.salaryBasis === SalaryBasis.MONTHLY 
+                          ? "Monthly Salary ($)" 
+                          : "Yearly Salary ($)"}
+                    </Label>
+                    <Input
+                      id="salary"
+                      name="salary"
+                      type="number"
+                      value={formData.salary}
+                      onChange={handleChange}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <h4 className="font-medium text-sm mt-4 mb-2 flex items-center">
+                <Calendar className="h-4 w-4 mr-1" />
+                Incentive Options
+              </h4>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="incentiveType">Incentive Type</Label>
+                  <select
+                    id="incentiveType"
+                    name="incentiveType"
+                    value={formData.incentiveType}
+                    onChange={handleChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value={IncentiveType.HOURLY}>Per Hour</option>
+                    <option value={IncentiveType.WEEKLY}>Per Week</option>
+                    <option value={IncentiveType.MONTHLY}>Per Month</option>
+                  </select>
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="incentiveAmount">Incentive Amount ($)</Label>
+                  <Input
+                    id="incentiveAmount"
+                    name="incentiveAmount"
+                    type="number"
+                    value={formData.incentiveAmount}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
             </div>
             
             <div>

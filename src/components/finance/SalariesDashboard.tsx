@@ -19,7 +19,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Employee, SalaryBasis } from "@/types/employee";
+import { Employee, SalaryBasis, IncentiveType } from "@/types/employee";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -28,19 +28,23 @@ import {
   BadgeDollarSign, 
   Calendar, 
   Users,
-  Search
+  Search,
+  Filter,
+  Clock
 } from "lucide-react";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import ReportGenerator from "@/components/finance/ReportGenerator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
 
 interface SalariesDashboardProps {
   dateRange: DateRange | undefined;
   setDateRange: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
 
-type SalarySort = "name-asc" | "name-desc" | "salary-high" | "salary-low" | "tenure-long" | "tenure-short";
+type SalarySort = "name-asc" | "name-desc" | "salary-high" | "salary-low" | "tenure-long" | "tenure-short" | "hourly-high" | "hourly-low";
 
 const SalariesDashboard: React.FC<SalariesDashboardProps> = ({ 
   dateRange,
@@ -50,6 +54,8 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOption, setSortOption] = useState<SalarySort>("salary-high");
+  const [hourlyRateRange, setHourlyRateRange] = useState<[number, number]>([0, 100]);
+  const [viewMode, setViewMode] = useState<"standard" | "hourly">("standard");
   
   // Extract unique departments
   const departments = Array.from(
@@ -65,6 +71,9 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         monthlySalary = employee.salary * 4.33; // Average weeks in a month
       } else if (employee.salaryBasis === SalaryBasis.YEARLY) {
         monthlySalary = employee.salary / 12;
+      } else if (employee.salaryBasis === SalaryBasis.HOURLY) {
+        // Assume 40 hours per week, 4.33 weeks per month
+        monthlySalary = (employee.hourlyRate || 0) * 40 * 4.33;
       }
       
       // Calculate taxes if available
@@ -87,7 +96,10 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         monthlySalary,
         taxAmount,
         netSalary,
-        tenureMonths
+        tenureMonths,
+        hourlyRate: employee.hourlyRate || 0,
+        incentiveAmount: employee.incentiveAmount || 0,
+        incentiveType: employee.incentiveType || IncentiveType.HOURLY
       };
     });
   };
@@ -113,7 +125,13 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         statusFilter === "all" || 
         employee.status === statusFilter;
       
-      return matchesSearch && matchesDepartment && matchesStatus;
+      // Hourly rate filter
+      const hourlyRate = employee.hourlyRate || 0;
+      const matchesHourlyRate = 
+        hourlyRate >= hourlyRateRange[0] && 
+        hourlyRate <= hourlyRateRange[1];
+      
+      return matchesSearch && matchesDepartment && matchesStatus && matchesHourlyRate;
     })
     .sort((a, b) => {
       switch (sortOption) {
@@ -125,6 +143,10 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
           return b.monthlySalary - a.monthlySalary;
         case "salary-low":
           return a.monthlySalary - b.monthlySalary;
+        case "hourly-high":
+          return (b.hourlyRate || 0) - (a.hourlyRate || 0);
+        case "hourly-low":
+          return (a.hourlyRate || 0) - (b.hourlyRate || 0);
         case "tenure-long":
           return b.tenureMonths - a.tenureMonths;
         case "tenure-short":
@@ -149,6 +171,10 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
     (sum, employee) => sum + employee.netSalary, 
     0
   );
+  
+  const avgHourlyRate = filteredEmployees.length
+    ? filteredEmployees.reduce((sum, emp) => sum + (emp.hourlyRate || 0), 0) / filteredEmployees.length
+    : 0;
 
   // Format number as currency
   const formatCurrency = (amount: number) => {
@@ -159,10 +185,22 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
       maximumFractionDigits: 0,
     }).format(amount);
   };
+  
+  // Format hourly rate
+  const formatHourlyRate = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   // Get salary basis display text
   const getSalaryBasisText = (basis?: SalaryBasis) => {
     switch (basis) {
+      case SalaryBasis.HOURLY:
+        return "Hourly";
       case SalaryBasis.WEEKLY:
         return "Weekly";
       case SalaryBasis.MONTHLY:
@@ -173,11 +211,25 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         return "Yearly";
     }
   };
+  
+  // Get incentive type display text
+  const getIncentiveTypeText = (type?: IncentiveType) => {
+    switch (type) {
+      case IncentiveType.HOURLY:
+        return "Per Hour";
+      case IncentiveType.WEEKLY:
+        return "Per Week";
+      case IncentiveType.MONTHLY:
+        return "Per Month";
+      default:
+        return "N/A";
+    }
+  };
 
   return (
     <div className="space-y-6">
       {/* Salaries Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
@@ -228,7 +280,35 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
             </p>
           </CardContent>
         </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <Clock className="h-4 w-4 mr-1" />
+              Average Hourly Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <span className="text-2xl font-bold">{formatHourlyRate(avgHourlyRate)}</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Per hour
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* View Mode Selector */}
+      <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "standard" | "hourly")}>
+        <TabsList className="mb-4">
+          <TabsTrigger value="standard">Standard View</TabsTrigger>
+          <TabsTrigger value="hourly" className="flex items-center">
+            <Clock className="h-4 w-4 mr-1" />
+            Hourly View
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* Filters Section */}
       <div className="flex flex-col md:flex-row gap-4">
@@ -244,7 +324,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
           </div>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All Departments" />
@@ -276,6 +356,8 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
             <SelectContent>
               <SelectItem value="salary-high">Salary (High-Low)</SelectItem>
               <SelectItem value="salary-low">Salary (Low-High)</SelectItem>
+              <SelectItem value="hourly-high">Hourly Rate (High-Low)</SelectItem>
+              <SelectItem value="hourly-low">Hourly Rate (Low-High)</SelectItem>
               <SelectItem value="name-asc">Name (A-Z)</SelectItem>
               <SelectItem value="name-desc">Name (Z-A)</SelectItem>
               <SelectItem value="tenure-long">Tenure (Longest)</SelectItem>
@@ -284,6 +366,29 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
           </Select>
         </div>
       </div>
+      
+      {/* Hourly Rate Filter (only shown in hourly view) */}
+      {viewMode === "hourly" && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium flex items-center">
+              <Filter className="h-4 w-4 mr-2" />
+              Hourly Rate Filter
+            </h3>
+            <div className="text-sm">
+              {formatHourlyRate(hourlyRateRange[0])} - {formatHourlyRate(hourlyRateRange[1])}
+            </div>
+          </div>
+          <Slider
+            className="my-4"
+            value={hourlyRateRange}
+            min={0}
+            max={100}
+            step={1}
+            onValueChange={(value) => setHourlyRateRange(value as [number, number])}
+          />
+        </Card>
+      )}
       
       {/* Date Range Picker */}
       <div className="flex justify-between items-center">
@@ -296,81 +401,161 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
 
       {/* Employees Salary Table */}
       <Card className="overflow-hidden border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Employee</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Position</TableHead>
-              <TableHead>Start Date</TableHead>
-              <TableHead>Basis</TableHead>
-              <TableHead>
-                <div className="flex items-center gap-1">
-                  <span>Gross Salary</span>
-                  <ArrowUpDown 
-                    className="h-3.5 w-3.5 cursor-pointer" 
-                    onClick={() => setSortOption(
-                      sortOption === "salary-high" ? "salary-low" : "salary-high"
-                    )}
-                  />
-                </div>
-              </TableHead>
-              <TableHead>Tax %</TableHead>
-              <TableHead>Tax Amount</TableHead>
-              <TableHead>Net Salary</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredEmployees.length > 0 ? (
-              filteredEmployees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
-                        {employee.profileImage && (
-                          <AvatarImage src={employee.profileImage} alt={employee.name} />
-                        )}
-                        <AvatarFallback className="bg-indigo-100 text-indigo-600">
-                          {employee.name.split(' ').map(part => part[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{employee.name}</div>
-                        <div className="text-sm text-muted-foreground">{employee.email}</div>
+        {viewMode === "standard" ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Position</TableHead>
+                <TableHead>Start Date</TableHead>
+                <TableHead>Basis</TableHead>
+                <TableHead>
+                  <div className="flex items-center gap-1">
+                    <span>Gross Salary</span>
+                    <ArrowUpDown 
+                      className="h-3.5 w-3.5 cursor-pointer" 
+                      onClick={() => setSortOption(
+                        sortOption === "salary-high" ? "salary-low" : "salary-high"
+                      )}
+                    />
+                  </div>
+                </TableHead>
+                <TableHead>Tax %</TableHead>
+                <TableHead>Tax Amount</TableHead>
+                <TableHead>Net Salary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredEmployees.length > 0 ? (
+                filteredEmployees.map((employee) => (
+                  <TableRow key={employee.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9">
+                          {employee.profileImage && (
+                            <AvatarImage src={employee.profileImage} alt={employee.name} />
+                          )}
+                          <AvatarFallback className="bg-indigo-100 text-indigo-600">
+                            {employee.name.split(' ').map(part => part[0]).join('').toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{employee.name}</div>
+                          <div className="text-sm text-muted-foreground">{employee.email}</div>
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.position}</TableCell>
-                  <TableCell>
-                    {format(new Date(employee.dateHired), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{getSalaryBasisText(employee.salaryBasis)}</Badge>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {formatCurrency(employee.salary)}
-                  </TableCell>
-                  <TableCell>
-                    {employee.taxPercentage ? `${employee.taxPercentage}%` : "N/A"}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatCurrency(employee.taxAmount)}
-                  </TableCell>
-                  <TableCell className="font-semibold">
-                    {formatCurrency(employee.netSalary)}
+                    </TableCell>
+                    <TableCell>{employee.department}</TableCell>
+                    <TableCell>{employee.position}</TableCell>
+                    <TableCell>
+                      {format(new Date(employee.dateHired), "MMM d, yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{getSalaryBasisText(employee.salaryBasis)}</Badge>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {formatCurrency(employee.salary)}
+                    </TableCell>
+                    <TableCell>
+                      {employee.taxPercentage ? `${employee.taxPercentage}%` : "N/A"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatCurrency(employee.taxAmount)}
+                    </TableCell>
+                    <TableCell className="font-semibold">
+                      {formatCurrency(employee.netSalary)}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} className="h-24 text-center">
+                    No employees match the current filters
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
+              )}
+            </TableBody>
+          </Table>
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center">
-                  No employees match the current filters
-                </TableCell>
+                <TableHead>Employee</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Position</TableHead>
+                <TableHead>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span>Hourly Rate</span>
+                    <ArrowUpDown 
+                      className="h-3.5 w-3.5 cursor-pointer" 
+                      onClick={() => setSortOption(
+                        sortOption === "hourly-high" ? "hourly-low" : "hourly-high"
+                      )}
+                    />
+                  </div>
+                </TableHead>
+                <TableHead>Incentive Type</TableHead>
+                <TableHead>Incentive Amount</TableHead>
+                <TableHead>Est. Weekly</TableHead>
+                <TableHead>Est. Monthly</TableHead>
+                <TableHead>Est. Yearly</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredEmployees.length > 0 ? (
+                filteredEmployees.map((employee) => {
+                  const hourlyRate = employee.hourlyRate || 0;
+                  const weeklyPay = hourlyRate * 40; // Assume 40 hour week
+                  const monthlyPay = weeklyPay * 4.33; // Avg weeks in month
+                  const yearlyPay = monthlyPay * 12;
+                  
+                  return (
+                    <TableRow key={employee.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            {employee.profileImage && (
+                              <AvatarImage src={employee.profileImage} alt={employee.name} />
+                            )}
+                            <AvatarFallback className="bg-indigo-100 text-indigo-600">
+                              {employee.name.split(' ').map(part => part[0]).join('').toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{employee.name}</div>
+                            <div className="text-sm text-muted-foreground">{employee.email}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{employee.department}</TableCell>
+                      <TableCell>{employee.position}</TableCell>
+                      <TableCell className="font-medium">
+                        {formatHourlyRate(hourlyRate)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {getIncentiveTypeText(employee.incentiveType)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{formatHourlyRate(employee.incentiveAmount || 0)}</TableCell>
+                      <TableCell>{formatCurrency(weeklyPay)}</TableCell>
+                      <TableCell>{formatCurrency(monthlyPay)}</TableCell>
+                      <TableCell className="font-semibold">{formatCurrency(yearlyPay)}</TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} className="h-24 text-center">
+                    No employees match the current filters
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </Card>
 
       {/* Report Generator */}
