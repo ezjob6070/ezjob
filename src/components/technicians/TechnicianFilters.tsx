@@ -13,7 +13,8 @@ import TechnicianSelectDropdown from "./filters/TechnicianSelectDropdown";
 import TechnicianSearchBar from "./filters/TechnicianSearchBar";
 import DateSortFilter from "./filters/DateSortFilter";
 
-type SortOption = "none" | "newest" | "oldest";
+// Extended sort options
+type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
 
 interface TechnicianFiltersProps {
   categories: string[];
@@ -43,7 +44,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   onTechnicianToggle,
   searchQuery = "",
   onSearchChange,
-  sortOption = "none",
+  sortOption = "newest",
   onSortChange
 }) => {
   const [technicianDropdownOpen, setTechnicianDropdownOpen] = React.useState(false);
@@ -70,7 +71,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           </SelectContent>
         </Select>
         
-        {/* Date sort filter */}
+        {/* Enhanced date/name/revenue sort filter */}
         {onSortChange && (
           <DateSortFilter
             sortOption={sortOption}

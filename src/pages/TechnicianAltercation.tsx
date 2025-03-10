@@ -11,8 +11,8 @@ import TechnicianStats from "@/components/technicians/TechnicianStats";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 
-// Define the type for date sorting options
-type SortOption = "none" | "newest" | "oldest";
+// Define the type for sort options
+type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
 
 const TechnicianAltercation = () => {
   const { toast } = useToast();
@@ -23,7 +23,7 @@ const TechnicianAltercation = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
-  const [sortOption, setSortOption] = useState<SortOption>("none");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
 
   // Extract unique categories from technicians
   const categories = useMemo(() => {
@@ -56,21 +56,24 @@ const TechnicianAltercation = () => {
     });
 
     // Then, apply sorting
-    if (sortOption !== "none") {
-      filtered = [...filtered].sort((a, b) => {
-        // Use startDate for sorting if available, otherwise fallback to ID
-        const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
-        const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
-        
-        if (sortOption === "newest") {
-          return dateB - dateA; // Newest first
-        } else {
-          return dateA - dateB; // Oldest first
-        }
-      });
-    }
-    
-    return filtered;
+    return [...filtered].sort((a, b) => {
+      switch (sortOption) {
+        case "newest":
+          return new Date(b.startDate || 0).getTime() - new Date(a.startDate || 0).getTime();
+        case "oldest":
+          return new Date(a.startDate || 0).getTime() - new Date(b.startDate || 0).getTime();
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "revenue-high":
+          return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+        case "revenue-low":
+          return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+        default:
+          return 0;
+      }
+    });
   }, [technicians, searchQuery, selectedCategories, statusFilter, sortOption]);
 
   const handleEditTechnician = (technician: Technician) => {

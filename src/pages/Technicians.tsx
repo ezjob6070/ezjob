@@ -10,7 +10,11 @@ import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
+import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import { initialTechnicians } from "@/data/technicians";
+
+// Define extended sort options
+type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
 
 const Technicians = () => {
   const { toast } = useToast();
@@ -20,14 +24,53 @@ const Technicians = () => {
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
+  
+  // Extract unique categories
+  const categories = technicians
+    .map(tech => tech.category || "Uncategorized")
+    .filter((value, index, self) => self.indexOf(value) === index);
 
-  const filteredTechnicians = technicians.filter(tech => {
-    if (searchQuery === "") return true;
-    
-    return tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           tech.email.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  // Apply all filters and sorting
+  const filteredTechnicians = technicians
+    .filter(tech => {
+      // Text search filter
+      const matchesSearch = searchQuery === "" || 
+        tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Category filter
+      const matchesCategory = selectedCategories.length === 0 || 
+        selectedCategories.includes(tech.category || "Uncategorized");
+      
+      // Status filter
+      const matchesStatus = statusFilter === "all" || 
+        tech.status === statusFilter;
+      
+      return matchesSearch && matchesCategory && matchesStatus;
+    })
+    .sort((a, b) => {
+      switch (sortOption) {
+        case "newest":
+          return new Date(b.startDate || 0).getTime() - new Date(a.startDate || 0).getTime();
+        case "oldest":
+          return new Date(a.startDate || 0).getTime() - new Date(b.startDate || 0).getTime();
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "revenue-high":
+          return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+        case "revenue-low":
+          return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+        default:
+          return 0;
+      }
+    });
 
   const handleAddTechnician = (newTechnician: Technician) => {
     setTechnicians((prevTechnicians) => [newTechnician, ...prevTechnicians]);
@@ -68,6 +111,27 @@ const Technicians = () => {
     });
   };
 
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(category)) {
+        return prev.filter(c => c !== category);
+      } else {
+        return [...prev, category];
+      }
+    });
+  };
+
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+  };
+
+  const addCategory = (category: string) => {
+    toast({
+      title: "Category Added",
+      description: `New category "${category}" has been added.`,
+    });
+  };
+
   return (
     <div className="space-y-8 py-8">
       <div className="flex justify-between items-center">
@@ -97,10 +161,29 @@ const Technicians = () => {
 
       <TechnicianStats technicians={technicians} />
       
+      {/* Enhanced filters with sorting options */}
+      <div className="mb-6">
+        <TechnicianFilters 
+          categories={categories}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          addCategory={addCategory}
+          status={statusFilter}
+          onStatusChange={setStatusFilter}
+          technicians={technicians}
+          selectedTechnicians={selectedTechnicians}
+          onTechnicianToggle={toggleTechnician}
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          sortOption={sortOption}
+          onSortChange={handleSortChange}
+        />
+      </div>
+      
       {/* Financial Performance with Charts and Filters */}
       <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
       
-      {/* Technicians List */}
+      {/* Technicians List with new table/card view toggle */}
       <TechniciansList 
         technicians={filteredTechnicians} 
         onEditTechnician={handleEditTechnician}

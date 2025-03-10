@@ -1,15 +1,22 @@
 
 import React from "react";
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { CalendarRange } from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { ArrowUp, ArrowDown } from "lucide-react";
 
-type SortOption = "none" | "newest" | "oldest";
+// Extended sort options to match employees
+type SortOption = 
+  | "newest" 
+  | "oldest" 
+  | "name-asc" 
+  | "name-desc" 
+  | "revenue-high" 
+  | "revenue-low";
 
 interface DateSortFilterProps {
   sortOption: SortOption;
@@ -20,18 +27,67 @@ const DateSortFilter: React.FC<DateSortFilterProps> = ({
   sortOption, 
   onSortChange 
 }) => {
+  const getSortButtonIcon = () => {
+    if (sortOption === "newest" || sortOption === "name-desc" || sortOption === "revenue-high") {
+      return <ArrowDown className="h-4 w-4 mr-1" />;
+    }
+    return <ArrowUp className="h-4 w-4 mr-1" />;
+  };
+
+  const getSortButtonText = () => {
+    switch (sortOption) {
+      case "newest":
+        return "Newest First";
+      case "oldest":
+        return "Oldest First";
+      case "name-asc":
+        return "Name (A-Z)";
+      case "name-desc":
+        return "Name (Z-A)";
+      case "revenue-high":
+        return "Revenue (High-Low)";
+      case "revenue-low":
+        return "Revenue (Low-High)";
+      default:
+        return "Sort";
+    }
+  };
+
   return (
-    <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
-      <SelectTrigger className="w-[180px]">
-        <CalendarRange className="h-4 w-4 mr-2" />
-        <SelectValue placeholder="Sort by date" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="none">No date sorting</SelectItem>
-        <SelectItem value="newest">Newest first</SelectItem>
-        <SelectItem value="oldest">Oldest first</SelectItem>
-      </SelectContent>
-    </Select>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="flex items-center">
+          {getSortButtonIcon()}
+          {getSortButtonText()}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={() => onSortChange("newest")}>
+          <ArrowDown className="h-4 w-4 mr-2" />
+          Newest First
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onSortChange("oldest")}>
+          <ArrowUp className="h-4 w-4 mr-2" />
+          Oldest First
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onSortChange("name-asc")}>
+          <ArrowUp className="h-4 w-4 mr-2" />
+          Name (A-Z)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onSortChange("name-desc")}>
+          <ArrowDown className="h-4 w-4 mr-2" />
+          Name (Z-A)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onSortChange("revenue-high")}>
+          <ArrowDown className="h-4 w-4 mr-2" />
+          Revenue (High-Low)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onSortChange("revenue-low")}>
+          <ArrowUp className="h-4 w-4 mr-2" />
+          Revenue (Low-High)
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
