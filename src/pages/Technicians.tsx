@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,26 +27,21 @@ const Technicians = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   
-  // Extract unique categories
   const categories = technicians
     .map(tech => tech.category || "Uncategorized")
     .filter((value, index, self) => self.indexOf(value) === index);
 
-  // Apply all filters and sorting
   const filteredTechnicians = technicians
     .filter(tech => {
-      // Text search filter
       const matchesSearch = searchQuery === "" || 
         tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
       
-      // Category filter
       const matchesCategory = selectedCategories.length === 0 || 
         selectedCategories.includes(tech.category || "Uncategorized");
       
-      // Status filter
       const matchesStatus = statusFilter === "all" || 
         tech.status === statusFilter;
       
@@ -161,7 +155,6 @@ const Technicians = () => {
 
       <TechnicianStats technicians={technicians} />
       
-      {/* Enhanced filters with sorting options */}
       <div className="mb-6">
         <TechnicianFilters 
           categories={categories}
@@ -180,15 +173,13 @@ const Technicians = () => {
         />
       </div>
       
-      {/* Financial Performance with Charts and Filters */}
       <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
       
-      {/* Technicians List with new table/card view toggle */}
       <TechniciansList 
-        technicians={filteredTechnicians} 
-        onEditTechnician={handleEditTechnician}
+        technicians={filteredTechnicians}
         selectedTechnicians={selectedTechnicians}
         onToggleSelect={toggleTechnician}
+        onEditTechnician={handleEditTechnician}
       />
       
       <AddTechnicianModal 

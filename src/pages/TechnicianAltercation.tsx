@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
@@ -25,7 +24,6 @@ const TechnicianAltercation = () => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("newest");
 
-  // Extract unique categories from technicians
   const categories = useMemo(() => {
     const allCategories = technicians
       .map(tech => tech.category || "Uncategorized")
@@ -135,7 +133,6 @@ const TechnicianAltercation = () => {
 
   return (
     <div className="container py-8">
-      {/* Main Technician Navigation Tabs */}
       <TechnicianTabs currentTab="list" />
 
       <div className="mb-8 flex justify-between items-center">
@@ -155,7 +152,6 @@ const TechnicianAltercation = () => {
       {/* Technician Stats Section */}
       <TechnicianStats technicians={technicians} />
 
-      {/* Integrated Filters Section */}
       <div className="mb-6">
         <TechnicianFilters 
           categories={categories}
@@ -174,15 +170,13 @@ const TechnicianAltercation = () => {
         />
       </div>
 
-      {/* Technicians List without Integrated Search (moved to filters) */}
       <TechniciansList 
-        technicians={filteredTechnicians} 
-        onEditTechnician={handleEditTechnician}
+        technicians={filteredTechnicians}
         selectedTechnicians={selectedTechnicians}
         onToggleSelect={toggleTechnician}
+        onEditTechnician={handleEditTechnician}
       />
 
-      {/* Edit Technician Modal */}
       <EditTechnicianModal
         open={showEditModal}
         onOpenChange={setShowEditModal}
