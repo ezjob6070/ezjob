@@ -2,10 +2,17 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, Upload, Filter, Search } from "lucide-react";
+import { Plus, Upload, Filter, Search, Users } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import EmployeesList from "@/components/employed/EmployeesList";
 import ResumesList from "@/components/employed/ResumesList";
@@ -15,7 +22,7 @@ import UploadResumeModal from "@/components/employed/UploadResumeModal";
 import ReportsSection from "@/components/employed/ReportsSection";
 
 import { initialEmployees, initialResumes, employeeReports } from "@/data/employees";
-import { Employee, Resume, Report, ResumeStatus } from "@/types/employee";
+import { Employee, Resume, Report, ResumeStatus, EmployeeStatus } from "@/types/employee";
 
 const Employed = () => {
   const { toast } = useToast();
@@ -25,6 +32,7 @@ const Employed = () => {
   const [reports, setReports] = useState<Report[]>(employeeReports);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
+  const [employeeStatusFilter, setEmployeeStatusFilter] = useState<string>("all");
   
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [showEditEmployeeModal, setShowEditEmployeeModal] = useState(false);
@@ -32,9 +40,9 @@ const Employed = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   
   // Stats calculation
-  const activeEmployees = employees.filter(emp => emp.status === "active").length;
-  const pendingEmployees = employees.filter(emp => emp.status === "pending").length;
-  const inactiveEmployees = employees.filter(emp => emp.status === "inactive").length;
+  const activeEmployees = employees.filter(emp => emp.status === EmployeeStatus.ACTIVE).length;
+  const pendingEmployees = employees.filter(emp => emp.status === EmployeeStatus.PENDING).length;
+  const inactiveEmployees = employees.filter(emp => emp.status === EmployeeStatus.INACTIVE).length;
   const totalSalary = employees.reduce((sum, emp) => sum + emp.salary, 0);
   
   const handleAddEmployee = (newEmployee: Employee) => {
@@ -94,6 +102,11 @@ const Employed = () => {
       }
     });
   };
+
+  // Filter employees based on status filter
+  const filteredEmployeesByStatus = employeeStatusFilter === "all" 
+    ? employees 
+    : employees.filter(emp => emp.status === employeeStatusFilter);
   
   return (
     <div className="space-y-8 py-8">
@@ -141,6 +154,41 @@ const Employed = () => {
         </TabsList>
         
         <TabsContent value="employees" className="mt-6">
+          {/* Employee Status Filter */}
+          {activeTab === "employees" && (
+            <div className="mb-6 flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="text-muted-foreground h-5 w-5" />
+                <span className="font-medium">Status Filter:</span>
+                <Select 
+                  value={employeeStatusFilter} 
+                  onValueChange={setEmployeeStatusFilter}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Employees</SelectItem>
+                    <SelectItem value={EmployeeStatus.ACTIVE}>Active</SelectItem>
+                    <SelectItem value={EmployeeStatus.PENDING}>Pending</SelectItem>
+                    <SelectItem value={EmployeeStatus.INACTIVE}>Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex items-center text-sm text-muted-foreground">
+                <span className="mr-2">
+                  {filteredEmployeesByStatus.length} {filteredEmployeesByStatus.length === 1 ? 'employee' : 'employees'} found
+                </span>
+                {selectedEmployees.length > 0 && (
+                  <span className="ml-2 px-2 py-1 bg-primary/10 rounded-full text-xs">
+                    {selectedEmployees.length} selected
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Employee Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card className="bg-white">
@@ -251,7 +299,7 @@ const Employed = () => {
           </div>
 
           <EmployeesList 
-            employees={employees} 
+            employees={filteredEmployeesByStatus} 
             onEditEmployee={handleEditEmployee}
             selectedEmployees={selectedEmployees}
             onToggleSelect={toggleEmployee}

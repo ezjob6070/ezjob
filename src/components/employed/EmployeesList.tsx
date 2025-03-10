@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Employee, EmployeeStatus } from "@/types/employee";
 import { Input } from "@/components/ui/input";
-import { Search, User, ExternalLink, Filter, Circle } from "lucide-react";
+import { Search, User, ExternalLink, Filter, Circle, ArrowUp, ArrowDown } from "lucide-react";
 import { 
   Table, 
   TableBody, 
@@ -21,6 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,6 +38,8 @@ interface EmployeesListProps {
   onToggleSelect?: (employeeId: string) => void;
 }
 
+type SortOrder = "newest" | "oldest" | "name-asc" | "name-desc" | "salary-high" | "salary-low";
+
 const EmployeesList = ({ 
   employees, 
   onEditEmployee,
@@ -41,6 +49,7 @@ const EmployeesList = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
   
   // Get unique departments for filter
   const departments = Array.from(
@@ -49,14 +58,62 @@ const EmployeesList = ({
   
   // Filter employees based on search and department
   const filteredEmployees = employees.filter((employee) => {
-    const matchesSearch = employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          employee.position.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = 
+      employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (employee.phone && employee.phone.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      employee.position.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesDepartment = departmentFilter === "all" || employee.department === departmentFilter;
     
     return matchesSearch && matchesDepartment;
   });
+
+  // Sort employees based on sort order
+  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
+    switch (sortOrder) {
+      case "newest":
+        return new Date(b.dateHired).getTime() - new Date(a.dateHired).getTime();
+      case "oldest":
+        return new Date(a.dateHired).getTime() - new Date(b.dateHired).getTime();
+      case "name-asc":
+        return a.name.localeCompare(b.name);
+      case "name-desc":
+        return b.name.localeCompare(a.name);
+      case "salary-high":
+        return b.salary - a.salary;
+      case "salary-low":
+        return a.salary - b.salary;
+      default:
+        return 0;
+    }
+  });
+
+  const getSortButtonIcon = () => {
+    if (sortOrder === "newest" || sortOrder === "name-desc" || sortOrder === "salary-high") {
+      return <ArrowDown className="h-4 w-4 mr-1" />;
+    }
+    return <ArrowUp className="h-4 w-4 mr-1" />;
+  };
+
+  const getSortButtonText = () => {
+    switch (sortOrder) {
+      case "newest":
+        return "Newest First";
+      case "oldest":
+        return "Oldest First";
+      case "name-asc":
+        return "Name (A-Z)";
+      case "name-desc":
+        return "Name (Z-A)";
+      case "salary-high":
+        return "Salary (High-Low)";
+      case "salary-low":
+        return "Salary (Low-High)";
+      default:
+        return "Sort";
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -64,14 +121,14 @@ const EmployeesList = ({
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search employees..."
+            placeholder="Search by name, email, phone..."
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <div className="w-full sm:w-48">
             <Select
               value={departmentFilter}
@@ -90,6 +147,41 @@ const EmployeesList = ({
               </SelectContent>
             </Select>
           </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center">
+                {getSortButtonIcon()}
+                {getSortButtonText()}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setSortOrder("newest")}>
+                <ArrowDown className="h-4 w-4 mr-2" />
+                Newest First
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
+                <ArrowUp className="h-4 w-4 mr-2" />
+                Oldest First
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOrder("name-asc")}>
+                <ArrowUp className="h-4 w-4 mr-2" />
+                Name (A-Z)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOrder("name-desc")}>
+                <ArrowDown className="h-4 w-4 mr-2" />
+                Name (Z-A)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOrder("salary-high")}>
+                <ArrowDown className="h-4 w-4 mr-2" />
+                Salary (High-Low)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOrder("salary-low")}>
+                <ArrowUp className="h-4 w-4 mr-2" />
+                Salary (Low-High)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <div className="flex gap-1">
             <Button 
@@ -174,8 +266,8 @@ const EmployeesList = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredEmployees.length > 0 ? (
-                filteredEmployees.map((employee) => (
+              {sortedEmployees.length > 0 ? (
+                sortedEmployees.map((employee) => (
                   <TableRow key={employee.id}>
                     {onToggleSelect && (
                       <TableCell>
@@ -264,8 +356,8 @@ const EmployeesList = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredEmployees.length > 0 ? (
-            filteredEmployees.map((employee) => (
+          {sortedEmployees.length > 0 ? (
+            sortedEmployees.map((employee) => (
               <EmployeeCard
                 key={employee.id}
                 employee={employee}
@@ -318,8 +410,8 @@ const EmployeeCard = ({ employee, onEdit, isSelected = false, onToggleSelect }: 
                 <h3 className="font-semibold text-lg">{employee.name}</h3>
                 <div className="flex items-center mt-1">
                   <Badge variant={
-                    employee.status === EmployeeStatus.ACTIVE ? "success" : 
-                    employee.status === EmployeeStatus.PENDING ? "warning" : "destructive"
+                    employee.status === EmployeeStatus.ACTIVE ? "default" : 
+                    employee.status === EmployeeStatus.PENDING ? "outline" : "secondary"
                   } className="text-xs">
                     {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
                   </Badge>
