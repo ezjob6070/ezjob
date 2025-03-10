@@ -11,6 +11,9 @@ import TechnicianStats from "@/components/technicians/TechnicianStats";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 
+// Define the type for date sorting options
+type SortOption = "none" | "newest" | "oldest";
+
 const TechnicianAltercation = () => {
   const { toast } = useToast();
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
@@ -20,6 +23,7 @@ const TechnicianAltercation = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
+  const [sortOption, setSortOption] = useState<SortOption>("none");
 
   // Extract unique categories from technicians
   const categories = useMemo(() => {
@@ -29,24 +33,45 @@ const TechnicianAltercation = () => {
     return allCategories;
   }, [technicians]);
 
-  const filteredTechnicians = technicians.filter(tech => {
-    // Text search filter
-    const matchesSearch = searchQuery === "" || 
-      tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Apply all filters and sorting
+  const filteredTechnicians = useMemo(() => {
+    // First, filter technicians
+    let filtered = technicians.filter(tech => {
+      // Text search filter
+      const matchesSearch = searchQuery === "" || 
+        tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Category filter
+      const matchesCategory = selectedCategories.length === 0 || 
+        selectedCategories.includes(tech.category || "Uncategorized");
+      
+      // Status filter
+      const matchesStatus = statusFilter === "all" || 
+        tech.status === statusFilter;
+      
+      return matchesSearch && matchesCategory && matchesStatus;
+    });
+
+    // Then, apply sorting
+    if (sortOption !== "none") {
+      filtered = [...filtered].sort((a, b) => {
+        // Use startDate for sorting if available, otherwise fallback to ID
+        const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+        const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+        
+        if (sortOption === "newest") {
+          return dateB - dateA; // Newest first
+        } else {
+          return dateA - dateB; // Oldest first
+        }
+      });
+    }
     
-    // Category filter
-    const matchesCategory = selectedCategories.length === 0 || 
-      selectedCategories.includes(tech.category || "Uncategorized");
-    
-    // Status filter
-    const matchesStatus = statusFilter === "all" || 
-      tech.status === statusFilter;
-    
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+    return filtered;
+  }, [technicians, searchQuery, selectedCategories, statusFilter, sortOption]);
 
   const handleEditTechnician = (technician: Technician) => {
     setSelectedTechnician(technician);
@@ -93,6 +118,10 @@ const TechnicianAltercation = () => {
     });
   };
 
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+  };
+
   const addCategory = (category: string) => {
     toast({
       title: "Category Added",
@@ -137,6 +166,8 @@ const TechnicianAltercation = () => {
           onTechnicianToggle={toggleTechnician}
           searchQuery={searchQuery}
           onSearchChange={handleSearchChange}
+          sortOption={sortOption}
+          onSortChange={handleSortChange}
         />
       </div>
 

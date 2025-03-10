@@ -11,6 +11,9 @@ import CategoryFilter from "@/components/finance/technician-filters/CategoryFilt
 import { Technician } from "@/types/technician";
 import TechnicianSelectDropdown from "./filters/TechnicianSelectDropdown";
 import TechnicianSearchBar from "./filters/TechnicianSearchBar";
+import DateSortFilter from "./filters/DateSortFilter";
+
+type SortOption = "none" | "newest" | "oldest";
 
 interface TechnicianFiltersProps {
   categories: string[];
@@ -24,6 +27,8 @@ interface TechnicianFiltersProps {
   onTechnicianToggle?: (technicianId: string) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  sortOption?: SortOption;
+  onSortChange?: (option: SortOption) => void;
 }
 
 const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
@@ -37,7 +42,9 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   selectedTechnicians = [],
   onTechnicianToggle,
   searchQuery = "",
-  onSearchChange
+  onSearchChange,
+  sortOption = "none",
+  onSortChange
 }) => {
   const [technicianDropdownOpen, setTechnicianDropdownOpen] = React.useState(false);
 
@@ -62,6 +69,14 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
             <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
+        
+        {/* Date sort filter */}
+        {onSortChange && (
+          <DateSortFilter
+            sortOption={sortOption}
+            onSortChange={onSortChange}
+          />
+        )}
         
         {/* Multi-select Technician dropdown */}
         {technicians.length > 0 && onTechnicianToggle && (

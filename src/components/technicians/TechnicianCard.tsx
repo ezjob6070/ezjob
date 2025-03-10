@@ -5,8 +5,9 @@ import { Technician } from "@/types/technician";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, User, Pencil, Circle } from "lucide-react";
+import { MapPin, Phone, Mail, User, Pencil, Circle, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 interface TechnicianCardProps {
   technician: Technician;
@@ -30,6 +31,11 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
     }
     navigate(`/technicians/${technician.id}`);
   };
+
+  // Format the start date if it exists
+  const formattedStartDate = technician.startDate 
+    ? format(new Date(technician.startDate), 'MMM d, yyyy')
+    : 'Not specified';
 
   return (
     <Card className={`overflow-hidden ${isSelected ? 'ring-2 ring-indigo-500' : ''} cursor-pointer transition-shadow hover:shadow-md`} onClick={handleCardClick}>
@@ -79,6 +85,11 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
                   <span>{technician.address}</span>
                 </div>
               )}
+              {/* Add start date display */}
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4 mr-2" />
+                <span>Started: {formattedStartDate}</span>
+              </div>
             </div>
           </div>
 
