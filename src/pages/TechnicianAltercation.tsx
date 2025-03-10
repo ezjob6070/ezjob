@@ -5,14 +5,17 @@ import { initialTechnicians } from "@/data/technicians";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
+import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import { useToast } from "@/components/ui/use-toast";
 
 const TechnicianAltercation = () => {
   const { toast } = useToast();
-  const [technicians] = useState<Technician[]>(initialTechnicians);
+  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
 
   // Extract unique categories from technicians
   const categories = useMemo(() => {
@@ -42,8 +45,19 @@ const TechnicianAltercation = () => {
   });
 
   const handleEditTechnician = (technician: Technician) => {
-    // This would typically open an edit modal or navigate to an edit page
-    console.log("Edit technician:", technician);
+    setSelectedTechnician(technician);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateTechnician = (updatedTechnician: Technician) => {
+    setTechnicians(prev => 
+      prev.map(tech => tech.id === updatedTechnician.id ? updatedTechnician : tech)
+    );
+    
+    toast({
+      title: "Technician Updated",
+      description: `${updatedTechnician.name}'s information has been updated.`,
+    });
   };
 
   const handleSearchChange = (query: string) => {
@@ -100,6 +114,14 @@ const TechnicianAltercation = () => {
         onSearchChange={handleSearchChange}
         selectedCategories={selectedCategories}
         selectedStatus={statusFilter}
+      />
+
+      {/* Edit Technician Modal */}
+      <EditTechnicianModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        onUpdateTechnician={handleUpdateTechnician}
+        technician={selectedTechnician}
       />
     </div>
   );
