@@ -7,7 +7,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { CalendarSort } from "lucide-react";
+import { CalendarRange } from "lucide-react";
 
 type SortOption = "none" | "newest" | "oldest";
 
@@ -23,7 +23,7 @@ const DateSortFilter: React.FC<DateSortFilterProps> = ({
   return (
     <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
       <SelectTrigger className="w-[180px]">
-        <CalendarSort className="h-4 w-4 mr-2" />
+        <CalendarRange className="h-4 w-4 mr-2" />
         <SelectValue placeholder="Sort by date" />
       </SelectTrigger>
       <SelectContent>
