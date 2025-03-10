@@ -17,7 +17,6 @@ const TechnicianAltercation = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
 
   // Extract unique categories from technicians
   const categories = useMemo(() => {
