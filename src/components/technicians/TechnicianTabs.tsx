@@ -13,10 +13,10 @@ const TechnicianTabs = ({ currentTab }: TechnicianTabsProps) => {
   return (
     <div className="mb-6">
       <Tabs defaultValue={currentTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-6 overflow-hidden rounded-lg border border-gray-200 shadow-sm h-14">
           <TabsTrigger 
             value="list" 
-            className="text-lg py-3 font-medium"
+            className="text-lg py-3 font-medium data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all duration-200"
             onClick={() => navigate("/technicians")}
           >
             <List className="mr-2 h-5 w-5" />
@@ -24,7 +24,7 @@ const TechnicianTabs = ({ currentTab }: TechnicianTabsProps) => {
           </TabsTrigger>
           <TabsTrigger 
             value="analytics" 
-            className="text-lg py-3 font-medium"
+            className="text-lg py-3 font-medium data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all duration-200"
             onClick={() => navigate("/technicians/analytics")}
           >
             <BarChart2 className="mr-2 h-5 w-5" />
