@@ -4,6 +4,7 @@ import TechnicianCard from "./TechnicianCard";
 import { Technician } from "@/types/technician";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface TechniciansListProps {
   technicians: Technician[];
@@ -24,8 +25,8 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
     <div className="space-y-4">
       {/* Selected technicians display */}
       {selectedTechnicians.length > 0 && (
-        <div className="flex flex-wrap gap-1 p-3 bg-gray-50 rounded-lg">
-          <div className="mr-2 font-medium text-sm">Selected:</div>
+        <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg">
+          <div className="mr-2 font-medium text-sm flex items-center">Selected:</div>
           {selectedTechnicians.map(techId => {
             const tech = technicians.find(t => t.id === techId);
             return tech ? (
@@ -42,8 +43,8 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
                     className="h-4 w-4 p-0 ml-1" 
                     onClick={() => onToggleSelect(tech.id)}
                   >
+                    <X className="h-3 w-3" />
                     <span className="sr-only">Remove</span>
-                    ×
                   </Button>
                 )}
               </Badge>

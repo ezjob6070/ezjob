@@ -19,6 +19,7 @@ const Technicians = () => {
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
 
   const filteredTechnicians = technicians.filter(tech => {
     if (searchQuery === "") return true;
@@ -57,6 +58,16 @@ const Technicians = () => {
     setSearchQuery(query);
   };
 
+  const toggleTechnician = (technicianId: string) => {
+    setSelectedTechnicians(prev => {
+      if (prev.includes(technicianId)) {
+        return prev.filter(id => id !== technicianId);
+      } else {
+        return [...prev, technicianId];
+      }
+    });
+  };
+
   return (
     <div className="space-y-8 py-8">
       <div className="flex justify-between items-center">
@@ -93,8 +104,8 @@ const Technicians = () => {
       <TechniciansList 
         technicians={filteredTechnicians} 
         onEditTechnician={handleEditTechnician}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
+        selectedTechnicians={selectedTechnicians}
+        onToggleSelect={toggleTechnician}
       />
       
       <AddTechnicianModal 
