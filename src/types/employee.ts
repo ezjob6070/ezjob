@@ -19,6 +19,12 @@ export enum DocumentType {
   OTHER = "other"
 }
 
+export enum SalaryBasis {
+  WEEKLY = "weekly",
+  MONTHLY = "monthly",
+  YEARLY = "yearly"
+}
+
 export interface EmployeeDocument {
   id: string;
   type: DocumentType;
@@ -60,6 +66,8 @@ export interface Employee {
   dateHired: Date;
   reportsTo?: string;
   salary: number;
+  salaryBasis?: SalaryBasis;
+  taxPercentage?: number;
   address: string;
   profileImage?: string;
   skills: string[];

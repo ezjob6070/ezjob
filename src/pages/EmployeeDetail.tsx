@@ -1,7 +1,8 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus, FileBadge } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus, FileBadge, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Employee, EmployeeNote } from "@/types/employee";
+import { Employee, EmployeeNote, SalaryBasis } from "@/types/employee";
 import { initialEmployees } from "@/data/employees";
 import EmployeeDocuments from "@/components/employed/EmployeeDocuments";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const EmployeeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +21,7 @@ const EmployeeDetail = () => {
   const { toast } = useToast();
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [newNote, setNewNote] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   
   useEffect(() => {
     // In a real app, fetch employee data from API
@@ -63,6 +66,47 @@ const EmployeeDetail = () => {
   const handleUpdateEmployee = (updatedEmployee: Employee) => {
     setEmployee(updatedEmployee);
   };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0] && employee) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result && employee) {
+          const updatedEmployee = {
+            ...employee,
+            profileImage: event.target.result as string
+          };
+          setEmployee(updatedEmployee);
+        }
+      };
+      reader.readAsDataURL(file);
+      
+      toast({
+        title: "Image Updated",
+        description: "Profile image has been updated successfully",
+      });
+    }
+  };
+
+  const removeImage = () => {
+    if (employee) {
+      const updatedEmployee = {
+        ...employee,
+        profileImage: undefined
+      };
+      setEmployee(updatedEmployee);
+      setImageFile(null);
+      
+      toast({
+        title: "Image Removed",
+        description: "Profile image has been removed",
+      });
+    }
+  };
   
   if (!employee) {
     return (
@@ -71,6 +115,24 @@ const EmployeeDetail = () => {
       </div>
     );
   }
+
+  // Format salary based on basis
+  const formatSalary = () => {
+    if (!employee.salaryBasis || employee.salaryBasis === SalaryBasis.YEARLY) {
+      return `$${employee.salary.toLocaleString()}/year`;
+    } else if (employee.salaryBasis === SalaryBasis.MONTHLY) {
+      return `$${employee.salary.toLocaleString()}/month`;
+    } else {
+      return `$${employee.salary.toLocaleString()}/week`;
+    }
+  };
+  
+  // Generate initials if not provided
+  const initials = employee.initials || employee.name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase();
   
   return (
     <div className="space-y-8 py-8">
@@ -92,16 +154,55 @@ const EmployeeDetail = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <div className="h-32 w-32 rounded-full bg-slate-200 flex items-center justify-center mb-4">
+                <div className="relative mb-4">
                   {employee.profileImage ? (
-                    <img 
-                      src={employee.profileImage} 
-                      alt={employee.name} 
-                      className="h-32 w-32 rounded-full object-cover"
-                    />
+                    <Avatar className="h-32 w-32 border-4 border-background">
+                      <AvatarImage 
+                        src={employee.profileImage} 
+                        alt={employee.name} 
+                        className="h-32 w-32 rounded-full object-cover"
+                      />
+                      <AvatarFallback className="text-xl">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
                   ) : (
-                    <User size={48} className="text-slate-500" />
+                    <Avatar className="h-32 w-32 border-4 border-background">
+                      <AvatarFallback className="text-xl bg-slate-200 text-slate-500">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
                   )}
+
+                  <div className="mt-2 flex justify-center gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => document.getElementById('profile-upload')?.click()}
+                    >
+                      <Upload className="h-3.5 w-3.5 mr-1" />
+                      {employee.profileImage ? "Change" : "Upload"}
+                    </Button>
+                    {employee.profileImage && (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={removeImage}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </Button>
+                    )}
+                    <input
+                      id="profile-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </div>
                 </div>
                 <h2 className="text-xl font-bold">{employee.name}</h2>
                 <p className="text-sm text-muted-foreground mb-2">{employee.position}</p>
@@ -144,7 +245,10 @@ const EmployeeDetail = () => {
                 <Separator />
                 <div className="flex justify-between py-2">
                   <span className="text-sm text-muted-foreground">Salary:</span>
-                  <span className="text-sm font-medium">${employee.salary.toLocaleString()}</span>
+                  <span className="text-sm font-medium">
+                    {formatSalary()}
+                    {employee.taxPercentage ? ` (${employee.taxPercentage}% tax)` : ''}
+                  </span>
                 </div>
                 {employee.dateOfBirth && (
                   <>

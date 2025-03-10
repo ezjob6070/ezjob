@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Employee, EmployeeStatus } from "@/types/employee";
+import { Employee, EmployeeStatus, SalaryBasis } from "@/types/employee";
 import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,6 +62,8 @@ const EditEmployeeModal = ({
     dateHired: "",
     reportsTo: "",
     salary: 0,
+    salaryBasis: SalaryBasis.YEARLY,
+    taxPercentage: 0,
     address: "",
     skills: "",
     education: "",
@@ -86,6 +88,8 @@ const EditEmployeeModal = ({
         dateHired: new Date(employee.dateHired).toISOString().split("T")[0],
         reportsTo: employee.reportsTo || "",
         salary: employee.salary,
+        salaryBasis: employee.salaryBasis || SalaryBasis.YEARLY,
+        taxPercentage: employee.taxPercentage || 0,
         address: employee.address,
         skills: employee.skills?.join(", ") || "",
         education: employee.education?.join(", ") || "",
@@ -139,6 +143,8 @@ const EditEmployeeModal = ({
       dateHired: new Date(data.dateHired),
       reportsTo: data.reportsTo || undefined,
       salary: Number(data.salary),
+      salaryBasis: data.salaryBasis as SalaryBasis,
+      taxPercentage: data.taxPercentage ? Number(data.taxPercentage) : undefined,
       address: data.address,
       profileImage: profileImage || undefined,
       skills: skills,
@@ -381,25 +387,81 @@ const EditEmployeeModal = ({
                     </FormItem>
                   )}
                 />
+                
+                {/* Salary with basis selection */}
+                <div className="grid grid-cols-2 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="salary"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Salary Amount</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="number" 
+                            min="0" 
+                            step="100" 
+                            required 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="salaryBasis"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Salary Basis</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select basis" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value={SalaryBasis.YEARLY}>Yearly</SelectItem>
+                            <SelectItem value={SalaryBasis.MONTHLY}>Monthly</SelectItem>
+                            <SelectItem value={SalaryBasis.WEEKLY}>Weekly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Tax percentage field (optional) */}
                 <FormField
                   control={form.control}
-                  name="salary"
+                  name="taxPercentage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Salary ($)</FormLabel>
+                      <FormLabel>Tax Percentage (%)</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
                           type="number" 
                           min="0" 
-                          step="1000" 
-                          required 
+                          max="100" 
+                          step="0.1" 
+                          placeholder="Optional"
                         />
                       </FormControl>
+                      <FormDescription>
+                        Optional: Enter tax percentage to be deducted
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                
                 <FormField
                   control={form.control}
                   name="reportsTo"
