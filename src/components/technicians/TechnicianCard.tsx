@@ -4,21 +4,17 @@ import { Technician } from "@/types/technician";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, MapPin, Phone, Mail, User, Pencil } from "lucide-react";
+import { MapPin, Phone, Mail, User, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface TechnicianCardProps {
   technician: Technician;
   onEdit: () => void;
-  isMarked?: boolean;
-  onMark?: () => void;
 }
 
 const TechnicianCard: React.FC<TechnicianCardProps> = ({ 
   technician, 
-  onEdit,
-  isMarked = false,
-  onMark
+  onEdit
 }) => {
   return (
     <Card className="overflow-hidden">
@@ -34,23 +30,7 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">{technician.name}</h3>
-                  {onMark && (
-                    <Button 
-                      variant={isMarked ? "default" : "outline"} 
-                      size="sm" 
-                      className={`h-7 w-7 p-0 ${isMarked ? 'bg-green-600 hover:bg-green-700' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMark();
-                      }}
-                    >
-                      <Check className="h-4 w-4" />
-                      <span className="sr-only">{isMarked ? 'Unmark' : 'Mark'} technician</span>
-                    </Button>
-                  )}
-                </div>
+                <h3 className="font-semibold text-lg">{technician.name}</h3>
                 <div className="flex items-center mt-1">
                   <Badge variant={technician.status === "active" ? "success" : "destructive"} className="text-xs">
                     {technician.status}
