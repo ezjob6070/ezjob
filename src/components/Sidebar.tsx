@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { 
   HomeIcon, 
@@ -7,20 +8,18 @@ import {
   LogOutIcon,
   UserPlusIcon,
   FileTextIcon,
-  SendIcon,
   WalletIcon,
-  DollarSignIcon,
-  BarChartIcon,
-  WrenchIcon,
   BriefcaseIcon,
   MapIcon,
   CreditCardIcon,
-  ReceiptIcon,
+  WrenchIcon,
   UserRoundIcon,
   CalendarIcon,
-  ListChecksIcon
+  ChevronDownIcon,
+  ChevronUpIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -30,11 +29,22 @@ type SidebarProps = {
 type NavItem = {
   label: string;
   icon: JSX.Element;
-  href: string;
+  href?: string;
+  children?: NavItem[];
 };
 
 const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
   const location = useLocation();
+  const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
+    "leads-clients": true, // Start expanded
+  });
+
+  const toggleExpand = (key: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   const navItems: NavItem[] = [
     {
@@ -43,14 +53,20 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       href: "/",
     },
     {
-      label: "Leads",
-      icon: <UserPlusIcon size={20} />,
-      href: "/leads",
-    },
-    {
-      label: "Clients",
+      label: "Leads & Clients",
       icon: <UsersIcon size={20} />,
-      href: "/clients",
+      children: [
+        {
+          label: "Leads",
+          icon: <UserPlusIcon size={20} />,
+          href: "/leads",
+        },
+        {
+          label: "Clients",
+          icon: <UsersIcon size={20} />,
+          href: "/clients",
+        },
+      ],
     },
     {
       label: "Tasks",
@@ -126,19 +142,63 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       <nav className="flex-1 py-6 px-4">
         <ul className="space-y-2">
           {navItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                to={item.href}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200",
-                  location.pathname === item.href
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                )}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
+            <li key={item.href || item.label}>
+              {item.children ? (
+                <div>
+                  <button
+                    onClick={() => toggleExpand("leads-clients")}
+                    className={cn(
+                      "flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-colors duration-200",
+                      (location.pathname === "/leads" || location.pathname === "/clients")
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </div>
+                    {expandedItems["leads-clients"] ? (
+                      <ChevronUpIcon size={16} />
+                    ) : (
+                      <ChevronDownIcon size={16} />
+                    )}
+                  </button>
+                  {expandedItems["leads-clients"] && (
+                    <ul className="mt-2 ml-4 space-y-2">
+                      {item.children.map((child) => (
+                        <li key={child.href}>
+                          <Link
+                            to={child.href!}
+                            className={cn(
+                              "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors duration-200",
+                              location.pathname === child.href
+                                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                            )}
+                          >
+                            {child.icon}
+                            <span>{child.label}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to={item.href!}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200",
+                    location.pathname === item.href
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  )}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              )}
             </li>
           ))}
         </ul>
