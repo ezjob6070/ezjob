@@ -91,82 +91,87 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
         </div>
       </div>
       
-      {/* Filters section */}
-      <div className="flex flex-wrap gap-3 items-center">
-        {/* Technician selection dropdown */}
-        <DropdownMenu open={technicianDropdownOpen} onOpenChange={setTechnicianDropdownOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              <UserCheck className="h-4 w-4" />
-              {selectedTechnicians.length === 0 
-                ? "Select Technicians" 
-                : `${selectedTechnicians.length} Selected`}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 p-2" align="start">
-            <div className="mb-2">
-              <Input
-                placeholder="Find technician..."
-                className="w-full"
-                value={technicianFilterQuery}
-                onChange={(e) => setTechnicianFilterQuery(e.target.value)}
-              />
-            </div>
-            <div className="max-h-60 overflow-y-auto">
-              {filteredTechniciansForDropdown.map((tech) => (
-                <DropdownMenuCheckboxItem
-                  key={tech.id}
-                  checked={selectedTechnicians.includes(tech.id)}
-                  onCheckedChange={() => handleTechnicianToggle(tech.id)}
-                >
-                  {tech.name}
-                </DropdownMenuCheckboxItem>
-              ))}
-              {filteredTechniciansForDropdown.length === 0 && (
-                <div className="py-2 px-2 text-sm text-gray-500">No technicians found</div>
-              )}
-            </div>
-            {selectedTechnicians.length > 0 && (
-              <div className="pt-2 mt-2 border-t border-gray-200">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-center text-xs"
-                  onClick={clearSelectedTechnicians}
-                >
-                  Clear selection
-                </Button>
+      {/* Filters section - updated layout */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
+        {/* Filters on the left */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Technician selection dropdown */}
+          <DropdownMenu open={technicianDropdownOpen} onOpenChange={setTechnicianDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2 h-10">
+                <UserCheck className="h-4 w-4" />
+                {selectedTechnicians.length === 0 
+                  ? "Select Technicians" 
+                  : `${selectedTechnicians.length} Selected`}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 p-2" align="start">
+              <div className="mb-2">
+                <Input
+                  placeholder="Find technician..."
+                  className="w-full"
+                  value={technicianFilterQuery}
+                  onChange={(e) => setTechnicianFilterQuery(e.target.value)}
+                />
               </div>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        
-        {/* Selected technicians display */}
-        {selectedTechnicians.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {selectedTechnicians.map(techId => {
-              const tech = technicians.find(t => t.id === techId);
-              return tech ? (
-                <Badge 
-                  key={tech.id} 
-                  variant="secondary" 
-                  className="flex items-center gap-1 px-2 py-1"
-                >
-                  {tech.name}
+              <div className="max-h-60 overflow-y-auto">
+                {filteredTechniciansForDropdown.map((tech) => (
+                  <DropdownMenuCheckboxItem
+                    key={tech.id}
+                    checked={selectedTechnicians.includes(tech.id)}
+                    onCheckedChange={() => handleTechnicianToggle(tech.id)}
+                  >
+                    {tech.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+                {filteredTechniciansForDropdown.length === 0 && (
+                  <div className="py-2 px-2 text-sm text-gray-500">No technicians found</div>
+                )}
+              </div>
+              {selectedTechnicians.length > 0 && (
+                <div className="pt-2 mt-2 border-t border-gray-200">
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-4 w-4 p-0 ml-1" 
-                    onClick={() => handleTechnicianToggle(tech.id)}
+                    className="w-full justify-center text-xs"
+                    onClick={clearSelectedTechnicians}
                   >
-                    <span className="sr-only">Remove</span>
-                    ×
+                    Clear selection
                   </Button>
-                </Badge>
-              ) : null;
-            })}
-          </div>
-        )}
+                </div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        {/* Selected technicians display */}
+        <div className="flex flex-wrap gap-1">
+          {selectedTechnicians.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {selectedTechnicians.map(techId => {
+                const tech = technicians.find(t => t.id === techId);
+                return tech ? (
+                  <Badge 
+                    key={tech.id} 
+                    variant="secondary" 
+                    className="flex items-center gap-1 px-2 py-1"
+                  >
+                    {tech.name}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-4 w-4 p-0 ml-1" 
+                      onClick={() => handleTechnicianToggle(tech.id)}
+                    >
+                      <span className="sr-only">Remove</span>
+                      ×
+                    </Button>
+                  </Badge>
+                ) : null;
+              })}
+            </div>
+          )}
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

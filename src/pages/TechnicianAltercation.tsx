@@ -105,17 +105,19 @@ const TechnicianAltercation = () => {
       {/* Technician Stats Section */}
       <TechnicianStats technicians={technicians} />
 
-      {/* Technician Filters */}
-      <TechnicianFilters 
-        categories={categories}
-        selectedCategories={selectedCategories}
-        toggleCategory={toggleCategory}
-        addCategory={addCategory}
-        status={statusFilter}
-        onStatusChange={setStatusFilter}
-      />
+      {/* Integrated Filters Section */}
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6">
+        <TechnicianFilters 
+          categories={categories}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          addCategory={addCategory}
+          status={statusFilter}
+          onStatusChange={setStatusFilter}
+        />
+      </div>
 
-      {/* Technicians List */}
+      {/* Technicians List with Integrated Search */}
       <TechniciansList 
         technicians={filteredTechnicians} 
         onEditTechnician={handleEditTechnician}
