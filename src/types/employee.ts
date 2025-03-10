@@ -71,6 +71,13 @@ export interface Employee {
   performanceRating?: number;
   notes?: EmployeeNote[];
   documents?: EmployeeDocument[];
+  // Added fields to match technician features
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  rating?: number;
+  initials?: string;
+  specialty?: string; // For employees, this could represent their main skill
 }
 
 export interface Report {

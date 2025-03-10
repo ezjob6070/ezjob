@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,12 +8,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { Employee, EmployeeStatus } from "@/types/employee";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload } from "lucide-react";
-import { v4 as uuidv4 } from 'uuid';
 
-type AddEmployeeModalProps = {
+type EditEmployeeModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddEmployee: (employee: Employee) => void;
+  onUpdateEmployee: (updatedEmployee: Employee) => void;
+  employee: Employee | null;
 };
 
 const DEPARTMENTS = [
@@ -44,18 +44,21 @@ const POSITIONS = [
   "Operations Coordinator",
 ];
 
-const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModalProps) => {
+const EditEmployeeModal = ({ open, onOpenChange, onUpdateEmployee, employee }: EditEmployeeModalProps) => {
   const { toast } = useToast();
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<Employee>>({
     name: "",
     email: "",
     phone: "",
     position: "",
     department: "",
     address: "",
-    salary: "",
-    skills: [] as string[],
+    status: EmployeeStatus.ACTIVE,
+    salary: 0,
+    skills: [],
+    performanceRating: 3,
+    background: "",
     profileImage: "",
   });
   
@@ -64,9 +67,41 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [skillInput, setSkillInput] = useState("");
 
+  // Update form data when employee changes
+  useEffect(() => {
+    if (employee) {
+      setFormData({
+        name: employee.name,
+        email: employee.email,
+        phone: employee.phone || "",
+        position: employee.position,
+        department: employee.department || "",
+        address: employee.address || "",
+        status: employee.status,
+        salary: employee.salary,
+        skills: [...(employee.skills || [])],
+        performanceRating: employee.performanceRating || 3,
+        background: employee.background || "",
+        profileImage: employee.profileImage || "",
+      });
+      
+      // Set preview if image exists
+      if (employee.profileImage) {
+        setPreviewUrl(employee.profileImage);
+      } else {
+        setPreviewUrl("");
+      }
+    }
+  }, [employee]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,10 +120,10 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
   };
 
   const addSkill = () => {
-    if (skillInput.trim() && !formData.skills.includes(skillInput.trim())) {
+    if (skillInput.trim() && !formData.skills?.includes(skillInput.trim())) {
       setFormData(prev => ({
         ...prev,
-        skills: [...prev.skills, skillInput.trim()]
+        skills: [...(prev.skills || []), skillInput.trim()]
       }));
       setSkillInput("");
     }
@@ -97,7 +132,7 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
   const removeSkill = (skillToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      skills: prev.skills.filter(skill => skill !== skillToRemove)
+      skills: prev.skills?.filter(skill => skill !== skillToRemove) || []
     }));
   };
 
@@ -105,7 +140,7 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
     e.preventDefault();
     
     // Validate form
-    if (!formData.name || !formData.email || !formData.position || !formData.department) {
+    if (!formData.name || !formData.email || !formData.position) {
       toast({
         title: "Error",
         description: "Please fill all required fields",
@@ -114,53 +149,27 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
       return;
     }
 
-    // Generate initials
+    if (!employee) return;
+
+    // Generate initials if they don't exist
     const initials = formData.name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase();
 
-    // Create new employee object
-    const newEmployee: Employee = {
-      id: `emp-${uuidv4().slice(0, 8)}`,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      position: formData.position,
-      department: formData.department,
-      status: EmployeeStatus.ACTIVE,
-      dateHired: new Date(),
-      salary: parseFloat(formData.salary) || 50000,
-      address: formData.address,
-      skills: formData.skills,
-      performanceRating: 3,
+    // Create updated employee object
+    const updatedEmployee: Employee = {
+      ...employee,
+      ...formData,
+      salary: typeof formData.salary === 'string' 
+        ? parseFloat(formData.salary) 
+        : formData.salary || 0,
       profileImage: formData.profileImage || undefined,
-      initials,
-      completedJobs: 0,
-      cancelledJobs: 0,
-      totalRevenue: 0,
-      rating: 4.5,
+      initials: initials,
     };
 
-    onAddEmployee(newEmployee);
-    
-    // Reset form and close modal
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      position: "",
-      department: "",
-      address: "",
-      salary: "",
-      skills: [],
-      profileImage: "",
-    });
-    setPreviewUrl("");
-    setSelectedImage(null);
-    setSkillInput("");
-    
+    onUpdateEmployee(updatedEmployee);
     onOpenChange(false);
   };
 
@@ -168,7 +177,7 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Employee</DialogTitle>
+          <DialogTitle>Edit Employee</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           {/* Image upload section */}
@@ -180,13 +189,13 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
                   <Avatar className="h-24 w-24 border-2 border-primary/20">
                     <AvatarImage src={previewUrl} alt={formData.name || "Profile"} />
                     <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
-                      {formData.name ? formData.name.split(" ").map(n => n[0]).join("") : "+"}
+                      {employee?.name?.split(" ").map(n => n[0]).join("") || ""}
                     </AvatarFallback>
                   </Avatar>
                 ) : (
                   <Avatar className="h-24 w-24 border-2 border-primary/20">
                     <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
-                      +
+                      {employee?.name?.split(" ").map(n => n[0]).join("") || ""}
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -267,7 +276,7 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
               <Input
                 id="address"
                 name="address"
-                value={formData.address}
+                value={formData.address || ""}
                 onChange={handleChange}
                 placeholder="123 Main St, City, State, ZIP"
               />
@@ -312,17 +321,47 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
             </div>
             
             <div className="grid gap-2">
+              <Label htmlFor="status">Status</Label>
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value={EmployeeStatus.ACTIVE}>Active</option>
+                <option value={EmployeeStatus.PENDING}>Pending</option>
+                <option value={EmployeeStatus.INACTIVE}>Inactive</option>
+              </select>
+            </div>
+            
+            <div className="grid gap-2">
               <Label htmlFor="salary">Salary ($) *</Label>
               <Input
                 id="salary"
                 name="salary"
                 type="number"
                 value={formData.salary}
-                onChange={handleChange}
+                onChange={handleNumberChange}
                 placeholder="50000"
                 min="0"
                 step="1000"
                 required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="performanceRating">Performance Rating (1-5)</Label>
+              <Input
+                id="performanceRating"
+                name="performanceRating"
+                type="number"
+                value={formData.performanceRating}
+                onChange={handleNumberChange}
+                placeholder="3"
+                min="1"
+                max="5"
+                step="0.1"
               />
             </div>
           </div>
@@ -344,32 +383,47 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
               <Button type="button" variant="outline" onClick={addSkill}>Add</Button>
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              {formData.skills.map((skill, index) => (
-                <div key={index} className="flex items-center rounded-full bg-blue-100 text-blue-700 px-3 py-1 text-sm">
+              {formData.skills?.map((skill, index) => (
+                <Badge key={index} className="px-3 py-1">
                   {skill}
-                  <button
+                  <Button
                     type="button"
-                    className="ml-2 text-blue-500 hover:text-blue-700"
+                    variant="ghost"
+                    size="sm"
+                    className="h-4 w-4 p-0 ml-2"
                     onClick={() => removeSkill(skill)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
                       <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
-                  </button>
-                </div>
+                    <span className="sr-only">Remove {skill}</span>
+                  </Button>
+                </Badge>
               ))}
-              {!formData.skills.length && (
+              {!formData.skills?.length && (
                 <span className="text-sm text-muted-foreground">No skills added yet</span>
               )}
             </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="background">Background & Experience</Label>
+            <textarea
+              id="background"
+              name="background"
+              value={formData.background || ""}
+              onChange={handleChange}
+              placeholder="Professional background and experience..."
+              className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
           </div>
           
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Add Employee</Button>
+            <Button type="submit">Update Employee</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -377,4 +431,4 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
   );
 };
 
-export default AddEmployeeModal;
+export default EditEmployeeModal;
