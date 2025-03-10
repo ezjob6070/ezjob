@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Technician } from "@/types/technician";
 
 interface TechnicianSelectDropdownProps {
@@ -94,15 +94,15 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
           {filteredTechniciansForDropdown.map((tech) => (
             <div key={tech.id} className="flex items-center space-x-2 px-2 py-1.5 hover:bg-muted rounded-sm cursor-pointer" onClick={() => onTechnicianToggle(tech.id)}>
               <div className="flex items-center justify-center">
-                <RadioGroupItem 
-                  value={tech.id} 
-                  id={`tech-radio-${tech.id}`}
+                <Checkbox 
+                  id={`tech-checkbox-${tech.id}`}
                   checked={selectedTechnicians.includes(tech.id)}
+                  onCheckedChange={() => onTechnicianToggle(tech.id)}
                   className="data-[state=checked]:border-primary data-[state=checked]:bg-primary"
                 />
               </div>
               <label 
-                htmlFor={`tech-radio-${tech.id}`}
+                htmlFor={`tech-checkbox-${tech.id}`}
                 className="text-sm font-medium leading-none cursor-pointer flex-1"
               >
                 {tech.name}
