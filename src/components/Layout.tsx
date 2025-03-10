@@ -11,6 +11,7 @@ const Layout = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -25,22 +26,33 @@ const Layout = () => {
       }
     };
 
+    // Check for scrolling to add shadow to header
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
     // Initial check
     checkScreenSize();
+    handleScroll();
 
-    // Add event listener
+    // Add event listeners
     window.addEventListener("resize", checkScreenSize);
+    window.addEventListener("scroll", handleScroll);
 
     // Cleanup
-    return () => window.removeEventListener("resize", checkScreenSize);
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-blue-700">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-indigo-700">
       <Header
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         isMobile={isMobile}
+        isScrolled={isScrolled}
       />
       <div className="flex-1 flex overflow-hidden pt-16"> {/* Added pt-16 to account for the fixed header */}
         <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
@@ -51,7 +63,7 @@ const Layout = () => {
             ${isLeftSidebarOpen && !isMobile ? 'ml-80' : ''}
             ${isCalendarOpen && !isMobile ? 'mr-80' : 'mr-0'}`}
         >
-          <div className="max-w-6xl mx-auto animate-fade-in rounded-xl bg-white/80 backdrop-blur-sm p-6 shadow-lg">
+          <div className="max-w-6xl mx-auto animate-fade-in rounded-xl bg-white/90 backdrop-blur-sm p-6 shadow-lg">
             <Outlet />
           </div>
         </main>

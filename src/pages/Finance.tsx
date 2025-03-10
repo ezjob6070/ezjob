@@ -12,6 +12,8 @@ import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
 import OfficeDashboard from "@/components/finance/OfficeDashboard";
 import SalariesDashboard from "@/components/finance/SalariesDashboard";
 import { useFinanceData } from "@/hooks/useFinanceData";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Finance = () => {
   const [activeTab, setActiveTab] = useState<FinanceTabId>("overview");
@@ -43,87 +45,119 @@ const Finance = () => {
     activeTechnicians
   } = useFinanceData();
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as FinanceTabId);
+  };
+
   return (
     <div className="container py-8">
       <FinancePageHeader />
 
-      {/* Top Navigation */}
-      <FinanceHeader 
-        tabOptions={financeTabOptions}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab as (tab: string) => void}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
-        date={date}
-        setDate={setDate}
-      />
-      
-      {/* Filters Panel */}
-      <FinanceFiltersPanel 
-        showFilters={showFilters}
-        technicianNames={technicianNames}
-        jobSourceNames={jobSourceNames}
-        selectedTechnicians={selectedTechnicians}
-        selectedJobSources={selectedJobSources}
-        toggleTechnician={toggleTechnician}
-        toggleJobSource={toggleJobSource}
-        clearFilters={clearFilters}
-        setShowFilters={setShowFilters}
-        applyFilters={applyFilters}
-      />
+      <Card className="mb-8 border-none shadow-md bg-gradient-to-br from-blue-50 to-indigo-50">
+        <CardContent className="p-0">
+          <Tabs 
+            defaultValue="overview" 
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="w-full"
+          >
+            <div className="flex items-center justify-between p-4 border-b">
+              <TabsList className="bg-white/50 backdrop-blur-sm">
+                {financeTabOptions.map(tab => (
+                  <TabsTrigger 
+                    key={tab.id} 
+                    value={tab.id}
+                    className="flex items-center gap-2 px-4 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                  >
+                    {tab.icon}
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              
+              <div className="flex items-center gap-3">
+                <FinanceHeader 
+                  tabOptions={financeTabOptions}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab as (tab: string) => void}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  showFilters={showFilters}
+                  setShowFilters={setShowFilters}
+                  date={date}
+                  setDate={setDate}
+                />
+              </div>
+            </div>
+            
+            {/* Filters Panel */}
+            <FinanceFiltersPanel 
+              showFilters={showFilters}
+              technicianNames={technicianNames}
+              jobSourceNames={jobSourceNames}
+              selectedTechnicians={selectedTechnicians}
+              selectedJobSources={selectedJobSources}
+              toggleTechnician={toggleTechnician}
+              toggleJobSource={toggleJobSource}
+              clearFilters={clearFilters}
+              setShowFilters={setShowFilters}
+              applyFilters={applyFilters}
+            />
 
-      {/* Active Tab Content */}
-      {activeTab === "overview" && (
-        <OverviewDashboard 
-          totalRevenue={totalRevenue}
-          totalExpenses={totalExpenses}
-          totalProfit={totalProfit}
-          jobSources={jobSources}
-          filteredTransactions={filteredTransactions}
-          expenseCategories={expenseCategories}
-          date={date}
-          setDate={setDate}
-        />
-      )}
+            <div className="p-6">
+              <TabsContent value="overview" className="mt-0">
+                <OverviewDashboard 
+                  totalRevenue={totalRevenue}
+                  totalExpenses={totalExpenses}
+                  totalProfit={totalProfit}
+                  jobSources={jobSources}
+                  filteredTransactions={filteredTransactions}
+                  expenseCategories={expenseCategories}
+                  date={date}
+                  setDate={setDate}
+                />
+              </TabsContent>
 
-      {activeTab === "jobSources" && (
-        <JobSourcesDashboard 
-          filteredJobSources={filteredJobSources}
-          filteredTransactions={filteredTransactions}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
-      )}
+              <TabsContent value="jobSources" className="mt-0">
+                <JobSourcesDashboard 
+                  filteredJobSources={filteredJobSources}
+                  filteredTransactions={filteredTransactions}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                />
+              </TabsContent>
 
-      {activeTab === "technicians" && (
-        <TechniciansDashboard 
-          activeTechnicians={activeTechnicians}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
-      )}
+              <TabsContent value="technicians" className="mt-0">
+                <TechniciansDashboard 
+                  activeTechnicians={activeTechnicians}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                />
+              </TabsContent>
 
-      {activeTab === "transactions" && (
-        <TransactionsDashboard 
-          filteredTransactions={filteredTransactions}
-        />
-      )}
+              <TabsContent value="transactions" className="mt-0">
+                <TransactionsDashboard 
+                  filteredTransactions={filteredTransactions}
+                />
+              </TabsContent>
 
-      {activeTab === "salaries" && (
-        <SalariesDashboard
-          dateRange={date}
-          setDateRange={setDate}
-        />
-      )}
+              <TabsContent value="salaries" className="mt-0">
+                <SalariesDashboard
+                  dateRange={date}
+                  setDateRange={setDate}
+                />
+              </TabsContent>
 
-      {activeTab === "office" && (
-        <OfficeDashboard
-          date={date}
-          setDate={setDate}
-        />
-      )}
+              <TabsContent value="office" className="mt-0">
+                <OfficeDashboard
+                  date={date}
+                  setDate={setDate}
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
