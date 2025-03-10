@@ -85,14 +85,14 @@ export const initialJobs: Job[] = [
     id: uuidv4(),
     clientName: "Thomas Anderson",
     title: "Garbage Disposal Installation",
-    status: "canceled",
+    status: "cancelled",
     date: new Date("2023-07-08"),
     technicianName: "Michael Brown",
     address: "432 Birch St, San Bernardino, CA 92410",
     amount: 325,
     paymentMethod: "credit_card",
     description: "Install new garbage disposal unit in kitchen sink",
-    notes: "Customer canceled due to emergency"
+    notes: "Customer cancelled due to emergency"
   },
   {
     id: uuidv4(),
@@ -111,14 +111,14 @@ export const initialJobs: Job[] = [
     id: uuidv4(),
     clientName: "Emily Wilson",
     title: "Electrical Troubleshooting",
-    status: "canceled",
+    status: "cancelled",
     date: new Date("2023-07-20"),
     technicianName: "Jennifer Taylor",
     address: "345 Redwood Dr, Moreno Valley, CA 92553",
     amount: 150,
     paymentMethod: "cash",
     description: "Diagnose and fix flickering lights in living room",
-    notes: "Canceled - customer found another service"
+    notes: "Cancelled - customer found another service"
   },
   {
     id: uuidv4(),

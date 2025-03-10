@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Technician } from "@/types/technician";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Image, FileImage, Upload } from "lucide-react";
 
 type EditTechnicianModalProps = {
   open: boolean;
@@ -40,7 +42,12 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
     paymentType: "percentage",
     paymentRate: 0,
     notes: "",
+    imageUrl: "",
   });
+  
+  // For image handling
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   // Update form data when technician changes
   useEffect(() => {
@@ -55,13 +62,36 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
         paymentType: technician.paymentType,
         paymentRate: technician.paymentRate,
         notes: technician.notes || "",
+        imageUrl: technician.imageUrl || "",
       });
+      
+      // Set preview if image exists
+      if (technician.imageUrl) {
+        setPreviewUrl(technician.imageUrl);
+      } else {
+        setPreviewUrl("");
+      }
     }
   }, [technician]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      
+      // Create object URL for preview
+      const fileUrl = URL.createObjectURL(file);
+      setSelectedImage(file);
+      setPreviewUrl(fileUrl);
+      
+      // In a real app, you would upload to server here
+      // For this demo, we'll just use the URL directly
+      setFormData(prev => ({ ...prev, imageUrl: fileUrl }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -88,6 +118,7 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
         : formData.paymentRate || 0,
       paymentType: formData.paymentType as "percentage" | "flat",
       status: formData.status as "active" | "inactive",
+      imageUrl: formData.imageUrl || undefined,
     };
 
     onUpdateTechnician(updatedTechnician);
@@ -101,6 +132,60 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
           <DialogTitle>Edit Technician</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          {/* Image upload section */}
+          <div className="grid gap-2">
+            <Label>Profile Picture</Label>
+            <div className="flex flex-col items-center">
+              <div className="mb-3">
+                {previewUrl ? (
+                  <Avatar className="h-24 w-24 border-2 border-primary/20">
+                    <AvatarImage src={previewUrl} alt={formData.name || "Profile"} />
+                    <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
+                      {technician?.initials || ""}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Avatar className="h-24 w-24 border-2 border-primary/20">
+                    <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
+                      {technician?.initials || ""}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+              
+              <div className="flex gap-2">
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <div className="flex items-center gap-1 px-3 py-1.5 text-sm border rounded-md hover:bg-accent">
+                    <Upload className="h-4 w-4" />
+                    <span>Upload</span>
+                  </div>
+                  <input 
+                    id="image-upload" 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*" 
+                    onChange={handleImageChange}
+                  />
+                </label>
+                
+                {previewUrl && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setPreviewUrl("");
+                      setSelectedImage(null);
+                      setFormData(prev => ({ ...prev, imageUrl: "" }));
+                    }}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Name *</Label>
