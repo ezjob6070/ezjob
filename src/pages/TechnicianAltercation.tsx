@@ -7,6 +7,7 @@ import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import { useToast } from "@/components/ui/use-toast";
+import TechnicianStats from "@/components/technicians/TechnicianStats";
 
 const TechnicianAltercation = () => {
   const { toast } = useToast();
@@ -16,6 +17,7 @@ const TechnicianAltercation = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Extract unique categories from technicians
   const categories = useMemo(() => {
@@ -60,6 +62,11 @@ const TechnicianAltercation = () => {
     });
   };
 
+  const handleAddTechnician = () => {
+    setSelectedTechnician(null);
+    setShowEditModal(true);
+  };
+
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
   };
@@ -96,6 +103,9 @@ const TechnicianAltercation = () => {
         </div>
       </div>
 
+      {/* Technician Stats Section */}
+      <TechnicianStats technicians={technicians} />
+
       {/* Technician Filters */}
       <TechnicianFilters 
         categories={categories}
@@ -110,6 +120,7 @@ const TechnicianAltercation = () => {
       <TechniciansList 
         technicians={filteredTechnicians} 
         onEditTechnician={handleEditTechnician}
+        onAddTechnician={handleAddTechnician}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
         selectedCategories={selectedCategories}
