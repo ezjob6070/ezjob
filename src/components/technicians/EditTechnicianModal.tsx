@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -205,7 +204,7 @@ const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technicia
               </div>
             </div>
           </div>
-
+          
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Name *</Label>

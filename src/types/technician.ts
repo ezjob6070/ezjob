@@ -23,7 +23,7 @@ export interface Technician {
   paymentType: "percentage" | "flat";
   paymentRate: number;
   
-  // New salary-related fields
+  // Salary-related fields
   salaryBasis?: SalaryBasis;
   hourlyRate?: number;
   incentiveType?: IncentiveType;

@@ -1,4 +1,3 @@
-
 export enum EmployeeStatus {
   ACTIVE = "active",
   PENDING = "pending",
