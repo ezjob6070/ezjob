@@ -4,20 +4,24 @@ import { Technician } from "@/types/technician";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, User, Pencil } from "lucide-react";
+import { MapPin, Phone, Mail, User, Pencil, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface TechnicianCardProps {
   technician: Technician;
   onEdit: () => void;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }
 
 const TechnicianCard: React.FC<TechnicianCardProps> = ({ 
   technician, 
-  onEdit
+  onEdit,
+  isSelected = false,
+  onToggleSelect
 }) => {
   return (
-    <Card className="overflow-hidden">
+    <Card className={`overflow-hidden ${isSelected ? 'ring-2 ring-indigo-500' : ''}`}>
       <CardContent className="p-0">
         <div className="p-5 flex items-start">
           {/* Avatar and Name Section */}
@@ -68,10 +72,24 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <Button variant="ghost" size="sm" onClick={onEdit} className="ml-2">
-            <Pencil className="h-4 w-4" />
-            <span className="sr-only">Edit</span>
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button variant="ghost" size="sm" onClick={onEdit} className="ml-2">
+              <Pencil className="h-4 w-4" />
+              <span className="sr-only">Edit</span>
+            </Button>
+            
+            {onToggleSelect && (
+              <Button 
+                variant={isSelected ? "default" : "outline"} 
+                size="sm" 
+                onClick={onToggleSelect}
+                className={`ml-2 ${isSelected ? 'bg-indigo-600' : ''}`}
+              >
+                <Check className="h-4 w-4" />
+                <span className="sr-only">{isSelected ? 'Deselect' : 'Select'}</span>
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Performance Stats */}
