@@ -20,4 +20,5 @@ export type Technician = {
   imageUrl?: string;
   initials: string;
   notes?: string;
+  canceledJobs?: number;
 };

@@ -5,7 +5,7 @@ import { Technician } from "@/types/technician";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, User, Pencil, Circle, Calendar } from "lucide-react";
+import { MapPin, Phone, Mail, User, Pencil, Circle, Calendar, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
@@ -130,10 +130,20 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
         </div>
 
         {/* Performance Stats */}
-        <div className="bg-muted px-5 py-3 grid grid-cols-3 gap-2 text-center border-t">
-          <div>
-            <p className="text-sm font-medium">{technician.completedJobs}</p>
-            <p className="text-xs text-muted-foreground">Jobs</p>
+        <div className="bg-muted px-5 py-3 grid grid-cols-4 gap-2 text-center border-t">
+          <div className="flex flex-col items-center">
+            <div className="flex items-center">
+              <CheckCircle className="h-3 w-3 text-green-600 mr-1" />
+              <p className="text-sm font-medium">{technician.completedJobs}</p>
+            </div>
+            <p className="text-xs text-muted-foreground">Completed</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="flex items-center">
+              <XCircle className="h-3 w-3 text-red-600 mr-1" />
+              <p className="text-sm font-medium">{technician.canceledJobs || 0}</p>
+            </div>
+            <p className="text-xs text-muted-foreground">Canceled</p>
           </div>
           <div>
             <p className="text-sm font-medium">${technician.totalRevenue.toLocaleString()}</p>

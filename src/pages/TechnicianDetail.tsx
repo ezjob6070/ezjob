@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { User, Phone, Mail, MapPin, FileText, Upload, Building, Calendar, Star, Briefcase, DollarSign, Clock, ChevronLeft } from "lucide-react";
+import { User, Phone, Mail, MapPin, FileText, Building, Calendar, Star, Briefcase, DollarSign, Clock, ChevronLeft } from "lucide-react";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianDocumentUpload from "@/components/technicians/TechnicianDocumentUpload";
+import TechnicianJobHistory from "@/components/technicians/TechnicianJobHistory";
 
 const TechnicianDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -161,13 +162,24 @@ const TechnicianDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Tabbed section for documents and additional information */}
-        <Tabs defaultValue="documents" className="w-full">
+        {/* Tabbed section for job history, documents and notes */}
+        <Tabs defaultValue="job-history" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="job-history">Job History</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="notes">Notes</TabsTrigger>
-            <TabsTrigger value="history">Work History</TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="job-history" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Job History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TechnicianJobHistory technician={technician} />
+              </CardContent>
+            </Card>
+          </TabsContent>
           
           <TabsContent value="documents" className="mt-4">
             <Card>
@@ -197,23 +209,6 @@ const TechnicianDetail = () => {
                   <FileText className="h-4 w-4 mr-2" />
                   Edit Notes
                 </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="history" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl">Work History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
-                  <h3 className="mt-4 text-lg font-medium">No work history available</h3>
-                  <p className="text-muted-foreground mt-2">
-                    Detailed work history will appear here once jobs are completed.
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
