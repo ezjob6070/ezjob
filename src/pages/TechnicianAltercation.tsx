@@ -8,6 +8,8 @@ import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import { useToast } from "@/components/ui/use-toast";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
+import { Button } from "@/components/ui/button";
+import { UserPlus } from "lucide-react";
 
 const TechnicianAltercation = () => {
   const { toast } = useToast();
@@ -17,6 +19,7 @@ const TechnicianAltercation = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
+  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
 
   // Extract unique categories from technicians
   const categories = useMemo(() => {
@@ -80,6 +83,16 @@ const TechnicianAltercation = () => {
     });
   };
 
+  const toggleTechnician = (technicianId: string) => {
+    setSelectedTechnicians(prev => {
+      if (prev.includes(technicianId)) {
+        return prev.filter(id => id !== technicianId);
+      } else {
+        return [...prev, technicianId];
+      }
+    });
+  };
+
   const addCategory = (category: string) => {
     toast({
       title: "Category Added",
@@ -100,13 +113,18 @@ const TechnicianAltercation = () => {
             View and manage all technicians and their performance records
           </p>
         </div>
+        
+        <Button onClick={handleAddTechnician} size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900">
+          <UserPlus className="h-4 w-4 mr-2" />
+          Add Technician
+        </Button>
       </div>
 
       {/* Technician Stats Section */}
       <TechnicianStats technicians={technicians} />
 
       {/* Integrated Filters Section */}
-      <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6">
+      <div className="mb-6">
         <TechnicianFilters 
           categories={categories}
           selectedCategories={selectedCategories}
@@ -114,18 +132,20 @@ const TechnicianAltercation = () => {
           addCategory={addCategory}
           status={statusFilter}
           onStatusChange={setStatusFilter}
+          technicians={technicians}
+          selectedTechnicians={selectedTechnicians}
+          onTechnicianToggle={toggleTechnician}
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
         />
       </div>
 
-      {/* Technicians List with Integrated Search */}
+      {/* Technicians List without Integrated Search (moved to filters) */}
       <TechniciansList 
         technicians={filteredTechnicians} 
         onEditTechnician={handleEditTechnician}
-        onAddTechnician={handleAddTechnician}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        selectedCategories={selectedCategories}
-        selectedStatus={statusFilter}
+        selectedTechnicians={selectedTechnicians}
+        onToggleSelect={toggleTechnician}
       />
 
       {/* Edit Technician Modal */}
