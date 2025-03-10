@@ -26,6 +26,7 @@ import EmployeeDetail from "./pages/EmployeeDetail";
 import Schedule from "./pages/Schedule";
 import TechnicianAltercation from "./pages/TechnicianAltercation";
 import TechnicianAnalytics from "./pages/TechnicianAnalytics";
+import TechnicianDetail from "./pages/TechnicianDetail";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="schedule" element={<Schedule />} />
             <Route path="payments" element={<Payments />} />
             <Route path="technicians" element={<TechnicianAltercation />} />
+            <Route path="technicians/:id" element={<TechnicianDetail />} />
             <Route path="technicians/analytics" element={<TechnicianAnalytics />} />
             <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
             <Route path="estimates" element={<Estimates />} />

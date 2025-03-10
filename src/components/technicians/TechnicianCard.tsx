@@ -1,10 +1,11 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Technician } from "@/types/technician";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, User, Pencil, Check, Circle } from "lucide-react";
+import { MapPin, Phone, Mail, User, Pencil, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface TechnicianCardProps {
@@ -20,8 +21,18 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
   isSelected = false,
   onToggleSelect
 }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on buttons or selection
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    navigate(`/technicians/${technician.id}`);
+  };
+
   return (
-    <Card className={`overflow-hidden ${isSelected ? 'ring-2 ring-indigo-500' : ''}`}>
+    <Card className={`overflow-hidden ${isSelected ? 'ring-2 ring-indigo-500' : ''} cursor-pointer transition-shadow hover:shadow-md`} onClick={handleCardClick}>
       <CardContent className="p-0">
         <div className="p-5 flex items-start">
           {/* Avatar and Name Section */}
@@ -73,7 +84,15 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-2">
-            <Button variant="ghost" size="sm" onClick={onEdit} className="ml-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }} 
+              className="ml-2"
+            >
               <Pencil className="h-4 w-4" />
               <span className="sr-only">Edit</span>
             </Button>
@@ -82,7 +101,10 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
               <Button 
                 variant="outline" 
                 size="icon" 
-                onClick={onToggleSelect}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleSelect();
+                }}
                 className="ml-2 rounded-full w-8 h-8 p-0 flex items-center justify-center border-2"
               >
                 {isSelected ? (
