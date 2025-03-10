@@ -83,11 +83,6 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
       href: "/technicians",
     },
     {
-      label: "Technician Dashboard",
-      icon: <ListChecksIcon size={20} />,
-      href: "/technicians/dashboard",
-    },
-    {
       label: "Employed",
       icon: <UserRoundIcon size={20} />,
       href: "/employed",
