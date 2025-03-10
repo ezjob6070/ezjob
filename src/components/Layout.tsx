@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import CalendarSidebar from "./calendar/CalendarSidebar";
 import LeftSidebar from "./calendar/LeftSidebar";
+import GlobalDateRangeFilter from "./GlobalDateRangeFilter";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -52,7 +53,6 @@ const Layout = () => {
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         isMobile={isMobile}
-        isScrolled={isScrolled}
       />
       <div className="flex-1 flex overflow-hidden pt-16"> {/* Added pt-16 to account for the fixed header */}
         <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
@@ -63,6 +63,9 @@ const Layout = () => {
             ${isLeftSidebarOpen && !isMobile ? 'ml-80' : ''}
             ${isCalendarOpen && !isMobile ? 'mr-80' : 'mr-0'}`}
         >
+          <div className="mb-4">
+            <GlobalDateRangeFilter />
+          </div>
           <div className="max-w-6xl mx-auto animate-fade-in rounded-xl bg-white/90 backdrop-blur-sm p-6 shadow-lg">
             <Outlet />
           </div>

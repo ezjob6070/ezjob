@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,44 +26,49 @@ import Schedule from "./pages/Schedule";
 import TechnicianAltercation from "./pages/TechnicianAltercation";
 import TechnicianAnalytics from "./pages/TechnicianAnalytics";
 import TechnicianDetail from "./pages/TechnicianDetail";
+import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="clients" element={<Clients />} />
-            <Route path="clients/:id" element={<ClientDetail />} />
-            <Route path="leads" element={<Leads />} />
-            <Route path="tasks" element={<Tasks />} />
-            <Route path="tasks/:id" element={<TaskDetail />} />
-            <Route path="jobs" element={<Jobs />} />
-            <Route path="schedule" element={<Schedule />} />
-            <Route path="payments" element={<Payments />} />
-            <Route path="technicians" element={<TechnicianAltercation />} />
-            <Route path="technicians/:id" element={<TechnicianDetail />} />
-            <Route path="technicians/analytics" element={<TechnicianAnalytics />} />
-            <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
-            <Route path="estimates" element={<Estimates />} />
-            <Route path="finance" element={<Finance />} />
-            <Route path="gps-tracking" element={<GPSTracking />} />
-            <Route path="job-sources" element={<JobSources />} />
-            <Route path="employed" element={<Employed />} />
-            <Route path="employed/employee/:id" element={<EmployeeDetail />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <QuickActions />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <GlobalDateProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="clients" element={<Clients />} />
+                <Route path="clients/:id" element={<ClientDetail />} />
+                <Route path="leads" element={<Leads />} />
+                <Route path="tasks" element={<Tasks />} />
+                <Route path="tasks/:id" element={<TaskDetail />} />
+                <Route path="jobs" element={<Jobs />} />
+                <Route path="schedule" element={<Schedule />} />
+                <Route path="payments" element={<Payments />} />
+                <Route path="technicians" element={<TechnicianAltercation />} />
+                <Route path="technicians/:id" element={<TechnicianDetail />} />
+                <Route path="technicians/analytics" element={<TechnicianAnalytics />} />
+                <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
+                <Route path="estimates" element={<Estimates />} />
+                <Route path="finance" element={<Finance />} />
+                <Route path="gps-tracking" element={<GPSTracking />} />
+                <Route path="job-sources" element={<JobSources />} />
+                <Route path="employed" element={<Employed />} />
+                <Route path="employed/employee/:id" element={<EmployeeDetail />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <QuickActions />
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </GlobalDateProvider>
+  );
+}
 
 export default App;

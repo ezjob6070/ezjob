@@ -1,179 +1,136 @@
-
-import React, { useState } from "react";
-import TechnicianCard from "./TechnicianCard";
-import { Technician } from "@/types/technician";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { X, Grid2X2, List } from "lucide-react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { format } from "date-fns";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { Star, Edit, Trash2 } from "lucide-react";
+import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
+
+interface Technician {
+  id: string;
+  name: string;
+  email: string;
+  specialty?: string;
+  status: string;
+  totalRevenue?: number;
+  rating?: number;
+  image?: string;
+  initials: string;
+}
 
 interface TechniciansListProps {
   technicians: Technician[];
-  onEditTechnician: (technician: Technician) => void;
-  onAddTechnician?: () => void;
-  selectedTechnicians?: string[];
-  onToggleSelect?: (technicianId: string) => void;
+  displayMode: "card" | "table";
+  displayedTechnicians: Technician[];
+  getBadgeVariantFromStatus: (status: string) => string;
 }
 
 const TechniciansList: React.FC<TechniciansListProps> = ({ 
   technicians, 
-  onEditTechnician,
-  onAddTechnician,
-  selectedTechnicians = [],
-  onToggleSelect
+  displayMode, 
+  displayedTechnicians, 
+  getBadgeVariantFromStatus 
 }) => {
-  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
-
-  // Format number as currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-4">
-      {/* View toggle buttons */}
-      <div className="flex justify-end">
-        <div className="flex gap-1">
-          <Button 
-            variant={viewMode === "cards" ? "default" : "outline"} 
-            size="icon"
-            onClick={() => setViewMode("cards")}
-          >
-            <Grid2X2 className="h-4 w-4" />
-            <span className="sr-only">Card view</span>
-          </Button>
-          <Button 
-            variant={viewMode === "table" ? "default" : "outline"} 
-            size="icon"
-            onClick={() => setViewMode("table")}
-          >
-            <List className="h-4 w-4" />
-            <span className="sr-only">Table view</span>
-          </Button>
-        </div>
-      </div>
-      
-      {/* Selected technicians display */}
-      {selectedTechnicians.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg">
-          <div className="mr-2 font-medium text-sm flex items-center">Selected:</div>
-          {selectedTechnicians.map(techId => {
-            const tech = technicians.find(t => t.id === techId);
-            return tech ? (
-              <Badge 
-                key={tech.id} 
-                variant="secondary" 
-                className="flex items-center gap-1 px-2 py-1"
-              >
-                {tech.name}
-                {onToggleSelect && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-4 w-4 p-0 ml-1" 
-                    onClick={() => onToggleSelect(tech.id)}
-                  >
-                    <X className="h-3 w-3" />
-                    <span className="sr-only">Remove</span>
-                  </Button>
-                )}
-              </Badge>
-            ) : null;
-          })}
-        </div>
-      )}
-      
-      {viewMode === "cards" ? (
+      <CompactTechnicianFilter 
+        technicianNames={technicians.map(tech => tech.name)}
+        selectedTechnicians={[]}
+        toggleTechnician={() => {}}
+        clearFilters={() => {}}
+        applyFilters={() => {}}
+      />
+
+      {displayMode === "card" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {technicians.map((technician) => (
+          {displayedTechnicians.map((technician) => (
             <TechnicianCard
               key={technician.id}
               technician={technician}
-              onEdit={() => onEditTechnician(technician)}
-              isSelected={selectedTechnicians.includes(technician.id)}
-              onToggleSelect={onToggleSelect ? () => onToggleSelect(technician.id) : undefined}
+              onSelect={() => navigate(`/technicians/${technician.id}`)}
             />
           ))}
-          
-          {technicians.length === 0 && (
-            <div className="col-span-3 p-4 text-center text-muted-foreground">
-              No technicians found. Try adjusting your search or filters.
-            </div>
-          )}
         </div>
       ) : (
-        <div className="border rounded-md">
+        <div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Technician</TableHead>
+                <TableHead>Name</TableHead>
                 <TableHead>Specialty</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Start Date</TableHead>
                 <TableHead>Revenue</TableHead>
                 <TableHead>Rating</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {technicians.length > 0 ? (
-                technicians.map((technician) => (
-                  <TableRow key={technician.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          {technician.profileImage && (
-                            <AvatarImage src={technician.profileImage} alt={technician.name} />
-                          )}
-                          <AvatarFallback className="bg-indigo-100 text-indigo-600">
-                            {technician.name.split(' ').map(part => part[0]).join('').toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{technician.name}</div>
-                          <div className="text-sm text-muted-foreground">{technician.email}</div>
-                        </div>
+              {displayedTechnicians.map((technician) => (
+                <TableRow
+                  key={technician.id}
+                  className="cursor-pointer hover:bg-slate-50"
+                  onClick={() => navigate(`/technicians/${technician.id}`)}
+                >
+                  <TableCell className="font-medium">
+                    <div className="flex items-center">
+                      <Avatar className="h-10 w-10 mr-3">
+                        <AvatarImage src={technician.image || ""} alt={technician.name} />
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {technician.image ? "" : technician.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-semibold">{technician.name}</div>
+                        <div className="text-xs text-muted-foreground">{technician.email}</div>
                       </div>
-                    </TableCell>
-                    <TableCell>{technician.specialty}</TableCell>
-                    <TableCell>
-                      <Badge variant={technician.status === "active" ? "default" : "secondary"}>
-                        {technician.status.charAt(0).toUpperCase() + technician.status.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {technician.startDate ? format(new Date(technician.startDate), "MMM d, yyyy") : "N/A"}
-                    </TableCell>
-                    <TableCell>{formatCurrency(technician.totalRevenue || 0)}</TableCell>
-                    <TableCell>{technician.rating ? `${technician.rating}/5` : "N/A"}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" onClick={() => onEditTechnician(technician)}>
-                        Edit
+                    </div>
+                  </TableCell>
+                  <TableCell>{technician.specialty || "General"}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={getBadgeVariantFromStatus(technician.status)}
+                      className="capitalize"
+                    >
+                      {technician.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatCurrency(technician.totalRevenue || 0)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Star className="w-4 h-4 text-yellow-400 mr-1 fill-yellow-400" />
+                      <span>{technician.rating || "N/A"}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/technicians/${technician.id}/edit`);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
                       </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    No technicians found. Try adjusting your filters.
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Handle delete
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
+              ))}
             </TableBody>
           </Table>
         </div>
