@@ -31,7 +31,6 @@ const Employed = () => {
   const [resumes, setResumes] = useState<Resume[]>(initialResumes);
   const [reports, setReports] = useState<Report[]>(employeeReports);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [employeeStatusFilter, setEmployeeStatusFilter] = useState<string>("all");
   
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
@@ -90,16 +89,6 @@ const Employed = () => {
     toast({
       title: status === "approved" ? "Resume Approved" : "Resume Rejected",
       description: `The resume has been ${status === "approved" ? "approved" : "rejected"} successfully`,
-    });
-  };
-  
-  const toggleEmployee = (employeeId: string) => {
-    setSelectedEmployees(prev => {
-      if (prev.includes(employeeId)) {
-        return prev.filter(id => id !== employeeId);
-      } else {
-        return [...prev, employeeId];
-      }
     });
   };
 
@@ -180,11 +169,6 @@ const Employed = () => {
                 <span className="mr-2">
                   {filteredEmployeesByStatus.length} {filteredEmployeesByStatus.length === 1 ? 'employee' : 'employees'} found
                 </span>
-                {selectedEmployees.length > 0 && (
-                  <span className="ml-2 px-2 py-1 bg-primary/10 rounded-full text-xs">
-                    {selectedEmployees.length} selected
-                  </span>
-                )}
               </div>
             </div>
           )}
@@ -301,8 +285,6 @@ const Employed = () => {
           <EmployeesList 
             employees={filteredEmployeesByStatus} 
             onEditEmployee={handleEditEmployee}
-            selectedEmployees={selectedEmployees}
-            onToggleSelect={toggleEmployee}
           />
         </TabsContent>
         

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Employee, EmployeeStatus } from "@/types/employee";
 import { Input } from "@/components/ui/input";
-import { Search, User, ExternalLink, Filter, Circle, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, User, ExternalLink, Filter, ArrowUp, ArrowDown } from "lucide-react";
 import { 
   Table, 
   TableBody, 
@@ -34,17 +34,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 interface EmployeesListProps {
   employees: Employee[];
   onEditEmployee?: (employee: Employee) => void;
-  selectedEmployees?: string[];
-  onToggleSelect?: (employeeId: string) => void;
 }
 
 type SortOrder = "newest" | "oldest" | "name-asc" | "name-desc" | "salary-high" | "salary-low";
 
 const EmployeesList = ({ 
   employees, 
-  onEditEmployee,
-  selectedEmployees = [],
-  onToggleSelect 
+  onEditEmployee
 }: EmployeesListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
@@ -215,47 +211,11 @@ const EmployeesList = ({
         </div>
       </div>
 
-      {/* Selected employees display */}
-      {selectedEmployees.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg">
-          <div className="mr-2 font-medium text-sm flex items-center">Selected:</div>
-          {selectedEmployees.map(empId => {
-            const emp = employees.find(e => e.id === empId);
-            return emp ? (
-              <Badge 
-                key={emp.id} 
-                variant="secondary" 
-                className="flex items-center gap-1 px-2 py-1"
-              >
-                {emp.name}
-                {onToggleSelect && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-4 w-4 p-0 ml-1" 
-                    onClick={() => onToggleSelect(emp.id)}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    <span className="sr-only">Remove</span>
-                  </Button>
-                )}
-              </Badge>
-            ) : null;
-          })}
-        </div>
-      )}
-
       {viewMode === "table" ? (
         <div className="border rounded-md">
           <Table>
             <TableHeader>
               <TableRow>
-                {onToggleSelect && (
-                  <TableHead className="w-[50px]">Select</TableHead>
-                )}
                 <TableHead>Employee</TableHead>
                 <TableHead>Position</TableHead>
                 <TableHead>Department</TableHead>
@@ -269,25 +229,6 @@ const EmployeesList = ({
               {sortedEmployees.length > 0 ? (
                 sortedEmployees.map((employee) => (
                   <TableRow key={employee.id}>
-                    {onToggleSelect && (
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => onToggleSelect(employee.id)}
-                          className="rounded-full w-6 h-6 p-0 flex items-center justify-center border-2"
-                        >
-                          {selectedEmployees.includes(employee.id) ? (
-                            <Circle className="h-4 w-4 fill-primary stroke-primary" />
-                          ) : (
-                            <Circle className="h-4 w-4" />
-                          )}
-                          <span className="sr-only">
-                            {selectedEmployees.includes(employee.id) ? 'Deselect' : 'Select'}
-                          </span>
-                        </Button>
-                      </TableCell>
-                    )}
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center">
@@ -346,7 +287,7 @@ const EmployeesList = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={onToggleSelect ? 8 : 7} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     No employees found. Try adjusting your filters.
                   </TableCell>
                 </TableRow>
@@ -362,8 +303,6 @@ const EmployeesList = ({
                 key={employee.id}
                 employee={employee}
                 onEdit={onEditEmployee ? () => onEditEmployee(employee) : undefined}
-                isSelected={selectedEmployees.includes(employee.id)}
-                onToggleSelect={onToggleSelect ? () => onToggleSelect(employee.id) : undefined}
               />
             ))
           ) : (
@@ -381,11 +320,9 @@ const EmployeesList = ({
 interface EmployeeCardProps {
   employee: Employee;
   onEdit?: () => void;
-  isSelected?: boolean;
-  onToggleSelect?: () => void;
 }
 
-const EmployeeCard = ({ employee, onEdit, isSelected = false, onToggleSelect }: EmployeeCardProps) => {
+const EmployeeCard = ({ employee, onEdit }: EmployeeCardProps) => {
   // Generate initials if not provided
   const initials = employee.initials || employee.name
     .split(' ')
@@ -394,7 +331,7 @@ const EmployeeCard = ({ employee, onEdit, isSelected = false, onToggleSelect }: 
     .toUpperCase();
 
   return (
-    <Card className={`overflow-hidden ${isSelected ? 'ring-2 ring-indigo-500' : ''} cursor-pointer transition-shadow hover:shadow-md`}>
+    <Card className="overflow-hidden cursor-pointer transition-shadow hover:shadow-md">
       <CardContent className="p-0">
         <div className="p-5 flex items-start">
           {/* Avatar and Name Section */}
@@ -475,25 +412,6 @@ const EmployeeCard = ({ employee, onEdit, isSelected = false, onToggleSelect }: 
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                 </svg>
                 <span className="sr-only">Edit</span>
-              </Button>
-            )}
-            
-            {onToggleSelect && (
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleSelect();
-                }}
-                className="ml-2 rounded-full w-8 h-8 p-0 flex items-center justify-center border-2"
-              >
-                {isSelected ? (
-                  <Circle className="h-5 w-5 fill-primary stroke-primary" />
-                ) : (
-                  <Circle className="h-5 w-5" />
-                )}
-                <span className="sr-only">{isSelected ? 'Deselect' : 'Select'}</span>
               </Button>
             )}
           </div>
