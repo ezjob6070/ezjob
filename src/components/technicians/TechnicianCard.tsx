@@ -4,7 +4,7 @@ import { Technician } from "@/types/technician";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, User, Pencil, Check } from "lucide-react";
+import { MapPin, Phone, Mail, User, Pencil, Check, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface TechnicianCardProps {
@@ -80,12 +80,16 @@ const TechnicianCard: React.FC<TechnicianCardProps> = ({
             
             {onToggleSelect && (
               <Button 
-                variant={isSelected ? "default" : "outline"} 
-                size="sm" 
+                variant="outline" 
+                size="icon" 
                 onClick={onToggleSelect}
-                className={`ml-2 ${isSelected ? 'bg-indigo-600' : ''}`}
+                className="ml-2 rounded-full w-8 h-8 p-0 flex items-center justify-center border-2"
               >
-                <Check className="h-4 w-4" />
+                {isSelected ? (
+                  <Circle className="h-5 w-5 fill-primary stroke-primary" />
+                ) : (
+                  <Circle className="h-5 w-5" />
+                )}
                 <span className="sr-only">{isSelected ? 'Deselect' : 'Select'}</span>
               </Button>
             )}

@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Technician } from "@/types/technician";
 import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface TechnicianFiltersProps {
   categories: string[];
@@ -138,15 +139,24 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
                 )}
               </div>
               <DropdownMenuSeparator className="my-1" />
-              <div className="max-h-60 overflow-y-auto">
+              <div className="max-h-60 overflow-y-auto space-y-1 py-1">
                 {filteredTechniciansForDropdown.map((tech) => (
-                  <DropdownMenuCheckboxItem
-                    key={tech.id}
-                    checked={selectedTechnicians.includes(tech.id)}
-                    onCheckedChange={() => onTechnicianToggle(tech.id)}
-                  >
-                    {tech.name}
-                  </DropdownMenuCheckboxItem>
+                  <div key={tech.id} className="flex items-center space-x-2 px-2 py-1.5 hover:bg-muted rounded-sm cursor-pointer" onClick={() => onTechnicianToggle(tech.id)}>
+                    <div className="flex items-center justify-center">
+                      <RadioGroupItem 
+                        value={tech.id} 
+                        id={`tech-radio-${tech.id}`}
+                        checked={selectedTechnicians.includes(tech.id)}
+                        className="data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                      />
+                    </div>
+                    <label 
+                      htmlFor={`tech-radio-${tech.id}`}
+                      className="text-sm font-medium leading-none cursor-pointer flex-1"
+                    >
+                      {tech.name}
+                    </label>
+                  </div>
                 ))}
                 {filteredTechniciansForDropdown.length === 0 && (
                   <div className="py-2 px-2 text-sm text-gray-500">No technicians found</div>
