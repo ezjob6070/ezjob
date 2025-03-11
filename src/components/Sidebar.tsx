@@ -16,7 +16,9 @@ import {
   UserRoundIcon,
   CalendarIcon,
   ChevronDownIcon,
-  ChevronUpIcon
+  ChevronUpIcon,
+  BuildingIcon,
+  HomeIcon as HouseIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -31,13 +33,28 @@ type NavItem = {
   icon: JSX.Element;
   href?: string;
   children?: NavItem[];
+  industries?: string[]; // Only show for specific industries
 };
+
+// This would come from user selection/login in a real app
+const INDUSTRY_TYPES = ['construction', 'real_estate', 'general'] as const;
+type IndustryType = typeof INDUSTRY_TYPES[number];
 
 const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
     "leads-clients": true, // Start expanded
   });
+  
+  // In a real implementation, this would come from user context or similar
+  const [currentIndustry, setCurrentIndustry] = useState<IndustryType>('general');
+  
+  // For demo purposes only - toggle between industries
+  const cycleIndustry = () => {
+    const currentIndex = INDUSTRY_TYPES.indexOf(currentIndustry);
+    const nextIndex = (currentIndex + 1) % INDUSTRY_TYPES.length;
+    setCurrentIndustry(INDUSTRY_TYPES[nextIndex]);
+  };
 
   const toggleExpand = (key: string) => {
     setExpandedItems(prev => ({
@@ -46,84 +63,129 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
     }));
   };
 
-  const navItems: NavItem[] = [
-    {
-      label: "Dashboard",
-      icon: <HomeIcon size={20} />,
-      href: "/",
-    },
-    {
-      label: "Leads & Clients",
-      icon: <UsersIcon size={20} />,
-      children: [
-        {
-          label: "Leads",
-          icon: <UserPlusIcon size={20} />,
-          href: "/leads",
-        },
-        {
-          label: "Clients",
-          icon: <UsersIcon size={20} />,
-          href: "/clients",
-        },
-      ],
-    },
-    {
-      label: "Tasks",
-      icon: <ClipboardListIcon size={20} />,
-      href: "/tasks",
-    },
-    {
-      label: "Jobs",
-      icon: <BriefcaseIcon size={20} />,
-      href: "/jobs",
-    },
-    {
-      label: "Schedule",
-      icon: <CalendarIcon size={20} />,
-      href: "/schedule",
-    },
-    {
-      label: "Estimates",
-      icon: <FileTextIcon size={20} />,
-      href: "/estimates",
-    },
-    {
-      label: "Payments & Invoices",
-      icon: <CreditCardIcon size={20} />,
-      href: "/payments",
-    },
-    {
-      label: "Technicians",
-      icon: <WrenchIcon size={20} />,
-      href: "/technicians",
-    },
-    {
-      label: "Employed",
-      icon: <UserRoundIcon size={20} />,
-      href: "/employed",
-    },
-    {
-      label: "GPS Tracking",
-      icon: <MapIcon size={20} />,
-      href: "/gps-tracking",
-    },
-    {
-      label: "Job Sources",
-      icon: <BriefcaseIcon size={20} />,
-      href: "/job-sources",
-    },
-    {
-      label: "Finance & Reports",
-      icon: <WalletIcon size={20} />,
-      href: "/finance",
-    },
-    {
-      label: "Settings",
-      icon: <SettingsIcon size={20} />,
-      href: "/settings",
-    },
-  ];
+  const getIndustrySpecificNavItems = (): NavItem[] => {
+    const commonItems: NavItem[] = [
+      {
+        label: "Dashboard",
+        icon: <HomeIcon size={20} />,
+        href: "/",
+      },
+      {
+        label: "Leads & Clients",
+        icon: <UsersIcon size={20} />,
+        children: [
+          {
+            label: "Leads",
+            icon: <UserPlusIcon size={20} />,
+            href: "/leads",
+          },
+          {
+            label: "Clients",
+            icon: <UsersIcon size={20} />,
+            href: "/clients",
+          },
+        ],
+      },
+      {
+        label: "Tasks",
+        icon: <ClipboardListIcon size={20} />,
+        href: "/tasks",
+      },
+      {
+        label: "Schedule",
+        icon: <CalendarIcon size={20} />,
+        href: "/schedule",
+      },
+      {
+        label: "Estimates",
+        icon: <FileTextIcon size={20} />,
+        href: "/estimates",
+      },
+      {
+        label: "Payments & Invoices",
+        icon: <CreditCardIcon size={20} />,
+        href: "/payments",
+      },
+      {
+        label: "Finance & Reports",
+        icon: <WalletIcon size={20} />,
+        href: "/finance",
+      },
+      {
+        label: "Settings",
+        icon: <SettingsIcon size={20} />,
+        href: "/settings",
+      },
+    ];
+    
+    // Industry-specific items
+    const constructionItems: NavItem[] = [
+      {
+        label: "Jobs",
+        icon: <BriefcaseIcon size={20} />,
+        href: "/jobs",
+        industries: ['construction'],
+      },
+      {
+        label: "Technicians",
+        icon: <WrenchIcon size={20} />,
+        href: "/technicians",
+        industries: ['construction'],
+      },
+      {
+        label: "Employed",
+        icon: <UserRoundIcon size={20} />,
+        href: "/employed",
+        industries: ['construction'],
+      },
+      {
+        label: "GPS Tracking",
+        icon: <MapIcon size={20} />,
+        href: "/gps-tracking",
+        industries: ['construction'],
+      },
+      {
+        label: "Job Sources",
+        icon: <BriefcaseIcon size={20} />,
+        href: "/job-sources",
+        industries: ['construction'],
+      },
+    ];
+    
+    const realEstateItems: NavItem[] = [
+      {
+        label: "Properties",
+        icon: <HouseIcon size={20} />,
+        href: "/properties",
+        industries: ['real_estate'],
+      },
+      {
+        label: "Agents",
+        icon: <UserRoundIcon size={20} />,
+        href: "/agents",
+        industries: ['real_estate'],
+      },
+      {
+        label: "Listings",
+        icon: <BuildingIcon size={20} />,
+        href: "/listings",
+        industries: ['real_estate'],
+      },
+    ];
+    
+    // Combine and filter based on current industry
+    return [
+      ...commonItems,
+      ...constructionItems.filter(item => 
+        !item.industries || item.industries.includes(currentIndustry)
+      ),
+      ...realEstateItems.filter(item => 
+        !item.industries || item.industries.includes(currentIndustry)
+      ),
+    ];
+  };
+  
+  const navItems = getIndustrySpecificNavItems();
 
   if (!isOpen) return null;
 
@@ -135,8 +197,16 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
         isMobile && isOpen ? "shadow-xl" : ""
       )}
     >
-      <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
+      <div className="h-16 flex items-center justify-between px-6 border-b border-sidebar-border">
         <h1 className="text-xl font-semibold tracking-tight">Essence CRM</h1>
+        <div className="flex items-center">
+          <button 
+            onClick={cycleIndustry}
+            className="text-xs bg-sidebar-accent/30 px-2 py-1 rounded-md"
+          >
+            {currentIndustry.replace('_', ' ')}
+          </button>
+        </div>
       </div>
 
       <nav className="flex-1 py-6 px-4">
