@@ -1,27 +1,36 @@
 
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LogOutIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SidebarProps } from "./sidebarTypes";
+import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
 import NavItem from "./NavItem";
 import SidebarHeader from "./SidebarHeader";
 
 const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
     "leads-clients": true, // Start expanded
   });
   
   // In a real implementation, this would come from user context or similar
-  const [currentIndustry, setCurrentIndustry] = useState(INDUSTRY_TYPES[2]); // Default to general
+  const [currentIndustry, setCurrentIndustry] = useState<IndustryType>(INDUSTRY_TYPES[2]); // Default to general
   
   // For demo purposes only - toggle between industries
   const cycleIndustry = () => {
     const currentIndex = INDUSTRY_TYPES.indexOf(currentIndustry);
     const nextIndex = (currentIndex + 1) % INDUSTRY_TYPES.length;
-    setCurrentIndustry(INDUSTRY_TYPES[nextIndex]);
+    const nextIndustry = INDUSTRY_TYPES[nextIndex];
+    setCurrentIndustry(nextIndustry);
+    
+    // Navigate to real estate dashboard when real_estate is selected
+    if (nextIndustry === 'real_estate' && location.pathname === '/') {
+      navigate('/real-estate-dashboard');
+    } else if (nextIndustry !== 'real_estate' && location.pathname === '/real-estate-dashboard') {
+      navigate('/');
+    }
   };
 
   const toggleExpand = (key: string) => {
