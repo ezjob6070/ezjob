@@ -1,465 +1,369 @@
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
+import { technicianSchema } from "@/lib/validations/technician";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Camera } from "lucide-react";
+import { forwardRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { getInitials } from "@/lib/utils";
+import { v4 as uuidv4 } from 'uuid';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { PopoverClose } from "@radix-ui/react-popover";
+import { DatePicker } from "../ui/date-picker";
 import { Technician } from "@/types/technician";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Image, FileImage, Upload, DollarSign, Clock, Calendar } from "lucide-react";
-import { SalaryBasis, IncentiveType } from "@/types/employee";
 
-type EditTechnicianModalProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onUpdateTechnician: (updatedTechnician: Technician) => void;
-  technician: Technician | null;
-};
+interface EditTechnicianModalProps {
+  technician: Technician;
+}
 
-const SPECIALTIES = [
-  "HVAC",
-  "Electrical", 
-  "Plumbing",
-  "Carpentry",
-  "General Maintenance",
-  "Security Systems",
-  "Painting",
-  "Flooring",
-  "Roofing",
-  "Landscaping",
-];
-
-const EditTechnicianModal = ({ open, onOpenChange, onUpdateTechnician, technician }: EditTechnicianModalProps) => {
+export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) => {
+  const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const { toast } = useToast();
-  
-  const [formData, setFormData] = useState<Partial<Technician>>({
-    name: "",
-    email: "",
-    phone: "",
-    specialty: "",
-    address: "",
-    status: "active",
-    paymentType: "percentage",
-    paymentRate: 0,
-    notes: "",
-    imageUrl: "",
-    // New salary fields
-    salaryBasis: SalaryBasis.HOURLY,
-    hourlyRate: 0,
-    incentiveType: IncentiveType.HOURLY,
-    incentiveAmount: 0,
+
+  const form = useForm<z.infer<typeof technicianSchema>>({
+    resolver: zodResolver(technicianSchema),
+    defaultValues: {
+      name: technician.name,
+      email: technician.email,
+      phone: technician.phone,
+      address: technician.address,
+      specialty: technician.specialty,
+      status: technician.status,
+      paymentType: technician.paymentType,
+      paymentRate: technician.paymentRate.toString(),
+      hireDate: technician.hireDate,
+    },
   });
-  
-  // For image handling
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
 
-  // Update form data when technician changes
-  useEffect(() => {
-    if (technician) {
-      setFormData({
-        name: technician.name,
-        email: technician.email,
-        phone: technician.phone || "",
-        specialty: technician.specialty,
-        address: technician.address || "",
-        status: technician.status,
-        paymentType: technician.paymentType,
-        paymentRate: technician.paymentRate,
-        notes: technician.notes || "",
-        imageUrl: technician.imageUrl || "",
-        // New salary fields
-        salaryBasis: technician.salaryBasis || SalaryBasis.HOURLY,
-        hourlyRate: technician.hourlyRate || 0,
-        incentiveType: technician.incentiveType || IncentiveType.HOURLY,
-        incentiveAmount: technician.incentiveAmount || 0,
+  const { mutate: updateTechnician } = useMutation({
+    mutationFn: async (values: z.infer<typeof technicianSchema>) => {
+      // Simulate API update
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      // Optimistically update the cache
+      queryClient.setQueryData<Technician[]>(['technicians'], (old) => {
+        if (!old) return [];
+        return old.map((tech) => tech.id === technician.id ? { ...technician, ...values } : tech);
       });
-      
-      // Set preview if image exists
-      if (technician.imageUrl) {
-        setPreviewUrl(technician.imageUrl);
-      } else {
-        setPreviewUrl("");
-      }
-    }
-  }, [technician]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      
-      // Create object URL for preview
-      const fileUrl = URL.createObjectURL(file);
-      setSelectedImage(file);
-      setPreviewUrl(fileUrl);
-      
-      // In a real app, you would upload to server here
-      // For this demo, we'll just use the URL directly
-      setFormData(prev => ({ ...prev, imageUrl: fileUrl }));
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate form
-    if (!formData.name || !formData.email || !formData.specialty) {
+      return values;
+    },
+    onSuccess: () => {
       toast({
-        title: "Error",
-        description: "Please fill all required fields",
+        title: "Technician updated successfully!",
+      });
+      queryClient.invalidateQueries({ queryKey: ['technicians'] });
+      setOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Something went wrong.",
+        description: error instanceof Error ? error.message : "Failed to update technician.",
         variant: "destructive",
       });
-      return;
+    },
+  });
+
+  const handleSubmit = (data: z.infer<typeof technicianSchema>) => {
+    updateTechnician({
+      ...data,
+      status: data.status as "active" | "inactive" | "onLeave",
+      paymentType: data.paymentType as "percentage" | "flat" | "hourly",
+      paymentRate: parseFloat(data.paymentRate),
+    });
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-
-    if (!technician) return;
-
-    // Create updated technician object
-    const updatedTechnician: Technician = {
-      ...technician,
-      ...formData,
-      paymentRate: typeof formData.paymentRate === 'string' 
-        ? parseFloat(formData.paymentRate) 
-        : formData.paymentRate || 0,
-      paymentType: formData.paymentType as "percentage" | "flat",
-      status: formData.status as "active" | "inactive",
-      imageUrl: formData.imageUrl || undefined,
-      // New salary fields
-      salaryBasis: formData.salaryBasis as SalaryBasis,
-      hourlyRate: typeof formData.hourlyRate === 'string'
-        ? parseFloat(formData.hourlyRate)
-        : formData.hourlyRate || 0,
-      incentiveType: formData.incentiveType as IncentiveType,
-      incentiveAmount: typeof formData.incentiveAmount === 'string'
-        ? parseFloat(formData.incentiveAmount)
-        : formData.incentiveAmount || 0,
-    };
-
-    onUpdateTechnician(updatedTechnician);
-    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Edit</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Technician</DialogTitle>
+          <DialogDescription>
+            Make changes to your technician here. Click save when you're done.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          {/* Image upload section */}
-          <div className="grid gap-2">
-            <Label>Profile Picture</Label>
-            <div className="flex flex-col items-center">
-              <div className="mb-3">
-                {previewUrl ? (
-                  <Avatar className="h-24 w-24 border-2 border-primary/20">
-                    <AvatarImage src={previewUrl} alt={formData.name || "Profile"} />
-                    <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
-                      {technician?.initials || ""}
-                    </AvatarFallback>
-                  </Avatar>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-12 w-12">
+                {selectedImage ? (
+                  <img
+                    src={selectedImage}
+                    alt="Technician Avatar"
+                    className="rounded-full"
+                  />
                 ) : (
-                  <Avatar className="h-24 w-24 border-2 border-primary/20">
-                    <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
-                      {technician?.initials || ""}
-                    </AvatarFallback>
-                  </Avatar>
+                  <AvatarFallback>{technician.initials}</AvatarFallback>
                 )}
+              </Avatar>
+              <div>
+                <Label htmlFor="picture">Change Picture</Label>
+                <Input
+                  id="picture"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </div>
+            </div>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Technician Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="mail@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="+1 (555) 123-4567" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="123 Example St. City, State" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="specialty"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Specialty</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Plumbing, Electrical, etc." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="onLeave">On Leave</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="paymentType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Type</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a payment type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="percentage">Percentage</SelectItem>
+                      <SelectItem value="flat">Flat</SelectItem>
+                      <SelectItem value="hourly">Hourly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="paymentRate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Rate</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Payment Rate" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid gap-2 py-2">
+              <div className="flex justify-between text-sm">
+                <div className="text-muted-foreground">Pay Rate:</div>
+                <div className="font-medium">
+                  {technician.paymentType === "percentage"
+                    ? `${technician.paymentRate}%`
+                    : technician.paymentType === "hourly"
+                    ? `$${technician.paymentRate}/hr`
+                    : `$${technician.paymentRate} flat`}
+                </div>
               </div>
               
-              <div className="flex gap-2">
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <div className="flex items-center gap-1 px-3 py-1.5 text-sm border rounded-md hover:bg-accent">
-                    <Upload className="h-4 w-4" />
-                    <span>Upload</span>
-                  </div>
-                  <input 
-                    id="image-upload" 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*" 
-                    onChange={handleImageChange}
-                  />
-                </label>
-                
-                {previewUrl && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      setPreviewUrl("");
-                      setSelectedImage(null);
-                      setFormData(prev => ({ ...prev, imageUrl: "" }));
-                    }}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="John Smith"
-                required
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="john@example.com"
-                required
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="(555) 123-4567"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                name="address"
-                value={formData.address || ""}
-                onChange={handleChange}
-                placeholder="123 Main St, City, State, ZIP"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="specialty">Specialty *</Label>
-              <select
-                id="specialty"
-                name="specialty"
-                value={formData.specialty}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                required
-              >
-                <option value="" disabled>Select specialty</option>
-                {SPECIALTIES.map((specialty) => (
-                  <option key={specialty} value={specialty}>
-                    {specialty}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Remove or comment out the salary display that doesn't exist */}
+              {/* <div className="flex justify-between text-sm">
+                <div className="text-muted-foreground">Salary:</div>
+                <div className="font-medium">${technician.salary}/yr</div>
+              </div> */}
 
-            <div className="grid gap-2">
-              <Label htmlFor="status">Status</Label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-            
-            {/* Salary Settings Section */}
-            <div className="bg-slate-50 p-4 rounded-md mt-4 border">
-              <h3 className="font-medium text-md flex items-center mb-3">
-                <DollarSign className="h-4 w-4 mr-1" />
-                Salary Settings
-              </h3>
-              
-              <div className="grid gap-2 mb-3">
-                <Label htmlFor="salaryBasis">Salary Basis *</Label>
-                <select
-                  id="salaryBasis"
-                  name="salaryBasis"
-                  value={formData.salaryBasis}
-                  onChange={handleChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value={SalaryBasis.HOURLY}>Hourly</option>
-                  <option value={SalaryBasis.WEEKLY}>Weekly</option>
-                  <option value={SalaryBasis.MONTHLY}>Monthly</option>
-                  <option value={SalaryBasis.YEARLY}>Yearly</option>
-                </select>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="hourlyRate" className="flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    Hourly Rate ($)
-                  </Label>
-                  <Input
-                    id="hourlyRate"
-                    name="hourlyRate"
-                    type="number"
-                    value={formData.hourlyRate}
-                    onChange={handleChange}
-                    placeholder="25.00"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                
-                {formData.salaryBasis !== SalaryBasis.HOURLY && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="salary" className="flex items-center">
-                      <DollarSign className="h-4 w-4 mr-1" />
-                      {formData.salaryBasis === SalaryBasis.WEEKLY 
-                        ? "Weekly Salary ($)" 
-                        : formData.salaryBasis === SalaryBasis.MONTHLY 
-                          ? "Monthly Salary ($)" 
-                          : "Yearly Salary ($)"}
-                    </Label>
-                    <Input
-                      id="salary"
-                      name="salary"
-                      type="number"
-                      value={formData.salary}
-                      onChange={handleChange}
-                      placeholder="0.00"
-                      min="0"
-                      step="0.01"
-                      required
-                    />
-                  </div>
+              <FormField
+                control={form.control}
+                name="hireDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Hire Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <DatePicker
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date?.toISOString())}
+                          disabled={false}
+                          initialFocus
+                        />
+                        <PopoverClose>
+                          <Button className="w-full" variant={'secondary'}>Close</Button>
+                        </PopoverClose>
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      The date the technician was hired.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
-              
-              <h4 className="font-medium text-sm mt-4 mb-2 flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                Incentive Options
-              </h4>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="incentiveType">Incentive Type</Label>
-                  <select
-                    id="incentiveType"
-                    name="incentiveType"
-                    value={formData.incentiveType}
-                    onChange={handleChange}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    <option value={IncentiveType.HOURLY}>Per Hour</option>
-                    <option value={IncentiveType.WEEKLY}>Per Week</option>
-                    <option value={IncentiveType.MONTHLY}>Per Month</option>
-                  </select>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="incentiveAmount">Incentive Amount ($)</Label>
-                  <Input
-                    id="incentiveAmount"
-                    name="incentiveAmount"
-                    type="number"
-                    value={formData.incentiveAmount}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <Label className="mb-2 block">Payment Structure *</Label>
-              <div className="flex flex-col space-y-2">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    id="percentage"
-                    name="paymentType"
-                    value="percentage"
-                    checked={formData.paymentType === "percentage"}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <Label htmlFor="percentage" className="cursor-pointer">Percentage (%)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    id="flat"
-                    name="paymentType"
-                    value="flat"
-                    checked={formData.paymentType === "flat"}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <Label htmlFor="flat" className="cursor-pointer">Flat Rate ($)</Label>
-                </div>
-              </div>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="paymentRate">
-                {formData.paymentType === "percentage" ? "Percentage Rate (%)" : "Flat Rate ($)"}
-              </Label>
-              <Input
-                id="paymentRate"
-                name="paymentRate"
-                type="number"
-                value={formData.paymentRate}
-                onChange={handleChange}
-                placeholder={formData.paymentType === "percentage" ? "20" : "100"}
-                min="0"
-                step={formData.paymentType === "percentage" ? "1" : "0.01"}
-                required
               />
             </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="notes">Notes</Label>
-              <textarea
-                id="notes"
-                name="notes"
-                value={formData.notes || ""}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="Additional information about this technician..."
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              />
+            <div className="flex justify-end">
+              <Button type="submit">Update Technician</Button>
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Update Technician</Button>
-          </DialogFooter>
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
 };
-
-export default EditTechnicianModal;

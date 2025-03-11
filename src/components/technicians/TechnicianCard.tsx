@@ -1,162 +1,71 @@
-
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 import { Technician } from "@/types/technician";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, User, Pencil, Circle, Calendar, CheckCircle, XCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useMemo } from "react";
 
 interface TechnicianCardProps {
   technician: Technician;
-  onEdit: () => void;
-  isSelected?: boolean;
-  onToggleSelect?: () => void;
+  selected: boolean;
+  onSelect: (id: string) => void;
+  onClick: (id: string) => void;
 }
 
-const TechnicianCard: React.FC<TechnicianCardProps> = ({ 
-  technician, 
-  onEdit,
-  isSelected = false,
-  onToggleSelect
-}) => {
-  const navigate = useNavigate();
+export default function TechnicianCard({
+  technician,
+  selected,
+  onSelect,
+  onClick
+}: TechnicianCardProps) {
+  const revenue = useMemo(() => {
+    if (!technician.totalRevenue) return "0";
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on buttons or selection
-    if ((e.target as HTMLElement).closest('button')) {
-      return;
-    }
-    navigate(`/technicians/${technician.id}`);
-  };
-
-  // Format the start date if it exists
-  const formattedStartDate = technician.startDate 
-    ? format(new Date(technician.startDate), 'MMM d, yyyy')
-    : 'Not specified';
-
+    return technician.totalRevenue.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+  }, [technician.totalRevenue]);
+  
   return (
-    <Card className={`overflow-hidden ${isSelected ? 'ring-2 ring-indigo-500' : ''} cursor-pointer transition-shadow hover:shadow-md`} onClick={handleCardClick}>
-      <CardContent className="p-0">
-        <div className="p-5 flex items-start">
-          {/* Avatar and Name Section */}
-          <div className="flex-1">
-            <div className="flex items-center space-x-3">
-              <Avatar className="h-12 w-12">
-                {technician.imageUrl && <AvatarImage src={technician.imageUrl} alt={technician.name} />}
-                <AvatarFallback className="bg-indigo-100 text-indigo-600">
-                  {technician.initials}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold text-lg">{technician.name}</h3>
-                <div className="flex items-center mt-1">
-                  <Badge variant={technician.status === "active" ? "success" : "destructive"} className="text-xs">
-                    {technician.status}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground ml-2">ID: {technician.id}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Details Section */}
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <User className="h-4 w-4 mr-2" />
-                <span>{technician.specialty}</span>
-              </div>
-              {technician.email && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Mail className="h-4 w-4 mr-2" />
-                  <span>{technician.email}</span>
-                </div>
-              )}
-              {technician.phone && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Phone className="h-4 w-4 mr-2" />
-                  <span>{technician.phone}</span>
-                </div>
-              )}
-              {technician.address && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  <span>{technician.address}</span>
-                </div>
-              )}
-              {/* Add start date display */}
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4 mr-2" />
-                <span>Started: {formattedStartDate}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }} 
-              className="ml-2"
-            >
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">Edit</span>
-            </Button>
-            
-            {onToggleSelect && (
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleSelect();
-                }}
-                className="ml-2 rounded-full w-8 h-8 p-0 flex items-center justify-center border-2"
-              >
-                {isSelected ? (
-                  <Circle className="h-5 w-5 fill-primary stroke-primary" />
-                ) : (
-                  <Circle className="h-5 w-5" />
-                )}
-                <span className="sr-only">{isSelected ? 'Deselect' : 'Select'}</span>
-              </Button>
-            )}
+    <div
+      onClick={() => onClick(technician.id)}
+      className={cn(
+        "group relative flex flex-col rounded-lg border p-4 hover:cursor-pointer hover:border-2",
+        selected ? "border-primary-foreground" : "border-border"
+      )}
+    >
+      <Checkbox
+        checked={selected}
+        onCheckedChange={() => onSelect(technician.id)}
+        className="absolute right-2 top-2 rounded-full border-2 ring-offset-background focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 peer-focus:ring-2"
+      />
+      <div className="flex items-center">
+        <Avatar className="h-10 w-10">
+          <AvatarFallback>{technician.initials}</AvatarFallback>
+        </Avatar>
+        <div className="ml-4 flex flex-col">
+          <div className="text-sm font-medium">{technician.name}</div>
+          <div className="text-xs text-muted-foreground">
+            {technician.specialty}
           </div>
         </div>
+      </div>
 
-        {/* Performance Stats */}
-        <div className="bg-muted px-5 py-3 grid grid-cols-4 gap-2 text-center border-t">
-          <div className="flex flex-col items-center">
-            <div className="flex items-center">
-              <CheckCircle className="h-3 w-3 text-green-600 mr-1" />
-              <p className="text-sm font-medium">{technician.completedJobs}</p>
-            </div>
-            <p className="text-xs text-muted-foreground">Completed</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="flex items-center">
-              <XCircle className="h-3 w-3 text-red-600 mr-1" />
-              <p className="text-sm font-medium">{technician.canceledJobs || 0}</p>
-            </div>
-            <p className="text-xs text-muted-foreground">Canceled</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium">${technician.totalRevenue.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">Revenue</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium">{technician.rating}/5</p>
-            <p className="text-xs text-muted-foreground">Rating</p>
-          </div>
+      <div className="grid grid-cols-3 text-center gap-2 mt-2">
+        <div>
+          <div className="text-sm font-medium">{technician.completedJobs}</div>
+          <div className="text-xs text-muted-foreground">Completed</div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <div className="text-sm font-medium">{technician.cancelledJobs}</div>
+          <div className="text-xs text-muted-foreground">Cancelled</div>
+        </div>
+        <div>
+          <div className="text-sm font-medium">${revenue}</div>
+          <div className="text-xs text-muted-foreground">Revenue</div>
+        </div>
+      </div>
+    </div>
   );
-};
-
-export default TechnicianCard;
+}

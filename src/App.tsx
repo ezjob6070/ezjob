@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import RealEstateDashboard from "./pages/RealEstateDashboard";
+import RealEstateAgents from "./pages/RealEstateAgents";
 import Clients from "./pages/Clients";
 import Leads from "./pages/Leads";
 import ClientDetail from "./pages/ClientDetail";
@@ -44,6 +45,7 @@ function App() {
               <Route path="/" element={<Layout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
+                <Route path="agents" element={<RealEstateAgents />} />
                 <Route path="clients" element={<Clients />} />
                 <Route path="clients/:id" element={<ClientDetail />} />
                 <Route path="leads" element={<Leads />} />
