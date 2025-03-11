@@ -12,7 +12,7 @@ export const technicians: Technician[] = [
     status: "active",
     paymentType: "percentage",
     paymentRate: 60,
-    hireDate: "2021-03-15", // Convert Date to string
+    hireDate: "2021-03-15",
     completedJobs: 148,
     cancelledJobs: 7,
     totalRevenue: 28750,
@@ -29,7 +29,7 @@ export const technicians: Technician[] = [
     status: "active",
     paymentType: "flat",
     paymentRate: 120,
-    hireDate: "2022-01-10", // Convert Date to string
+    hireDate: "2022-01-10",
     completedJobs: 87,
     cancelledJobs: 3,
     totalRevenue: 18900,
@@ -46,7 +46,7 @@ export const technicians: Technician[] = [
     status: "inactive",
     paymentType: "hourly",
     paymentRate: 35,
-    hireDate: "2020-08-22", // Convert Date to string
+    hireDate: "2020-08-22",
     completedJobs: 215,
     cancelledJobs: 12,
     totalRevenue: 32400,
@@ -63,7 +63,7 @@ export const technicians: Technician[] = [
     status: "active",
     paymentType: "percentage",
     paymentRate: 55,
-    hireDate: "2021-11-05", // Convert Date to string
+    hireDate: "2021-11-05",
     completedJobs: 92,
     cancelledJobs: 5,
     totalRevenue: 19850,
@@ -80,7 +80,7 @@ export const technicians: Technician[] = [
     status: "onLeave",
     paymentType: "flat",
     paymentRate: 95,
-    hireDate: "2022-04-18", // Convert Date to string
+    hireDate: "2022-04-18",
     completedJobs: 68,
     cancelledJobs: 2,
     totalRevenue: 14300,
@@ -97,7 +97,7 @@ export const technicians: Technician[] = [
     status: "active",
     paymentType: "hourly",
     paymentRate: 32,
-    hireDate: "2021-07-30", // Convert Date to string
+    hireDate: "2021-07-30",
     completedJobs: 124,
     cancelledJobs: 8,
     totalRevenue: 22600,
@@ -114,7 +114,7 @@ export const technicians: Technician[] = [
     status: "active",
     paymentType: "percentage",
     paymentRate: 65,
-    hireDate: "2020-12-15", // Convert Date to string
+    hireDate: "2020-12-15",
     completedJobs: 178,
     cancelledJobs: 10,
     totalRevenue: 38200,
@@ -122,3 +122,6 @@ export const technicians: Technician[] = [
     initials: "RM"
   }
 ];
+
+// Export the same array as initialTechnicians to fix import errors
+export const initialTechnicians = technicians;

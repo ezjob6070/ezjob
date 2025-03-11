@@ -1,3 +1,4 @@
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +34,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { technicianSchema } from "@/lib/validations/technician";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera } from "lucide-react";
+import { Camera, CalendarIcon } from "lucide-react";
 import { forwardRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -56,17 +57,24 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
 import { PopoverClose } from "@radix-ui/react-popover";
 import { DatePicker } from "../ui/date-picker";
 import { Technician } from "@/types/technician";
+import * as z from "zod";
 
 interface EditTechnicianModalProps {
   technician: Technician;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onUpdateTechnician: (technician: Technician) => void;
 }
 
-export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) => {
-  const [open, setOpen] = useState(false);
+export function EditTechnicianModal({ 
+  technician, 
+  open, 
+  onOpenChange,
+  onUpdateTechnician 
+}: EditTechnicianModalProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -76,13 +84,14 @@ export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) =>
     defaultValues: {
       name: technician.name,
       email: technician.email,
-      phone: technician.phone,
-      address: technician.address,
+      phone: technician.phone || "",
+      address: technician.address || "",
       specialty: technician.specialty,
       status: technician.status,
       paymentType: technician.paymentType,
       paymentRate: technician.paymentRate.toString(),
-      hireDate: technician.hireDate,
+      hireDate: technician.hireDate || "",
+      notes: technician.notes || "",
     },
   });
 
@@ -91,20 +100,30 @@ export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) =>
       // Simulate API update
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      // Optimistically update the cache
-      queryClient.setQueryData<Technician[]>(['technicians'], (old) => {
-        if (!old) return [];
-        return old.map((tech) => tech.id === technician.id ? { ...technician, ...values } : tech);
-      });
-
       return values;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const updatedTechnician: Technician = {
+        ...technician,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        specialty: data.specialty,
+        status: data.status,
+        paymentType: data.paymentType,
+        paymentRate: parseFloat(data.paymentRate),
+        hireDate: data.hireDate,
+        notes: data.notes,
+      };
+      
+      onUpdateTechnician(updatedTechnician);
+      
       toast({
         title: "Technician updated successfully!",
       });
-      queryClient.invalidateQueries({ queryKey: ['technicians'] });
-      setOpen(false);
+      
+      onOpenChange(false);
     },
     onError: (error) => {
       toast({
@@ -116,12 +135,7 @@ export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) =>
   });
 
   const handleSubmit = (data: z.infer<typeof technicianSchema>) => {
-    updateTechnician({
-      ...data,
-      status: data.status as "active" | "inactive" | "onLeave",
-      paymentType: data.paymentType as "percentage" | "flat" | "hourly",
-      paymentRate: parseFloat(data.paymentRate),
-    });
+    updateTechnician(data);
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,10 +150,7 @@ export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) =>
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Edit</Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Technician</DialogTitle>
@@ -306,12 +317,6 @@ export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) =>
                 </div>
               </div>
               
-              {/* Remove or comment out the salary display that doesn't exist */}
-              {/* <div className="flex justify-between text-sm">
-                <div className="text-muted-foreground">Salary:</div>
-                <div className="font-medium">${technician.salary}/yr</div>
-              </div> */}
-
               <FormField
                 control={form.control}
                 name="hireDate"
@@ -341,7 +346,7 @@ export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) =>
                         <DatePicker
                           mode="single"
                           selected={field.value ? new Date(field.value) : undefined}
-                          onSelect={(date) => field.onChange(date?.toISOString())}
+                          onSelect={(date) => field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")}
                           disabled={false}
                           initialFocus
                         />
@@ -366,4 +371,7 @@ export const EditTechnicianModal = ({ technician }: EditTechnicianModalProps) =>
       </DialogContent>
     </Dialog>
   );
-};
+}
+
+// For backward compatibility
+export default EditTechnicianModal;

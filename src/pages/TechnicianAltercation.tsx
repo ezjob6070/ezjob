@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Table,
@@ -8,8 +9,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +18,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { MoreVertical, Copy, Edit, Trash, FileInput, Plus, Upload, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,8 +34,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { toast } from "@/components/ui/use-toast"
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/components/ui/use-toast";
 import { technicians } from "@/data/technicians";
 import {
   Dialog,
@@ -43,9 +44,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
-import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
+import { EditTechnicianModal } from "@/components/technicians/EditTechnicianModal";
 import TechnicianCard from "@/components/technicians/TechnicianCard";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { cn } from "@/lib/utils";
@@ -80,7 +81,7 @@ export default function TechnicianAltercation() {
 
   const filteredTechnicians = technicians.filter((technician) => {
     const searchRegex = new RegExp(searchValue, "i");
-    const matchesSearch = searchRegex.test(technician.name) || searchRegex.test(technician.email) || searchRegex.test(technician.phone);
+    const matchesSearch = searchRegex.test(technician.name) || searchRegex.test(technician.email) || (technician.phone && searchRegex.test(technician.phone));
     const matchesSpecialty = selectedSpecialties.length === 0 || selectedSpecialties.includes(technician.specialty);
     const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(technician.status);
 
@@ -100,9 +101,17 @@ export default function TechnicianAltercation() {
       case "revenue-low":
         return a.totalRevenue - b.totalRevenue;
       case "hourly-high":
-        return a.paymentType === 'hourly' && b.paymentType === 'hourly' ? b.paymentRate - a.paymentRate : 0;
+        // Safely compare hourly rates
+        if (a.paymentType === "hourly" && b.paymentType === "hourly") {
+          return b.paymentRate - a.paymentRate;
+        }
+        return 0;
       case "hourly-low":
-        return a.paymentType === 'hourly' && b.paymentType === 'hourly' ? a.paymentRate - b.paymentRate : 0;
+        // Safely compare hourly rates
+        if (a.paymentType === "hourly" && b.paymentType === "hourly") {
+          return a.paymentRate - b.paymentRate;
+        }
+        return 0;
       default:
         return 0;
     }
@@ -142,13 +151,26 @@ export default function TechnicianAltercation() {
     toast({
       title: "Technician deleted.",
       description: "Your technician has been deleted from the system.",
-    })
-  }
+    });
+  };
 
   const handleEditOpen = (id: string) => {
     setSelectedTechnician(id);
     setEditOpen(true);
-  }
+  };
+
+  // Find the currently selected technician for edit
+  const technicianToEdit = selectedTechnician 
+    ? technicians.find(tech => tech.id === selectedTechnician) || null
+    : null;
+
+  // Mock handler for technician update
+  const handleUpdateTechnician = (updatedTechnician: any) => {
+    toast({
+      title: "Technician updated successfully",
+      description: `${updatedTechnician.name} has been updated.`
+    });
+  };
 
   return (
     <div>
@@ -351,11 +373,14 @@ export default function TechnicianAltercation() {
         </Table>
       )}
 
-      <EditTechnicianModal
-        open={editOpen}
-        setOpen={setEditOpen}
-        technicianId={selectedTechnician}
-      />
+      {technicianToEdit && (
+        <EditTechnicianModal
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          technician={technicianToEdit}
+          onUpdateTechnician={handleUpdateTechnician}
+        />
+      )}
     </div>
-  )
+  );
 }

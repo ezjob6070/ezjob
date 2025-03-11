@@ -10,17 +10,18 @@ export interface Technician {
   phone?: string;
   initials: string;
   specialty: string;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "onLeave";
   category?: string;
   completedJobs: number;
   cancelledJobs: number;
   totalRevenue: number;
   rating: number;
   startDate?: string;
+  hireDate?: string;
   address?: string;
   notes?: string;
   imageUrl?: string;
-  paymentType: "percentage" | "flat";
+  paymentType: "percentage" | "flat" | "hourly";
   paymentRate: number;
   
   // Salary-related fields

@@ -1,3 +1,4 @@
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,47 +26,23 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
+import { technicianSchema } from "@/lib/validations/technician";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from 'uuid';
 import * as z from "zod";
-import { storage } from "../../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { DatePicker } from "../ui/date-picker";
 import { Technician } from "@/types/technician";
-
-const technicianSchema = z.object({
-  name: z.string().min(2, {
-    message: "Technician name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  phone: z.string().min(10, {
-    message: "Please enter a valid phone number.",
-  }),
-  address: z.string().min(5, {
-    message: "Please enter a valid address.",
-  }),
-  specialty: z.string().min(2, {
-    message: "Please enter a valid specialty.",
-  }),
-  status: z.enum(["active", "inactive", "onLeave"]).default("active"),
-  paymentType: z.enum(["percentage", "flat", "hourly"]).default("percentage"),
-  paymentRate: z.string().min(1, {
-    message: "Please enter a valid payment rate.",
-  }),
-  hireDate: z.string().min(1, {
-    message: "Please enter a valid hire date.",
-  }),
-  notes: z.string().optional(),
-});
+import { PopoverClose } from "@radix-ui/react-popover";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 interface AddTechnicianModalProps {
   open: boolean;
@@ -75,7 +52,6 @@ interface AddTechnicianModalProps {
 const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ open, setOpen }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const { addTechnician } = useGlobalState();
   const { toast } = useToast();
 
@@ -114,62 +90,27 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ open, setOpen }
     }
   };
 
-  const handleImageUpload = async () => {
-    if (!selectedImage) {
-      toast({
-        title: "No image selected.",
-        description: "Please select an image to upload.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const storageRef = ref(storage, `technicianImages/${selectedImage.name}`);
-      const snapshot = await uploadBytes(storageRef, selectedImage);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-
-      toast({
-        title: "Upload Successful",
-        description: "Image uploaded successfully!",
-      });
-
-      setImageUrl(downloadURL);
-    } catch (error: any) {
-      toast({
-        title: "Upload Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-      setSelectedImage(null);
-    }
-  };
-
   const getInitials = (name: string) => {
     return name.split(" ").map((n) => n[0]).join("");
   };
 
   const handleSubmit = (data: z.infer<typeof technicianSchema>) => {
-    if (selectedImage) {
-      handleImageUpload();
-    }
-
     const newTechnician: Technician = {
       id: uuidv4(),
       initials: getInitials(data.name),
-      status: data.status as "active" | "inactive" | "onLeave",
-      paymentType: data.paymentType as "percentage" | "flat" | "hourly",
+      status: data.status,
+      paymentType: data.paymentType,
       paymentRate: parseFloat(data.paymentRate),
       completedJobs: 0,
-      cancelledJobs: 0,  // Add this missing field
+      cancelledJobs: 0,
       totalRevenue: 0,
       rating: 0,
       ...data,
     };
+
+    if (imageUrl) {
+      newTechnician.imageUrl = imageUrl;
+    }
 
     addTechnician(newTechnician);
     toast({
@@ -200,14 +141,14 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ open, setOpen }
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <Camera className="w-12 h-12 text-gray-500" />
+                    <Calendar className="w-12 h-12 text-gray-500" />
                   </div>
                 )}
                 <label
                   htmlFor="image-upload"
                   className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
                 >
-                  <Camera className="w-6 h-6 mr-2" />
+                  <Calendar className="w-6 h-6 mr-2" />
                   Upload
                 </label>
                 <input
@@ -344,11 +285,40 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ open, setOpen }
               control={form.control}
               name="hireDate"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Hire Date</FormLabel>
-                  <FormControl>
-                    <Input placeholder="YYYY-MM-DD" {...field} />
-                  </FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(new Date(field.value), "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <DatePicker
+                        mode="single"
+                        selected={field.value ? new Date(field.value) : undefined}
+                        onSelect={(date) => field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")}
+                        disabled={false}
+                        initialFocus
+                      />
+                      <PopoverClose>
+                        <Button className="w-full" variant={"secondary"}>Close</Button>
+                      </PopoverClose>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
