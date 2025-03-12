@@ -1,69 +1,30 @@
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
+import { technicianSchema } from "@/lib/validations/technician";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
-import { technicianSchema } from "@/lib/validations/technician";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, CalendarIcon } from "lucide-react";
-import { forwardRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import { getInitials } from "@/lib/utils";
-import { v4 as uuidv4 } from 'uuid';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { format } from "date-fns"
-import { PopoverClose } from "@radix-ui/react-popover";
-import { DatePicker } from "../ui/date-picker";
+import { Button } from "@/components/ui/button";
 import { Technician } from "@/types/technician";
 import * as z from "zod";
+import { TechnicianImageUpload } from "./TechnicianImageUpload";
+import { TechnicianBasicInfoFields } from "./TechnicianBasicInfoFields";
+import { TechnicianStatusFields } from "./TechnicianStatusFields";
+import { TechnicianDateField } from "./TechnicianDateField";
 
 interface EditTechnicianModalProps {
-  technician: Technician;
+  technician: Technician | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdateTechnician: (technician: Technician) => void;
@@ -76,12 +37,11 @@ export function EditTechnicianModal({
   onUpdateTechnician 
 }: EditTechnicianModalProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof technicianSchema>>({
     resolver: zodResolver(technicianSchema),
-    defaultValues: {
+    defaultValues: technician ? {
       name: technician.name,
       email: technician.email,
       phone: technician.phone || "",
@@ -90,9 +50,9 @@ export function EditTechnicianModal({
       status: technician.status,
       paymentType: technician.paymentType,
       paymentRate: technician.paymentRate.toString(),
-      hireDate: technician.hireDate || "",
+      hireDate: technician.hireDate,
       notes: technician.notes || "",
-    },
+    } : undefined,
   });
 
   const { mutate: updateTechnician } = useMutation({
@@ -103,6 +63,8 @@ export function EditTechnicianModal({
       return values;
     },
     onSuccess: (data) => {
+      if (!technician) return;
+      
       const updatedTechnician: Technician = {
         ...technician,
         name: data.name,
@@ -115,6 +77,7 @@ export function EditTechnicianModal({
         paymentRate: parseFloat(data.paymentRate),
         hireDate: data.hireDate,
         notes: data.notes,
+        imageUrl: selectedImage || technician.imageUrl,
       };
       
       onUpdateTechnician(updatedTechnician);
@@ -138,16 +101,7 @@ export function EditTechnicianModal({
     updateTechnician(data);
   };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  if (!technician) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -160,151 +114,16 @@ export function EditTechnicianModal({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-12 w-12">
-                {selectedImage ? (
-                  <img
-                    src={selectedImage}
-                    alt="Technician Avatar"
-                    className="rounded-full"
-                  />
-                ) : (
-                  <AvatarFallback>{technician.initials}</AvatarFallback>
-                )}
-              </Avatar>
-              <div>
-                <Label htmlFor="picture">Change Picture</Label>
-                <Input
-                  id="picture"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </div>
-            </div>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Technician Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <TechnicianImageUpload 
+              initials={technician.initials} 
+              defaultImage={technician.imageUrl} 
+              onImageChange={setSelectedImage}
             />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="mail@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+1 (555) 123-4567" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="123 Example St. City, State" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="specialty"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Specialty</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Plumbing, Electrical, etc." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="onLeave">On Leave</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="paymentType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a payment type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="percentage">Percentage</SelectItem>
-                      <SelectItem value="flat">Flat</SelectItem>
-                      <SelectItem value="hourly">Hourly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="paymentRate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Rate</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Payment Rate" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
+            <TechnicianBasicInfoFields control={form.control} />
+            
+            <TechnicianStatusFields control={form.control} />
+            
             <div className="grid gap-2 py-2">
               <div className="flex justify-between text-sm">
                 <div className="text-muted-foreground">Pay Rate:</div>
@@ -317,52 +136,14 @@ export function EditTechnicianModal({
                 </div>
               </div>
               
-              <FormField
+              <TechnicianDateField 
                 control={form.control}
                 name="hireDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Hire Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(new Date(field.value), "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <DatePicker
-                          mode="single"
-                          selected={field.value ? new Date(field.value) : undefined}
-                          onSelect={(date) => field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")}
-                          disabled={false}
-                          initialFocus
-                        />
-                        <PopoverClose>
-                          <Button className="w-full" variant={'secondary'}>Close</Button>
-                        </PopoverClose>
-                      </PopoverContent>
-                    </Popover>
-                    <FormDescription>
-                      The date the technician was hired.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Hire Date"
+                description="The date the technician was hired."
               />
             </div>
+            
             <div className="flex justify-end">
               <Button type="submit">Update Technician</Button>
             </div>

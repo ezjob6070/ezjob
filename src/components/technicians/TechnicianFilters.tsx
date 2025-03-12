@@ -8,7 +8,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Search, UserPlus, X } from "lucide-react";
+import { Calendar as CalendarIcon, Search, UserPlus, X, Filter, Download } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -18,14 +18,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import { Technician } from "@/types/technician";
 import TechnicianSelectDropdown from "./filters/TechnicianSelectDropdown";
 import TechnicianSearchBar from "./filters/TechnicianSearchBar";
 import DateSortFilter from "./filters/DateSortFilter";
+import { cn } from "@/lib/utils";
 
-// Extended sort options
+// Define extended sort options
 type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
 
 interface TechnicianFiltersProps {
@@ -100,7 +102,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="gap-2">
-                <Calendar className="h-4 w-4" />
+                <CalendarIcon className="h-4 w-4" />
                 {date?.from ? (
                   date.to ? (
                     <>
@@ -122,6 +124,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
                 selected={date}
                 onSelect={setDate}
                 numberOfMonths={2}
+                className={cn("p-3 pointer-events-auto")}
               />
             </PopoverContent>
           </Popover>
