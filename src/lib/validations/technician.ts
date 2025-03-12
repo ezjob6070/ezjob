@@ -26,4 +26,7 @@ export const technicianSchema = z.object({
     message: "Please enter a valid hire date.",
   }),
   notes: z.string().optional(),
+  contractType: z.string().optional(),
+  position: z.string().optional(),
+  department: z.string().optional(),
 });

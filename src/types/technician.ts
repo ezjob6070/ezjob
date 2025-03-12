@@ -29,6 +29,7 @@ export interface Technician {
   incentiveAmount?: number;
   department?: string;
   position?: string;
+  contractType?: string;
   skills?: string[];
   dateOfBirth?: string;
   emergencyContact?: string;
