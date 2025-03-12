@@ -1,16 +1,26 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, ListChecks } from "lucide-react";
+import { PlusIcon, ListChecks, Filter, Download, MoreHorizontal } from "lucide-react";
+import { DateRange } from "react-day-picker";
 import { Technician } from "@/types/technician";
 import { Link } from "react-router-dom";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
-import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
+import { EditTechnicianModal } from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import { initialTechnicians } from "@/data/technicians";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Define extended sort options
 type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
@@ -26,10 +36,18 @@ const Technicians = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   
-  const categories = technicians
-    .map(tech => tech.category || "Uncategorized")
-    .filter((value, index, self) => self.indexOf(value) === index);
+  // Extract departments and categories from technicians
+  const categories = Array.from(new Set(
+    technicians.map(tech => tech.category || "Uncategorized")
+  ));
+  
+  const departments = Array.from(new Set(
+    technicians.map(tech => tech.department || "General")
+  ));
+  
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
   const filteredTechnicians = technicians
     .filter(tech => {
@@ -45,14 +63,21 @@ const Technicians = () => {
       const matchesStatus = statusFilter === "all" || 
         tech.status === statusFilter;
       
-      return matchesSearch && matchesCategory && matchesStatus;
+      const matchesDepartment = selectedDepartments.length === 0 ||
+        selectedDepartments.includes(tech.department || "General");
+      
+      const matchesDateRange = !dateRange?.from ||
+        (tech.hireDate && new Date(tech.hireDate) >= dateRange.from &&
+         (!dateRange.to || new Date(tech.hireDate) <= dateRange.to));
+      
+      return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange;
     })
     .sort((a, b) => {
       switch (sortOption) {
         case "newest":
-          return new Date(b.startDate || 0).getTime() - new Date(a.startDate || 0).getTime();
+          return new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime();
         case "oldest":
-          return new Date(a.startDate || 0).getTime() - new Date(b.startDate || 0).getTime();
+          return new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime();
         case "name-asc":
           return a.name.localeCompare(b.name);
         case "name-desc":
@@ -114,6 +139,16 @@ const Technicians = () => {
       }
     });
   };
+  
+  const toggleDepartment = (department: string) => {
+    setSelectedDepartments(prev => {
+      if (prev.includes(department)) {
+        return prev.filter(d => d !== department);
+      } else {
+        return [...prev, department];
+      }
+    });
+  };
 
   const handleSortChange = (option: SortOption) => {
     setSortOption(option);
@@ -123,6 +158,27 @@ const Technicians = () => {
     toast({
       title: "Category Added",
       description: `New category "${category}" has been added.`,
+    });
+  };
+  
+  const exportTechnicians = () => {
+    const dataToExport = filteredTechnicians;
+    const json = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const href = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = 'technicians-export.json';
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+    
+    toast({
+      title: "Export Successful",
+      description: `Exported ${dataToExport.length} technicians to JSON.`,
     });
   };
 
@@ -144,6 +200,28 @@ const Technicians = () => {
               Technician Altercation
             </Button>
           </Link>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <MoreHorizontal className="h-4 w-4 mr-2" />
+                Actions
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Technician Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={exportTechnicians}>
+                <Download className="h-4 w-4 mr-2" />
+                Export Technicians
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Filter className="h-4 w-4 mr-2" />
+                Bulk Edit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
           <Button 
             onClick={() => setShowAddModal(true)}
             className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900"
@@ -170,6 +248,11 @@ const Technicians = () => {
           onSearchChange={handleSearchChange}
           sortOption={sortOption}
           onSortChange={handleSortChange}
+          date={dateRange}
+          setDate={setDateRange}
+          departments={departments}
+          selectedDepartments={selectedDepartments}
+          toggleDepartment={toggleDepartment}
         />
       </div>
       
@@ -180,6 +263,7 @@ const Technicians = () => {
         selectedTechnicians={selectedTechnicians}
         onToggleSelect={toggleTechnician}
         onEditTechnician={handleEditTechnician}
+        showSalaryData={selectedDepartments.includes("Finance") || selectedDepartments.length === 0}
       />
       
       <AddTechnicianModal 

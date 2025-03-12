@@ -1,7 +1,6 @@
 
 import { SalaryBasis, IncentiveType } from './employee';
 
-// Add more type definition if needed
 export interface Technician {
   id: string;
   name: string;
@@ -16,16 +15,24 @@ export interface Technician {
   totalRevenue: number;
   rating: number;
   startDate?: string;
-  hireDate: string; // Made this required since it's used throughout the code
+  hireDate: string; // Required field
   address?: string;
   notes?: string;
   imageUrl?: string;
   paymentType: "percentage" | "flat" | "hourly";
   paymentRate: number;
   
-  // Salary-related fields
+  // Salary-related fields matching employee functionality
   salaryBasis?: SalaryBasis;
   hourlyRate?: number;
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
+  department?: string;
+  position?: string;
+  skills?: string[];
+  dateOfBirth?: string;
+  emergencyContact?: string;
+  education?: string[];
+  certifications?: string[];
+  performanceRating?: number;
 }
