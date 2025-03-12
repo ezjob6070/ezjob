@@ -3,12 +3,14 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Control } from "react-hook-form";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TechnicianStatusFieldsProps {
   control: Control<any>;
+  showAdvancedFields?: boolean;
 }
 
-export function TechnicianStatusFields({ control }: TechnicianStatusFieldsProps) {
+export function TechnicianStatusFields({ control, showAdvancedFields = false }: TechnicianStatusFieldsProps) {
   return (
     <>
       <FormField
@@ -27,6 +29,8 @@ export function TechnicianStatusFields({ control }: TechnicianStatusFieldsProps)
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="inactive">Inactive</SelectItem>
                 <SelectItem value="onLeave">On Leave</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+                <SelectItem value="terminated">Terminated</SelectItem>
               </SelectContent>
             </Select>
             <FormMessage />
@@ -49,6 +53,7 @@ export function TechnicianStatusFields({ control }: TechnicianStatusFieldsProps)
                 <SelectItem value="percentage">Percentage</SelectItem>
                 <SelectItem value="flat">Flat</SelectItem>
                 <SelectItem value="hourly">Hourly</SelectItem>
+                <SelectItem value="salary">Salary</SelectItem>
               </SelectContent>
             </Select>
             <FormMessage />
@@ -68,6 +73,95 @@ export function TechnicianStatusFields({ control }: TechnicianStatusFieldsProps)
           </FormItem>
         )}
       />
+      
+      {showAdvancedFields && (
+        <>
+          <FormField
+            control={control}
+            name="salaryBasis"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Salary Basis</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select salary basis" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="HOURLY">Hourly</SelectItem>
+                    <SelectItem value="WEEKLY">Weekly</SelectItem>
+                    <SelectItem value="MONTHLY">Monthly</SelectItem>
+                    <SelectItem value="YEARLY">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="hourlyRate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Hourly Rate</FormLabel>
+                <FormControl>
+                  <Input placeholder="Hourly Rate" type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="incentiveType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Incentive Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select incentive type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="HOURLY">Per Hour</SelectItem>
+                    <SelectItem value="WEEKLY">Per Week</SelectItem>
+                    <SelectItem value="MONTHLY">Per Month</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="incentiveAmount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Incentive Amount</FormLabel>
+                <FormControl>
+                  <Input placeholder="Incentive Amount" type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Additional notes about the technician" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </>
+      )}
     </>
   );
 }

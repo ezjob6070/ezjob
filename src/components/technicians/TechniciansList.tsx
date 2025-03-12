@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { Star, Edit, Trash2, LayoutGrid, List, Clock, DollarSign, Calendar } from "lucide-react";
+import { Star, Edit, Trash2, LayoutGrid, List, Clock, DollarSign, Calendar, User, Phone, Mail, MapPin, Briefcase, CheckCircle, XCircle } from "lucide-react";
 import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 interface Technician {
@@ -25,6 +25,14 @@ interface Technician {
   salaryBasis?: SalaryBasis;
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
+  phone?: string;
+  address?: string;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  contractType?: string;
+  department?: string;
+  position?: string;
+  hireDate?: string;
 }
 
 interface TechniciansListProps {
@@ -54,6 +62,12 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
         return "success" as const;
       case "inactive":
         return "secondary" as const;
+      case "onleave":
+        return "warning" as const;
+      case "suspended":
+        return "destructive" as const;
+      case "terminated":
+        return "outline" as const;
       default:
         return "default" as const;
     }
@@ -141,75 +155,92 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
               className="cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => navigate(`/technicians/${technician.id}`)}
             >
-              <CardContent className="pt-6">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <Badge
+                    variant={getBadgeVariantFromStatus(technician.status)}
+                    className="capitalize"
+                  >
+                    {technician.status}
+                  </Badge>
+                  {technician.department && (
+                    <Badge variant="outline">{technician.department}</Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="pt-2">
                 <div className="flex items-center gap-4 mb-4">
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="h-16 w-16">
                     <AvatarImage src={technician.imageUrl || ""} alt={technician.name} />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xl">
                       {technician.initials}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h3 className="font-medium text-lg">{technician.name}</h3>
-                    <p className="text-sm text-muted-foreground">{technician.email}</p>
+                    <p className="text-sm text-muted-foreground">{technician.specialty || "General"}</p>
+                    <div className="flex items-center text-xs text-muted-foreground mt-1">
+                      <Star className="w-3 h-3 text-yellow-400 mr-1 fill-yellow-400" />
+                      <span>{technician.rating || "N/A"}</span>
+                    </div>
                   </div>
                 </div>
                 
-                {showSalaryData ? (
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground flex items-center">
-                        <Clock className="h-3.5 w-3.5 mr-1" />
-                        Hourly Rate
-                      </p>
-                      <p className="font-medium">{formatHourlyRate(technician.hourlyRate)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Basis</p>
-                      <Badge
-                        variant="outline"
-                        className="capitalize"
-                      >
-                        {getSalaryBasisText(technician.salaryBasis)}
-                      </Badge>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Incentive Type</p>
-                      <p>{getIncentiveTypeText(technician.incentiveType)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Incentive Amount</p>
-                      <p className="font-medium">{formatHourlyRate(technician.incentiveAmount)}</p>
-                    </div>
+                <div className="grid grid-cols-1 gap-2 mb-4">
+                  <div className="flex items-center text-sm">
+                    <Mail className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                    <span className="truncate">{technician.email}</span>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Specialty</p>
-                      <p>{technician.specialty || "General"}</p>
+                  {technician.phone && (
+                    <div className="flex items-center text-sm">
+                      <Phone className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                      <span>{technician.phone}</span>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Status</p>
-                      <Badge
-                        variant={getBadgeVariantFromStatus(technician.status)}
-                        className="capitalize"
-                      >
-                        {technician.status}
-                      </Badge>
+                  )}
+                  {technician.address && (
+                    <div className="flex items-center text-sm">
+                      <MapPin className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                      <span className="truncate">{technician.address}</span>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Revenue</p>
-                      <p>{formatCurrency(technician.totalRevenue || 0)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Rating</p>
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 mr-1 fill-yellow-400" />
-                        <span>{technician.rating || "N/A"}</span>
-                      </div>
-                    </div>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Contract Type</p>
+                    <p className="text-sm font-medium">{technician.contractType || "N/A"}</p>
                   </div>
-                )}
+                  <div>
+                    <p className="text-xs text-muted-foreground">Position</p>
+                    <p className="text-sm font-medium">{technician.position || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground flex items-center">
+                      <CheckCircle className="h-3 w-3 mr-1 text-green-500" />
+                      Completed Jobs
+                    </p>
+                    <p className="text-sm font-medium">{technician.completedJobs || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground flex items-center">
+                      <XCircle className="h-3 w-3 mr-1 text-red-500" />
+                      Cancelled Jobs
+                    </p>
+                    <p className="text-sm font-medium">{technician.cancelledJobs || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Revenue</p>
+                    <p className="text-sm font-medium">{formatCurrency(technician.totalRevenue || 0)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Payment</p>
+                    <p className="text-sm font-medium">
+                      {technician.paymentType === "percentage" 
+                        ? `${technician.paymentRate}%` 
+                        : formatHourlyRate(technician.paymentRate)}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-2 bg-muted/30 p-2">
                 <Button
@@ -227,31 +258,17 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
           ))}
         </div>
       ) : (
-        <div>
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                {showSalaryData ? (
-                  <>
-                    <TableHead>Salary Basis</TableHead>
-                    <TableHead>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1" />
-                        Hourly Rate
-                      </div>
-                    </TableHead>
-                    <TableHead>Incentive Type</TableHead>
-                    <TableHead>Incentive Amount</TableHead>
-                  </>
-                ) : (
-                  <>
-                    <TableHead>Specialty</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Revenue</TableHead>
-                    <TableHead>Rating</TableHead>
-                  </>
-                )}
+                <TableHead className="w-[250px]">Technician</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Jobs</TableHead>
+                <TableHead>Revenue</TableHead>
+                <TableHead>Contract</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -272,44 +289,72 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
                       </Avatar>
                       <div>
                         <div className="font-semibold">{technician.name}</div>
-                        <div className="text-xs text-muted-foreground">{technician.email}</div>
+                        <div className="text-xs text-muted-foreground">{technician.specialty}</div>
+                        <div className="flex items-center mt-1">
+                          <Star className="w-3 h-3 text-yellow-400 mr-1 fill-yellow-400" />
+                          <span className="text-xs">{technician.rating || "N/A"}</span>
+                        </div>
                       </div>
                     </div>
                   </TableCell>
                   
-                  {showSalaryData ? (
-                    <>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {getSalaryBasisText(technician.salaryBasis)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {formatHourlyRate(technician.hourlyRate)}
-                      </TableCell>
-                      <TableCell>{getIncentiveTypeText(technician.incentiveType)}</TableCell>
-                      <TableCell>{formatHourlyRate(technician.incentiveAmount)}</TableCell>
-                    </>
-                  ) : (
-                    <>
-                      <TableCell>{technician.specialty || "General"}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={getBadgeVariantFromStatus(technician.status)}
-                          className="capitalize"
-                        >
-                          {technician.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{formatCurrency(technician.totalRevenue || 0)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 text-yellow-400 mr-1 fill-yellow-400" />
-                          <span>{technician.rating || "N/A"}</span>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="text-xs flex items-center">
+                        <Mail className="h-3 w-3 mr-1 text-muted-foreground" /> 
+                        <span className="truncate max-w-[150px]">{technician.email}</span>
+                      </div>
+                      {technician.phone && (
+                        <div className="text-xs flex items-center">
+                          <Phone className="h-3 w-3 mr-1 text-muted-foreground" /> 
+                          <span>{technician.phone}</span>
                         </div>
-                      </TableCell>
-                    </>
-                  )}
+                      )}
+                    </div>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <div>
+                      <div className="text-sm">{technician.department || "General"}</div>
+                      {technician.position && (
+                        <div className="text-xs text-muted-foreground">{technician.position}</div>
+                      )}
+                    </div>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <Badge
+                      variant={getBadgeVariantFromStatus(technician.status)}
+                      className="capitalize"
+                    >
+                      {technician.status}
+                    </Badge>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="text-xs flex items-center">
+                        <CheckCircle className="h-3 w-3 mr-1 text-green-500" /> 
+                        <span>{technician.completedJobs || 0} completed</span>
+                      </div>
+                      <div className="text-xs flex items-center">
+                        <XCircle className="h-3 w-3 mr-1 text-red-500" /> 
+                        <span>{technician.cancelledJobs || 0} cancelled</span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  
+                  <TableCell>{formatCurrency(technician.totalRevenue || 0)}</TableCell>
+                  
+                  <TableCell>
+                    <div>
+                      <div className="text-sm">{technician.contractType || "Standard"}</div>
+                      <div className="text-xs text-muted-foreground flex items-center">
+                        <Calendar className="h-3 w-3 mr-1" /> 
+                        {technician.hireDate ? new Date(technician.hireDate).toLocaleDateString() : "N/A"}
+                      </div>
+                    </div>
+                  </TableCell>
                   
                   <TableCell className="text-right">
                     <div className="flex justify-end items-center gap-1">
@@ -322,16 +367,6 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
                         }}
                       >
                         <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Handle delete
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
