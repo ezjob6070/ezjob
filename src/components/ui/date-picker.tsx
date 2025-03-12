@@ -17,14 +17,39 @@ export function DatePicker({
   disabled = false,
   initialFocus = false,
 }: DatePickerProps) {
-  return (
-    <Calendar
-      mode={mode}
-      selected={selected}
-      onSelect={onSelect}
-      disabled={disabled}
-      initialFocus={initialFocus}
-      className="p-0"
-    />
-  );
+  // We need to pass proper props based on the mode
+  if (mode === "single") {
+    return (
+      <Calendar
+        mode="single"
+        selected={selected as Date}
+        onSelect={onSelect as (date: Date | undefined) => void}
+        disabled={disabled}
+        initialFocus={initialFocus}
+        className="p-0"
+      />
+    );
+  } else if (mode === "range") {
+    return (
+      <Calendar
+        mode="range"
+        selected={selected as DateRange}
+        onSelect={onSelect as (date: DateRange | undefined) => void}
+        disabled={disabled}
+        initialFocus={initialFocus}
+        className="p-0"
+      />
+    );
+  } else {
+    return (
+      <Calendar
+        mode="multiple"
+        selected={selected as Date[]}
+        onSelect={onSelect as (date: Date[] | undefined) => void}
+        disabled={disabled}
+        initialFocus={initialFocus}
+        className="p-0"
+      />
+    );
+  }
 }

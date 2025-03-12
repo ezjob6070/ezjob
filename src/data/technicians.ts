@@ -123,5 +123,5 @@ export const technicians: Technician[] = [
   }
 ];
 
-// Export the same array as initialTechnicians to fix import errors
+// Export the same array as initialTechnicians for consistent reference
 export const initialTechnicians = technicians;

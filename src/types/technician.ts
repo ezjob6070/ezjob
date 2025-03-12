@@ -1,5 +1,4 @@
 
-// src/types/technician.ts
 import { SalaryBasis, IncentiveType } from './employee';
 
 // Add more type definition if needed
@@ -17,7 +16,7 @@ export interface Technician {
   totalRevenue: number;
   rating: number;
   startDate?: string;
-  hireDate?: string;
+  hireDate: string; // Made this required since it's used throughout the code
   address?: string;
   notes?: string;
   imageUrl?: string;

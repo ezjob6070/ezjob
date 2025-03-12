@@ -1,16 +1,21 @@
 
+import React, { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import { technicianSchema } from "@/lib/validations/technician";
+import { Technician } from "@/types/technician";
+import { getInitials } from "@/lib/utils";
+import { SalaryBasis, IncentiveType } from "@/types/employee";
+
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -19,42 +24,32 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
-import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
-import { technicianSchema } from "@/lib/validations/technician";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { v4 as uuidv4 } from 'uuid';
-import * as z from "zod";
-import { CalendarIcon } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
-import { DatePicker } from "../ui/date-picker";
-import { Technician } from "@/types/technician";
-import { PopoverClose } from "@radix-ui/react-popover";
-import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
-interface AddTechnicianModalProps {
+export interface AddTechnicianModalProps {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  onOpenChange: (open: boolean) => void;
+  onAddTechnician: (technician: Technician) => void;
 }
 
-const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ open, setOpen }) => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const { addTechnician } = useGlobalState();
-  const { toast } = useToast();
-
+const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ 
+  open, 
+  onOpenChange, 
+  onAddTechnician 
+}) => {
+  const [date, setDate] = useState<Date>();
+  
   const form = useForm<z.infer<typeof technicianSchema>>({
     resolver: zodResolver(technicianSchema),
     defaultValues: {
@@ -65,264 +60,237 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ open, setOpen }
       specialty: "",
       status: "active",
       paymentType: "percentage",
-      paymentRate: "",
+      paymentRate: "50",
       hireDate: "",
       notes: "",
     },
   });
-
-  useEffect(() => {
-    if (selectedImage) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result as string);
-      };
-      reader.readAsDataURL(selectedImage);
-    } else {
-      setImageUrl(null);
-    }
-  }, [selectedImage]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-    }
-  };
-
-  const getInitials = (name: string) => {
-    return name.split(" ").map((n) => n[0]).join("");
-  };
-
-  const handleSubmit = (data: z.infer<typeof technicianSchema>) => {
+  
+  function onSubmit(values: z.infer<typeof technicianSchema>) {
     const newTechnician: Technician = {
       id: uuidv4(),
-      initials: getInitials(data.name),
-      status: data.status,
-      paymentType: data.paymentType,
-      paymentRate: parseFloat(data.paymentRate),
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      address: values.address,
+      specialty: values.specialty,
+      status: values.status as "active" | "inactive" | "onLeave",
+      paymentType: values.paymentType as "percentage" | "flat" | "hourly",
+      paymentRate: Number(values.paymentRate), // Convert string to number
+      hireDate: values.hireDate,
+      notes: values.notes,
+      initials: getInitials(values.name),
+      // Default values for new technicians
       completedJobs: 0,
       cancelledJobs: 0,
       totalRevenue: 0,
-      rating: 0,
-      ...data,
+      rating: 5.0,
+      // Default salary-related fields if they're used elsewhere
+      salaryBasis: values.paymentType === "hourly" ? SalaryBasis.HOURLY : undefined,
+      hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : undefined,
     };
-
-    if (imageUrl) {
-      newTechnician.imageUrl = imageUrl;
-    }
-
-    addTechnician(newTechnician);
-    toast({
-      title: "Success",
-      description: "Technician added successfully!",
-    });
-    setOpen(false);
-  };
-
+    
+    onAddTechnician(newTechnician);
+    form.reset();
+    onOpenChange(false);
+  }
+  
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Add Technician</AlertDialogTitle>
-          <AlertDialogDescription>
-            Add a new technician to the system.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Add New Technician</DialogTitle>
+        </DialogHeader>
+        
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-32 h-32 rounded-full overflow-hidden relative">
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt="Technician"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <Calendar className="w-12 h-12 text-gray-500" />
-                  </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Technician Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                <label
-                  htmlFor="image-upload"
-                  className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
-                >
-                  <Calendar className="w-6 h-6 mr-2" />
-                  Upload
-                </label>
-                <input
-                  type="file"
-                  id="image-upload"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </div>
-            </div>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Technician Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="example@email.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="555-555-5555" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="123 Main St" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="specialty"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Specialty</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Plumbing" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
+                      <Input placeholder="email@example.com" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="onLeave">On Leave</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="paymentType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a payment type" />
-                      </SelectTrigger>
+                      <Input placeholder="Phone number" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="percentage">Percentage</SelectItem>
-                      <SelectItem value="flat">Flat</SelectItem>
-                      <SelectItem value="hourly">Hourly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="paymentRate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Rate</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Payment Rate" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="hireDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Hire Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="specialty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Specialty</FormLabel>
+                    <FormControl>
+                      <Input placeholder="E.g., Plumbing, Electrical, etc." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(new Date(field.value), "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
                       </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <DatePicker
-                        mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
-                        onSelect={(date) => field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")}
-                        disabled={false}
-                        initialFocus
-                      />
-                      <PopoverClose>
-                        <Button className="w-full" variant={"secondary"}>Close</Button>
-                      </PopoverClose>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="onLeave">On Leave</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="paymentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select payment type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="percentage">Percentage</SelectItem>
+                        <SelectItem value="flat">Flat Rate</SelectItem>
+                        <SelectItem value="hourly">Hourly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="paymentRate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {form.watch("paymentType") === "percentage"
+                        ? "Percentage Rate (%)"
+                        : form.watch("paymentType") === "flat"
+                        ? "Flat Rate ($)"
+                        : "Hourly Rate ($/hour)"}
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter rate" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="hireDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Hire Date</FormLabel>
+                    <div className="grid gap-2">
+                      {date ? (
+                        <Button
+                          variant="outline"
+                          className="justify-start text-left font-normal"
+                          onClick={() => form.setValue("hireDate", format(date, "yyyy-MM-dd"))}
+                          type="button"
+                        >
+                          {format(date, "PPP")}
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          className="justify-start text-left font-normal"
+                          type="button"
+                        >
+                          Pick a date
+                        </Button>
+                      )}
+                      <div className="border rounded-md p-3">
+                        <DatePicker
+                          mode="single"
+                          selected={date}
+                          onSelect={(date) => {
+                            setDate(date as Date);
+                            if (date) {
+                              form.setValue("hireDate", format(date as Date, "yyyy-MM-dd"));
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
             <FormField
               control={form.control}
               name="notes"
@@ -330,20 +298,27 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({ open, setOpen }
                 <FormItem>
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Notes" {...field} />
+                    <Textarea
+                      placeholder="Additional notes about the technician"
+                      className="min-h-[100px]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <Button type="submit">Submit</Button>
-            </AlertDialogFooter>
+            
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add Technician</Button>
+            </DialogFooter>
           </form>
         </Form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 
