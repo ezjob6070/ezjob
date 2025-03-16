@@ -9,7 +9,15 @@ export const filterTechnicians = (
   paymentTypeFilter: string,
   selectedTechnicianNames: string[]
 ) => {
+  // Ensure technicians is not null or undefined
+  if (!technicians || technicians.length === 0) {
+    return [];
+  }
+
   return technicians.filter(tech => {
+    // Ensure tech is not null before accessing properties
+    if (!tech) return false;
+    
     // Filter by payment type
     const matchesPaymentType = 
       paymentTypeFilter === "all" || 
@@ -31,6 +39,8 @@ export const toggleTechnicianInFilter = (
   techName: string,
   selectedTechnicianNames: string[]
 ) => {
+  if (!techName) return selectedTechnicianNames;
+  
   return selectedTechnicianNames.includes(techName) 
     ? selectedTechnicianNames.filter(t => t !== techName)
     : [...selectedTechnicianNames, techName];

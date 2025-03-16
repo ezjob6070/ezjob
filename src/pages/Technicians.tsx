@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Technician } from "@/types/technician";
 import useTechniciansData from "@/hooks/useTechniciansData";
@@ -45,6 +44,23 @@ const Technicians = () => {
     setShowEditModal(true);
   };
 
+  const handleUpdateTechnicianForm = (values: any) => {
+    if (!selectedTechnician) return;
+    
+    const updatedTechnician: Technician = {
+      ...selectedTechnician,
+      ...values,
+      id: selectedTechnician.id,
+      initials: selectedTechnician.initials,
+      completedJobs: selectedTechnician.completedJobs,
+      cancelledJobs: selectedTechnician.cancelledJobs,
+      totalRevenue: selectedTechnician.totalRevenue,
+      rating: selectedTechnician.rating
+    };
+    
+    handleUpdateTechnician(updatedTechnician);
+  };
+
   return (
     <div className="space-y-8 py-8">
       <TechniciansPageHeader 
@@ -77,7 +93,7 @@ const Technicians = () => {
         />
       </div>
       
-      <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} />
+      <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} dateRange={dateRange} />
       
       <TechniciansList 
         technicians={filteredTechnicians}
@@ -96,7 +112,7 @@ const Technicians = () => {
       <EditTechnicianModal
         open={showEditModal}
         onOpenChange={setShowEditModal}
-        onUpdateTechnician={handleUpdateTechnician}
+        onUpdateTechnician={handleUpdateTechnicianForm}
         technician={selectedTechnician}
       />
     </div>

@@ -5,13 +5,25 @@ import { Technician } from "@/types/technician";
  * Calculate total financial metrics for all technicians
  */
 export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) => {
+  // Default values if no technicians or empty array
+  if (!displayedTechnicians || displayedTechnicians.length === 0) {
+    return { 
+      totalRevenue: 0, 
+      technicianEarnings: 0, 
+      totalExpenses: 0, 
+      companyProfit: 0 
+    };
+  }
+  
   // Calculate total revenue from technicians
-  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
+  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech?.totalRevenue || 0), 0);
   
   // Calculate total technician payments
-  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => 
-    sum + tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1), 0
-  );
+  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => {
+    if (!tech) return sum;
+    const rate = tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1;
+    return sum + (tech.totalRevenue || 0) * rate;
+  }, 0);
   
   // Estimate expenses as 33% of revenue
   const totalExpenses = totalRevenue * 0.33;
@@ -33,7 +45,7 @@ export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) =>
 export const calculateTechnicianMetrics = (technician: Technician | null) => {
   if (!technician) return null;
   
-  const revenue = technician.totalRevenue;
+  const revenue = technician.totalRevenue || 0;
   const earnings = revenue * (technician.paymentType === "percentage" 
     ? technician.paymentRate / 100 
     : 1);

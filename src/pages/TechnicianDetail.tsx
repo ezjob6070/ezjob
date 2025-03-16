@@ -14,6 +14,7 @@ import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakd
 import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
 import TechnicianDetailCard from "@/components/technicians/charts/TechnicianDetailCard";
 import JobsRevenueComparison from "@/components/technicians/JobsRevenueComparison";
+import { calculateFinancialMetrics } from "@/hooks/technicians/financialUtils";
 
 const TechnicianDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,12 +48,22 @@ const TechnicianDetail = () => {
   }, [id, navigate, toast]);
 
   const handleUpdateTechnician = (values: any) => {
+    if (!technician) return;
+    
     const updatedTechnician: Technician = {
-      ...technician!,
-      ...values
+      ...technician,
+      ...values,
+      id: technician.id,
+      initials: technician.initials,
+      completedJobs: technician.completedJobs,
+      cancelledJobs: technician.cancelledJobs,
+      totalRevenue: technician.totalRevenue,
+      rating: technician.rating
     };
     
     setTechnician(updatedTechnician);
+    setFilteredTechnicians([updatedTechnician]);
+    setDisplayedTechnicians([updatedTechnician]);
     
     toast({
       title: "Success",
@@ -117,6 +128,8 @@ const TechnicianDetail = () => {
     totalRevenue: technician.totalRevenue,
     rating: technician.rating
   };
+  
+  const financialMetrics = calculateFinancialMetrics([technician]);
 
   return (
     <div className="space-y-6">
@@ -189,8 +202,11 @@ const TechnicianDetail = () => {
 
         <TabsContent value="financial" className="space-y-6">
           <PaymentBreakdownCards 
-            technicians={[technician]} 
-            dateRangeText="All Time" 
+            revenue={financialMetrics.totalRevenue}
+            technicianEarnings={financialMetrics.technicianEarnings}
+            expenses={financialMetrics.totalExpenses}
+            profit={financialMetrics.companyProfit}
+            dateRangeText="All Time"
           />
           <TechnicianFinancialTable 
             filteredTechnicians={filteredTechnicians}
