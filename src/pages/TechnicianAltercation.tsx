@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
+import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 
 const TechnicianAltercation = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const TechnicianAltercation = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
 
-  const handleUpdateTechnician = (values: any) => {
+  const handleUpdateTechnician = (values: TechnicianEditFormValues) => {
     // Convert form values to Technician type and ensure all required fields are present
     const updatedTechnician: Technician = {
       ...selectedTechnician!,

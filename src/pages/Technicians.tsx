@@ -8,6 +8,7 @@ import TechniciansList from "@/components/technicians/TechniciansList";
 import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
+import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -44,7 +45,7 @@ const Technicians = () => {
     setShowEditModal(true);
   };
 
-  const handleUpdateTechnicianForm = (values: any) => {
+  const handleUpdateTechnicianForm = (values: TechnicianEditFormValues) => {
     if (!selectedTechnician) return;
     
     const updatedTechnician: Technician = {

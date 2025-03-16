@@ -15,6 +15,7 @@ import TechnicianFinancialTable from "@/components/technicians/charts/Technician
 import TechnicianDetailCard from "@/components/technicians/charts/TechnicianDetailCard";
 import JobsRevenueComparison from "@/components/technicians/JobsRevenueComparison";
 import { calculateFinancialMetrics } from "@/hooks/technicians/financialUtils";
+import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 
 const TechnicianDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +48,7 @@ const TechnicianDetail = () => {
     }
   }, [id, navigate, toast]);
 
-  const handleUpdateTechnician = (values: any) => {
+  const handleUpdateTechnician = (values: TechnicianEditFormValues) => {
     if (!technician) return;
     
     const updatedTechnician: Technician = {
