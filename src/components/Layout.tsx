@@ -35,7 +35,6 @@ const Layout = () => {
     };
   }, []);
 
-  // Now we'll pass just the isMobile prop, which matches our updated SidebarProps type
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-indigo-700">
       <Header />

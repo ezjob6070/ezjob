@@ -18,6 +18,7 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
     "leads-clients": true, // Start expanded
   });
   const [technicianSearch, setTechnicianSearch] = useState("");
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>("all");
   
   // In a real implementation, this would come from user context or similar
   const [currentIndustry, setCurrentIndustry] = useState<IndustryType>(INDUSTRY_TYPES[2]); // Default to general
@@ -52,11 +53,18 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
     setIsHovering(false);
   };
 
-  // Filter technicians based on search input
-  const filteredTechnicians = initialTechnicians.filter(tech => 
-    tech.name.toLowerCase().includes(technicianSearch.toLowerCase()) ||
-    tech.specialty.toLowerCase().includes(technicianSearch.toLowerCase())
-  );
+  // Filter technicians based on search input and payment type
+  const filteredTechnicians = initialTechnicians.filter(tech => {
+    const matchesSearch = 
+      tech.name.toLowerCase().includes(technicianSearch.toLowerCase()) ||
+      tech.specialty.toLowerCase().includes(technicianSearch.toLowerCase());
+    
+    const matchesPaymentType = 
+      paymentTypeFilter === "all" || 
+      tech.paymentType === paymentTypeFilter;
+    
+    return matchesSearch && matchesPaymentType;
+  });
 
   const navItems = getIndustrySpecificNavItems(currentIndustry);
 
@@ -95,7 +103,7 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           )}
         </div>
 
-        {/* Technician search section */}
+        {/* Technician search section - always at the top of sidebar when on technician pages */}
         {isHovering && location.pathname.includes("technician") && (
           <div className="px-4 py-2 border-t border-blue-700/30">
             <div className="mb-2">
@@ -111,8 +119,60 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
               />
             </div>
             
-            {/* Technician List */}
-            <div className="mt-2 max-h-48 overflow-y-auto">
+            {/* Payment Type Filter */}
+            <div className="mt-2">
+              <h4 className="text-xs font-medium text-white/70 mb-1">Payment Type</h4>
+              <div className="flex flex-wrap gap-1">
+                <button 
+                  className={cn(
+                    "text-xs px-2 py-1 rounded-md transition-colors",
+                    paymentTypeFilter === "all" 
+                      ? "bg-blue-500 text-white" 
+                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
+                  )}
+                  onClick={() => setPaymentTypeFilter("all")}
+                >
+                  All
+                </button>
+                <button 
+                  className={cn(
+                    "text-xs px-2 py-1 rounded-md transition-colors",
+                    paymentTypeFilter === "percentage" 
+                      ? "bg-blue-500 text-white" 
+                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
+                  )}
+                  onClick={() => setPaymentTypeFilter("percentage")}
+                >
+                  Percentage
+                </button>
+                <button 
+                  className={cn(
+                    "text-xs px-2 py-1 rounded-md transition-colors",
+                    paymentTypeFilter === "flat" 
+                      ? "bg-blue-500 text-white" 
+                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
+                  )}
+                  onClick={() => setPaymentTypeFilter("flat")}
+                >
+                  Flat
+                </button>
+                <button 
+                  className={cn(
+                    "text-xs px-2 py-1 rounded-md transition-colors",
+                    paymentTypeFilter === "hourly" 
+                      ? "bg-blue-500 text-white" 
+                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
+                  )}
+                  onClick={() => setPaymentTypeFilter("hourly")}
+                >
+                  Hourly
+                </button>
+              </div>
+            </div>
+            
+            {/* Technician List - moved to top of sidebar */}
+            <div className="mt-3 max-h-60 overflow-y-auto border-t border-blue-700/30 pt-2">
+              <h4 className="text-xs font-medium text-white/70 mb-1">Technicians ({filteredTechnicians.length})</h4>
               <ul className="space-y-1">
                 {filteredTechnicians.map(tech => (
                   <li key={tech.id}>
@@ -126,9 +186,16 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
                       <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/50 text-white">
                         <User size={14} />
                       </div>
-                      <div className="truncate">
+                      <div className="truncate flex-1">
                         <span>{tech.name}</span>
-                        <p className="text-xs text-blue-300">{tech.specialty}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-blue-300">{tech.specialty}</p>
+                          <p className="text-xs text-blue-200 ml-1">
+                            {tech.paymentType === "percentage" ? `${tech.paymentRate}%` : 
+                             tech.paymentType === "hourly" ? `$${tech.paymentRate}/h` : 
+                             "Flat"}
+                          </p>
+                        </div>
                       </div>
                     </Link>
                   </li>
