@@ -34,7 +34,7 @@ const NavItem = ({ item, isExpanded, onToggleExpand, currentPath }: NavItemProps
           onClick={onToggleExpand}
           className={cn(
             "flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-colors duration-200",
-            (currentPath === "/leads" || currentPath === "/clients")
+            (item.children.some(child => currentPath === child.href))
               ? "bg-blue-700 text-white"
               : "text-white/80 hover:bg-blue-700 hover:text-white"
           )}

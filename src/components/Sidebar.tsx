@@ -1,4 +1,4 @@
 
-import Sidebar from "./sidebar";
+import SidebarComponent from "./sidebar/Sidebar";
 
-export default Sidebar;
+export default SidebarComponent;
