@@ -15,6 +15,8 @@ interface CompactTechnicianFilterProps {
   toggleTechnician: (techName: string) => void;
   clearFilters: () => void;
   applyFilters: () => void;
+  selectAllTechnicians?: () => void;
+  deselectAllTechnicians?: () => void;
 }
 
 const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
@@ -23,6 +25,8 @@ const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
   toggleTechnician,
   clearFilters,
   applyFilters,
+  selectAllTechnicians,
+  deselectAllTechnicians,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -37,15 +41,23 @@ const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
 
   const handleSelectAllChange = () => {
     if (allSelected) {
-      clearFilters();
+      if (deselectAllTechnicians) {
+        deselectAllTechnicians();
+      } else {
+        clearFilters();
+      }
     } else {
-      const allTechNames = technicianNames;
-      // Set all technicians as selected
-      allTechNames.forEach(tech => {
-        if (!selectedTechnicians.includes(tech)) {
-          toggleTechnician(tech);
-        }
-      });
+      if (selectAllTechnicians) {
+        selectAllTechnicians();
+      } else {
+        // Fallback if selectAllTechnicians isn't provided
+        const allTechNames = technicianNames;
+        allTechNames.forEach(tech => {
+          if (!selectedTechnicians.includes(tech)) {
+            toggleTechnician(tech);
+          }
+        });
+      }
     }
   };
 

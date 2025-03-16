@@ -1,117 +1,79 @@
 
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { Technician } from "@/types/technician";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { TrendingUp, Users, Calculator, DollarSign } from "lucide-react";
 
-export interface PaymentBreakdownCardsProps {
-  technicians: Technician[];
+interface PaymentBreakdownCardsProps {
+  revenue: number;
+  technicianEarnings: number;
+  expenses: number;
+  profit: number;
+  dateRangeText: string;
 }
 
-const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({ technicians }) => {
-  // Combine data from all technicians
-  const totalRevenue = technicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
-  
-  // Calculate technician earnings based on payment type
-  const technicianEarnings = technicians.reduce((sum, tech) => {
-    const earnings = tech.paymentType === "percentage" 
-      ? tech.totalRevenue * (tech.paymentRate / 100)
-      : tech.paymentType === "hourly"
-      ? tech.paymentRate * 160 // Assuming 160 hours per month
-      : tech.paymentRate; // Flat rate
-    return sum + earnings;
-  }, 0);
-  
-  // Expenses (usually parts, materials, etc.)
-  const expenses = totalRevenue * 0.33; // Assuming 33% goes to expenses
-  
-  // Company profit
-  const companyProfit = totalRevenue - technicianEarnings - expenses;
-  
-  // Data for pie chart
-  const pieData = [
-    { name: "Technician Earnings", value: technicianEarnings },
-    { name: "Expenses", value: expenses },
-    { name: "Company Profit", value: companyProfit },
+const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
+  revenue,
+  technicianEarnings,
+  expenses,
+  profit,
+  dateRangeText
+}) => {
+  const cards = [
+    {
+      title: "Total Revenue",
+      value: formatCurrency(revenue),
+      icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
+      color: "bg-blue-50 text-blue-700",
+      iconColor: "bg-blue-100"
+    },
+    {
+      title: "Technician Earnings",
+      value: formatCurrency(technicianEarnings),
+      icon: <Users className="h-5 w-5 text-indigo-500" />,
+      color: "bg-indigo-50 text-indigo-700",
+      iconColor: "bg-indigo-100"
+    },
+    {
+      title: "Expenses",
+      value: formatCurrency(expenses),
+      icon: <Calculator className="h-5 w-5 text-red-500" />,
+      color: "bg-red-50 text-red-700",
+      iconColor: "bg-red-100"
+    },
+    {
+      title: "Company Profit",
+      value: formatCurrency(profit),
+      icon: <DollarSign className="h-5 w-5 text-green-500" />,
+      color: "bg-green-50 text-green-700",
+      iconColor: "bg-green-100"
+    }
   ];
-  
-  // Colors for pie chart
-  const COLORS = ["#f43f5e", "#fbbf24", "#10b981"];
-  
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Total Revenue</CardTitle>
-          <CardDescription>All jobs combined</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{formatCurrency(totalRevenue)}</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Based on {technicians.reduce((sum, tech) => sum + tech.completedJobs, 0)} completed jobs
-          </p>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Technician Earnings</CardTitle>
-          <CardDescription>Payments to technicians</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-red-500">{formatCurrency(technicianEarnings)}</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {((technicianEarnings / totalRevenue) * 100).toFixed(1)}% of total revenue
-          </p>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Company Profit</CardTitle>
-          <CardDescription>After expenses and payments</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-emerald-500">{formatCurrency(companyProfit)}</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {((companyProfit / totalRevenue) * 100).toFixed(1)}% profit margin
-          </p>
-        </CardContent>
-      </Card>
-      
-      <Card className="md:col-span-3">
-        <CardHeader>
-          <CardTitle>Revenue Breakdown</CardTitle>
-          <CardDescription>Distribution of revenue across categories</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={90}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
-                />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+    <div>
+      {dateRangeText && (
+        <div className="mb-3 text-sm font-medium text-muted-foreground">
+          Financial breakdown: {dateRangeText}
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map((card, index) => (
+          <Card key={index} className={`border-l-4 border-l-${card.color.split(' ')[0].replace('bg-', '')}-400`}>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
+                  <p className="text-2xl font-bold mt-1">{card.value}</p>
+                </div>
+                <div className={`p-2 rounded-full ${card.iconColor}`}>
+                  {card.icon}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };

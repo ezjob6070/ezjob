@@ -12,6 +12,18 @@ interface TechnicianCircleChartsProps {
   dateRange?: DateRange;
 }
 
+interface TechnicianMetrics {
+  completedJobs: number;
+  cancelledJobs: number;
+  totalRevenue: number;
+  rating: number;
+  revenue?: number;
+  earnings?: number;
+  expenses?: number;
+  profit?: number;
+  partsValue?: number;
+}
+
 const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({ 
   filteredTechnicians,
   dateRange
@@ -32,23 +44,36 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
     applyFilters,
     handleTechnicianSelect
   } = useTechnicianFinancials(filteredTechnicians, dateRange);
+
+  // Convert selectedTechnicianMetrics to the expected format for TechnicianDetailCard
+  const formattedTechnicianMetrics: TechnicianMetrics | null = selectedTechnician && selectedTechnicianMetrics ? {
+    completedJobs: selectedTechnician.completedJobs,
+    cancelledJobs: selectedTechnician.cancelledJobs,
+    totalRevenue: selectedTechnician.totalRevenue,
+    rating: selectedTechnician.rating,
+    revenue: selectedTechnicianMetrics.revenue,
+    earnings: selectedTechnicianMetrics.earnings,
+    expenses: selectedTechnicianMetrics.expenses,
+    profit: selectedTechnicianMetrics.profit,
+    partsValue: selectedTechnicianMetrics.partsValue
+  } : null;
   
   return (
     <div className="space-y-6">
       {/* Payment Breakdown Simple Cards */}
       <PaymentBreakdownCards 
-        totalRevenue={financialMetrics.totalRevenue}
+        revenue={financialMetrics.totalRevenue}
         technicianEarnings={financialMetrics.technicianEarnings}
-        totalExpenses={financialMetrics.totalExpenses}
-        companyProfit={financialMetrics.companyProfit}
+        expenses={financialMetrics.totalExpenses}
+        profit={financialMetrics.companyProfit}
         dateRangeText={dateRangeText}
       />
       
       {/* Selected Technician Metrics */}
-      {selectedTechnician && selectedTechnicianMetrics && (
+      {selectedTechnician && formattedTechnicianMetrics && (
         <TechnicianDetailCard 
           technician={selectedTechnician} 
-          metrics={selectedTechnicianMetrics} 
+          metrics={formattedTechnicianMetrics} 
           dateRangeText={dateRangeText}
         />
       )}
