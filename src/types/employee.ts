@@ -1,107 +1,26 @@
-export enum EmployeeStatus {
-  ACTIVE = "active",
-  PENDING = "pending",
-  INACTIVE = "inactive",
-}
-
-export enum ResumeStatus {
-  PENDING = "pending",
-  APPROVED = "approved",
-  REJECTED = "rejected",
-}
-
-export enum DocumentType {
-  ID = "id",
-  PASSPORT = "passport",
-  DRIVERS_LICENSE = "drivers_license",
-  WORK_PERMIT = "work_permit",
-  OTHER = "other"
-}
 
 export enum SalaryBasis {
-  HOURLY = "hourly",
-  WEEKLY = "weekly",
-  MONTHLY = "monthly",
-  YEARLY = "yearly"
+  HOURLY = "HOURLY",
+  SALARY = "SALARY",
+  COMMISSION = "COMMISSION"
 }
 
 export enum IncentiveType {
-  HOURLY = "hourly",
-  WEEKLY = "weekly",
-  MONTHLY = "monthly"
+  BONUS = "BONUS",
+  COMMISSION = "COMMISSION",
+  PROFIT_SHARING = "PROFIT_SHARING",
+  NONE = "NONE"
 }
 
-export interface EmployeeDocument {
-  id: string;
-  type: DocumentType;
-  name: string;
-  url: string;
-  dateUploaded: Date;
-  expiryDate?: Date;
-  notes?: string;
-}
+export const SALARY_BASIS_OPTIONS = [
+  { value: SalaryBasis.HOURLY, label: "Hourly" },
+  { value: SalaryBasis.SALARY, label: "Salary" },
+  { value: SalaryBasis.COMMISSION, label: "Commission" }
+];
 
-export interface Resume {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  position: string;
-  experience: string;
-  status: ResumeStatus;
-  dateSubmitted: Date;
-  resumeUrl: string;
-  notes: string;
-}
-
-export interface EmployeeNote {
-  id: string;
-  content: string;
-  createdAt: Date;
-  createdBy: string;
-}
-
-export interface Employee {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  position: string;
-  department: string;
-  status: EmployeeStatus;
-  dateHired: Date;
-  reportsTo?: string;
-  salary: number;
-  salaryBasis?: SalaryBasis;
-  hourlyRate?: number;
-  incentiveType?: IncentiveType;
-  incentiveAmount?: number;
-  taxPercentage?: number;
-  address: string;
-  profileImage?: string;
-  skills: string[];
-  dateOfBirth?: Date;
-  emergencyContact?: string;
-  background?: string;
-  education?: string[];
-  certifications?: string[];
-  performanceRating?: number;
-  notes?: EmployeeNote[];
-  documents?: EmployeeDocument[];
-  // Added fields to match technician features
-  completedJobs?: number;
-  cancelledJobs?: number;
-  totalRevenue?: number;
-  rating?: number;
-  initials?: string;
-  specialty?: string; // For employees, this could represent their main skill
-}
-
-export interface Report {
-  id: string;
-  employeeId: string;
-  title: string;
-  description: string;
-  status: "completed" | "in-progress" | "pending";
-  dateSubmitted: Date;
-}
+export const INCENTIVE_TYPE_OPTIONS = [
+  { value: IncentiveType.BONUS, label: "Bonus" },
+  { value: IncentiveType.COMMISSION, label: "Commission" },
+  { value: IncentiveType.PROFIT_SHARING, label: "Profit Sharing" },
+  { value: IncentiveType.NONE, label: "None" }
+];

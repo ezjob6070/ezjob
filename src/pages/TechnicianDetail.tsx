@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Technician } from "@/types/technician";
@@ -71,7 +70,6 @@ const TechnicianDetail = () => {
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* Header section with basic info and actions */}
         <div className="flex justify-between items-start">
           <Button 
             variant="outline" 
@@ -87,7 +85,6 @@ const TechnicianDetail = () => {
           </Button>
         </div>
 
-        {/* Main technician profile card */}
         <Card className="mb-6">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-6">
@@ -162,7 +159,6 @@ const TechnicianDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Tabbed section for job history, documents and notes */}
         <Tabs defaultValue="job-history" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="job-history">Job History</TabsTrigger>
@@ -215,13 +211,14 @@ const TechnicianDetail = () => {
         </Tabs>
       </div>
 
-      {/* Edit Technician Modal */}
-      <EditTechnicianModal
-        open={showEditModal}
-        onOpenChange={setShowEditModal}
-        onUpdateTechnician={handleUpdateTechnician}
-        technician={technician}
-      />
+      {technician && (
+        <EditTechnicianModal
+          open={showEditModal}
+          onOpenChange={setShowEditModal}
+          onUpdateTechnician={handleUpdateTechnician}
+          technician={technician}
+        />
+      )}
     </div>
   );
 };

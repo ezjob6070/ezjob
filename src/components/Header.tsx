@@ -13,19 +13,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type HeaderProps = {
-  isSidebarOpen: boolean;
-  toggleSidebar: () => void;
-  isMobile: boolean;
+  isSidebarOpen?: boolean;
+  toggleSidebar?: () => void;
+  isMobile?: boolean;
 };
 
-const Header = ({ isSidebarOpen, toggleSidebar, isMobile }: HeaderProps) => {
+const Header = ({ isSidebarOpen, toggleSidebar, isMobile }: HeaderProps = {}) => {
   return (
     <header className={`h-16 border-b border-border fixed top-0 right-0 left-0 z-10 bg-card transition-all duration-300
       ${isSidebarOpen && !isMobile ? 'pl-64' : 'pl-16'}
       ${isMobile ? 'pl-0' : ''}`}>
       <div className="h-full px-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          {isMobile && (
+          {isMobile && toggleSidebar && (
             <Button
               variant="ghost"
               size="icon"

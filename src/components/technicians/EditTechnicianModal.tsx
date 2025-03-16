@@ -48,12 +48,11 @@ import {
   INCENTIVE_TYPE_OPTIONS,
 } from "@/types/employee";
 
-interface EditTechnicianModalProps {
+export interface EditTechnicianModalProps {
   technician: Technician;
   open: boolean;
-  setOpen: (open: boolean) => void;
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
-  onDelete: (id: string) => void;
+  onOpenChange: (open: boolean) => void;
+  onUpdateTechnician: (values: z.infer<typeof formSchema>) => void;
 }
 
 const formSchema = z.object({
@@ -94,9 +93,8 @@ const formSchema = z.object({
 const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
   technician,
   open,
-  setOpen,
-  onSubmit,
-  onDelete,
+  onOpenChange,
+  onUpdateTechnician,
 }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -121,22 +119,13 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
     },
   });
 
-  function handleOpenChange(open: boolean) {
-    if (!open) {
-      setOpen(false);
-    }
-  }
-
   function onSubmitForm(values: z.infer<typeof formSchema>) {
-    onSubmit(values);
-    setOpen(false);
+    onUpdateTechnician(values);
+    onOpenChange(false);
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Edit Technician</Button>
-      </AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Edit Technician</AlertDialogTitle>
@@ -482,28 +471,11 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
               )}
             />
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <Button type="submit">Submit</Button>
+              <AlertDialogCancel onClick={() => onOpenChange(false)}>Cancel</AlertDialogCancel>
+              <Button type="submit">Save Changes</Button>
             </AlertDialogFooter>
           </form>
         </Form>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Submit</AlertDialogAction>
-        </AlertDialogFooter>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button type="submit">Submit</Button>
-        </AlertDialogFooter>
-        <Button
-          variant="destructive"
-          onClick={() => {
-            onDelete(technician.id);
-            setOpen(false);
-          }}
-        >
-          Delete
-        </Button>
       </AlertDialogContent>
     </AlertDialog>
   );

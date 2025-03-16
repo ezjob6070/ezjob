@@ -7,7 +7,7 @@ import { DateRange } from "react-day-picker";
 import { Technician } from "@/types/technician";
 import { Link } from "react-router-dom";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
-import { EditTechnicianModal } from "@/components/technicians/EditTechnicianModal";
+import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
