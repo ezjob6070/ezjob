@@ -1,16 +1,11 @@
 
-interface TaskCardProps {
-  task: {
-    id: string;
-    title: string;
-    priority: string;
-    status: string;
-    client: { name: string };
-  };
-}
-
+import { Task } from "../types";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+interface TaskCardProps {
+  task: Task;
+}
 
 const TaskCard = ({ task }: TaskCardProps) => {
   const getPriorityBadgeColor = (priority: string) => {

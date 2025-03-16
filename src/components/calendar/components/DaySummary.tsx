@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Job } from "@/components/jobs/JobTypes";
 import JobCard from "./JobCard";
 import TaskCard from "./TaskCard";
+import { Task } from "../types";
 
 interface DaySummaryProps {
   selectedDate: Date;
   jobsForSelectedDate: Job[];
-  tasksForSelectedDate: any[];
+  tasksForSelectedDate: Task[];
   onPreviousDay: () => void;
   onNextDay: () => void;
 }

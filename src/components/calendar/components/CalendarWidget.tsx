@@ -4,12 +4,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { DayProps } from "react-day-picker";
 import { Job } from "@/components/jobs/JobTypes";
+import { Task } from "../types";
+import CalendarEventIndicator from "./CalendarEventIndicator";
 
 interface CalendarWidgetProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
   jobs: Job[];
-  tasks: any[];
+  tasks: Task[];
   currentMonth: Date;
 }
 
@@ -56,7 +58,6 @@ const CalendarWidget = ({ selectedDate, setSelectedDate, jobs, tasks, currentMon
             
             const jobsCount = jobs.filter(job => isSameDay(job.date, date)).length;
             const tasksCount = tasks.filter(task => isSameDay(task.dueDate, date)).length;
-            const hasEvents = jobsCount > 0 || tasksCount > 0;
             
             return (
               <button 
@@ -71,16 +72,10 @@ const CalendarWidget = ({ selectedDate, setSelectedDate, jobs, tasks, currentMon
                 {...props}
               >
                 {format(date, "d")}
-                {hasEvents && (
-                  <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-0.5">
-                    {jobsCount > 0 && (
-                      <div className="w-1 h-1 rounded-full bg-blue-500"></div>
-                    )}
-                    {tasksCount > 0 && (
-                      <div className="w-1 h-1 rounded-full bg-red-500"></div>
-                    )}
-                  </div>
-                )}
+                <CalendarEventIndicator 
+                  jobsCount={jobsCount} 
+                  tasksCount={tasksCount} 
+                />
               </button>
             );
           }

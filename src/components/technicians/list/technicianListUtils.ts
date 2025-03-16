@@ -9,7 +9,8 @@ export const getBadgeVariantFromStatus = (status: string) => {
     case "inactive":
       return "secondary" as const;
     case "onleave":
-      return "warning" as const;
+      // Change from "warning" to a supported variant
+      return "secondary" as const;
     case "suspended":
       return "destructive" as const;
     case "terminated":
