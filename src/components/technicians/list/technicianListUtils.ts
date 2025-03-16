@@ -1,3 +1,4 @@
+
 import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 // Helper function to determine badge variant

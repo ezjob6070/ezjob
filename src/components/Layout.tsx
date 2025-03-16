@@ -4,7 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import CalendarSidebar from "./calendar/CalendarSidebar";
-import LeftSidebar from "./calendar/LeftSidebar";
+import LeftCalendarSidebar from "./calendar/LeftCalendarSidebar";
 import GlobalDateRangeFilter from "./GlobalDateRangeFilter";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
@@ -60,7 +60,7 @@ const Layout = () => {
         toggleSidebar={toggleSidebar}
         isMobile={isMobile}
       />
-      <div className="flex-1 flex overflow-hidden pt-16"> {/* Added pt-16 to account for the fixed header */}
+      <div className="flex-1 flex overflow-hidden pt-16">
         <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
         
         {/* Toggle sidebar button */}
@@ -77,7 +77,7 @@ const Layout = () => {
           </div>
         )}
         
-        <LeftSidebar isOpen={isLeftSidebarOpen} />
+        <LeftCalendarSidebar isOpen={isLeftSidebarOpen} />
         <main 
           className={`flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg
             ${isSidebarOpen && !isMobile ? 'ml-64' : 'ml-16'}

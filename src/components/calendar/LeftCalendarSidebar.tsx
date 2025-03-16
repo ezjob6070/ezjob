@@ -41,13 +41,10 @@ const LeftCalendarSidebar = ({ isOpen }: LeftCalendarSidebarProps) => {
     setCurrentMonth(prev => addMonths(prev, 1));
   };
 
-  // Added console log to debug visibility
-  console.log("LeftCalendarSidebar isOpen:", isOpen);
-
   if (!isOpen) return null;
 
   return (
-    <aside className="fixed top-0 left-0 z-30 h-screen w-80 flex flex-col bg-card text-card-foreground border-r border-border shadow-lg transition-all duration-300 ease-in-out pt-16"> {/* Added pt-16 to account for the fixed header */}
+    <aside className="fixed top-0 left-0 z-30 h-screen w-80 flex flex-col bg-card text-card-foreground border-r border-border shadow-lg transition-all duration-300 ease-in-out pt-16">
       <SidebarHeader 
         currentMonth={currentMonth}
         onPrevMonth={handlePrevMonth}
