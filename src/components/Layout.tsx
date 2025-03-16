@@ -10,12 +10,13 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
 
 const Layout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [allSidebarsHidden, setAllSidebarsHidden] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -25,8 +26,6 @@ const Layout = () => {
         setIsSidebarOpen(false);
         setIsCalendarOpen(false);
         setIsLeftSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
       }
     };
 
@@ -57,7 +56,7 @@ const Layout = () => {
   const toggleAllSidebars = () => {
     if (allSidebarsHidden) {
       // Restore previous state
-      setIsSidebarOpen(true);
+      setIsSidebarOpen(false);
       setIsLeftSidebarOpen(false);
       setIsCalendarOpen(false);
     } else {
@@ -69,6 +68,14 @@ const Layout = () => {
     setAllSidebarsHidden(!allSidebarsHidden);
   };
 
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-indigo-700">
       <Header
@@ -76,39 +83,19 @@ const Layout = () => {
         toggleSidebar={toggleSidebar}
         isMobile={isMobile}
       />
-      <div className="fixed top-4 right-4 z-50">
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          onClick={toggleAllSidebars} 
-          className="h-8 w-8 rounded-full shadow-md"
-        >
-          {allSidebarsHidden ? <ChevronRightIcon size={16} /> : <XIcon size={16} />}
-        </Button>
-      </div>
       <div className="flex-1 flex overflow-hidden pt-16">
-        <Sidebar isOpen={isSidebarOpen && !allSidebarsHidden} isMobile={isMobile} />
-        
-        {/* Toggle sidebar button */}
-        {!isMobile && !allSidebarsHidden && (
-          <div className={`fixed z-30 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${isSidebarOpen ? 'left-64' : 'left-16'}`}>
-            <Button 
-              variant="secondary" 
-              size="icon" 
-              onClick={toggleSidebar} 
-              className="h-8 w-8 rounded-full shadow-md"
-            >
-              {isSidebarOpen ? <ChevronLeftIcon size={16} /> : <ChevronRightIcon size={16} />}
-            </Button>
+        <div 
+          className="fixed left-0 top-16 bottom-0 z-30"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className={`h-full transition-all duration-300 ease-in-out ${isHovering ? 'w-64' : 'w-16'}`}>
+            <Sidebar isOpen={isHovering} isMobile={isMobile} />
           </div>
-        )}
+        </div>
         
-        <LeftCalendarSidebar isOpen={isLeftSidebarOpen && !allSidebarsHidden} />
         <main 
-          className={`flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg
-            ${isSidebarOpen && !isMobile && !allSidebarsHidden ? 'ml-64' : 'ml-0'}
-            ${isLeftSidebarOpen && !isMobile && !allSidebarsHidden ? 'ml-80' : ''}
-            ${isCalendarOpen && !isMobile && !allSidebarsHidden ? 'mr-80' : 'mr-0'}`}
+          className={`flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg ml-16`}
         >
           <div className="mb-4">
             <GlobalDateRangeFilter />
@@ -117,7 +104,6 @@ const Layout = () => {
             <Outlet />
           </div>
         </main>
-        <CalendarSidebar isOpen={isCalendarOpen && !allSidebarsHidden} />
       </div>
     </div>
   );

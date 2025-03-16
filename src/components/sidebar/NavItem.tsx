@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,8 +13,8 @@ export const SubNavItem = ({ item, currentPath }: SubNavItemProps) => {
         className={cn(
           "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors duration-200",
           currentPath === item.href
-            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-            : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+            ? "bg-blue-700 text-white"
+            : "text-white/80 hover:bg-blue-700 hover:text-white"
         )}
       >
         {item.icon}
@@ -34,8 +35,8 @@ const NavItem = ({ item, isExpanded, onToggleExpand, currentPath }: NavItemProps
           className={cn(
             "flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-colors duration-200",
             (currentPath === "/leads" || currentPath === "/clients")
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+              ? "bg-blue-700 text-white"
+              : "text-white/80 hover:bg-blue-700 hover:text-white"
           )}
         >
           <div className="flex items-center gap-3">
@@ -66,8 +67,8 @@ const NavItem = ({ item, isExpanded, onToggleExpand, currentPath }: NavItemProps
       className={cn(
         "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200",
         currentPath === item.href
-          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-          : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+          ? "bg-blue-700 text-white"
+          : "text-white/80 hover:bg-blue-700 hover:text-white"
       )}
     >
       {item.icon}

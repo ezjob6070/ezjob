@@ -45,13 +45,32 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
   return (
     <aside
       className={cn(
-        "fixed top-0 left-0 z-20 h-screen flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 ease-in-out",
-        isOpen ? "w-64" : "w-16",
-        isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "",
-        isMobile && isOpen ? "shadow-xl" : ""
+        "h-full flex flex-col bg-blue-600 text-white transition-all duration-300 ease-in-out overflow-hidden",
+        isOpen ? "w-64" : "w-16"
       )}
     >
-      <SidebarHeader industry={currentIndustry} onCycleIndustry={cycleIndustry} />
+      <div className={cn("py-4", isOpen ? "px-4" : "px-2")}>
+        {isOpen ? (
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-lg">Dashboard</span>
+            <button 
+              onClick={cycleIndustry}
+              className="p-1 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <MenuIcon size={20} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <button
+              onClick={cycleIndustry}
+              className="p-1 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <MenuIcon size={20} />
+            </button>
+          </div>
+        )}
+      </div>
 
       <nav className={cn("flex-1 py-6", isOpen ? "px-4" : "px-2")}>
         {isOpen ? (
@@ -68,7 +87,7 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
             ))}
           </ul>
         ) : (
-          <ul className="space-y-2 flex flex-col items-center">
+          <ul className="space-y-4 flex flex-col items-center">
             {navItems.map((item) => (
               <li key={item.href || item.label} className="w-full flex justify-center">
                 {!item.children && item.href && (
@@ -77,12 +96,26 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
                     className={cn(
                       "p-2 rounded-lg transition-colors duration-200 flex justify-center",
                       location.pathname === item.href
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                        ? "bg-blue-700 text-white"
+                        : "text-white/80 hover:bg-blue-700 hover:text-white"
                     )}
+                    title={item.label}
                   >
                     {item.icon}
                   </Link>
+                )}
+                {item.children && (
+                  <button
+                    className={cn(
+                      "p-2 rounded-lg transition-colors duration-200 flex justify-center",
+                      (location.pathname === "/leads" || location.pathname === "/clients")
+                        ? "bg-blue-700 text-white"
+                        : "text-white/80 hover:bg-blue-700 hover:text-white"
+                    )}
+                    title={item.label}
+                  >
+                    {item.icon}
+                  </button>
                 )}
               </li>
             ))}
@@ -90,14 +123,17 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
         )}
       </nav>
 
-      <div className={cn("p-4 border-t border-sidebar-border", !isOpen && "flex justify-center")}>
+      <div className={cn("p-4 border-t border-blue-700/50", !isOpen && "flex justify-center")}>
         {isOpen ? (
-          <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors duration-200">
+          <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-700 hover:text-white transition-colors duration-200">
             <LogOutIcon size={20} />
             <span>Sign out</span>
           </button>
         ) : (
-          <button className="p-2 rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors duration-200">
+          <button 
+            className="p-2 rounded-lg text-white/80 hover:bg-blue-700 hover:text-white transition-colors duration-200"
+            title="Sign out"
+          >
             <LogOutIcon size={20} />
           </button>
         )}
