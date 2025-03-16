@@ -15,12 +15,19 @@ const TechnicianAltercation = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
 
-  const handleUpdateTechnician = (updatedTechnician: Technician) => {
+  const handleUpdateTechnician = (values: any) => {
+    // Convert form values to Technician type and ensure all required fields are present
+    const updatedTechnician: Technician = {
+      ...selectedTechnician!,
+      ...values
+    };
+    
     setTechnicians((prevTechnicians) => 
       prevTechnicians.map((tech) => 
         tech.id === updatedTechnician.id ? updatedTechnician : tech
       )
     );
+    
     toast({
       title: "Success",
       description: "Technician updated successfully",

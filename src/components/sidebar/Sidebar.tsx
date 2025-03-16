@@ -1,14 +1,11 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { LogOutIcon, MenuIcon, Search, User } from "lucide-react";
+import { LogOutIcon, MenuIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
 import NavItem from "./NavItem";
-import { Input } from "@/components/ui/input";
-import { initialTechnicians } from "@/data/technicians";
-import { Technician } from "@/types/technician";
 
 const Sidebar = ({ isMobile }: SidebarProps) => {
   const location = useLocation();
@@ -17,8 +14,6 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
     "leads-clients": true, // Start expanded
   });
-  const [technicianSearch, setTechnicianSearch] = useState("");
-  const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>("all");
   
   // In a real implementation, this would come from user context or similar
   const [currentIndustry, setCurrentIndustry] = useState<IndustryType>(INDUSTRY_TYPES[2]); // Default to general
@@ -52,19 +47,6 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
   const handleMouseLeave = () => {
     setIsHovering(false);
   };
-
-  // Filter technicians based on search input and payment type
-  const filteredTechnicians = initialTechnicians.filter(tech => {
-    const matchesSearch = 
-      tech.name.toLowerCase().includes(technicianSearch.toLowerCase()) ||
-      tech.specialty.toLowerCase().includes(technicianSearch.toLowerCase());
-    
-    const matchesPaymentType = 
-      paymentTypeFilter === "all" || 
-      tech.paymentType === paymentTypeFilter;
-    
-    return matchesSearch && matchesPaymentType;
-  });
 
   const navItems = getIndustrySpecificNavItems(currentIndustry);
 
@@ -102,111 +84,6 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
             </div>
           )}
         </div>
-
-        {/* Technician search section - always at the top of sidebar when on technician pages */}
-        {isHovering && location.pathname.includes("technician") && (
-          <div className="px-4 py-2 border-t border-blue-700/30">
-            <div className="mb-2">
-              <h3 className="text-sm font-medium text-white/80">Find Technicians</h3>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-blue-300" />
-              <Input
-                placeholder="Search technicians..."
-                className="pl-8 text-sm py-2 h-9 bg-blue-700/30 border-blue-500 text-white placeholder:text-blue-300"
-                value={technicianSearch}
-                onChange={(e) => setTechnicianSearch(e.target.value)}
-              />
-            </div>
-            
-            {/* Payment Type Filter */}
-            <div className="mt-2">
-              <h4 className="text-xs font-medium text-white/70 mb-1">Payment Type</h4>
-              <div className="flex flex-wrap gap-1">
-                <button 
-                  className={cn(
-                    "text-xs px-2 py-1 rounded-md transition-colors",
-                    paymentTypeFilter === "all" 
-                      ? "bg-blue-500 text-white" 
-                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
-                  )}
-                  onClick={() => setPaymentTypeFilter("all")}
-                >
-                  All
-                </button>
-                <button 
-                  className={cn(
-                    "text-xs px-2 py-1 rounded-md transition-colors",
-                    paymentTypeFilter === "percentage" 
-                      ? "bg-blue-500 text-white" 
-                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
-                  )}
-                  onClick={() => setPaymentTypeFilter("percentage")}
-                >
-                  Percentage
-                </button>
-                <button 
-                  className={cn(
-                    "text-xs px-2 py-1 rounded-md transition-colors",
-                    paymentTypeFilter === "flat" 
-                      ? "bg-blue-500 text-white" 
-                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
-                  )}
-                  onClick={() => setPaymentTypeFilter("flat")}
-                >
-                  Flat
-                </button>
-                <button 
-                  className={cn(
-                    "text-xs px-2 py-1 rounded-md transition-colors",
-                    paymentTypeFilter === "hourly" 
-                      ? "bg-blue-500 text-white" 
-                      : "bg-blue-700/50 text-white/80 hover:bg-blue-700"
-                  )}
-                  onClick={() => setPaymentTypeFilter("hourly")}
-                >
-                  Hourly
-                </button>
-              </div>
-            </div>
-            
-            {/* Technician List - moved to top of sidebar */}
-            <div className="mt-3 max-h-60 overflow-y-auto border-t border-blue-700/30 pt-2">
-              <h4 className="text-xs font-medium text-white/70 mb-1">Technicians ({filteredTechnicians.length})</h4>
-              <ul className="space-y-1">
-                {filteredTechnicians.map(tech => (
-                  <li key={tech.id}>
-                    <Link
-                      to={`/technicians/detail/${tech.id}`}
-                      className={cn(
-                        "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-white/90 hover:bg-blue-700",
-                        location.pathname.includes(tech.id) && "bg-blue-700 font-medium"
-                      )}
-                    >
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/50 text-white">
-                        <User size={14} />
-                      </div>
-                      <div className="truncate flex-1">
-                        <span>{tech.name}</span>
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-blue-300">{tech.specialty}</p>
-                          <p className="text-xs text-blue-200 ml-1">
-                            {tech.paymentType === "percentage" ? `${tech.paymentRate}%` : 
-                             tech.paymentType === "hourly" ? `$${tech.paymentRate}/h` : 
-                             "Flat"}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-                {filteredTechnicians.length === 0 && (
-                  <li className="px-2 py-1.5 text-sm text-blue-300">No technicians found</li>
-                )}
-              </ul>
-            </div>
-          </div>
-        )}
 
         <nav className={cn("flex-1 py-2", isHovering ? "px-4" : "px-2")}>
           {isHovering ? (

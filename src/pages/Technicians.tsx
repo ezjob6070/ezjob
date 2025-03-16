@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -38,7 +37,6 @@ const Technicians = () => {
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   
-  // Extract departments and categories from technicians
   const categories = Array.from(new Set(
     technicians.map(tech => tech.category || "Uncategorized")
   ));
@@ -104,12 +102,18 @@ const Technicians = () => {
     setShowEditModal(true);
   };
 
-  const handleUpdateTechnician = (updatedTechnician: Technician) => {
+  const handleUpdateTechnician = (values: any) => {
+    const updatedTechnician: Technician = {
+      ...selectedTechnician!,
+      ...values
+    };
+    
     setTechnicians((prevTechnicians) => 
       prevTechnicians.map((tech) => 
         tech.id === updatedTechnician.id ? updatedTechnician : tech
       )
     );
+    
     toast({
       title: "Success",
       description: "Technician updated successfully",
