@@ -35,11 +35,11 @@ const Layout = () => {
     };
   }, []);
 
+  // Now we'll pass just the isMobile prop, which matches our updated SidebarProps type
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-indigo-700">
-      <Header
-        isMobile={isMobile}
-      />
+      <Header />
+      
       <div className="flex-1 flex overflow-hidden pt-16">
         {/* Sidebar is now fixed position with controlled width */}
         <Sidebar isMobile={isMobile} />

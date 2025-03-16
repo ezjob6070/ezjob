@@ -12,7 +12,6 @@ export type NavItem = {
 };
 
 export type SidebarProps = {
-  isOpen: boolean;
   isMobile: boolean;
 };
 
