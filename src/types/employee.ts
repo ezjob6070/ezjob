@@ -24,7 +24,8 @@ export enum EmployeeStatus {
   ON_LEAVE = "ON_LEAVE",
   TERMINATED = "TERMINATED",
   CONTRACT = "CONTRACT",
-  PROBATION = "PROBATION"
+  PROBATION = "PROBATION",
+  PENDING = "PENDING" // Added missing status
 }
 
 export enum ResumeStatus {
@@ -33,7 +34,8 @@ export enum ResumeStatus {
   INTERVIEW = "INTERVIEW",
   REJECTED = "REJECTED",
   HIRED = "HIRED",
-  ARCHIVED = "ARCHIVED"
+  ARCHIVED = "ARCHIVED",
+  APPROVED = "APPROVED" // Added missing status
 }
 
 export enum DocumentType {
@@ -42,7 +44,12 @@ export enum DocumentType {
   INSURANCE = "INSURANCE",
   CONTRACT = "CONTRACT",
   TAX = "TAX",
-  OTHER = "OTHER"
+  OTHER = "OTHER",
+  // Added missing document types
+  ID = "ID",
+  PASSPORT = "PASSPORT",
+  DRIVERS_LICENSE = "DRIVERS_LICENSE",
+  WORK_PERMIT = "WORK_PERMIT"
 }
 
 export interface Employee {
@@ -52,7 +59,8 @@ export interface Employee {
   department: string;
   email: string;
   phone: string;
-  hireDate: string;
+  hireDate: string; // Keep this for compatibility
+  dateHired: Date | string; // Add this for components that need it
   status: EmployeeStatus;
   salary: number;
   salaryBasis: SalaryBasis;
@@ -70,6 +78,21 @@ export interface Employee {
   };
   skillset?: string[];
   performanceRating?: number;
+  // Added missing properties
+  skills?: string[];
+  profileImage?: string;
+  initials?: string;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  rating?: number;
+  dateOfBirth?: string;
+  reportsTo?: string;
+  taxPercentage?: number;
+  hourlyRate?: number;
+  education?: string[];
+  certifications?: string[];
+  background?: string;
 }
 
 export interface EmployeeNote {
@@ -78,6 +101,9 @@ export interface EmployeeNote {
   content: string;
   author: string;
   type: string;
+  // Added missing properties
+  createdAt?: string;
+  createdBy?: string;
 }
 
 export interface EmployeeDocument {
@@ -88,6 +114,9 @@ export interface EmployeeDocument {
   fileUrl: string;
   expiryDate?: string;
   notes?: string;
+  // Added missing properties
+  dateUploaded?: Date | string;
+  url?: string;
 }
 
 export interface Resume {
@@ -102,6 +131,11 @@ export interface Resume {
   notes?: string;
   reviewedBy?: string;
   reviewDate?: string;
+  // Added missing properties
+  name?: string;
+  experience?: string;
+  resumeUrl?: string;
+  dateSubmitted?: string;
 }
 
 export interface Report {
@@ -113,6 +147,10 @@ export interface Report {
   fileUrl?: string;
   author: string;
   relatedEmployees?: string[];
+  // Added missing properties
+  employeeId?: string;
+  status?: string;
+  dateSubmitted?: string;
 }
 
 export const SALARY_BASIS_OPTIONS = [
@@ -140,5 +178,6 @@ export const EMPLOYEE_STATUS_OPTIONS = [
   { value: EmployeeStatus.ON_LEAVE, label: "On Leave" },
   { value: EmployeeStatus.TERMINATED, label: "Terminated" },
   { value: EmployeeStatus.CONTRACT, label: "Contract" },
-  { value: EmployeeStatus.PROBATION, label: "Probation" }
+  { value: EmployeeStatus.PROBATION, label: "Probation" },
+  { value: EmployeeStatus.PENDING, label: "Pending" }
 ];

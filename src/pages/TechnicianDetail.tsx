@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,12 +23,21 @@ const TechnicianDetail = () => {
   const [technician, setTechnician] = useState<Technician | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>([]);
+  const [displayedTechnicians, setDisplayedTechnicians] = useState<Technician[]>([]);
+  const [selectedTechnicianNames, setSelectedTechnicianNames] = useState<string[]>([]);
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState("all");
+  const [localDateRange, setLocalDateRange] = useState<any>(undefined);
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     // In a real app, this would be an API call
     const techData = initialTechnicians.find(tech => tech.id === id);
     if (techData) {
       setTechnician(techData);
+      setFilteredTechnicians([techData]);
+      setDisplayedTechnicians([techData]);
+      setSelectedTechnicianId(techData.id);
     } else {
       toast({
         title: "Error",
@@ -51,6 +61,26 @@ const TechnicianDetail = () => {
       title: "Success",
       description: "Technician updated successfully",
     });
+  };
+
+  // Mock functions for table props
+  const toggleTechnician = (techName: string) => {
+    setSelectedTechnicianNames(prev => 
+      prev.includes(techName) ? prev.filter(name => name !== techName) : [...prev, techName]
+    );
+  };
+  
+  const clearFilters = () => {
+    setSelectedTechnicianNames([]);
+  };
+  
+  const applyFilters = () => {
+    // In a real app, this would filter the technicians
+    console.log("Applying filters");
+  };
+  
+  const onTechnicianSelect = (tech: Technician) => {
+    setSelectedTechnicianId(tech.id);
   };
 
   if (!technician) {
@@ -84,6 +114,14 @@ const TechnicianDetail = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  // Create metrics object for TechnicianDetailCard
+  const metrics = {
+    completedJobs: technician.completedJobs,
+    cancelledJobs: technician.cancelledJobs,
+    totalRevenue: technician.totalRevenue,
+    rating: technician.rating
   };
 
   return (
@@ -145,15 +183,28 @@ const TechnicianDetail = () => {
               </CardContent>
             </Card>
 
-            <TechnicianDetailCard technician={technician} />
+            <TechnicianDetailCard technician={technician} metrics={metrics} />
 
-            <JobsRevenueComparison technician={technician} />
+            <JobsRevenueComparison technicians={[technician]} />
           </div>
         </TabsContent>
 
         <TabsContent value="financial" className="space-y-6">
-          <PaymentBreakdownCards technician={technician} />
-          <TechnicianFinancialTable technician={technician} />
+          <PaymentBreakdownCards technicians={[technician]} />
+          <TechnicianFinancialTable 
+            filteredTechnicians={filteredTechnicians}
+            displayedTechnicians={displayedTechnicians}
+            selectedTechnicianNames={selectedTechnicianNames}
+            toggleTechnician={toggleTechnician}
+            clearFilters={clearFilters}
+            applyFilters={applyFilters}
+            paymentTypeFilter={paymentTypeFilter}
+            setPaymentTypeFilter={setPaymentTypeFilter}
+            localDateRange={localDateRange}
+            setLocalDateRange={setLocalDateRange}
+            onTechnicianSelect={onTechnicianSelect}
+            selectedTechnicianId={selectedTechnicianId}
+          />
         </TabsContent>
 
         <TabsContent value="history" className="space-y-6">

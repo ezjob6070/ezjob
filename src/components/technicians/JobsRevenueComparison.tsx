@@ -1,60 +1,83 @@
 
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Technician } from "@/types/technician";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 
-type JobsRevenueComparisonProps = {
+export interface JobsRevenueComparisonProps {
   technicians: Technician[];
-};
+}
 
-const JobsRevenueComparison = ({ technicians }: JobsRevenueComparisonProps) => {
-  // Calculate highest values for scaling
-  const highestRevenue = Math.max(...technicians.map(t => t.totalRevenue));
-  const highestJobs = Math.max(...technicians.map(t => t.completedJobs));
+const JobsRevenueComparison: React.FC<JobsRevenueComparisonProps> = ({ technicians }) => {
+  // Function to calculate average revenue per job
+  const getAverageRevenuePerJob = (tech: Technician) => {
+    if (tech.completedJobs === 0) return 0;
+    return tech.totalRevenue / tech.completedJobs;
+  };
+
+  // Process the data for the chart
+  const chartData = technicians.map(tech => ({
+    name: tech.name,
+    completedJobs: tech.completedJobs,
+    cancelledJobs: tech.cancelledJobs,
+    averageRevenue: getAverageRevenuePerJob(tech)
+  }));
 
   return (
-    <Card>
+    <Card className="md:col-span-1">
       <CardHeader>
-        <CardTitle>Jobs vs Revenue Comparison</CardTitle>
-        <CardDescription>Analyzing job quantity and revenue generation for active technicians</CardDescription>
+        <CardTitle>Jobs & Revenue Comparison</CardTitle>
+        <CardDescription>Jobs completed and average revenue per job</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          {technicians
-            .filter(tech => tech.status === "active")
-            .sort((a, b) => b.completedJobs - a.completedJobs)
-            .slice(0, 6)
-            .map((tech) => (
-              <div key={tech.id} className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                      {tech.initials}
-                    </div>
-                    <span className="font-medium">{tech.name}</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {tech.completedJobs} jobs | ${tech.totalRevenue.toLocaleString()}
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span>Jobs</span>
-                    <span>{Math.round((tech.completedJobs / highestJobs) * 100)}%</span>
-                  </div>
-                  <Progress value={(tech.completedJobs / highestJobs) * 100} className="h-2 bg-gray-100" />
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span>Revenue</span>
-                    <span>{Math.round((tech.totalRevenue / highestRevenue) * 100)}%</span>
-                  </div>
-                  <Progress value={(tech.totalRevenue / highestRevenue) * 100} className="h-2 bg-blue-100" />
-                </div>
-              </div>
-            ))}
+        <div className="h-[260px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis yAxisId="left" orientation="left" />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]}
+              />
+              <Tooltip
+                formatter={(value: number, name: string) => {
+                  if (name === "averageRevenue") {
+                    return [`$${value.toFixed(2)}`, "Avg Revenue per Job"];
+                  }
+                  return [value, name === "completedJobs" ? "Completed Jobs" : "Cancelled Jobs"];
+                }}
+              />
+              <Legend />
+              <Bar
+                yAxisId="left"
+                dataKey="completedJobs"
+                fill="#3b82f6"
+                name="Completed Jobs"
+              />
+              <Bar
+                yAxisId="left"
+                dataKey="cancelledJobs"
+                fill="#f43f5e"
+                name="Cancelled Jobs"
+              />
+              <Bar
+                yAxisId="right"
+                dataKey="averageRevenue"
+                fill="#10b981"
+                name="Avg Revenue per Job"
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>

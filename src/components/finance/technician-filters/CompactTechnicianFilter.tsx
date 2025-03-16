@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Users, ChevronDown } from "lucide-react";
-import { 
+import { Filter, Check } from "lucide-react";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -15,8 +15,6 @@ interface CompactTechnicianFilterProps {
   toggleTechnician: (techName: string) => void;
   clearFilters: () => void;
   applyFilters: () => void;
-  selectAllTechnicians?: () => void;
-  deselectAllTechnicians?: () => void;
 }
 
 const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
@@ -25,40 +23,58 @@ const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
   toggleTechnician,
   clearFilters,
   applyFilters,
-  selectAllTechnicians,
-  deselectAllTechnicians
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  
-  const allSelected = technicianNames.length > 0 && selectedTechnicians.length === technicianNames.length;
-  const someSelected = selectedTechnicians.length > 0 && selectedTechnicians.length < technicianNames.length;
-  
+  const [isOpen, setIsOpen] = useState(false);
+
+  const allSelected = 
+    technicianNames.length > 0 && 
+    technicianNames.every(tech => selectedTechnicians.includes(tech));
+    
+  const someSelected = 
+    selectedTechnicians.length > 0 && 
+    !allSelected;
+
   const handleSelectAllChange = () => {
     if (allSelected) {
-      deselectAllTechnicians?.();
+      clearFilters();
     } else {
-      selectAllTechnicians?.();
+      const allTechNames = technicianNames;
+      // Set all technicians as selected
+      allTechNames.forEach(tech => {
+        if (!selectedTechnicians.includes(tech)) {
+          toggleTechnician(tech);
+        }
+      });
     }
   };
 
+  const handleApply = () => {
+    applyFilters();
+    setIsOpen(false);
+  };
+
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button 
           variant="outline" 
-          className="w-auto justify-between px-3 py-5 text-base font-medium"
+          size="sm" 
+          className={`h-9 ${someSelected ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}
         >
-          <Users className="mr-2 h-4 w-4" />
-          <span>
-            {selectedTechnicians.length === 0 ? "All Technicians" : 
-              selectedTechnicians.length === 1 ? `${selectedTechnicians[0]}` :
-              `${selectedTechnicians.length} Technicians`}
-          </span>
-          <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+          <Filter className="h-4 w-4 mr-2" />
+          Technicians
+          {selectedTechnicians.length > 0 && (
+            <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">
+              {selectedTechnicians.length}
+            </span>
+          )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72 p-0" align="start">
-        <div className="p-3 space-y-3">
+      <PopoverContent className="w-80" align="start">
+        <div className="space-y-4">
+          <h4 className="font-medium">Filter Technicians</h4>
+          
           <TechnicianCheckboxList 
             technicianNames={technicianNames}
             selectedTechnicians={selectedTechnicians}
@@ -71,11 +87,20 @@ const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
             compact={true}
           />
           
-          <div className="flex justify-between pt-2 border-t border-gray-200">
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Clear all
+          <div className="flex justify-between pt-2 border-t">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                clearFilters();
+                setSearchQuery("");
+              }}
+              disabled={selectedTechnicians.length === 0}
+            >
+              Clear
             </Button>
-            <Button size="sm" onClick={applyFilters}>
+            <Button size="sm" onClick={handleApply} className="gap-1">
+              <Check className="h-3.5 w-3.5" />
               Apply
             </Button>
           </div>
