@@ -7,7 +7,7 @@ import CalendarSidebar from "./calendar/CalendarSidebar";
 import LeftCalendarSidebar from "./calendar/LeftCalendarSidebar";
 import GlobalDateRangeFilter from "./GlobalDateRangeFilter";
 import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -15,6 +15,7 @@ const Layout = () => {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [allSidebarsHidden, setAllSidebarsHidden] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -53,6 +54,21 @@ const Layout = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const toggleAllSidebars = () => {
+    if (allSidebarsHidden) {
+      // Restore previous state
+      setIsSidebarOpen(true);
+      setIsLeftSidebarOpen(false);
+      setIsCalendarOpen(false);
+    } else {
+      // Hide all sidebars
+      setIsSidebarOpen(false);
+      setIsLeftSidebarOpen(false);
+      setIsCalendarOpen(false);
+    }
+    setAllSidebarsHidden(!allSidebarsHidden);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-indigo-700">
       <Header
@@ -60,11 +76,21 @@ const Layout = () => {
         toggleSidebar={toggleSidebar}
         isMobile={isMobile}
       />
+      <div className="fixed top-4 right-4 z-50">
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          onClick={toggleAllSidebars} 
+          className="h-8 w-8 rounded-full shadow-md"
+        >
+          {allSidebarsHidden ? <ChevronRightIcon size={16} /> : <XIcon size={16} />}
+        </Button>
+      </div>
       <div className="flex-1 flex overflow-hidden pt-16">
-        <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
+        <Sidebar isOpen={isSidebarOpen && !allSidebarsHidden} isMobile={isMobile} />
         
         {/* Toggle sidebar button */}
-        {!isMobile && (
+        {!isMobile && !allSidebarsHidden && (
           <div className={`fixed z-30 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${isSidebarOpen ? 'left-64' : 'left-16'}`}>
             <Button 
               variant="secondary" 
@@ -77,12 +103,12 @@ const Layout = () => {
           </div>
         )}
         
-        <LeftCalendarSidebar isOpen={isLeftSidebarOpen} />
+        <LeftCalendarSidebar isOpen={isLeftSidebarOpen && !allSidebarsHidden} />
         <main 
           className={`flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg
-            ${isSidebarOpen && !isMobile ? 'ml-64' : 'ml-16'}
-            ${isLeftSidebarOpen && !isMobile ? 'ml-80' : ''}
-            ${isCalendarOpen && !isMobile ? 'mr-80' : 'mr-0'}`}
+            ${isSidebarOpen && !isMobile && !allSidebarsHidden ? 'ml-64' : 'ml-0'}
+            ${isLeftSidebarOpen && !isMobile && !allSidebarsHidden ? 'ml-80' : ''}
+            ${isCalendarOpen && !isMobile && !allSidebarsHidden ? 'mr-80' : 'mr-0'}`}
         >
           <div className="mb-4">
             <GlobalDateRangeFilter />
@@ -91,7 +117,7 @@ const Layout = () => {
             <Outlet />
           </div>
         </main>
-        <CalendarSidebar isOpen={isCalendarOpen} />
+        <CalendarSidebar isOpen={isCalendarOpen && !allSidebarsHidden} />
       </div>
     </div>
   );
