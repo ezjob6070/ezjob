@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,6 @@ const TechnicianDetail = () => {
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    // In a real app, this would be an API call
     const techData = initialTechnicians.find(tech => tech.id === id);
     if (techData) {
       setTechnician(techData);
@@ -49,7 +47,6 @@ const TechnicianDetail = () => {
   }, [id, navigate, toast]);
 
   const handleUpdateTechnician = (values: any) => {
-    // Convert form values to Technician type and ensure all required fields are present
     const updatedTechnician: Technician = {
       ...technician!,
       ...values
@@ -63,7 +60,6 @@ const TechnicianDetail = () => {
     });
   };
 
-  // Mock functions for table props
   const toggleTechnician = (techName: string) => {
     setSelectedTechnicianNames(prev => 
       prev.includes(techName) ? prev.filter(name => name !== techName) : [...prev, techName]
@@ -75,7 +71,6 @@ const TechnicianDetail = () => {
   };
   
   const applyFilters = () => {
-    // In a real app, this would filter the technicians
     console.log("Applying filters");
   };
   
@@ -116,7 +111,6 @@ const TechnicianDetail = () => {
     }
   };
 
-  // Create metrics object for TechnicianDetailCard
   const metrics = {
     completedJobs: technician.completedJobs,
     cancelledJobs: technician.cancelledJobs,
@@ -183,14 +177,21 @@ const TechnicianDetail = () => {
               </CardContent>
             </Card>
 
-            <TechnicianDetailCard technician={technician} metrics={metrics} />
+            <TechnicianDetailCard 
+              technician={technician} 
+              metrics={metrics}
+              dateRangeText="Current Period" 
+            />
 
             <JobsRevenueComparison technicians={[technician]} />
           </div>
         </TabsContent>
 
         <TabsContent value="financial" className="space-y-6">
-          <PaymentBreakdownCards technicians={[technician]} />
+          <PaymentBreakdownCards 
+            technicians={[technician]} 
+            dateRangeText="All Time" 
+          />
           <TechnicianFinancialTable 
             filteredTechnicians={filteredTechnicians}
             displayedTechnicians={displayedTechnicians}

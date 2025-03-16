@@ -1,11 +1,10 @@
-
 import React from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
 import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
 import TechnicianDetailCard from "@/components/technicians/charts/TechnicianDetailCard";
 import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
-import useTechnicianFinancials from "@/hooks/useTechnicianFinancials";
+import useTechnicianFinancials from "@/hooks/technicians/useTechnicianFinancials";
 
 interface TechnicianCircleChartsProps {
   filteredTechnicians: Technician[];
@@ -45,7 +44,6 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
     handleTechnicianSelect
   } = useTechnicianFinancials(filteredTechnicians, dateRange);
 
-  // Convert selectedTechnicianMetrics to the expected format for TechnicianDetailCard
   const formattedTechnicianMetrics: TechnicianMetrics | null = selectedTechnician && selectedTechnicianMetrics ? {
     completedJobs: selectedTechnician.completedJobs,
     cancelledJobs: selectedTechnician.cancelledJobs,
@@ -60,7 +58,6 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
   
   return (
     <div className="space-y-6">
-      {/* Payment Breakdown Simple Cards */}
       <PaymentBreakdownCards 
         revenue={financialMetrics.totalRevenue}
         technicianEarnings={financialMetrics.technicianEarnings}
@@ -69,7 +66,6 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         dateRangeText={dateRangeText}
       />
       
-      {/* Selected Technician Metrics */}
       {selectedTechnician && formattedTechnicianMetrics && (
         <TechnicianDetailCard 
           technician={selectedTechnician} 
@@ -78,7 +74,6 @@ const TechnicianCircleCharts: React.FC<TechnicianCircleChartsProps> = ({
         />
       )}
       
-      {/* Technicians List Table */}
       <TechnicianFinancialTable
         filteredTechnicians={filteredTechnicians}
         displayedTechnicians={displayedTechnicians}

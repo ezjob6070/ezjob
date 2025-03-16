@@ -1,24 +1,53 @@
-
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { TrendingUp, Users, Calculator, DollarSign } from "lucide-react";
+import { Technician } from "@/types/technician";
 
 interface PaymentBreakdownCardsProps {
-  revenue: number;
-  technicianEarnings: number;
-  expenses: number;
-  profit: number;
-  dateRangeText: string;
+  revenue?: number;
+  technicianEarnings?: number;
+  expenses?: number;
+  profit?: number;
+  dateRangeText?: string;
+  technicians?: Technician[];
 }
 
 const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
-  revenue,
-  technicianEarnings,
-  expenses,
-  profit,
-  dateRangeText
+  revenue: externalRevenue,
+  technicianEarnings: externalEarnings,
+  expenses: externalExpenses,
+  profit: externalProfit,
+  dateRangeText = "",
+  technicians = []
 }) => {
+  const calculatedMetrics = useMemo(() => {
+    if (technicians.length > 0 && externalRevenue === undefined) {
+      const totalRevenue = technicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
+      const totalEarnings = technicians.reduce((sum, tech) => 
+        sum + tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1), 0
+      );
+      const totalExpenses = totalRevenue * 0.33;
+      const totalProfit = totalRevenue - totalEarnings - totalExpenses;
+      
+      return {
+        revenue: totalRevenue,
+        technicianEarnings: totalEarnings,
+        expenses: totalExpenses,
+        profit: totalProfit
+      };
+    }
+    
+    return {
+      revenue: externalRevenue || 0,
+      technicianEarnings: externalEarnings || 0,
+      expenses: externalExpenses || 0,
+      profit: externalProfit || 0
+    };
+  }, [technicians, externalRevenue, externalEarnings, externalExpenses, externalProfit]);
+  
+  const { revenue, technicianEarnings, expenses, profit } = calculatedMetrics;
+
   const cards = [
     {
       title: "Total Revenue",
