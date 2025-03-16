@@ -1,7 +1,7 @@
 
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { LogOutIcon } from "lucide-react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { LogOutIcon, ChevronLeftIcon, MenuIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
@@ -42,38 +42,65 @@ const Sidebar = ({ isOpen, isMobile }: SidebarProps) => {
 
   const navItems = getIndustrySpecificNavItems(currentIndustry);
 
-  if (!isOpen) return null;
-
   return (
     <aside
       className={cn(
-        "fixed top-0 left-0 z-20 h-screen w-64 flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 ease-in-out",
+        "fixed top-0 left-0 z-20 h-screen flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 ease-in-out",
+        isOpen ? "w-64" : "w-16",
         isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "",
         isMobile && isOpen ? "shadow-xl" : ""
       )}
     >
       <SidebarHeader industry={currentIndustry} onCycleIndustry={cycleIndustry} />
 
-      <nav className="flex-1 py-6 px-4">
-        <ul className="space-y-2">
-          {navItems.map((item) => (
-            <li key={item.href || item.label}>
-              <NavItem 
-                item={item}
-                isExpanded={expandedItems["leads-clients"]}
-                onToggleExpand={() => toggleExpand("leads-clients")}
-                currentPath={location.pathname}
-              />
-            </li>
-          ))}
-        </ul>
+      <nav className={cn("flex-1 py-6", isOpen ? "px-4" : "px-2")}>
+        {isOpen ? (
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.href || item.label}>
+                <NavItem 
+                  item={item}
+                  isExpanded={expandedItems["leads-clients"]}
+                  onToggleExpand={() => toggleExpand("leads-clients")}
+                  currentPath={location.pathname}
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="space-y-2 flex flex-col items-center">
+            {navItems.map((item) => (
+              <li key={item.href || item.label} className="w-full flex justify-center">
+                {!item.children && item.href && (
+                  <Link 
+                    to={item.href} 
+                    className={cn(
+                      "p-2 rounded-lg transition-colors duration-200 flex justify-center",
+                      location.pathname === item.href
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    {item.icon}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </nav>
 
-      <div className="p-4 border-t border-sidebar-border">
-        <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors duration-200">
-          <LogOutIcon size={20} />
-          <span>Sign out</span>
-        </button>
+      <div className={cn("p-4 border-t border-sidebar-border", !isOpen && "flex justify-center")}>
+        {isOpen ? (
+          <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors duration-200">
+            <LogOutIcon size={20} />
+            <span>Sign out</span>
+          </button>
+        ) : (
+          <button className="p-2 rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors duration-200">
+            <LogOutIcon size={20} />
+          </button>
+        )}
       </div>
     </aside>
   );

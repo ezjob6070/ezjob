@@ -21,18 +21,21 @@ type HeaderProps = {
 const Header = ({ isSidebarOpen, toggleSidebar, isMobile }: HeaderProps) => {
   return (
     <header className={`h-16 border-b border-border fixed top-0 right-0 left-0 z-10 bg-card transition-all duration-300
-      ${isSidebarOpen && !isMobile ? 'pl-64' : 'pl-0'}`}>
+      ${isSidebarOpen && !isMobile ? 'pl-64' : 'pl-16'}
+      ${isMobile ? 'pl-0' : ''}`}>
       <div className="h-full px-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-            className="transition-all duration-300"
-          >
-            {isSidebarOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
-          </Button>
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+              className="transition-all duration-300"
+            >
+              {isSidebarOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
+            </Button>
+          )}
 
           <div className="hidden md:flex items-center relative w-64">
             <SearchIcon className="absolute left-3 text-muted-foreground" size={16} />

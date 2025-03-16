@@ -6,6 +6,8 @@ import Header from "./Header";
 import CalendarSidebar from "./calendar/CalendarSidebar";
 import LeftSidebar from "./calendar/LeftSidebar";
 import GlobalDateRangeFilter from "./GlobalDateRangeFilter";
+import { Button } from "@/components/ui/button";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -47,19 +49,38 @@ const Layout = () => {
     };
   }, []);
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-indigo-700">
       <Header
         isSidebarOpen={isSidebarOpen}
-        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        toggleSidebar={toggleSidebar}
         isMobile={isMobile}
       />
       <div className="flex-1 flex overflow-hidden pt-16"> {/* Added pt-16 to account for the fixed header */}
         <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
+        
+        {/* Toggle sidebar button */}
+        {!isMobile && (
+          <div className={`fixed z-30 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${isSidebarOpen ? 'left-64' : 'left-16'}`}>
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={toggleSidebar} 
+              className="h-8 w-8 rounded-full shadow-md"
+            >
+              {isSidebarOpen ? <ChevronLeftIcon size={16} /> : <ChevronRightIcon size={16} />}
+            </Button>
+          </div>
+        )}
+        
         <LeftSidebar isOpen={isLeftSidebarOpen} />
         <main 
           className={`flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg
-            ${isSidebarOpen && !isMobile ? 'ml-64' : 'ml-0'}
+            ${isSidebarOpen && !isMobile ? 'ml-64' : 'ml-16'}
             ${isLeftSidebarOpen && !isMobile ? 'ml-80' : ''}
             ${isCalendarOpen && !isMobile ? 'mr-80' : 'mr-0'}`}
         >
