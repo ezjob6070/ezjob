@@ -7,6 +7,9 @@ import AmountFilter from "./AmountFilter";
 import PaymentMethodFilter from "./PaymentMethodFilter";
 import DateRangeFilter from "@/components/finance/technician-filters/DateRangeFilter";
 import JobSourceFilter from "./JobSourceFilter";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { FilterIcon, DollarSign, Calendar, Users, TagIcon } from "lucide-react";
 
 interface JobFiltersSectionProps {
   technicianNames: string[];
@@ -61,37 +64,112 @@ const JobFiltersSection = ({
 }: JobFiltersSectionProps) => {
   // Create components
   const filtersComponent = (
-    <FilterContent
-      technicianNames={technicianNames}
-      selectedTechnicians={selectedTechnicians}
-      toggleTechnician={toggleTechnician}
-      date={date}
-      setDate={setDate}
-      selectAllTechnicians={selectAllTechnicians}
-      deselectAllTechnicians={deselectAllTechnicians}
-    />
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="flex items-center gap-1.5">
+          <Users className="h-4 w-4" />
+          <span>Technicians</span>
+          {selectedTechnicians.length > 0 && (
+            <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[10px] text-primary-foreground">
+              {selectedTechnicians.length}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="start">
+        <FilterContent
+          technicianNames={technicianNames}
+          selectedTechnicians={selectedTechnicians}
+          toggleTechnician={toggleTechnician}
+          date={date}
+          setDate={setDate}
+          selectAllTechnicians={selectAllTechnicians}
+          deselectAllTechnicians={deselectAllTechnicians}
+        />
+      </PopoverContent>
+    </Popover>
   );
 
   const dateRangeComponent = (
-    <DateRangeFilter date={date} setDate={setDate} compact={true} />
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="flex items-center gap-1.5">
+          <Calendar className="h-4 w-4" />
+          <span>Date</span>
+          {date && (
+            <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[10px] text-primary-foreground">
+              ✓
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <DateRangeFilter date={date} setDate={setDate} compact={true} />
+      </PopoverContent>
+    </Popover>
   );
 
   const amountFilterComponent = (
-    <AmountFilter value={amountRange} onChange={setAmountRange} />
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="flex items-center gap-1.5">
+          <DollarSign className="h-4 w-4" />
+          <span>Amount</span>
+          {amountRange && (
+            <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[10px] text-primary-foreground">
+              ✓
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-4" align="start">
+        <AmountFilter value={amountRange} onChange={setAmountRange} />
+      </PopoverContent>
+    </Popover>
   );
 
   const paymentMethodComponent = (
-    <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="flex items-center gap-1.5">
+          <FilterIcon className="h-4 w-4" />
+          <span>Payment</span>
+          {paymentMethod && (
+            <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[10px] text-primary-foreground">
+              ✓
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-4" align="start">
+        <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
+      </PopoverContent>
+    </Popover>
   );
 
   const jobSourceComponent = (
-    <JobSourceFilter
-      jobSourceNames={jobSourceNames}
-      selectedJobSources={selectedJobSources}
-      toggleJobSource={toggleJobSource}
-      selectAllJobSources={selectAllJobSources}
-      deselectAllJobSources={deselectAllJobSources}
-    />
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="flex items-center gap-1.5">
+          <TagIcon className="h-4 w-4" />
+          <span>Sources</span>
+          {selectedJobSources.length > 0 && (
+            <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[10px] text-primary-foreground">
+              {selectedJobSources.length}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="start">
+        <JobSourceFilter
+          jobSourceNames={jobSourceNames}
+          selectedJobSources={selectedJobSources}
+          toggleJobSource={toggleJobSource}
+          selectAllJobSources={selectAllJobSources}
+          deselectAllJobSources={deselectAllJobSources}
+        />
+      </PopoverContent>
+    </Popover>
   );
 
   return {

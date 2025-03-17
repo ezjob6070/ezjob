@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { initialJobs } from "@/data/jobs";
 import { initialTechnicians } from "@/data/technicians";
@@ -30,8 +31,6 @@ const JOB_CATEGORIES = [
 
 const Jobs = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
-  const [jobSourceSearchQuery, setJobSourceSearchQuery] = useState("");
   
   const {
     jobs,
@@ -41,6 +40,7 @@ const Jobs = () => {
     setSearchTerm,
     selectedTechnicians,
     selectedCategories,
+    selectedJobSources,
     date,
     amountRange,
     paymentMethod,
@@ -50,21 +50,21 @@ const Jobs = () => {
     isStatusModalOpen,
     toggleTechnician,
     toggleCategory,
+    toggleJobSource,
     setDate,
     setAmountRange,
     setPaymentMethod,
     selectAllTechnicians,
     deselectAllTechnicians,
+    selectAllJobSources,
+    deselectAllJobSources,
     clearFilters,
     applyFilters,
     handleCancelJob,
     handleCompleteJob,
     handleRescheduleJob,
     openStatusModal,
-    closeStatusModal,
-    toggleJobSource,
-    selectAllJobSources,
-    deselectAllJobSources
+    closeStatusModal
   } = useJobsData(initialJobs, JOB_SOURCES.map(source => source.name));
 
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);

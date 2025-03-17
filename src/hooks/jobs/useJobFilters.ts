@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Job } from "@/components/jobs/JobTypes";
+import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
 import { AmountRange } from "@/components/jobs/AmountFilter";
 import { DateRange } from "react-day-picker";
 import { isWithinInterval, isSameDay, startOfDay } from "date-fns";
@@ -13,13 +13,10 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
   
   // Initialize date range to today
   const today = new Date();
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: today,
-    to: today,
-  });
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
   
   const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [appliedFilters, setAppliedFilters] = useState(false);
 
   const toggleTechnician = (techName: string) => {
@@ -47,6 +44,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
   };
 
   const selectAllTechnicians = () => {
+    // This should be updated to set all technician names
     setSelectedTechnicians(prevTechnicians => [...prevTechnicians]);
   };
 
@@ -76,12 +74,13 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     setAppliedFilters(true);
   };
 
-  const hasActiveFilters = appliedFilters || 
+  const hasActiveFilters = 
+    (appliedFilters && selectedTechnicians.length > 0) || 
     selectedCategories.length > 0 || 
     selectedJobSources.length > 0 ||
-    date?.from || 
-    amountRange || 
-    paymentMethod;
+    !!date?.from || 
+    !!amountRange || 
+    !!paymentMethod;
 
   // Filter jobs based on various criteria
   const filterJobs = (jobs: Job[], searchTerm: string): Job[] => {

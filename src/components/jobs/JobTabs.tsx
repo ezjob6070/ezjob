@@ -19,7 +19,7 @@ export interface JobTabsProps {
   filtersComponent?: React.ReactNode;
   amountFilterComponent?: React.ReactNode;
   paymentMethodComponent?: React.ReactNode;
-  jobSourceComponent?: React.ReactNode; // New prop for job source filter
+  jobSourceComponent?: React.ReactNode;
   selectedJob: Job | null;
   isStatusModalOpen: boolean;
   openStatusModal: (job: Job) => void;
@@ -37,7 +37,7 @@ const JobTabs = ({
   filtersComponent,
   amountFilterComponent,
   paymentMethodComponent,
-  jobSourceComponent, // New prop
+  jobSourceComponent,
   selectedJob,
   isStatusModalOpen,
   openStatusModal,
@@ -78,10 +78,10 @@ const JobTabs = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2 mb-4">
+      <div className="flex flex-wrap items-center justify-start gap-2 mb-4">
         {dateRangeComponent}
         {filtersComponent}
-        {jobSourceComponent} {/* Add the job source filter component */}
+        {jobSourceComponent}
         {amountFilterComponent}
         {paymentMethodComponent}
       </div>
