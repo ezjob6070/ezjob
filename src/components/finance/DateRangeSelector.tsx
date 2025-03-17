@@ -90,15 +90,18 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) 
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start" side="bottom">
-          <div className="p-2 space-y-2">
-            <Calendar
-              mode="range"
-              selected={date}
-              onSelect={setDate}
-              initialFocus
-              numberOfMonths={1}
-            />
-            <div className="grid grid-cols-1 gap-1 mt-2 border-t pt-2">
+          <div className="flex flex-col md:flex-row">
+            <div className="p-2">
+              <Calendar
+                mode="range"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+                numberOfMonths={1}
+              />
+            </div>
+            <div className="border-l p-2 space-y-1 min-w-[180px]">
+              <p className="text-sm font-medium mb-1 px-2">Presets</p>
               <Button 
                 variant="ghost" 
                 className="w-full justify-start"

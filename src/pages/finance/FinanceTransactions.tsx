@@ -13,10 +13,12 @@ import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import TransactionsSection from "@/components/finance/TransactionsSection";
 
 const FinanceTransactions = () => {
+  // Initialize with a date range (last month to today by default)
   const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
+    from: new Date(),
     to: new Date(),
   });
+  
   const [transactions, setTransactions] = useState<FinancialTransaction[]>(sampleTransactions);
   const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>([]);
   const [activeTechnicians, setActiveTechnicians] = useState(initialTechnicians.filter(tech => tech.status === "active"));
@@ -72,7 +74,9 @@ const FinanceTransactions = () => {
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <DateRangeSelector date={date} setDate={setDate} />
+          <div className="w-full md:w-64">
+            <DateRangeSelector date={date} setDate={setDate} />
+          </div>
           
           <div className="flex flex-col gap-2 w-full md:w-64">
             <Label htmlFor="technician-filter">Technician</Label>

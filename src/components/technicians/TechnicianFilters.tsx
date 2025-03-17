@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { 
   Select, 
@@ -16,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { DateRange } from "react-day-picker";
-import { DateRangeSelector } from "@/components/finance/DateRangeSelector";
+import DateRangeSelector from "@/components/finance/DateRangeSelector";
 
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import { Technician } from "@/types/technician";
@@ -102,7 +103,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           </div>
         )}
 
-        {/* Department filter if available - keep as is */}
+        {/* Department filter if available */}
         {departments.length > 0 && toggleDepartment && (
           <Popover>
             <PopoverTrigger asChild>
@@ -164,7 +165,6 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         </Button>
       </div>
       
-      {/* Keep the rest of the file as is */}
       {/* Advanced filters section */}
       {showAdvancedFilters && (
         <div className="bg-muted/30 p-4 rounded-md space-y-4">
