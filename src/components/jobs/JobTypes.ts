@@ -21,13 +21,14 @@ export interface Job {
   notes?: string;
   cancellationReason?: string;
   source?: string;
-  // Add missing properties referenced in components
+  // Additional properties
   clientId?: string;
   clientEmail?: string;
   clientPhone?: string;
   jobSourceId?: string;
   jobSourceName?: string;
   parts?: string[];
+  createdAt?: Date;
 }
 
 export interface JobTab {

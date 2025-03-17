@@ -55,6 +55,7 @@ const TechnicianDetail = () => {
       ...technician,
       ...values,
       id: technician.id,
+      paymentRate: Number(values.paymentRate),
       initials: technician.initials,
       completedJobs: technician.completedJobs,
       cancelledJobs: technician.cancelledJobs,

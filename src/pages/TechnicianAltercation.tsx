@@ -17,9 +17,11 @@ const TechnicianAltercation = () => {
 
   const handleUpdateTechnician = (values: TechnicianEditFormValues) => {
     // Convert form values to Technician type and ensure all required fields are present
+    // Ensure paymentRate is a number
     const updatedTechnician: Technician = {
       ...selectedTechnician!,
-      ...values
+      ...values,
+      paymentRate: Number(values.paymentRate) // Ensure it's a number
     };
     
     setTechnicians((prevTechnicians) => 

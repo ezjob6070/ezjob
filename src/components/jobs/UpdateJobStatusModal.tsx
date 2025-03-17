@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Job, JobStatus } from "./JobTypes";
 import {
@@ -50,7 +49,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
     if (job) {
       setStatus(job.status === "in_progress" ? "completed" : job.status);
       setActualAmount(job.amount || 0);
-      setParts(job.parts || "");
+      setParts(job.parts ? job.parts.join(", ") : "");
       setCancellationReason(job.cancellationReason || "");
       setRescheduleDate(job.scheduledDate ? new Date(job.scheduledDate) : new Date());
     }

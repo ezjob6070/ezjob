@@ -1,4 +1,4 @@
-import { Employee, EmployeeStatus, Report, Resume, ResumeStatus, EmployeeNote } from "@/types/employee";
+import { Employee, EmployeeStatus, Report, Resume, ResumeStatus, EmployeeNote, SalaryBasis } from "@/types/employee";
 
 export const initialEmployees: Employee[] = [
   {
@@ -9,12 +9,14 @@ export const initialEmployees: Employee[] = [
     position: "HR Manager",
     department: "Human Resources",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2021-03-15"),
+    dateHired: "2021-03-15",
+    hireDate: "2021-03-15",
     salary: 75000,
+    salaryBasis: SalaryBasis.YEARLY,
     address: "123 Main St, Anytown, CA 12345",
     skills: ["Recruitment", "Employee Relations", "Conflict Resolution", "Policy Development"],
-    dateOfBirth: new Date("1985-06-15"),
-    background: "John has over 10 years of experience in Human Resources Management. He previously worked at XYZ Corp where he implemented numerous employee wellness programs that reduced turnover by 15%.",
+    dateOfBirth: "1985-06-15",
+    background: "John has over 10 years of experience in Human Resources Management. He previously worked at XYZ Corp where he implemented numerous employee wellness programs that reduced turnover by 15%",
     education: [
       "MBA in Human Resource Management, University of California, 2010",
       "Bachelor's in Business Administration, State University, 2007"
@@ -25,7 +27,7 @@ export const initialEmployees: Employee[] = [
       {
         id: "note-1",
         content: "John successfully led the implementation of the new HRIS system, completing the project under budget and ahead of schedule.",
-        createdAt: new Date("2022-05-20"),
+        createdAt: "2022-05-20",
         createdBy: "Michael Davis"
       }
     ]
@@ -38,17 +40,23 @@ export const initialEmployees: Employee[] = [
     position: "Marketing Specialist",
     department: "Marketing",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2020-06-22"),
+    dateHired: "2020-06-22",
+    hireDate: "2020-06-22",
+    salaryBasis: SalaryBasis.YEARLY,
     reportsTo: "emp-5",
     salary: 62000,
     address: "456 Oak Ave, Anytown, CA 12345",
     skills: ["Social Media Marketing", "Content Creation", "SEO", "Analytics"],
-    dateOfBirth: new Date("1992-11-30"),
+    dateOfBirth: "1992-11-30",
     background: "Sarah specializes in digital marketing with a focus on social media campaigns. She has experience in both B2B and B2C marketing environments and has managed campaigns with budgets exceeding $500,000.",
     education: [
       "Bachelor's in Marketing, Pacific University, 2015"
     ],
-    emergencyContact: "Robert Johnson (Brother): (555) 987-6543",
+    emergencyContact: {
+      name: "Robert Johnson",
+      relationship: "Brother",
+      phone: "(555) 987-6543"
+    },
     performanceRating: 5
   },
   {
@@ -59,7 +67,7 @@ export const initialEmployees: Employee[] = [
     position: "Software Developer",
     department: "Engineering",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2022-01-10"),
+    dateHired: "2022-01-10",
     reportsTo: "emp-6",
     salary: 85000,
     address: "789 Pine St, Anytown, CA 12345",
@@ -76,12 +84,12 @@ export const initialEmployees: Employee[] = [
     position: "Accountant",
     department: "Finance",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2019-11-05"),
+    dateHired: "2019-11-05",
     reportsTo: "emp-7",
     salary: 68000,
     address: "321 Elm St, Anytown, CA 12345",
     skills: ["Financial Analysis", "Budgeting", "Tax Preparation", "Reconciliation"],
-    dateOfBirth: new Date("1988-04-10"),
+    dateOfBirth: "1988-04-10",
     background: "Emily has 10 years of experience in accounting and finance. She has worked in both public and private sectors and has a strong track record of financial reporting and analysis.",
     education: [
       "Bachelor's in Accounting, University of California, 2012"
@@ -96,11 +104,11 @@ export const initialEmployees: Employee[] = [
     position: "Marketing Director",
     department: "Marketing",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2018-08-20"),
+    dateHired: "2018-08-20",
     salary: 95000,
     address: "654 Maple Ave, Anytown, CA 12345",
     skills: ["Brand Strategy", "Marketing Campaigns", "Team Management", "Budget Planning"],
-    dateOfBirth: new Date("1979-02-12"),
+    dateOfBirth: "1979-02-12",
     background: "Michael has over 15 years of experience in marketing. He has worked in both B2B and B2C industries and has a proven track record of driving sales and increasing brand awareness.",
     education: [
       "MBA in Marketing, Stanford University, 2014"
@@ -115,11 +123,11 @@ export const initialEmployees: Employee[] = [
     position: "Engineering Manager",
     department: "Engineering",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2017-05-15"),
+    dateHired: "2017-05-15",
     salary: 110000,
     address: "987 Cedar St, Anytown, CA 12345",
     skills: ["Project Management", "Software Architecture", "Team Leadership", "Agile Methodologies"],
-    dateOfBirth: new Date("1980-09-18"),
+    dateOfBirth: "1980-09-18",
     background: "Jennifer has over 10 years of experience in engineering management. She has worked in both startups and established companies and has a strong track record of leading teams to success.",
     education: [
       "Bachelor's in Computer Science, University of California, 2008"
@@ -134,11 +142,11 @@ export const initialEmployees: Employee[] = [
     position: "Finance Director",
     department: "Finance",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2016-09-01"),
+    dateHired: "2016-09-01",
     salary: 105000,
     address: "159 Birch St, Anytown, CA 12345",
     skills: ["Financial Planning", "Risk Management", "Strategic Planning", "Investment Analysis"],
-    dateOfBirth: new Date("1976-03-25"),
+    dateOfBirth: "1976-03-25",
     background: "Robert has over 12 years of experience in finance. He has worked in both public and private sectors and has a strong track record of financial analysis and risk management.",
     education: [
       "Bachelor's in Finance, University of California, 2009"
@@ -153,12 +161,12 @@ export const initialEmployees: Employee[] = [
     position: "Customer Service Rep",
     department: "Customer Support",
     status: EmployeeStatus.INACTIVE,
-    dateHired: new Date("2020-02-15"),
+    dateHired: "2020-02-15",
     reportsTo: "emp-9",
     salary: 45000,
     address: "753 Willow St, Anytown, CA 12345",
     skills: ["Communication", "Problem Solving", "Customer Relations", "CRM Software"],
-    dateOfBirth: new Date("1982-07-14"),
+    dateOfBirth: "1982-07-14",
     background: "Lisa has 8 years of experience in customer service. She has worked in both retail and hospitality industries and has a strong track record of resolving customer complaints and providing excellent customer service.",
     education: [
       "Bachelor's in Business Administration, University of California, 2010"
@@ -173,11 +181,11 @@ export const initialEmployees: Employee[] = [
     position: "Customer Support Manager",
     department: "Customer Support",
     status: EmployeeStatus.ACTIVE,
-    dateHired: new Date("2019-07-10"),
+    dateHired: "2019-07-10",
     salary: 72000,
     address: "852 Spruce St, Anytown, CA 12345",
     skills: ["Team Management", "Customer Experience", "Conflict Resolution", "Support Metrics"],
-    dateOfBirth: new Date("1984-01-05"),
+    dateOfBirth: "1984-01-05",
     background: "Thomas has over 10 years of experience in customer support. He has worked in both retail and hospitality industries and has a strong track record of managing teams and resolving customer complaints.",
     education: [
       "Bachelor's in Business Administration, University of California, 2011"
@@ -195,7 +203,7 @@ export const initialResumes: Resume[] = [
     position: "Software Developer",
     experience: "5 years",
     status: ResumeStatus.PENDING,
-    dateSubmitted: new Date("2023-10-15"),
+    dateSubmitted: "2023-10-15",
     resumeUrl: "/path/to/resume1.pdf",
     notes: "Strong JavaScript and React experience. Referred by David Williams."
   },
@@ -207,7 +215,7 @@ export const initialResumes: Resume[] = [
     position: "Marketing Coordinator",
     experience: "3 years",
     status: ResumeStatus.APPROVED,
-    dateSubmitted: new Date("2023-10-10"),
+    dateSubmitted: "2023-10-10",
     resumeUrl: "/path/to/resume2.pdf",
     notes: "Good fit for the marketing team. Schedule for interview next week."
   },
@@ -219,7 +227,7 @@ export const initialResumes: Resume[] = [
     position: "HR Specialist",
     experience: "7 years",
     status: ResumeStatus.REJECTED,
-    dateSubmitted: new Date("2023-10-05"),
+    dateSubmitted: "2023-10-05",
     resumeUrl: "/path/to/resume3.pdf",
     notes: "Not enough experience in employee benefits administration."
   },
@@ -231,7 +239,7 @@ export const initialResumes: Resume[] = [
     position: "Financial Analyst",
     experience: "2 years",
     status: ResumeStatus.PENDING,
-    dateSubmitted: new Date("2023-10-12"),
+    dateSubmitted: "2023-10-12",
     resumeUrl: "/path/to/resume4.pdf",
     notes: "Recently graduated with MBA. Limited experience but shows potential."
   },
@@ -243,7 +251,7 @@ export const initialResumes: Resume[] = [
     position: "Customer Service Representative",
     experience: "4 years",
     status: ResumeStatus.PENDING,
-    dateSubmitted: new Date("2023-10-14"),
+    dateSubmitted: "2023-10-14",
     resumeUrl: "/path/to/resume5.pdf",
     notes: "Excellent communication skills. Previous experience in retail customer service."
   }
@@ -256,7 +264,10 @@ export const employeeReports: Report[] = [
     title: "Q3 Marketing Campaign Results",
     description: "Detailed analysis of Q3 social media campaign performance and ROI metrics.",
     status: "completed",
-    dateSubmitted: new Date("2023-10-01")
+    dateSubmitted: "2023-10-01",
+    date: "2023-10-01",
+    type: "Marketing Report",
+    author: "Sarah Johnson"
   },
   {
     id: "rep-2",
@@ -264,7 +275,10 @@ export const employeeReports: Report[] = [
     title: "New Feature Implementation Plan",
     description: "Technical specification and implementation timeline for the new customer dashboard features.",
     status: "in-progress",
-    dateSubmitted: new Date("2023-10-08")
+    dateSubmitted: "2023-10-08",
+    date: "2023-10-08",
+    type: "Technical Report",
+    author: "David Williams"
   },
   {
     id: "rep-3",
@@ -272,7 +286,10 @@ export const employeeReports: Report[] = [
     title: "Monthly Financial Statement",
     description: "September 2023 financial statements including profit & loss, balance sheet, and cash flow analysis.",
     status: "completed",
-    dateSubmitted: new Date("2023-10-05")
+    dateSubmitted: "2023-10-05",
+    date: "2023-10-05",
+    type: "Financial Report",
+    author: "Emily Brown"
   },
   {
     id: "rep-4",
@@ -280,7 +297,10 @@ export const employeeReports: Report[] = [
     title: "Customer Support Training Manual Update",
     description: "Updated procedures for handling escalated support tickets and using the new CRM features.",
     status: "pending",
-    dateSubmitted: new Date("2023-10-12")
+    dateSubmitted: "2023-10-12",
+    date: "2023-10-12",
+    type: "Training Material",
+    author: "Lisa Anderson"
   },
   {
     id: "rep-5",
@@ -288,6 +308,8 @@ export const employeeReports: Report[] = [
     title: "Q4 Marketing Strategy Proposal",
     description: "Proposed marketing initiatives for Q4 with budget allocation and expected outcomes.",
     status: "in-progress",
-    dateSubmitted: new Date("2023-10-10")
-  }
-];
+    dateSubmitted: "2023-10-10",
+    date: "2023-10-10",
+    type: "Strategy Document",
+
+

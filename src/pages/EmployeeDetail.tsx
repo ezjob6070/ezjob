@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
@@ -329,7 +328,15 @@ const EmployeeDetail = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm">{employee.emergencyContact}</p>
+                    <div>
+                      {employee.emergencyContact && (
+                        <>
+                          <span>{employee.emergencyContact.name}</span>
+                          <span> ({employee.emergencyContact.relationship}): </span>
+                          <span>{employee.emergencyContact.phone}</span>
+                        </>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               )}

@@ -33,7 +33,7 @@ const DateFilterDropdown = ({
       <PopoverTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
-          Today
+          {selectedLabel}
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </PopoverTrigger>

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -155,7 +154,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       isAllDay: isAllDay,
       address: values.clientAddress,
       status: "in_progress" as JobStatus,
-      createdAt: new Date(),
+      // Remove createdAt as it's not in the type
     };
 
     // Add optional fields
@@ -172,7 +171,8 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     }
 
     if (values.parts) {
-      newJob.parts = values.parts;
+      // Convert string to string array by splitting on new lines or commas
+      newJob.parts = values.parts.split(/[\n,]+/).map(part => part.trim()).filter(Boolean);
     }
 
     if (values.clientEmail) {

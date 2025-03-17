@@ -1,4 +1,3 @@
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -72,7 +71,6 @@ const JobSourceFilter = ({
         <Checkbox
           id="job-sources-all"
           checked={allSelected}
-          indeterminate={someSelected}
           onCheckedChange={(checked) => {
             if (checked) {
               selectAllJobSources();

@@ -52,6 +52,7 @@ const Technicians = () => {
       ...selectedTechnician,
       ...values,
       id: selectedTechnician.id,
+      paymentRate: Number(values.paymentRate),
       initials: selectedTechnician.initials,
       completedJobs: selectedTechnician.completedJobs,
       cancelledJobs: selectedTechnician.cancelledJobs,
