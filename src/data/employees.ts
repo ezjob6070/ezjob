@@ -1,3 +1,4 @@
+
 import { Employee, EmployeeStatus, Report, Resume, ResumeStatus, EmployeeNote, SalaryBasis } from "@/types/employee";
 
 export const initialEmployees: Employee[] = [
@@ -311,5 +312,6 @@ export const employeeReports: Report[] = [
     dateSubmitted: "2023-10-10",
     date: "2023-10-10",
     type: "Strategy Document",
-
-
+    author: "Sarah Johnson"
+  }
+];
