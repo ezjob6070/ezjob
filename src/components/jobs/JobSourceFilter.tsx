@@ -13,6 +13,7 @@ interface JobSourceFilterProps {
   toggleJobSource: (sourceName: string) => void;
   selectAllJobSources: () => void;
   deselectAllJobSources: () => void;
+  appliedFilters?: boolean;
 }
 
 const JobSourceFilter = ({

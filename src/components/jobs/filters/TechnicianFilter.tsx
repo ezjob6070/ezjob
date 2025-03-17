@@ -1,58 +1,117 @@
 
 import { Button } from "@/components/ui/button";
-import { Users, ChevronDown } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface TechnicianFilterProps {
-  technicianFilter: string;
-  technicians: { id: string; name: string }[];
-  updateFilter: (key: string, value: string) => void;
+  technicians: string[];
+  selectedNames: string[];
+  onToggle: (name: string) => void;
+  onSelectAll: () => void;
+  onDeselectAll: () => void;
+  appliedFilters?: boolean;
 }
 
-const TechnicianFilter = ({ 
-  technicianFilter, 
-  technicians, 
-  updateFilter 
+const TechnicianFilter = ({
+  technicians,
+  selectedNames,
+  onToggle,
+  onSelectAll,
+  onDeselectAll
 }: TechnicianFilterProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const filteredTechnicians = technicians.filter(name =>
+    name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const allSelected = technicians.length > 0 && 
+    selectedNames.length === technicians.length;
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Users className="h-4 w-4" />
-          {technicianFilter ? 
-            technicians.find(t => t.id === technicianFilter)?.name || "Technician" : 
-            "All Technicians"}
-          <ChevronDown className="h-3 w-3 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
-        <div className="p-2">
-          <div className="space-y-2">
-            <Button 
-              variant={technicianFilter === "" ? "default" : "outline"} 
-              className="w-full justify-start text-left"
-              onClick={() => updateFilter("technicianFilter", "")}
-            >
-              All Technicians
-            </Button>
-            {technicians.map((tech) => (
-              <Button 
-                key={tech.id} 
-                variant={technicianFilter === tech.id ? "default" : "outline"} 
-                className="w-full justify-start text-left"
-                onClick={() => updateFilter("technicianFilter", tech.id)}
-              >
-                {tech.name}
-              </Button>
-            ))}
-          </div>
+    <div className="p-4 space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-sm font-medium">Technician Filter</h3>
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onSelectAll}
+            disabled={allSelected}
+          >
+            Select All
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onDeselectAll}
+            disabled={selectedNames.length === 0}
+          >
+            Clear
+          </Button>
         </div>
-      </PopoverContent>
-    </Popover>
+      </div>
+      
+      <div className="relative">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input 
+          placeholder="Search technicians..." 
+          className="pl-8"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-1">
+        <Checkbox
+          id="technicians-all"
+          checked={allSelected}
+          onCheckedChange={(checked) => {
+            if (checked) {
+              onSelectAll();
+            } else {
+              onDeselectAll();
+            }
+          }}
+        />
+        <Label
+          htmlFor="technicians-all"
+          className="text-sm font-medium ml-2"
+        >
+          All Technicians
+        </Label>
+      </div>
+
+      <ScrollArea className="h-72 pr-4">
+        <div className="space-y-1">
+          {filteredTechnicians.map((name) => (
+            <div key={name} className="flex items-center">
+              <Checkbox
+                id={`technician-${name}`}
+                checked={selectedNames.includes(name)}
+                onCheckedChange={() => onToggle(name)}
+              />
+              <Label
+                htmlFor={`technician-${name}`}
+                className="text-sm ml-2"
+              >
+                {name}
+              </Label>
+            </div>
+          ))}
+          
+          {filteredTechnicians.length === 0 && (
+            <p className="text-sm text-muted-foreground py-2">
+              No technicians found
+            </p>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 

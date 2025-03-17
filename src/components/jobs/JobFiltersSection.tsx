@@ -8,6 +8,8 @@ import CategoryFilter from "./filters/CategoryFilter";
 import AmountFilter from "./AmountFilter";
 import PaymentMethodFilter from "./PaymentMethodFilter";
 import JobSourceFilter from "./JobSourceFilter";
+import FilterHeader from "./filters/FilterHeader";
+import FilterActions from "./filters/FilterActions";
 
 interface JobFiltersSectionProps {
   technicianNames: string[];
@@ -39,14 +41,11 @@ const JobFiltersSection = ({
   technicianNames,
   selectedTechnicians,
   selectedCategories,
-  date,
   amountRange,
   paymentMethod,
   categories,
-  appliedFilters,
   toggleTechnician,
   toggleCategory,
-  setDate,
   setAmountRange,
   setPaymentMethod,
   addCategory,
@@ -58,55 +57,43 @@ const JobFiltersSection = ({
   selectedJobSources,
   toggleJobSource,
   selectAllJobSources,
-  deselectAllJobSources
+  deselectAllJobSources,
+  appliedFilters
 }: JobFiltersSectionProps) => {
   
   const filtersComponent = (
     <div className="space-y-6 p-6">
-      <div>
-        <h3 className="text-lg font-medium mb-3">Filter Jobs</h3>
-        <div className="space-y-4">
-          <TechnicianFilter
-            technicians={technicianNames}
-            selectedNames={selectedTechnicians}
-            onToggle={toggleTechnician}
-            onSelectAll={selectAllTechnicians}
-            onDeselectAll={deselectAllTechnicians}
-            appliedFilters={appliedFilters}
-          />
-          
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategories}
-            toggleCategory={toggleCategory}
-            addCategory={addCategory}
-          />
-          
-          <JobSourceFilter
-            sources={jobSourceNames}
-            selectedSources={selectedJobSources}
-            onToggleSource={toggleJobSource}
-            onSelectAll={selectAllJobSources}
-            onDeselectAll={deselectAllJobSources}
-            appliedFilters={appliedFilters}
-          />
-        </div>
+      <FilterHeader title="Filter Jobs" />
+      
+      <div className="space-y-4">
+        <TechnicianFilter
+          technicians={technicianNames}
+          selectedNames={selectedTechnicians}
+          onToggle={toggleTechnician}
+          onSelectAll={selectAllTechnicians}
+          onDeselectAll={deselectAllTechnicians}
+        />
+        
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategories}
+          toggleCategory={toggleCategory}
+          addCategory={addCategory}
+        />
+        
+        <JobSourceFilter
+          jobSourceNames={jobSourceNames}
+          selectedJobSources={selectedJobSources}
+          toggleJobSource={toggleJobSource}
+          selectAllJobSources={selectAllJobSources}
+          deselectAllJobSources={deselectAllJobSources}
+        />
       </div>
       
-      <div className="flex justify-between">
-        <button 
-          className="text-sm text-muted-foreground hover:text-primary"
-          onClick={clearFilters}
-        >
-          Clear filters
-        </button>
-        <button 
-          className="text-sm font-medium text-primary hover:underline"
-          onClick={applyFilters}
-        >
-          Apply filters
-        </button>
-      </div>
+      <FilterActions
+        clearFilters={clearFilters}
+        applyFilters={applyFilters}
+      />
     </div>
   );
   
@@ -126,12 +113,11 @@ const JobFiltersSection = ({
   
   const jobSourceComponent = (
     <JobSourceFilter
-      sources={jobSourceNames}
-      selectedSources={selectedJobSources}
-      onToggleSource={toggleJobSource}
-      onSelectAll={selectAllJobSources}
-      onDeselectAll={deselectAllJobSources}
-      appliedFilters={appliedFilters}
+      jobSourceNames={jobSourceNames}
+      selectedJobSources={selectedJobSources}
+      toggleJobSource={toggleJobSource}
+      selectAllJobSources={selectAllJobSources}
+      deselectAllJobSources={deselectAllJobSources}
     />
   );
   
