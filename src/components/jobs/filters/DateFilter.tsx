@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar, ChevronDown } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
   Popover,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { DateFilterType } from "../JobFilterTypes";
 import DateFilterOptions from "./DateFilterOptions";
+import { DATE_FILTERS } from "./filterConstants";
 
 interface DateFilterProps {
   dateFilter: DateFilterType;
@@ -31,9 +32,10 @@ const DateFilter = ({
   return (
     <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
           {getDateFilterLabel()}
+          <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0 bg-popover" align="start" side="bottom" sideOffset={5}>
@@ -41,6 +43,7 @@ const DateFilter = ({
           <DateFilterOptions
             dateFilter={dateFilter}
             handleDateFilterChange={handleDateFilterChange}
+            dateFilters={DATE_FILTERS}
           />
           <div className="pt-4 px-2 pb-2">
             <CalendarComponent
@@ -50,6 +53,7 @@ const DateFilter = ({
                 if (date) {
                   updateFilter("customDateRange", { from: date, to: date });
                   handleDateFilterChange("custom");
+                  setOpenCalendar(false);
                 }
               }}
               className="rounded-md border"

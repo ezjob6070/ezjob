@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Job } from "../jobs/JobTypes";
 import { JOB_CATEGORIES, DATE_FILTERS } from "./filters/filterConstants";
@@ -15,8 +14,8 @@ interface JobFilterBarProps {
 const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
   const [selectedTechnician, setSelectedTechnician] = useState<string>("All Technicians");
-  const [selectedDateFilter, setSelectedDateFilter] = useState<string>("today"); // Default to today
-
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string>("today"); // Today as default
+  
   const technicians = [
     "All Technicians",
     ...initialTechnicians.map((tech) => tech.name),
