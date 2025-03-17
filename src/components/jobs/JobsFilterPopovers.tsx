@@ -42,7 +42,13 @@ export const JobsFilterPopovers = () => {
               <span>Date</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
+          <PopoverContent 
+            className="w-auto p-4" 
+            align="start" 
+            side="bottom" 
+            sideOffset={5}
+            avoidCollisions={false}
+          >
             <JobsDateFilter date={date} setDate={setDate} />
           </PopoverContent>
         </Popover>
@@ -58,7 +64,13 @@ export const JobsFilterPopovers = () => {
               <span>Technicians</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
+          <PopoverContent 
+            className="w-auto p-4" 
+            align="start" 
+            side="bottom" 
+            sideOffset={5}
+            avoidCollisions={false}
+          >
             <TechnicianFilter
               technicians={[]} // This will be populated from props
               selectedNames={selectedTechnicians}
@@ -80,7 +92,13 @@ export const JobsFilterPopovers = () => {
               <span>Sources</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
+          <PopoverContent 
+            className="w-auto p-4" 
+            align="start" 
+            side="bottom" 
+            sideOffset={5}
+            avoidCollisions={false}
+          >
             <JobSourceFilter
               jobSourceNames={[]} // This will be populated from props
               selectedJobSources={selectedJobSources}
@@ -102,7 +120,13 @@ export const JobsFilterPopovers = () => {
               <span>Amount</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
+          <PopoverContent 
+            className="w-auto p-4" 
+            align="start" 
+            side="bottom" 
+            sideOffset={5}
+            avoidCollisions={false}
+          >
             <AmountFilter value={amountRange} onChange={setAmountRange} />
           </PopoverContent>
         </Popover>
@@ -118,7 +142,13 @@ export const JobsFilterPopovers = () => {
               <span>Payment</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
+          <PopoverContent 
+            className="w-auto p-4" 
+            align="start" 
+            side="bottom" 
+            sideOffset={5}
+            avoidCollisions={false}
+          >
             <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
           </PopoverContent>
         </Popover>
