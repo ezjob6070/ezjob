@@ -4,11 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import JobsTable from "./JobsTable";
 import { Job } from "./JobTypes";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { SearchIcon, Calendar, Users, Banknote, CreditCard, LayoutList } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { SearchIcon } from "lucide-react";
 import UpdateJobStatusModal from "./UpdateJobStatusModal";
-import { PopoverTrigger } from "@/components/ui/popover";
 
 export interface JobTabsProps {
   jobs: Job[];
@@ -17,11 +14,6 @@ export interface JobTabsProps {
   onCompleteJob: (jobId: string, actualAmount: number) => void;
   onRescheduleJob?: (jobId: string, newDate: Date, isAllDay: boolean) => void;
   onSearchChange?: (term: string) => void;
-  dateRangeComponent?: React.ReactNode;
-  filtersComponent?: React.ReactNode;
-  amountFilterComponent?: React.ReactNode;
-  paymentMethodComponent?: React.ReactNode;
-  jobSourceComponent?: React.ReactNode;
   selectedJob: Job | null;
   isStatusModalOpen: boolean;
   openStatusModal: (job: Job) => void;
@@ -40,20 +32,10 @@ const JobTabs = ({
   onCompleteJob,
   onRescheduleJob,
   onSearchChange,
-  dateRangeComponent,
-  filtersComponent,
-  amountFilterComponent,
-  paymentMethodComponent,
-  jobSourceComponent,
   selectedJob,
   isStatusModalOpen,
   openStatusModal,
-  closeStatusModal,
-  setDatePopoverOpen,
-  setTechPopoverOpen,
-  setSourcePopoverOpen,
-  setAmountPopoverOpen,
-  setPaymentPopoverOpen
+  closeStatusModal
 }: JobTabsProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
@@ -73,80 +55,6 @@ const JobTabs = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        {dateRangeComponent && (
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setDatePopoverOpen && setDatePopoverOpen(true)}
-            >
-              <Calendar className="h-4 w-4" />
-              <span>Date</span>
-            </Button>
-          </PopoverTrigger>
-        )}
-        
-        {filtersComponent && (
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setTechPopoverOpen && setTechPopoverOpen(true)}
-            >
-              <Users className="h-4 w-4" />
-              <span>Technicians</span>
-            </Button>
-          </PopoverTrigger>
-        )}
-        
-        {jobSourceComponent && (
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setSourcePopoverOpen && setSourcePopoverOpen(true)}
-            >
-              <LayoutList className="h-4 w-4" />
-              <span>Sources</span>
-            </Button>
-          </PopoverTrigger>
-        )}
-        
-        {amountFilterComponent && (
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setAmountPopoverOpen && setAmountPopoverOpen(true)}
-            >
-              <Banknote className="h-4 w-4" />
-              <span>Amount</span>
-            </Button>
-          </PopoverTrigger>
-        )}
-        
-        {paymentMethodComponent && (
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setPaymentPopoverOpen && setPaymentPopoverOpen(true)}
-            >
-              <CreditCard className="h-4 w-4" />
-              <span>Payment</span>
-            </Button>
-          </PopoverTrigger>
-        )}
-      </div>
-      
-      {/* Put the actual popover content components here */}
-      {dateRangeComponent}
-      {filtersComponent}
-      {jobSourceComponent}
-      {amountFilterComponent}
-      {paymentMethodComponent}
-      
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger 
