@@ -8,6 +8,10 @@ import JobStats from "@/components/jobs/JobStats";
 import JobFiltersSection from "@/components/jobs/JobFiltersSection";
 import JobFilterInfoBar from "@/components/jobs/JobFilterInfoBar";
 import JobsPageHeader from "@/components/jobs/JobsPageHeader";
+import JobHeader from "@/components/jobs/JobHeader";
+import CreateJobModal from "@/components/jobs/CreateJobModal";
+import { Job } from "@/components/jobs/JobTypes";
+import { toast } from "@/hooks/use-toast";
 
 const JOB_CATEGORIES = [
   "Plumbing",
@@ -17,7 +21,11 @@ const JOB_CATEGORIES = [
 ];
 
 const Jobs = () => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
   const {
+    jobs,
+    setJobs,
     filteredJobs,
     searchTerm,
     setSearchTerm,
@@ -42,9 +50,18 @@ const Jobs = () => {
 
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
   const technicianNames = initialTechnicians.map(tech => tech.name);
+  const technicianOptions = initialTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
 
   const addCategory = (category: string) => {
     setCategories(prev => [...prev, category]);
+  };
+
+  const handleAddJob = (job: Job) => {
+    setJobs([job, ...jobs]);
+    toast({
+      title: "Job created",
+      description: `New job "${job.title}" for ${job.clientName} has been created.`,
+    });
   };
 
   const filterComponents = JobFiltersSection({
@@ -70,7 +87,7 @@ const Jobs = () => {
 
   return (
     <div className="space-y-6 py-8">
-      <JobsPageHeader />
+      <JobHeader onCreateJob={() => setIsCreateModalOpen(true)} />
 
       <JobStats jobs={filteredJobs} date={date} />
       
@@ -90,6 +107,13 @@ const Jobs = () => {
         dateRangeComponent={filterComponents.dateRangeComponent}
         amountFilterComponent={filterComponents.amountFilterComponent}
         paymentMethodComponent={filterComponents.paymentMethodComponent}
+      />
+
+      <CreateJobModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onAddJob={handleAddJob}
+        technicians={technicianOptions}
       />
     </div>
   );

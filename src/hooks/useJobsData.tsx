@@ -130,6 +130,7 @@ export const useJobsData = (initialJobs: Job[]) => {
 
   return {
     jobs,
+    setJobs,
     filteredJobs,
     searchTerm,
     setSearchTerm,
