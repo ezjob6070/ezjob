@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { initialJobs } from "@/data/jobs";
 import { initialTechnicians } from "@/data/technicians";
-import { useJobsData } from "@/hooks/useJobsData";
+import { useJobsData, useJobSources } from "@/hooks/useJobsData";
 import JobTabs from "@/components/jobs/JobTabs";
 import JobStats from "@/components/jobs/JobStats";
 import JobFiltersSection from "@/components/jobs/JobFiltersSection";
@@ -12,9 +11,7 @@ import JobHeader from "@/components/jobs/JobHeader";
 import CreateJobModal from "@/components/jobs/CreateJobModal";
 import { Job } from "@/components/jobs/JobTypes";
 import { toast } from "@/hooks/use-toast";
-import { useJobSources } from "@/hooks/useJobSources";
 
-// Mock job sources data - in a real app, this would come from an API or store
 const JOB_SOURCES = [
   { id: "js1", name: "Website" },
   { id: "js2", name: "Referral" },
