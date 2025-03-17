@@ -8,23 +8,20 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { UserPlus, X, Filter, Download } from "lucide-react";
+import { UserPlus, Filter, ChevronDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { DateRange } from "react-day-picker";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import { Technician } from "@/types/technician";
 import TechnicianSelectDropdown from "./filters/TechnicianSelectDropdown";
-import TechnicianSearchBar from "./filters/TechnicianSearchBar";
 import DateSortFilter from "./filters/DateSortFilter";
-import { cn } from "@/lib/utils";
 
 // Define extended sort options
 type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
@@ -60,8 +57,6 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   technicians = [],
   selectedTechnicians = [],
   onTechnicianToggle,
-  searchQuery = "",
-  onSearchChange,
   sortOption = "newest",
   onSortChange,
   date,
@@ -115,7 +110,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72" align="start" side="bottom">
+            <PopoverContent className="w-72" align="start" side="bottom" avoidCollisions={false}>
               <div className="space-y-2">
                 <div className="font-medium">Filter by Department</div>
                 <Separator />
@@ -156,91 +151,89 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         )}
         
         {/* Advanced filters toggle */}
-        <Button 
-          variant="outline" 
-          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-          className="ml-auto"
-        >
-          {showAdvancedFilters ? "Hide Advanced Filters" : "Advanced Filters"}
-        </Button>
-      </div>
-      
-      {/* Advanced filters section */}
-      {showAdvancedFilters && (
-        <div className="bg-muted/30 p-4 rounded-md space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Experience Level</h3>
-              <RadioGroup defaultValue="all">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="all" id="exp-all" />
-                  <Label htmlFor="exp-all">All Levels</Label>
+        <Popover open={showAdvancedFilters} onOpenChange={setShowAdvancedFilters}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="ml-auto gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Advanced Filters
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="end" side="bottom" avoidCollisions={false}>
+            <div className="space-y-4">
+              <div className="font-medium">Advanced Filters</div>
+              <Separator />
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Experience Level</h3>
+                  <RadioGroup defaultValue="all">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="all" id="exp-all" />
+                      <Label htmlFor="exp-all">All Levels</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="junior" id="exp-junior" />
+                      <Label htmlFor="exp-junior">Junior (0-2 years)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="mid" id="exp-mid" />
+                      <Label htmlFor="exp-mid">Mid-Level (2-5 years)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="senior" id="exp-senior" />
+                      <Label htmlFor="exp-senior">Senior (5+ years)</Label>
+                    </div>
+                  </RadioGroup>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="junior" id="exp-junior" />
-                  <Label htmlFor="exp-junior">Junior (0-2 years)</Label>
+                
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Payment Type</h3>
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="payment-percentage" />
+                      <Label htmlFor="payment-percentage">Percentage</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="payment-flat" />
+                      <Label htmlFor="payment-flat">Flat Rate</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="payment-hourly" />
+                      <Label htmlFor="payment-hourly">Hourly</Label>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="mid" id="exp-mid" />
-                  <Label htmlFor="exp-mid">Mid-Level (2-5 years)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="senior" id="exp-senior" />
-                  <Label htmlFor="exp-senior">Senior (5+ years)</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Payment Type</h3>
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="payment-percentage" />
-                  <Label htmlFor="payment-percentage">Percentage</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="payment-flat" />
-                  <Label htmlFor="payment-flat">Flat Rate</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="payment-hourly" />
-                  <Label htmlFor="payment-hourly">Hourly</Label>
+                
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Rating</h3>
+                  <RadioGroup defaultValue="all">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="all" id="rating-all" />
+                      <Label htmlFor="rating-all">All Ratings</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="5" id="rating-5" />
+                      <Label htmlFor="rating-5">5 Stars</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="4+" id="rating-4" />
+                      <Label htmlFor="rating-4">4+ Stars</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="3+" id="rating-3" />
+                      <Label htmlFor="rating-3">3+ Stars</Label>
+                    </div>
+                  </RadioGroup>
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Rating</h3>
-              <RadioGroup defaultValue="all">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="all" id="rating-all" />
-                  <Label htmlFor="rating-all">All Ratings</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="5" id="rating-5" />
-                  <Label htmlFor="rating-5">5 Stars</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="4+" id="rating-4" />
-                  <Label htmlFor="rating-4">4+ Stars</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="3+" id="rating-3" />
-                  <Label htmlFor="rating-3">3+ Stars</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Search bar */}
-      {onSearchChange && (
-        <TechnicianSearchBar
-          searchQuery={searchQuery}
-          onSearchChange={onSearchChange}
-        />
-      )}
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 };

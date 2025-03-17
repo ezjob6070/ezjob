@@ -27,15 +27,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <CompactTechnicianFilter 
-          technicianNames={technicians.map(tech => tech.name)}
-          selectedTechnicians={[]}
-          toggleTechnician={() => {}}
-          clearFilters={() => {}}
-          applyFilters={() => {}}
-        />
-        
+      <div className="flex items-center justify-end mb-4">
         <ViewToggleButtons 
           displayMode={displayMode}
           onDisplayModeChange={setDisplayMode}

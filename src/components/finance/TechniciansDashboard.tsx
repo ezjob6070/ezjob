@@ -5,6 +5,7 @@ import { DateRange } from "react-day-picker";
 import TechnicianDashboardHeader from "@/components/finance/dashboard/TechnicianDashboardHeader";
 import FinancialChartSection from "@/components/finance/dashboard/FinancialChartSection";
 import TechnicianPerformanceTable from "@/components/finance/dashboard/TechnicianPerformanceTable";
+import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -42,7 +43,12 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       (tech.category && selectedCategories.includes(tech.category)) ||
       (!tech.category && selectedCategories.includes("Others"));
     
-    return matchesSelectedTechnicians && matchesCategory;
+    const matchesSearch = 
+      !searchQuery || 
+      tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (tech.specialty && tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesSelectedTechnicians && matchesCategory && matchesSearch;
   });
 
   const toggleTechnician = (techName: string) => {
@@ -90,6 +96,13 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   return (
     <div className="space-y-8">
+      <div className="mb-4">
+        <TechnicianSearchBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+      </div>
+      
       <TechnicianDashboardHeader
         technicianNames={technicianNames}
         selectedTechnicians={selectedTechnicians}
