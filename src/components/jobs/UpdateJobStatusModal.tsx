@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { Job } from "./JobTypes";
+import React, { useState, useEffect } from "react";
+import { Job, JobStatus } from "./JobTypes";
 import {
   Dialog,
   DialogContent,
@@ -51,7 +51,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   onComplete,
   onReschedule,
 }) => {
-  const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule">("completed");
+  const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled">("completed");
   const [actualAmount, setActualAmount] = useState<number>(job?.amount || 0);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>(
     job?.scheduledDate ? new Date(job.scheduledDate) : new Date()
@@ -62,6 +62,17 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   const [endTime, setEndTime] = useState<string>("10:00");
   const [parts, setParts] = useState<string>("");
   const [cancellationReason, setCancellationReason] = useState<string>("");
+  
+  useEffect(() => {
+    // Set initial status based on current job status
+    if (job) {
+      setStatus(job.status === "in_progress" ? "completed" : job.status);
+      setActualAmount(job.amount || 0);
+      setParts(job.parts || "");
+      setCancellationReason(job.cancellationReason || "");
+      setRescheduleDate(job.scheduledDate ? new Date(job.scheduledDate) : new Date());
+    }
+  }, [job]);
   
   if (!job) return null;
 
@@ -120,6 +131,28 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
     onOpenChange(false);
   };
 
+  // Get available status options based on current job status
+  const getStatusOptions = () => {
+    const options: { value: JobStatus | "reschedule"; label: string }[] = [];
+    
+    // Always add these options
+    options.push({ value: "completed", label: "Completed" });
+    options.push({ value: "cancelled", label: "Cancelled" });
+    options.push({ value: "reschedule", label: "Reschedule" });
+    
+    // Only add in_progress if not already in that status
+    if (job.status !== "in_progress") {
+      options.push({ value: "in_progress", label: "In Progress" });
+    }
+    
+    // Only add scheduled if not already in that status
+    if (job.status !== "scheduled") {
+      options.push({ value: "scheduled", label: "Scheduled" });
+    }
+    
+    return options;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
@@ -151,21 +184,18 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
                   Source: {job.jobSourceName}
                 </p>
               )}
+              <p className="text-sm text-muted-foreground">
+                Current Status: <Badge className="ml-1">{job.status.replace('_', ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</Badge>
+              </p>
             </div>
 
-            <RadioGroup value={status} onValueChange={(value) => setStatus(value as "completed" | "cancelled" | "reschedule")}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="completed" id="completed" />
-                <Label htmlFor="completed">Completed</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cancelled" id="cancelled" />
-                <Label htmlFor="cancelled">Cancelled</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="reschedule" id="reschedule" />
-                <Label htmlFor="reschedule">Reschedule</Label>
-              </div>
+            <RadioGroup value={status} onValueChange={(value) => setStatus(value as "completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled")}>
+              {getStatusOptions().map((option) => (
+                <div key={option.value} className="flex items-center space-x-2">
+                  <RadioGroupItem value={option.value} id={option.value} />
+                  <Label htmlFor={option.value}>{option.label}</Label>
+                </div>
+              ))}
             </RadioGroup>
 
             {status === "completed" && (

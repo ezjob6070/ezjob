@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
+import { Job, PaymentMethod, JobStatus } from "@/components/jobs/JobTypes";
 import { AmountRange } from "@/components/jobs/AmountFilter";
 import { DateRange } from "react-day-picker";
 import { addDays, isSameDay, isWithinInterval, startOfDay } from "date-fns";
@@ -60,6 +60,18 @@ export const useJobsData = (initialJobs: Job[]) => {
     toast({
       title: "Job rescheduled",
       description: `The job has been rescheduled to ${newDate.toLocaleDateString()}.`,
+    });
+  };
+
+  const updateJobStatus = (jobId: string, status: JobStatus) => {
+    setJobs(prevJobs =>
+      prevJobs.map(job =>
+        job.id === jobId ? { ...job, status } : job
+      )
+    );
+    toast({
+      title: "Job status updated",
+      description: `The job has been marked as ${status.replace('_', ' ')}.`,
     });
   };
 
@@ -206,6 +218,7 @@ export const useJobsData = (initialJobs: Job[]) => {
     handleCancelJob,
     handleCompleteJob,
     handleRescheduleJob,
+    updateJobStatus,
     openStatusModal,
     closeStatusModal
   };

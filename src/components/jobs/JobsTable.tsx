@@ -12,7 +12,7 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Button } from "@/components/ui/button";
 import { Job } from "./JobTypes";
 import { Badge } from "@/components/ui/badge";
-import { AlarmClock, Clock, MoreHorizontal } from "lucide-react";
+import { AlarmClock, Clock, ExternalLink, MoreHorizontal, PencilLine } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -139,12 +139,14 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {job.status === "in_progress" && (
-                      <DropdownMenuItem onClick={() => onOpenStatusModal(job)}>
-                        Update Status
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem>View Details</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onOpenStatusModal(job)}>
+                      <PencilLine className="h-4 w-4 mr-2" />
+                      Update Status
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View Details
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
