@@ -5,6 +5,7 @@ import { AmountRange } from "./AmountFilter";
 import { PaymentMethod } from "./JobTypes";
 import JobFiltersSection from "./JobFiltersSection";
 import JobsDateFilter from "./filters/JobsDateFilter";
+import JobFilterInfoBar from "./JobFilterInfoBar";
 
 interface JobFiltersWrapperProps {
   technicianNames: string[];
@@ -69,19 +70,12 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
         <JobsDateFilter date={date} setDate={setDate} />
       </div>
       
-      {hasActiveFilters && (
-        <div className="flex justify-between items-center mb-4">
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredJobsCount} of {totalJobsCount} jobs
-          </p>
-          <button 
-            onClick={clearFilters}
-            className="text-sm text-primary hover:underline"
-          >
-            Clear all filters
-          </button>
-        </div>
-      )}
+      <JobFilterInfoBar
+        filteredCount={filteredJobsCount}
+        totalCount={totalJobsCount}
+        hasActiveFilters={hasActiveFilters}
+        clearFilters={clearFilters}
+      />
       
       <JobFiltersSection 
         technicianNames={technicianNames}

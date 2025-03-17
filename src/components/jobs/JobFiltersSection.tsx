@@ -5,8 +5,6 @@ import { AmountRange } from "./AmountFilter";
 import { PaymentMethod } from "./JobTypes";
 import TechnicianFilter from "./filters/TechnicianFilter";
 import CategoryFilter from "./filters/CategoryFilter";
-import AmountFilter from "./AmountFilter";
-import PaymentMethodFilter from "./PaymentMethodFilter";
 import JobSourceFilter from "./JobSourceFilter";
 import FilterHeader from "./filters/FilterHeader";
 import FilterActions from "./filters/FilterActions";
@@ -41,13 +39,9 @@ const JobFiltersSection: React.FC<JobFiltersSectionProps> = ({
   technicianNames,
   selectedTechnicians,
   selectedCategories,
-  amountRange,
-  paymentMethod,
   categories,
   toggleTechnician,
   toggleCategory,
-  setAmountRange,
-  setPaymentMethod,
   addCategory,
   selectAllTechnicians,
   deselectAllTechnicians,
@@ -59,9 +53,8 @@ const JobFiltersSection: React.FC<JobFiltersSectionProps> = ({
   selectAllJobSources,
   deselectAllJobSources,
   appliedFilters
-}: JobFiltersSectionProps) => {
+}) => {
   
-  // Return the components directly as React elements
   return (
     <div className="space-y-6">
       <div className="space-y-6 p-6">
