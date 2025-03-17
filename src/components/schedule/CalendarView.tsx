@@ -75,7 +75,7 @@ const CalendarView = ({
                 mode="single"
                 selected={selectedDate}
                 onSelect={handleDateSelect}
-                className="border rounded-md shadow-sm w-full max-w-3xl mx-auto"
+                className="border rounded-md shadow-sm w-full max-w-4xl mx-auto"
                 modifiers={{
                   hasEvents: (date) => 
                     jobs.some(job => isSameDay(job.date, date)) || 
@@ -93,7 +93,7 @@ const CalendarView = ({
                       <button 
                         type="button"
                         className={cn(
-                          "h-11 w-11 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto",
+                          "h-12 w-12 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center",
                           getDayClassName(date),
                           isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                           isOutsideMonth && "text-muted-foreground opacity-50"
@@ -121,7 +121,7 @@ const CalendarView = ({
                 }}
               />
             </div>
-            <div className="flex justify-center gap-6 mt-4 px-4 w-full">
+            <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
                 <span className="text-sm">Jobs</span>
