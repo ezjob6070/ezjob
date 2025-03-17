@@ -13,6 +13,7 @@ export interface JobTabsProps {
   searchTerm: string;
   onCancelJob: (jobId: string) => void;
   onCompleteJob: (jobId: string, actualAmount: number) => void;
+  onRescheduleJob?: (jobId: string, newDate: Date, isAllDay: boolean) => void;
   onSearchChange?: (term: string) => void;
   dateRangeComponent?: React.ReactNode;
   filtersComponent?: React.ReactNode;
@@ -28,7 +29,8 @@ const JobTabs = ({
   jobs, 
   searchTerm, 
   onCancelJob,
-  onCompleteJob, 
+  onCompleteJob,
+  onRescheduleJob,
   onSearchChange,
   dateRangeComponent,
   filtersComponent,
@@ -165,6 +167,7 @@ const JobTabs = ({
         job={selectedJob}
         onCancel={onCancelJob}
         onComplete={onCompleteJob}
+        onReschedule={onRescheduleJob}
       />
     </div>
   );

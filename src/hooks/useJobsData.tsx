@@ -43,6 +43,26 @@ export const useJobsData = (initialJobs: Job[]) => {
     });
   };
 
+  const handleRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
+    setJobs(prevJobs =>
+      prevJobs.map(job =>
+        job.id === jobId 
+          ? { 
+              ...job, 
+              scheduledDate: newDate,
+              date: newDate, // Update both date fields
+              isAllDay: isAllDay, 
+              status: "scheduled"
+            } 
+          : job
+      )
+    );
+    toast({
+      title: "Job rescheduled",
+      description: `The job has been rescheduled to ${newDate.toLocaleDateString()}.`,
+    });
+  };
+
   const openStatusModal = (job: Job) => {
     setSelectedJob(job);
     setIsStatusModalOpen(true);
@@ -185,6 +205,7 @@ export const useJobsData = (initialJobs: Job[]) => {
     applyFilters,
     handleCancelJob,
     handleCompleteJob,
+    handleRescheduleJob,
     openStatusModal,
     closeStatusModal
   };

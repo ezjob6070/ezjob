@@ -24,6 +24,7 @@ export interface Job {
   jobSourceId?: string;
   jobSourceName?: string;
   isAllDay?: boolean; // Added for all-day jobs
+  parts?: string; // Added for tracking parts used
 }
 
 // Utility types for job filtering

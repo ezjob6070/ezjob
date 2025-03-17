@@ -72,6 +72,7 @@ const formSchema = z.object({
   endTime: z.string().optional(),
   amount: z.coerce.number().optional(),
   notes: z.string().optional(),
+  parts: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -99,6 +100,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       endTime: "10:00",
       amount: undefined,
       notes: "",
+      parts: "",
     },
   });
 
@@ -167,6 +169,10 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
 
     if (values.notes) {
       newJob.notes = values.notes;
+    }
+
+    if (values.parts) {
+      newJob.parts = values.parts;
     }
 
     if (values.clientEmail) {
@@ -516,23 +522,43 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Special Notes (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Add any special notes about the job..."
-                        className="min-h-[100px]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Special Notes (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Add any special notes about the job..."
+                          className="min-h-[100px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="parts"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Parts (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="List any parts needed for this job..."
+                          className="min-h-[100px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             <DialogFooter>

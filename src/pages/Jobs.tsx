@@ -59,6 +59,7 @@ const Jobs = () => {
     applyFilters,
     handleCancelJob,
     handleCompleteJob,
+    handleRescheduleJob,
     openStatusModal,
     closeStatusModal
   } = useJobsData(initialJobs);
@@ -118,6 +119,7 @@ const Jobs = () => {
         searchTerm={searchTerm}
         onCancelJob={handleCancelJob}
         onCompleteJob={handleCompleteJob}
+        onRescheduleJob={handleRescheduleJob}
         onSearchChange={setSearchTerm}
         filtersComponent={filterComponents.filtersComponent}
         dateRangeComponent={filterComponents.dateRangeComponent}
