@@ -7,7 +7,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Search, UserPlus, X, Filter, Download } from "lucide-react";
+import { UserPlus, X, Filter, Download } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -16,8 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
+import { DateRangeSelector } from "@/components/finance/DateRangeSelector";
 
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import { Technician } from "@/types/technician";
@@ -96,87 +95,11 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           </SelectContent>
         </Select>
         
-        {/* Date range filter with simplified dropdown */}
-        {setDate && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <CalendarIcon className="h-4 w-4" />
-                {date?.from ? (
-                  date.to && date.from.toDateString() !== date.to.toDateString() ? (
-                    <>
-                      {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    `Today (${format(date.from, "LLL dd, y")})`
-                  )
-                ) : (
-                  "Date Range"
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start" side="bottom">
-              <div className="p-2 space-y-2">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    const today = new Date();
-                    setDate({ from: today, to: today });
-                  }}
-                >
-                  Today
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    const today = new Date();
-                    const yesterday = new Date(today);
-                    yesterday.setDate(yesterday.getDate() - 1);
-                    setDate({ from: yesterday, to: yesterday });
-                  }}
-                >
-                  Yesterday
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    const today = new Date();
-                    const lastWeek = new Date(today);
-                    lastWeek.setDate(lastWeek.getDate() - 7);
-                    setDate({ from: lastWeek, to: today });
-                  }}
-                >
-                  Last 7 days
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    const today = new Date();
-                    const lastMonth = new Date(today);
-                    lastMonth.setMonth(lastMonth.getMonth() - 1);
-                    setDate({ from: lastMonth, to: today });
-                  }}
-                >
-                  Last 30 days
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    const today = new Date();
-                    const thisYear = new Date(today.getFullYear(), 0, 1);
-                    setDate({ from: thisYear, to: today });
-                  }}
-                >
-                  This Year
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+        {/* Date filter - simplified */}
+        {setDate && date && (
+          <div className="w-[220px]">
+            <DateRangeSelector date={date} setDate={setDate} />
+          </div>
         )}
 
         {/* Department filter if available - keep as is */}

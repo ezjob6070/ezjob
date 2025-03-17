@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -87,81 +87,89 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) 
                 <span>Today</span>
               )}
             </div>
-            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start" side="bottom">
           <div className="p-2 space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("today")}
-            >
-              Today
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("yesterday")}
-            >
-              Yesterday
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("this-week")}
-            >
-              This Week
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("last-week")}
-            >
-              Last Week
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("this-month")}
-            >
-              This Month
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("last-month")}
-            >
-              Last Month
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("last-30-days")}
-            >
-              Last 30 Days
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("last-90-days")}
-            >
-              Last 90 Days
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("this-year")}
-            >
-              This Year
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start"
-              onClick={() => handleDatePresetSelection("last-year")}
-            >
-              Last Year
-            </Button>
+            <Calendar
+              mode="range"
+              selected={date}
+              onSelect={setDate}
+              initialFocus
+              numberOfMonths={1}
+            />
+            <div className="grid grid-cols-1 gap-1 mt-2 border-t pt-2">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("today")}
+              >
+                Today
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("yesterday")}
+              >
+                Yesterday
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("this-week")}
+              >
+                This Week
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("last-week")}
+              >
+                Last Week
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("this-month")}
+              >
+                This Month
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("last-month")}
+              >
+                Last Month
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("last-30-days")}
+              >
+                Last 30 Days
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("last-90-days")}
+              >
+                Last 90 Days
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("this-year")}
+              >
+                This Year
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => handleDatePresetSelection("last-year")}
+              >
+                Last Year
+              </Button>
+            </div>
           </div>
         </PopoverContent>
       </Popover>
