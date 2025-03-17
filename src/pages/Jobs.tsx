@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { initialJobs } from "@/data/jobs";
 import { initialTechnicians } from "@/data/technicians";
@@ -15,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { JobSource } from "@/types/jobSource";
 import { FolderIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import JobsDateFilter from "@/components/jobs/filters/JobsDateFilter";
 
 const SAMPLE_JOB_SOURCES: JobSource[] = [
   { 
@@ -232,6 +234,10 @@ const Jobs = () => {
         }
       />
 
+      <div className="flex justify-end mb-4">
+        <JobsDateFilter date={date} setDate={setDate} />
+      </div>
+
       <JobStats jobs={filteredJobs} date={date} />
       
       <JobFilterInfoBar 
@@ -249,7 +255,8 @@ const Jobs = () => {
         onRescheduleJob={handleRescheduleJob}
         onSearchChange={setSearchTerm}
         filtersComponent={filterComponents.filtersComponent}
-        dateRangeComponent={filterComponents.dateRangeComponent}
+        // We're removing the date range component and using our new date filter
+        dateRangeComponent={null}
         amountFilterComponent={filterComponents.amountFilterComponent}
         paymentMethodComponent={filterComponents.paymentMethodComponent}
         jobSourceComponent={filterComponents.jobSourceComponent}
