@@ -36,7 +36,7 @@ const DateFilter = ({
           {getDateFilterLabel()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0" align="start" side="bottom" sideOffset={5}>
+      <PopoverContent className="w-[300px] p-0 bg-popover" align="start" side="bottom" sideOffset={5}>
         <div className="space-y-2">
           <DateFilterOptions
             dateFilter={dateFilter}
