@@ -24,12 +24,15 @@ const DateFilterDropdown = ({
   dateFilters, 
   onDateFilterChange 
 }: DateFilterDropdownProps) => {
+  // Find the selected filter label based on the current value
+  const selectedLabel = dateFilters.find(filter => filter.value === selectedDateFilter)?.label || "Today";
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
-          Today
+          {selectedLabel}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="z-50">

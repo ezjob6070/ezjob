@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/popover";
 import { DateFilterType } from "../JobFilterTypes";
 import DateFilterOptions from "./DateFilterOptions";
-import { format } from "date-fns";
 
 interface DateFilterProps {
   dateFilter: DateFilterType;
@@ -34,7 +33,7 @@ const DateFilter = ({
       <PopoverTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Calendar className="h-4 w-4" />
-          Today
+          {getDateFilterLabel()}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0" align="start" side="bottom" sideOffset={5}>
