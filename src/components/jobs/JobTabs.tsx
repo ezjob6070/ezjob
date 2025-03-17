@@ -11,7 +11,7 @@ import UpdateJobStatusModal from "./UpdateJobStatusModal";
 export interface JobTabsProps {
   jobs: Job[];
   searchTerm: string;
-  onCancelJob: (jobId: string) => void;
+  onCancelJob: (jobId: string, cancellationReason?: string) => void;
   onCompleteJob: (jobId: string, actualAmount: number) => void;
   onRescheduleJob?: (jobId: string, newDate: Date, isAllDay: boolean) => void;
   onSearchChange?: (term: string) => void;

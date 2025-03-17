@@ -25,6 +25,7 @@ export interface Job {
   jobSourceName?: string;
   isAllDay?: boolean; // Added for all-day jobs
   parts?: string; // Added for tracking parts used
+  cancellationReason?: string; // Added for storing cancellation reasons
 }
 
 // Utility types for job filtering

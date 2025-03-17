@@ -19,10 +19,10 @@ export const useJobsData = (initialJobs: Job[]) => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
-  const handleCancelJob = (jobId: string) => {
+  const handleCancelJob = (jobId: string, cancellationReason?: string) => {
     setJobs(prevJobs =>
       prevJobs.map(job =>
-        job.id === jobId ? { ...job, status: "cancelled" } : job
+        job.id === jobId ? { ...job, status: "cancelled", cancellationReason } : job
       )
     );
     toast({

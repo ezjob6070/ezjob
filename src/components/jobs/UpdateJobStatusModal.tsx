@@ -25,12 +25,13 @@ import {
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 
 interface UpdateJobStatusModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   job: Job | null;
-  onCancel: (jobId: string) => void;
+  onCancel: (jobId: string, cancellationReason?: string) => void;
   onComplete: (jobId: string, actualAmount: number) => void;
   onReschedule?: (jobId: string, newDate: Date, isAllDay: boolean) => void;
 }
@@ -60,6 +61,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   const [startTime, setStartTime] = useState<string>("09:00");
   const [endTime, setEndTime] = useState<string>("10:00");
   const [parts, setParts] = useState<string>("");
+  const [cancellationReason, setCancellationReason] = useState<string>("");
   
   if (!job) return null;
 
@@ -78,7 +80,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
     if (status === "completed") {
       onComplete(job.id, actualAmount);
     } else if (status === "cancelled") {
-      onCancel(job.id);
+      onCancel(job.id, cancellationReason);
     } else if (status === "reschedule" && rescheduleDate && onReschedule) {
       // Create date with time if not all day
       let scheduledDate = new Date(rescheduleDate);
@@ -189,6 +191,20 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
                     onChange={(e) => setParts(e.target.value)}
                   />
                 </div>
+              </div>
+            )}
+
+            {status === "cancelled" && (
+              <div className="space-y-2">
+                <Label htmlFor="cancellationReason">Reason for Cancellation (Optional)</Label>
+                <Textarea
+                  id="cancellationReason"
+                  placeholder="Enter reason for cancellation..."
+                  value={cancellationReason}
+                  onChange={(e) => setCancellationReason(e.target.value)}
+                  className="resize-none"
+                  rows={3}
+                />
               </div>
             )}
 
