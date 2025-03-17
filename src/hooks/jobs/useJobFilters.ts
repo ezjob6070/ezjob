@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
 import { AmountRange } from "@/components/jobs/AmountFilter";
@@ -67,7 +66,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     setSelectedTechnicians([]);
     setSelectedCategories([]);
     setSelectedJobSources([]);
-    // Reset date to today instead of undefined
+    // Reset date to today
     const resetToday = new Date();
     setDate({
       from: resetToday,

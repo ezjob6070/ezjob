@@ -1,129 +1,193 @@
+import { useState } from "react";
+import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
+import { AmountRange } from "@/components/jobs/AmountFilter";
+import { DateRange } from "react-day-picker";
+import { isWithinInterval, isSameDay, startOfDay } from "date-fns";
+import { JobFiltersState } from "./jobHookTypes";
 
-import { useState, useMemo } from "react";
-import { 
-  format, 
-  isWithinInterval, 
-  startOfWeek, 
-  endOfWeek, 
-  startOfMonth, 
-  endOfMonth,
-  addDays,
-  addWeeks,
-  addMonths,
-  subDays,
-  subWeeks,
-  subMonths,
-  isSameDay,
-  isAfter,
-  isBefore
-} from "date-fns";
-import { Job } from "./JobTypes";
-import { JobFilters, DateFilterType, FilteredJobsResult } from "./JobFilterTypes";
-
-export const useJobFilters = (jobs: Job[]) => {
-  const [filters, setFilters] = useState<JobFilters>({
-    searchTerm: "",
-    technicianFilter: "",
-    dateFilter: "today",
-    customDateRange: {
-      from: undefined,
-      to: undefined
-    }
+export const useJobFilters = (initialJobSources: string[] = []) => {
+  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
+  
+  // Initialize date range to today
+  const today = new Date();
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: today,
+    to: today
   });
+  
+  const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState(false);
 
-  const resetFilters = () => {
-    setFilters({
-      searchTerm: "",
-      technicianFilter: "",
-      dateFilter: "today",
-      customDateRange: { from: undefined, to: undefined }
-    });
+  const toggleTechnician = (techName: string) => {
+    setSelectedTechnicians(prev => 
+      prev.includes(techName) 
+        ? prev.filter(t => t !== techName)
+        : [...prev, techName]
+    );
   };
 
-  const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
-      // Search filter
-      const matchesSearch = 
-        job.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        job.clientName.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        job.technicianName.toLowerCase().includes(filters.searchTerm.toLowerCase());
-      
-      // Technician filter
-      const matchesTechnician = 
-        filters.technicianFilter === "" || job.technicianId === filters.technicianFilter;
-      
-      // Date filter
-      let matchesDate = true;
-      const jobDate = new Date(job.scheduledDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      switch(filters.dateFilter) {
-        case "today":
-          matchesDate = isSameDay(jobDate, today);
-          break;
-        case "tomorrow":
-          matchesDate = isSameDay(jobDate, addDays(today, 1));
-          break;
-        case "yesterday":
-          matchesDate = isSameDay(jobDate, subDays(today, 1));
-          break;
-        case "thisWeek": {
-          const weekStart = startOfWeek(today, { weekStartsOn: 1 });
-          const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
-          matchesDate = isWithinInterval(jobDate, { start: weekStart, end: weekEnd });
-          break;
-        }
-        case "nextWeek": {
-          const nextWeekStart = startOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
-          const nextWeekEnd = endOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
-          matchesDate = isWithinInterval(jobDate, { start: nextWeekStart, end: nextWeekEnd });
-          break;
-        }
-        case "lastWeek": {
-          const lastWeekStart = startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
-          const lastWeekEnd = endOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
-          matchesDate = isWithinInterval(jobDate, { start: lastWeekStart, end: lastWeekEnd });
-          break;
-        }
-        case "thisMonth": {
-          const monthStart = startOfMonth(today);
-          const monthEnd = endOfMonth(today);
-          matchesDate = isWithinInterval(jobDate, { start: monthStart, end: monthEnd });
-          break;
-        }
-        case "nextMonth": {
-          const nextMonthStart = startOfMonth(addMonths(today, 1));
-          const nextMonthEnd = endOfMonth(addMonths(today, 1));
-          matchesDate = isWithinInterval(jobDate, { start: nextMonthStart, end: nextMonthEnd });
-          break;
-        }
-        case "lastMonth": {
-          const lastMonthStart = startOfMonth(subMonths(today, 1));
-          const lastMonthEnd = endOfMonth(subMonths(today, 1));
-          matchesDate = isWithinInterval(jobDate, { start: lastMonthStart, end: lastMonthEnd });
-          break;
-        }
-        case "custom":
-          if (filters.customDateRange.from && filters.customDateRange.to) {
-            matchesDate = isWithinInterval(jobDate, { 
-              start: filters.customDateRange.from, 
-              end: filters.customDateRange.to 
-            });
-          }
-          break;
-        default:
-          matchesDate = true;
-      }
-      
-      return matchesSearch && matchesTechnician && matchesDate;
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const toggleJobSource = (sourceName: string) => {
+    setSelectedJobSources(prev => 
+      prev.includes(sourceName) 
+        ? prev.filter(s => s !== sourceName)
+        : [...prev, sourceName]
+    );
+  };
+
+  const selectAllTechnicians = () => {
+    // This should be updated to set all technician names
+    setSelectedTechnicians(prevTechnicians => [...prevTechnicians]);
+  };
+
+  const deselectAllTechnicians = () => {
+    setSelectedTechnicians([]);
+  };
+
+  const selectAllJobSources = () => {
+    setSelectedJobSources(initialJobSources);
+  };
+
+  const deselectAllJobSources = () => {
+    setSelectedJobSources([]);
+  };
+
+  const clearFilters = () => {
+    setSelectedTechnicians([]);
+    setSelectedCategories([]);
+    setSelectedJobSources([]);
+    // Reset date to today
+    const resetToday = new Date();
+    setDate({
+      from: resetToday,
+      to: resetToday
     });
-  }, [jobs, filters]);
+    setAmountRange(null);
+    setPaymentMethod(null);
+    setAppliedFilters(false);
+  };
+
+  const applyFilters = () => {
+    setAppliedFilters(true);
+  };
+
+  const hasActiveFilters = 
+    (appliedFilters && selectedTechnicians.length > 0) || 
+    selectedCategories.length > 0 || 
+    selectedJobSources.length > 0 ||
+    !!date?.from || 
+    !!amountRange || 
+    !!paymentMethod;
+
+  // Filter jobs based on various criteria
+  const filterJobs = (jobs: Job[], searchTerm: string): Job[] => {
+    let result = jobs;
+
+    if (searchTerm) {
+      result = result.filter(job =>
+        job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    if (appliedFilters && selectedTechnicians.length > 0) {
+      result = result.filter(job => 
+        job.technicianName && selectedTechnicians.includes(job.technicianName)
+      );
+    }
+
+    if (selectedCategories.length > 0) {
+      result = result.filter(job => 
+        job.title && selectedCategories.some(category => 
+          job.title!.toLowerCase().includes(category.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by job source if any are selected
+    if (selectedJobSources.length > 0) {
+      result = result.filter(job => 
+        job.source && selectedJobSources.includes(job.source)
+      );
+    }
+
+    if (date?.from) {
+      const fromDate = startOfDay(date.from);
+      const toDate = date.to ? startOfDay(date.to) : fromDate;
+      
+      result = result.filter(job => {
+        const jobDate = startOfDay(job.date);
+        
+        if (isSameDay(fromDate, toDate)) {
+          return isSameDay(jobDate, fromDate);
+        }
+        
+        return isWithinInterval(jobDate, { start: fromDate, end: toDate });
+      });
+    }
+
+    if (amountRange) {
+      result = result.filter(job => {
+        if (!job.amount) return true;
+        
+        if (amountRange.min !== undefined && amountRange.max !== undefined) {
+          return job.amount >= amountRange.min && job.amount <= amountRange.max;
+        } else if (amountRange.min !== undefined) {
+          return job.amount >= amountRange.min;
+        } else if (amountRange.max !== undefined) {
+          return job.amount <= amountRange.max;
+        }
+        return true;
+      });
+    }
+
+    if (paymentMethod) {
+      result = result.filter(job => 
+        job.paymentMethod === paymentMethod
+      );
+    }
+
+    return result;
+  };
 
   return {
-    filters,
-    setFilters,
-    filteredJobs,
-    resetFilters
+    // Filter state
+    selectedTechnicians,
+    selectedCategories,
+    selectedJobSources,
+    date,
+    amountRange,
+    paymentMethod,
+    appliedFilters,
+    hasActiveFilters,
+    
+    // Filter setters
+    setDate,
+    setAmountRange,
+    setPaymentMethod,
+    
+    // Filter actions
+    toggleTechnician,
+    toggleCategory,
+    toggleJobSource,
+    selectAllTechnicians,
+    deselectAllTechnicians,
+    selectAllJobSources,
+    deselectAllJobSources,
+    clearFilters,
+    applyFilters,
+    
+    // Filter logic
+    filterJobs
   };
 };

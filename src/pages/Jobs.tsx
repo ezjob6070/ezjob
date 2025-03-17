@@ -77,61 +77,53 @@ const Jobs = () => {
   return (
     <div className="space-y-6 py-8">
       {/* Header Section */}
-      <JobHeaderActions 
-        onCreateJob={() => setIsCreateModalOpen(true)}
-        toggleJobSourceSidebar={jobSourceData.toggleJobSourceSidebar}
-      />
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Jobs Management</h1>
+        <JobHeaderActions 
+          onCreateJob={() => setIsCreateModalOpen(true)}
+          toggleJobSourceSidebar={jobSourceData.toggleJobSourceSidebar}
+        />
+      </div>
+      <p className="text-muted-foreground">Create, schedule, and manage jobs and technicians</p>
 
-      {/* Filters and Stats Section */}
-      <JobFiltersWrapper
-        technicianNames={technicianNames}
-        selectedTechnicians={selectedTechnicians}
-        selectedCategories={selectedCategories}
-        date={date}
-        amountRange={amountRange}
-        paymentMethod={paymentMethod}
-        categories={categories}
-        appliedFilters={appliedFilters}
-        toggleTechnician={toggleTechnician}
-        toggleCategory={toggleCategory}
-        setDate={setDate}
-        setAmountRange={setAmountRange}
-        setPaymentMethod={setPaymentMethod}
-        addCategory={addCategory}
-        selectAllTechnicians={selectAllTechnicians}
-        deselectAllTechnicians={deselectAllTechnicians}
-        clearFilters={clearFilters}
-        applyFilters={applyFilters}
-        jobSourceNames={jobSourceNames}
-        selectedJobSources={selectedJobSources}
-        toggleJobSource={toggleJobSource}
-        selectAllJobSources={selectAllJobSources}
-        deselectAllJobSources={deselectAllJobSources}
-        hasActiveFilters={hasActiveFilters}
-        filteredJobsCount={filteredJobs.length}
-        totalJobsCount={initialJobs.length}
-      />
-
+      {/* Job Stats Cards */}
       <JobStats jobs={filteredJobs} date={date} />
       
-      {/* Jobs List Section */}
-      <JobTabs 
-        jobs={filteredJobs} 
-        searchTerm={searchTerm}
-        onCancelJob={handleCancelJob}
-        onCompleteJob={handleCompleteJob}
-        onRescheduleJob={handleRescheduleJob}
-        onSearchChange={setSearchTerm}
-        filtersComponent={null}
-        dateRangeComponent={null}
-        amountFilterComponent={null}
-        paymentMethodComponent={null}
-        jobSourceComponent={null}
-        selectedJob={selectedJob}
-        isStatusModalOpen={isStatusModalOpen}
-        openStatusModal={openStatusModal}
-        closeStatusModal={closeStatusModal}
-      />
+      {/* Filters and Jobs Table Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredJobs.length} of {jobs.length} jobs
+          </p>
+          {hasActiveFilters && (
+            <button 
+              onClick={clearFilters} 
+              className="text-sm text-blue-500 hover:underline"
+            >
+              Clear all filters
+            </button>
+          )}
+        </div>
+
+        {/* Jobs Tabs and Table */}
+        <JobTabs 
+          jobs={filteredJobs} 
+          searchTerm={searchTerm}
+          onCancelJob={handleCancelJob}
+          onCompleteJob={handleCompleteJob}
+          onRescheduleJob={handleRescheduleJob}
+          onSearchChange={setSearchTerm}
+          dateRangeComponent={null}
+          filtersComponent={null}
+          amountFilterComponent={null}
+          paymentMethodComponent={null}
+          jobSourceComponent={null}
+          selectedJob={selectedJob}
+          isStatusModalOpen={isStatusModalOpen}
+          openStatusModal={openStatusModal}
+          closeStatusModal={closeStatusModal}
+        />
+      </div>
 
       {/* Modals */}
       <JobModals

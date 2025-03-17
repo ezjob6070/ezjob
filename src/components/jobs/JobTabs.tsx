@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import JobsTable from "./JobsTable";
 import { Job } from "./JobTypes";
 import { Input } from "@/components/ui/input";
-import { SearchIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SearchIcon, Calendar, Users, Banknote, CreditCard, LayoutList } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UpdateJobStatusModal from "./UpdateJobStatusModal";
 
@@ -59,38 +60,36 @@ const JobTabs = ({
   const cancelledJobsCount = jobs.filter(job => job.status === "cancelled").length;
   const allJobsCount = jobs.length;
 
-  const getTabTriggerClass = (value: string) => {
-    switch (value) {
-      case "all":
-        return "data-[state=active]:bg-blue-500 data-[state=active]:text-white";
-      case "scheduled":
-        return "data-[state=active]:bg-yellow-500 data-[state=active]:text-white";
-      case "in_progress":
-        return "data-[state=active]:bg-black data-[state=active]:text-white";
-      case "completed":
-        return "data-[state=active]:bg-green-500 data-[state=active]:text-white";
-      case "cancelled":
-        return "data-[state=active]:bg-red-500 data-[state=active]:text-white";
-      default:
-        return "data-[state=active]:bg-primary";
-    }
-  };
-
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-start gap-2 mb-4">
-        {dateRangeComponent}
-        {filtersComponent}
-        {jobSourceComponent}
-        {amountFilterComponent}
-        {paymentMethodComponent}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Button variant="outline" className="flex items-center gap-2">
+          <Calendar className="h-4 w-4" />
+          <span>Date</span>
+        </Button>
+        <Button variant="outline" className="flex items-center gap-2">
+          <Users className="h-4 w-4" />
+          <span>Technicians</span>
+        </Button>
+        <Button variant="outline" className="flex items-center gap-2">
+          <LayoutList className="h-4 w-4" />
+          <span>Sources</span>
+        </Button>
+        <Button variant="outline" className="flex items-center gap-2">
+          <Banknote className="h-4 w-4" />
+          <span>Amount</span>
+        </Button>
+        <Button variant="outline" className="flex items-center gap-2">
+          <CreditCard className="h-4 w-4" />
+          <span>Payment</span>
+        </Button>
       </div>
       
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger 
             value="all"
-            className={getTabTriggerClass("all")}
+            className="data-[state=active]:bg-blue-500 data-[state=active]:text-white"
           >
             All
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-gray-200 text-gray-800 rounded-full font-medium">
@@ -99,7 +98,7 @@ const JobTabs = ({
           </TabsTrigger>
           <TabsTrigger 
             value="scheduled"
-            className={getTabTriggerClass("scheduled")}
+            className="data-[state=active]:bg-yellow-500 data-[state=active]:text-white"
           >
             Scheduled
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">
@@ -108,7 +107,7 @@ const JobTabs = ({
           </TabsTrigger>
           <TabsTrigger 
             value="in_progress"
-            className={getTabTriggerClass("in_progress")}
+            className="data-[state=active]:bg-black data-[state=active]:text-white"
           >
             In Progress
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full font-medium">
@@ -117,7 +116,7 @@ const JobTabs = ({
           </TabsTrigger>
           <TabsTrigger 
             value="completed"
-            className={getTabTriggerClass("completed")}
+            className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
           >
             Completed
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-green-100 text-green-800 rounded-full font-medium">
@@ -126,7 +125,7 @@ const JobTabs = ({
           </TabsTrigger>
           <TabsTrigger 
             value="cancelled"
-            className={getTabTriggerClass("cancelled")}
+            className="data-[state=active]:bg-red-500 data-[state=active]:text-white"
           >
             Cancelled
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-red-100 text-red-800 rounded-full font-medium">
