@@ -12,10 +12,23 @@ import JobHeaderActions from "@/components/jobs/JobHeaderActions";
 import JobModals from "@/components/jobs/JobModals";
 import { Job } from "@/components/jobs/JobTypes";
 import { toast } from "@/hooks/use-toast";
+import TechnicianFilter from "@/components/jobs/filters/TechnicianFilter";
+import JobsDateFilter from "@/components/jobs/filters/JobsDateFilter";
+import JobSourceFilter from "@/components/jobs/JobSourceFilter";
+import AmountFilter from "@/components/jobs/AmountFilter";
+import PaymentMethodFilter from "@/components/jobs/PaymentMethodFilter";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const Jobs = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
+  
+  // Control state for filter popovers
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
+  const [techPopoverOpen, setTechPopoverOpen] = useState(false);
+  const [sourcePopoverOpen, setSourcePopoverOpen] = useState(false);
+  const [amountPopoverOpen, setAmountPopoverOpen] = useState(false);
+  const [paymentPopoverOpen, setPaymentPopoverOpen] = useState(false);
 
   // Get job source related data and functions
   const jobSourceData = useJobSourceData();
@@ -74,6 +87,59 @@ const Jobs = () => {
     });
   };
 
+  // Create filter components
+  const dateFilterComponent = (
+    <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
+      <PopoverContent className="w-auto p-4" align="start">
+        <JobsDateFilter date={date} setDate={setDate} />
+      </PopoverContent>
+    </Popover>
+  );
+
+  const technicianFilterComponent = (
+    <Popover open={techPopoverOpen} onOpenChange={setTechPopoverOpen}>
+      <PopoverContent className="w-auto p-4" align="start">
+        <TechnicianFilter
+          technicians={technicianNames}
+          selectedNames={selectedTechnicians}
+          onToggle={toggleTechnician}
+          onSelectAll={selectAllTechnicians}
+          onDeselectAll={deselectAllTechnicians}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+
+  const jobSourceFilterComponent = (
+    <Popover open={sourcePopoverOpen} onOpenChange={setSourcePopoverOpen}>
+      <PopoverContent className="w-auto p-4" align="start">
+        <JobSourceFilter
+          jobSourceNames={jobSourceNames}
+          selectedJobSources={selectedJobSources}
+          toggleJobSource={toggleJobSource}
+          selectAllJobSources={selectAllJobSources}
+          deselectAllJobSources={deselectAllJobSources}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+
+  const amountFilterComponent = (
+    <Popover open={amountPopoverOpen} onOpenChange={setAmountPopoverOpen}>
+      <PopoverContent className="w-auto p-4" align="start">
+        <AmountFilter value={amountRange} onChange={setAmountRange} />
+      </PopoverContent>
+    </Popover>
+  );
+
+  const paymentMethodComponent = (
+    <Popover open={paymentPopoverOpen} onOpenChange={setPaymentPopoverOpen}>
+      <PopoverContent className="w-auto p-4" align="start">
+        <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
+      </PopoverContent>
+    </Popover>
+  );
+
   return (
     <div className="space-y-6 py-8">
       {/* Header Section */}
@@ -113,15 +179,20 @@ const Jobs = () => {
           onCompleteJob={handleCompleteJob}
           onRescheduleJob={handleRescheduleJob}
           onSearchChange={setSearchTerm}
-          dateRangeComponent={null}
-          filtersComponent={null}
-          amountFilterComponent={null}
-          paymentMethodComponent={null}
-          jobSourceComponent={null}
+          dateRangeComponent={dateFilterComponent}
+          filtersComponent={technicianFilterComponent}
+          amountFilterComponent={amountFilterComponent}
+          paymentMethodComponent={paymentMethodComponent}
+          jobSourceComponent={jobSourceFilterComponent}
           selectedJob={selectedJob}
           isStatusModalOpen={isStatusModalOpen}
           openStatusModal={openStatusModal}
           closeStatusModal={closeStatusModal}
+          setDatePopoverOpen={setDatePopoverOpen}
+          setTechPopoverOpen={setTechPopoverOpen}
+          setSourcePopoverOpen={setSourcePopoverOpen}
+          setAmountPopoverOpen={setAmountPopoverOpen}
+          setPaymentPopoverOpen={setPaymentPopoverOpen}
         />
       </div>
 
