@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronDown, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,13 @@ interface DateRangeSelectorProps {
 }
 
 const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) => {
+  useEffect(() => {
+    if (!date?.from) {
+      const today = new Date();
+      setDate({ from: today, to: today });
+    }
+  }, [date, setDate]);
+
   const handleDatePresetSelection = (preset: string) => {
     const today = new Date();
     
@@ -79,105 +85,22 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) 
                       format(date.from, "MMM dd, yyyy")
                     )
                   ) : (
-                    <span>Select date range</span>
+                    <span>Today</span>
                   )}
                 </div>
               </div>
               <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="center">
-            <div className="border-b border-border p-3">
-              <div className="flex flex-wrap gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("today")}
-                >
-                  Today
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("yesterday")}
-                >
-                  Yesterday
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("this-week")}
-                >
-                  This Week
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("last-week")}
-                >
-                  Last Week
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("this-month")}
-                >
-                  This Month
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("last-month")}
-                >
-                  Last Month
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("last-30-days")}
-                >
-                  Last 30 Days
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("last-90-days")}
-                >
-                  Last 90 Days
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("this-year")}
-                >
-                  This Year
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => handleDatePresetSelection("last-year")}
-                >
-                  Last Year
-                </Button>
-              </div>
-            </div>
+          <PopoverContent className="w-auto p-0" align="ce">
             <Calendar
               mode="range"
-              defaultMonth={date?.from}
+              defaultMonth={date?.from || new Date()}
               selected={date}
               onSelect={setDate}
               numberOfMonths={2}
               className="pointer-events-auto"
+              initialFocus
             />
           </PopoverContent>
         </Popover>

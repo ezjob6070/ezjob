@@ -13,7 +13,10 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
   
   // Initialize date range to today
   const today = new Date();
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: today,
+    to: today
+  });
   
   const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
@@ -64,7 +67,12 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     setSelectedTechnicians([]);
     setSelectedCategories([]);
     setSelectedJobSources([]);
-    setDate(undefined);
+    // Reset date to today instead of undefined
+    const resetToday = new Date();
+    setDate({
+      from: resetToday,
+      to: resetToday
+    });
     setAmountRange(null);
     setPaymentMethod(null);
     setAppliedFilters(false);
