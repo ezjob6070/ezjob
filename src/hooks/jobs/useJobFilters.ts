@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
 import { AmountRange } from "@/components/jobs/AmountFilter";
@@ -85,7 +86,6 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     (appliedFilters && selectedTechnicians.length > 0) || 
     selectedCategories.length > 0 || 
     selectedJobSources.length > 0 ||
-    !!date?.from || 
     !!amountRange || 
     !!paymentMethod;
 

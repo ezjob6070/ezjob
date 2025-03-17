@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import JobsDateFilter from "@/components/jobs/filters/JobsDateFilter";
 import JobSourceFilter from "@/components/jobs/JobSourceFilter";
 import AmountFilter from "@/components/jobs/AmountFilter";
 import PaymentMethodFilter from "@/components/jobs/PaymentMethodFilter";
+import { isSameDay, isToday, format } from "date-fns";
 
 export const JobsFilterPopovers = () => {
   const {
@@ -28,19 +28,36 @@ export const JobsFilterPopovers = () => {
     selectAllJobSources, deselectAllJobSources
   } = useJobsContext();
 
-  // Determine if we should show "Today" on the date button
+  // Determine the label for the date button
   const getDateButtonLabel = () => {
     if (!date?.from) return "Today";
     
-    if (date.to) {
-      if (date.from.toDateString() === date.to.toDateString()) {
-        if (date.from.toDateString() === new Date().toDateString()) {
-          return "Today";
-        }
-      }
+    // Check if this is today's date
+    if (date.from && isToday(date.from) && (!date.to || isToday(date.to))) {
+      return "Today";
     }
     
-    return "Date Range";
+    // Check for same-day selection
+    if (date.from && date.to && isSameDay(date.from, date.to)) {
+      return format(date.from, "MMM d, yyyy");
+    }
+    
+    // Handle date ranges
+    if (date.from && date.to) {
+      const fromMonth = format(date.from, "MMM");
+      const toMonth = format(date.to, "MMM");
+      
+      // If months are the same, show "Month X-Y, Year"
+      if (fromMonth === toMonth && date.from.getFullYear() === date.to.getFullYear()) {
+        return `${fromMonth} ${date.from.getDate()}-${date.to.getDate()}, ${date.from.getFullYear()}`;
+      }
+      
+      // Otherwise show full range
+      return `${format(date.from, "MMM d")} - ${format(date.to, "MMM d, yyyy")}`;
+    }
+    
+    // Just from date with no to date
+    return format(date.from, "MMM d, yyyy");
   };
 
   return (

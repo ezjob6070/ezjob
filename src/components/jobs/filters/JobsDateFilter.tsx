@@ -14,7 +14,8 @@ import {
   startOfMonth, 
   endOfMonth, 
   startOfYear, 
-  endOfYear 
+  endOfYear,
+  isToday
 } from "date-fns";
 
 interface JobsDateFilterProps {
@@ -23,20 +24,64 @@ interface JobsDateFilterProps {
 }
 
 const JobsDateFilter = ({ date, setDate }: JobsDateFilterProps) => {
-  const formatDateRange = () => {
+  // Descriptive label function for selected date range
+  const getDateRangeDescription = () => {
     if (!date?.from) return "Today";
     
-    if (date.to) {
-      if (date.from.toDateString() === date.to.toDateString()) {
-        if (date.from.toDateString() === new Date().toDateString()) {
-          return "Today";
-        }
-        return format(date.from, "MMMM d, yyyy");
+    // Check if both dates are the same
+    if (date.to && date.from.toDateString() === date.to.toDateString()) {
+      // Check if it's today
+      if (isToday(date.from)) {
+        return "Today";
       }
-      return `${format(date.from, "MMM d, yyyy")} - ${format(date.to, "MMM d, yyyy")}`;
+      // Single day selection
+      return format(date.from, "MMMM d, yyyy");
     }
     
-    return format(date.from, "MMMM d, yyyy");
+    // Check for this week
+    const today = new Date();
+    const thisWeekStart = startOfWeek(today, { weekStartsOn: 1 });
+    const thisWeekEnd = endOfWeek(today, { weekStartsOn: 1 });
+    
+    if (date.from && date.to && 
+        date.from.getTime() === thisWeekStart.getTime() && 
+        date.to.getTime() === thisWeekEnd.getTime()) {
+      return "This Week";
+    }
+    
+    // Check for last week
+    const lastWeekStart = startOfWeek(subDays(today, 7), { weekStartsOn: 1 });
+    const lastWeekEnd = endOfWeek(subDays(today, 7), { weekStartsOn: 1 });
+    
+    if (date.from && date.to && 
+        date.from.getTime() === lastWeekStart.getTime() && 
+        date.to.getTime() === lastWeekEnd.getTime()) {
+      return "Last Week";
+    }
+    
+    // Check for this month
+    const thisMonthStart = startOfMonth(today);
+    const thisMonthEnd = endOfMonth(today);
+    
+    if (date.from && date.to && 
+        date.from.getTime() === thisMonthStart.getTime() && 
+        date.to.getTime() === thisMonthEnd.getTime()) {
+      return "This Month";
+    }
+    
+    // Check for last month
+    const lastMonthDate = subDays(startOfMonth(today), 1);
+    const lastMonthStart = startOfMonth(lastMonthDate);
+    const lastMonthEnd = endOfMonth(lastMonthDate);
+    
+    if (date.from && date.to && 
+        date.from.getTime() === lastMonthStart.getTime() && 
+        date.to.getTime() === lastMonthEnd.getTime()) {
+      return "Last Month";
+    }
+    
+    // Default format for custom date range
+    return `${format(date.from, "MMM d, yyyy")} - ${format(date.to || date.from, "MMM d, yyyy")}`;
   };
 
   // Handle past date presets
@@ -114,6 +159,9 @@ const JobsDateFilter = ({ date, setDate }: JobsDateFilterProps) => {
     <div className="flex">
       {/* Calendar on left side */}
       <div className="border-r pr-4">
+        <div className="mb-2">
+          <h3 className="text-sm font-medium">Custom Range</h3>
+        </div>
         <CalendarComponent
           initialFocus
           mode="range"
@@ -132,7 +180,7 @@ const JobsDateFilter = ({ date, setDate }: JobsDateFilterProps) => {
             <Button 
               variant="outline"
               size="sm" 
-              className="justify-start"
+              className={cn("justify-start", date?.from && date.to && isToday(date.from) && isToday(date.to) ? "bg-blue-50 border-blue-200" : "")}
               onClick={() => selectCurrentPreset("today")}
             >
               Today
@@ -216,6 +264,11 @@ const JobsDateFilter = ({ date, setDate }: JobsDateFilterProps) => {
               Last Year
             </Button>
           </div>
+        </div>
+        
+        <div className="pt-2 border-t">
+          <p className="text-sm font-medium mb-1">Selected:</p>
+          <p className="text-sm">{getDateRangeDescription()}</p>
         </div>
       </div>
     </div>
