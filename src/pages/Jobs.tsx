@@ -26,7 +26,10 @@ const SAMPLE_JOB_SOURCES: JobSource[] = [
     totalJobs: 120, 
     totalRevenue: 55000, 
     profit: 23000,
-    createdAt: new Date()
+    createdAt: new Date(),
+    email: "website@example.com",
+    phone: "(555) 123-4567",
+    notes: "Our company website leads"
   },
   { 
     id: "js2", 
@@ -37,7 +40,8 @@ const SAMPLE_JOB_SOURCES: JobSource[] = [
     totalJobs: 80, 
     totalRevenue: 40000, 
     profit: 18000,
-    createdAt: new Date()
+    createdAt: new Date(),
+    notes: "Customer referrals program"
   },
   { 
     id: "js3", 
@@ -49,7 +53,9 @@ const SAMPLE_JOB_SOURCES: JobSource[] = [
     totalRevenue: 70000,
     profit: 30000,
     createdAt: new Date(),
-    website: "https://google.com"
+    website: "https://google.com",
+    email: "adsales@google.com",
+    phone: "(555) 987-6543"
   },
   { 
     id: "js4", 
@@ -61,7 +67,8 @@ const SAMPLE_JOB_SOURCES: JobSource[] = [
     totalRevenue: 32000, 
     profit: 12000,
     createdAt: new Date(),
-    website: "https://facebook.com"
+    website: "https://facebook.com",
+    email: "marketing@facebook.com"
   },
   { 
     id: "js5", 
@@ -73,7 +80,9 @@ const SAMPLE_JOB_SOURCES: JobSource[] = [
     totalRevenue: 48000, 
     profit: 22000,
     createdAt: new Date(),
-    website: "https://homeadvisor.com"
+    website: "https://homeadvisor.com",
+    phone: "(555) 765-4321",
+    notes: "Contractor platform for service leads"
   },
   { 
     id: "js6", 
@@ -85,7 +94,10 @@ const SAMPLE_JOB_SOURCES: JobSource[] = [
     totalRevenue: 25000, 
     profit: 10000,
     createdAt: new Date(),
-    website: "https://angi.com"
+    website: "https://angi.com",
+    email: "partners@angi.com",
+    phone: "(555) 234-5678",
+    notes: "Home services marketplace"
   },
 ];
 

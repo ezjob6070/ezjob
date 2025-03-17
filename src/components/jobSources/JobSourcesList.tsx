@@ -19,8 +19,17 @@ const JobSourcesList = ({ jobSources, onEditJobSource }: JobSourcesListProps) =>
   const [filterActive, setFilterActive] = useState("all");
 
   const filteredJobSources = jobSources.filter(source => {
-    const matchesSearch = source.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        (source.website && source.website.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (!searchTerm) return true;
+    
+    const search = searchTerm.toLowerCase();
+    
+    // Search by name, phone, email, or website
+    const matchesName = source.name.toLowerCase().includes(search);
+    const matchesPhone = source.phone?.toLowerCase().includes(search) || false;
+    const matchesEmail = source.email?.toLowerCase().includes(search) || false;
+    const matchesWebsite = source.website?.toLowerCase().includes(search) || false;
+    
+    const matchesSearch = matchesName || matchesPhone || matchesEmail || matchesWebsite;
     
     const matchesActiveFilter = filterActive === "all" || 
                               (filterActive === "active" && source.isActive) || 
@@ -50,7 +59,7 @@ const JobSourcesList = ({ jobSources, onEditJobSource }: JobSourcesListProps) =>
         <div className="relative flex-1">
           <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search job sources..."
+            placeholder="Search by name, phone, or email..."
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

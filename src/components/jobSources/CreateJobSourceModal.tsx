@@ -9,16 +9,20 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { JobSource } from "@/types/jobSource";
 import { v4 as uuidv4 } from 'uuid';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   website: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
+  email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal("")),
   logoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
   paymentType: z.enum(["percentage", "fixed"]),
   paymentValue: z.coerce.number().min(0, { message: "Payment value cannot be negative." }),
   isActive: z.boolean().default(true),
+  notes: z.string().optional().or(z.literal("")),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -37,10 +41,13 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
     defaultValues: {
       name: "",
       website: "",
+      phone: "",
+      email: "",
       logoUrl: "",
       paymentType: "percentage",
       paymentValue: 0,
       isActive: true,
+      notes: "",
     },
   });
 
@@ -52,10 +59,13 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
       id: uuidv4(),
       name: values.name,
       website: values.website || undefined,
+      phone: values.phone || undefined,
+      email: values.email || undefined,
       logoUrl: values.logoUrl || undefined,
       paymentType: values.paymentType,
       paymentValue: values.paymentValue,
       isActive: values.isActive,
+      notes: values.notes || undefined,
       totalJobs: 0,
       totalRevenue: 0,
       profit: 0,
@@ -93,6 +103,36 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
                 </FormItem>
               )}
             />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number (optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(555) 123-4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email (optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="contact@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             
             <FormField
               control={form.control}
@@ -173,6 +213,24 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
                       ? "Enter the percentage value (e.g., 10 for 10%)" 
                       : "Enter the fixed amount in dollars"}
                   </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Add any additional information about this job source"
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
