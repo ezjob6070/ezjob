@@ -67,27 +67,27 @@ const JobFiltersSection = ({
         <h3 className="text-lg font-medium mb-3">Filter Jobs</h3>
         <div className="space-y-4">
           <TechnicianFilter
-            technicianNames={technicianNames}
-            selectedTechnicians={selectedTechnicians}
-            toggleTechnician={toggleTechnician}
-            selectAll={selectAllTechnicians}
-            deselectAll={deselectAllTechnicians}
+            technicians={technicianNames}
+            selectedNames={selectedTechnicians}
+            onToggle={toggleTechnician}
+            onSelectAll={selectAllTechnicians}
+            onDeselectAll={deselectAllTechnicians}
             appliedFilters={appliedFilters}
           />
           
           <CategoryFilter
             categories={categories}
-            selectedCategories={selectedCategories}
+            selectedCategory={selectedCategories}
             toggleCategory={toggleCategory}
             addCategory={addCategory}
           />
           
           <JobSourceFilter
-            jobSourceNames={jobSourceNames}
-            selectedJobSources={selectedJobSources}
-            toggleJobSource={toggleJobSource}
-            selectAll={selectAllJobSources}
-            deselectAll={deselectAllJobSources}
+            sources={jobSourceNames}
+            selectedSources={selectedJobSources}
+            onToggleSource={toggleJobSource}
+            onSelectAll={selectAllJobSources}
+            onDeselectAll={deselectAllJobSources}
             appliedFilters={appliedFilters}
           />
         </div>
@@ -112,25 +112,25 @@ const JobFiltersSection = ({
   
   const amountFilterComponent = (
     <AmountFilter 
-      amountRange={amountRange}
-      setAmountRange={setAmountRange}
+      value={amountRange}
+      onChange={setAmountRange}
     />
   );
   
   const paymentMethodComponent = (
     <PaymentMethodFilter 
-      paymentMethod={paymentMethod}
-      setPaymentMethod={setPaymentMethod}
+      value={paymentMethod}
+      onChange={setPaymentMethod}
     />
   );
   
   const jobSourceComponent = (
     <JobSourceFilter
-      jobSourceNames={jobSourceNames}
-      selectedJobSources={selectedJobSources}
-      toggleJobSource={toggleJobSource}
-      selectAll={selectAllJobSources}
-      deselectAll={deselectAllJobSources}
+      sources={jobSourceNames}
+      selectedSources={selectedJobSources}
+      onToggleSource={toggleJobSource}
+      onSelectAll={selectAllJobSources}
+      onDeselectAll={deselectAllJobSources}
       appliedFilters={appliedFilters}
     />
   );
