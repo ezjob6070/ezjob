@@ -28,6 +28,21 @@ export const JobsFilterPopovers = () => {
     selectAllJobSources, deselectAllJobSources
   } = useJobsContext();
 
+  // Determine if we should show "Today" on the date button
+  const getDateButtonLabel = () => {
+    if (!date?.from) return "Today";
+    
+    if (date.to) {
+      if (date.from.toDateString() === date.to.toDateString()) {
+        if (date.from.toDateString() === new Date().toDateString()) {
+          return "Today";
+        }
+      }
+    }
+    
+    return "Date Range";
+  };
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -39,7 +54,7 @@ export const JobsFilterPopovers = () => {
               onClick={() => setDatePopoverOpen(true)}
             >
               <Calendar className="h-4 w-4" />
-              <span>Date</span>
+              <span>{getDateButtonLabel()}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent 
