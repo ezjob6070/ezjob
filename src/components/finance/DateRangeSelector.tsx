@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronDown, CalendarRange } from "lucide-react";
@@ -92,7 +93,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) 
               <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="ce">
+          <PopoverContent className="w-auto p-0" align="center">
             <Calendar
               mode="range"
               defaultMonth={date?.from || new Date()}
