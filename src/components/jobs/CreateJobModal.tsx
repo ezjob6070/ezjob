@@ -48,8 +48,9 @@ const timeOptions = [
   "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM"
 ];
 
+// Update the form schema to make title optional
 const formSchema = z.object({
-  title: z.string().min(3, "Job title must be at least 3 characters"),
+  title: z.string().optional(),
   clientName: z.string().min(2, "Client name must be at least 2 characters"),
   clientPhone: z.string().min(10, "Phone number must be at least 10 characters"),
   clientEmail: z.string().email("Invalid email").optional().or(z.literal("")),
@@ -60,7 +61,7 @@ const formSchema = z.object({
     required_error: "Please select a date",
   }),
   time: z.string().min(1, "Please select a time"),
-  amount: z.coerce.number().positive("Amount must be positive"),
+  amount: z.coerce.number().optional(),
   description: z.string().optional(),
 });
 
@@ -83,7 +84,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       clientAddress: "",
       technicianId: "",
       jobSourceId: "",
-      amount: 0,
+      amount: undefined,
       description: "",
     },
   });
@@ -99,22 +100,32 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     const scheduledDate = new Date(values.date);
     scheduledDate.setHours(scheduledHours, minutes, 0, 0);
     
-    // Generate new job
+    // Generate new job - defaulting to in_progress status
     const newJob: Job = {
       id: uuidv4(),
-      title: values.title,
       clientName: values.clientName,
-      clientId: uuidv4().slice(0, 8), // Generate a simple client ID
+      clientId: uuidv4().slice(0, 8),
       technicianName: technician?.name || "",
       technicianId: values.technicianId,
-      date: scheduledDate, // For the list view
-      scheduledDate: scheduledDate, // When it's scheduled
+      date: scheduledDate,
+      scheduledDate: scheduledDate,
       address: values.clientAddress,
-      amount: values.amount,
-      status: "scheduled" as JobStatus,
-      description: values.description || "",
+      status: "in_progress" as JobStatus,
       createdAt: new Date(),
     };
+
+    // Add optional fields
+    if (values.title) {
+      newJob.title = values.title;
+    }
+
+    if (values.amount) {
+      newJob.amount = values.amount;
+    }
+
+    if (values.description) {
+      newJob.description = values.description;
+    }
 
     if (values.clientEmail) {
       newJob.clientEmail = values.clientEmail;
@@ -155,7 +166,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Job Title *</FormLabel>
+                    <FormLabel>Job Title (Optional)</FormLabel>
                     <FormControl>
                       <Input placeholder="HVAC Installation" {...field} />
                     </FormControl>
@@ -214,9 +225,16 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Amount ($) *</FormLabel>
+                      <FormLabel>Estimated Amount ($) (Optional)</FormLabel>
                       <FormControl>
-                        <Input type="number" min="0" step="0.01" {...field} />
+                        <Input 
+                          type="number" 
+                          min="0" 
+                          step="0.01" 
+                          placeholder="0.00"
+                          {...field} 
+                          value={field.value || ''}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

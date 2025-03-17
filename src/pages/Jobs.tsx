@@ -36,6 +36,8 @@ const Jobs = () => {
     paymentMethod,
     appliedFilters,
     hasActiveFilters,
+    selectedJob,
+    isStatusModalOpen,
     toggleTechnician,
     toggleCategory,
     setDate,
@@ -45,7 +47,10 @@ const Jobs = () => {
     deselectAllTechnicians,
     clearFilters,
     applyFilters,
-    handleCancelJob
+    handleCancelJob,
+    handleCompleteJob,
+    openStatusModal,
+    closeStatusModal
   } = useJobsData(initialJobs);
 
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
@@ -60,7 +65,7 @@ const Jobs = () => {
     setJobs([job, ...jobs]);
     toast({
       title: "Job created",
-      description: `New job "${job.title}" for ${job.clientName} has been created.`,
+      description: `New job for ${job.clientName} has been created and is in progress.`,
     });
   };
 
@@ -101,12 +106,17 @@ const Jobs = () => {
       <JobTabs 
         jobs={filteredJobs} 
         searchTerm={searchTerm}
-        onCancelJob={handleCancelJob} 
+        onCancelJob={handleCancelJob}
+        onCompleteJob={handleCompleteJob}
         onSearchChange={setSearchTerm}
         filtersComponent={filterComponents.filtersComponent}
         dateRangeComponent={filterComponents.dateRangeComponent}
         amountFilterComponent={filterComponents.amountFilterComponent}
         paymentMethodComponent={filterComponents.paymentMethodComponent}
+        selectedJob={selectedJob}
+        isStatusModalOpen={isStatusModalOpen}
+        openStatusModal={openStatusModal}
+        closeStatusModal={closeStatusModal}
       />
 
       <CreateJobModal

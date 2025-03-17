@@ -4,6 +4,7 @@ import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
 import { AmountRange } from "@/components/jobs/AmountFilter";
 import { DateRange } from "react-day-picker";
 import { addDays, isSameDay, isWithinInterval, startOfDay } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 
 export const useJobsData = (initialJobs: Job[]) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +16,8 @@ export const useJobsData = (initialJobs: Job[]) => {
   const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [appliedFilters, setAppliedFilters] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
   const handleCancelJob = (jobId: string) => {
     setJobs(prevJobs =>
@@ -22,6 +25,32 @@ export const useJobsData = (initialJobs: Job[]) => {
         job.id === jobId ? { ...job, status: "cancelled" } : job
       )
     );
+    toast({
+      title: "Job cancelled",
+      description: "The job has been marked as cancelled.",
+    });
+  };
+
+  const handleCompleteJob = (jobId: string, actualAmount: number) => {
+    setJobs(prevJobs =>
+      prevJobs.map(job =>
+        job.id === jobId ? { ...job, status: "completed", actualAmount } : job
+      )
+    );
+    toast({
+      title: "Job completed",
+      description: "The job has been marked as completed.",
+    });
+  };
+
+  const openStatusModal = (job: Job) => {
+    setSelectedJob(job);
+    setIsStatusModalOpen(true);
+  };
+
+  const closeStatusModal = () => {
+    setSelectedJob(null);
+    setIsStatusModalOpen(false);
   };
 
   useEffect(() => {
@@ -30,7 +59,7 @@ export const useJobsData = (initialJobs: Job[]) => {
     if (searchTerm) {
       result = result.filter(job =>
         job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.title.toLowerCase().includes(searchTerm.toLowerCase())
+        (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
@@ -42,8 +71,8 @@ export const useJobsData = (initialJobs: Job[]) => {
 
     if (selectedCategories.length > 0) {
       result = result.filter(job => 
-        selectedCategories.some(category => 
-          job.title.toLowerCase().includes(category.toLowerCase())
+        job.title && selectedCategories.some(category => 
+          job.title!.toLowerCase().includes(category.toLowerCase())
         )
       );
     }
@@ -65,6 +94,8 @@ export const useJobsData = (initialJobs: Job[]) => {
 
     if (amountRange) {
       result = result.filter(job => {
+        if (!job.amount) return true;
+        
         if (amountRange.min !== undefined && amountRange.max !== undefined) {
           return job.amount >= amountRange.min && job.amount <= amountRange.max;
         } else if (amountRange.min !== undefined) {
@@ -141,6 +172,8 @@ export const useJobsData = (initialJobs: Job[]) => {
     paymentMethod,
     appliedFilters,
     hasActiveFilters,
+    selectedJob,
+    isStatusModalOpen,
     toggleTechnician,
     toggleCategory,
     setDate,
@@ -150,6 +183,9 @@ export const useJobsData = (initialJobs: Job[]) => {
     deselectAllTechnicians,
     clearFilters,
     applyFilters,
-    handleCancelJob
+    handleCancelJob,
+    handleCompleteJob,
+    openStatusModal,
+    closeStatusModal
   };
 };

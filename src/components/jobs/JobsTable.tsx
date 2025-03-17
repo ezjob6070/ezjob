@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,19 +12,33 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Button } from "@/components/ui/button";
 import { Job } from "./JobTypes";
 import { Badge } from "@/components/ui/badge";
+import { MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface JobsTableProps {
   jobs: Job[];
   searchTerm: string;
+  onOpenStatusModal: (job: Job) => void;
 }
 
-const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
+const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
   const [jobsData, setJobsData] = useState(jobs);
+
+  useEffect(() => {
+    setJobsData(jobs);
+  }, [jobs]);
 
   // Filter jobs based on search term
   const filteredJobs = jobsData.filter(job =>
     job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
     job.technicianName?.toLowerCase().includes(searchTerm.toLowerCase() || '')
   );
 
@@ -53,11 +67,12 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead>Client</TableHead>
+            <TableHead>Job</TableHead>
             <TableHead>Technician</TableHead>
-            <TableHead>Payment Method</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead className="text-right">Status</TableHead>
+            <TableHead className="w-[80px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -67,23 +82,49 @@ const JobsTable = ({ jobs, searchTerm }: JobsTableProps) => {
                 {job.clientName}
               </TableCell>
               <TableCell>
-                {job.technicianName || "Unassigned"}
+                {job.title || "No title specified"}
               </TableCell>
               <TableCell>
-                {job.paymentMethod ? job.paymentMethod.replace("_", " ") : "Not specified"}
+                {job.technicianName || "Unassigned"}
               </TableCell>
               <TableCell>{job.date.toLocaleDateString()}</TableCell>
-              <TableCell>{formatCurrency(job.amount)}</TableCell>
+              <TableCell>
+                {job.actualAmount 
+                  ? formatCurrency(job.actualAmount) 
+                  : job.amount 
+                    ? formatCurrency(job.amount) + " (est.)" 
+                    : "Not specified"}
+              </TableCell>
               <TableCell className="text-right">
                 <Badge className={getStatusBadgeColor(job.status)}>
                   {formatStatus(job.status)}
                 </Badge>
               </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {job.status === "in_progress" && (
+                      <DropdownMenuItem onClick={() => onOpenStatusModal(job)}>
+                        Update Status
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem>View Details</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
             </TableRow>
           ))}
           {filteredJobs.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 No jobs found.
               </TableCell>
             </TableRow>

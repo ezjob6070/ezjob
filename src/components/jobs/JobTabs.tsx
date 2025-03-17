@@ -6,27 +6,38 @@ import { Job } from "./JobTypes";
 import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import UpdateJobStatusModal from "./UpdateJobStatusModal";
 
 export interface JobTabsProps {
   jobs: Job[];
   searchTerm: string;
   onCancelJob: (jobId: string) => void;
+  onCompleteJob: (jobId: string, actualAmount: number) => void;
   onSearchChange?: (term: string) => void;
   dateRangeComponent?: React.ReactNode;
   filtersComponent?: React.ReactNode;
   amountFilterComponent?: React.ReactNode;
   paymentMethodComponent?: React.ReactNode;
+  selectedJob: Job | null;
+  isStatusModalOpen: boolean;
+  openStatusModal: (job: Job) => void;
+  closeStatusModal: () => void;
 }
 
 const JobTabs = ({ 
   jobs, 
   searchTerm, 
-  onCancelJob, 
+  onCancelJob,
+  onCompleteJob, 
   onSearchChange,
   dateRangeComponent,
   filtersComponent,
   amountFilterComponent,
-  paymentMethodComponent
+  paymentMethodComponent,
+  selectedJob,
+  isStatusModalOpen,
+  openStatusModal,
+  closeStatusModal
 }: JobTabsProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
@@ -108,25 +119,53 @@ const JobTabs = ({
         </div>
         
         <TabsContent value="all">
-          <JobsTable jobs={filteredJobs("all")} searchTerm={searchTerm} />
+          <JobsTable 
+            jobs={filteredJobs("all")} 
+            searchTerm={searchTerm}
+            onOpenStatusModal={openStatusModal}
+          />
         </TabsContent>
         
         <TabsContent value="scheduled">
-          <JobsTable jobs={filteredJobs("scheduled")} searchTerm={searchTerm} />
+          <JobsTable 
+            jobs={filteredJobs("scheduled")} 
+            searchTerm={searchTerm}
+            onOpenStatusModal={openStatusModal}
+          />
         </TabsContent>
         
         <TabsContent value="in_progress">
-          <JobsTable jobs={filteredJobs("in_progress")} searchTerm={searchTerm} />
+          <JobsTable 
+            jobs={filteredJobs("in_progress")} 
+            searchTerm={searchTerm}
+            onOpenStatusModal={openStatusModal}
+          />
         </TabsContent>
         
         <TabsContent value="completed">
-          <JobsTable jobs={filteredJobs("completed")} searchTerm={searchTerm} />
+          <JobsTable 
+            jobs={filteredJobs("completed")} 
+            searchTerm={searchTerm}
+            onOpenStatusModal={openStatusModal}
+          />
         </TabsContent>
         
         <TabsContent value="cancelled">
-          <JobsTable jobs={filteredJobs("cancelled")} searchTerm={searchTerm} />
+          <JobsTable 
+            jobs={filteredJobs("cancelled")} 
+            searchTerm={searchTerm}
+            onOpenStatusModal={openStatusModal}
+          />
         </TabsContent>
       </Tabs>
+
+      <UpdateJobStatusModal
+        open={isStatusModalOpen}
+        onOpenChange={closeStatusModal}
+        job={selectedJob}
+        onCancel={onCancelJob}
+        onComplete={onCompleteJob}
+      />
     </div>
   );
 };

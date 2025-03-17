@@ -6,18 +6,23 @@ export interface Job {
   id: string;
   clientName: string;
   clientId?: string;
-  title: string;
+  title?: string; // Optional now
   status: JobStatus;
   date: Date;
   scheduledDate?: Date;
   technicianName?: string;
   technicianId?: string;
   address: string;
-  amount: number;
+  amount?: number; // Optional as it's only an estimate
+  actualAmount?: number; // Added for when a job is completed
   paymentMethod?: PaymentMethod;
   description?: string;
   notes?: string;
   createdAt?: Date;
+  clientPhone?: string;
+  clientEmail?: string;
+  jobSourceId?: string;
+  jobSourceName?: string;
 }
 
 // Utility types for job filtering
