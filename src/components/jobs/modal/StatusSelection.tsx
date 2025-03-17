@@ -1,0 +1,52 @@
+
+import React from "react";
+import { JobStatus } from "../JobTypes";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+
+interface StatusSelectionProps {
+  status: string;
+  onStatusChange: (value: string) => void;
+  job: { status: JobStatus };
+}
+
+const StatusSelection: React.FC<StatusSelectionProps> = ({ 
+  status, 
+  onStatusChange,
+  job
+}) => {
+  // Get available status options based on current job status
+  const getStatusOptions = () => {
+    const options: { value: JobStatus | "reschedule"; label: string }[] = [];
+    
+    // Always add these options
+    options.push({ value: "completed", label: "Completed" });
+    options.push({ value: "cancelled", label: "Cancelled" });
+    options.push({ value: "reschedule", label: "Reschedule" });
+    
+    // Only add in_progress if not already in that status
+    if (job.status !== "in_progress") {
+      options.push({ value: "in_progress", label: "In Progress" });
+    }
+    
+    // Only add scheduled if not already in that status
+    if (job.status !== "scheduled") {
+      options.push({ value: "scheduled", label: "Scheduled" });
+    }
+    
+    return options;
+  };
+
+  return (
+    <RadioGroup value={status} onValueChange={onStatusChange}>
+      {getStatusOptions().map((option) => (
+        <div key={option.value} className="flex items-center space-x-2">
+          <RadioGroupItem value={option.value} id={option.value} />
+          <Label htmlFor={option.value}>{option.label}</Label>
+        </div>
+      ))}
+    </RadioGroup>
+  );
+};
+
+export default StatusSelection;

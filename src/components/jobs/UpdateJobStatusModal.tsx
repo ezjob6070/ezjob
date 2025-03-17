@@ -10,22 +10,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { CalendarIcon, Clock } from "lucide-react";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+import JobDetailsSection from "./modal/JobDetailsSection";
+import StatusSelection from "./modal/StatusSelection";
+import CompletionForm from "./modal/CompletionForm";
+import CancellationForm from "./modal/CancellationForm";
+import RescheduleForm from "./modal/RescheduleForm";
 
 interface UpdateJobStatusModalProps {
   open: boolean;
@@ -35,13 +24,6 @@ interface UpdateJobStatusModalProps {
   onComplete: (jobId: string, actualAmount: number) => void;
   onReschedule?: (jobId: string, newDate: Date, isAllDay: boolean) => void;
 }
-
-// Time options for quick selection
-const timeOptions = [
-  "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", 
-  "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", 
-  "04:00 PM", "05:00 PM", "06:00 PM"
-];
 
 const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   open,
@@ -75,15 +57,6 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   }, [job]);
   
   if (!job) return null;
-
-  const formatTimeOption = (time: string) => {
-    return (
-      <div className="flex items-center">
-        <Clock className="mr-2 h-4 w-4" />
-        {time}
-      </div>
-    );
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,28 +104,6 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
     onOpenChange(false);
   };
 
-  // Get available status options based on current job status
-  const getStatusOptions = () => {
-    const options: { value: JobStatus | "reschedule"; label: string }[] = [];
-    
-    // Always add these options
-    options.push({ value: "completed", label: "Completed" });
-    options.push({ value: "cancelled", label: "Cancelled" });
-    options.push({ value: "reschedule", label: "Reschedule" });
-    
-    // Only add in_progress if not already in that status
-    if (job.status !== "in_progress") {
-      options.push({ value: "in_progress", label: "In Progress" });
-    }
-    
-    // Only add scheduled if not already in that status
-    if (job.status !== "scheduled") {
-      options.push({ value: "scheduled", label: "Scheduled" });
-    }
-    
-    return options;
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
@@ -165,186 +116,43 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <h4 className="font-medium">Job Details</h4>
-              <p className="text-sm text-muted-foreground">Client: {job.clientName}</p>
-              <p className="text-sm text-muted-foreground">
-                Technician: {job.technicianName || "Unassigned"}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Initial Estimate: {job.amount ? formatCurrency(job.amount) : "No estimate provided"}
-              </p>
-              {job.notes && (
-                <p className="text-sm text-muted-foreground">
-                  Special Notes: {job.notes}
-                </p>
-              )}
-              {job.jobSourceName && (
-                <p className="text-sm text-muted-foreground">
-                  Source: {job.jobSourceName}
-                </p>
-              )}
-              <p className="text-sm text-muted-foreground">
-                Current Status: <Badge className="ml-1">{job.status.replace('_', ' ').replace(/\b\w/g, (char) => char.toUpperCase())}</Badge>
-              </p>
-            </div>
+            <JobDetailsSection job={job} />
 
-            <RadioGroup value={status} onValueChange={(value) => setStatus(value as "completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled")}>
-              {getStatusOptions().map((option) => (
-                <div key={option.value} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option.value} id={option.value} />
-                  <Label htmlFor={option.value}>{option.label}</Label>
-                </div>
-              ))}
-            </RadioGroup>
+            <StatusSelection 
+              status={status} 
+              onStatusChange={(value) => setStatus(value as "completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled")}
+              job={job}
+            />
 
             {status === "completed" && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="actualAmount">Actual Amount ($)</Label>
-                  <Input
-                    id="actualAmount"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={actualAmount}
-                    onChange={(e) => setActualAmount(Number(e.target.value))}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="parts">Parts Used (Optional)</Label>
-                  <Input
-                    id="parts"
-                    placeholder="e.g., AC filter, pipe fitting, etc."
-                    value={parts}
-                    onChange={(e) => setParts(e.target.value)}
-                  />
-                </div>
-              </div>
+              <CompletionForm
+                actualAmount={actualAmount}
+                setActualAmount={setActualAmount}
+                parts={parts}
+                setParts={setParts}
+              />
             )}
 
             {status === "cancelled" && (
-              <div className="space-y-2">
-                <Label htmlFor="cancellationReason">Reason for Cancellation (Optional)</Label>
-                <Textarea
-                  id="cancellationReason"
-                  placeholder="Enter reason for cancellation..."
-                  value={cancellationReason}
-                  onChange={(e) => setCancellationReason(e.target.value)}
-                  className="resize-none"
-                  rows={3}
-                />
-              </div>
+              <CancellationForm
+                cancellationReason={cancellationReason}
+                setCancellationReason={setCancellationReason}
+              />
             )}
 
             {status === "reschedule" && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Reschedule Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !rescheduleDate && "text-muted-foreground"
-                        )}
-                      >
-                        {rescheduleDate ? (
-                          format(rescheduleDate, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={rescheduleDate}
-                        onSelect={setRescheduleDate}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Time Selection</Label>
-                  <Tabs 
-                    value={timeSelection} 
-                    onValueChange={(v) => setTimeSelection(v as "preset" | "custom" | "allDay")}
-                    className="w-full"
-                  >
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="preset">Preset Time</TabsTrigger>
-                      <TabsTrigger value="custom">Custom Time</TabsTrigger>
-                      <TabsTrigger value="allDay">All Day</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="preset">
-                      <div className="mt-2">
-                        <Select 
-                          onValueChange={setPresetTime} 
-                          value={presetTime}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a time">
-                              {presetTime ? (
-                                <div className="flex items-center">
-                                  <Clock className="mr-2 h-4 w-4" />
-                                  {presetTime}
-                                </div>
-                              ) : (
-                                <span>Select a time</span>
-                              )}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {timeOptions.map((time) => (
-                              <SelectItem key={time} value={time}>
-                                {formatTimeOption(time)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="custom">
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <div>
-                          <Label htmlFor="startTime">Start Time</Label>
-                          <Input 
-                            id="startTime"
-                            type="time" 
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="endTime">End Time</Label>
-                          <Input 
-                            id="endTime"
-                            type="time" 
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="allDay">
-                      <div className="flex items-center justify-center p-6 text-sm text-muted-foreground">
-                        This job will be scheduled for the entire day
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
+              <RescheduleForm
+                rescheduleDate={rescheduleDate}
+                setRescheduleDate={setRescheduleDate}
+                timeSelection={timeSelection}
+                setTimeSelection={setTimeSelection}
+                presetTime={presetTime}
+                setPresetTime={setPresetTime}
+                startTime={startTime}
+                setStartTime={setStartTime}
+                endTime={endTime}
+                setEndTime={setEndTime}
+              />
             )}
           </div>
 
