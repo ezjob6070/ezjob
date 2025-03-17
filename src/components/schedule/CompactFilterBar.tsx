@@ -7,9 +7,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import JobCard from "@/components/calendar/components/JobCard";
 import TaskCard from "@/components/calendar/components/TaskCard";
+import { toast } from "sonner";
 
 interface CompactFilterBarProps {
   jobs: Job[];
@@ -20,6 +20,7 @@ interface CompactFilterBarProps {
 const CompactFilterBar = ({ jobs, tasks, selectedTabValue }: CompactFilterBarProps) => {
   const [showAllDialog, setShowAllDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [dialogTabValue, setDialogTabValue] = useState(selectedTabValue);
   
   const filteredJobs = jobs.filter(job => 
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -33,32 +34,14 @@ const CompactFilterBar = ({ jobs, tasks, selectedTabValue }: CompactFilterBarPro
     task.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "scheduled":
-        return "bg-blue-500 hover:bg-blue-600";
-      case "in_progress":
-        return "bg-yellow-500 hover:bg-yellow-600";
-      case "completed":
-        return "bg-green-500 hover:bg-green-600";
-      case "cancelled":
-        return "bg-red-500 hover:bg-red-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
-    }
+  const handleOpenDialog = () => {
+    setDialogTabValue(selectedTabValue);
+    setShowAllDialog(true);
   };
 
-  const getPriorityBadgeColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-500 hover:bg-red-600";
-      case "medium":
-        return "bg-yellow-500 hover:bg-yellow-600";
-      case "low":
-        return "bg-green-500 hover:bg-green-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
-    }
+  const handleApplyFilter = () => {
+    toast.success(`Filter applied: "${searchTerm}"`);
+    setShowAllDialog(false);
   };
 
   return (
@@ -83,7 +66,7 @@ const CompactFilterBar = ({ jobs, tasks, selectedTabValue }: CompactFilterBarPro
           variant="outline" 
           size="sm" 
           className="gap-1.5"
-          onClick={() => setShowAllDialog(true)}
+          onClick={handleOpenDialog}
         >
           <List className="h-4 w-4" />
           {selectedTabValue === "jobs" ? "All Jobs" : "All Tasks"}
@@ -93,21 +76,26 @@ const CompactFilterBar = ({ jobs, tasks, selectedTabValue }: CompactFilterBarPro
       <Dialog open={showAllDialog} onOpenChange={setShowAllDialog}>
         <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle>{selectedTabValue === "jobs" ? "All Jobs" : "All Tasks"}</DialogTitle>
+            <DialogTitle>{dialogTabValue === "jobs" ? "All Jobs" : "All Tasks"}</DialogTitle>
           </DialogHeader>
           
           <div className="py-4">
             <div className="relative mb-4">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={`Search ${selectedTabValue === "jobs" ? "jobs" : "tasks"}...`}
+                placeholder={`Search ${dialogTabValue === "jobs" ? "jobs" : "tasks"}...`}
                 className="pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             
-            <Tabs defaultValue={selectedTabValue} className="w-full">
+            <Tabs 
+              defaultValue={selectedTabValue} 
+              value={dialogTabValue}
+              onValueChange={setDialogTabValue}
+              className="w-full"
+            >
               <TabsList className="grid grid-cols-2 mb-4">
                 <TabsTrigger value="jobs">Jobs ({filteredJobs.length})</TabsTrigger>
                 <TabsTrigger value="tasks">Tasks ({filteredTasks.length})</TabsTrigger>
@@ -137,6 +125,15 @@ const CompactFilterBar = ({ jobs, tasks, selectedTabValue }: CompactFilterBarPro
                 )}
               </TabsContent>
             </Tabs>
+          </div>
+          
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setShowAllDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleApplyFilter}>
+              Apply
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
