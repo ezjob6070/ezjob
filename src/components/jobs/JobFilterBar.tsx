@@ -1,44 +1,16 @@
 
-import { useState } from "react";
-import { Filter, Calendar, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
 import { Job } from "../jobs/JobTypes";
+import { JOB_CATEGORIES, DATE_FILTERS } from "./filters/filterConstants";
 import { initialTechnicians } from "@/data/technicians";
+import CategoryFilter from "./filters/CategoryFilter";
+import TechnicianDropdown from "./filters/TechnicianDropdown";
+import DateFilterDropdown from "./filters/DateFilterDropdown";
 
 interface JobFilterBarProps {
   onFilterChange: (jobs: Job[]) => void;
   allJobs: Job[];
 }
-
-const JOB_CATEGORIES = [
-  "All Categories",
-  "Plumbing",
-  "HVAC",
-  "Electrical",
-  "General Maintenance",
-];
-
-const DATE_FILTERS = [
-  { label: "All Dates", value: "all" },
-  { label: "Today", value: "today" },
-  { label: "This Week", value: "this_week" },
-  { label: "Next Week", value: "next_week" },
-  { label: "This Month", value: "this_month" },
-  { label: "Next Month", value: "next_month" },
-];
 
 const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
@@ -56,7 +28,7 @@ const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
     // Filter by category (assuming job titles contain the category)
     if (selectedCategory !== "All Categories") {
       filteredJobs = filteredJobs.filter((job) => 
-        job.title.toLowerCase().includes(selectedCategory.toLowerCase())
+        job.title?.toLowerCase().includes(selectedCategory.toLowerCase())
       );
     }
 
@@ -127,71 +99,30 @@ const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
   };
 
   // Apply filters whenever any filter changes
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
-    setTimeout(applyFilters, 0);
-  };
-
-  const handleTechnicianChange = (value: string) => {
-    setSelectedTechnician(value);
-    setTimeout(applyFilters, 0);
-  };
-
-  const handleDateFilterChange = (value: string) => {
-    setSelectedDateFilter(value);
-    setTimeout(applyFilters, 0);
-  };
+  useEffect(() => {
+    applyFilters();
+  }, [selectedCategory, selectedTechnician, selectedDateFilter]);
 
   return (
     <div className="flex flex-wrap gap-2 mb-4">
       <div className="flex items-center gap-2">
-        <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-          <SelectTrigger className="w-[180px]">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            {JOB_CATEGORIES.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <CategoryFilter 
+          selectedCategory={selectedCategory} 
+          categories={JOB_CATEGORIES} 
+          onCategoryChange={setSelectedCategory} 
+        />
 
-        <Select value={selectedTechnician} onValueChange={handleTechnicianChange}>
-          <SelectTrigger className="w-[180px]">
-            <Users className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Technician" />
-          </SelectTrigger>
-          <SelectContent>
-            {technicians.map((tech) => (
-              <SelectItem key={tech} value={tech}>
-                {tech}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <TechnicianDropdown 
+          selectedTechnician={selectedTechnician} 
+          technicians={technicians} 
+          onTechnicianChange={setSelectedTechnician} 
+        />
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              {DATE_FILTERS.find(f => f.value === selectedDateFilter)?.label || "All Dates"}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {DATE_FILTERS.map((filter) => (
-              <DropdownMenuItem 
-                key={filter.value}
-                onClick={() => handleDateFilterChange(filter.value)}
-                className={selectedDateFilter === filter.value ? "bg-accent" : ""}
-              >
-                {filter.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DateFilterDropdown 
+          selectedDateFilter={selectedDateFilter} 
+          dateFilters={DATE_FILTERS} 
+          onDateFilterChange={setSelectedDateFilter} 
+        />
       </div>
     </div>
   );
