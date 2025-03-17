@@ -1,3 +1,4 @@
+
 import React from "react";
 import { DateRange } from "react-day-picker";
 import { AmountRange } from "./AmountFilter";
@@ -12,7 +13,6 @@ interface JobFiltersSectionProps {
   technicianNames: string[];
   selectedTechnicians: string[];
   selectedCategories: string[];
-  // Date is still in the props but we won't use it in this component anymore
   date?: DateRange | undefined;
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
@@ -20,7 +20,6 @@ interface JobFiltersSectionProps {
   appliedFilters: boolean;
   toggleTechnician: (techName: string) => void;
   toggleCategory: (category: string) => void;
-  // setDate is still in the props but we won't use it in this component anymore
   setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   setAmountRange: React.Dispatch<React.SetStateAction<AmountRange | null>>;
   setPaymentMethod: React.Dispatch<React.SetStateAction<PaymentMethod | null>>;
@@ -40,7 +39,6 @@ const JobFiltersSection = ({
   technicianNames,
   selectedTechnicians,
   selectedCategories,
-  // Keep date in destructuring
   date,
   amountRange,
   paymentMethod,
@@ -48,7 +46,6 @@ const JobFiltersSection = ({
   appliedFilters,
   toggleTechnician,
   toggleCategory,
-  // Keep setDate in destructuring
   setDate,
   setAmountRange,
   setPaymentMethod,
@@ -113,8 +110,6 @@ const JobFiltersSection = ({
     </div>
   );
   
-  // Remove the DateRangeComponent since we now have JobsDateFilter
-  
   const amountFilterComponent = (
     <AmountFilter 
       amountRange={amountRange}
@@ -142,7 +137,6 @@ const JobFiltersSection = ({
   
   return {
     filtersComponent,
-    // Return null for dateRangeComponent
     dateRangeComponent: null,
     amountFilterComponent,
     paymentMethodComponent,

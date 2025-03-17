@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { initialJobs } from "@/data/jobs";
 import { initialTechnicians } from "@/data/technicians";
@@ -255,7 +254,6 @@ const Jobs = () => {
         onRescheduleJob={handleRescheduleJob}
         onSearchChange={setSearchTerm}
         filtersComponent={filterComponents.filtersComponent}
-        // We're removing the date range component and using our new date filter
         dateRangeComponent={null}
         amountFilterComponent={filterComponents.amountFilterComponent}
         paymentMethodComponent={filterComponents.paymentMethodComponent}

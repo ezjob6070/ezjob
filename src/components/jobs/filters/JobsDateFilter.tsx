@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar, CalendarRange, ChevronDown } from "lucide-react";
@@ -193,7 +193,6 @@ const JobsDateFilter = ({ date, setDate }: JobsDateFilterProps) => {
             <div className="grid grid-cols-2 gap-2">
               <Button 
                 variant="outline"
-
                 size="sm" 
                 className="justify-start"
                 onClick={() => selectCurrentPreset("today")}
