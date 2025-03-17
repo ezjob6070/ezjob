@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { initialJobs } from "@/data/jobs";
 import { initialTechnicians } from "@/data/technicians";
@@ -11,6 +12,7 @@ import JobHeader from "@/components/jobs/JobHeader";
 import CreateJobModal from "@/components/jobs/CreateJobModal";
 import { Job } from "@/components/jobs/JobTypes";
 import { toast } from "@/hooks/use-toast";
+import { useJobSources } from "@/hooks/useJobSources";
 
 // Mock job sources data - in a real app, this would come from an API or store
 const JOB_SOURCES = [
@@ -31,6 +33,8 @@ const JOB_CATEGORIES = [
 
 const Jobs = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
+  const [jobSourceSearchQuery, setJobSourceSearchQuery] = useState("");
   
   const {
     jobs,
@@ -60,12 +64,16 @@ const Jobs = () => {
     handleCompleteJob,
     handleRescheduleJob,
     openStatusModal,
-    closeStatusModal
-  } = useJobsData(initialJobs);
+    closeStatusModal,
+    toggleJobSource,
+    selectAllJobSources,
+    deselectAllJobSources
+  } = useJobsData(initialJobs, JOB_SOURCES.map(source => source.name));
 
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
   const technicianNames = initialTechnicians.map(tech => tech.name);
   const technicianOptions = initialTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
+  const jobSourceNames = JOB_SOURCES.map(source => source.name);
 
   const addCategory = (category: string) => {
     setCategories(prev => [...prev, category]);
@@ -97,7 +105,12 @@ const Jobs = () => {
     selectAllTechnicians,
     deselectAllTechnicians,
     clearFilters,
-    applyFilters
+    applyFilters,
+    jobSourceNames,
+    selectedJobSources,
+    toggleJobSource,
+    selectAllJobSources,
+    deselectAllJobSources
   });
 
   return (
@@ -124,6 +137,7 @@ const Jobs = () => {
         dateRangeComponent={filterComponents.dateRangeComponent}
         amountFilterComponent={filterComponents.amountFilterComponent}
         paymentMethodComponent={filterComponents.paymentMethodComponent}
+        jobSourceComponent={filterComponents.jobSourceComponent}
         selectedJob={selectedJob}
         isStatusModalOpen={isStatusModalOpen}
         openStatusModal={openStatusModal}

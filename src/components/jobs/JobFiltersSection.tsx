@@ -1,12 +1,12 @@
 
-import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
-import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
+import { AmountRange } from "./AmountFilter";
+import { PaymentMethod } from "./JobTypes";
+import FilterContent from "@/components/finance/technician-filters/FilterContent";
+import AmountFilter from "./AmountFilter";
+import PaymentMethodFilter from "./PaymentMethodFilter";
 import DateRangeFilter from "@/components/finance/technician-filters/DateRangeFilter";
-import AmountFilter, { AmountRange } from "@/components/jobs/AmountFilter";
-import PaymentMethodFilter from "@/components/jobs/PaymentMethodFilter";
-import { PaymentMethod } from "@/components/jobs/JobTypes";
+import JobSourceFilter from "./JobSourceFilter";
 
 interface JobFiltersSectionProps {
   technicianNames: string[];
@@ -27,6 +27,11 @@ interface JobFiltersSectionProps {
   deselectAllTechnicians: () => void;
   clearFilters: () => void;
   applyFilters: () => void;
+  jobSourceNames?: string[];
+  selectedJobSources?: string[];
+  toggleJobSource?: (sourceName: string) => void;
+  selectAllJobSources?: () => void;
+  deselectAllJobSources?: () => void;
 }
 
 const JobFiltersSection = ({
@@ -47,37 +52,54 @@ const JobFiltersSection = ({
   selectAllTechnicians,
   deselectAllTechnicians,
   clearFilters,
-  applyFilters
+  applyFilters,
+  jobSourceNames = [],
+  selectedJobSources = [],
+  toggleJobSource = () => {},
+  selectAllJobSources = () => {},
+  deselectAllJobSources = () => {}
 }: JobFiltersSectionProps) => {
-  
-  const renderFiltersComponent = () => {
-    return (
-      <>
-        <CategoryFilter 
-          selectedCategories={selectedCategories}
-          toggleCategory={toggleCategory}
-          categories={categories}
-          addCategory={addCategory}
-        />
-        
-        <CompactTechnicianFilter 
-          technicianNames={technicianNames}
-          selectedTechnicians={selectedTechnicians}
-          toggleTechnician={toggleTechnician}
-          clearFilters={clearFilters}
-          applyFilters={applyFilters}
-          selectAllTechnicians={selectAllTechnicians}
-          deselectAllTechnicians={deselectAllTechnicians}
-        />
-      </>
-    );
-  };
+  // Create components
+  const filtersComponent = (
+    <FilterContent
+      technicianNames={technicianNames}
+      selectedTechnicians={selectedTechnicians}
+      toggleTechnician={toggleTechnician}
+      date={date}
+      setDate={setDate}
+      selectAllTechnicians={selectAllTechnicians}
+      deselectAllTechnicians={deselectAllTechnicians}
+    />
+  );
+
+  const dateRangeComponent = (
+    <DateRangeFilter date={date} setDate={setDate} compact={true} />
+  );
+
+  const amountFilterComponent = (
+    <AmountFilter value={amountRange} onChange={setAmountRange} />
+  );
+
+  const paymentMethodComponent = (
+    <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
+  );
+
+  const jobSourceComponent = (
+    <JobSourceFilter
+      jobSourceNames={jobSourceNames}
+      selectedJobSources={selectedJobSources}
+      toggleJobSource={toggleJobSource}
+      selectAllJobSources={selectAllJobSources}
+      deselectAllJobSources={deselectAllJobSources}
+    />
+  );
 
   return {
-    filtersComponent: renderFiltersComponent(),
-    dateRangeComponent: <DateRangeFilter date={date} setDate={setDate} compact />,
-    amountFilterComponent: <AmountFilter selectedRange={amountRange} onRangeChange={setAmountRange} />,
-    paymentMethodComponent: <PaymentMethodFilter selectedMethod={paymentMethod} onMethodChange={setPaymentMethod} />
+    filtersComponent,
+    dateRangeComponent,
+    amountFilterComponent,
+    paymentMethodComponent,
+    jobSourceComponent
   };
 };
 

@@ -6,12 +6,13 @@ import { DateRange } from "react-day-picker";
 import { addDays, isSameDay, isWithinInterval, startOfDay } from "date-fns";
 import { toast } from "@/hooks/use-toast";
 
-export const useJobsData = (initialJobs: Job[]) => {
+export const useJobsData = (initialJobs: Job[], jobSourceNames: string[] = []) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs);
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
   
   // Initialize date range to today
   const today = new Date();
@@ -116,6 +117,13 @@ export const useJobsData = (initialJobs: Job[]) => {
       );
     }
 
+    // Filter by job source if any are selected
+    if (selectedJobSources.length > 0) {
+      result = result.filter(job => 
+        job.source && selectedJobSources.includes(job.source)
+      );
+    }
+
     if (date?.from) {
       const fromDate = startOfDay(date.from);
       const toDate = date.to ? startOfDay(date.to) : fromDate;
@@ -153,7 +161,7 @@ export const useJobsData = (initialJobs: Job[]) => {
     }
 
     setFilteredJobs(result);
-  }, [jobs, searchTerm, selectedTechnicians, selectedCategories, date, amountRange, paymentMethod, appliedFilters]);
+  }, [jobs, searchTerm, selectedTechnicians, selectedCategories, selectedJobSources, date, amountRange, paymentMethod, appliedFilters]);
 
   const toggleTechnician = (techName: string) => {
     setSelectedTechnicians(prev => 
@@ -171,6 +179,14 @@ export const useJobsData = (initialJobs: Job[]) => {
     );
   };
 
+  const toggleJobSource = (sourceName: string) => {
+    setSelectedJobSources(prev => 
+      prev.includes(sourceName) 
+        ? prev.filter(s => s !== sourceName)
+        : [...prev, sourceName]
+    );
+  };
+
   const selectAllTechnicians = () => {
     setSelectedTechnicians(prevTechnicians => [...prevTechnicians]);
   };
@@ -179,9 +195,18 @@ export const useJobsData = (initialJobs: Job[]) => {
     setSelectedTechnicians([]);
   };
 
+  const selectAllJobSources = () => {
+    setSelectedJobSources(jobSourceNames);
+  };
+
+  const deselectAllJobSources = () => {
+    setSelectedJobSources([]);
+  };
+
   const clearFilters = () => {
     setSelectedTechnicians([]);
     setSelectedCategories([]);
+    setSelectedJobSources([]);
     setDate(undefined);
     setAmountRange(null);
     setPaymentMethod(null);
@@ -194,6 +219,7 @@ export const useJobsData = (initialJobs: Job[]) => {
 
   const hasActiveFilters = appliedFilters || 
     selectedCategories.length > 0 || 
+    selectedJobSources.length > 0 ||
     date?.from || 
     amountRange || 
     paymentMethod;
@@ -206,6 +232,7 @@ export const useJobsData = (initialJobs: Job[]) => {
     setSearchTerm,
     selectedTechnicians,
     selectedCategories,
+    selectedJobSources,
     date,
     amountRange,
     paymentMethod,
@@ -215,11 +242,14 @@ export const useJobsData = (initialJobs: Job[]) => {
     isStatusModalOpen,
     toggleTechnician,
     toggleCategory,
+    toggleJobSource,
     setDate,
     setAmountRange,
     setPaymentMethod,
     selectAllTechnicians,
     deselectAllTechnicians,
+    selectAllJobSources,
+    deselectAllJobSources,
     clearFilters,
     applyFilters,
     handleCancelJob,
