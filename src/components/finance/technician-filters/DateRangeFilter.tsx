@@ -53,6 +53,10 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
       case "today":
         setDate({ from: today, to: today });
         break;
+      case "tomorrow":
+        const tomorrow = addDays(today, 1);
+        setDate({ from: tomorrow, to: tomorrow });
+        break;
       case "this-week":
         const thisWeekStart = startOfWeek(today, { weekStartsOn: 1 });
         const thisWeekEnd = endOfWeek(today, { weekStartsOn: 1 });
@@ -96,56 +100,67 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, setDate, compac
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <CalendarComponent
-          initialFocus
-          mode="range"
-          defaultMonth={date?.from}
-          selected={date}
-          onSelect={setDate}
-          numberOfMonths={2}
-          className="p-3 pointer-events-auto"
-        />
-        
-        <div className="p-2 flex justify-between border-t">
-          <div className="space-y-1">
-            <div className="text-xs font-semibold mb-1">Past</div>
-            <div className="grid grid-cols-1 gap-1">
-              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("yesterday")}>
-                Yesterday
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-week")}>
-                Last Week
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-month")}>
-                Last Month
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-60-days")}>
-                Last 60 Days
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-year")}>
-                Last Year
-              </Button>
-            </div>
+        <div className="flex">
+          {/* Left side - Calendar */}
+          <div className="p-3">
+            <CalendarComponent
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={setDate}
+              numberOfMonths={1}
+              className="pointer-events-auto"
+            />
           </div>
           
-          <div className="space-y-1">
-            <div className="text-xs font-semibold mb-1">Present / Future</div>
-            <div className="grid grid-cols-1 gap-1">
-              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("today")}>
-                Today
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("this-week")}>
-                This Week
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("next-week")}>
-                Next Week
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("this-month")}>
-                This Month
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("next-month")}>
-                Next Month
-              </Button>
+          {/* Right side - Date presets */}
+          <div className="p-3 border-l min-w-[200px]">
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Present & Future</h4>
+                <div className="grid grid-cols-1 gap-1">
+                  <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("today")}>
+                    Today
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("tomorrow")}>
+                    Tomorrow
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("this-week")}>
+                    This Week
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("next-week")}>
+                    Next Week
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("this-month")}>
+                    This Month
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleFutureDatePreset("next-month")}>
+                    Next Month
+                  </Button>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Past</h4>
+                <div className="grid grid-cols-1 gap-1">
+                  <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("yesterday")}>
+                    Yesterday
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-week")}>
+                    Last Week
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-month")}>
+                    Last Month
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-60-days")}>
+                    Last 60 Days
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handlePastDatePreset("last-year")}>
+                    Last Year
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
