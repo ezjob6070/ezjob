@@ -34,7 +34,7 @@ const DateFilterDropdown = ({
           {selectedLabel}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent align="start" side="bottom" className="z-50">
         {dateFilters.map((filter) => (
           <DropdownMenuItem 
             key={filter.value}
