@@ -65,7 +65,7 @@ export function TechnicianPaymentFields({
               onValueChange={(value) => {
                 field.onChange(value as SalaryBasis);
               }}
-              defaultValue={defaultSalaryBasis || undefined}
+              defaultValue={defaultSalaryBasis}
             >
               <FormControl>
                 <SelectTrigger>
@@ -107,7 +107,7 @@ export function TechnicianPaymentFields({
               onValueChange={(value) => {
                 field.onChange(value as IncentiveType);
               }}
-              defaultValue={defaultIncentiveType || undefined}
+              defaultValue={defaultIncentiveType}
             >
               <FormControl>
                 <SelectTrigger>

@@ -20,6 +20,7 @@ import { TechnicianBasicInfoFields } from "@/components/technicians/TechnicianBa
 import { TechnicianDateField } from "@/components/technicians/TechnicianDateField";
 import { TechnicianPaymentFields } from "@/components/technicians/form/TechnicianPaymentFields";
 import { TechnicianStatusFields } from "@/components/technicians/form/TechnicianStatusFields";
+import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 export interface EditTechnicianModalProps {
   technician: Technician | null;

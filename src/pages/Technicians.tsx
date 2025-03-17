@@ -1,14 +1,6 @@
-
 import { useState } from "react";
 import { Technician } from "@/types/technician";
 import useTechniciansData from "@/hooks/useTechniciansData";
-import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
-import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
-import TechnicianStats from "@/components/technicians/TechnicianStats";
-import TechniciansList from "@/components/technicians/TechniciansList";
-import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
-import TechnicianFilters from "@/components/technicians/TechnicianFilters";
-import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 
 const Technicians = () => {

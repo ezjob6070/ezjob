@@ -87,7 +87,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       rating: 5.0,
       // Default salary-related fields if they're used elsewhere
       salaryBasis: values.paymentType === "hourly" ? SalaryBasis.HOURLY : undefined,
-      hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : undefined,
+      hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : 0,
     };
     
     onAddTechnician(newTechnician);

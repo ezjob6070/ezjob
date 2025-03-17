@@ -1,4 +1,6 @@
 
+import { SalaryBasis, IncentiveType } from "./employee";
+
 export type Technician = {
   id: string;
   name: string;
@@ -14,8 +16,8 @@ export type Technician = {
   paymentType: "percentage" | "flat" | "hourly";
   paymentRate: number;
   hourlyRate: number; // Required field, always a number
-  salaryBasis?: "hourly" | "monthly" | "yearly";
-  incentiveType?: "commission" | "bonus" | "none";
+  salaryBasis?: SalaryBasis;
+  incentiveType?: IncentiveType;
   incentiveAmount?: number;
   rating?: number;
   completedJobs?: number;
