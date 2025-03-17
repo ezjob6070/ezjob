@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { format, addDays } from "date-fns";
+import { addDays } from "date-fns";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import MetricsOverview from "@/components/dashboard/MetricsOverview";
