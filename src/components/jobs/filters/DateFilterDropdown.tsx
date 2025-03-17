@@ -33,11 +33,11 @@ const DateFilterDropdown = ({
       <PopoverTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
-          {selectedLabel}
+          Today
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0 bg-popover" align="start" side="bottom" sideOffset={5}>
+      <PopoverContent className="w-[300px] p-0 bg-white" align="start" side="bottom" sideOffset={5}>
         <div className="space-y-2">
           <DateFilterOptions
             dateFilter={selectedDateFilter}
@@ -55,7 +55,7 @@ const DateFilterDropdown = ({
                   setOpen(false);
                 }
               }}
-              className="rounded-md border pointer-events-auto"
+              className="rounded-md border"
             />
           </div>
         </div>
