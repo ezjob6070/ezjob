@@ -1,46 +1,15 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  Filter, 
-  X, 
-  Calendar,
-  ChevronDown,
-  Users
-} from "lucide-react";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue,
-  SelectGroup,
-  SelectLabel
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { 
-  JobFilterProps, 
-  DateFilterType,
-  DateFilterCategory 
-} from "./JobFilterTypes";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from "@/components/ui/tabs";
+import { JobFilterProps } from "./JobFilterTypes";
+import SearchInput from "./filters/SearchInput";
+import TechnicianFilter from "./filters/TechnicianFilter";
+import DateFilter from "./filters/DateFilter";
+import FiltersButton from "./filters/FiltersButton";
+import ResetFiltersButton from "./filters/ResetFiltersButton";
 
 const JobFilters = ({ filters, setFilters, technicians, resetFilters }: JobFilterProps) => {
   const [showFilters, setShowFilters] = useState(false);
-  const [openCalendar, setOpenCalendar] = useState(false);
 
   const updateFilter = <K extends keyof typeof filters>(
     key: K,
@@ -49,7 +18,7 @@ const JobFilters = ({ filters, setFilters, technicians, resetFilters }: JobFilte
     setFilters({ ...filters, [key]: value });
   };
 
-  const handleDateFilterChange = (value: DateFilterType) => {
+  const handleDateFilterChange = (value: typeof filters.dateFilter) => {
     updateFilter("dateFilter", value);
     // Reset custom date range if not using custom filter
     if (value !== "custom") {
@@ -80,170 +49,36 @@ const JobFilters = ({ filters, setFilters, technicians, resetFilters }: JobFilte
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap md:flex-nowrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search jobs..."
-            className="pl-8"
-            value={filters.searchTerm}
-            onChange={(e) => updateFilter("searchTerm", e.target.value)}
-          />
-        </div>
+        <SearchInput 
+          searchTerm={filters.searchTerm} 
+          updateFilter={updateFilter} 
+        />
         
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Users className="h-4 w-4" />
-              {filters.technicianFilter ? 
-                technicians.find(t => t.id === filters.technicianFilter)?.name || "Technician" : 
-                "All Technicians"}
-              <ChevronDown className="h-3 w-3 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0" align="start">
-            <div className="p-2">
-              <div className="space-y-2">
-                <Button 
-                  variant={filters.technicianFilter === "" ? "default" : "outline"} 
-                  className="w-full justify-start text-left"
-                  onClick={() => updateFilter("technicianFilter", "")}
-                >
-                  All Technicians
-                </Button>
-                {technicians.map((tech) => (
-                  <Button 
-                    key={tech.id} 
-                    variant={filters.technicianFilter === tech.id ? "default" : "outline"} 
-                    className="w-full justify-start text-left"
-                    onClick={() => updateFilter("technicianFilter", tech.id)}
-                  >
-                    {tech.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <TechnicianFilter 
+          technicianFilter={filters.technicianFilter} 
+          technicians={technicians} 
+          updateFilter={updateFilter} 
+        />
         
-        <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Calendar className="h-4 w-4" />
-              {getDateFilterLabel()}
-              <ChevronDown className="h-3 w-3 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[300px] p-0" align="start" side="bottom">
-            <Tabs defaultValue="preset" className="w-full">
-              <TabsList className="grid grid-cols-1 mb-2">
-                <TabsTrigger value="preset">Date Options</TabsTrigger>
-              </TabsList>
-              <TabsContent value="preset" className="p-2 space-y-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Button 
-                      variant={filters.dateFilter === "all" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("all")}
-                    >
-                      All Dates
-                    </Button>
-                    <Button 
-                      variant={filters.dateFilter === "today" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("today")}
-                    >
-                      Today
-                    </Button>
-                    <Button 
-                      variant={filters.dateFilter === "tomorrow" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("tomorrow")}
-                    >
-                      Tomorrow
-                    </Button>
-                    <Button 
-                      variant={filters.dateFilter === "thisWeek" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("thisWeek")}
-                    >
-                      This Week
-                    </Button>
-                    <Button 
-                      variant={filters.dateFilter === "nextWeek" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("nextWeek")}
-                    >
-                      Next Week
-                    </Button>
-                    <Button 
-                      variant={filters.dateFilter === "thisMonth" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("thisMonth")}
-                    >
-                      This Month
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <Button 
-                      variant={filters.dateFilter === "yesterday" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("yesterday")}
-                    >
-                      Yesterday
-                    </Button>
-                    <Button 
-                      variant={filters.dateFilter === "lastWeek" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("lastWeek")}
-                    >
-                      Last Week
-                    </Button>
-                    <Button 
-                      variant={filters.dateFilter === "lastMonth" ? "default" : "outline"} 
-                      className="w-full justify-start"
-                      onClick={() => handleDateFilterChange("lastMonth")}
-                    >
-                      Last Month
-                    </Button>
-                  </div>
-                </div>
-                <div className="pt-4">
-                  <CalendarComponent
-                    mode="single"
-                    selected={filters.customDateRange.from}
-                    onSelect={(date) => {
-                      if (date) {
-                        updateFilter("customDateRange", { from: date, to: date });
-                        handleDateFilterChange("custom");
-                      }
-                    }}
-                    className="rounded-md border"
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-          </PopoverContent>
-        </Popover>
+        <DateFilter 
+          dateFilter={filters.dateFilter}
+          customDateRange={filters.customDateRange}
+          updateFilter={updateFilter}
+          handleDateFilterChange={handleDateFilterChange}
+          getDateFilterLabel={getDateFilterLabel}
+        />
         
-        <Button 
-          variant="outline" 
-          onClick={() => setShowFilters(!showFilters)}
-          className="gap-2"
-        >
-          <Filter className="h-4 w-4" />
-          Filters
-        </Button>
+        <FiltersButton 
+          showFilters={showFilters} 
+          setShowFilters={setShowFilters} 
+        />
         <Button variant="outline">Export</Button>
       </div>
       
       {showFilters && (
         <div className="p-4 border rounded-md space-y-4">
           <div className="flex justify-end">
-            <Button variant="outline" size="sm" onClick={resetFilters} className="gap-2">
-              <X className="h-4 w-4" />
-              Reset Filters
-            </Button>
+            <ResetFiltersButton resetFilters={resetFilters} />
           </div>
         </div>
       )}
