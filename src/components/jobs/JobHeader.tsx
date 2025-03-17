@@ -1,29 +1,24 @@
 
-import React from "react";
-import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
 
 interface JobHeaderProps {
   onCreateJob: () => void;
+  extraActions?: ReactNode;
 }
 
-const JobHeader = ({ onCreateJob }: JobHeaderProps) => {
+const JobHeader = ({ onCreateJob, extraActions }: JobHeaderProps) => {
   return (
     <div className="flex justify-between items-center">
-      <div>
-        <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-          Jobs Management
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Create, schedule, and manage jobs and technicians
-        </p>
+      <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
+      <div className="flex gap-2">
+        {extraActions}
+        <Button onClick={onCreateJob}>
+          <PlusIcon className="h-4 w-4 mr-2" />
+          New Job
+        </Button>
       </div>
-      <Button 
-        onClick={onCreateJob}
-        className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
-      >
-        <PlusIcon className="mr-2 h-4 w-4" /> Create Job
-      </Button>
     </div>
   );
 };

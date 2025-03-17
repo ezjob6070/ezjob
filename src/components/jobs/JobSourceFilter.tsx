@@ -30,9 +30,6 @@ const JobSourceFilter = ({
   
   const allSelected = jobSourceNames.length > 0 && 
     selectedJobSources.length === jobSourceNames.length;
-  
-  const someSelected = selectedJobSources.length > 0 && 
-    selectedJobSources.length < jobSourceNames.length;
 
   return (
     <div className="p-4 space-y-4">

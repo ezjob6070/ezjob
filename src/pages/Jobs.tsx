@@ -10,8 +10,85 @@ import JobFilterInfoBar from "@/components/jobs/JobFilterInfoBar";
 import JobsPageHeader from "@/components/jobs/JobsPageHeader";
 import JobHeader from "@/components/jobs/JobHeader";
 import CreateJobModal from "@/components/jobs/CreateJobModal";
+import JobSourceSidebar from "@/components/jobs/JobSourceSidebar";
 import { Job } from "@/components/jobs/JobTypes";
 import { toast } from "@/hooks/use-toast";
+import { JobSource } from "@/types/jobSource";
+import { FolderIcon } from "lucide-react";
+
+// Sample job sources for demo
+const SAMPLE_JOB_SOURCES: JobSource[] = [
+  { 
+    id: "js1", 
+    name: "Website", 
+    isActive: true, 
+    paymentType: "percentage", 
+    paymentValue: 10, 
+    totalJobs: 120, 
+    totalRevenue: 55000, 
+    profit: 23000,
+    createdAt: new Date()
+  },
+  { 
+    id: "js2", 
+    name: "Referral", 
+    isActive: true, 
+    paymentType: "fixed", 
+    paymentValue: 50, 
+    totalJobs: 80, 
+    totalRevenue: 40000, 
+    profit: 18000,
+    createdAt: new Date()
+  },
+  { 
+    id: "js3", 
+    name: "Google", 
+    isActive: true, 
+    paymentType: "percentage", 
+    paymentValue: 15, 
+    totalJobs: 150, 
+    totalRevenue: 70000,
+    profit: 30000,
+    createdAt: new Date(),
+    website: "https://google.com"
+  },
+  { 
+    id: "js4", 
+    name: "Facebook", 
+    isActive: false, 
+    paymentType: "fixed", 
+    paymentValue: 75, 
+    totalJobs: 65, 
+    totalRevenue: 32000, 
+    profit: 12000,
+    createdAt: new Date(),
+    website: "https://facebook.com"
+  },
+  { 
+    id: "js5", 
+    name: "HomeAdvisor", 
+    isActive: true, 
+    paymentType: "percentage", 
+    paymentValue: 20, 
+    totalJobs: 95, 
+    totalRevenue: 48000, 
+    profit: 22000,
+    createdAt: new Date(),
+    website: "https://homeadvisor.com"
+  },
+  { 
+    id: "js6", 
+    name: "Angi", 
+    isActive: true, 
+    paymentType: "fixed", 
+    paymentValue: 100, 
+    totalJobs: 45, 
+    totalRevenue: 25000, 
+    profit: 10000,
+    createdAt: new Date(),
+    website: "https://angi.com"
+  },
+];
 
 const JOB_SOURCES = [
   { id: "js1", name: "Website" },
@@ -31,6 +108,10 @@ const JOB_CATEGORIES = [
 
 const Jobs = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isJobSourceSidebarOpen, setIsJobSourceSidebarOpen] = useState(false);
+  const [isCreateJobSourceModalOpen, setIsCreateJobSourceModalOpen] = useState(false);
+  const [selectedJobSourceForEdit, setSelectedJobSourceForEdit] = useState<JobSource | null>(null);
+  const [jobSources, setJobSources] = useState<JobSource[]>(SAMPLE_JOB_SOURCES);
   
   const {
     jobs,
@@ -84,6 +165,19 @@ const Jobs = () => {
     });
   };
 
+  const handleAddJobSource = () => {
+    setIsCreateJobSourceModalOpen(true);
+  };
+
+  const handleEditJobSource = (jobSource: JobSource) => {
+    setSelectedJobSourceForEdit(jobSource);
+    setIsCreateJobSourceModalOpen(true);
+  };
+
+  const toggleJobSourceSidebar = () => {
+    setIsJobSourceSidebarOpen(!isJobSourceSidebarOpen);
+  };
+
   const filterComponents = JobFiltersSection({
     technicianNames,
     selectedTechnicians,
@@ -112,7 +206,20 @@ const Jobs = () => {
 
   return (
     <div className="space-y-6 py-8">
-      <JobHeader onCreateJob={() => setIsCreateModalOpen(true)} />
+      <JobHeader 
+        onCreateJob={() => setIsCreateModalOpen(true)} 
+        extraActions={
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={toggleJobSourceSidebar}
+            className="flex items-center gap-2"
+          >
+            <FolderIcon className="h-4 w-4" />
+            Job Sources
+          </Button>
+        }
+      />
 
       <JobStats jobs={filteredJobs} date={date} />
       
@@ -147,6 +254,14 @@ const Jobs = () => {
         onAddJob={handleAddJob}
         technicians={technicianOptions}
         jobSources={JOB_SOURCES}
+      />
+
+      <JobSourceSidebar 
+        jobSources={jobSources}
+        isOpen={isJobSourceSidebarOpen}
+        onClose={() => setIsJobSourceSidebarOpen(false)}
+        onAddJobSource={handleAddJobSource}
+        onEditJobSource={handleEditJobSource}
       />
     </div>
   );
