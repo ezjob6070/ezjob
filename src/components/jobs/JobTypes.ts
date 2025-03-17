@@ -1,42 +1,31 @@
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
-export type PaymentMethod = "credit_card" | "check" | "cash" | "zelle" | "other" | string;
+
+export type PaymentMethod = "credit_card" | "cash" | "check" | "zelle" | "venmo" | "paypal";
 
 export interface Job {
   id: string;
   clientName: string;
-  clientId?: string;
-  title?: string; // Optional now
+  title?: string;
   status: JobStatus;
   date: Date;
   scheduledDate?: Date;
-  technicianName?: string;
+  isAllDay?: boolean;
   technicianId?: string;
-  address: string;
-  amount?: number; // Optional as it's only an estimate
-  actualAmount?: number; // Added for when a job is completed
+  technicianName?: string;
+  address?: string;
+  amount?: number;
+  actualAmount?: number;
   paymentMethod?: PaymentMethod;
   description?: string;
   notes?: string;
-  createdAt?: Date;
-  clientPhone?: string;
-  clientEmail?: string;
-  jobSourceId?: string;
-  jobSourceName?: string;
-  isAllDay?: boolean; // Added for all-day jobs
-  parts?: string; // Added for tracking parts used
-  cancellationReason?: string; // Added for storing cancellation reasons
+  cancellationReason?: string;
+  source?: string; // Add this to support job source filtering
 }
 
-// Utility types for job filtering
-export type JobsByDate = {
-  [date: string]: Job[];
-};
-
-export type FilteredJobs = {
-  scheduled: Job[];
-  in_progress: Job[];
-  completed: Job[];
-  cancelled: Job[];
-  all: Job[];
-};
+export interface JobTab {
+  id: string;
+  label: string;
+  status: JobStatus | "all";
+  count: number;
+}
