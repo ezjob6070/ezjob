@@ -139,82 +139,85 @@ const JobFilters = ({ filters, setFilters, technicians, resetFilters }: JobFilte
                 <TabsTrigger value="preset">Date Options</TabsTrigger>
               </TabsList>
               <TabsContent value="preset" className="p-2 space-y-2">
-                <div className="grid grid-cols-1 gap-2">
-                  <Button 
-                    variant={filters.dateFilter === "all" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("all")}
-                  >
-                    All Dates
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "today" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("today")}
-                  >
-                    Today
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "tomorrow" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("tomorrow")}
-                  >
-                    Tomorrow
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "thisWeek" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("thisWeek")}
-                  >
-                    This Week
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "nextWeek" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("nextWeek")}
-                  >
-                    Next Week
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "thisMonth" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("thisMonth")}
-                  >
-                    This Month
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "yesterday" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("yesterday")}
-                  >
-                    Yesterday
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "lastWeek" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("lastWeek")}
-                  >
-                    Last Week
-                  </Button>
-                  <Button 
-                    variant={filters.dateFilter === "lastMonth" ? "default" : "outline"} 
-                    className="justify-start"
-                    onClick={() => handleDateFilterChange("lastMonth")}
-                  >
-                    Last Month
-                  </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <Button 
+                      variant={filters.dateFilter === "all" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("all")}
+                    >
+                      All Dates
+                    </Button>
+                    <Button 
+                      variant={filters.dateFilter === "today" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("today")}
+                    >
+                      Today
+                    </Button>
+                    <Button 
+                      variant={filters.dateFilter === "tomorrow" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("tomorrow")}
+                    >
+                      Tomorrow
+                    </Button>
+                    <Button 
+                      variant={filters.dateFilter === "thisWeek" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("thisWeek")}
+                    >
+                      This Week
+                    </Button>
+                    <Button 
+                      variant={filters.dateFilter === "nextWeek" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("nextWeek")}
+                    >
+                      Next Week
+                    </Button>
+                    <Button 
+                      variant={filters.dateFilter === "thisMonth" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("thisMonth")}
+                    >
+                      This Month
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <Button 
+                      variant={filters.dateFilter === "yesterday" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("yesterday")}
+                    >
+                      Yesterday
+                    </Button>
+                    <Button 
+                      variant={filters.dateFilter === "lastWeek" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("lastWeek")}
+                    >
+                      Last Week
+                    </Button>
+                    <Button 
+                      variant={filters.dateFilter === "lastMonth" ? "default" : "outline"} 
+                      className="w-full justify-start"
+                      onClick={() => handleDateFilterChange("lastMonth")}
+                    >
+                      Last Month
+                    </Button>
+                  </div>
                 </div>
                 <div className="pt-4">
                   <CalendarComponent
-                    mode="range"
-                    selected={filters.customDateRange}
-                    onSelect={(range) => {
-                      if (range) {
-                        updateFilter("customDateRange", range);
+                    mode="single"
+                    selected={filters.customDateRange.from}
+                    onSelect={(date) => {
+                      if (date) {
+                        updateFilter("customDateRange", { from: date, to: date });
                         handleDateFilterChange("custom");
                       }
                     }}
-                    numberOfMonths={1}
                     className="rounded-md border"
                   />
                 </div>

@@ -24,7 +24,7 @@ export const useJobFilters = (jobs: Job[]) => {
   const [filters, setFilters] = useState<JobFilters>({
     searchTerm: "",
     technicianFilter: "",
-    dateFilter: "all",
+    dateFilter: "today",
     customDateRange: {
       from: undefined,
       to: undefined
@@ -35,7 +35,7 @@ export const useJobFilters = (jobs: Job[]) => {
     setFilters({
       searchTerm: "",
       technicianFilter: "",
-      dateFilter: "all",
+      dateFilter: "today",
       customDateRange: { from: undefined, to: undefined }
     });
   };
