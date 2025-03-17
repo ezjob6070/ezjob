@@ -56,6 +56,12 @@ const CalendarView = ({
     return "";
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      updateSelectedDateItems(date);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -68,8 +74,8 @@ const CalendarView = ({
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={(date) => date && updateSelectedDateItems(date)}
-                className="border rounded-md shadow-sm w-full max-w-md mx-auto"
+                onSelect={handleDateSelect}
+                className="border rounded-md shadow-sm w-full max-w-3xl mx-auto"
                 modifiers={{
                   hasEvents: (date) => 
                     jobs.some(job => isSameDay(job.date, date)) || 
@@ -87,19 +93,20 @@ const CalendarView = ({
                       <button 
                         type="button"
                         className={cn(
-                          "h-10 w-10 p-0 aria-selected:opacity-100 rounded-md relative",
+                          "h-11 w-11 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto",
                           getDayClassName(date),
                           isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                           isOutsideMonth && "text-muted-foreground opacity-50"
                         )}
                         disabled={isOutsideMonth}
+                        onClick={() => handleDateSelect(date)}
                         {...props}
                       >
-                        {format(date, "d")}
+                        <span className="text-base">{format(date, "d")}</span>
                         {(jobs.some(job => isSameDay(job.date, date)) || 
                           tasks.some(task => isSameDay(task.dueDate, date))) && 
                           !isSelected && (
-                          <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-0.5">
+                          <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
                             {jobs.some(job => isSameDay(job.date, date)) && (
                               <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                             )}
@@ -117,19 +124,19 @@ const CalendarView = ({
             <div className="flex justify-center gap-6 mt-4 px-4 w-full">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
-                <span className="text-xs">Jobs</span>
+                <span className="text-sm">Jobs</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-500"></div>
-                <span className="text-xs">Tasks</span>
+                <span className="text-sm">Tasks</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-500"></div>
-                <span className="text-xs">Both</span>
+                <span className="text-sm">Both</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-100 border border-red-500"></div>
-                <span className="text-xs">High Priority</span>
+                <span className="text-sm">High Priority</span>
               </div>
             </div>
           </CardContent>
@@ -137,7 +144,7 @@ const CalendarView = ({
         
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle>
+            <CardTitle className="text-xl">
               {format(selectedDate, "EEEE, MMMM d, yyyy")}
             </CardTitle>
           </CardHeader>

@@ -8,6 +8,7 @@ interface DatePickerProps {
   onSelect?: (date: Date | DateRange | Date[] | undefined) => void;
   disabled?: boolean;
   initialFocus?: boolean;
+  className?: string;
 }
 
 export function DatePicker({
@@ -16,6 +17,7 @@ export function DatePicker({
   onSelect,
   disabled = false,
   initialFocus = false,
+  className,
 }: DatePickerProps) {
   // We need to pass proper props based on the mode
   if (mode === "single") {
@@ -26,7 +28,7 @@ export function DatePicker({
         onSelect={onSelect as (date: Date | undefined) => void}
         disabled={disabled}
         initialFocus={initialFocus}
-        className="p-0"
+        className={className}
       />
     );
   } else if (mode === "range") {
@@ -37,7 +39,7 @@ export function DatePicker({
         onSelect={onSelect as (date: DateRange | undefined) => void}
         disabled={disabled}
         initialFocus={initialFocus}
-        className="p-0"
+        className={className}
       />
     );
   } else {
@@ -48,7 +50,7 @@ export function DatePicker({
         onSelect={onSelect as (date: Date[] | undefined) => void}
         disabled={disabled}
         initialFocus={initialFocus}
-        className="p-0"
+        className={className}
       />
     );
   }
