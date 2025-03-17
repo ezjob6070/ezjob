@@ -12,7 +12,14 @@ export const useJobsData = (initialJobs: Job[]) => {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs);
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
+  
+  // Initialize date range to today
+  const today = new Date();
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: today,
+    to: today,
+  });
+  
   const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [appliedFilters, setAppliedFilters] = useState(false);

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { initialJobs } from "@/data/jobs";
 import { initialTechnicians } from "@/data/technicians";
