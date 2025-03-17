@@ -1,11 +1,9 @@
 
 import { format } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
-import { cn } from "@/lib/utils";
+import TaskCard from "@/components/calendar/components/TaskCard";
 
 interface TasksViewProps {
   selectedDate: Date;
@@ -21,61 +19,45 @@ const TasksView = ({
   onNextDay 
 }: TasksViewProps) => {
   return (
-    <Card className="shadow-sm">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onPreviousDay}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          
-          <CardTitle>{format(selectedDate, "EEEE, MMMM d, yyyy")}</CardTitle>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onNextDay}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onPreviousDay}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        <h3 className="text-lg font-medium">
+          {format(selectedDate, "EEEE, MMMM d, yyyy")}
+        </h3>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onNextDay}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      <div className="space-y-4">
+        <h3 className="font-medium">
+          Tasks ({tasksForSelectedDate.length})
+        </h3>
+        
         {tasksForSelectedDate.length === 0 ? (
-          <p className="text-center text-muted-foreground py-4">No tasks due for this day</p>
+          <p className="text-sm text-muted-foreground">No tasks scheduled for this day.</p>
         ) : (
           <div className="space-y-4">
-            {tasksForSelectedDate.map(task => (
-              <Card key={task.id} className="overflow-hidden shadow-sm">
-                <CardContent className="p-4">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <h3 className="font-medium">{task.title}</h3>
-                      <p className="text-sm text-muted-foreground">{task.client.name}</p>
-                    </div>
-                    <div className="text-right">
-                      <Badge 
-                        className={cn(
-                          task.priority === "low" && "bg-blue-500",
-                          task.priority === "medium" && "bg-yellow-500",
-                          task.priority === "high" && "bg-red-500"
-                        )}
-                      >
-                        {task.priority}
-                      </Badge>
-                      <p className="text-sm text-muted-foreground mt-1 capitalize">{task.status}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {tasksForSelectedDate.map((task) => (
+              <TaskCard key={task.id} task={task} />
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

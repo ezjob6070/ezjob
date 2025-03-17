@@ -11,6 +11,7 @@ import CalendarView from "@/components/schedule/CalendarView";
 import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
+import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 
 const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -18,6 +19,7 @@ const Schedule = () => {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
+  const [activeTab, setActiveTab] = useState("calendar");
 
   const updateSelectedDateItems = (date: Date) => {
     const filteredJobs = jobs.filter(job => isSameDay(job.date, date));
@@ -61,12 +63,25 @@ const Schedule = () => {
         </Button>
       </div>
 
-      <Tabs defaultValue="calendar" className="w-full">
+      <Tabs 
+        defaultValue="calendar" 
+        className="w-full"
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
         <TabsList className="mb-4">
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="jobs">Jobs</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
         </TabsList>
+        
+        {(activeTab === "jobs" || activeTab === "tasks") && (
+          <CompactFilterBar 
+            jobs={jobs} 
+            tasks={tasks} 
+            selectedTabValue={activeTab} 
+          />
+        )}
         
         <TabsContent value="calendar" className="space-y-6">
           <CalendarView 
