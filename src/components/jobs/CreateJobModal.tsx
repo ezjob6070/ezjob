@@ -32,6 +32,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Job, JobStatus } from "./JobTypes";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -48,7 +49,7 @@ const timeOptions = [
   "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM"
 ];
 
-// Update the form schema to make title optional
+// Update the form schema with the new fields
 const formSchema = z.object({
   title: z.string().optional(),
   clientName: z.string().min(2, "Client name must be at least 2 characters"),
@@ -60,9 +61,10 @@ const formSchema = z.object({
   date: z.date({
     required_error: "Please select a date",
   }),
-  time: z.string().min(1, "Please select a time"),
+  isAllDay: z.boolean().default(false),
+  time: z.string().optional(),
   amount: z.coerce.number().optional(),
-  description: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -84,21 +86,35 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       clientAddress: "",
       technicianId: "",
       jobSourceId: "",
+      isAllDay: false,
+      time: "",
       amount: undefined,
-      description: "",
+      notes: "",
     },
   });
+
+  // Watch the isAllDay field to conditionally show/hide the time field
+  const isAllDay = form.watch("isAllDay");
 
   const onSubmit = (values: FormValues) => {
     // Find technician name
     const technician = technicians.find(tech => tech.id === values.technicianId);
     
-    // Create date with time
-    const [hours, minutes] = values.time.split(":").map(part => parseInt(part.split(" ")[0]));
-    const isPM = values.time.includes("PM");
-    const scheduledHours = isPM && hours !== 12 ? hours + 12 : hours;
-    const scheduledDate = new Date(values.date);
-    scheduledDate.setHours(scheduledHours, minutes, 0, 0);
+    // Create date with time if not all day
+    let scheduledDate = new Date(values.date);
+    
+    if (!values.isAllDay && values.time) {
+      const timeParts = values.time.split(/[: ]/);
+      const hours = parseInt(timeParts[0]);
+      const minutes = parseInt(timeParts[1]);
+      const isPM = values.time.includes("PM");
+      
+      const scheduledHours = isPM && hours !== 12 ? hours + 12 : hours;
+      scheduledDate.setHours(scheduledHours, minutes, 0, 0);
+    } else {
+      // For all-day events, set to start of day
+      scheduledDate.setHours(9, 0, 0, 0);
+    }
     
     // Generate new job - defaulting to in_progress status
     const newJob: Job = {
@@ -109,6 +125,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       technicianId: values.technicianId,
       date: scheduledDate,
       scheduledDate: scheduledDate,
+      isAllDay: values.isAllDay,
       address: values.clientAddress,
       status: "in_progress" as JobStatus,
       createdAt: new Date(),
@@ -123,8 +140,8 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       newJob.amount = values.amount;
     }
 
-    if (values.description) {
-      newJob.description = values.description;
+    if (values.notes) {
+      newJob.notes = values.notes;
     }
 
     if (values.clientEmail) {
@@ -357,55 +374,80 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Time *</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                      >
+                <div className="space-y-5">
+                  <FormField
+                    control={form.control}
+                    name="isAllDay"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a time">
-                              <div className="flex items-center">
-                                {field.value ? (
-                                  field.value
-                                ) : (
-                                  <span>Select a time</span>
-                                )}
-                              </div>
-                            </SelectValue>
-                          </SelectTrigger>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
-                        <SelectContent>
-                          {timeOptions.map((time) => (
-                            <SelectItem key={time} value={time}>
-                              <div className="flex items-center">
-                                <Clock className="mr-2 h-4 w-4" />
-                                {time}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>All Day</FormLabel>
+                          <FormDescription>
+                            Job will be scheduled for the entire day
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  {!isAllDay && (
+                    <FormField
+                      control={form.control}
+                      name="time"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Time</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a time">
+                                  <div className="flex items-center">
+                                    {field.value ? (
+                                      field.value
+                                    ) : (
+                                      <span>Select a time</span>
+                                    )}
+                                  </div>
+                                </SelectValue>
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {timeOptions.map((time) => (
+                                <SelectItem key={time} value={time}>
+                                  <div className="flex items-center">
+                                    <Clock className="mr-2 h-4 w-4" />
+                                    {time}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
+                </div>
               </div>
 
               <FormField
                 control={form.control}
-                name="description"
+                name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Job Description (Optional)</FormLabel>
+                    <FormLabel>Special Notes (Optional)</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Describe the job details..."
+                        placeholder="Add any special notes about the job..."
                         className="min-h-[100px]"
                         {...field} 
                       />

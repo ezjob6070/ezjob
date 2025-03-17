@@ -12,7 +12,7 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Button } from "@/components/ui/button";
 import { Job } from "./JobTypes";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal } from "lucide-react";
+import { AlarmClock, Clock, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,7 +39,8 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
   const filteredJobs = jobsData.filter(job =>
     job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    job.technicianName?.toLowerCase().includes(searchTerm.toLowerCase() || '')
+    job.technicianName?.toLowerCase().includes(searchTerm.toLowerCase() || '') ||
+    job.jobSourceName?.toLowerCase().includes(searchTerm.toLowerCase() || '')
   );
 
   const getStatusBadgeColor = (status: string) => {
@@ -61,6 +62,18 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
     return status.replace('_', ' ').replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
+  const formatDateTime = (date: Date, isAllDay?: boolean) => {
+    if (isAllDay) {
+      return (
+        <div className="flex items-center">
+          <span>{date.toLocaleDateString()}</span>
+          <Badge variant="outline" className="ml-2 text-xs">All Day</Badge>
+        </div>
+      );
+    }
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -69,7 +82,8 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
             <TableHead>Client</TableHead>
             <TableHead>Job</TableHead>
             <TableHead>Technician</TableHead>
-            <TableHead>Date</TableHead>
+            <TableHead>Source</TableHead>
+            <TableHead>Date/Time</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead className="text-right">Status</TableHead>
             <TableHead className="w-[80px]">Actions</TableHead>
@@ -87,7 +101,12 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
               <TableCell>
                 {job.technicianName || "Unassigned"}
               </TableCell>
-              <TableCell>{job.date.toLocaleDateString()}</TableCell>
+              <TableCell>
+                {job.jobSourceName || "Not specified"}
+              </TableCell>
+              <TableCell>
+                {formatDateTime(job.date, job.isAllDay)}
+              </TableCell>
               <TableCell>
                 {job.actualAmount 
                   ? formatCurrency(job.actualAmount) 
@@ -124,7 +143,7 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
           ))}
           {filteredJobs.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 No jobs found.
               </TableCell>
             </TableRow>

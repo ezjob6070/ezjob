@@ -13,6 +13,16 @@ import CreateJobModal from "@/components/jobs/CreateJobModal";
 import { Job } from "@/components/jobs/JobTypes";
 import { toast } from "@/hooks/use-toast";
 
+// Mock job sources data - in a real app, this would come from an API or store
+const JOB_SOURCES = [
+  { id: "js1", name: "Website" },
+  { id: "js2", name: "Referral" },
+  { id: "js3", name: "Google" },
+  { id: "js4", name: "Facebook" },
+  { id: "js5", name: "HomeAdvisor" },
+  { id: "js6", name: "Angi" },
+];
+
 const JOB_CATEGORIES = [
   "Plumbing",
   "HVAC",
@@ -124,6 +134,7 @@ const Jobs = () => {
         onOpenChange={setIsCreateModalOpen}
         onAddJob={handleAddJob}
         technicians={technicianOptions}
+        jobSources={JOB_SOURCES}
       />
     </div>
   );

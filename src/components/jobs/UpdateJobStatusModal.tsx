@@ -68,6 +68,16 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
               <p className="text-sm text-muted-foreground">
                 Initial Estimate: {job.amount ? formatCurrency(job.amount) : "No estimate provided"}
               </p>
+              {job.notes && (
+                <p className="text-sm text-muted-foreground">
+                  Special Notes: {job.notes}
+                </p>
+              )}
+              {job.jobSourceName && (
+                <p className="text-sm text-muted-foreground">
+                  Source: {job.jobSourceName}
+                </p>
+              )}
             </div>
 
             <RadioGroup value={status} onValueChange={(value) => setStatus(value as "completed" | "cancelled")}>

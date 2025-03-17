@@ -23,6 +23,7 @@ export interface Job {
   clientEmail?: string;
   jobSourceId?: string;
   jobSourceName?: string;
+  isAllDay?: boolean; // Added for all-day jobs
 }
 
 // Utility types for job filtering
