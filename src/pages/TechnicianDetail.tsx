@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ const TechnicianDetail = () => {
       ...values,
       id: technician.id,
       paymentRate: Number(values.paymentRate),
+      hourlyRate: Number(values.hourlyRate || technician.hourlyRate),
       initials: technician.initials,
       completedJobs: technician.completedJobs,
       cancelledJobs: technician.cancelledJobs,

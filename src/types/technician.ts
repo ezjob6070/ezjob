@@ -8,19 +8,26 @@ export type Technician = {
   position?: string;
   department?: string;
   hireDate: string;
+  startDate?: string;
   status: "active" | "inactive" | "onLeave";
   specialty: string;
   paymentType: "percentage" | "flat" | "hourly";
   paymentRate: number;
   hourlyRate: number; // Required field, always a number
+  salaryBasis?: "hourly" | "monthly" | "yearly";
+  incentiveType?: "commission" | "bonus" | "none";
+  incentiveAmount?: number;
   rating?: number;
   completedJobs?: number;
   cancelledJobs?: number;
   totalRevenue?: number;
   notes?: string;
   profileImage?: string;
+  imageUrl?: string;
   certifications?: string[];
   skills?: string[];
+  category?: string;
+  contractType?: string;
   schedule?: {
     monday: boolean;
     tuesday: boolean;

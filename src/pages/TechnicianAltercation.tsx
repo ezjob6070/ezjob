@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,8 @@ const TechnicianAltercation = () => {
     const updatedTechnician: Technician = {
       ...selectedTechnician!,
       ...values,
-      paymentRate: Number(values.paymentRate) // Ensure it's a number
+      paymentRate: Number(values.paymentRate),
+      hourlyRate: Number(values.hourlyRate || selectedTechnician?.hourlyRate || 0) // Ensure hourlyRate is a number
     };
     
     setTechnicians((prevTechnicians) => 

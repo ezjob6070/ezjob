@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Technician } from "@/types/technician";
 import useTechniciansData from "@/hooks/useTechniciansData";
@@ -53,6 +54,7 @@ const Technicians = () => {
       ...values,
       id: selectedTechnician.id,
       paymentRate: Number(values.paymentRate),
+      hourlyRate: Number(values.hourlyRate || selectedTechnician.hourlyRate),
       initials: selectedTechnician.initials,
       completedJobs: selectedTechnician.completedJobs,
       cancelledJobs: selectedTechnician.cancelledJobs,
