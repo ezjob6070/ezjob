@@ -15,7 +15,7 @@ interface JobFilterBarProps {
 const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
   const [selectedTechnician, setSelectedTechnician] = useState<string>("All Technicians");
-  const [selectedDateFilter, setSelectedDateFilter] = useState<string>("all");
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string>("today"); // Default to today
 
   const technicians = [
     "All Technicians",

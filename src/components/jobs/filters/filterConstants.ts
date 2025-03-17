@@ -8,8 +8,8 @@ export const JOB_CATEGORIES = [
 ];
 
 export const DATE_FILTERS = [
-  { label: "All Dates", value: "all" },
   { label: "Today", value: "today" },
+  { label: "All Dates", value: "all" },
   { label: "This Week", value: "this_week" },
   { label: "Next Week", value: "next_week" },
   { label: "This Month", value: "this_month" },
