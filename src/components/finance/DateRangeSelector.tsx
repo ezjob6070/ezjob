@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, ChevronDown, CalendarRange } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -14,6 +14,7 @@ interface DateRangeSelectorProps {
 }
 
 const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) => {
+  // Always initialize with today's date
   useEffect(() => {
     if (!date?.from) {
       const today = new Date();
@@ -66,48 +67,115 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({ date, setDate }) 
 
   return (
     <div className="flex flex-col space-y-2">
-      <div className="flex justify-center space-x-2">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-between px-3 py-5 text-base font-medium"
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-full justify-between px-3 py-2 text-base font-medium"
+          >
+            <div className="flex items-center">
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date?.from ? (
+                date.to && !isSameDay(date.from, date.to) ? (
+                  <span>
+                    {format(date.from, "MMM dd, yyyy")} - {format(date.to, "MMM dd, yyyy")}
+                  </span>
+                ) : (
+                  <span>Today ({format(date.from, "MMM dd, yyyy")})</span>
+                )
+              ) : (
+                <span>Today</span>
+              )}
+            </div>
+            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start" side="bottom">
+          <div className="p-2 space-y-2">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("today")}
             >
-              <div className="flex flex-col items-center w-full">
-                <span className="text-xs font-semibold text-black uppercase mb-1">CUSTOM RANGE</span>
-                <div className="flex items-center">
-                  <CalendarRange className="mr-2 h-4 w-4" />
-                  {date?.from ? (
-                    date.to ? (
-                      <span>
-                        {format(date.from, "MMM dd, yyyy")} - {format(date.to, "MMM dd, yyyy")}
-                      </span>
-                    ) : (
-                      format(date.from, "MMM dd, yyyy")
-                    )
-                  ) : (
-                    <span>Today</span>
-                  )}
-                </div>
-              </div>
-              <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+              Today
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="center">
-            <Calendar
-              mode="range"
-              defaultMonth={date?.from || new Date()}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={2}
-              className="pointer-events-auto"
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("yesterday")}
+            >
+              Yesterday
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("this-week")}
+            >
+              This Week
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("last-week")}
+            >
+              Last Week
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("this-month")}
+            >
+              This Month
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("last-month")}
+            >
+              Last Month
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("last-30-days")}
+            >
+              Last 30 Days
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("last-90-days")}
+            >
+              Last 90 Days
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("this-year")}
+            >
+              This Year
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start"
+              onClick={() => handleDatePresetSelection("last-year")}
+            >
+              Last Year
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };
+
+// Helper function to check if two dates are the same day
+function isSameDay(date1: Date, date2: Date): boolean {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
 
 export default DateRangeSelector;

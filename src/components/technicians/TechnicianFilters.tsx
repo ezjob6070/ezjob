@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Select, 
@@ -97,40 +96,90 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           </SelectContent>
         </Select>
         
-        {/* Date range filter */}
+        {/* Date range filter with simplified dropdown */}
         {setDate && (
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <CalendarIcon className="h-4 w-4" />
                 {date?.from ? (
-                  date.to ? (
+                  date.to && date.from.toDateString() !== date.to.toDateString() ? (
                     <>
                       {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
                     </>
                   ) : (
-                    format(date.from, "LLL dd, y")
+                    `Today (${format(date.from, "LLL dd, y")})`
                   )
                 ) : (
                   "Date Range"
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={2}
-                className={cn("p-3 pointer-events-auto")}
-              />
+            <PopoverContent className="w-auto p-0" align="start" side="bottom">
+              <div className="p-2 space-y-2">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    const today = new Date();
+                    setDate({ from: today, to: today });
+                  }}
+                >
+                  Today
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    const today = new Date();
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    setDate({ from: yesterday, to: yesterday });
+                  }}
+                >
+                  Yesterday
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    const today = new Date();
+                    const lastWeek = new Date(today);
+                    lastWeek.setDate(lastWeek.getDate() - 7);
+                    setDate({ from: lastWeek, to: today });
+                  }}
+                >
+                  Last 7 days
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    const today = new Date();
+                    const lastMonth = new Date(today);
+                    lastMonth.setMonth(lastMonth.getMonth() - 1);
+                    setDate({ from: lastMonth, to: today });
+                  }}
+                >
+                  Last 30 days
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    const today = new Date();
+                    const thisYear = new Date(today.getFullYear(), 0, 1);
+                    setDate({ from: thisYear, to: today });
+                  }}
+                >
+                  This Year
+                </Button>
+              </div>
             </PopoverContent>
           </Popover>
         )}
 
-        {/* Department filter if available */}
+        {/* Department filter if available - keep as is */}
         {departments.length > 0 && toggleDepartment && (
           <Popover>
             <PopoverTrigger asChild>
@@ -142,7 +191,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72">
+            <PopoverContent className="w-72" align="start" side="bottom">
               <div className="space-y-2">
                 <div className="font-medium">Filter by Department</div>
                 <Separator />
@@ -171,7 +220,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           />
         )}
         
-        {/* Multi-select Technician dropdown */}
+        {/* Simplified Technician dropdown that only shows the list */}
         {technicians.length > 0 && onTechnicianToggle && (
           <TechnicianSelectDropdown
             technicians={technicians}
@@ -192,6 +241,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         </Button>
       </div>
       
+      {/* Keep the rest of the file as is */}
       {/* Advanced filters section */}
       {showAdvancedFilters && (
         <div className="bg-muted/30 p-4 rounded-md space-y-4">
