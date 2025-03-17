@@ -7,7 +7,12 @@ export const JOB_CATEGORIES = [
   "General Maintenance",
 ];
 
-export const DATE_FILTERS = [
+export interface DateFilter {
+  label: string;
+  value: string;
+}
+
+export const DATE_FILTERS: DateFilter[] = [
   { label: "Today", value: "today" },
   { label: "All Dates", value: "all" },
   { label: "This Week", value: "this_week" },
