@@ -63,13 +63,13 @@ const CalendarView = ({
           <CardHeader>
             <CardTitle>Calendar</CardTitle>
           </CardHeader>
-          <CardContent className="pb-6">
-            <div className="flex justify-center items-center w-full mb-4">
+          <CardContent className="pb-8">
+            <div className="flex justify-center items-center w-full mb-6">
               <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={(date) => date && updateSelectedDateItems(date)}
-                className="border rounded-md shadow-sm"
+                className="border rounded-md shadow-sm w-full max-w-md mx-auto"
                 modifiers={{
                   hasEvents: (date) => 
                     jobs.some(job => isSameDay(job.date, date)) || 
@@ -87,7 +87,7 @@ const CalendarView = ({
                       <button 
                         type="button"
                         className={cn(
-                          "h-9 w-9 p-0 aria-selected:opacity-100 rounded-md relative",
+                          "h-10 w-10 p-0 aria-selected:opacity-100 rounded-md relative",
                           getDayClassName(date),
                           isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                           isOutsideMonth && "text-muted-foreground opacity-50"
@@ -101,10 +101,10 @@ const CalendarView = ({
                           !isSelected && (
                           <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-0.5">
                             {jobs.some(job => isSameDay(job.date, date)) && (
-                              <div className="w-1 h-1 rounded-full bg-blue-500"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                             )}
                             {tasks.some(task => isSameDay(task.dueDate, date)) && (
-                              <div className="w-1 h-1 rounded-full bg-red-500"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
                             )}
                           </div>
                         )}

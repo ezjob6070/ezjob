@@ -10,7 +10,7 @@ import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
 import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 
 const Schedule = () => {
@@ -57,7 +57,12 @@ const Schedule = () => {
             Manage your appointments, jobs, and tasks in one place.
           </p>
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2 h-9"
+          onClick={() => setActiveTab("calendar")}
+        >
           <CalendarIcon className="h-4 w-4" />
           Show Calendar
         </Button>
