@@ -71,7 +71,16 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
         </div>
       );
     }
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    
+    return (
+      <div className="flex items-center">
+        <span>{date.toLocaleDateString()}</span>
+        <Badge variant="outline" className="ml-2 text-xs flex items-center">
+          <Clock className="h-3 w-3 mr-1" /> 
+          {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </Badge>
+      </div>
+    );
   };
 
   return (

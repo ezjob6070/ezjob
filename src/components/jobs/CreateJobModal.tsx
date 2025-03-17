@@ -33,6 +33,12 @@ import { Job, JobStatus } from "./JobTypes";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -42,11 +48,11 @@ interface CreateJobModalProps {
   jobSources?: { id: string; name: string }[];
 }
 
+// Time options for quick selection
 const timeOptions = [
-  "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", 
-  "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", 
-  "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", 
-  "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM"
+  "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", 
+  "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", 
+  "04:00 PM", "05:00 PM", "06:00 PM"
 ];
 
 // Update the form schema with the new fields
@@ -62,7 +68,10 @@ const formSchema = z.object({
     required_error: "Please select a date",
   }),
   isAllDay: z.boolean().default(false),
-  time: z.string().optional(),
+  timeSelection: z.enum(["preset", "custom"]).default("preset"),
+  presetTime: z.string().optional(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
   amount: z.coerce.number().optional(),
   notes: z.string().optional(),
 });
@@ -87,7 +96,10 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       technicianId: "",
       jobSourceId: "",
       isAllDay: false,
-      time: "",
+      timeSelection: "preset",
+      presetTime: "",
+      startTime: "09:00",
+      endTime: "10:00",
       amount: undefined,
       notes: "",
     },
@@ -95,6 +107,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
 
   // Watch the isAllDay field to conditionally show/hide the time field
   const isAllDay = form.watch("isAllDay");
+  const timeSelection = form.watch("timeSelection");
 
   const onSubmit = (values: FormValues) => {
     // Find technician name
@@ -103,17 +116,32 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     // Create date with time if not all day
     let scheduledDate = new Date(values.date);
     
-    if (!values.isAllDay && values.time) {
-      const timeParts = values.time.split(/[: ]/);
-      const hours = parseInt(timeParts[0]);
-      const minutes = parseInt(timeParts[1]);
-      const isPM = values.time.includes("PM");
+    if (!values.isAllDay) {
+      let timeString = "";
       
-      const scheduledHours = isPM && hours !== 12 ? hours + 12 : hours;
-      scheduledDate.setHours(scheduledHours, minutes, 0, 0);
+      if (values.timeSelection === "preset" && values.presetTime) {
+        timeString = values.presetTime;
+      } else if (values.timeSelection === "custom" && values.startTime) {
+        timeString = values.startTime;
+      }
+      
+      if (timeString) {
+        const isPM = timeString.includes("PM");
+        let hours = parseInt(timeString.split(":")[0]);
+        const minutes = parseInt(timeString.split(":")[1]?.split(" ")[0] || "0");
+        
+        // Convert 12-hour format to 24-hour if needed
+        if (isPM && hours !== 12) hours += 12;
+        if (!isPM && hours === 12) hours = 0;
+        
+        scheduledDate.setHours(hours, minutes, 0, 0);
+      } else {
+        // Default to 9 AM if no time is specified
+        scheduledDate.setHours(9, 0, 0, 0);
+      }
     } else {
       // For all-day events, set to start of day
-      scheduledDate.setHours(9, 0, 0, 0);
+      scheduledDate.setHours(0, 0, 0, 0);
     }
     
     // Generate new job - defaulting to in_progress status
@@ -163,6 +191,16 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     onAddJob(newJob);
     onOpenChange(false);
     form.reset();
+  };
+
+  // Format time for display
+  const formatTimeOption = (time: string) => {
+    return (
+      <div className="flex items-center">
+        <Clock className="mr-2 h-4 w-4" />
+        {time}
+      </div>
+    );
   };
 
   return (
@@ -387,7 +425,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>All Day</FormLabel>
+                          <FormLabel>All Day Job</FormLabel>
                           <FormDescription>
                             Job will be scheduled for the entire day
                           </FormDescription>
@@ -399,38 +437,98 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   {!isAllDay && (
                     <FormField
                       control={form.control}
-                      name="time"
+                      name="timeSelection"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Time</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select a time">
-                                  <div className="flex items-center">
-                                    {field.value ? (
-                                      field.value
-                                    ) : (
-                                      <span>Select a time</span>
+                          <FormLabel>Time Selection</FormLabel>
+                          <FormControl>
+                            <Tabs 
+                              value={field.value} 
+                              onValueChange={field.onChange}
+                              className="w-full"
+                            >
+                              <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="preset">Preset Time</TabsTrigger>
+                                <TabsTrigger value="custom">Custom Time</TabsTrigger>
+                              </TabsList>
+                              
+                              <TabsContent value="preset">
+                                <FormField
+                                  control={form.control}
+                                  name="presetTime"
+                                  render={({ field }) => (
+                                    <FormItem className="mt-2">
+                                      <FormControl>
+                                        <Select 
+                                          onValueChange={field.onChange} 
+                                          value={field.value}
+                                        >
+                                          <SelectTrigger>
+                                            <SelectValue placeholder="Select a time">
+                                              {field.value ? (
+                                                <div className="flex items-center">
+                                                  <Clock className="mr-2 h-4 w-4" />
+                                                  {field.value}
+                                                </div>
+                                              ) : (
+                                                <span>Select a time</span>
+                                              )}
+                                            </SelectValue>
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {timeOptions.map((time) => (
+                                              <SelectItem key={time} value={time}>
+                                                {formatTimeOption(time)}
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </TabsContent>
+                              
+                              <TabsContent value="custom">
+                                <div className="grid grid-cols-2 gap-2 mt-2">
+                                  <FormField
+                                    control={form.control}
+                                    name="startTime"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>Start Time</FormLabel>
+                                        <FormControl>
+                                          <Input 
+                                            type="time" 
+                                            {...field} 
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
                                     )}
-                                  </div>
-                                </SelectValue>
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {timeOptions.map((time) => (
-                                <SelectItem key={time} value={time}>
-                                  <div className="flex items-center">
-                                    <Clock className="mr-2 h-4 w-4" />
-                                    {time}
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                                  />
+                                  
+                                  <FormField
+                                    control={form.control}
+                                    name="endTime"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>End Time</FormLabel>
+                                        <FormControl>
+                                          <Input 
+                                            type="time" 
+                                            {...field} 
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                </div>
+                              </TabsContent>
+                            </Tabs>
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
