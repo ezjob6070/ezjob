@@ -42,7 +42,7 @@ export const JobsFilterPopovers = () => {
               <span>Date</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start">
+          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
             <JobsDateFilter date={date} setDate={setDate} />
           </PopoverContent>
         </Popover>
@@ -58,7 +58,7 @@ export const JobsFilterPopovers = () => {
               <span>Technicians</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start">
+          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
             <TechnicianFilter
               technicians={[]} // This will be populated from props
               selectedNames={selectedTechnicians}
@@ -80,7 +80,7 @@ export const JobsFilterPopovers = () => {
               <span>Sources</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start">
+          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
             <JobSourceFilter
               jobSourceNames={[]} // This will be populated from props
               selectedJobSources={selectedJobSources}
@@ -102,7 +102,7 @@ export const JobsFilterPopovers = () => {
               <span>Amount</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start">
+          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
             <AmountFilter value={amountRange} onChange={setAmountRange} />
           </PopoverContent>
         </Popover>
@@ -118,7 +118,7 @@ export const JobsFilterPopovers = () => {
               <span>Payment</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start">
+          <PopoverContent className="w-auto p-4" align="start" side="bottom" sideOffset={5}>
             <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
           </PopoverContent>
         </Popover>
