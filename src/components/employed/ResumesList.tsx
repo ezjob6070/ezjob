@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Resume } from "@/types/employee";
+import { Resume, ResumeStatus } from "@/types/employee";
 import { 
   Card, 
   CardContent, 
@@ -26,14 +26,15 @@ const ResumesList = ({ resumes, onStatusChange }: ResumesListProps) => {
   
   // Filter resumes based on search and status
   const filteredResumes = resumes.filter((resume) => {
+    const resumeName = resume.name || resume.candidateName || "";
     const matchesSearch = 
-      resume.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resumeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       resume.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       resume.position.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesStatus = 
       statusFilter === "all" || 
-      resume.status === statusFilter;
+      resume.status.toString().toLowerCase() === statusFilter.toLowerCase();
     
     return matchesSearch && matchesStatus;
   });
@@ -89,17 +90,17 @@ const ResumesList = ({ resumes, onStatusChange }: ResumesListProps) => {
             <Card key={resume.id} className="h-full">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
-                  <CardTitle>{resume.name}</CardTitle>
+                  <CardTitle>{resume.name || resume.candidateName}</CardTitle>
                   <Badge
                     variant={
-                      resume.status === "pending" 
+                      resume.status === ResumeStatus.PENDING 
                         ? "outline" 
-                        : resume.status === "approved" 
+                        : resume.status === ResumeStatus.APPROVED 
                           ? "default" 
                           : "destructive"
                     }
                   >
-                    {resume.status.charAt(0).toUpperCase() + resume.status.slice(1)}
+                    {resume.status.toString().charAt(0).toUpperCase() + resume.status.toString().slice(1).toLowerCase()}
                   </Badge>
                 </div>
                 <p className="text-lg font-medium">{resume.position}</p>
@@ -134,7 +135,7 @@ const ResumesList = ({ resumes, onStatusChange }: ResumesListProps) => {
                 )}
               </CardContent>
               
-              {resume.status === "pending" && (
+              {resume.status === ResumeStatus.PENDING && (
                 <CardFooter className="pt-2 flex justify-between gap-2">
                   <Button 
                     variant="outline" 

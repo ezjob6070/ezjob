@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ const UploadResumeModal = ({ open, onOpenChange, onUploadResume }: UploadResumeM
     position: "",
     experience: "",
     notes: "",
-    resumeUrl: "/path/to/resume.pdf", // In a real app, this would be set after file upload
+    resumeUrl: "/path/to/resume.pdf",
   });
 
   const handleChange = (
@@ -48,15 +47,17 @@ const UploadResumeModal = ({ open, onOpenChange, onUploadResume }: UploadResumeM
     }
 
     // Create new resume object
+    const currentDate = new Date();
     const newResume: Resume = {
       id: `res-${Date.now()}`,
       name: formData.name,
+      candidateName: formData.name,
       email: formData.email,
       phone: formData.phone,
       position: formData.position,
       experience: formData.experience,
       status: ResumeStatus.PENDING,
-      dateSubmitted: new Date(),
+      dateSubmitted: currentDate.toISOString(),
       resumeUrl: formData.resumeUrl,
       notes: formData.notes,
     };

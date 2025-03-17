@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Employee, EmployeeStatus } from "@/types/employee";
+import { Employee, EmployeeStatus, SalaryBasis } from "@/types/employee";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload } from "lucide-react";
 import { v4 as uuidv4 } from 'uuid';
@@ -59,7 +58,6 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
     profileImage: "",
   });
   
-  // For image handling
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [skillInput, setSkillInput] = useState("");
@@ -73,13 +71,10 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Create object URL for preview
       const fileUrl = URL.createObjectURL(file);
       setSelectedImage(file);
       setPreviewUrl(fileUrl);
       
-      // In a real app, you would upload to server here
-      // For this demo, we'll just use the URL directly
       setFormData(prev => ({ ...prev, profileImage: fileUrl }));
     }
   };
@@ -104,7 +99,6 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
     if (!formData.name || !formData.email || !formData.position || !formData.department) {
       toast({
         title: "Error",
@@ -114,14 +108,13 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
       return;
     }
 
-    // Generate initials
     const initials = formData.name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase();
 
-    // Create new employee object
+    const currentDate = new Date();
     const newEmployee: Employee = {
       id: `emp-${uuidv4().slice(0, 8)}`,
       name: formData.name,
@@ -130,8 +123,10 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
       position: formData.position,
       department: formData.department,
       status: EmployeeStatus.ACTIVE,
-      dateHired: new Date(),
+      dateHired: currentDate.toISOString(),
+      hireDate: currentDate.toISOString(),
       salary: parseFloat(formData.salary) || 50000,
+      salaryBasis: SalaryBasis.YEARLY,
       address: formData.address,
       skills: formData.skills,
       performanceRating: 3,
@@ -145,7 +140,6 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
 
     onAddEmployee(newEmployee);
     
-    // Reset form and close modal
     setFormData({
       name: "",
       email: "",
@@ -171,7 +165,6 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
           <DialogTitle>Add New Employee</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          {/* Image upload section */}
           <div className="grid gap-2">
             <Label>Profile Picture</Label>
             <div className="flex flex-col items-center">

@@ -59,8 +59,8 @@ export interface Employee {
   department: string;
   email: string;
   phone: string;
-  hireDate: string; // Keep this for compatibility
-  dateHired: Date | string; // Add this for components that need it
+  hireDate: string; // Date as string
+  dateHired: string | Date; // Support both string and Date
   status: EmployeeStatus;
   salary: number;
   salaryBasis: SalaryBasis;
@@ -97,12 +97,12 @@ export interface Employee {
 
 export interface EmployeeNote {
   id: string;
-  date: string;
+  date?: string;
   content: string;
-  author: string;
-  type: string;
+  author?: string;
+  type?: string;
   // Added missing properties
-  createdAt?: string;
+  createdAt?: string | Date;
   createdBy?: string;
 }
 
@@ -110,32 +110,32 @@ export interface EmployeeDocument {
   id: string;
   name: string;
   type: DocumentType;
-  date: string;
-  fileUrl: string;
-  expiryDate?: string;
+  date?: string;
+  fileUrl?: string;
+  expiryDate?: string | Date;
   notes?: string;
   // Added missing properties
-  dateUploaded?: Date | string;
+  dateUploaded?: string | Date;
   url?: string;
 }
 
 export interface Resume {
   id: string;
-  candidateName: string;
+  candidateName?: string;
+  name?: string;
   email: string;
   phone: string;
   position: string;
-  submissionDate: string;
-  fileUrl: string;
+  submissionDate?: string;
+  fileUrl?: string;
   status: ResumeStatus;
   notes?: string;
   reviewedBy?: string;
   reviewDate?: string;
   // Added missing properties
-  name?: string;
   experience?: string;
   resumeUrl?: string;
-  dateSubmitted?: string;
+  dateSubmitted?: string | Date;
 }
 
 export interface Report {
@@ -150,7 +150,7 @@ export interface Report {
   // Added missing properties
   employeeId?: string;
   status?: string;
-  dateSubmitted?: string;
+  dateSubmitted?: string | Date;
 }
 
 export const SALARY_BASIS_OPTIONS = [

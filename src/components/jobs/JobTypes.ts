@@ -20,7 +20,14 @@ export interface Job {
   description?: string;
   notes?: string;
   cancellationReason?: string;
-  source?: string; // Add this to support job source filtering
+  source?: string;
+  // Add missing properties referenced in components
+  clientId?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  jobSourceId?: string;
+  jobSourceName?: string;
+  parts?: string[];
 }
 
 export interface JobTab {

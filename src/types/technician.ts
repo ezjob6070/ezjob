@@ -20,7 +20,7 @@ export interface Technician {
   notes?: string;
   imageUrl?: string;
   paymentType: "percentage" | "flat" | "hourly";
-  paymentRate: number;
+  paymentRate: number; // Must be number type
   
   // Salary-related fields matching employee functionality
   salaryBasis?: SalaryBasis;

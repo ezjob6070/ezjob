@@ -55,7 +55,7 @@ const DateFilterDropdown = ({
                   setOpen(false);
                 }
               }}
-              className="rounded-md border"
+              className="rounded-md border pointer-events-auto"
             />
           </div>
         </div>

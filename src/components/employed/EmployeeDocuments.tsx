@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { FileText, Upload, Eye, Trash2, Calendar } from "lucide-react";
@@ -63,24 +62,22 @@ const EmployeeDocuments = ({ employee, onUpdateEmployee }: EmployeeDocumentsProp
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you would upload this to a server
-      // Here we just simulate it with a local URL
       const documentUrl = URL.createObjectURL(file);
+      const currentDate = new Date();
       
       const newDocumentObj: EmployeeDocument = {
         id: `doc-${Date.now()}`,
         type: newDocument.type,
         name: newDocument.name || file.name,
         url: documentUrl,
-        dateUploaded: new Date(),
+        dateUploaded: currentDate.toISOString(),
         notes: newDocument.notes || undefined,
-        expiryDate: newDocument.expiryDate ? new Date(newDocument.expiryDate) : undefined,
+        expiryDate: newDocument.expiryDate ? new Date(newDocument.expiryDate).toISOString() : undefined,
       };
       
       const updatedDocuments = [...documents, newDocumentObj];
       setDocuments(updatedDocuments);
       
-      // Update the employee object
       const updatedEmployee = {
         ...employee,
         documents: updatedDocuments,
@@ -88,7 +85,6 @@ const EmployeeDocuments = ({ employee, onUpdateEmployee }: EmployeeDocumentsProp
       
       onUpdateEmployee(updatedEmployee);
       
-      // Reset form and close dialog
       setNewDocument({
         type: DocumentType.ID,
         name: "",
@@ -114,7 +110,6 @@ const EmployeeDocuments = ({ employee, onUpdateEmployee }: EmployeeDocumentsProp
     const updatedDocuments = documents.filter(doc => doc.id !== documentId);
     setDocuments(updatedDocuments);
     
-    // Update the employee object
     const updatedEmployee = {
       ...employee,
       documents: updatedDocuments,
@@ -127,7 +122,6 @@ const EmployeeDocuments = ({ employee, onUpdateEmployee }: EmployeeDocumentsProp
       description: "The document has been removed from the employee's records",
     });
     
-    // Close the view dialog if open
     if (showViewDocumentDialog && selectedDocument?.id === documentId) {
       setShowViewDocumentDialog(false);
     }
@@ -288,7 +282,6 @@ const EmployeeDocuments = ({ employee, onUpdateEmployee }: EmployeeDocumentsProp
         </CardContent>
       </Card>
       
-      {/* Document Viewer Dialog */}
       <Dialog open={showViewDocumentDialog} onOpenChange={setShowViewDocumentDialog}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh]">
           <DialogHeader>
@@ -304,7 +297,6 @@ const EmployeeDocuments = ({ employee, onUpdateEmployee }: EmployeeDocumentsProp
                 </div>
                 
                 <div className="max-h-[60vh] overflow-auto border rounded-md p-2">
-                  {/* Document preview - would be an iframe for PDFs or img for images */}
                   <img 
                     src={selectedDocument.url} 
                     alt={selectedDocument.name}
