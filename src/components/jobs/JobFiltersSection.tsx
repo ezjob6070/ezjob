@@ -37,7 +37,7 @@ interface JobFiltersSectionProps {
   deselectAllJobSources: () => void;
 }
 
-const JobFiltersSection = ({
+const JobFiltersSection: React.FC<JobFiltersSectionProps> = ({
   technicianNames,
   selectedTechnicians,
   selectedCategories,
@@ -61,73 +61,44 @@ const JobFiltersSection = ({
   appliedFilters
 }: JobFiltersSectionProps) => {
   
-  const filtersComponent = (
-    <div className="space-y-6 p-6">
-      <FilterHeader title="Filter Jobs" />
-      
-      <div className="space-y-4">
-        <TechnicianFilter
-          technicians={technicianNames}
-          selectedNames={selectedTechnicians}
-          onToggle={toggleTechnician}
-          onSelectAll={selectAllTechnicians}
-          onDeselectAll={deselectAllTechnicians}
-        />
+  // Return the components directly as React elements
+  return (
+    <div className="space-y-6">
+      <div className="space-y-6 p-6">
+        <FilterHeader title="Filter Jobs" />
         
-        <CategoryFilter
-          categories={categories}
-          selectedCategory={selectedCategories}
-          toggleCategory={toggleCategory}
-          addCategory={addCategory}
-        />
+        <div className="space-y-4">
+          <TechnicianFilter
+            technicians={technicianNames}
+            selectedNames={selectedTechnicians}
+            onToggle={toggleTechnician}
+            onSelectAll={selectAllTechnicians}
+            onDeselectAll={deselectAllTechnicians}
+          />
+          
+          <CategoryFilter
+            categories={categories}
+            selectedCategory={selectedCategories}
+            toggleCategory={toggleCategory}
+            addCategory={addCategory}
+          />
+          
+          <JobSourceFilter
+            jobSourceNames={jobSourceNames}
+            selectedJobSources={selectedJobSources}
+            toggleJobSource={toggleJobSource}
+            selectAllJobSources={selectAllJobSources}
+            deselectAllJobSources={deselectAllJobSources}
+          />
+        </div>
         
-        <JobSourceFilter
-          jobSourceNames={jobSourceNames}
-          selectedJobSources={selectedJobSources}
-          toggleJobSource={toggleJobSource}
-          selectAllJobSources={selectAllJobSources}
-          deselectAllJobSources={deselectAllJobSources}
+        <FilterActions
+          clearFilters={clearFilters}
+          applyFilters={applyFilters}
         />
       </div>
-      
-      <FilterActions
-        clearFilters={clearFilters}
-        applyFilters={applyFilters}
-      />
     </div>
   );
-  
-  const amountFilterComponent = (
-    <AmountFilter 
-      value={amountRange}
-      onChange={setAmountRange}
-    />
-  );
-  
-  const paymentMethodComponent = (
-    <PaymentMethodFilter 
-      value={paymentMethod}
-      onChange={setPaymentMethod}
-    />
-  );
-  
-  const jobSourceComponent = (
-    <JobSourceFilter
-      jobSourceNames={jobSourceNames}
-      selectedJobSources={selectedJobSources}
-      toggleJobSource={toggleJobSource}
-      selectAllJobSources={selectAllJobSources}
-      deselectAllJobSources={deselectAllJobSources}
-    />
-  );
-  
-  return {
-    filtersComponent,
-    dateRangeComponent: null,
-    amountFilterComponent,
-    paymentMethodComponent,
-    jobSourceComponent
-  };
 };
 
 export default JobFiltersSection;

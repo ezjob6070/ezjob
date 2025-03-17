@@ -63,32 +63,6 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
   filteredJobsCount,
   totalJobsCount
 }) => {
-  const filterComponents = JobFiltersSection({
-    technicianNames,
-    selectedTechnicians,
-    selectedCategories,
-    date,
-    amountRange,
-    paymentMethod,
-    categories,
-    appliedFilters,
-    toggleTechnician,
-    toggleCategory,
-    setDate,
-    setAmountRange,
-    setPaymentMethod,
-    addCategory,
-    selectAllTechnicians,
-    deselectAllTechnicians,
-    clearFilters,
-    applyFilters,
-    jobSourceNames,
-    selectedJobSources,
-    toggleJobSource,
-    selectAllJobSources,
-    deselectAllJobSources
-  });
-
   return (
     <>
       <div className="flex justify-end mb-4">
@@ -109,7 +83,31 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
         </div>
       )}
       
-      {filterComponents}
+      <JobFiltersSection 
+        technicianNames={technicianNames}
+        selectedTechnicians={selectedTechnicians}
+        selectedCategories={selectedCategories}
+        date={date}
+        amountRange={amountRange}
+        paymentMethod={paymentMethod}
+        categories={categories}
+        appliedFilters={appliedFilters}
+        toggleTechnician={toggleTechnician}
+        toggleCategory={toggleCategory}
+        setDate={setDate}
+        setAmountRange={setAmountRange}
+        setPaymentMethod={setPaymentMethod}
+        addCategory={addCategory}
+        selectAllTechnicians={selectAllTechnicians}
+        deselectAllTechnicians={deselectAllTechnicians}
+        clearFilters={clearFilters}
+        applyFilters={applyFilters}
+        jobSourceNames={jobSourceNames}
+        selectedJobSources={selectedJobSources}
+        toggleJobSource={toggleJobSource}
+        selectAllJobSources={selectAllJobSources}
+        deselectAllJobSources={deselectAllJobSources}
+      />
     </>
   );
 };

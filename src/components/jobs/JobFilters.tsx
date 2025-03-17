@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -46,6 +47,9 @@ const JobFilters = ({ filters, setFilters, technicians, resetFilters }: JobFilte
     }
   };
 
+  // Convert technician objects to string array of names for the filter component
+  const technicianNames = technicians.map(tech => tech.name);
+
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap md:flex-nowrap">
@@ -55,9 +59,11 @@ const JobFilters = ({ filters, setFilters, technicians, resetFilters }: JobFilte
         />
         
         <TechnicianFilter 
-          technicianFilter={filters.technicianFilter} 
-          technicians={technicians} 
-          updateFilter={updateFilter} 
+          technicians={technicianNames}
+          selectedNames={[filters.technicianFilter]} 
+          onToggle={(name) => updateFilter("technicianFilter", name)}
+          onSelectAll={() => {}}
+          onDeselectAll={() => updateFilter("technicianFilter", "")}
         />
         
         <DateFilter 

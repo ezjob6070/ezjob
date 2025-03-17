@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Job } from "../jobs/JobTypes";
 import { JOB_CATEGORIES, DATE_FILTERS } from "./filters/filterConstants";
@@ -12,7 +13,7 @@ interface JobFilterBarProps {
 }
 
 const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(["All Categories"]);
   const [selectedTechnician, setSelectedTechnician] = useState<string>("All Technicians");
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>("today"); // Today as default
   
@@ -25,9 +26,11 @@ const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
     let filteredJobs = [...allJobs];
 
     // Filter by category (assuming job titles contain the category)
-    if (selectedCategory !== "All Categories") {
+    if (selectedCategory.length > 0 && !selectedCategory.includes("All Categories")) {
       filteredJobs = filteredJobs.filter((job) => 
-        job.title?.toLowerCase().includes(selectedCategory.toLowerCase())
+        selectedCategory.some(category => 
+          job.title?.toLowerCase().includes(category.toLowerCase())
+        )
       );
     }
 
@@ -102,13 +105,19 @@ const JobFilterBar = ({ onFilterChange, allJobs }: JobFilterBarProps) => {
     applyFilters();
   }, [selectedCategory, selectedTechnician, selectedDateFilter]);
 
+  // Helper to handle category selection changes
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory([category]);
+  };
+
   return (
     <div className="flex flex-wrap gap-2 mb-4">
       <div className="flex items-center gap-2">
         <CategoryFilter 
-          selectedCategory={selectedCategory} 
           categories={JOB_CATEGORIES} 
-          onCategoryChange={setSelectedCategory} 
+          selectedCategory={selectedCategory}
+          toggleCategory={handleCategoryChange}
+          addCategory={(category) => {}} // Not used in this component
         />
 
         <TechnicianDropdown 
