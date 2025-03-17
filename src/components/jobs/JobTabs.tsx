@@ -43,12 +43,19 @@ const JobTabs = ({
 }: JobTabsProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
-  const filteredJobs = (status: string) => {
+  const getJobsByStatus = (status: string) => {
     if (status === "all") {
       return jobs;
     }
     return jobs.filter(job => job.status === status);
   };
+
+  // Count jobs by status
+  const scheduledJobsCount = jobs.filter(job => job.status === "scheduled").length;
+  const inProgressJobsCount = jobs.filter(job => job.status === "in_progress").length;
+  const completedJobsCount = jobs.filter(job => job.status === "completed").length;
+  const cancelledJobsCount = jobs.filter(job => job.status === "cancelled").length;
+  const allJobsCount = jobs.length;
 
   const getTabTriggerClass = (value: string) => {
     switch (value) {
@@ -83,30 +90,45 @@ const JobTabs = ({
             className={getTabTriggerClass("all")}
           >
             All
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-gray-200 text-gray-800 rounded-full font-medium">
+              {allJobsCount}
+            </span>
           </TabsTrigger>
           <TabsTrigger 
             value="scheduled"
             className={getTabTriggerClass("scheduled")}
           >
             Scheduled
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">
+              {scheduledJobsCount}
+            </span>
           </TabsTrigger>
           <TabsTrigger 
             value="in_progress"
             className={getTabTriggerClass("in_progress")}
           >
             In Progress
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full font-medium">
+              {inProgressJobsCount}
+            </span>
           </TabsTrigger>
           <TabsTrigger 
             value="completed"
             className={getTabTriggerClass("completed")}
           >
             Completed
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-green-100 text-green-800 rounded-full font-medium">
+              {completedJobsCount}
+            </span>
           </TabsTrigger>
           <TabsTrigger 
             value="cancelled"
             className={getTabTriggerClass("cancelled")}
           >
             Cancelled
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-red-100 text-red-800 rounded-full font-medium">
+              {cancelledJobsCount}
+            </span>
           </TabsTrigger>
         </TabsList>
         
@@ -122,7 +144,7 @@ const JobTabs = ({
         
         <TabsContent value="all">
           <JobsTable 
-            jobs={filteredJobs("all")} 
+            jobs={getJobsByStatus("all")} 
             searchTerm={searchTerm}
             onOpenStatusModal={openStatusModal}
           />
@@ -130,7 +152,7 @@ const JobTabs = ({
         
         <TabsContent value="scheduled">
           <JobsTable 
-            jobs={filteredJobs("scheduled")} 
+            jobs={getJobsByStatus("scheduled")} 
             searchTerm={searchTerm}
             onOpenStatusModal={openStatusModal}
           />
@@ -138,7 +160,7 @@ const JobTabs = ({
         
         <TabsContent value="in_progress">
           <JobsTable 
-            jobs={filteredJobs("in_progress")} 
+            jobs={getJobsByStatus("in_progress")} 
             searchTerm={searchTerm}
             onOpenStatusModal={openStatusModal}
           />
@@ -146,7 +168,7 @@ const JobTabs = ({
         
         <TabsContent value="completed">
           <JobsTable 
-            jobs={filteredJobs("completed")} 
+            jobs={getJobsByStatus("completed")} 
             searchTerm={searchTerm}
             onOpenStatusModal={openStatusModal}
           />
@@ -154,7 +176,7 @@ const JobTabs = ({
         
         <TabsContent value="cancelled">
           <JobsTable 
-            jobs={filteredJobs("cancelled")} 
+            jobs={getJobsByStatus("cancelled")} 
             searchTerm={searchTerm}
             onOpenStatusModal={openStatusModal}
           />
