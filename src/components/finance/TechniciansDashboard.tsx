@@ -61,6 +61,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     setFilteredTechnicians(filtered);
   }, [activeTechnicians]);
 
+  // Calculate totals for all filtered technicians
   const totalRevenue = financialMetrics?.totalRevenue || 0;
   const totalEarnings = financialMetrics?.technicianEarnings || 0;
   const companyProfit = financialMetrics?.companyProfit || 0;
@@ -78,9 +79,9 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     
     return {
       revenue: selectedTechnician.totalRevenue || 0,
-      earnings: selectedTechnician.totalRevenue * 0.40,
-      expenses: selectedTechnician.totalRevenue * 0.20,
-      profit: selectedTechnician.totalRevenue * 0.40,
+      earnings: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
+      expenses: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.20 : 0,
+      profit: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
       totalJobs: 42,
       completedJobs: 38,
       cancelledJobs: 4,

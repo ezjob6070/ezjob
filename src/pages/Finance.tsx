@@ -117,7 +117,9 @@ const Finance = () => {
               </TabsContent>
 
               <TabsContent value="technicians" className="mt-0">
+                {/* Add key to force re-render when tab changes */}
                 <TechniciansDashboard 
+                  key="technicians-dashboard"
                   activeTechnicians={activeTechnicians}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}

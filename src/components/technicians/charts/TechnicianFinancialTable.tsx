@@ -1,31 +1,46 @@
 
 import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
-import TechnicianInvoiceDialog from "../invoices/TechnicianInvoiceDialog";
-import TechnicianFinancialFilterBar from "../filters/TechnicianFinancialFilterBar";
-import TechnicianFinancialTableContent from "../tables/TechnicianFinancialTableContent";
-import useTechnicianTableSorting from "@/hooks/technicians/useTechnicianTableSorting";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import TechnicianFilters from "@/components/finance/technician-filters/TechnicianFilters";
+import { SortOption } from "@/hooks/useTechniciansData";
+import TechnicianFinancialFilterBar from "./TechnicianFinancialFilterBar";
+import TechnicianFinancialTableContent from "./TechnicianFinancialTableContent";
 
 interface TechnicianFinancialTableProps {
   filteredTechnicians: Technician[];
   displayedTechnicians: Technician[];
   selectedTechnicianNames: string[];
-  toggleTechnician: (techName: string) => void;
+  toggleTechnician: (name: string) => void;
   clearFilters: () => void;
   applyFilters: () => void;
   paymentTypeFilter: string;
-  setPaymentTypeFilter: (value: string) => void;
+  setPaymentTypeFilter: (filter: string) => void;
   localDateRange: DateRange | undefined;
-  setLocalDateRange: (date: DateRange | undefined) => void;
+  setLocalDateRange: (range: DateRange | undefined) => void;
   onTechnicianSelect: (technician: Technician) => void;
   selectedTechnicianId?: string;
 }
 
-const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
+const TechnicianFinancialTable = ({
   filteredTechnicians,
   displayedTechnicians,
   selectedTechnicianNames,
@@ -38,71 +53,62 @@ const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
   setLocalDateRange,
   onTechnicianSelect,
   selectedTechnicianId
-}) => {
+}: TechnicianFinancialTableProps) => {
+  const [appliedFilters, setAppliedFilters] = useState(false);
+  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
   const technicianNames = filteredTechnicians.map(tech => tech.name);
-  const { sortBy, setSortBy, sortedTechnicians } = useTechnicianTableSorting(displayedTechnicians);
-  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
-  const [selectedTechnicianForInvoice, setSelectedTechnicianForInvoice] = useState<Technician | null>(null);
 
-  const handleCreateInvoice = (technician: Technician) => {
-    setSelectedTechnicianForInvoice(technician);
-    setInvoiceDialogOpen(true);
+  const handleSort = (option: SortOption) => {
+    setSortOption(option);
   };
-  
+
   return (
     <Card>
-      <CardHeader>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-          <div>
-            <CardTitle>Technician Financial Performance</CardTitle>
-            <CardDescription>Earnings and profit metrics for each technician</CardDescription>
-          </div>
-          {selectedTechnicianId && (
-            <Button 
-              variant="outline" 
-              className="gap-2 whitespace-nowrap"
-              onClick={() => {
-                const selectedTech = displayedTechnicians.find(tech => tech.id === selectedTechnicianId);
-                if (selectedTech) handleCreateInvoice(selectedTech);
-              }}
-            >
-              <FileText className="h-4 w-4" />
-              Create Invoice
-            </Button>
-          )}
-        </div>
+      <CardHeader className="pb-3">
+        <CardTitle>Technician Financial Performance</CardTitle>
+        <CardDescription>
+          Financial performance metrics for each technician in the selected time period.
+        </CardDescription>
       </CardHeader>
+      
+      <TechnicianFinancialFilterBar
+        sortOption={sortOption}
+        onSortChange={handleSort}
+      />
+      
       <CardContent>
-        {/* Filters */}
-        <TechnicianFinancialFilterBar 
-          technicianNames={technicianNames}
-          selectedTechnicians={selectedTechnicianNames}
-          toggleTechnician={toggleTechnician}
-          clearFilters={clearFilters}
-          applyFilters={applyFilters}
-          paymentTypeFilter={paymentTypeFilter}
-          setPaymentTypeFilter={setPaymentTypeFilter}
-          localDateRange={localDateRange}
-          setLocalDateRange={setLocalDateRange}
-          sortBy={sortBy as string}
-          setSortBy={setSortBy}
-        />
+        <div className="mb-6">
+          <TechnicianFilters
+            date={localDateRange}
+            setDate={setLocalDateRange}
+            selectedTechnicians={selectedTechnicianNames}
+            setSelectedTechnicians={(techs) => {
+              // This just updates the UI. The actual filtering logic is in the parent
+            }}
+            technicianNames={technicianNames}
+            paymentTypeFilter={paymentTypeFilter}
+            setPaymentTypeFilter={setPaymentTypeFilter}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            clearFilters={clearFilters}
+          />
+        </div>
 
-        {/* Table */}
-        <TechnicianFinancialTableContent 
-          technicians={sortedTechnicians}
-          selectedTechnicianId={selectedTechnicianId}
+        <TechnicianFinancialTableContent
+          displayedTechnicians={displayedTechnicians}
           onTechnicianSelect={onTechnicianSelect}
-          onCreateInvoice={handleCreateInvoice}
-        />
-
-        {/* Invoice Dialog */}
-        <TechnicianInvoiceDialog
-          open={invoiceDialogOpen}
-          onOpenChange={setInvoiceDialogOpen}
-          technician={selectedTechnicianForInvoice}
+          selectedTechnicianId={selectedTechnicianId}
         />
       </CardContent>
+      
+      <CardFooter className="flex justify-between border-t px-6 py-4">
+        <div className="text-xs text-muted-foreground">
+          Showing {displayedTechnicians.length} of {filteredTechnicians.length} technicians
+        </div>
+        <Button variant="outline" size="sm" onClick={applyFilters}>
+          Apply Filters
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

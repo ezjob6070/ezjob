@@ -72,7 +72,7 @@ const EmployeeDocuments = ({ employee, onUpdateEmployee }: EmployeeDocumentsProp
                   Cancel
                 </Button>
                 <label htmlFor="document-file-upload">
-                  <Button as="span">Upload</Button>
+                  <Button>Upload</Button>
                   <Input
                     id="document-file-upload"
                     type="file"
