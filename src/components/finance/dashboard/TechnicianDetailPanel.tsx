@@ -2,8 +2,8 @@
 import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Technician } from "@/types/technician";
+import { BriefcaseIcon, BarChartIcon, DollarSignIcon, XIcon } from "lucide-react";
 import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
-import TechnicianPerformanceMetrics from "@/components/technicians/charts/TechnicianPerformanceMetrics";
 
 interface TechnicianDetailPanelProps {
   selectedTechnician: Technician | null;
@@ -80,21 +80,66 @@ const TechnicianDetailPanel: React.FC<TechnicianDetailPanelProps> = ({
               <CardTitle>Performance Metrics</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex flex-col items-center p-4 border rounded-lg">
-                  <span className="text-sm text-muted-foreground">Total Jobs</span>
-                  <span className="text-2xl font-bold">{selectedTechnicianMetrics?.totalJobs || 0}</span>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-blue-100 rounded-full">
+                        <BriefcaseIcon className="h-5 w-5 text-blue-700" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Jobs</p>
+                        <p className="text-2xl font-bold">{selectedTechnicianMetrics?.totalJobs || 0}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
                 
-                <div className="flex flex-col items-center p-4 border rounded-lg">
-                  <span className="text-sm text-muted-foreground">Completed Jobs</span>
-                  <span className="text-2xl font-bold">{selectedTechnicianMetrics?.completedJobs || 0}</span>
-                </div>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-blue-100 rounded-full">
+                        <BriefcaseIcon className="h-5 w-5 text-blue-700" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Completed Jobs</p>
+                        <p className="text-2xl font-bold">{selectedTechnicianMetrics?.completedJobs || 0}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
                 
-                <div className="flex flex-col items-center p-4 border rounded-lg">
-                  <span className="text-sm text-muted-foreground">Cancelled Jobs</span>
-                  <span className="text-2xl font-bold">{selectedTechnicianMetrics?.cancelledJobs || 0}</span>
-                </div>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-red-100 rounded-full">
+                        <XIcon className="h-5 w-5 text-red-700" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Cancelled Jobs</p>
+                        <p className="text-2xl font-bold">{selectedTechnicianMetrics?.cancelledJobs || 0}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-green-100 rounded-full">
+                        <DollarSignIcon className="h-5 w-5 text-green-700" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Average Job Value</p>
+                        <p className="text-2xl font-bold">
+                          ${selectedTechnicianMetrics?.revenue && selectedTechnicianMetrics?.totalJobs 
+                            ? Math.round(selectedTechnicianMetrics.revenue / selectedTechnicianMetrics.totalJobs) 
+                            : 0}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>
