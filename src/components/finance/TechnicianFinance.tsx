@@ -7,7 +7,7 @@ import TechnicianInvoiceSection from '@/components/finance/TechnicianInvoiceSect
 import TechnicianPaymentsSection from '@/components/finance/TechnicianPaymentsSection';
 import InvoiceButton from '@/components/finance/InvoiceButton';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, FileText } from 'lucide-react';
 
 const TechnicianFinance = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -22,7 +22,15 @@ const TechnicianFinance = () => {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium">Technician Financial Management</h3>
         <div className="flex gap-2">
-          <InvoiceButton entityName="Selected Technician" entityType="technician" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-2"
+            onClick={() => setActiveTab("invoices")}
+          >
+            <FileText className="h-4 w-4" />
+            Generate Invoice
+          </Button>
           <Button size="sm" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             New Payment
