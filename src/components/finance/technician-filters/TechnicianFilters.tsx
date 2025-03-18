@@ -10,7 +10,6 @@ import {
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { format, isAfter, isBefore, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -41,9 +40,8 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
 }) => {
   const [showTechnicianFilter, setShowTechnicianFilter] = useState(false);
   const [showDateFilter, setShowDateFilter] = useState(false);
-  const [showPaymentTypeFilter, setShowPaymentTypeFilter] = useState(false);
-  const [technicianSearchQuery, setTechnicianSearchQuery] = useState("");
-
+  const [showPaymentRateFilter, setShowPaymentRateFilter] = useState(false);
+  
   const handleDatePreset = (preset: string) => {
     const today = new Date();
     let from: Date;
@@ -92,33 +90,22 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
 
   const toggleAllTechnicians = (checked: boolean) => {
     if (checked) {
-      setSelectedTechnicians(
-        technicianSearchQuery 
-          ? technicianNames.filter(name => name.toLowerCase().includes(technicianSearchQuery.toLowerCase()))
-          : [...technicianNames]
-      );
+      setSelectedTechnicians([...technicianNames]);
     } else {
       setSelectedTechnicians([]);
     }
   };
 
-  const filteredTechniciansForSelection = technicianNames.filter(
-    tech => tech.toLowerCase().includes(technicianSearchQuery.toLowerCase())
-  );
-
-  const allTechniciansSelected = 
-    filteredTechniciansForSelection.length > 0 && 
-    filteredTechniciansForSelection.every(tech => selectedTechnicians.includes(tech));
+  const allTechniciansSelected = technicianNames.length > 0 && 
+    technicianNames.every(tech => selectedTechnicians.includes(tech));
   
-  const someTechniciansSelected = 
-    selectedTechnicians.length > 0 && 
-    !allTechniciansSelected;
+  const someTechniciansSelected = selectedTechnicians.length > 0 && !allTechniciansSelected;
 
   const applyFilters = () => {
     setAppliedFilters(true);
     setShowTechnicianFilter(false);
     setShowDateFilter(false);
-    setShowPaymentTypeFilter(false);
+    setShowPaymentRateFilter(false);
   };
 
   return (
@@ -178,13 +165,6 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-64 p-0" align="start">
           <div className="p-3">
-            <Input 
-              type="text" 
-              placeholder="Search technicians..." 
-              className="mb-3" 
-              value={technicianSearchQuery}
-              onChange={(e) => setTechnicianSearchQuery(e.target.value)}
-            />
             <div className="flex items-center space-x-2 py-2 border-b border-gray-200 mb-2">
               <Checkbox 
                 id="select-all-technicians"
@@ -206,7 +186,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
               </label>
             </div>
             <div className="max-h-64 overflow-y-auto">
-              {filteredTechniciansForSelection.map(tech => (
+              {technicianNames.map(tech => (
                 <div key={tech} className="flex items-center space-x-2 py-1">
                   <Checkbox 
                     id={`tech-${tech}`} 
@@ -221,7 +201,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
                   </label>
                 </div>
               ))}
-              {filteredTechniciansForSelection.length === 0 && (
+              {technicianNames.length === 0 && (
                 <div className="text-sm text-muted-foreground py-2">No technicians found</div>
               )}
             </div>
@@ -233,13 +213,13 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         </PopoverContent>
       </Popover>
 
-      <Popover open={showPaymentTypeFilter} onOpenChange={setShowPaymentTypeFilter}>
+      <Popover open={showPaymentRateFilter} onOpenChange={setShowPaymentRateFilter}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="flex items-center gap-2">
             <Filter className="h-4 w-4" />
             {paymentTypeFilter !== "all" 
-              ? `Payment: ${paymentTypeFilter}` 
-              : "Payment Type"
+              ? `Payment Rate: ${paymentTypeFilter}` 
+              : "Payment Rate"
             }
           </Button>
         </PopoverTrigger>
@@ -247,14 +227,14 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           <div className="p-3">
             <Select value={paymentTypeFilter} onValueChange={(value) => {
               setPaymentTypeFilter(value);
-              setShowPaymentTypeFilter(false);
+              setShowPaymentRateFilter(false);
               setAppliedFilters(true);
             }}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Payment Type" />
+                <SelectValue placeholder="Payment Rate" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="all">All Rates</SelectItem>
                 <SelectItem value="percentage">Percentage</SelectItem>
                 <SelectItem value="flat">Flat Rate</SelectItem>
                 <SelectItem value="hourly">Hourly</SelectItem>
