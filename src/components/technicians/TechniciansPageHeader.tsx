@@ -1,8 +1,7 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, ListChecks, MoreHorizontal, Download, Filter } from "lucide-react";
+import { PlusIcon, Download, Filter, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,13 +31,6 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
         </p>
       </div>
       <div className="flex space-x-2">
-        <Link to="/technician-altercation">
-          <Button variant="outline" className="gap-2">
-            <ListChecks className="h-4 w-4" />
-            Technician Altercation
-          </Button>
-        </Link>
-        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
