@@ -63,7 +63,10 @@ const TechnicianDetail = () => {
       completedJobs: technician.completedJobs,
       cancelledJobs: technician.cancelledJobs,
       totalRevenue: technician.totalRevenue,
-      rating: technician.rating
+      rating: technician.rating,
+      // Add support for profile image
+      profileImage: values.profileImage || technician.profileImage,
+      imageUrl: values.profileImage || technician.imageUrl,
     };
     
     setTechnician(updatedTechnician);

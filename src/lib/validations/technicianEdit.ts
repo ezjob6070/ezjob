@@ -35,6 +35,7 @@ export const technicianEditSchema = z.object({
   hourlyRate: z.string().optional(),
   incentiveType: z.nativeEnum(IncentiveType).optional(),
   incentiveAmount: z.string().optional(),
+  profileImage: z.string().nullable().optional(),
 });
 
 export type TechnicianEditFormValues = z.infer<typeof technicianEditSchema>;

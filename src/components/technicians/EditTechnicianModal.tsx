@@ -20,6 +20,7 @@ import { TechnicianBasicInfoFields } from "@/components/technicians/TechnicianBa
 import { TechnicianDateField } from "@/components/technicians/TechnicianDateField";
 import { TechnicianPaymentFields } from "@/components/technicians/form/TechnicianPaymentFields";
 import { TechnicianStatusFields } from "@/components/technicians/form/TechnicianStatusFields";
+import { TechnicianImageUpload } from "@/components/technicians/TechnicianImageUpload";
 import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 export interface EditTechnicianModalProps {
@@ -58,8 +59,17 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
     },
   });
 
+  // Add state for profile image
+  const [profileImage, setProfileImage] = React.useState<string | null>(
+    technician?.profileImage || technician?.imageUrl || null
+  );
+
   function onSubmitForm(values: TechnicianEditFormValues) {
-    onUpdateTechnician(values);
+    // Include the profile image in the update
+    onUpdateTechnician({
+      ...values,
+      profileImage: profileImage,
+    });
     onOpenChange(false);
   }
 
@@ -80,6 +90,15 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
             onSubmit={form.handleSubmit(onSubmitForm)}
             className="space-y-4"
           >
+            <div className="flex justify-center mb-4">
+              <TechnicianImageUpload
+                initials={technician.initials || ""}
+                defaultImage={profileImage}
+                onImageChange={setProfileImage}
+                size="lg"
+              />
+            </div>
+
             <div className="space-y-4">
               <TechnicianBasicInfoFields control={form.control} />
               
