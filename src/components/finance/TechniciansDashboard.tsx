@@ -65,6 +65,23 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     }
   };
 
+  // Prepare mock metrics data for the selected technician
+  const prepareMetricsData = () => {
+    if (!selectedTechnician) return null;
+    
+    return {
+      revenue: selectedTechnician.totalRevenue || 0,
+      earnings: selectedTechnician.totalRevenue * 0.40, // Mock 40% of revenue
+      expenses: selectedTechnician.totalRevenue * 0.20, // Mock 20% of revenue
+      profit: selectedTechnician.totalRevenue * 0.40, // Mock 40% of revenue
+      totalJobs: 42, // Mock value
+      completedJobs: 38, // Mock value
+      cancelledJobs: 4, // Mock value
+    };
+  };
+
+  const mockMetrics = prepareMetricsData();
+
   return (
     <div className="space-y-6">
       <Card>
@@ -124,7 +141,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       {selectedTechnician && (
         <TechnicianDetailPanel 
           selectedTechnician={selectedTechnician}
-          selectedTechnicianMetrics={selectedTechnicianMetrics}
+          selectedTechnicianMetrics={mockMetrics}
           dateRangeText={dateRangeText}
         />
       )}
