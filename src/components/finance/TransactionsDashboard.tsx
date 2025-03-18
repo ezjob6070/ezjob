@@ -27,7 +27,6 @@ const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle>Transaction Analysis</CardTitle>
           <CardDescription>Track payment flow and analyze patterns</CardDescription>
         </CardHeader>
         <CardContent>

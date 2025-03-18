@@ -55,7 +55,6 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
     <div className="mb-8">
       <div className="mb-6">
         <div className="flex flex-col items-center">
-          <h3 className="text-xl font-bold mb-4">Overall Finance</h3>
           <div className="w-full flex justify-center mb-2">
             <CompactDateRangePicker date={date} setDate={setDate} />
           </div>

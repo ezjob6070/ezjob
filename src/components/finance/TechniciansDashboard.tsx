@@ -100,11 +100,11 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <h2 className="text-xl font-semibold">Technician Financial Dashboard</h2>
             <div className="w-full md:w-auto">
               <TechnicianSearchBar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                hidden={true}
               />
             </div>
           </div>

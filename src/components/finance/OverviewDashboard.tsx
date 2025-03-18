@@ -2,7 +2,6 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DonutChart } from "@/components/DonutChart";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { JobSource, FinancialTransaction, ProfitBreakdownItem } from "@/types/finance";
 import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
