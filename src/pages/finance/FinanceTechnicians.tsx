@@ -18,7 +18,7 @@ const FinanceTechnicians = () => {
             <h2 className="text-2xl font-bold tracking-tight">Technician Finance</h2>
           </div>
           <p className="text-muted-foreground">
-            Track technician performance and earnings.
+            Track technician performance, revenue, and earnings across all jobs.
           </p>
         </div>
       </div>
