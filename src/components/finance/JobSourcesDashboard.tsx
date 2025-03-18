@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -8,7 +7,7 @@ import JobSourceInvoiceSection from "@/components/finance/JobSourceInvoiceSectio
 import JobSourceCircleCharts from "@/components/finance/JobSourceCircleCharts";
 import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
-import { Calendar, Filter } from "lucide-react";
+import { Calendar, Filter, Search } from "lucide-react";
 import { 
   Popover, 
   PopoverContent, 
@@ -45,7 +44,6 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
 
   const jobSourceNames = filteredJobSources.map(source => source.name);
 
-  // Handle date presets
   const handleDatePreset = (preset: string) => {
     const today = new Date();
     let from: Date;
@@ -84,21 +82,17 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     setAppliedFilters(true);
   };
 
-  // Filter sources based on selections
   const filteredSources = filteredJobSources.filter(source => {
-    // Filter by selected job sources
     const matchesSelectedSources = 
       !appliedFilters || 
       selectedJobSources.length === 0 || 
       selectedJobSources.includes(source.name);
 
-    // Filter by selected categories
     const matchesCategory = 
       selectedCategories.length === 0 || 
       (source.category && selectedCategories.includes(source.category)) ||
       (!source.category && selectedCategories.includes("Others"));
     
-    // Filter by date range
     let matchesDateRange = true;
     if (appliedFilters && date?.from && source.createdAt) {
       const sourceDate = new Date(source.createdAt);
@@ -112,12 +106,10 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     return matchesSelectedSources && matchesCategory && matchesDateRange;
   });
 
-  // Calculate totals
   const totalRevenue = filteredSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
   const totalExpenses = filteredSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
   const totalProfit = filteredSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
 
-  // Job source selection functions
   const toggleJobSource = (sourceName: string) => {
     setSelectedJobSources(prev => 
       prev.includes(sourceName) 
@@ -134,25 +126,41 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     );
   };
 
-  // Toggle all job sources
   const toggleAllJobSources = (checked: boolean) => {
     if (checked) {
-      // Select all job sources (filtered by search query if any)
       setSelectedJobSources(
         sourceSearchQuery 
           ? jobSourceNames.filter(name => name.toLowerCase().includes(sourceSearchQuery.toLowerCase()))
           : [...jobSourceNames]
       );
     } else {
-      // Deselect all job sources
       setSelectedJobSources([]);
     }
   };
 
-  // Filtered job sources for the selector
+  const searchFilter = (source: JobSource, query: string) => {
+    if (!query.trim()) return true;
+    
+    const searchLower = query.toLowerCase();
+    
+    const nameMatch = source.name.toLowerCase().includes(searchLower);
+    
+    const phoneMatch = source.phone?.toLowerCase().includes(searchLower) || false;
+    
+    const emailMatch = source.email?.toLowerCase().includes(searchLower) || false;
+    
+    const websiteMatch = source.website?.toLowerCase().includes(searchLower) || false;
+    
+    const categoryMatch = source.category?.toLowerCase().includes(searchLower) || false;
+    
+    return nameMatch || phoneMatch || emailMatch || websiteMatch || categoryMatch;
+  };
+
   const filteredJobSourcesForSelection = jobSourceNames.filter(
     source => source.toLowerCase().includes(sourceSearchQuery.toLowerCase())
   );
+
+  const searchFilteredSources = filteredSources.filter(source => searchFilter(source, searchQuery));
 
   const clearFilters = () => {
     setSelectedJobSources([]);
@@ -168,21 +176,17 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     setShowDateFilter(false);
   };
 
-  // Check if all job sources are selected
   const allJobSourcesSelected = 
     filteredJobSourcesForSelection.length > 0 && 
     filteredJobSourcesForSelection.every(source => selectedJobSources.includes(source));
   
-  // Check if some job sources are selected
   const someJobSourcesSelected = 
     selectedJobSources.length > 0 && 
     !allJobSourcesSelected;
 
   return (
     <div className="space-y-8">
-      {/* Filter Bar */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {/* Date Range Filter */}
         <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
@@ -226,7 +230,6 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
           </PopoverContent>
         </Popover>
 
-        {/* Job Source Filter */}
         <Popover open={showSourceFilter} onOpenChange={setShowSourceFilter}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
@@ -327,6 +330,16 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
           </div>
         </CardHeader>
         <CardContent>
+          <div className="relative mb-4">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="pl-8"
+              placeholder="Search job sources by name, phone, email, website, or category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
           <Table>
             <TableHeader>
               <TableRow>
@@ -340,7 +353,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredSources.map((source) => {
+              {searchFilteredSources.map((source) => {
                 const totalRevenue = source.totalRevenue || 0;
                 const expenses = source.expenses || 0;
                 const profit = source.companyProfit || 0;
@@ -372,7 +385,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
                 );
               })}
               
-              {filteredSources.length === 0 && (
+              {searchFilteredSources.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="h-24 text-center">
                     No job sources match the selected filters
