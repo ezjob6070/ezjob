@@ -3,10 +3,17 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { BriefcaseIcon, BarChartIcon, DollarSignIcon, StarIcon } from "lucide-react";
+import { Technician } from "@/types/technician";
 
-interface TechnicianPerformanceMetricsProps {
-  technician: any;
-  metrics: any;
+export interface TechnicianPerformanceMetricsProps {
+  technician: Technician;
+  metrics: {
+    revenue?: number;
+    earnings?: number;
+    expenses?: number;
+    profit?: number;
+    partsValue?: number;
+  };
 }
 
 const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> = ({

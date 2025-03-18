@@ -1,10 +1,11 @@
+
 import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { TrendingUp, Users, Calculator, DollarSign } from "lucide-react";
 import { Technician } from "@/types/technician";
 
-interface PaymentBreakdownCardsProps {
+export interface PaymentBreakdownCardsProps {
   revenue?: number;
   technicianEarnings?: number;
   expenses?: number;
@@ -23,9 +24,9 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
 }) => {
   const calculatedMetrics = useMemo(() => {
     if (technicians.length > 0 && externalRevenue === undefined) {
-      const totalRevenue = technicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
+      const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
       const totalEarnings = technicians.reduce((sum, tech) => 
-        sum + tech.totalRevenue * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1), 0
+        sum + (tech.totalRevenue || 0) * (tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1), 0
       );
       const totalExpenses = totalRevenue * 0.33;
       const totalProfit = totalRevenue - totalEarnings - totalExpenses;

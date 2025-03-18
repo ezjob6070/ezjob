@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Technician } from "@/types/technician";
 
-interface TechnicianMetrics {
+export interface TechnicianMetrics {
   completedJobs: number;
   cancelledJobs: number;
   totalRevenue: number;
@@ -24,7 +24,7 @@ interface TechnicianMetrics {
   partsValue?: number;
 }
 
-interface TechnicianDetailCardProps {
+export interface TechnicianDetailCardProps {
   technician: Technician;
   metrics: TechnicianMetrics;
   dateRangeText?: string;
