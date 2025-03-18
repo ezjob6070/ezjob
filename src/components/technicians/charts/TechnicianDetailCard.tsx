@@ -1,13 +1,13 @@
+
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { 
-  Star, 
+  Briefcase, 
+  BanIcon, 
   DollarSign, 
   ArrowDown, 
   ArrowUp, 
-  Briefcase, 
-  BanIcon, 
   WrenchIcon,
   Settings
 } from "lucide-react";
@@ -17,7 +17,6 @@ interface TechnicianMetrics {
   completedJobs: number;
   cancelledJobs: number;
   totalRevenue: number;
-  rating: number;
   revenue?: number;
   earnings?: number;
   expenses?: number;
@@ -72,16 +71,16 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
-              <p className="text-2xl font-bold">{formatCurrency(metrics.totalRevenue)}</p>
+              <p className="text-2xl font-bold text-blue-600">{formatCurrency(metrics.totalRevenue)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-yellow-100">
-              <Star className="h-5 w-5 text-yellow-500" />
+            <div className="p-2 rounded-full bg-red-100">
+              <ArrowDown className="h-5 w-5 text-red-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Rating</p>
-              <p className="text-2xl font-bold">{metrics.rating.toFixed(1)}</p>
+              <p className="text-sm font-medium text-muted-foreground">Technician Earnings</p>
+              <p className="text-2xl font-bold text-red-600">-{formatCurrency(metrics.earnings || 0)}</p>
             </div>
           </div>
         </div>
@@ -90,12 +89,12 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
           <h4 className="text-sm font-medium text-muted-foreground mb-2">Financial Breakdown</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-green-100">
-                <ArrowUp className="h-5 w-5 text-green-500" />
+              <div className="p-2 rounded-full bg-blue-100">
+                <ArrowUp className="h-5 w-5 text-blue-500" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Revenue</p>
-                <p className="text-xl font-semibold">{metrics.revenue ? formatCurrency(metrics.revenue) : 'N/A'}</p>
+                <p className="text-xl font-semibold text-blue-600">{metrics.revenue ? formatCurrency(metrics.revenue) : 'N/A'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -103,8 +102,8 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
                 <ArrowDown className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Earnings</p>
-                <p className="text-xl font-semibold">-{metrics.earnings ? formatCurrency(metrics.earnings) : 'N/A'}</p>
+                <p className="text-sm font-medium text-muted-foreground">Expenses</p>
+                <p className="text-xl font-semibold text-red-600">-{metrics.expenses ? formatCurrency(metrics.expenses) : 'N/A'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -113,16 +112,16 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Parts Value</p>
-                <p className="text-xl font-semibold">-{metrics.partsValue ? formatCurrency(metrics.partsValue) : 'N/A'}</p>
+                <p className="text-xl font-semibold text-orange-600">-{metrics.partsValue ? formatCurrency(metrics.partsValue) : 'N/A'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-violet-100">
-                <Settings className="h-5 w-5 text-violet-500" />
+              <div className="p-2 rounded-full bg-green-100">
+                <Settings className="h-5 w-5 text-green-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Profit</p>
-                <p className="text-xl font-semibold">{metrics.profit ? formatCurrency(metrics.profit) : 'N/A'}</p>
+                <p className="text-sm font-medium text-muted-foreground">Company Profit</p>
+                <p className="text-xl font-semibold text-green-600">{metrics.profit ? formatCurrency(metrics.profit) : 'N/A'}</p>
               </div>
             </div>
             <div className="col-span-2">
