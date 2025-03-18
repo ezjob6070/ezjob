@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Calendar, ChevronDown, ArrowUpAZ, ArrowDownAZ, ArrowUp10, ArrowDown10 } from "lucide-react";
+import { Calendar, ChevronDown, ArrowUpAZ, ArrowDownAZ, ArrowUp10, ArrowDown10, FileText } from "lucide-react";
 import { format } from "date-fns";
+import TechnicianInvoiceDialog from "../invoices/TechnicianInvoiceDialog";
 
 interface TechnicianFinancialTableProps {
   filteredTechnicians: Technician[];
@@ -49,6 +50,9 @@ const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
   const technicianNames = filteredTechnicians.map(tech => tech.name);
   const [sortBy, setSortBy] = useState<string>("default");
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [selectedTechnicianForInvoice, setSelectedTechnicianForInvoice] = useState<Technician | null>(null);
+  
   const today = new Date();
   
   // Sort technicians based on selected sort option
@@ -145,12 +149,34 @@ const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
     setLocalDateRange({ from, to });
     setShowDateFilter(false);
   };
+
+  const handleCreateInvoice = (technician: Technician) => {
+    setSelectedTechnicianForInvoice(technician);
+    setInvoiceDialogOpen(true);
+  };
   
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Technician Financial Performance</CardTitle>
-        <CardDescription>Earnings and profit metrics for each technician</CardDescription>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div>
+            <CardTitle>Technician Financial Performance</CardTitle>
+            <CardDescription>Earnings and profit metrics for each technician</CardDescription>
+          </div>
+          {selectedTechnicianId && (
+            <Button 
+              variant="outline" 
+              className="gap-2 whitespace-nowrap"
+              onClick={() => {
+                const selectedTech = displayedTechnicians.find(tech => tech.id === selectedTechnicianId);
+                if (selectedTech) handleCreateInvoice(selectedTech);
+              }}
+            >
+              <FileText className="h-4 w-4" />
+              Create Invoice
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {/* Filters */}
@@ -186,7 +212,7 @@ const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
                 <div className="text-xs text-muted-foreground mt-0.5">
                   {isSameDay(localDateRange?.from || today, today) ? 
                     getTodayFormattedDate() : 
-                    "Click to select custom range"}
+                    "Select custom date range"}
                 </div>
                 <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               </Button>
@@ -272,6 +298,7 @@ const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
               <TableHead>Company Earnings</TableHead>
               <TableHead>Profit Ratio</TableHead>
               <TableHead>Parts</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -303,11 +330,32 @@ const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
                   <TableCell className="text-violet-600">{formatCurrency(companyEarnings)}</TableCell>
                   <TableCell>{profitRatio}%</TableCell>
                   <TableCell className="text-red-600">-{formatCurrency(partsValue)}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateInvoice(tech);
+                      }}
+                    >
+                      <FileText className="h-4 w-4" />
+                      Invoice
+                    </Button>
+                  </TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
+
+        {/* Invoice Dialog */}
+        <TechnicianInvoiceDialog
+          open={invoiceDialogOpen}
+          onOpenChange={setInvoiceDialogOpen}
+          technician={selectedTechnicianForInvoice}
+        />
       </CardContent>
     </Card>
   );
