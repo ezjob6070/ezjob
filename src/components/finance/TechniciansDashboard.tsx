@@ -1,16 +1,13 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import TechnicianFilters from "./technician-filters/TechnicianFilters";
-import { searchTechnician } from "./technician-filters/TechnicianUtils";
 import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
 import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
 import TechnicianPerformanceMetrics from "@/components/technicians/charts/TechnicianPerformanceMetrics";
 import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { DollarSignIcon, Search } from "lucide-react";
+import { DollarSignIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { Input } from "@/components/ui/input";
 
 interface TechniciansDashboardProps {
   activeTechnicians: any[];
@@ -23,7 +20,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
-  // Fix type error by setting the full DateRange object
   const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
     to: new Date(),
@@ -31,15 +27,13 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const [appliedFilters, setAppliedFilters] = useState(false);
   const [filteredTechnicians, setFilteredTechnicians] = useState(activeTechnicians);
 
-  // Get technician names for filters
   const technicianNames = activeTechnicians.map(tech => tech.name);
 
-  // Use the hook for technician financials
   const {
     paymentTypeFilter,
     setPaymentTypeFilter,
     selectedTechnicianNames,
-    setSelectedTechnicianNames,  // Fixed: Get this function from the hook
+    setSelectedTechnicianNames,
     selectedTechnician,
     localDateRange,
     setLocalDateRange,
@@ -53,15 +47,11 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     handleTechnicianSelect
   } = useTechnicianFinancials(filteredTechnicians, dateRange);
 
-  // Filter technicians by search query
   useEffect(() => {
-    const filtered = activeTechnicians.filter(tech => 
-      searchTechnician(tech, searchQuery)
-    );
+    const filtered = activeTechnicians;
     setFilteredTechnicians(filtered);
-  }, [activeTechnicians, searchQuery]);
+  }, [activeTechnicians]);
 
-  // Calculate totals for stat cards
   const totalRevenue = financialMetrics?.totalRevenue || 0;
   const totalEarnings = financialMetrics?.technicianEarnings || 0;
   const companyProfit = financialMetrics?.companyProfit || 0;
@@ -75,18 +65,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            {/* New search bar inside the card */}
-            <div className="relative mb-4">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search technicians by name, specialty, or performance..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
             <TechnicianFilters
               date={localDateRange}
               setDate={setLocalDateRange}
@@ -101,7 +79,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             />
           </div>
 
-          {/* Financial Stat Cards - Showing only revenue, earnings and profit with date */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <Card>
               <CardContent className="pt-6">
