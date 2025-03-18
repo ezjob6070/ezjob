@@ -40,7 +40,9 @@ const Finance = () => {
     toggleJobSource,
     clearFilters,
     applyFilters,
-    activeTechnicians
+    activeTechnicians,
+    searchQuery,
+    setSearchQuery
   } = useFinanceData();
 
   const handleTabChange = (value: string) => {
@@ -118,12 +120,16 @@ const Finance = () => {
                 <JobSourcesDashboard 
                   filteredJobSources={filteredJobSources}
                   filteredTransactions={filteredTransactions}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
                 />
               </TabsContent>
 
               <TabsContent value="technicians" className="mt-0">
                 <TechniciansDashboard 
                   activeTechnicians={activeTechnicians}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
                 />
               </TabsContent>
 
