@@ -9,8 +9,7 @@ import TechnicianFinancialTable from "@/components/technicians/charts/Technician
 import TechnicianPerformanceMetrics from "@/components/technicians/charts/TechnicianPerformanceMetrics";
 import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import StatCard from "@/components/StatCard";
-import { BriefcaseIcon, DollarSignIcon, Users } from "lucide-react";
+import { DollarSignIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
 interface TechniciansDashboardProps {
@@ -63,7 +62,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   }, [activeTechnicians, searchQuery]);
 
   // Calculate totals for stat cards
-  const totalActiveTechnicians = activeTechnicians.filter(tech => tech.status === 'active').length;
   const totalRevenue = financialMetrics?.totalRevenue || 0;
   const totalEarnings = financialMetrics?.technicianEarnings || 0;
   const companyProfit = financialMetrics?.companyProfit || 0;
@@ -82,7 +80,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
               setSearchQuery={setSearchQuery}
             />
             
-            {/* Fixed TechnicianFilters component props by passing setSelectedTechnicianNames */}
             <TechnicianFilters
               date={localDateRange}
               setDate={setLocalDateRange}
@@ -97,17 +94,37 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             />
           </div>
 
-          {/* Financial Stat Cards - Styled to match JobSourceStats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {/* Financial Stat Cards - Showing only revenue, earnings and profit with date */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
                   <div className="p-2 bg-blue-100 rounded-full">
-                    <Users className="h-5 w-5 text-blue-700" />
+                    <DollarSignIcon className="h-5 w-5 text-blue-700" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Active Technicians</p>
-                    <p className="text-2xl font-bold">{totalActiveTechnicians}</p>
+                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalRevenue)}</p>
+                    {dateRangeText && (
+                      <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-red-100 rounded-full">
+                    <DollarSignIcon className="h-5 w-5 text-red-700" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Technician Earnings</p>
+                    <p className="text-2xl font-bold text-red-600">-{formatCurrency(totalEarnings)}</p>
+                    {dateRangeText && (
+                      <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -120,36 +137,11 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                     <DollarSignIcon className="h-5 w-5 text-green-700" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Revenue</p>
-                    <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-purple-100 rounded-full">
-                    <DollarSignIcon className="h-5 w-5 text-purple-700" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Technician Earnings</p>
-                    <p className="text-2xl font-bold">{formatCurrency(totalEarnings)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-indigo-100 rounded-full">
-                    <BriefcaseIcon className="h-5 w-5 text-indigo-700" />
-                  </div>
-                  <div>
                     <p className="text-sm text-muted-foreground">Company Profit</p>
-                    <p className="text-2xl font-bold">{formatCurrency(companyProfit)}</p>
+                    <p className="text-2xl font-bold text-green-600">{formatCurrency(companyProfit)}</p>
+                    {dateRangeText && (
+                      <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
