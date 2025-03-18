@@ -4,7 +4,10 @@ import { Technician } from "@/types/technician";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { FileText, Upload, Download, Trash2, Plus } from "lucide-react";
+import { FileText, Upload, Download, Trash2, Plus, Save } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TechnicianDocumentUploadProps {
   technician: Technician;
@@ -40,6 +43,9 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
       url: "#"
     }
   ]);
+  
+  const [technicianNotes, setTechnicianNotes] = useState<string>(technician.notes || "");
+  const [activeTab, setActiveTab] = useState<string>("documents");
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -77,6 +83,14 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     });
   };
 
+  const handleSaveNotes = () => {
+    // In a real app, this would save to a server
+    toast({
+      title: "Notes Saved",
+      description: "Technician notes have been updated",
+    });
+  };
+
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' bytes';
     else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -94,85 +108,117 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium">Technician Documents</h3>
+          <h3 className="text-lg font-medium">Documents & Notes</h3>
           <p className="text-sm text-muted-foreground">
-            Upload agreements, certifications, and other relevant documents
+            Manage documents and notes for this technician
           </p>
-        </div>
-        
-        <div className="relative">
-          <input
-            type="file"
-            id="document-upload"
-            className="sr-only"
-            onChange={handleFileUpload}
-            multiple
-          />
-          <label htmlFor="document-upload">
-            <Button variant="outline" className="cursor-pointer" asChild>
-              <span>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Document
-              </span>
-            </Button>
-          </label>
         </div>
       </div>
 
-      {documents.length === 0 ? (
-        <div className="text-center py-12 border-2 border-dashed rounded-lg">
-          <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
-          <h3 className="mt-4 text-lg font-medium">No documents yet</h3>
-          <p className="text-muted-foreground mt-2">
-            Upload employment agreements, certifications, or other documents
-          </p>
-          <Button variant="outline" className="mt-4" asChild>
-            <label htmlFor="document-upload" className="cursor-pointer">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Document
-            </label>
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {documents.map(doc => (
-            <Card key={doc.id} className="p-4 flex items-center gap-4">
-              {getDocumentIcon(doc.type)}
-              
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium truncate">{doc.name}</h4>
-                <div className="flex text-xs text-muted-foreground">
-                  <span>{formatFileSize(doc.size)}</span>
-                  <span className="mx-2">•</span>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="documents" className="space-y-4">
+          <div className="flex justify-end">
+            <div className="relative">
+              <input
+                type="file"
+                id="document-upload"
+                className="sr-only"
+                onChange={handleFileUpload}
+                multiple
+              />
+              <label htmlFor="document-upload">
+                <Button variant="outline" className="cursor-pointer" asChild>
                   <span>
-                    {doc.uploaded.toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Document
                   </span>
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Download className="h-4 w-4" />
-                  <span className="sr-only">Download</span>
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-destructive hover:text-destructive"
-                  onClick={() => handleDelete(doc.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Delete</span>
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+              </label>
+            </div>
+          </div>
+
+          {documents.length === 0 ? (
+            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+              <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-medium">No documents yet</h3>
+              <p className="text-muted-foreground mt-2">
+                Upload employment agreements, certifications, or other documents
+              </p>
+              <Button variant="outline" className="mt-4" asChild>
+                <label htmlFor="document-upload" className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Document
+                </label>
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {documents.map(doc => (
+                <Card key={doc.id} className="p-4 flex items-center gap-4">
+                  {getDocumentIcon(doc.type)}
+                  
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium truncate">{doc.name}</h4>
+                    <div className="flex text-xs text-muted-foreground">
+                      <span>{formatFileSize(doc.size)}</span>
+                      <span className="mx-2">•</span>
+                      <span>
+                        {doc.uploaded.toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Download className="h-4 w-4" />
+                      <span className="sr-only">Download</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={() => handleDelete(doc.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="notes" className="space-y-4">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="technician-notes">Notes</Label>
+              <Textarea 
+                id="technician-notes" 
+                placeholder="Add notes about this technician..." 
+                value={technicianNotes}
+                onChange={(e) => setTechnicianNotes(e.target.value)}
+                className="h-60"
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={handleSaveNotes}>
+                <Save className="h-4 w-4 mr-2" />
+                Save Notes
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

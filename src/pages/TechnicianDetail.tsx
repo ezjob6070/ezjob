@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -64,9 +63,9 @@ const TechnicianDetail = () => {
       cancelledJobs: technician.cancelledJobs,
       totalRevenue: technician.totalRevenue,
       rating: technician.rating,
-      // Add support for profile image
       profileImage: values.profileImage || technician.profileImage,
       imageUrl: values.profileImage || technician.imageUrl,
+      notes: values.notes || technician.notes,
     };
     
     setTechnician(updatedTechnician);
@@ -165,7 +164,7 @@ const TechnicianDetail = () => {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="financial">Financial</TabsTrigger>
           <TabsTrigger value="history">Job History</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="documents">Documents & Notes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
