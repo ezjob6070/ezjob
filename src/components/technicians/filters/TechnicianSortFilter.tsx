@@ -2,10 +2,11 @@
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUpAZ, ArrowDownAZ, ArrowUp10, ArrowDown10 } from "lucide-react";
+import { SortOption } from "@/hooks/technicians/useTechnicianTableSorting";
 
 interface TechnicianSortFilterProps {
-  sortBy: string;
-  setSortBy: (value: string) => void;
+  sortBy: SortOption;
+  setSortBy: (value: SortOption) => void;
 }
 
 const TechnicianSortFilter: React.FC<TechnicianSortFilterProps> = ({
@@ -13,7 +14,7 @@ const TechnicianSortFilter: React.FC<TechnicianSortFilterProps> = ({
   setSortBy
 }) => {
   return (
-    <Select value={sortBy} onValueChange={setSortBy}>
+    <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Sort technicians" />
       </SelectTrigger>

@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TechnicianDateFilter from "./TechnicianDateFilter";
 import TechnicianSortFilter from "./TechnicianSortFilter";
 import { DateRange } from "react-day-picker";
+import { SortOption } from "@/hooks/technicians/useTechnicianTableSorting";
 
 interface TechnicianFinancialFilterBarProps {
   technicianNames: string[];
@@ -16,8 +17,8 @@ interface TechnicianFinancialFilterBarProps {
   setPaymentTypeFilter: (value: string) => void;
   localDateRange: DateRange | undefined;
   setLocalDateRange: (date: DateRange | undefined) => void;
-  sortBy: string;
-  setSortBy: (value: string) => void;
+  sortBy: SortOption;
+  setSortBy: (value: SortOption) => void;
 }
 
 const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> = ({
