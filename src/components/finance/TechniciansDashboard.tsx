@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
@@ -74,18 +73,17 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     }
   };
 
-  // Prepare mock metrics data for the selected technician
   const prepareMetricsData = () => {
     if (!selectedTechnician) return null;
     
     return {
       revenue: selectedTechnician.totalRevenue || 0,
-      earnings: selectedTechnician.totalRevenue * 0.40, // Mock 40% of revenue
-      expenses: selectedTechnician.totalRevenue * 0.20, // Mock 20% of revenue
-      profit: selectedTechnician.totalRevenue * 0.40, // Mock 40% of revenue
-      totalJobs: 42, // Mock value
-      completedJobs: 38, // Mock value
-      cancelledJobs: 4, // Mock value
+      earnings: selectedTechnician.totalRevenue * 0.40,
+      expenses: selectedTechnician.totalRevenue * 0.20,
+      profit: selectedTechnician.totalRevenue * 0.40,
+      totalJobs: 42,
+      completedJobs: 38,
+      cancelledJobs: 4,
     };
   };
 
@@ -138,24 +136,20 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const getDateDisplayText = () => {
     if (!localDateRange?.from) return "Today";
     
-    // If from and to are the same date and it's today
     if (localDateRange.to && 
         isSameDay(localDateRange.from, localDateRange.to) && 
         isSameDay(localDateRange.from, today)) {
       return "Today";
     }
     
-    // If from and to are the same date but not today
     if (localDateRange.to && isSameDay(localDateRange.from, localDateRange.to)) {
       return format(localDateRange.from, "MMM d, yyyy");
     }
     
-    // If from and to are different dates
     if (localDateRange.to) {
       return `${format(localDateRange.from, "MMM d")} - ${format(localDateRange.to, "MMM d, yyyy")}`;
     }
     
-    // If only from date is set
     return format(localDateRange.from, "MMM d, yyyy");
   };
 
@@ -163,7 +157,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     return format(today, "MMM d, yyyy");
   };
   
-  // Helper function to check if two dates are the same day
   function isSameDay(date1: Date, date2: Date): boolean {
     return (
       date1.getFullYear() === date2.getFullYear() &&
@@ -225,12 +218,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                   </div>
                 </PopoverContent>
               </Popover>
-
-              {appliedFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters}>
-                  Clear All Filters
-                </Button>
-              )}
             </div>
           </div>
 
