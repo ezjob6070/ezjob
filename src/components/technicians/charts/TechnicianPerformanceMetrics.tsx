@@ -15,57 +15,63 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
 }) => {
   if (!technician || !metrics) return null;
 
-  const cards = [
-    {
-      title: "Completed Jobs",
-      value: technician.completedJobs || 0,
-      icon: <BriefcaseIcon className="h-5 w-5 text-blue-500" />,
-      color: "bg-blue-50 text-blue-700",
-      iconColor: "bg-blue-100"
-    },
-    {
-      title: "Rating",
-      value: (technician.rating || 0).toFixed(1),
-      suffix: "★",
-      icon: <StarIcon className="h-5 w-5 text-amber-500" />,
-      color: "bg-amber-50 text-amber-700",
-      iconColor: "bg-amber-100"
-    },
-    {
-      title: "Average Job Value",
-      value: formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0),
-      icon: <BarChartIcon className="h-5 w-5 text-purple-500" />,
-      color: "bg-purple-50 text-purple-700",
-      iconColor: "bg-purple-100"
-    },
-    {
-      title: "Total Revenue",
-      value: formatCurrency(metrics.revenue || 0),
-      icon: <DollarSignIcon className="h-5 w-5 text-green-500" />,
-      color: "bg-green-50 text-green-700",
-      iconColor: "bg-green-100"
-    }
-  ];
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card, index) => (
-        <Card key={index} className={`border-l-4 border-l-${card.color.split(' ')[0].replace('bg-', '')}-400`}>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
-                <p className="text-2xl font-bold mt-1">
-                  {card.value}{card.suffix || ''}
-                </p>
-              </div>
-              <div className={`p-2 rounded-full ${card.iconColor}`}>
-                {card.icon}
-              </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-blue-100 rounded-full">
+              <BriefcaseIcon className="h-5 w-5 text-blue-700" />
             </div>
-          </CardContent>
-        </Card>
-      ))}
+            <div>
+              <p className="text-sm text-muted-foreground">Completed Jobs</p>
+              <p className="text-2xl font-bold">{technician.completedJobs || 0}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-amber-100 rounded-full">
+              <StarIcon className="h-5 w-5 text-amber-700" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Rating</p>
+              <p className="text-2xl font-bold">{(technician.rating || 0).toFixed(1)}★</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-purple-100 rounded-full">
+              <BarChartIcon className="h-5 w-5 text-purple-700" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Average Job Value</p>
+              <p className="text-2xl font-bold">{formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-green-100 rounded-full">
+              <DollarSignIcon className="h-5 w-5 text-green-700" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-2xl font-bold">{formatCurrency(metrics.revenue || 0)}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

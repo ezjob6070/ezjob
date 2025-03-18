@@ -10,7 +10,8 @@ import TechnicianPerformanceMetrics from "@/components/technicians/charts/Techni
 import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import StatCard from "@/components/StatCard";
-import { BriefcaseIcon, DollarSignIcon, PercentIcon, Users } from "lucide-react";
+import { BriefcaseIcon, DollarSignIcon, Users } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
 interface TechniciansDashboardProps {
   activeTechnicians: any[];
@@ -23,7 +24,8 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({
+  // Fix type error by setting the full DateRange object
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
     to: new Date(),
   });
@@ -64,7 +66,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const totalRevenue = financialMetrics?.totalRevenue || 0;
   const totalEarnings = financialMetrics?.technicianEarnings || 0;
   const companyProfit = financialMetrics?.companyProfit || 0;
-  const profitMargin = totalRevenue > 0 ? (companyProfit / totalRevenue) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -80,11 +81,12 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
               setSearchQuery={setSearchQuery}
             />
             
+            {/* Fixed TechnicianFilters component props */}
             <TechnicianFilters
               date={localDateRange}
               setDate={setLocalDateRange}
               selectedTechnicians={selectedTechnicianNames}
-              toggleTechnician={toggleTechnician}
+              setSelectedTechnicians={setSelectedTechnicianNames}
               technicianNames={technicianNames}
               paymentTypeFilter={paymentTypeFilter}
               setPaymentTypeFilter={setPaymentTypeFilter}
@@ -94,39 +96,63 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             />
           </div>
 
-          {/* Financial Stat Cards - Added to match JobSourcesDashboard */}
+          {/* Financial Stat Cards - Styled to match JobSourceStats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <StatCard
-              title="Active Technicians"
-              value={totalActiveTechnicians.toString()}
-              icon={<Users size={20} />}
-              description="Currently employed technicians"
-              className="bg-blue-50"
-            />
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-blue-100 rounded-full">
+                    <Users className="h-5 w-5 text-blue-700" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Active Technicians</p>
+                    <p className="text-2xl font-bold">{totalActiveTechnicians}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
-            <StatCard
-              title="Total Revenue"
-              value={formatCurrency(totalRevenue)}
-              icon={<DollarSignIcon size={20} />}
-              description="Revenue from all jobs"
-              className="bg-green-50"
-            />
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-green-100 rounded-full">
+                    <DollarSignIcon className="h-5 w-5 text-green-700" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
-            <StatCard
-              title="Technician Earnings"
-              value={formatCurrency(totalEarnings)}
-              icon={<BriefcaseIcon size={20} />}
-              description="Payments to technicians"
-              className="bg-purple-50"
-            />
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-purple-100 rounded-full">
+                    <DollarSignIcon className="h-5 w-5 text-purple-700" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Technician Earnings</p>
+                    <p className="text-2xl font-bold">{formatCurrency(totalEarnings)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
-            <StatCard
-              title="Profit Margin"
-              value={`${profitMargin.toFixed(1)}%`}
-              icon={<PercentIcon size={20} />}
-              description={`Company Profit: ${formatCurrency(companyProfit)}`}
-              className="bg-yellow-50"
-            />
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-indigo-100 rounded-full">
+                    <BriefcaseIcon className="h-5 w-5 text-indigo-700" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Company Profit</p>
+                    <p className="text-2xl font-bold">{formatCurrency(companyProfit)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
           
           <TechnicianFinancialTable
