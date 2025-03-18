@@ -7,13 +7,17 @@ interface TechnicianSearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   showIcons?: boolean;
+  hidden?: boolean; // Added hidden prop
 }
 
 const TechnicianSearchBar: React.FC<TechnicianSearchBarProps> = ({
   searchQuery,
   onSearchChange,
-  showIcons = true
+  showIcons = true,
+  hidden = false // Default to visible
 }) => {
+  if (hidden) return null; // Don't render if hidden
+  
   return (
     <div className="w-full relative">
       <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
