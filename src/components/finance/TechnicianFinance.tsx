@@ -5,16 +5,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TechniciansDashboard from '@/components/finance/TechniciansDashboard';
 import TechnicianInvoiceSection from '@/components/finance/TechnicianInvoiceSection';
 import TechnicianPaymentsSection from '@/components/finance/TechnicianPaymentsSection';
+import InvoiceButton from '@/components/finance/InvoiceButton';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 const TechnicianFinance = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Filter only active technicians for the invoice section
   const activeTechnicians = initialTechnicians.filter(tech => tech.status === 'active');
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium">Technician Financial Management</h3>
+        <div className="flex gap-2">
+          <InvoiceButton entityName="Selected Technician" entityType="technician" />
+          <Button size="sm" className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            New Payment
+          </Button>
+        </div>
+      </div>
+      
       <Tabs 
         defaultValue="dashboard" 
         value={activeTab}
@@ -31,7 +46,12 @@ const TechnicianFinance = () => {
         </TabsList>
         
         <TabsContent value="dashboard" className="mt-6">
-          <TechniciansDashboard key={`dashboard-${refreshKey}`} />
+          <TechniciansDashboard 
+            key={`dashboard-${refreshKey}`} 
+            activeTechnicians={activeTechnicians}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
         </TabsContent>
         
         <TabsContent value="invoices" className="mt-6">
@@ -39,7 +59,7 @@ const TechnicianFinance = () => {
         </TabsContent>
         
         <TabsContent value="payments" className="mt-6">
-          <TechnicianPaymentsSection />
+          <TechnicianPaymentsSection technicians={activeTechnicians} />
         </TabsContent>
       </Tabs>
     </div>
