@@ -9,7 +9,6 @@ import TechnicianPaymentsSection from '@/components/finance/TechnicianPaymentsSe
 const TechnicianFinance = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [refreshKey, setRefreshKey] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Filter only active technicians for the invoice section
   const activeTechnicians = initialTechnicians.filter(tech => tech.status === 'active');
@@ -32,12 +31,7 @@ const TechnicianFinance = () => {
         </TabsList>
         
         <TabsContent value="dashboard" className="mt-6">
-          <TechniciansDashboard 
-            key={`dashboard-${refreshKey}`}
-            activeTechnicians={activeTechnicians}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
+          <TechniciansDashboard key={`dashboard-${refreshKey}`} />
         </TabsContent>
         
         <TabsContent value="invoices" className="mt-6">
@@ -45,7 +39,7 @@ const TechnicianFinance = () => {
         </TabsContent>
         
         <TabsContent value="payments" className="mt-6">
-          <TechnicianPaymentsSection technicians={activeTechnicians} />
+          <TechnicianPaymentsSection />
         </TabsContent>
       </Tabs>
     </div>
