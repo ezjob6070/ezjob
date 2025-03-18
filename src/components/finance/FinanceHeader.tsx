@@ -49,7 +49,7 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
-        <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center gap-3">
+        <div className="flex justify-end items-center gap-3">
           <div className="flex items-center gap-3">
             {/* Date Range Picker */}
             <Popover>
