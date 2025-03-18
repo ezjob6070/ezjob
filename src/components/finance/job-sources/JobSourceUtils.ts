@@ -10,10 +10,11 @@ export const searchJobSource = (source: JobSource, query: string): boolean => {
   // Match against all possible fields
   return (
     source.name.toLowerCase().includes(searchLower) ||
-    (source.phoneNumber?.toLowerCase().includes(searchLower) || false) ||
-    (source.emailAddress?.toLowerCase().includes(searchLower) || false) ||
-    (source.website?.toLowerCase().includes(searchLower) || false) ||
-    (source.category?.toLowerCase().includes(searchLower) || false)
+    // For other fields, we need to check if they exist first
+    (source.phone && source.phone.toLowerCase().includes(searchLower)) ||
+    (source.email && source.email.toLowerCase().includes(searchLower)) ||
+    (source.website && source.website.toLowerCase().includes(searchLower)) ||
+    (source.category && source.category.toLowerCase().includes(searchLower))
   );
 };
 

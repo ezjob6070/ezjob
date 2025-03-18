@@ -72,7 +72,21 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             date={localDateRange}
             setDate={setLocalDateRange}
             selectedTechnicians={selectedTechnicianNames}
-            setSelectedTechnicians={toggleTechnician}
+            // Fix the type issue by creating a wrapper function with the correct type
+            setSelectedTechnicians={(techNames) => {
+              if (typeof techNames === 'function') {
+                // Handle the function case (React's setState can take a function)
+                const newNames = techNames(selectedTechnicianNames);
+                newNames.forEach(name => toggleTechnician(name));
+              } else {
+                // Handle direct array assignment
+                const toAdd = techNames.filter(name => !selectedTechnicianNames.includes(name));
+                const toRemove = selectedTechnicianNames.filter(name => !techNames.includes(name));
+                
+                toAdd.forEach(name => toggleTechnician(name));
+                toRemove.forEach(name => toggleTechnician(name));
+              }
+            }}
             technicianNames={technicianNames}
             paymentTypeFilter={paymentTypeFilter}
             setPaymentTypeFilter={setPaymentTypeFilter}
