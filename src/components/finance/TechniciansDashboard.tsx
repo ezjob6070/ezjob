@@ -1,14 +1,22 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Technician } from '@/types/technician';
-import { Input } from '@/components/ui/input';
-import { SearchIcon } from 'lucide-react';
-import PaymentBreakdownCards from '@/components/technicians/charts/PaymentBreakdownCards';
-import TechnicianPerformanceMetrics from '@/components/technicians/charts/TechnicianPerformanceMetrics';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
+import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
+import { DateRange } from "react-day-picker";
+import DashboardMetrics from "./dashboard/MetricsCards";
+import TechnicianDetailPanel from "./dashboard/TechnicianDetailPanel";
+import { Button } from "@/components/ui/button";
+import { Calendar, ChevronDown } from "lucide-react";
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 interface TechniciansDashboardProps {
-  activeTechnicians: Technician[];
+  activeTechnicians: any[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
@@ -18,96 +26,232 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
-  const filteredTechnicians = activeTechnicians.filter(tech => 
-    tech.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  // Calculate total metrics for all displayed technicians
-  const aggregateMetrics = {
-    completedJobs: filteredTechnicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0),
-    cancelledJobs: filteredTechnicians.reduce((sum, tech) => sum + (tech.cancelledJobs || 0), 0),
-    totalRevenue: filteredTechnicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0),
-    revenue: filteredTechnicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0)
+  const today = new Date();
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: today,
+    to: today,
+  });
+  const [appliedFilters, setAppliedFilters] = useState(false);
+  const [filteredTechnicians, setFilteredTechnicians] = useState(activeTechnicians);
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("");
+  const [showDateFilter, setShowDateFilter] = useState(false);
+
+  const technicianNames = activeTechnicians.map(tech => tech.name);
+
+  const {
+    paymentTypeFilter,
+    setPaymentTypeFilter,
+    selectedTechnicianNames,
+    setSelectedTechnicianNames,
+    selectedTechnician,
+    localDateRange,
+    setLocalDateRange,
+    displayedTechnicians,
+    financialMetrics,
+    selectedTechnicianMetrics,
+    dateRangeText,
+    toggleTechnician,
+    clearFilters,
+    applyFilters,
+    handleTechnicianSelect
+  } = useTechnicianFinancials(filteredTechnicians, dateRange);
+
+  useEffect(() => {
+    const filtered = activeTechnicians;
+    setFilteredTechnicians(filtered);
+  }, [activeTechnicians]);
+
+  // Calculate totals for all filtered technicians
+  const totalRevenue = financialMetrics?.totalRevenue || 0;
+  const totalEarnings = financialMetrics?.technicianEarnings || 0;
+  const companyProfit = financialMetrics?.companyProfit || 0;
+
+  const handleTechnicianChange = (techId: string) => {
+    setSelectedTechnicianId(techId);
+    const tech = activeTechnicians.find(t => t.id === techId);
+    if (tech) {
+      handleTechnicianSelect(tech);
+    }
+  };
+
+  const prepareMetricsData = () => {
+    if (!selectedTechnician) return null;
+    
+    return {
+      revenue: selectedTechnician.totalRevenue || 0,
+      earnings: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
+      expenses: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.20 : 0,
+      profit: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
+      totalJobs: 42,
+      completedJobs: 38,
+      cancelledJobs: 4,
+    };
+  };
+
+  const mockMetrics = prepareMetricsData();
+
+  const handleDatePreset = (preset: string) => {
+    const today = new Date();
+    let from: Date;
+    let to: Date = today;
+
+    switch (preset) {
+      case "today":
+        from = today;
+        break;
+      case "yesterday":
+        from = new Date(today);
+        from.setDate(today.getDate() - 1);
+        to = new Date(from);
+        break;
+      case "thisWeek":
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+        from = startOfWeek;
+        break;
+      case "lastWeek":
+        const lastWeekStart = new Date(today);
+        lastWeekStart.setDate(today.getDate() - today.getDay() - 6);
+        from = lastWeekStart;
+        const lastWeekEnd = new Date(lastWeekStart);
+        lastWeekEnd.setDate(lastWeekStart.getDate() + 6);
+        to = lastWeekEnd;
+        break;
+      case "thisMonth":
+        from = new Date(today.getFullYear(), today.getMonth(), 1);
+        to = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        break;
+      case "lastMonth":
+        from = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        to = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      default:
+        from = today;
+    }
+    
+    setLocalDateRange({ from, to });
+    setAppliedFilters(true);
+    setShowDateFilter(false);
+  };
+
+  const getDateDisplayText = () => {
+    if (!localDateRange?.from) return "Today";
+    
+    if (localDateRange.to && 
+        isSameDay(localDateRange.from, localDateRange.to) && 
+        isSameDay(localDateRange.from, today)) {
+      return "Today";
+    }
+    
+    if (localDateRange.to && isSameDay(localDateRange.from, localDateRange.to)) {
+      return format(localDateRange.from, "MMM d, yyyy");
+    }
+    
+    if (localDateRange.to) {
+      return `${format(localDateRange.from, "MMM d")} - ${format(localDateRange.to, "MMM d, yyyy")}`;
+    }
+    
+    return format(localDateRange.from, "MMM d, yyyy");
+  };
+
+  const getTodayFormattedDate = () => {
+    return format(today, "MMM d, yyyy");
   };
   
-  // Calculate technician earnings
-  const technicianEarnings = filteredTechnicians.reduce((sum, tech) => {
-    if (!tech.totalRevenue) return sum;
-    return sum + (tech.paymentType === 'percentage'
-      ? tech.totalRevenue * (tech.paymentRate / 100)
-      : tech.completedJobs * tech.paymentRate);
-  }, 0);
-  
-  // Simplified calculations for other financial metrics
-  const expenses = aggregateMetrics.revenue * 0.2;
-  const profit = aggregateMetrics.revenue - technicianEarnings - expenses;
+  function isSameDay(date1: Date, date2: Date): boolean {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div>
-          <h2 className="text-xl font-semibold">Technician Dashboard</h2>
-          <p className="text-muted-foreground">Overview of technician financial performance</p>
-        </div>
-        
-        <div className="w-full md:w-64 relative">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search technicians..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
-          />
-        </div>
-      </div>
-      
-      {filteredTechnicians.length > 0 ? (
-        <>
-          <PaymentBreakdownCards
-            revenue={aggregateMetrics.revenue}
-            technicianEarnings={technicianEarnings}
-            expenses={expenses}
-            profit={profit}
-            dateRangeText="Last 30 days"
+      <Card>
+        <CardHeader>
+          <CardTitle>Technician Financial Performance</CardTitle>
+          <CardDescription>Search, filter, and analyze technician earnings and profitability</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex flex-col items-start px-4 py-2 h-auto min-h-[3rem] relative">
+                    <div className="flex items-center gap-2 font-medium">
+                      <Calendar className="h-4 w-4" />
+                      {getDateDisplayText()}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {isSameDay(localDateRange?.from || today, today) ? 
+                        getTodayFormattedDate() : 
+                        "Click to select custom range"}
+                    </div>
+                    <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <div className="p-3 border-b">
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("today")}>Today</Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("yesterday")}>Yesterday</Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("thisWeek")}>This Week</Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("lastWeek")}>Last Week</Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("thisMonth")}>This Month</Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("lastMonth")}>Last Month</Button>
+                    </div>
+                    <div className="text-sm font-medium mb-2">Custom Range</div>
+                    <CalendarComponent
+                      mode="range"
+                      selected={localDateRange}
+                      onSelect={setLocalDateRange}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </div>
+                  <div className="p-3 flex justify-between">
+                    <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
+                    <Button variant="default" size="sm" onClick={() => {
+                      applyFilters();
+                      setShowDateFilter(false);
+                    }}>Apply</Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          <DashboardMetrics 
+            totalRevenue={totalRevenue}
+            totalEarnings={totalEarnings}
+            companyProfit={companyProfit}
+            dateRangeText={dateRangeText}
           />
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Top Performing Technicians</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredTechnicians
-                  .sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0))
-                  .slice(0, 3)
-                  .map(tech => {
-                    // Calculate metrics for this technician
-                    const metrics = {
-                      completedJobs: tech.completedJobs || 0,
-                      cancelledJobs: tech.cancelledJobs || 0,
-                      totalRevenue: tech.totalRevenue || 0,
-                      revenue: tech.totalRevenue || 0
-                    };
-                    
-                    return (
-                      <div key={tech.id} className="border-b pb-4 last:border-0 last:pb-0">
-                        <h3 className="text-lg font-medium mb-2">{tech.name}</h3>
-                        <TechnicianPerformanceMetrics 
-                          technician={tech}
-                          metrics={metrics}
-                        />
-                      </div>
-                    );
-                  })
-                }
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      ) : (
-        <div className="flex justify-center items-center h-40 bg-muted/30 rounded-lg">
-          <p className="text-muted-foreground">No technicians found</p>
-        </div>
+          <TechnicianFinancialTable
+            filteredTechnicians={filteredTechnicians}
+            displayedTechnicians={displayedTechnicians}
+            selectedTechnicianNames={selectedTechnicianNames}
+            toggleTechnician={toggleTechnician}
+            clearFilters={clearFilters}
+            applyFilters={applyFilters}
+            paymentTypeFilter={paymentTypeFilter}
+            setPaymentTypeFilter={setPaymentTypeFilter}
+            localDateRange={localDateRange}
+            setLocalDateRange={setLocalDateRange}
+            onTechnicianSelect={handleTechnicianSelect}
+            selectedTechnicianId={selectedTechnician?.id}
+          />
+        </CardContent>
+      </Card>
+
+      {selectedTechnician && (
+        <TechnicianDetailPanel 
+          selectedTechnician={selectedTechnician}
+          selectedTechnicianMetrics={mockMetrics}
+          dateRangeText={dateRangeText}
+        />
       )}
     </div>
   );
