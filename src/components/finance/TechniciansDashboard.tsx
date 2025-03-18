@@ -1,12 +1,13 @@
 
-import React, { useState } from "react";
-import { Technician } from "@/types/technician";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRange } from "react-day-picker";
-import TechnicianDashboardHeader from "@/components/finance/dashboard/TechnicianDashboardHeader";
-import FinancialChartSection from "@/components/finance/dashboard/FinancialChartSection";
-import TechnicianPerformanceTable from "@/components/finance/dashboard/TechnicianPerformanceTable";
-import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Technician } from "@/types/technician";
+import TechnicianSearchFilter from "./technician-filters/TechnicianSearchFilter";
+import TechnicianFilters from "./technician-filters/TechnicianFilters";
+import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
+import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
+import TechnicianPerformanceMetrics from "@/components/technicians/charts/TechnicianPerformanceMetrics";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -19,128 +20,97 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
-  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
-  const today = new Date();
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: today,
-    to: today
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
+    to: new Date()
   });
+  
   const [appliedFilters, setAppliedFilters] = useState(false);
-  const [categories, setCategories] = useState<string[]>([
-    "Garage Door", "HVAC", "Electrical", "Plumbing", "Construction", "Others"
-  ]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
+  const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>(activeTechnicians);
+  
+  // Get technician names for filters
   const technicianNames = activeTechnicians.map(tech => tech.name);
-
-  const filteredTechnicians = activeTechnicians.filter(tech => {
-    const matchesSelectedTechnicians = 
-      !appliedFilters || 
-      selectedTechnicians.length === 0 || 
-      selectedTechnicians.includes(tech.name);
-
-    const matchesCategory = 
-      selectedCategories.length === 0 || 
-      (tech.category && selectedCategories.includes(tech.category)) ||
-      (!tech.category && selectedCategories.includes("Others"));
-    
-    const matchesSearch = 
-      !searchQuery || 
-      tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (tech.specialty && tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    return matchesSelectedTechnicians && matchesCategory && matchesSearch;
-  });
-
-  const toggleTechnician = (techName: string) => {
-    setSelectedTechnicians(prev => 
-      prev.includes(techName) 
-        ? prev.filter(t => t !== techName)
-        : [...prev, techName]
+  
+  // Use the hook for technician financials
+  const {
+    paymentTypeFilter,
+    setPaymentTypeFilter,
+    selectedTechnicianNames,
+    selectedTechnician,
+    localDateRange,
+    setLocalDateRange,
+    displayedTechnicians,
+    financialMetrics,
+    selectedTechnicianMetrics,
+    toggleTechnician,
+    clearFilters,
+    applyFilters,
+    handleTechnicianSelect
+  } = useTechnicianFinancials(filteredTechnicians, dateRange);
+  
+  // Filter technicians by search query
+  useEffect(() => {
+    const filtered = activeTechnicians.filter(
+      tech => tech.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  };
-
-  const toggleCategory = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-
-  const addCategory = (category: string) => {
-    setCategories(prev => [...prev, category]);
-  };
-
-  const selectAllTechnicians = () => {
-    setSelectedTechnicians([...technicianNames]);
-  };
-
-  const deselectAllTechnicians = () => {
-    setSelectedTechnicians([]);
-  };
-
-  const clearFilters = () => {
-    setSelectedTechnicians([]);
-    setSelectedCategories([]);
-    const resetToday = new Date();
-    setDate({
-      from: resetToday,
-      to: resetToday
-    });
-    setAppliedFilters(false);
-  };
-
-  const applyFilters = () => {
-    setAppliedFilters(true);
-  };
+    setFilteredTechnicians(filtered);
+  }, [activeTechnicians, searchQuery]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="w-full md:w-auto">
-              <TechnicianSearchBar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                hidden={true}
-              />
-            </div>
-          </div>
+        <CardHeader>
+          <CardTitle>Technician Financial Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TechnicianSearchFilter 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery} 
+          />
           
-          <div className="mt-4">
-            <TechnicianDashboardHeader
-              technicianNames={technicianNames}
-              selectedTechnicians={selectedTechnicians}
-              toggleTechnician={toggleTechnician}
-              categories={categories}
-              selectedCategories={selectedCategories}
-              toggleCategory={toggleCategory}
-              addCategory={addCategory}
-              clearFilters={clearFilters}
-              applyFilters={applyFilters}
-              date={date}
-              setDate={setDate}
-              selectAllTechnicians={selectAllTechnicians}
-              deselectAllTechnicians={deselectAllTechnicians}
-              appliedFilters={appliedFilters}
-              filteredTechnicians={filteredTechnicians}
-              activeTechnicians={activeTechnicians}
-            />
-          </div>
+          <TechnicianFilters
+            date={localDateRange}
+            setDate={setLocalDateRange}
+            selectedTechnicians={selectedTechnicianNames}
+            setSelectedTechnicians={toggleTechnician}
+            technicianNames={technicianNames}
+            paymentTypeFilter={paymentTypeFilter}
+            setPaymentTypeFilter={setPaymentTypeFilter}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            clearFilters={clearFilters}
+          />
+          
+          <TechnicianFinancialTable
+            filteredTechnicians={filteredTechnicians}
+            displayedTechnicians={displayedTechnicians}
+            selectedTechnicianNames={selectedTechnicianNames}
+            toggleTechnician={toggleTechnician}
+            clearFilters={clearFilters}
+            applyFilters={applyFilters}
+            paymentTypeFilter={paymentTypeFilter}
+            setPaymentTypeFilter={setPaymentTypeFilter}
+            localDateRange={localDateRange}
+            setLocalDateRange={setLocalDateRange}
+            onTechnicianSelect={handleTechnicianSelect}
+            selectedTechnicianId={selectedTechnician?.id}
+          />
         </CardContent>
       </Card>
       
-      <FinancialChartSection 
-        filteredTechnicians={filteredTechnicians}
-        date={date}
-      />
-      
-      <TechnicianPerformanceTable 
-        filteredTechnicians={filteredTechnicians}
-        selectedCategories={selectedCategories}
-      />
+      {selectedTechnician && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Technician Details: {selectedTechnician.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TechnicianPerformanceMetrics 
+              technician={selectedTechnician}
+              metrics={selectedTechnicianMetrics}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, Filter } from "lucide-react";
@@ -17,7 +16,7 @@ interface JobSourceFiltersProps {
   date: DateRange | undefined;
   setDate: (date: DateRange | undefined) => void;
   selectedJobSources: string[];
-  setSelectedJobSources: (sources: string[]) => void;
+  setSelectedJobSources: React.Dispatch<React.SetStateAction<string[]>>;
   jobSourceNames: string[];
   appliedFilters: boolean;
   setAppliedFilters: (applied: boolean) => void;
