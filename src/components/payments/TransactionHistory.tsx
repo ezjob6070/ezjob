@@ -2,9 +2,8 @@
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { SearchIcon, FilterIcon } from "lucide-react";
+import { FilterIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import DateRangeFilter from "@/components/finance/technician-filters/DateRangeFilter";
 import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
@@ -88,16 +87,7 @@ const TransactionHistory = ({ transactions, formatCurrency }: TransactionHistory
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center">
-          <div className="relative flex-1">
-            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search transactions..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="flex justify-end items-center">
           <div className="flex gap-2">
             <Button 
               variant="outline" 

@@ -6,11 +6,13 @@ import { Search, Phone, Mail, User } from "lucide-react";
 interface TechnicianSearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  showIcons?: boolean;
 }
 
 const TechnicianSearchBar: React.FC<TechnicianSearchBarProps> = ({
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  showIcons = true
 }) => {
   return (
     <div className="w-full relative">
@@ -19,15 +21,17 @@ const TechnicianSearchBar: React.FC<TechnicianSearchBarProps> = ({
       </div>
       <Input
         placeholder="Search by name, email, phone, or specialty..."
-        className="w-full pl-10 pr-10"
+        className={`w-full pl-10 ${showIcons ? 'pr-10' : 'pr-4'}`}
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
       />
-      <div className="absolute inset-y-0 right-3 flex items-center space-x-1 text-muted-foreground">
-        <User className="h-3 w-3" />
-        <Mail className="h-3 w-3" />
-        <Phone className="h-3 w-3" />
-      </div>
+      {showIcons && (
+        <div className="absolute inset-y-0 right-3 flex items-center space-x-1 text-muted-foreground">
+          <User className="h-3 w-3" />
+          <Mail className="h-3 w-3" />
+          <Phone className="h-3 w-3" />
+        </div>
+      )}
     </div>
   );
 };

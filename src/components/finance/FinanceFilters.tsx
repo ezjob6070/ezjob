@@ -33,9 +33,11 @@ const FinanceFilters = ({ filters, setFilters, jobSources, resetFilters }: Finan
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap md:flex-nowrap">
+        {/* Search bar hidden */}
         <SearchBar 
           searchTerm={filters.searchTerm}
           updateFilter={updateFilter}
+          hidden={true}
         />
         
         <JobSourceFilter 

@@ -23,8 +23,6 @@ const Finance = () => {
   });
   
   const {
-    searchQuery,
-    setSearchQuery,
     showFilters,
     setShowFilters,
     selectedTechnicians,
@@ -80,8 +78,6 @@ const Finance = () => {
                   tabOptions={financeTabOptions}
                   activeTab={activeTab}
                   setActiveTab={setActiveTab as (tab: string) => void}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
                   showFilters={showFilters}
                   setShowFilters={setShowFilters}
                   date={date}
@@ -122,16 +118,12 @@ const Finance = () => {
                 <JobSourcesDashboard 
                   filteredJobSources={filteredJobSources}
                   filteredTransactions={filteredTransactions}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
                 />
               </TabsContent>
 
               <TabsContent value="technicians" className="mt-0">
                 <TechniciansDashboard 
                   activeTechnicians={activeTechnicians}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
                 />
               </TabsContent>
 

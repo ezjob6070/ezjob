@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import { Technician } from "@/types/technician";
-import CompactTechnicianFilter from "@/components/finance/technician-filters/CompactTechnicianFilter";
 import TechniciansTableView from "@/components/technicians/list/TechniciansTableView";
 import TechniciansCardView from "@/components/technicians/list/TechniciansCardView";
 import ViewToggleButtons from "@/components/technicians/list/ViewToggleButtons";

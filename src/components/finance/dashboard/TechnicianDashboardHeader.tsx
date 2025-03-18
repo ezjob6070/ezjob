@@ -5,7 +5,6 @@ import { Technician } from "@/types/technician";
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel";
 import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface TechnicianDashboardHeaderProps {
   technicianNames: string[];

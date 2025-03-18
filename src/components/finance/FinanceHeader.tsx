@@ -18,8 +18,6 @@ interface FinanceHeaderProps {
   tabOptions: TabOption[];
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
   showFilters: boolean;
   setShowFilters: (show: boolean) => void;
   date: DateRange | undefined;
