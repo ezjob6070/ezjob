@@ -61,7 +61,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <MetricsCard
-        title="Total Revenue"
+        title="Total Revenue from All Technicians"
         value={totalRevenue}
         iconColor="text-blue-700"
         bgColor="bg-blue-100"
@@ -70,7 +70,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
       />
       
       <MetricsCard
-        title="Technician Earnings"
+        title="Technician Earnings from All Technicians"
         value={totalEarnings}
         iconColor="text-red-700"
         bgColor="bg-red-100"
@@ -80,7 +80,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
       />
       
       <MetricsCard
-        title="Company Profit"
+        title="Company Profit from All Technicians"
         value={companyProfit}
         iconColor="text-green-700"
         bgColor="bg-green-100"
