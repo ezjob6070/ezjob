@@ -59,6 +59,7 @@ export const useTechnicianFinancials = (
     paymentTypeFilter,
     setPaymentTypeFilter,
     selectedTechnicianNames,
+    setSelectedTechnicianNames,  // Explicitly return this function
     selectedTechnician,
     localDateRange,
     setLocalDateRange,

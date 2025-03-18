@@ -40,6 +40,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     paymentTypeFilter,
     setPaymentTypeFilter,
     selectedTechnicianNames,
+    setSelectedTechnicianNames,  // Fixed: Get this function from the hook
     selectedTechnician,
     localDateRange,
     setLocalDateRange,
@@ -81,7 +82,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
               setSearchQuery={setSearchQuery}
             />
             
-            {/* Fixed TechnicianFilters component props */}
+            {/* Fixed TechnicianFilters component props by passing setSelectedTechnicianNames */}
             <TechnicianFilters
               date={localDateRange}
               setDate={setLocalDateRange}
