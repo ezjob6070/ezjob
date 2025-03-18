@@ -7,7 +7,7 @@ import { DateRange } from "react-day-picker";
 import DashboardMetrics from "./dashboard/MetricsCards";
 import TechnicianDetailPanel from "./dashboard/TechnicianDetailPanel";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar, ChevronDown } from "lucide-react";
 import { 
   Popover, 
   PopoverContent, 
@@ -158,6 +158,10 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     // If only from date is set
     return format(localDateRange.from, "MMM d, yyyy");
   };
+
+  const getTodayFormattedDate = () => {
+    return format(today, "MMM d, yyyy");
+  };
   
   // Helper function to check if two dates are the same day
   function isSameDay(date1: Date, date2: Date): boolean {
@@ -180,9 +184,17 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             <div className="flex flex-wrap gap-2 mb-6">
               <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    {getDateDisplayText()}
+                  <Button variant="outline" className="flex flex-col items-start px-4 py-2 h-auto min-h-[3rem] relative">
+                    <div className="flex items-center gap-2 font-medium">
+                      <Calendar className="h-4 w-4" />
+                      {getDateDisplayText()}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {isSameDay(localDateRange?.from || today, today) ? 
+                        getTodayFormattedDate() : 
+                        "Click to select custom range"}
+                    </div>
+                    <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
