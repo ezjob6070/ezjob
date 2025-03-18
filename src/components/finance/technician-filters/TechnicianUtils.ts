@@ -17,45 +17,6 @@ export const searchTechnician = (technician: Technician, query: string): boolean
   );
 };
 
-// Filter technicians based on selected categories
-export const filterTechniciansByCategory = (
-  technicians: Technician[], 
-  selectedCategories: string[]
-): Technician[] => {
-  if (selectedCategories.length === 0) return technicians;
-  
-  return technicians.filter(technician => 
-    (technician.category && selectedCategories.includes(technician.category)) ||
-    (!technician.category && selectedCategories.includes("Uncategorized"))
-  );
-};
-
-// Filter technicians based on date range
-export const filterTechniciansByDate = (
-  technicians: Technician[],
-  dateRange: { from?: Date; to?: Date } | undefined,
-  appliedFilters: boolean
-): Technician[] => {
-  if (!appliedFilters || !dateRange?.from) return technicians;
-  
-  return technicians.filter(technician => {
-    if (!technician.hireDate) return true;
-    
-    const technicianDate = new Date(technician.hireDate);
-    let matchesDateRange = true;
-    
-    if (dateRange.from) {
-      matchesDateRange = technicianDate >= dateRange.from;
-    }
-    
-    if (dateRange.to && matchesDateRange) {
-      matchesDateRange = technicianDate <= dateRange.to;
-    }
-    
-    return matchesDateRange;
-  });
-};
-
 // Filter technicians based on payment type
 export const filterTechniciansByPaymentType = (
   technicians: Technician[],
@@ -66,4 +27,19 @@ export const filterTechniciansByPaymentType = (
   return technicians.filter(technician => 
     technician.paymentType === paymentType
   );
+};
+
+// Filter technicians based on date range
+export const filterTechniciansByDateRange = (
+  technicians: Technician[],
+  dateRange: { from?: Date; to?: Date } | undefined
+): Technician[] => {
+  if (!dateRange?.from || !dateRange?.to) return technicians;
+  
+  return technicians.filter(technician => {
+    if (!technician.hireDate) return true;
+    
+    const hireDate = new Date(technician.hireDate);
+    return hireDate >= dateRange.from! && hireDate <= dateRange.to!;
+  });
 };
