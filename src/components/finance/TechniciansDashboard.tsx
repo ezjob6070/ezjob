@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import TechnicianSearchFilter from "./technician-filters/TechnicianSearchFilter";
 import TechnicianFilters from "./technician-filters/TechnicianFilters";
 import { searchTechnician } from "./technician-filters/TechnicianUtils";
 import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
@@ -9,8 +8,9 @@ import TechnicianFinancialTable from "@/components/technicians/charts/Technician
 import TechnicianPerformanceMetrics from "@/components/technicians/charts/TechnicianPerformanceMetrics";
 import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { DollarSignIcon } from "lucide-react";
+import { DollarSignIcon, Search } from "lucide-react";
 import { DateRange } from "react-day-picker";
+import { Input } from "@/components/ui/input";
 
 interface TechniciansDashboardProps {
   activeTechnicians: any[];
@@ -75,10 +75,17 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <TechnicianSearchFilter 
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
+            {/* New search bar inside the card */}
+            <div className="relative mb-4">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search technicians by name, specialty, or performance..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
             
             <TechnicianFilters
               date={localDateRange}
