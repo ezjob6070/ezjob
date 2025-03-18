@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -5,10 +6,7 @@ import { JobSource, FinancialTransaction } from "@/types/finance";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import JobSourceInvoiceSection from "@/components/finance/JobSourceInvoiceSection";
 import JobSourceCircleCharts from "@/components/finance/JobSourceCircleCharts";
-import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
 import { DateRange } from "react-day-picker";
-import JobSourceFiltersPanel from "@/components/finance/JobSourceFiltersPanel";
-import JobSourceCategoryFilter from "@/components/finance/jobsource-filters/JobSourceCategoryFilter";
 
 interface JobSourcesDashboardProps {
   filteredJobSources: JobSource[];
@@ -92,38 +90,7 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <JobSourceCategoryFilter 
-            selectedCategories={selectedCategories}
-            toggleCategory={toggleCategory}
-            categories={categories}
-            addCategory={addCategory}
-          />
-          
-          <JobSourceFiltersPanel 
-            showFilters={true}
-            jobSourceNames={jobSourceNames}
-            selectedJobSources={selectedJobSources}
-            toggleJobSource={toggleJobSource}
-            clearFilters={clearFilters}
-            applyFilters={applyFilters}
-            date={date}
-            setDate={setDate}
-            selectAllJobSources={selectAllJobSources}
-            deselectAllJobSources={deselectAllJobSources}
-            compact={true}
-          />
-          
-          <CompactDateRangeSelector date={date} setDate={setDate} />
-        </div>
-        
-        {(selectedJobSources.length > 0 || selectedCategories.length > 0) && (
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredSources.length} of {filteredJobSources.length} job sources
-          </div>
-        )}
-      </div>
+      {/* Filter bar completely removed */}
       
       <JobSourceCircleCharts 
         filteredJobSources={filteredSources} 

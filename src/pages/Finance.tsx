@@ -3,7 +3,6 @@ import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { financeTabOptions, FinanceTabId } from "@/components/finance/FinanceTabConfig";
 import FinancePageHeader from "@/components/finance/FinancePageHeader";
-import FinanceHeader from "@/components/finance/FinanceHeader";
 import FinanceFiltersPanel from "@/components/finance/FinanceFiltersPanel";
 import OverviewDashboard from "@/components/finance/OverviewDashboard";
 import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
@@ -75,32 +74,24 @@ const Finance = () => {
                 ))}
               </TabsList>
               
-              <div className="flex items-center gap-3">
-                <FinanceHeader 
-                  tabOptions={financeTabOptions}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab as (tab: string) => void}
-                  showFilters={showFilters}
-                  setShowFilters={setShowFilters}
-                  date={date}
-                  setDate={setDate}
-                />
-              </div>
+              {/* Date range picker and filters button completely removed */}
             </div>
             
-            {/* Filters Panel */}
-            <FinanceFiltersPanel 
-              showFilters={showFilters}
-              technicianNames={technicianNames}
-              jobSourceNames={jobSourceNames}
-              selectedTechnicians={selectedTechnicians}
-              selectedJobSources={selectedJobSources}
-              toggleTechnician={toggleTechnician}
-              toggleJobSource={toggleJobSource}
-              clearFilters={clearFilters}
-              setShowFilters={setShowFilters}
-              applyFilters={applyFilters}
-            />
+            {/* Filters Panel - Hide it completely */}
+            {false && (
+              <FinanceFiltersPanel 
+                showFilters={showFilters}
+                technicianNames={technicianNames}
+                jobSourceNames={jobSourceNames}
+                selectedTechnicians={selectedTechnicians}
+                selectedJobSources={selectedJobSources}
+                toggleTechnician={toggleTechnician}
+                toggleJobSource={toggleJobSource}
+                clearFilters={clearFilters}
+                setShowFilters={setShowFilters}
+                applyFilters={applyFilters}
+              />
+            )}
 
             <div className="p-6">
               <TabsContent value="overview" className="mt-0">
