@@ -29,6 +29,7 @@ import Schedule from "./pages/Schedule";
 import TechnicianAltercation from "./pages/TechnicianAltercation";
 import TechnicianAnalytics from "./pages/TechnicianAnalytics";
 import TechnicianDetail from "./pages/TechnicianDetail";
+import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,7 @@ function App() {
                 <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
                 <Route path="estimates" element={<Estimates />} />
                 <Route path="finance" element={<Finance />} />
+                <Route path="finance/technicians" element={<FinanceTechnicians />} />
                 <Route path="gps-tracking" element={<GPSTracking />} />
                 <Route path="job-sources" element={<JobSources />} />
                 <Route path="employed" element={<Employed />} />
