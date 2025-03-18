@@ -4,6 +4,7 @@ import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
 import { calculateFinancialMetrics, calculateTechnicianMetrics, formatDateRangeText } from "./financialUtils";
 import { filterTechnicians, toggleTechnicianInFilter } from "./technicianFilters";
+import { format } from "date-fns";
 
 export const useTechnicianFinancials = (
   filteredTechnicians: Technician[],
@@ -29,9 +30,19 @@ export const useTechnicianFinancials = (
     return calculateTechnicianMetrics(selectedTechnician);
   }, [selectedTechnician]);
   
-  // Format date range for display
+  // Format date range for display - using compact format similar to job source page
   const dateRangeText = useMemo(() => {
-    return formatDateRangeText(localDateRange?.from, localDateRange?.to);
+    if (!localDateRange?.from) return "";
+    
+    if (localDateRange.to) {
+      if (localDateRange.from.toDateString() === localDateRange.to.toDateString()) {
+        // Same day
+        return format(localDateRange.from, "MMM d, yyyy");
+      }
+      return `${format(localDateRange.from, "MMM d")} - ${format(localDateRange.to, "MMM d, yyyy")}`;
+    }
+    
+    return format(localDateRange.from, "MMM d, yyyy");
   }, [localDateRange]);
   
   // Handle technician selection in filters
