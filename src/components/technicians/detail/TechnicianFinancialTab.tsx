@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,12 +40,34 @@ const TechnicianFinancialTab = ({
   selectedTechnicianId,
   onTechnicianSelect
 }: TechnicianFinancialTabProps) => {
+  const technicianMetrics = useMemo(() => {
+    return {
+      completedJobs: technician.completedJobs || 0,
+      cancelledJobs: technician.cancelledJobs || 0,
+      totalRevenue: technician.totalRevenue || 0,
+      revenue: technician.totalRevenue || 0,
+      earnings: technician.totalRevenue ? technician.totalRevenue * (technician.paymentType === "percentage" ? technician.paymentRate / 100 : 1) : 0,
+      expenses: technician.totalRevenue ? technician.totalRevenue * 0.2 : 0,
+      profit: technician.totalRevenue ? technician.totalRevenue * 0.4 : 0,
+      partsValue: technician.totalRevenue ? technician.totalRevenue * 0.1 : 0
+    };
+  }, [technician]);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <TechnicianDetailCard technician={technician} />
+        <TechnicianDetailCard 
+          technician={technician}
+          metrics={technicianMetrics}
+        />
         <div className="md:col-span-2">
-          <PaymentBreakdownCards technician={technician} />
+          <PaymentBreakdownCards 
+            technicians={[technician]}
+            revenue={technicianMetrics.revenue}
+            technicianEarnings={technicianMetrics.earnings}
+            expenses={technicianMetrics.expenses}
+            profit={technicianMetrics.profit}
+          />
         </div>
       </div>
       
@@ -66,7 +88,10 @@ const TechnicianFinancialTab = ({
         </CardContent>
       </Card>
       
-      <TechnicianPerformanceMetrics technician={technician} />
+      <TechnicianPerformanceMetrics 
+        technician={technician}
+        metrics={technicianMetrics}
+      />
       
       <TechnicianFinancialTable
         filteredTechnicians={filteredTechnicians}
