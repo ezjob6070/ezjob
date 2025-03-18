@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar, Filter, Users } from "lucide-react";
+import { Calendar, Filter } from "lucide-react";
 import { 
   Popover, 
   PopoverContent, 
@@ -9,10 +9,10 @@ import {
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
+import { format, isAfter, isBefore, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TechnicianFiltersProps {
   date: DateRange | undefined;
@@ -21,7 +21,7 @@ interface TechnicianFiltersProps {
   setSelectedTechnicians: React.Dispatch<React.SetStateAction<string[]>>;
   technicianNames: string[];
   paymentTypeFilter: string;
-  setPaymentTypeFilter: (paymentType: string) => void;
+  setPaymentTypeFilter: (filter: string) => void;
   appliedFilters: boolean;
   setAppliedFilters: (applied: boolean) => void;
   clearFilters: () => void;
@@ -41,8 +41,8 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
 }) => {
   const [showTechnicianFilter, setShowTechnicianFilter] = useState(false);
   const [showDateFilter, setShowDateFilter] = useState(false);
-  const [technicianSearchQuery, setTechnicianSearchQuery] = useState("");
   const [showPaymentTypeFilter, setShowPaymentTypeFilter] = useState(false);
+  const [technicianSearchQuery, setTechnicianSearchQuery] = useState("");
 
   const handleDatePreset = (preset: string) => {
     const today = new Date();
@@ -82,11 +82,11 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
     setAppliedFilters(true);
   };
   
-  const toggleTechnician = (techName: string) => {
+  const toggleTechnician = (technicianName: string) => {
     setSelectedTechnicians(prev => 
-      prev.includes(techName) 
-        ? prev.filter(t => t !== techName)
-        : [...prev, techName]
+      prev.includes(technicianName) 
+        ? prev.filter(t => t !== technicianName)
+        : [...prev, technicianName]
     );
   };
 
@@ -169,7 +169,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
       <Popover open={showTechnicianFilter} onOpenChange={setShowTechnicianFilter}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
+            <Filter className="h-4 w-4" />
             {selectedTechnicians.length > 0 
               ? `${selectedTechnicians.length} technicians selected` 
               : "Filter Technicians"
@@ -238,59 +238,28 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           <Button variant="outline" className="flex items-center gap-2">
             <Filter className="h-4 w-4" />
             {paymentTypeFilter !== "all" 
-              ? `Payment Type: ${paymentTypeFilter === "percentage" ? "Percentage" : "Flat Rate"}` 
+              ? `Payment: ${paymentTypeFilter}` 
               : "Payment Type"
             }
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-64 p-0" align="start">
+        <PopoverContent className="w-48 p-0" align="start">
           <div className="p-3">
-            <h3 className="text-sm font-medium mb-3">Select Payment Type</h3>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="payment-all" 
-                  checked={paymentTypeFilter === "all"}
-                  onCheckedChange={() => setPaymentTypeFilter("all")}
-                />
-                <label 
-                  htmlFor="payment-all"
-                  className="text-sm cursor-pointer"
-                >
-                  All Payment Types
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="payment-percentage" 
-                  checked={paymentTypeFilter === "percentage"}
-                  onCheckedChange={() => setPaymentTypeFilter("percentage")}
-                />
-                <label 
-                  htmlFor="payment-percentage"
-                  className="text-sm cursor-pointer"
-                >
-                  Percentage Based
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="payment-flat" 
-                  checked={paymentTypeFilter === "flat"}
-                  onCheckedChange={() => setPaymentTypeFilter("flat")}
-                />
-                <label 
-                  htmlFor="payment-flat"
-                  className="text-sm cursor-pointer"
-                >
-                  Flat Rate
-                </label>
-              </div>
-            </div>
-          </div>
-          <div className="border-t p-3 flex justify-between">
-            <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
-            <Button variant="default" size="sm" onClick={applyFilters}>Apply</Button>
+            <Select value={paymentTypeFilter} onValueChange={(value) => {
+              setPaymentTypeFilter(value);
+              setShowPaymentTypeFilter(false);
+              setAppliedFilters(true);
+            }}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Payment Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="percentage">Percentage</SelectItem>
+                <SelectItem value="flat">Flat Rate</SelectItem>
+                <SelectItem value="hourly">Hourly</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </PopoverContent>
       </Popover>

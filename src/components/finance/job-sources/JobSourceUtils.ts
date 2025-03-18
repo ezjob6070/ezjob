@@ -7,12 +7,10 @@ export const searchJobSource = (source: JobSource, query: string): boolean => {
   
   const searchLower = query.toLowerCase();
   
-  // Match against all possible fields
+  // Match against all possible fields, checking for optional properties
   return (
     source.name.toLowerCase().includes(searchLower) ||
-    // For other fields, we need to check if they exist first
-    (source.phone && source.phone.toLowerCase().includes(searchLower)) ||
-    (source.email && source.email.toLowerCase().includes(searchLower)) ||
+    // Check if the property exists before trying to search it
     (source.website && source.website.toLowerCase().includes(searchLower)) ||
     (source.category && source.category.toLowerCase().includes(searchLower))
   );
