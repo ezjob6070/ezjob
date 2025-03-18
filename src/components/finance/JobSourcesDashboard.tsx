@@ -7,6 +7,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import JobSourceInvoiceSection from "@/components/finance/JobSourceInvoiceSection";
 import JobSourceCircleCharts from "@/components/finance/JobSourceCircleCharts";
 import { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, Filter } from "lucide-react";
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format, isAfter, isBefore, isToday, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface JobSourcesDashboardProps {
   filteredJobSources: JobSource[];
@@ -28,27 +39,85 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     "Online", "Social Media", "Referral", "Directory", "Advertisement", "Others"
   ]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [showSourceFilter, setShowSourceFilter] = useState(false);
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [sourceSearchQuery, setSourceSearchQuery] = useState("");
 
   const jobSourceNames = filteredJobSources.map(source => source.name);
 
+  // Handle date presets
+  const handleDatePreset = (preset: string) => {
+    const today = new Date();
+    let from: Date;
+    let to: Date = today;
+
+    switch (preset) {
+      case "today":
+        from = today;
+        break;
+      case "yesterday":
+        from = new Date(today);
+        from.setDate(today.getDate() - 1);
+        to = new Date(from);
+        break;
+      case "thisWeek":
+        from = startOfWeek(today, { weekStartsOn: 1 });
+        to = endOfWeek(today, { weekStartsOn: 1 });
+        break;
+      case "lastWeek":
+        from = startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
+        to = endOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
+        break;
+      case "thisMonth":
+        from = startOfMonth(today);
+        to = endOfMonth(today);
+        break;
+      case "lastMonth":
+        from = startOfMonth(subMonths(today, 1));
+        to = endOfMonth(subMonths(today, 1));
+        break;
+      default:
+        from = today;
+    }
+    
+    setDate({ from, to });
+    setAppliedFilters(true);
+  };
+
+  // Filter sources based on selections
   const filteredSources = filteredJobSources.filter(source => {
+    // Filter by selected job sources
     const matchesSelectedSources = 
       !appliedFilters || 
       selectedJobSources.length === 0 || 
       selectedJobSources.includes(source.name);
 
+    // Filter by selected categories
     const matchesCategory = 
       selectedCategories.length === 0 || 
       (source.category && selectedCategories.includes(source.category)) ||
       (!source.category && selectedCategories.includes("Others"));
     
-    return matchesSelectedSources && matchesCategory;
+    // Filter by date range
+    let matchesDateRange = true;
+    if (appliedFilters && date?.from && source.createdAt) {
+      const sourceDate = new Date(source.createdAt);
+      matchesDateRange = isAfter(sourceDate, date.from) || isToday(sourceDate);
+      
+      if (date.to && matchesDateRange) {
+        matchesDateRange = isBefore(sourceDate, date.to) || isToday(sourceDate);
+      }
+    }
+    
+    return matchesSelectedSources && matchesCategory && matchesDateRange;
   });
 
+  // Calculate totals
   const totalRevenue = filteredSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
   const totalExpenses = filteredSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
   const totalProfit = filteredSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
 
+  // Job source selection functions
   const toggleJobSource = (sourceName: string) => {
     setSelectedJobSources(prev => 
       prev.includes(sourceName) 
@@ -65,32 +134,127 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     );
   };
 
-  const addCategory = (category: string) => {
-    setCategories(prev => [...prev, category]);
-  };
-
-  const selectAllJobSources = () => {
-    setSelectedJobSources([...jobSourceNames]);
-  };
-
-  const deselectAllJobSources = () => {
-    setSelectedJobSources([]);
-  };
+  // Filtered job sources for the selector
+  const filteredJobSourcesForSelection = jobSourceNames.filter(
+    source => source.toLowerCase().includes(sourceSearchQuery.toLowerCase())
+  );
 
   const clearFilters = () => {
     setSelectedJobSources([]);
     setSelectedCategories([]);
     setDate(undefined);
     setAppliedFilters(false);
+    setSourceSearchQuery("");
   };
 
   const applyFilters = () => {
     setAppliedFilters(true);
+    setShowSourceFilter(false);
+    setShowDateFilter(false);
   };
 
   return (
     <div className="space-y-8">
-      {/* Filter bar completely removed */}
+      {/* Filter Bar */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {/* Date Range Filter */}
+        <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "MMM d, yyyy")} - {format(date.to, "MMM d, yyyy")}
+                  </>
+                ) : (
+                  format(date.from, "MMM d, yyyy")
+                )
+              ) : (
+                "Select date range"
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <div className="p-3 border-b">
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <Button size="sm" variant="outline" onClick={() => handleDatePreset("today")}>Today</Button>
+                <Button size="sm" variant="outline" onClick={() => handleDatePreset("yesterday")}>Yesterday</Button>
+                <Button size="sm" variant="outline" onClick={() => handleDatePreset("thisWeek")}>This Week</Button>
+                <Button size="sm" variant="outline" onClick={() => handleDatePreset("lastWeek")}>Last Week</Button>
+                <Button size="sm" variant="outline" onClick={() => handleDatePreset("thisMonth")}>This Month</Button>
+                <Button size="sm" variant="outline" onClick={() => handleDatePreset("lastMonth")}>Last Month</Button>
+              </div>
+              <div className="text-sm font-medium mb-2">Custom Range</div>
+              <CalendarComponent
+                mode="range"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+                className="p-3 pointer-events-auto"
+              />
+            </div>
+            <div className="p-3 flex justify-between">
+              <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
+              <Button variant="default" size="sm" onClick={applyFilters}>Apply</Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Job Source Filter */}
+        <Popover open={showSourceFilter} onOpenChange={setShowSourceFilter}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              {selectedJobSources.length > 0 
+                ? `${selectedJobSources.length} sources selected` 
+                : "Filter Job Sources"
+              }
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0" align="start">
+            <div className="p-3">
+              <Input 
+                type="text" 
+                placeholder="Search sources..." 
+                className="mb-3" 
+                value={sourceSearchQuery}
+                onChange={(e) => setSourceSearchQuery(e.target.value)}
+              />
+              <div className="max-h-64 overflow-y-auto">
+                {filteredJobSourcesForSelection.map(source => (
+                  <div key={source} className="flex items-center space-x-2 py-1">
+                    <Checkbox 
+                      id={`source-${source}`} 
+                      checked={selectedJobSources.includes(source)}
+                      onCheckedChange={() => toggleJobSource(source)}
+                    />
+                    <label 
+                      htmlFor={`source-${source}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {source}
+                    </label>
+                  </div>
+                ))}
+                {filteredJobSourcesForSelection.length === 0 && (
+                  <div className="text-sm text-muted-foreground py-2">No job sources found</div>
+                )}
+              </div>
+            </div>
+            <div className="border-t p-3 flex justify-between">
+              <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
+              <Button variant="default" size="sm" onClick={applyFilters}>Apply</Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {appliedFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
+            Clear All Filters
+          </Button>
+        )}
+      </div>
       
       <JobSourceCircleCharts 
         filteredJobSources={filteredSources} 
