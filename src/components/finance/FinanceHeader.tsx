@@ -1,10 +1,9 @@
 
 import React from "react";
-import { SlidersHorizontal, Search, Calendar } from "lucide-react";
+import { SlidersHorizontal, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,8 +27,6 @@ interface FinanceHeaderProps {
 }
 
 const FinanceHeader: React.FC<FinanceHeaderProps> = ({
-  searchQuery,
-  setSearchQuery,
   showFilters,
   setShowFilters,
   date,
@@ -57,19 +54,7 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <h2 className="text-xl font-semibold">Finance Dashboard</h2>
           
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            {/* Search Box */}
-            <div className="relative flex-1 sm:flex-auto sm:w-48">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 h-9 w-full"
-              />
-            </div>
-            
+          <div className="flex items-center gap-3">
             {/* Date Range Picker */}
             <Popover>
               <PopoverTrigger asChild>
