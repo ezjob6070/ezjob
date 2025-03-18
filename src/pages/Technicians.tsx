@@ -10,6 +10,7 @@ import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
 import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
+import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -71,6 +72,9 @@ const Technicians = () => {
 
   return (
     <div className="space-y-8 py-8">
+      {/* Add TechnicianTabs at the top */}
+      <TechnicianTabs currentTab="list" />
+      
       <TechniciansPageHeader 
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}

@@ -3,7 +3,7 @@ import { Technician } from "@/types/technician";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { UsersRound, DollarSign, Award, Clock } from "lucide-react";
+import { UsersRound, Award, Clock } from "lucide-react";
 
 interface TechnicianStatsProps {
   technicians: Technician[];
@@ -13,7 +13,6 @@ interface TechnicianStatsProps {
 const TechnicianStats = ({ technicians, showSalaryStats = false }: TechnicianStatsProps) => {
   const totalTechnicians = technicians.length;
   const activeTechnicians = technicians.filter(tech => tech.status === "active").length;
-  const totalRevenue = technicians.reduce((sum, tech) => sum + tech.totalRevenue, 0);
   const averageRating = technicians.reduce((sum, tech) => sum + tech.rating, 0) / totalTechnicians || 0;
   
   // Salary stats
@@ -38,7 +37,7 @@ const TechnicianStats = ({ technicians, showSalaryStats = false }: TechnicianSta
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
@@ -61,44 +60,21 @@ const TechnicianStats = ({ technicians, showSalaryStats = false }: TechnicianSta
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {showSalaryStats ? "Average Hourly Rate" : "Total Revenue"}
+            {showSalaryStats ? "Average Hourly Rate" : "Average Rating"}
           </CardTitle>
           {showSalaryStats 
             ? <Clock className="h-4 w-4 text-muted-foreground" />
-            : <DollarSign className="h-4 w-4 text-muted-foreground" />}
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {showSalaryStats 
-              ? formatHourlyRate(averageHourlyRate)
-              : formatCurrency(totalRevenue)}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {showSalaryStats 
-              ? "Per hour across all technicians"
-              : "Revenue from all jobs"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            {showSalaryStats ? "Technicians with Incentives" : "Average Rating"}
-          </CardTitle>
-          {showSalaryStats 
-            ? <DollarSign className="h-4 w-4 text-muted-foreground" />
             : <Award className="h-4 w-4 text-muted-foreground" />}
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {showSalaryStats 
-              ? techniciansWithIncentives.length
+              ? formatHourlyRate(averageHourlyRate)
               : averageRating.toFixed(1)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             {showSalaryStats 
-              ? `${techniciansWithIncentives.length} of ${totalTechnicians} technicians`
+              ? "Per hour across all technicians"
               : "Average customer rating"}
           </p>
         </CardContent>
@@ -107,23 +83,21 @@ const TechnicianStats = ({ technicians, showSalaryStats = false }: TechnicianSta
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {showSalaryStats ? "Average Incentive Amount" : "Active Technicians"}
+            {showSalaryStats ? "Technicians with Incentives" : "Active Technicians"}
           </CardTitle>
-          {showSalaryStats 
-            ? <Award className="h-4 w-4 text-muted-foreground" />
-            : <Badge variant="outline" className={activeTechnicians === totalTechnicians ? "bg-green-50" : ""}>
-                {activeTechnicians} of {totalTechnicians}
-              </Badge>}
+          <Badge variant="outline" className={activeTechnicians === totalTechnicians ? "bg-green-50" : ""}>
+            {activeTechnicians} of {totalTechnicians}
+          </Badge>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {showSalaryStats 
-              ? formatHourlyRate(averageIncentive)
+              ? techniciansWithIncentives.length
               : `${Math.round((activeTechnicians / totalTechnicians) * 100)}%`}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             {showSalaryStats 
-              ? "Average incentive per technician"
+              ? `${techniciansWithIncentives.length} of ${totalTechnicians} technicians`
               : "Technician availability"}
           </p>
         </CardContent>
