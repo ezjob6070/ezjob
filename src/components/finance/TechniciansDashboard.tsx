@@ -6,7 +6,6 @@ import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinanc
 import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
 import { DateRange } from "react-day-picker";
 import DashboardMetrics from "./dashboard/MetricsCards";
-import TechnicianQuickSelector from "./dashboard/TechnicianQuickSelector";
 import TechnicianDetailPanel from "./dashboard/TechnicianDetailPanel";
 
 interface TechniciansDashboardProps {
@@ -110,15 +109,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             totalEarnings={totalEarnings}
             companyProfit={companyProfit}
             dateRangeText={dateRangeText}
-          />
-          
-          <TechnicianQuickSelector 
-            activeTechnicians={activeTechnicians}
-            selectedTechnicianId={selectedTechnicianId}
-            handleTechnicianChange={handleTechnicianChange}
-            dateRangeText={dateRangeText}
-            localDateRange={localDateRange}
-            setLocalDateRange={setLocalDateRange}
           />
           
           <TechnicianFinancialTable
