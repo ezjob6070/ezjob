@@ -5,6 +5,7 @@ import { Technician } from "@/types/technician";
 import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import TechnicianFiltersPanel from "@/components/finance/TechnicianFiltersPanel";
 import CompactDateRangeSelector from "@/components/finance/CompactDateRangeSelector";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface TechnicianDashboardHeaderProps {
   technicianNames: string[];
@@ -44,7 +45,7 @@ const TechnicianDashboardHeader: React.FC<TechnicianDashboardHeaderProps> = ({
   activeTechnicians
 }) => {
   return (
-    <div className="flex items-center justify-between mb-6">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
       <div className="flex flex-wrap items-center gap-2">
         <CategoryFilter 
           selectedCategories={selectedCategories}
@@ -71,7 +72,7 @@ const TechnicianDashboardHeader: React.FC<TechnicianDashboardHeaderProps> = ({
       </div>
       
       {(selectedTechnicians.length > 0 || selectedCategories.length > 0) && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground mt-2 sm:mt-0">
           Showing {filteredTechnicians.length} of {activeTechnicians.length} technicians
         </div>
       )}

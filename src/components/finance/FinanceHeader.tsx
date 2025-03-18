@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface TabOption {
   id: string;
@@ -35,7 +36,14 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
   setDate
 }) => {
   const formatDateRange = () => {
-    if (!date?.from) return "Select date range";
+    if (!date?.from) return "Today";
+    
+    if (date.from && 
+        date.to && 
+        date.from.toDateString() === date.to.toDateString() && 
+        date.from.toDateString() === new Date().toDateString()) {
+      return "Today";
+    }
     
     const from = date.from.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const to = date.to ? date.to.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : "";
@@ -44,58 +52,66 @@ const FinanceHeader: React.FC<FinanceHeaderProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-3">
-      {/* Search Box */}
-      <div className="relative w-48">
-        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-8 h-9 bg-white/80 backdrop-blur-sm focus-visible:ring-blue-500"
-        />
-      </div>
-      
-      {/* Date Range Picker */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            className={cn(
-              "h-9 px-3 flex items-center gap-2 bg-white/80 backdrop-blur-sm",
-              date?.from && "text-blue-600 border-blue-200 bg-blue-50"
-            )}
-          >
-            <Calendar className="h-4 w-4" />
-            <span className="text-sm font-normal">{formatDateRange()}</span>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="end">
-          <CalendarComponent
-            initialFocus
-            mode="range"
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
-            numberOfMonths={2}
-          />
-        </PopoverContent>
-      </Popover>
-      
-      {/* Filters Toggle */}
-      <Button 
-        variant="outline" 
-        size="icon"
-        onClick={() => setShowFilters(!showFilters)}
-        className={cn(
-          "h-9 w-9 bg-white/80 backdrop-blur-sm", 
-          showFilters ? "bg-blue-50 text-blue-600 border-blue-200" : ""
-        )}
-      >
-        <SlidersHorizontal className="h-4 w-4" />
-      </Button>
-    </div>
+    <Card className="mb-4">
+      <CardContent className="p-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <h2 className="text-xl font-semibold">Finance Dashboard</h2>
+          
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            {/* Search Box */}
+            <div className="relative flex-1 sm:flex-auto sm:w-48">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 h-9 w-full"
+              />
+            </div>
+            
+            {/* Date Range Picker */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className={cn(
+                    "h-9 px-3 flex items-center gap-2",
+                    date?.from && "text-blue-600 border-blue-200 bg-blue-50/50"
+                  )}
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span className="text-sm font-normal">{formatDateRange()}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <CalendarComponent
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
+            
+            {/* Filters Toggle */}
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                "h-9 w-9", 
+                showFilters ? "bg-blue-50/50 text-blue-600 border-blue-200" : ""
+              )}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

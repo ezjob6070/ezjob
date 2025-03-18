@@ -6,6 +6,7 @@ import TechnicianDashboardHeader from "@/components/finance/dashboard/Technician
 import FinancialChartSection from "@/components/finance/dashboard/FinancialChartSection";
 import TechnicianPerformanceTable from "@/components/finance/dashboard/TechnicianPerformanceTable";
 import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface TechniciansDashboardProps {
   activeTechnicians: Technician[];
@@ -96,31 +97,40 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="mb-4">
-        <TechnicianSearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-      </div>
-      
-      <TechnicianDashboardHeader
-        technicianNames={technicianNames}
-        selectedTechnicians={selectedTechnicians}
-        toggleTechnician={toggleTechnician}
-        categories={categories}
-        selectedCategories={selectedCategories}
-        toggleCategory={toggleCategory}
-        addCategory={addCategory}
-        clearFilters={clearFilters}
-        applyFilters={applyFilters}
-        date={date}
-        setDate={setDate}
-        selectAllTechnicians={selectAllTechnicians}
-        deselectAllTechnicians={deselectAllTechnicians}
-        appliedFilters={appliedFilters}
-        filteredTechnicians={filteredTechnicians}
-        activeTechnicians={activeTechnicians}
-      />
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <h2 className="text-xl font-semibold">Technician Financial Dashboard</h2>
+            <div className="w-full md:w-auto">
+              <TechnicianSearchBar
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
+            </div>
+          </div>
+          
+          <div className="mt-4">
+            <TechnicianDashboardHeader
+              technicianNames={technicianNames}
+              selectedTechnicians={selectedTechnicians}
+              toggleTechnician={toggleTechnician}
+              categories={categories}
+              selectedCategories={selectedCategories}
+              toggleCategory={toggleCategory}
+              addCategory={addCategory}
+              clearFilters={clearFilters}
+              applyFilters={applyFilters}
+              date={date}
+              setDate={setDate}
+              selectAllTechnicians={selectAllTechnicians}
+              deselectAllTechnicians={deselectAllTechnicians}
+              appliedFilters={appliedFilters}
+              filteredTechnicians={filteredTechnicians}
+              activeTechnicians={activeTechnicians}
+            />
+          </div>
+        </CardContent>
+      </Card>
       
       <FinancialChartSection 
         filteredTechnicians={filteredTechnicians}
