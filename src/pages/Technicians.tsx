@@ -7,10 +7,9 @@ import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
-import TechnicianCircleCharts from "@/components/technicians/TechnicianCircleCharts";
-import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
 import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
+import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -75,8 +74,6 @@ const Technicians = () => {
       />
 
       <TechnicianStats technicians={technicians} />
-      
-      <TechnicianCircleCharts filteredTechnicians={filteredTechnicians} dateRange={dateRange} />
       
       <div className="mb-6">
         <div className="mb-4">
