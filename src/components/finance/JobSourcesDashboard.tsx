@@ -8,7 +8,7 @@ import JobSourceInvoiceSection from "@/components/finance/JobSourceInvoiceSectio
 import JobSourceCircleCharts from "@/components/finance/JobSourceCircleCharts";
 import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Filter } from "lucide-react";
+import { Calendar, Filter } from "lucide-react";
 import { 
   Popover, 
   PopoverContent, 
@@ -134,6 +134,21 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     );
   };
 
+  // Toggle all job sources
+  const toggleAllJobSources = (checked: boolean) => {
+    if (checked) {
+      // Select all job sources (filtered by search query if any)
+      setSelectedJobSources(
+        sourceSearchQuery 
+          ? jobSourceNames.filter(name => name.toLowerCase().includes(sourceSearchQuery.toLowerCase()))
+          : [...jobSourceNames]
+      );
+    } else {
+      // Deselect all job sources
+      setSelectedJobSources([]);
+    }
+  };
+
   // Filtered job sources for the selector
   const filteredJobSourcesForSelection = jobSourceNames.filter(
     source => source.toLowerCase().includes(sourceSearchQuery.toLowerCase())
@@ -152,6 +167,16 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
     setShowSourceFilter(false);
     setShowDateFilter(false);
   };
+
+  // Check if all job sources are selected
+  const allJobSourcesSelected = 
+    filteredJobSourcesForSelection.length > 0 && 
+    filteredJobSourcesForSelection.every(source => selectedJobSources.includes(source));
+  
+  // Check if some job sources are selected
+  const someJobSourcesSelected = 
+    selectedJobSources.length > 0 && 
+    !allJobSourcesSelected;
 
   return (
     <div className="space-y-8">
@@ -221,6 +246,26 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
                 value={sourceSearchQuery}
                 onChange={(e) => setSourceSearchQuery(e.target.value)}
               />
+              <div className="flex items-center space-x-2 py-2 border-b border-gray-200 mb-2">
+                <Checkbox 
+                  id="select-all-sources"
+                  checked={allJobSourcesSelected}
+                  data-state={
+                    someJobSourcesSelected 
+                      ? "indeterminate" 
+                      : allJobSourcesSelected 
+                        ? "checked" 
+                        : "unchecked"
+                  }
+                  onCheckedChange={toggleAllJobSources}
+                />
+                <label 
+                  htmlFor="select-all-sources"
+                  className="text-sm font-medium cursor-pointer"
+                >
+                  Select All Job Sources
+                </label>
+              </div>
               <div className="max-h-64 overflow-y-auto">
                 {filteredJobSourcesForSelection.map(source => (
                   <div key={source} className="flex items-center space-x-2 py-1">
