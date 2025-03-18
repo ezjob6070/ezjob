@@ -37,11 +37,19 @@ const TechnicianInvoiceDialog: React.FC<TechnicianInvoiceDialogProps> = ({
   
   const form = useForm({
     defaultValues: {
+      invoiceTitle: `Invoice - ${technician.name}`,
       period: "last-month",
       customPeriod: "",
       invoiceNumber: `INV-${Date.now().toString().substring(8)}`,
       description: `Payment for services - ${technician.name}`,
       notes: "",
+      showJobAddress: true,
+      showJobDate: true,
+      showTechnicianEarnings: true,
+      showCompanyProfit: false,
+      showPartsValue: true,
+      showDetails: true,
+      jobStatus: "completed"
     }
   });
 
@@ -50,11 +58,6 @@ const TechnicianInvoiceDialog: React.FC<TechnicianInvoiceDialogProps> = ({
       ...data,
       date,
       technician,
-      totalAmount: technician.totalRevenue ? (
-        technician.paymentType === "percentage" 
-          ? technician.totalRevenue * (technician.paymentRate / 100)
-          : (technician.completedJobs || 0) * technician.paymentRate
-      ) : 0,
     });
   };
 
@@ -62,6 +65,19 @@ const TechnicianInvoiceDialog: React.FC<TechnicianInvoiceDialogProps> = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="invoiceTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Invoice Title</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="invoiceNumber"
@@ -74,7 +90,9 @@ const TechnicianInvoiceDialog: React.FC<TechnicianInvoiceDialogProps> = ({
               </FormItem>
             )}
           />
+        </div>
           
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <FormLabel>Invoice Date</FormLabel>
             <Popover>
@@ -97,9 +115,7 @@ const TechnicianInvoiceDialog: React.FC<TechnicianInvoiceDialogProps> = ({
               </PopoverContent>
             </Popover>
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="period"
@@ -125,22 +141,22 @@ const TechnicianInvoiceDialog: React.FC<TechnicianInvoiceDialogProps> = ({
               </FormItem>
             )}
           />
-          
-          {form.watch("period") === "custom" && (
-            <FormField
-              control={form.control}
-              name="customPeriod"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Custom Period</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="e.g., Jan-Feb 2023" />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          )}
         </div>
+          
+        {form.watch("period") === "custom" && (
+          <FormField
+            control={form.control}
+            name="customPeriod"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custom Period</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g., Jan-Feb 2023" />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
@@ -168,8 +184,43 @@ const TechnicianInvoiceDialog: React.FC<TechnicianInvoiceDialogProps> = ({
           )}
         />
 
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="jobStatus"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Job Status Filter</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select job status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="all">All Jobs</SelectItem>
+                    <SelectItem value="completed">Completed Jobs</SelectItem>
+                    <SelectItem value="in_progress">In Progress Jobs</SelectItem>
+                    <SelectItem value="scheduled">Scheduled Jobs</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="border-t pt-4">
+          <h3 className="font-medium mb-2">Display Options</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Add toggle controls for different display options */}
+          </div>
+        </div>
+
         <div className="flex justify-end gap-2">
-          <Button type="submit">Save Settings</Button>
+          <Button type="submit">Generate Invoice</Button>
         </div>
       </form>
     </Form>

@@ -1,28 +1,31 @@
 
 import React from "react";
 import { Technician } from "@/types/technician";
-import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
-import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
-import { calculateFinancialMetrics } from "@/hooks/technicians/financialUtils";
 import { DateRange } from "react-day-picker";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import TechnicianInvoiceGenerator from "@/components/technicians/invoices/TechnicianInvoiceGenerator";
+import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
+import TechnicianPerformanceMetrics from "@/components/technicians/charts/TechnicianPerformanceMetrics";
+import TechnicianDetailCard from "@/components/technicians/charts/TechnicianDetailCard";
+import PaymentBreakdownCards from "@/components/technicians/charts/PaymentBreakdownCards";
 
 interface TechnicianFinancialTabProps {
   technician: Technician;
   filteredTechnicians: Technician[];
   displayedTechnicians: Technician[];
   selectedTechnicianNames: string[];
-  toggleTechnician: (techName: string) => void;
+  toggleTechnician: (name: string) => void;
   clearFilters: () => void;
   applyFilters: () => void;
   paymentTypeFilter: string;
-  setPaymentTypeFilter: (value: string) => void;
+  setPaymentTypeFilter: (filter: string) => void;
   localDateRange: DateRange | undefined;
-  setLocalDateRange: (date: DateRange | undefined) => void;
-  selectedTechnicianId: string | undefined;
-  onTechnicianSelect: (tech: Technician) => void;
+  setLocalDateRange: (range: DateRange | undefined) => void;
+  selectedTechnicianId?: string;
+  onTechnicianSelect: (technician: Technician) => void;
 }
 
-const TechnicianFinancialTab: React.FC<TechnicianFinancialTabProps> = ({
+const TechnicianFinancialTab = ({
   technician,
   filteredTechnicians,
   displayedTechnicians,
@@ -36,19 +39,36 @@ const TechnicianFinancialTab: React.FC<TechnicianFinancialTabProps> = ({
   setLocalDateRange,
   selectedTechnicianId,
   onTechnicianSelect
-}) => {
-  const financialMetrics = calculateFinancialMetrics([technician]);
-
+}: TechnicianFinancialTabProps) => {
   return (
     <div className="space-y-6">
-      <PaymentBreakdownCards 
-        revenue={financialMetrics.totalRevenue}
-        technicianEarnings={financialMetrics.technicianEarnings}
-        expenses={financialMetrics.totalExpenses}
-        profit={financialMetrics.companyProfit}
-        dateRangeText="All Time"
-      />
-      <TechnicianFinancialTable 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <TechnicianDetailCard technician={technician} />
+        <div className="md:col-span-2">
+          <PaymentBreakdownCards technician={technician} />
+        </div>
+      </div>
+      
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-md font-medium">
+            Invoice Generation
+          </CardTitle>
+          <TechnicianInvoiceGenerator 
+            technicians={[technician]} 
+            selectedTechnician={technician}
+          />
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Generate invoices for this technician based on jobs completed within a selected time period.
+          </p>
+        </CardContent>
+      </Card>
+      
+      <TechnicianPerformanceMetrics technician={technician} />
+      
+      <TechnicianFinancialTable
         filteredTechnicians={filteredTechnicians}
         displayedTechnicians={displayedTechnicians}
         selectedTechnicianNames={selectedTechnicianNames}

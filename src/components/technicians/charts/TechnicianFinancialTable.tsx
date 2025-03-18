@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Table, 
@@ -22,8 +21,8 @@ import { DateRange } from "react-day-picker";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import TechnicianFilters from "@/components/finance/technician-filters/TechnicianFilters";
 import { SortOption } from "@/hooks/useTechniciansData";
-import TechnicianFinancialFilterBar from "./TechnicianFinancialFilterBar";
-import TechnicianFinancialTableContent from "./TechnicianFinancialTableContent";
+import TechnicianFinancialFilterBar from "@/components/technicians/charts/TechnicianFinancialFilterBar";
+import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
 
 interface TechnicianFinancialTableProps {
   filteredTechnicians: Technician[];
