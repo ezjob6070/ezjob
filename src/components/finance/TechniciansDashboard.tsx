@@ -27,9 +27,10 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
+  const today = new Date();
   const [dateRange, setDateRange] = useState<DateRange>({
-    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
-    to: new Date(),
+    from: today,
+    to: today,
   });
   const [appliedFilters, setAppliedFilters] = useState(false);
   const [filteredTechnicians, setFilteredTechnicians] = useState(activeTechnicians);
@@ -134,6 +135,39 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     setShowDateFilter(false);
   };
 
+  const getDateDisplayText = () => {
+    if (!localDateRange?.from) return "Today";
+    
+    // If from and to are the same date and it's today
+    if (localDateRange.to && 
+        isSameDay(localDateRange.from, localDateRange.to) && 
+        isSameDay(localDateRange.from, today)) {
+      return "Today";
+    }
+    
+    // If from and to are the same date but not today
+    if (localDateRange.to && isSameDay(localDateRange.from, localDateRange.to)) {
+      return format(localDateRange.from, "MMM d, yyyy");
+    }
+    
+    // If from and to are different dates
+    if (localDateRange.to) {
+      return `${format(localDateRange.from, "MMM d")} - ${format(localDateRange.to, "MMM d, yyyy")}`;
+    }
+    
+    // If only from date is set
+    return format(localDateRange.from, "MMM d, yyyy");
+  };
+  
+  // Helper function to check if two dates are the same day
+  function isSameDay(date1: Date, date2: Date): boolean {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -148,17 +182,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    {localDateRange?.from ? (
-                      localDateRange.to ? (
-                        <>
-                          {format(localDateRange.from, "MMM d, yyyy")} - {format(localDateRange.to, "MMM d, yyyy")}
-                        </>
-                      ) : (
-                        format(localDateRange.from, "MMM d, yyyy")
-                      )
-                    ) : (
-                      "Select date range"
-                    )}
+                    {getDateDisplayText()}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
