@@ -126,12 +126,9 @@ const Finance = () => {
                   setSearchQuery={setSearchQuery}
                 />
                 
-                {/* Add Invoice Section with updated width and date range */}
+                {/* Add Invoice Section with updated width */}
                 <div className="mt-8 w-full">
-                  <TechnicianInvoiceSection 
-                    activeTechnicians={activeTechnicians} 
-                    dateRange={date}
-                  />
+                  <TechnicianInvoiceSection activeTechnicians={activeTechnicians} />
                 </div>
               </TabsContent>
 
