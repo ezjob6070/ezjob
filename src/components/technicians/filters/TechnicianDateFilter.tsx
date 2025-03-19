@@ -1,4 +1,3 @@
-
 import React from "react";
 import { 
   Popover, 
@@ -108,17 +107,15 @@ const TechnicianDateFilter: React.FC<TechnicianDateFilterProps> = ({
   return (
     <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="flex flex-col items-start px-4 py-2 h-auto min-h-[3rem] relative bg-white hover:bg-gray-50 border-gray-200 text-gray-700">
-          <div className="flex items-center gap-2 font-medium">
+        <Button 
+          variant="outline" 
+          className="w-[180px] h-10 bg-white hover:bg-gray-50 border-gray-200 text-gray-700 justify-between"
+        >
+          <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-gray-500" />
-            {getDateDisplayText()}
+            <span className="truncate">{getDateDisplayText()}</span>
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            {isSameDay(localDateRange?.from || today, today) ? 
-              getTodayFormattedDate() : 
-              "Select custom date range"}
-          </div>
-          <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground ml-auto" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
