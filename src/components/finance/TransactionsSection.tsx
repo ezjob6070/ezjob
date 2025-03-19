@@ -42,7 +42,7 @@ const TransactionsSection: React.FC<TransactionsSectionProps> = ({ filteredTrans
                     }
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">{transaction.name}</div>
+                    <div className="font-medium">{transaction.description}</div>
                     <div className="text-sm text-muted-foreground">
                       {transaction.notes || "No details provided"}
                     </div>
@@ -70,13 +70,13 @@ const TransactionsSection: React.FC<TransactionsSectionProps> = ({ filteredTrans
                   <TableCell className="text-right">
                     <span
                       className={
-                        transaction.type === "income"
+                        transaction.amount >= 0
                           ? "text-emerald-600 font-semibold"
                           : "text-red-600 font-semibold"
                       }
                     >
-                      {transaction.type === "income" ? "+" : "-"}
-                      {formatCurrency(transaction.amount)}
+                      {transaction.amount >= 0 ? "+" : "-"}
+                      {formatCurrency(Math.abs(transaction.amount))}
                     </span>
                   </TableCell>
                 </TableRow>
