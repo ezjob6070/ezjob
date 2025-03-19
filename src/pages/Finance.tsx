@@ -126,8 +126,8 @@ const Finance = () => {
                   setSearchQuery={setSearchQuery}
                 />
                 
-                {/* Add Invoice Section */}
-                <div className="mt-8">
+                {/* Add Invoice Section with updated width */}
+                <div className="mt-8 w-full">
                   <TechnicianInvoiceSection activeTechnicians={activeTechnicians} />
                 </div>
               </TabsContent>

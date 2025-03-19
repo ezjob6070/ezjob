@@ -1,8 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Technician } from "@/types/technician";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/use-toast";
 
 interface TechnicianListProps {
   technicians: Technician[];
@@ -19,6 +22,23 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
   searchQuery,
   onSearchChange,
 }) => {
+  const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
+  const [activeTechnician, setActiveTechnician] = useState<Technician | null>(null);
+
+  const handleDownloadClick = (technician: Technician, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the row click from triggering
+    setActiveTechnician(technician);
+    setDownloadDialogOpen(true);
+  };
+
+  const handleDownloadInvoice = () => {
+    toast({
+      title: "Download Started",
+      description: `Downloading invoice for ${activeTechnician?.name}...`,
+    });
+    setDownloadDialogOpen(false);
+  };
+
   return (
     <div className="w-full space-y-4">
       <div className="relative mb-4">
@@ -39,14 +59,25 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
               ${selectedTechnician?.id === tech.id ? 'bg-blue-50 border-blue-300' : ''}`}
             onClick={() => onSelectTechnician(tech)}
           >
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">
-                {tech.initials}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-2 text-xs">
+                  {tech.initials}
+                </div>
+                <div>
+                  <div className="font-medium">{tech.name}</div>
+                  <div className="text-sm text-muted-foreground">{tech.specialty}</div>
+                </div>
               </div>
-              <div>
-                <div className="font-medium">{tech.name}</div>
-                <div className="text-sm text-muted-foreground">{tech.specialty}</div>
-              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="ml-auto" 
+                onClick={(e) => handleDownloadClick(tech, e)}
+              >
+                <Download className="h-4 w-4 mr-1" />
+                Download
+              </Button>
             </div>
           </div>
         ))}
@@ -57,6 +88,28 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
           </div>
         )}
       </div>
+
+      {/* Download Dialog */}
+      <Dialog open={downloadDialogOpen} onOpenChange={setDownloadDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Download Invoice for {activeTechnician?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <p>Select the invoice format you would like to download:</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Button onClick={handleDownloadInvoice} className="flex items-center">
+                <Download className="h-4 w-4 mr-2" />
+                PDF Invoice
+              </Button>
+              <Button onClick={handleDownloadInvoice} variant="outline" className="flex items-center">
+                <Download className="h-4 w-4 mr-2" />
+                Excel Format
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
