@@ -58,7 +58,7 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
           <CardHeader>
-            <CardTitle>Total Income</CardTitle>
+            <CardTitle className="text-gray-900">Total Income</CardTitle>
             <CardDescription>
               Revenue from all sources
               {date && date.from && date.to && (
@@ -86,7 +86,7 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Total Expenses</CardTitle>
+            <CardTitle className="text-gray-900">Total Expenses</CardTitle>
             <CardDescription>
               Costs and operating expenses
               {date && date.from && date.to && (
@@ -114,7 +114,7 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Net Company Profit</CardTitle>
+            <CardTitle className="text-gray-900">Net Company Profit</CardTitle>
             <CardDescription>
               Revenue after all expenses
               {date && date.from && date.to && (
@@ -144,7 +144,7 @@ const JobSourceCircleCharts: React.FC<JobSourceCircleChartsProps> = ({
       {/* Job Sources List Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Job Source Financial Performance</CardTitle>
+          <CardTitle className="text-gray-900">Job Source Financial Performance</CardTitle>
           <CardDescription>Revenue and profit metrics for each source</CardDescription>
         </CardHeader>
         <CardContent>          
