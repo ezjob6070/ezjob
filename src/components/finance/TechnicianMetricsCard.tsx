@@ -25,7 +25,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
     : '0';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-semibold">{technician.name}'s Performance</h3>
@@ -34,94 +34,94 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="h-[120px]">
+          <CardHeader className="pb-1 pt-3">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-blue-100 rounded-full">
+              <div className="p-1.5 bg-blue-100 rounded-full">
                 <Briefcase className="h-4 w-4 text-blue-700" />
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Completed Jobs</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1 mb-2">Successfully finished services</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-1">Successfully finished services</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{technician.completedJobs}</div>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold">{technician.completedJobs}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="h-[120px]">
+          <CardHeader className="pb-1 pt-3">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-red-100 rounded-full">
+              <div className="p-1.5 bg-red-100 rounded-full">
                 <BanIcon className="h-4 w-4 text-red-700" />
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Cancelled Jobs</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1 mb-2">Jobs that didn't complete</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-1">Jobs that didn't complete</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{technician.cancelledJobs}</div>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold">{technician.cancelledJobs}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="h-[120px]">
+          <CardHeader className="pb-1 pt-3">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-blue-100 rounded-full">
+              <div className="p-1.5 bg-blue-100 rounded-full">
                 <DollarSign className="h-4 w-4 text-blue-700" />
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Total Income</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1 mb-2">Revenue from all jobs</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-1">Revenue from all jobs</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</div>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="h-[120px]">
+          <CardHeader className="pb-1 pt-3">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-red-100 rounded-full">
+              <div className="p-1.5 bg-red-100 rounded-full">
                 <ArrowDown className="h-4 w-4 text-red-700" />
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Expenses</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1 mb-2">Operational costs</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-1">Operational costs</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-red-600">-{formatCurrency(expenses)}</div>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-red-600">-{formatCurrency(expenses)}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="h-[120px]">
+          <CardHeader className="pb-1 pt-3">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-red-100 rounded-full">
+              <div className="p-1.5 bg-red-100 rounded-full">
                 <ArrowDown className="h-4 w-4 text-red-700" />
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Technician Earnings</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1 mb-2">Paid to technician</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-1">Paid to technician</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-red-600">-{formatCurrency(technicianEarnings)}</div>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-red-600">-{formatCurrency(technicianEarnings)}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="h-[120px]">
+          <CardHeader className="pb-1 pt-3">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-green-100 rounded-full">
+              <div className="p-1.5 bg-green-100 rounded-full">
                 <PiggyBank className="h-4 w-4 text-green-700" />
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Company Profit</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1 mb-2">Net earnings from services</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-1">Net earnings from services</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
-            <p className="text-xs text-muted-foreground mt-1">{profitMargin}% margin</p>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
+            <p className="text-xs text-muted-foreground">{profitMargin}% margin</p>
           </CardContent>
         </Card>
       </div>

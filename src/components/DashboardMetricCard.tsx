@@ -54,24 +54,24 @@ const DashboardMetricCard = ({
       getCardClass(),
       className
     )}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
         <CardTitle className="text-lg font-semibold text-gray-900">{title}</CardTitle>
         {icon && (
-          <div className="p-2 rounded-full bg-white shadow-sm">
+          <div className="p-1.5 rounded-full bg-white shadow-sm">
             {icon}
           </div>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="py-1">
         {children}
         
         <div className={cn("text-2xl font-bold mb-1", valueClassName)}>{value}</div>
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
         
         {trend && (
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-1">
             <div className={cn(
-              "flex items-center p-1.5 rounded-md bg-opacity-10 w-fit",
+              "flex items-center p-1 rounded-md bg-opacity-10 w-fit",
               trend.isPositive ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
             )}>
               {trend.isPositive ? (
@@ -90,7 +90,7 @@ const DashboardMetricCard = ({
           <Button 
             variant="ghost" 
             size="sm" 
-            className="mt-3 p-0 h-auto text-blue-600 hover:text-blue-700 hover:bg-transparent group"
+            className="mt-2 p-0 h-auto text-blue-600 hover:text-blue-700 hover:bg-transparent group"
             onClick={onClick}
           >
             <span className="text-xs">View Details</span>
