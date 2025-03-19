@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
+import TechnicianFilters from "@/components/finance/technician-filters/TechnicianFilters";
 import { SortOption } from "@/hooks/useTechniciansData";
 import TechnicianFinancialFilterBar from "@/components/technicians/charts/TechnicianFinancialFilterBar";
 import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
@@ -66,6 +67,23 @@ const TechnicianFinancialTable = ({
       />
       
       <CardContent className="p-3 sm:p-4">
+        <div className="mb-4">
+          <TechnicianFilters
+            date={localDateRange}
+            setDate={setLocalDateRange}
+            selectedTechnicians={selectedTechnicianNames}
+            setSelectedTechnicians={(techs) => {
+              // This just updates the UI. The actual filtering logic is in the parent
+            }}
+            technicianNames={technicianNames}
+            paymentTypeFilter={paymentTypeFilter}
+            setPaymentTypeFilter={setPaymentTypeFilter}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            clearFilters={clearFilters}
+          />
+        </div>
+
         <div className="overflow-x-auto">
           <TechnicianFinancialTableContent
             displayedTechnicians={displayedTechnicians}
