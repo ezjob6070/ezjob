@@ -16,6 +16,7 @@ type DashboardMetricCardProps = {
   };
   onClick?: () => void;
   className?: string;
+  valueClassName?: string; // Added for custom value color styling
   children?: React.ReactNode;
   variant?: 'default' | 'glass' | 'outline' | 'gradient' | 'finance';
 };
@@ -28,6 +29,7 @@ const DashboardMetricCard = ({
   trend,
   onClick,
   className,
+  valueClassName,
   children,
   variant = 'default'
 }: DashboardMetricCardProps) => {
@@ -61,7 +63,7 @@ const DashboardMetricCard = ({
         )}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold mb-1">{value}</div>
+        <div className={cn("text-2xl font-bold mb-1", valueClassName)}>{value}</div>
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
         
         {trend && (

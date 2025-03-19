@@ -32,16 +32,18 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         trend={revenueTrend}
         className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-blue-600"
       />
       
       <DashboardMetricCard
         title="Technician Earnings"
         value={formatCurrency(totalEarnings)}
-        icon={<BadgeDollarSign size={20} className="text-violet-500" />}
+        icon={<BadgeDollarSign size={20} className="text-red-500" />}
         description={`Period: ${dateRangeText || 'All time'}`}
         trend={earningsTrend}
-        className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-red-600"
       />
       
       <DashboardMetricCard
@@ -52,6 +54,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         trend={profitTrend}
         className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-emerald-600"
       />
     </div>
   );

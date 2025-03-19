@@ -1,60 +1,33 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
 import { FinancialTransaction } from "@/types/finance";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { format } from "date-fns";
 
 interface TransactionsSectionProps {
   filteredTransactions: FinancialTransaction[];
 }
 
-const TransactionsSection: React.FC<TransactionsSectionProps> = ({
-  filteredTransactions
-}) => {
-  // Function to get the badge variant based on transaction type
-  const getTransactionBadgeVariant = (category: string): "default" | "outline" | "destructive" | "secondary" | "success" => {
-    switch (category) {
-      case "payment":
-        return "success";
-      case "expense":
-        return "destructive";
-      case "refund":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
-
-  // Function to get transaction icon based on category
-  const getTransactionIcon = (category: string) => {
-    switch (category) {
-      case "payment":
-        return "↑";
-      case "expense":
-        return "↓";
-      case "refund":
-        return "↩";
-      default:
-        return "•";
-    }
-  };
-
+const TransactionsSection: React.FC<TransactionsSectionProps> = ({ filteredTransactions }) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Recent Transactions</CardTitle>
-        <CardDescription>Latest financial activities</CardDescription>
+        <CardDescription>Most recent financial activities</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
+              <TableHead>Transaction</TableHead>
               <TableHead>Category</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Amount</TableHead>
             </TableRow>
           </TableHeader>
@@ -62,33 +35,70 @@ const TransactionsSection: React.FC<TransactionsSectionProps> = ({
             {filteredTransactions.length > 0 ? (
               filteredTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
-                  <TableCell className="font-medium">
-                    {format(new Date(transaction.date), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell>{transaction.description}</TableCell>
                   <TableCell>
-                    <Badge variant={getTransactionBadgeVariant(transaction.category)}>
-                      {getTransactionIcon(transaction.category)} {transaction.category}
+                    {transaction.date ? 
+                      format(new Date(transaction.date), "MMM d, yyyy") : 
+                      "N/A"
+                    }
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">{transaction.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {transaction.notes || "No details provided"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="capitalize">
+                      {transaction.category}
                     </Badge>
                   </TableCell>
-                  <TableCell className={`text-right ${
-                    transaction.category === "payment" ? "text-green-600" : 
-                    transaction.category === "expense" ? "text-red-600" : 
-                    transaction.category === "refund" ? "text-amber-600" : ""
-                  }`}>
-                    {transaction.category === "expense" ? "-" : ""}{formatCurrency(transaction.amount)}
+                  <TableCell>
+                    <Badge
+                      className={
+                        transaction.status === "completed"
+                          ? "bg-green-500"
+                          : transaction.status === "pending"
+                          ? "bg-yellow-500"
+                          : transaction.status === "failed"
+                          ? "bg-red-500"
+                          : "bg-gray-500"
+                      }
+                    >
+                      {transaction.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <span
+                      className={
+                        transaction.type === "income"
+                          ? "text-emerald-600 font-semibold"
+                          : "text-red-600 font-semibold"
+                      }
+                    >
+                      {transaction.type === "income" ? "+" : "-"}
+                      {formatCurrency(transaction.amount)}
+                    </span>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">
-                  No recent transactions found
+                <TableCell colSpan={5} className="text-center py-4">
+                  No transactions found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+        
+        {filteredTransactions.length > 0 && (
+          <div className="flex justify-end mt-4">
+            <Button variant="ghost" size="sm" className="text-xs text-blue-600 hover:text-blue-700">
+              View All Transactions
+              <ChevronRight className="ml-1 h-3 w-3" />
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

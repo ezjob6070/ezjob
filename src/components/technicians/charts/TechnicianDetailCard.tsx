@@ -71,7 +71,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
             </div>
             <div>
               <p className="text-xl font-bold text-black">Total Revenue</p>
-              <p className="text-2xl font-bold text-sky-600">{formatCurrency(metrics.totalRevenue)}</p>
+              <p className="text-2xl font-bold text-blue-600">{formatCurrency(metrics.totalRevenue)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium text-black">Revenue</p>
-                <p className="text-xl font-semibold text-sky-600">{metrics.revenue ? formatCurrency(metrics.revenue) : 'N/A'}</p>
+                <p className="text-xl font-semibold text-blue-600">{metrics.revenue ? formatCurrency(metrics.revenue) : 'N/A'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

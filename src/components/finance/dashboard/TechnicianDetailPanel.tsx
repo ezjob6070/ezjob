@@ -84,7 +84,7 @@ const TechnicianDetailPanel: React.FC<TechnicianDetailPanelProps> = ({
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Company Profit</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-2xl font-bold text-emerald-600">
                     ${selectedTechnicianMetrics?.profit || 0}
                   </p>
                   <span className="text-xs text-muted-foreground mt-1">{dateRangeText}</span>
@@ -138,12 +138,12 @@ const TechnicianDetailPanel: React.FC<TechnicianDetailPanelProps> = ({
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="p-2 bg-green-100 rounded-full">
-                  <DollarSignIcon className="h-5 w-5 text-green-700" />
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <DollarSignIcon className="h-5 w-5 text-blue-700" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Average Job Value</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-2xl font-bold text-blue-600">
                     ${selectedTechnicianMetrics?.revenue && selectedTechnicianMetrics?.totalJobs 
                       ? Math.round(selectedTechnicianMetrics.revenue / selectedTechnicianMetrics.totalJobs) 
                       : 0}

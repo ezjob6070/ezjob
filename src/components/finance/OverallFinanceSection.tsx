@@ -51,6 +51,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           trend={{ value: "8.3%", isPositive: true }}
           className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all"
           variant="finance"
+          valueClassName="text-blue-600"
         />
         
         <DashboardMetricCard
@@ -61,6 +62,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           trend={{ value: "4.2%", isPositive: false }}
           className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all"
           variant="finance"
+          valueClassName="text-red-600"
         />
         
         <DashboardMetricCard
@@ -71,6 +73,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           trend={{ value: `${Math.abs(profitMargin - 25).toFixed(1)}%`, isPositive: isProfitPositive }}
           className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
           variant="finance"
+          valueClassName="text-emerald-600"
         />
       </div>
     </div>

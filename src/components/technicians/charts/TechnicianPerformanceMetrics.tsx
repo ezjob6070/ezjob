@@ -63,6 +63,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         trend={avgJobValueTrend}
         className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-violet-600"
       />
       
       <DashboardMetricCard
@@ -73,6 +74,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         trend={revenueTrend}
         className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-blue-600"
       />
 
       <DashboardMetricCard
@@ -83,6 +85,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         trend={profitTrend}
         className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-emerald-600"
       />
     </div>
   );

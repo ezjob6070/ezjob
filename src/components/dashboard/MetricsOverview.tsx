@@ -49,21 +49,23 @@ const MetricsOverview = ({
       <DashboardMetricCard
         title="Total Revenue"
         value={formatCurrency(financialMetrics.totalRevenue)}
-        icon={<CalculatorIcon size={20} className="text-emerald-500" />}
+        icon={<CalculatorIcon size={20} className="text-blue-500" />}
         description="Revenue this month"
         trend={{ value: "5%", isPositive: false }}
-        className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-blue-600"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
       />
       <DashboardMetricCard
         title="Company's Cut"
         value={formatCurrency(financialMetrics.companysCut)}
-        icon={<DollarSignIcon size={20} className="text-amber-500" />}
+        icon={<DollarSignIcon size={20} className="text-emerald-500" />}
         description="Commission earned"
         trend={{ value: "7%", isPositive: true }}
-        className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-100 hover:shadow-md transition-all"
         variant="finance"
+        valueClassName="text-emerald-600"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
       />
     </div>

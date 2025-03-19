@@ -1,3 +1,4 @@
+
 import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -59,7 +60,7 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
           <CardContent className="pt-6">
             <div>
               <p className="text-sm font-medium text-black">Total Revenue</p>
-              <p className="text-2xl font-bold text-sky-600">
+              <p className="text-2xl font-bold text-blue-600">
                 {formatCurrency(revenue)}
               </p>
               {dateRangeText && (

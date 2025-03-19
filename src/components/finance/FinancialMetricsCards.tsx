@@ -19,7 +19,7 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
         <CardContent className="pt-6">
           <div>
             <p className="text-sm font-medium text-black">Total Revenue</p>
-            <p className="text-2xl font-bold text-sky-600">{formatCurrency(report.totalRevenue)}</p>
+            <p className="text-2xl font-bold text-blue-600">{formatCurrency(report.totalRevenue)}</p>
             <p className="text-xs text-muted-foreground mt-1">
               {report.transactions.filter(t => t.category === "payment" && t.status === "completed").length} completed payments
             </p>
