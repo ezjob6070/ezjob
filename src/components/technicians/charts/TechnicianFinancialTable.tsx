@@ -68,7 +68,7 @@ const TechnicianFinancialTable = ({
       
       <CardContent className="p-3 sm:p-4">
         <div className="mb-4">
-          <div className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 rounded-md border border-gray-100">
+          <div className="flex flex-wrap items-center gap-3 p-3 border border-gray-100 rounded-md">
             <TechnicianFilters
               date={localDateRange}
               setDate={setLocalDateRange}
