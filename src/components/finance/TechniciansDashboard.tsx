@@ -231,6 +231,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           />
           
           <TechnicianFinancialTable
+            filteredTechnicians={filteredTechnicians}
             displayedTechnicians={displayedTechnicians}
             selectedTechnicianNames={selectedTechnicianNames}
             toggleTechnician={toggleTechnician}
