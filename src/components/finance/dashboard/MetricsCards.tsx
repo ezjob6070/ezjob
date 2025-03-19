@@ -28,7 +28,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             {icon}
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className="text-sm font-medium text-black">{title}</p>
             <p className="text-2xl font-bold">{formatCurrency(value)}</p>
             {dateRangeText && (
               <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>

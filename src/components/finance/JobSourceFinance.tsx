@@ -49,13 +49,13 @@ export const JobSourceFinance: React.FC<JobSourceFinanceProps> = ({ jobSources, 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Job Source</TableHead>
-              <TableHead>Total Jobs</TableHead>
-              <TableHead>Total Revenue</TableHead>
-              <TableHead>Revenue %</TableHead>
-              <TableHead>Expenses</TableHead>
-              <TableHead>Profit</TableHead>
-              <TableHead>Profit Margin</TableHead>
+              <TableHead className="font-medium text-black">Job Source</TableHead>
+              <TableHead className="font-medium text-black">Total Jobs</TableHead>
+              <TableHead className="font-medium text-black">Total Revenue</TableHead>
+              <TableHead className="font-medium text-black">Revenue %</TableHead>
+              <TableHead className="font-medium text-black">Expenses</TableHead>
+              <TableHead className="font-medium text-black">Profit</TableHead>
+              <TableHead className="font-medium text-black">Profit Margin</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -98,36 +98,36 @@ export const JobSourceFinance: React.FC<JobSourceFinanceProps> = ({ jobSources, 
       
       <div className="grid grid-cols-2 gap-4 mt-4">
         <div className="bg-blue-50 p-4 rounded">
-          <p className="text-sm text-gray-500">Total Expenses</p>
+          <p className="text-sm font-medium text-black">Total Expenses</p>
           <p className="text-xl font-semibold">{formatCurrency(totalExpenses)}</p>
           <div className="mt-2 grid grid-cols-2 gap-2">
             <div className="text-xs">
-              <p className="text-gray-500">Marketing</p>
+              <p className="text-gray-700 font-medium">Marketing</p>
               <p className="font-medium">{formatCurrency(totalExpenses * 0.4)}</p>
             </div>
             <div className="text-xs">
-              <p className="text-gray-500">Operations</p>
+              <p className="text-gray-700 font-medium">Operations</p>
               <p className="font-medium">{formatCurrency(totalExpenses * 0.35)}</p>
             </div>
             <div className="text-xs">
-              <p className="text-gray-500">Equipment</p>
+              <p className="text-gray-700 font-medium">Equipment</p>
               <p className="font-medium">{formatCurrency(totalExpenses * 0.15)}</p>
             </div>
             <div className="text-xs">
-              <p className="text-gray-500">Other</p>
+              <p className="text-gray-700 font-medium">Other</p>
               <p className="font-medium">{formatCurrency(totalExpenses * 0.1)}</p>
             </div>
           </div>
         </div>
         <div className="bg-green-50 p-4 rounded">
-          <p className="text-sm text-gray-500">Total Company Profit</p>
+          <p className="text-sm font-medium text-black">Total Company Profit</p>
           <p className="text-xl font-semibold">{formatCurrency(totalCompanyProfit)}</p>
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs font-medium text-gray-700">
             {totalExpenses + totalCompanyProfit > 0 ? 
               `Profit Margin: ${((totalCompanyProfit / (totalExpenses + totalCompanyProfit)) * 100).toFixed(1)}%` : 
               'Profit Margin: 0%'}
           </p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs font-medium text-gray-700">
             {jobSources.length > 0 ? 
               `Average Profit per Job Source: ${formatCurrency(totalCompanyProfit / jobSources.length)}` : 
               'Average Profit per Job Source: $0'}

@@ -31,7 +31,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
               <BriefcaseIcon className="h-5 w-5 text-blue-700" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Completed Jobs</p>
+              <p className="text-sm font-medium text-black">Completed Jobs</p>
               <p className="text-2xl font-bold">{technician.completedJobs || 0}</p>
             </div>
           </div>
@@ -45,7 +45,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
               <StarIcon className="h-5 w-5 text-amber-700" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Rating</p>
+              <p className="text-sm font-medium text-black">Rating</p>
               <p className="text-2xl font-bold">{(technician.rating || 0).toFixed(1)}★</p>
             </div>
           </div>
@@ -59,7 +59,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
               <BarChartIcon className="h-5 w-5 text-purple-700" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Average Job Value</p>
+              <p className="text-sm font-medium text-black">Average Job Value</p>
               <p className="text-2xl font-bold">{formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}</p>
             </div>
           </div>
@@ -73,7 +73,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
               <DollarSignIcon className="h-5 w-5 text-green-700" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-sm font-medium text-black">Total Revenue</p>
               <p className="text-2xl font-bold">{formatCurrency(metrics.revenue || 0)}</p>
             </div>
           </div>

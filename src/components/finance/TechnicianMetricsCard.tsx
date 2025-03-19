@@ -40,7 +40,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-blue-100 rounded-full">
                 <Briefcase className="h-4 w-4 text-blue-700" />
               </div>
-              <CardTitle className="text-sm font-medium">Completed Jobs</CardTitle>
+              <CardTitle className="text-sm font-medium text-black">Completed Jobs</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -54,7 +54,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-red-100 rounded-full">
                 <BanIcon className="h-4 w-4 text-red-700" />
               </div>
-              <CardTitle className="text-sm font-medium">Cancelled Jobs</CardTitle>
+              <CardTitle className="text-sm font-medium text-black">Cancelled Jobs</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -68,7 +68,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-blue-100 rounded-full">
                 <DollarSign className="h-4 w-4 text-blue-700" />
               </div>
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium text-black">Total Revenue</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -82,7 +82,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-red-100 rounded-full">
                 <ArrowDown className="h-4 w-4 text-red-700" />
               </div>
-              <CardTitle className="text-sm font-medium">Expenses</CardTitle>
+              <CardTitle className="text-sm font-medium text-black">Expenses</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -96,7 +96,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-red-100 rounded-full">
                 <ArrowDown className="h-4 w-4 text-red-700" />
               </div>
-              <CardTitle className="text-sm font-medium">Technician Earnings</CardTitle>
+              <CardTitle className="text-sm font-medium text-black">Technician Earnings</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -110,7 +110,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-green-100 rounded-full">
                 <PiggyBank className="h-4 w-4 text-green-700" />
               </div>
-              <CardTitle className="text-sm font-medium">Company Profit</CardTitle>
+              <CardTitle className="text-sm font-medium text-black">Company Profit</CardTitle>
             </div>
           </CardHeader>
           <CardContent>

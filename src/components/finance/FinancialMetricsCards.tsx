@@ -22,7 +22,7 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
               <DollarSignIcon className="h-5 w-5 text-blue-700" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-sm font-medium text-black">Total Revenue</p>
               <p className="text-2xl font-bold">{formatCurrency(report.totalRevenue)}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {report.transactions.filter(t => t.category === "payment" && t.status === "completed").length} completed payments
@@ -39,7 +39,7 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
               <PiggyBankIcon className="h-5 w-5 text-green-700" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Company Profit</p>
+              <p className="text-sm font-medium text-black">Company Profit</p>
               <p className="text-2xl font-bold">{formatCurrency(report.companyProfit)}</p>
               <div className="flex items-center">
                 <span className={`text-xs font-medium flex items-center mt-1 ${profitMargin > 30 ? "text-green-500" : "text-amber-500"}`}>
@@ -59,7 +59,7 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
               <TrendingDownIcon className="h-5 w-5 text-red-700" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Expenses</p>
+              <p className="text-sm font-medium text-black">Expenses</p>
               <p className="text-2xl font-bold">{formatCurrency(report.totalExpenses + report.technicianPayments)}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {formatCurrency(report.technicianPayments)} to technicians

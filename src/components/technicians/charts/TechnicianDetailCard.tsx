@@ -52,7 +52,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               <Briefcase className="h-5 w-5 text-green-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Completed Jobs</p>
+              <p className="text-sm font-medium text-black">Completed Jobs</p>
               <p className="text-2xl font-bold">{metrics.completedJobs}</p>
             </div>
           </div>
@@ -61,7 +61,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               <BanIcon className="h-5 w-5 text-red-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Cancelled Jobs</p>
+              <p className="text-sm font-medium text-black">Cancelled Jobs</p>
               <p className="text-2xl font-bold">{metrics.cancelledJobs}</p>
             </div>
           </div>
@@ -70,7 +70,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               <DollarSign className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
+              <p className="text-sm font-medium text-black">Total Revenue</p>
               <p className="text-2xl font-bold text-blue-600">{formatCurrency(metrics.totalRevenue)}</p>
             </div>
           </div>
@@ -79,21 +79,21 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               <ArrowDown className="h-5 w-5 text-red-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Technician Earnings</p>
+              <p className="text-sm font-medium text-black">Technician Earnings</p>
               <p className="text-2xl font-bold text-red-600">-{formatCurrency(metrics.earnings || 0)}</p>
             </div>
           </div>
         </div>
 
         <div className="border-t pt-4">
-          <h4 className="text-sm font-medium text-muted-foreground mb-2">Financial Breakdown</h4>
+          <h4 className="text-sm font-medium text-black mb-2">Financial Breakdown</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-blue-100">
                 <ArrowUp className="h-5 w-5 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Revenue</p>
+                <p className="text-sm font-medium text-black">Revenue</p>
                 <p className="text-xl font-semibold text-blue-600">{metrics.revenue ? formatCurrency(metrics.revenue) : 'N/A'}</p>
               </div>
             </div>
@@ -102,7 +102,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
                 <ArrowDown className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Expenses</p>
+                <p className="text-sm font-medium text-black">Expenses</p>
                 <p className="text-xl font-semibold text-red-600">-{metrics.expenses ? formatCurrency(metrics.expenses) : 'N/A'}</p>
               </div>
             </div>
@@ -111,7 +111,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
                 <WrenchIcon className="h-5 w-5 text-orange-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Parts Value</p>
+                <p className="text-sm font-medium text-black">Parts Value</p>
                 <p className="text-xl font-semibold text-orange-600">-{metrics.partsValue ? formatCurrency(metrics.partsValue) : 'N/A'}</p>
               </div>
             </div>
@@ -120,12 +120,12 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
                 <Settings className="h-5 w-5 text-green-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Company Profit</p>
+                <p className="text-sm font-medium text-black">Company Profit</p>
                 <p className="text-xl font-semibold text-green-600">{metrics.profit ? formatCurrency(metrics.profit) : 'N/A'}</p>
               </div>
             </div>
             <div className="col-span-2">
-              <p className="text-sm font-medium text-muted-foreground">Profit Margin</p>
+              <p className="text-sm font-medium text-black">Profit Margin</p>
               <p className="text-xl font-semibold">{profitMargin}%</p>
             </div>
           </div>

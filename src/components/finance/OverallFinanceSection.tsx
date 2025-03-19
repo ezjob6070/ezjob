@@ -66,7 +66,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
                 <DollarSignIcon className="h-5 w-5 text-blue-700" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Income</p>
+                <p className="text-sm font-medium text-black">Total Income</p>
                 <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
                 <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
               </div>
@@ -81,7 +81,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
                 <TrendingDownIcon className="h-5 w-5 text-red-700" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Expenses</p>
+                <p className="text-sm font-medium text-black">Total Expenses</p>
                 <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
                 <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
               </div>
@@ -96,7 +96,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
                 <PiggyBankIcon className="h-5 w-5 text-green-700" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Net Company Profit</p>
+                <p className="text-sm font-medium text-black">Net Company Profit</p>
                 <p className={`text-2xl font-bold ${totalProfit >= 0 ? '' : 'text-red-600'}`}>
                   {totalProfit >= 0 ? formatCurrency(totalProfit) : `-${formatCurrency(Math.abs(totalProfit))}`}
                 </p>

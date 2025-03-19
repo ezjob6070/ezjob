@@ -92,7 +92,7 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
                   {card.icon}
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">{card.title}</p>
+                  <p className="text-sm font-medium text-black">{card.title}</p>
                   <p className="text-2xl font-bold">{formatCurrency(card.value)}</p>
                   {dateRangeText && (
                     <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
