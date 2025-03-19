@@ -13,6 +13,7 @@ import SalariesDashboard from "@/components/finance/SalariesDashboard";
 import { useFinanceData } from "@/hooks/useFinanceData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 
 const Finance = () => {
   const [activeTab, setActiveTab] = useState<FinanceTabId>("overview");
@@ -124,6 +125,11 @@ const Finance = () => {
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
                 />
+                
+                {/* Add Invoice Section */}
+                <div className="mt-8">
+                  <TechnicianInvoiceSection activeTechnicians={activeTechnicians} />
+                </div>
               </TabsContent>
 
               <TabsContent value="transactions" className="mt-0">

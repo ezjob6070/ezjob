@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import { addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, format } from "date-fns";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface TechnicianInvoiceSectionProps {
   activeTechnicians: Technician[];
@@ -82,7 +82,11 @@ const TechnicianInvoiceSection: React.FC<TechnicianInvoiceSectionProps> = ({
 
   const generateInvoice = () => {
     if (!selectedTechnician || !date?.from || !date?.to) {
-      toast.error("Please select a technician and date range");
+      toast({
+        title: "Error",
+        description: "Please select a technician and date range",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -100,18 +104,28 @@ const TechnicianInvoiceSection: React.FC<TechnicianInvoiceSectionProps> = ({
 
     // In a real app, we would save the invoice to the database
     console.log("Generated invoice:", invoiceData);
-    toast.success("Invoice generated successfully!");
+    toast({
+      title: "Success",
+      description: "Invoice generated successfully!"
+    });
   };
 
   const downloadInvoicePdf = () => {
     if (!selectedTechnician) {
-      toast.error("Please select a technician first");
+      toast({
+        title: "Error",
+        description: "Please select a technician first",
+        variant: "destructive"
+      });
       return;
     }
     
     // In a real app, we would generate a PDF and download it
     console.log("Downloading invoice as PDF...");
-    toast.success("Invoice PDF downloaded successfully!");
+    toast({
+      title: "Success",
+      description: "Invoice PDF downloaded successfully!"
+    });
   };
 
   const handleDatePresetSelection = (preset: string) => {

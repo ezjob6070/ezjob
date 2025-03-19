@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronLeft, FileText, Download } from "lucide-react";
 import TechnicianFinance from "@/components/finance/TechnicianFinance";
+import { useNavigate } from "react-router-dom";
 
 const FinanceTechnicians = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="container py-8">
       <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -23,7 +26,12 @@ const FinanceTechnicians = () => {
         </div>
         
         <div className="flex gap-2 mt-2 md:mt-0">
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-2"
+            onClick={() => navigate("/finance", { state: { activeTab: "technicians", showInvoice: true } })}
+          >
             <FileText className="h-4 w-4" />
             Generate Invoice
           </Button>

@@ -2,7 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileTextIcon, EyeIcon, DownloadIcon } from "lucide-react";
+import { FileTextIcon, EyeIcon, DownloadIcon, PrinterIcon } from "lucide-react";
 
 type Invoice = {
   id: string;
@@ -43,6 +43,24 @@ const InvoiceList = () => {
       date: new Date("2023-08-28"),
       dueDate: new Date("2023-09-10"),
       status: "overdue"
+    },
+    {
+      id: "inv4",
+      invoiceNumber: "INV-1004",
+      client: "John Smith (Technician)",
+      amount: 1800,
+      date: new Date("2023-09-10"),
+      dueDate: new Date("2023-09-25"),
+      status: "pending"
+    },
+    {
+      id: "inv5",
+      invoiceNumber: "INV-1005",
+      client: "Mike Williams (Technician)",
+      amount: 2100,
+      date: new Date("2023-09-07"),
+      dueDate: new Date("2023-09-22"),
+      status: "paid"
     }
   ];
 
@@ -83,6 +101,7 @@ const InvoiceList = () => {
               <TableHead>Invoice #</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Amount</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Due Date</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -99,6 +118,7 @@ const InvoiceList = () => {
                 </TableCell>
                 <TableCell>{invoice.client}</TableCell>
                 <TableCell>{formatCurrency(invoice.amount)}</TableCell>
+                <TableCell>{formatDate(invoice.date)}</TableCell>
                 <TableCell>{formatDate(invoice.dueDate)}</TableCell>
                 <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                 <TableCell className="text-right">
@@ -106,6 +126,10 @@ const InvoiceList = () => {
                     <Button size="sm" variant="ghost">
                       <EyeIcon className="h-4 w-4" />
                       <span className="sr-only">View</span>
+                    </Button>
+                    <Button size="sm" variant="ghost">
+                      <PrinterIcon className="h-4 w-4" />
+                      <span className="sr-only">Print</span>
                     </Button>
                     <Button size="sm" variant="ghost">
                       <DownloadIcon className="h-4 w-4" />
@@ -117,7 +141,7 @@ const InvoiceList = () => {
             ))}
             {invoices.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
                   No invoices found
                 </TableCell>
               </TableRow>
