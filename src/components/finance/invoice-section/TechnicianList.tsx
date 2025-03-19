@@ -6,6 +6,7 @@ import { Search, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import InvoiceDownloadDialog from "./InvoiceDownloadDialog";
+import { DateRange } from "react-day-picker";
 
 interface TechnicianListProps {
   technicians: Technician[];
@@ -13,6 +14,7 @@ interface TechnicianListProps {
   onSelectTechnician: (technician: Technician) => void;
   searchQuery: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  dateRange?: DateRange;
 }
 
 const TechnicianList: React.FC<TechnicianListProps> = ({
@@ -21,6 +23,7 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
   onSelectTechnician,
   searchQuery,
   onSearchChange,
+  dateRange
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
   const [activeTechnician, setActiveTechnician] = useState<Technician | null>(null);
@@ -86,6 +89,7 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
         open={downloadDialogOpen} 
         onOpenChange={setDownloadDialogOpen} 
         technician={activeTechnician} 
+        initialDateRange={dateRange}
       />
     </div>
   );

@@ -1,12 +1,5 @@
+
 import React, { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
@@ -18,14 +11,12 @@ import {
 } from "@/components/ui/card";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import TechnicianFilters from "@/components/finance/technician-filters/TechnicianFilters";
 import { SortOption } from "@/hooks/useTechniciansData";
 import TechnicianFinancialFilterBar from "@/components/technicians/charts/TechnicianFinancialFilterBar";
 import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
 
 interface TechnicianFinancialTableProps {
-  filteredTechnicians: Technician[];
   displayedTechnicians: Technician[];
   selectedTechnicianNames: string[];
   toggleTechnician: (name: string) => void;
@@ -40,7 +31,6 @@ interface TechnicianFinancialTableProps {
 }
 
 const TechnicianFinancialTable = ({
-  filteredTechnicians,
   displayedTechnicians,
   selectedTechnicianNames,
   toggleTechnician,
@@ -54,8 +44,8 @@ const TechnicianFinancialTable = ({
   selectedTechnicianId
 }: TechnicianFinancialTableProps) => {
   const [appliedFilters, setAppliedFilters] = useState(false);
-  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
-  const technicianNames = filteredTechnicians.map(tech => tech.name);
+  const [sortOption, setSortOption] = useState<SortOption>("revenue-high"); // Default sort by revenue high to low
+  const technicianNames = displayedTechnicians.map(tech => tech.name);
 
   const handleSort = (option: SortOption) => {
     setSortOption(option);
@@ -77,36 +67,42 @@ const TechnicianFinancialTable = ({
       
       <CardContent>
         <div className="mb-6">
-          <TechnicianFilters
-            date={localDateRange}
-            setDate={setLocalDateRange}
-            selectedTechnicians={selectedTechnicianNames}
-            setSelectedTechnicians={(techs) => {
-              // This just updates the UI. The actual filtering logic is in the parent
-            }}
-            technicianNames={technicianNames}
-            paymentTypeFilter={paymentTypeFilter}
-            setPaymentTypeFilter={setPaymentTypeFilter}
-            appliedFilters={appliedFilters}
-            setAppliedFilters={setAppliedFilters}
-            clearFilters={clearFilters}
-          />
+          <div className="flex flex-wrap items-center gap-4">
+            <TechnicianFilters
+              date={localDateRange}
+              setDate={setLocalDateRange}
+              selectedTechnicians={selectedTechnicianNames}
+              setSelectedTechnicians={(techs) => {
+                // This just updates the UI. The actual filtering logic is in the parent
+              }}
+              technicianNames={technicianNames}
+              paymentTypeFilter={paymentTypeFilter}
+              setPaymentTypeFilter={setPaymentTypeFilter}
+              appliedFilters={appliedFilters}
+              setAppliedFilters={setAppliedFilters}
+              clearFilters={clearFilters}
+            />
+            
+            <div className="ml-auto">
+              <Button variant="outline" size="sm" onClick={applyFilters}>
+                Apply Filters
+              </Button>
+            </div>
+          </div>
         </div>
 
         <TechnicianFinancialTableContent
           displayedTechnicians={displayedTechnicians}
           onTechnicianSelect={onTechnicianSelect}
           selectedTechnicianId={selectedTechnicianId}
+          localDateRange={localDateRange}
         />
       </CardContent>
       
       <CardFooter className="flex justify-between border-t px-6 py-4">
         <div className="text-xs text-muted-foreground">
-          Showing {displayedTechnicians.length} of {filteredTechnicians.length} technicians
+          Showing {displayedTechnicians.length} technicians
         </div>
-        <Button variant="outline" size="sm" onClick={applyFilters}>
-          Apply Filters
-        </Button>
       </CardFooter>
     </Card>
   );

@@ -1,18 +1,21 @@
 
 import React, { useState } from "react";
-import { Technician } from "@/types/technician";
 import { 
   Dialog, 
   DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
   DialogHeader, 
-  DialogTitle,
-  DialogFooter
+  DialogTitle 
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Download, Filter, Calendar, X } from "lucide-react";
+import { Check, FileText, Download, X } from "lucide-react";
+import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
+import { toast } from "@/components/ui/use-toast";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { 
   Select, 
   SelectContent, 
@@ -20,305 +23,171 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import { toast } from "@/components/ui/use-toast";
 
 interface InvoiceDownloadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   technician: Technician | null;
+  initialDateRange?: DateRange;
 }
 
-const InvoiceDownloadDialog: React.FC<InvoiceDownloadDialogProps> = ({
-  open,
-  onOpenChange,
-  technician
+const InvoiceDownloadDialog: React.FC<InvoiceDownloadDialogProps> = ({ 
+  open, 
+  onOpenChange, 
+  technician,
+  initialDateRange
 }) => {
-  const [activeTab, setActiveTab] = useState<"filters" | "preview">("filters");
-  const [fileType, setFileType] = useState<"pdf" | "excel">("pdf");
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
-    to: new Date(),
-  });
+  // Set initial date range to the provided range or default to current month
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   
-  // Filter options
-  const [filterOptions, setFilterOptions] = useState({
-    showCompletedJobs: true,
-    showCancelledJobs: false,
-    showInProgressJobs: false,
-    showJobDate: true,
-    showJobAddress: true,
-    showCompanyProfit: false,
-    showTechnicianEarnings: true,
-    showJobDetails: true,
-    showPaymentMethods: true,
-  });
-
-  const handleCheckboxChange = (field: string) => {
-    setFilterOptions(prev => ({
-      ...prev,
-      [field]: !prev[field as keyof typeof filterOptions]
-    }));
+  const defaultDateRange: DateRange = initialDateRange || {
+    from: firstDayOfMonth,
+    to: lastDayOfMonth
   };
 
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(defaultDateRange);
+  const [includeCompletedJobs, setIncludeCompletedJobs] = useState(true);
+  const [includeCancelledJobs, setIncludeCancelledJobs] = useState(false);
+  const [includeInProgressJobs, setIncludeInProgressJobs] = useState(false);
+  const [showJobDetails, setShowJobDetails] = useState(true);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(true);
+  const [showExpenseDetails, setShowExpenseDetails] = useState(false);
+  const [fileFormat, setFileFormat] = useState<"pdf" | "excel">("pdf");
+  
   const handleDownload = () => {
+    // In a real app, this would call an API endpoint to generate and download the invoice
+    
+    // For now, we'll just show a success toast
     toast({
-      title: "Download Started",
-      description: `Downloading ${fileType.toUpperCase()} invoice for ${technician?.name} with your selected filters.`,
+      title: `Invoice for ${technician?.name} downloaded`,
+      description: `Downloaded as ${fileFormat.toUpperCase()} for period ${dateRange?.from ? dateRange.from.toLocaleDateString() : ''} to ${dateRange?.to ? dateRange.to.toLocaleDateString() : ''}`,
+      variant: "success",
     });
+    
     onOpenChange(false);
   };
 
-  if (!technician) return null;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Download Invoice for {technician.name}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Download Technician Invoice
+          </DialogTitle>
+          <DialogDescription>
+            {technician ? `Generate an invoice report for ${technician.name}` : 'Generate an invoice report'}
+          </DialogDescription>
         </DialogHeader>
         
-        <div className="flex border rounded-md mb-4">
-          <button
-            className={cn(
-              "flex-1 py-2 text-center text-sm font-medium",
-              activeTab === "filters" 
-                ? "bg-blue-50 text-blue-700 border-b-2 border-blue-700" 
-                : "text-gray-600 hover:bg-gray-50"
-            )}
-            onClick={() => setActiveTab("filters")}
-          >
-            <Filter className="h-4 w-4 inline-block mr-2" />
-            Filter Options
-          </button>
-          <button
-            className={cn(
-              "flex-1 py-2 text-center text-sm font-medium",
-              activeTab === "preview" 
-                ? "bg-blue-50 text-blue-700 border-b-2 border-blue-700" 
-                : "text-gray-600 hover:bg-gray-50"
-            )}
-            onClick={() => setActiveTab("preview")}
-          >
-            <Download className="h-4 w-4 inline-block mr-2" />
-            Download Options
-          </button>
+        <div className="py-4 space-y-4">
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Date Range</h3>
+            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Include Job Status</h3>
+            <div className="grid grid-cols-1 gap-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="completed" 
+                  checked={includeCompletedJobs} 
+                  onCheckedChange={(checked) => setIncludeCompletedJobs(checked as boolean)} 
+                />
+                <label htmlFor="completed" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Completed Jobs
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="cancelled" 
+                  checked={includeCancelledJobs} 
+                  onCheckedChange={(checked) => setIncludeCancelledJobs(checked as boolean)} 
+                />
+                <label htmlFor="cancelled" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Cancelled Jobs
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="inProgress" 
+                  checked={includeInProgressJobs} 
+                  onCheckedChange={(checked) => setIncludeInProgressJobs(checked as boolean)} 
+                />
+                <label htmlFor="inProgress" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  In Progress Jobs
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Display Options</h3>
+            <div className="grid grid-cols-1 gap-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="jobDetails" 
+                  checked={showJobDetails} 
+                  onCheckedChange={(checked) => setShowJobDetails(checked as boolean)} 
+                />
+                <label htmlFor="jobDetails" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Show Job Details
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="paymentDetails" 
+                  checked={showPaymentDetails} 
+                  onCheckedChange={(checked) => setShowPaymentDetails(checked as boolean)} 
+                />
+                <label htmlFor="paymentDetails" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Show Payment Details
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="expenseDetails" 
+                  checked={showExpenseDetails} 
+                  onCheckedChange={(checked) => setShowExpenseDetails(checked as boolean)} 
+                />
+                <label htmlFor="expenseDetails" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Show Expense Details
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">File Format</h3>
+            <Select value={fileFormat} onValueChange={(value) => setFileFormat(value as "pdf" | "excel")}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select file format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pdf">PDF</SelectItem>
+                <SelectItem value="excel">Excel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         
-        {activeTab === "filters" && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Date Range</Label>
-              <DatePickerWithRange date={date} setDate={setDate} />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Job Status</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showCompletedJobs"
-                    checked={filterOptions.showCompletedJobs}
-                    onCheckedChange={() => handleCheckboxChange("showCompletedJobs")}
-                  />
-                  <label
-                    htmlFor="showCompletedJobs"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Completed
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showCancelledJobs"
-                    checked={filterOptions.showCancelledJobs}
-                    onCheckedChange={() => handleCheckboxChange("showCancelledJobs")}
-                  />
-                  <label
-                    htmlFor="showCancelledJobs"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Cancelled
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showInProgressJobs"
-                    checked={filterOptions.showInProgressJobs}
-                    onCheckedChange={() => handleCheckboxChange("showInProgressJobs")}
-                  />
-                  <label
-                    htmlFor="showInProgressJobs"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    In Progress
-                  </label>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Display Options</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showJobDate"
-                    checked={filterOptions.showJobDate}
-                    onCheckedChange={() => handleCheckboxChange("showJobDate")}
-                  />
-                  <label
-                    htmlFor="showJobDate"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Job Date
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showJobAddress"
-                    checked={filterOptions.showJobAddress}
-                    onCheckedChange={() => handleCheckboxChange("showJobAddress")}
-                  />
-                  <label
-                    htmlFor="showJobAddress"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Job Address
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showTechnicianEarnings"
-                    checked={filterOptions.showTechnicianEarnings}
-                    onCheckedChange={() => handleCheckboxChange("showTechnicianEarnings")}
-                  />
-                  <label
-                    htmlFor="showTechnicianEarnings"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Technician Earnings
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showCompanyProfit"
-                    checked={filterOptions.showCompanyProfit}
-                    onCheckedChange={() => handleCheckboxChange("showCompanyProfit")}
-                  />
-                  <label
-                    htmlFor="showCompanyProfit"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Company Profit
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showJobDetails"
-                    checked={filterOptions.showJobDetails}
-                    onCheckedChange={() => handleCheckboxChange("showJobDetails")}
-                  />
-                  <label
-                    htmlFor="showJobDetails"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Job Details
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showPaymentMethods"
-                    checked={filterOptions.showPaymentMethods}
-                    onCheckedChange={() => handleCheckboxChange("showPaymentMethods")}
-                  />
-                  <label
-                    htmlFor="showPaymentMethods"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Payment Methods
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {activeTab === "preview" && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">File Format</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant={fileType === "pdf" ? "default" : "outline"} 
-                  className="flex items-center gap-2"
-                  onClick={() => setFileType("pdf")}
-                >
-                  <Download className="h-4 w-4" />
-                  PDF Format
-                </Button>
-                <Button 
-                  variant={fileType === "excel" ? "default" : "outline"} 
-                  className="flex items-center gap-2"
-                  onClick={() => setFileType("excel")}
-                >
-                  <Download className="h-4 w-4" />
-                  Excel Format
-                </Button>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Invoice Period</Label>
-              <Select defaultValue="custom">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="current-month">Current Month</SelectItem>
-                  <SelectItem value="last-month">Last Month</SelectItem>
-                  <SelectItem value="last-quarter">Last Quarter</SelectItem>
-                  <SelectItem value="custom">Custom Range</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="p-4 bg-blue-50 rounded-md">
-              <h3 className="font-medium text-blue-700 mb-2">Download Summary</h3>
-              <ul className="text-sm space-y-1 text-blue-600">
-                <li>Technician: {technician.name}</li>
-                <li>Date Range: {date?.from && date?.to ? `${date.from.toLocaleDateString()} to ${date.to.toLocaleDateString()}` : 'All time'}</li>
-                <li>Format: {fileType.toUpperCase()}</li>
-                <li>
-                  Job Status: {[
-                    filterOptions.showCompletedJobs ? 'Completed' : '',
-                    filterOptions.showCancelledJobs ? 'Cancelled' : '',
-                    filterOptions.showInProgressJobs ? 'In Progress' : ''
-                  ].filter(Boolean).join(', ')}
-                </li>
-                <li>
-                  Data Included: {[
-                    filterOptions.showJobDate ? 'Job Date' : '',
-                    filterOptions.showJobAddress ? 'Job Address' : '',
-                    filterOptions.showTechnicianEarnings ? 'Earnings' : '',
-                    filterOptions.showCompanyProfit ? 'Company Profit' : '',
-                    filterOptions.showJobDetails ? 'Job Details' : '',
-                    filterOptions.showPaymentMethods ? 'Payment Methods' : ''
-                  ].filter(Boolean).join(', ')}
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
-        
-        <DialogFooter className="mt-4">
+        <DialogFooter className="sm:justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            <X className="h-4 w-4 mr-2" />
+            <X className="mr-2 h-4 w-4" />
             Cancel
           </Button>
           <Button onClick={handleDownload}>
-            <Download className="h-4 w-4 mr-2" />
-            Download Invoice
+            <Download className="mr-2 h-4 w-4" />
+            Download {fileFormat.toUpperCase()}
           </Button>
         </DialogFooter>
       </DialogContent>

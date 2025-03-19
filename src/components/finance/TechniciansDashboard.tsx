@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
@@ -230,7 +231,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           />
           
           <TechnicianFinancialTable
-            filteredTechnicians={filteredTechnicians}
             displayedTechnicians={displayedTechnicians}
             selectedTechnicianNames={selectedTechnicianNames}
             toggleTechnician={toggleTechnician}

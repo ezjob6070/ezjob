@@ -14,17 +14,20 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import InvoiceDownloadDialog from "@/components/finance/invoice-section/InvoiceDownloadDialog";
+import { DateRange } from "react-day-picker";
 
 interface TechnicianFinancialTableContentProps {
   displayedTechnicians: Technician[];
   onTechnicianSelect: (technician: Technician) => void;
   selectedTechnicianId?: string;
+  localDateRange?: DateRange;
 }
 
 const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentProps> = ({
   displayedTechnicians,
   onTechnicianSelect,
-  selectedTechnicianId
+  selectedTechnicianId,
+  localDateRange
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
   const [activeTechnician, setActiveTechnician] = useState<Technician | null>(null);
@@ -118,6 +121,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
         open={downloadDialogOpen} 
         onOpenChange={setDownloadDialogOpen} 
         technician={activeTechnician} 
+        initialDateRange={localDateRange}
       />
     </>
   );
