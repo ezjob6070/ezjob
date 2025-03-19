@@ -42,7 +42,7 @@ const TransactionsSection: React.FC<TransactionsSectionProps> = ({ filteredTrans
                     }
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">{transaction.description}</div>
+                    <div className="font-medium">{transaction.jobTitle}</div>
                     <div className="text-sm text-muted-foreground">
                       {transaction.notes || "No details provided"}
                     </div>
