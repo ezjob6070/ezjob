@@ -12,21 +12,21 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="bg-blue-600 -mx-6 -mt-6 px-6 pt-6 pb-8 text-white">
+    <div className="bg-white -mx-6 -mt-6 px-6 pt-6 pb-8 border-b shadow-sm">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <div className="mr-3">
-            <span className="text-yellow-200 text-3xl">👋</span>
+            <span className="text-3xl">👋</span>
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Hello, Alex Johnson</h1>
-            <p className="text-blue-100">Welcome to your Uleadz CRM dashboard</p>
+            <h1 className="text-2xl font-bold text-gray-800">Hello, Alex Johnson</h1>
+            <p className="text-gray-500">Welcome to your Uleadz CRM dashboard</p>
           </div>
         </div>
         <div>
           <Button 
-            variant="secondary" 
-            className="bg-white/20 text-white hover:bg-white/30 border-none"
+            variant="outline" 
+            className="border-gray-200 bg-white hover:bg-gray-50"
           >
             <MailIcon className="mr-2 h-4 w-4" />
             <span>Send Reports</span>
@@ -35,22 +35,22 @@ const DashboardHeader = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
-        <TabsList className="bg-blue-700/30 text-white">
+        <TabsList className="bg-gray-100">
           <TabsTrigger 
             value="dashboard" 
-            className="data-[state=active]:bg-white data-[state=active]:text-blue-600"
+            className="data-[state=active]:bg-white data-[state=active]:text-gray-800 data-[state=active]:shadow-sm"
           >
             Dashboard
           </TabsTrigger>
           <TabsTrigger 
             value="statistics" 
-            className="data-[state=active]:bg-white data-[state=active]:text-blue-600"
+            className="data-[state=active]:bg-white data-[state=active]:text-gray-800 data-[state=active]:shadow-sm"
           >
             Statistics
           </TabsTrigger>
           <TabsTrigger 
             value="analytics" 
-            className="data-[state=active]:bg-white data-[state=active]:text-blue-600"
+            className="data-[state=active]:bg-white data-[state=active]:text-gray-800 data-[state=active]:shadow-sm"
           >
             Analytics
           </TabsTrigger>
@@ -61,7 +61,7 @@ const DashboardHeader = () => {
         </TabsContent>
         
         <TabsContent value="statistics">
-          <div className="mt-4 bg-white rounded-lg shadow p-4 text-gray-800">
+          <div className="mt-4 bg-white rounded-lg shadow-sm p-4 text-gray-800">
             <h2 className="text-xl font-bold mb-4">Statistics Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -84,7 +84,7 @@ const DashboardHeader = () => {
         </TabsContent>
         
         <TabsContent value="analytics">
-          <div className="mt-4 bg-white rounded-lg shadow p-4 text-gray-800">
+          <div className="mt-4 bg-white rounded-lg shadow-sm p-4 text-gray-800">
             <h2 className="text-xl font-bold mb-4">Analytics Dashboard</h2>
             <div className="space-y-6">
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -103,7 +103,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">42%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: '42%' }}></div>
+                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '42%' }}></div>
                     </div>
                     
                     <div className="flex justify-between">
@@ -111,7 +111,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">28%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: '28%' }}></div>
+                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '28%' }}></div>
                     </div>
                     
                     <div className="flex justify-between">
@@ -119,7 +119,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">18%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: '18%' }}></div>
+                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '18%' }}></div>
                     </div>
                     
                     <div className="flex justify-between">
@@ -127,7 +127,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">12%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: '12%' }}></div>
+                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '12%' }}></div>
                     </div>
                   </div>
                 </div>
@@ -136,7 +136,7 @@ const DashboardHeader = () => {
                   <h3 className="font-medium text-gray-700 mb-3">Engagement Metrics</h3>
                   <div className="space-y-4">
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-4">
                         <span className="text-lg font-bold">85%</span>
                       </div>
                       <div>
@@ -146,7 +146,7 @@ const DashboardHeader = () => {
                     </div>
                     
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-4">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-4">
                         <span className="text-lg font-bold">62%</span>
                       </div>
                       <div>
@@ -156,7 +156,7 @@ const DashboardHeader = () => {
                     </div>
                     
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-4">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-4">
                         <span className="text-lg font-bold">78%</span>
                       </div>
                       <div>

@@ -1,12 +1,43 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import MetricsOverview from "@/components/dashboard/MetricsOverview";
+import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+
+import {
+  dashboardFinancialMetrics,
+  dashboardTopTechnicians,
+  detailedTasksData,
+  detailedRevenueData,
+  detailedBusinessMetrics,
+  detailedClientsData
+} from "@/data/dashboardData";
 
 const Index = () => {
+  const openDetailDialog = () => {
+    // This is just a placeholder - in a real app, this would open a dialog
+    console.log("Would open detail dialog here");
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="space-y-4 py-4">
+      <DashboardHeader />
+      
+      <MetricsOverview 
+        financialMetrics={dashboardFinancialMetrics}
+        formatCurrency={formatCurrency}
+        openDetailDialog={openDetailDialog}
+        detailedTasksData={detailedTasksData}
+        detailedRevenueData={detailedRevenueData}
+        detailedBusinessMetrics={detailedBusinessMetrics}
+      />
+
+      <TopTechniciansCard 
+        topTechnicians={dashboardTopTechnicians}
+        formatCurrency={formatCurrency}
+        openDetailDialog={openDetailDialog}
+        detailedClientsData={detailedClientsData}
+      />
     </div>
   );
 };
