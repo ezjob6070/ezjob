@@ -29,6 +29,11 @@ export interface Job {
   jobSourceName?: string;
   parts?: string[];
   createdAt?: Date;
+  // New fields for signature and images
+  signature?: string;
+  hasImages?: boolean;
+  imageCount?: number;
+  images?: string[];
 }
 
 export interface JobTab {

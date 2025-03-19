@@ -1,7 +1,8 @@
+
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
-import { CalendarIcon, Clock } from "lucide-react";
+import { CalendarIcon, Clock, ImageIcon, FileSignature, Send } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -37,6 +38,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -72,6 +74,9 @@ const formSchema = z.object({
   amount: z.coerce.number().optional(),
   notes: z.string().optional(),
   parts: z.string().optional(),
+  // New fields
+  hasSignature: z.boolean().default(false),
+  sendNotification: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -100,11 +105,21 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       amount: undefined,
       notes: "",
       parts: "",
+      hasSignature: false,
+      sendNotification: false,
     },
   });
 
+  // State for signature and images
+  const [signatureData, setSignatureData] = useState<string | null>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const [signaturePad, setSignaturePad] = useState(false);
+  
   // Watch the timeSelection field to conditionally show/hide time fields
   const timeSelection = form.watch("timeSelection");
+  const hasSignature = form.watch("hasSignature");
+  const clientEmail = form.watch("clientEmail");
+  const sendNotification = form.watch("sendNotification");
 
   const onSubmit = (values: FormValues) => {
     // Find technician name
@@ -154,7 +169,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       isAllDay: isAllDay,
       address: values.clientAddress,
       status: "in_progress" as JobStatus,
-      // Remove createdAt as it's not in the type
     };
 
     // Add optional fields
@@ -191,9 +205,30 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       }
     }
 
+    // Add signature data if available
+    if (signatureData) {
+      newJob.signature = signatureData;
+    }
+
+    // For images, in a real app we would upload them to storage and store URLs
+    // Here we'll just indicate that images were attached
+    if (images.length > 0) {
+      newJob.hasImages = true;
+      newJob.imageCount = images.length;
+    }
+
+    // Handle notification (in a real app, this would send an email)
+    if (values.sendNotification && values.clientEmail) {
+      console.log(`Sending notification to ${values.clientEmail} about new job`);
+      // In a real implementation, this would call an API to send an email
+    }
+
     onAddJob(newJob);
     onOpenChange(false);
     form.reset();
+    setSignatureData(null);
+    setImages([]);
+    setSignaturePad(false);
   };
 
   // Format time for display
@@ -206,9 +241,30 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     );
   };
 
+  // Handle file selection for images
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const fileArray = Array.from(e.target.files);
+      setImages(prev => [...prev, ...fileArray]);
+    }
+  };
+
+  // Simulated signature pad (in a real app, use a proper signature library)
+  const handleSignature = () => {
+    setSignaturePad(!signaturePad);
+    if (!signaturePad) {
+      // This would be replaced with actual signature data
+      setTimeout(() => {
+        setSignatureData("data:image/png;base64,signature-data-placeholder");
+      }, 500);
+    } else {
+      setSignatureData(null);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Job</DialogTitle>
           <DialogDescription>
@@ -559,6 +615,139 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
               </div>
+
+              {/* New section for attachments and signature */}
+              <div className="border-t pt-4 mt-2">
+                <h3 className="text-lg font-medium mb-3">Additional Options</h3>
+                
+                {/* Image Upload */}
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium mb-2">Attach Images</h4>
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => document.getElementById('image-upload')?.click()}
+                      className="gap-2"
+                    >
+                      <ImageIcon size={16} />
+                      Add Images
+                    </Button>
+                    <input 
+                      id="image-upload" 
+                      type="file" 
+                      multiple 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handleImageUpload}
+                    />
+                    {images.length > 0 && (
+                      <span className="text-sm text-muted-foreground">
+                        {images.length} image{images.length !== 1 ? 's' : ''} selected
+                      </span>
+                    )}
+                  </div>
+                  {images.length > 0 && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {images.map((image, index) => (
+                        <div key={index} className="bg-gray-100 p-1 rounded text-xs">
+                          {image.name.length > 15 ? image.name.substring(0, 15) + '...' : image.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Signature Capture */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between">
+                    <FormField
+                      control={form.control}
+                      name="hasSignature"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <Checkbox 
+                              checked={field.value} 
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="cursor-pointer">Capture Client Signature</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {hasSignature && (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleSignature}
+                        className="gap-2"
+                      >
+                        <FileSignature size={16} />
+                        {signatureData ? "Clear Signature" : "Sign Now"}
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {hasSignature && signaturePad && (
+                    <div className="mt-2 border rounded p-4 flex items-center justify-center bg-gray-50 h-[150px]">
+                      {signatureData ? (
+                        <div className="text-center">
+                          <p className="text-sm text-green-600 font-medium">Signature captured!</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Client signature has been saved
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Signature pad would appear here (placeholder)
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Send notification to client */}
+                <div className="mb-2">
+                  <FormField
+                    control={form.control}
+                    name="sendNotification"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox 
+                            disabled={!clientEmail} 
+                            checked={field.value && !!clientEmail} 
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div>
+                          <FormLabel className={cn("cursor-pointer", !clientEmail && "opacity-50")}>
+                            Send Job Details to Client
+                          </FormLabel>
+                          {!clientEmail && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Client email required for notifications
+                            </p>
+                          )}
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {sendNotification && clientEmail && (
+                    <div className="flex items-center gap-2 ml-6 mt-2">
+                      <Send size={14} className="text-blue-500" />
+                      <p className="text-xs text-muted-foreground">
+                        Job details will be sent to {clientEmail}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
             </div>
 
             <DialogFooter>
