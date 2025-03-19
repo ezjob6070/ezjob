@@ -11,7 +11,7 @@ import {
 import { Technician } from "@/types/technician";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Button } from "@/components/ui/button";
-import { Download, Tool } from "lucide-react";
+import { Download } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import InvoiceDownloadDialog from "@/components/finance/invoice-section/InvoiceDownloadDialog";
 import { DateRange } from "react-day-picker";
@@ -56,8 +56,8 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
               <TableHead>Payment Rate</TableHead>
               <TableHead className="text-right">Completed Jobs</TableHead>
               <TableHead className="text-right">Cancelled Jobs</TableHead>
-              <TableHead className="text-right">Revenue</TableHead>
               <TableHead className="text-right">Parts</TableHead>
+              <TableHead className="text-right">Revenue</TableHead>
               <TableHead className="text-right">Company Profit</TableHead>
               <TableHead>Download</TableHead>
             </TableRow>
@@ -100,13 +100,10 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
                     <span className="font-semibold text-red-600">{technician.cancelledJobs || 0}</span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="font-semibold text-blue-600">{formatCurrency(technician.totalRevenue || 0)}</span>
+                    <span className="font-semibold text-red-600">{formatCurrency(partsValue)}</span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="font-semibold text-red-600 flex justify-end items-center gap-1">
-                      <Tool className="h-4 w-4" />
-                      {formatCurrency(partsValue)}
-                    </span>
+                    <span className="font-semibold text-blue-600">{formatCurrency(technician.totalRevenue || 0)}</span>
                   </TableCell>
                   <TableCell className="text-right">
                     <span className="font-semibold text-green-600">{formatCurrency(companyProfit)}</span>
