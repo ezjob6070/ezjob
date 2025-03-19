@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type DashboardMetricCardProps = {
@@ -38,7 +38,7 @@ const DashboardMetricCard = ({
       case 'outline':
         return 'bg-transparent border-2 hover:border-primary/50';
       case 'gradient':
-        return 'bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100';
+        return 'hover:shadow-md transition-all duration-300';
       default:
         return 'bg-white hover:shadow-md';
     }
@@ -46,14 +46,14 @@ const DashboardMetricCard = ({
 
   return (
     <Card className={cn(
-      "overflow-hidden transition-all duration-300", 
+      "overflow-hidden", 
       getCardClass(),
       className
     )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon && (
-          <div className="p-2 rounded-full bg-primary/10 text-primary">
+          <div className="p-2 rounded-full bg-white shadow-sm">
             {icon}
           </div>
         )}
@@ -63,13 +63,20 @@ const DashboardMetricCard = ({
         {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
         
         {trend && (
-          <div className="flex items-center mt-2 p-1.5 rounded-md bg-gray-50 w-fit">
-            <span className={cn(
-              "text-xs font-medium",
-              trend.isPositive ? "text-green-500" : "text-red-500"
+          <div className="flex items-center mt-2">
+            <div className={cn(
+              "flex items-center p-1.5 rounded-md bg-opacity-10 w-fit",
+              trend.isPositive ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
             )}>
-              {trend.isPositive ? "↑" : "↓"} {trend.value}
-            </span>
+              {trend.isPositive ? (
+                <TrendingUp className="mr-1 h-3 w-3" />
+              ) : (
+                <TrendingDown className="mr-1 h-3 w-3" />
+              )}
+              <span className="text-xs font-medium">
+                {trend.value}
+              </span>
+            </div>
           </div>
         )}
         
