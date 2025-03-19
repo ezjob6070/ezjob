@@ -8,7 +8,7 @@ const TechnicianFinance = () => {
   const { transactions } = useFinanceData();
   
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <TechniciansFinance 
         technicians={technicians} 
         transactions={transactions}

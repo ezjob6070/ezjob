@@ -46,13 +46,15 @@ const Layout = () => {
         <Sidebar isMobile={isMobile} />
         
         <main 
-          className="flex-1 overflow-auto p-4 transition-all duration-300 bg-white/10 backdrop-blur-lg ml-16"
+          className="flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg ml-16"
         >
           <div className="mb-4">
             <GlobalDateRangeFilter />
           </div>
-          <div className="w-full mx-auto animate-fade-in rounded-xl bg-white/90 backdrop-blur-sm p-4 md:p-6 shadow-lg">
-            <Outlet />
+          <div className="w-full mx-auto animate-fade-in rounded-xl bg-white/95 backdrop-blur-sm p-4 md:p-6 shadow-lg">
+            <div className="max-w-full overflow-x-hidden">
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

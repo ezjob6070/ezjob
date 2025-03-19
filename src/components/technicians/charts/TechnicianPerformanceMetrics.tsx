@@ -26,9 +26,9 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
   if (!technician || !metrics) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-      <Card>
-        <CardContent className="pt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-full overflow-x-hidden">
+      <Card className="shadow-sm">
+        <CardContent className="pt-6 px-4">
           <div>
             <p className="text-sm font-medium text-black">Completed Jobs</p>
             <p className="text-2xl font-bold">{technician.completedJobs || 0}</p>
@@ -36,8 +36,8 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="shadow-sm">
+        <CardContent className="pt-6 px-4">
           <div>
             <p className="text-sm font-medium text-black">Rating</p>
             <p className="text-2xl font-bold text-amber-600">{(technician.rating || 0).toFixed(1)}★</p>
@@ -45,8 +45,8 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="shadow-sm">
+        <CardContent className="pt-6 px-4">
           <div>
             <p className="text-sm font-medium text-black">Average Job Value</p>
             <p className="text-2xl font-bold text-purple-600">{formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}</p>
@@ -54,8 +54,8 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="shadow-sm">
+        <CardContent className="pt-6 px-4">
           <div>
             <p className="text-xl font-bold text-black">Total Revenue</p>
             <p className="text-2xl font-bold text-sky-600">{formatCurrency(metrics.revenue || 0)}</p>
@@ -63,8 +63,8 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="shadow-sm">
+        <CardContent className="pt-6 px-4">
           <div>
             <p className="text-xl font-bold text-black">Company Profit</p>
             <p className="text-2xl font-bold text-emerald-600">{formatCurrency(metrics.profit || 0)}</p>

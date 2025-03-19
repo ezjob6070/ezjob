@@ -38,15 +38,15 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
   const profitMargin = metrics.revenue ? ((metrics.profit || 0) / metrics.revenue * 100).toFixed(1) : '0.0';
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="shadow-sm overflow-hidden">
+      <CardHeader className="bg-gray-50 border-b pb-4">
         <CardTitle>Technician Performance</CardTitle>
         <CardDescription>
           Key metrics for {technician.name} {dateRangeText ? `(${dateRangeText})` : ''}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent className="space-y-4 p-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-green-100">
               <Briefcase className="h-5 w-5 text-green-500" />
@@ -85,9 +85,9 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
           </div>
         </div>
 
-        <div className="border-t pt-4">
-          <h4 className="text-sm font-medium text-black mb-2">Financial Breakdown</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="border-t pt-4 mt-4">
+          <h4 className="text-base font-medium mb-4">Financial Breakdown</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-blue-100">
                 <ArrowUp className="h-5 w-5 text-blue-500" />
@@ -124,9 +124,13 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
                 <p className="text-xl font-semibold text-emerald-600">{metrics.profit ? formatCurrency(metrics.profit) : 'N/A'}</p>
               </div>
             </div>
-            <div className="col-span-2">
-              <p className="text-sm font-medium text-black">Profit Margin</p>
-              <p className="text-xl font-semibold">{profitMargin}%</p>
+            <div className="col-span-1 sm:col-span-2">
+              <Card className="bg-gray-50">
+                <CardContent className="p-4">
+                  <p className="text-sm font-medium text-black">Profit Margin</p>
+                  <p className="text-xl font-semibold">{profitMargin}%</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
