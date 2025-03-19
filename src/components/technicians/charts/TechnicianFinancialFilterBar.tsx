@@ -91,8 +91,8 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
       {/* Technician Filter */}
       <Popover open={showTechnicianFilter} onOpenChange={setShowTechnicianFilter}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="bg-white hover:bg-gray-50 border-gray-200 text-gray-700">
-            <UserPlus className="h-4 w-4 mr-2 text-gray-500" />
+          <Button variant="outline" className="bg-white hover:bg-gray-50 border-gray-200 text-gray-900 font-medium">
+            <UserPlus className="h-4 w-4 mr-2 text-gray-700" />
             {selectedTechnicians.length > 0 
               ? `${selectedTechnicians.length} technicians` 
               : "Filter Technicians"}
@@ -118,7 +118,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
                 />
                 <label 
                   htmlFor="select-all-techs"
-                  className="text-sm font-medium cursor-pointer"
+                  className="text-sm font-medium cursor-pointer text-gray-900"
                 >
                   Select All Technicians
                 </label>
@@ -134,7 +134,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
                   />
                   <label 
                     htmlFor={`tech-${tech}`}
-                    className="text-sm cursor-pointer"
+                    className="text-sm cursor-pointer text-gray-900"
                   >
                     {tech}
                   </label>
@@ -157,7 +157,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
 
       {/* Payment Type Filter */}
       <Select value={paymentTypeFilter} onValueChange={setPaymentTypeFilter}>
-        <SelectTrigger className="w-[180px] bg-white border-gray-200 text-gray-700">
+        <SelectTrigger className="w-[180px] bg-white border-gray-200 text-gray-900 font-medium">
           <SelectValue placeholder="Payment Rate" />
         </SelectTrigger>
         <SelectContent>
@@ -171,8 +171,8 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
       {/* Sort Order Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="ml-auto gap-2 bg-white border-gray-200 text-gray-700">
-            <ArrowUpDown className="h-4 w-4 text-gray-500" />
+          <Button variant="outline" className="ml-auto gap-2 bg-white border-gray-200 text-gray-900 font-medium">
+            <ArrowUpDown className="h-4 w-4 text-gray-700" />
             {sortOption === "revenue-high" && "Revenue: High to Low"}
             {sortOption === "revenue-low" && "Revenue: Low to High"}
             {sortOption === "name-asc" && "Name: A to Z"}
@@ -197,7 +197,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
 
       {/* Applied Filters Indicator */}
       {(selectedTechnicians.length > 0 || paymentTypeFilter !== "all") && (
-        <div className="text-sm text-muted-foreground ml-2">
+        <div className="text-sm text-gray-900 font-medium ml-2">
           Showing {selectedTechnicians.length > 0 ? selectedTechnicians.length : "all"} technician(s)
         </div>
       )}
