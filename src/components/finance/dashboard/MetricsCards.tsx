@@ -1,40 +1,35 @@
 
-import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { DollarSignIcon } from "lucide-react";
+import { DollarSignIcon, TrendingDownIcon, PiggyBankIcon } from "lucide-react";
 
 interface MetricsCardProps {
   title: string;
   value: number;
-  iconColor: string;
+  icon: React.ReactNode;
   bgColor: string;
-  textColor: string;
-  isNegative?: boolean;
+  iconColor: string;
   dateRangeText?: string;
 }
 
-export const MetricsCard: React.FC<MetricsCardProps> = ({
+const MetricsCard: React.FC<MetricsCardProps> = ({
   title,
   value,
-  iconColor,
+  icon,
   bgColor,
-  textColor,
-  isNegative = false,
+  iconColor,
   dateRangeText
 }) => {
   return (
-    <Card className="border-l-4 shadow-sm hover:shadow-md transition-shadow" style={{ borderLeftColor: textColor.includes('blue') ? '#3b82f6' : textColor.includes('red') ? '#ef4444' : '#22c55e' }}>
-      <CardContent className="pt-4 p-4">
-        <div className="flex items-center gap-3">
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-4">
           <div className={`p-2 ${bgColor} rounded-full`}>
-            <DollarSignIcon className={`h-4 w-4 ${iconColor}`} />
+            {icon}
           </div>
           <div>
-            <p className="text-xs sm:text-sm text-muted-foreground">{title}</p>
-            <p className={`text-xl sm:text-2xl font-bold ${textColor}`}>
-              {isNegative && "-"}{formatCurrency(value)}
-            </p>
+            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className="text-2xl font-bold">{formatCurrency(value)}</p>
             {dateRangeText && (
               <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
             )}
@@ -59,32 +54,31 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
   dateRangeText
 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
       <MetricsCard
         title="Total Revenue"
         value={totalRevenue}
-        iconColor="text-blue-700"
+        icon={<DollarSignIcon className="h-5 w-5 text-blue-700" />}
         bgColor="bg-blue-100"
-        textColor="text-blue-600"
+        iconColor="text-blue-700"
         dateRangeText={dateRangeText}
       />
       
       <MetricsCard
         title="Technician Earnings"
         value={totalEarnings}
-        iconColor="text-red-700"
+        icon={<TrendingDownIcon className="h-5 w-5 text-red-700" />}
         bgColor="bg-red-100"
-        textColor="text-red-600"
-        isNegative={true}
+        iconColor="text-red-700"
         dateRangeText={dateRangeText}
       />
       
       <MetricsCard
         title="Company Profit"
         value={companyProfit}
-        iconColor="text-green-700"
+        icon={<PiggyBankIcon className="h-5 w-5 text-green-700" />}
         bgColor="bg-green-100"
-        textColor="text-green-600"
+        iconColor="text-green-700"
         dateRangeText={dateRangeText}
       />
     </div>

@@ -1,26 +1,17 @@
 
 import React from "react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { DateRange } from "react-day-picker";
 import CompactDateRangePicker from "./CompactDateRangePicker";
 import { format } from "date-fns";
 import { 
   CalendarIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  DollarSignIcon,
+  TrendingDownIcon,
+  PiggyBankIcon
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface OverallFinanceSectionProps {
   totalRevenue: number;
@@ -51,6 +42,10 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
     );
   };
 
+  const dateRangeText = date?.from && date?.to ? 
+    `${format(date.from, "MMM d")} - ${format(date.to, "MMM d, yyyy")}` : 
+    "All time";
+
   return (
     <div className="mb-8">
       <div className="mb-6">
@@ -65,87 +60,48 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Total Income</CardTitle>
-            <CardDescription>
-              Revenue from all sources
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {date?.from && date?.to && (
-                        <span>
-                          {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
-                        </span>
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Data for selected date range</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalRevenue)}</div>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-blue-100 rounded-full">
+                <DollarSignIcon className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Income</p>
+                <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Total Expenses</CardTitle>
-            <CardDescription>
-              Expenses across all categories
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {date?.from && date?.to && (
-                        <span>
-                          {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
-                        </span>
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Data for selected date range</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">-{formatCurrency(totalExpenses)}</div>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-red-100 rounded-full">
+                <TrendingDownIcon className="h-5 w-5 text-red-700" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Expenses</p>
+                <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Net Company Profit</CardTitle>
-            <CardDescription>
-              Revenue after expenses
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {date?.from && date?.to && (
-                        <span>
-                          {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
-                        </span>
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Data for selected date range</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {totalProfit >= 0 ? formatCurrency(totalProfit) : `-${formatCurrency(Math.abs(totalProfit))}`}
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-green-100 rounded-full">
+                <PiggyBankIcon className="h-5 w-5 text-green-700" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Net Company Profit</p>
+                <p className={`text-2xl font-bold ${totalProfit >= 0 ? '' : 'text-red-600'}`}>
+                  {totalProfit >= 0 ? formatCurrency(totalProfit) : `-${formatCurrency(Math.abs(totalProfit))}`}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -52,31 +52,27 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
   const cards = [
     {
       title: "Total Revenue",
-      value: formatCurrency(revenue),
-      icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
-      color: "bg-blue-50 text-blue-700",
-      iconColor: "bg-blue-100"
+      value: revenue,
+      icon: <TrendingUp className="h-5 w-5 text-blue-700" />,
+      bgColor: "bg-blue-100",
     },
     {
       title: "Technician Earnings",
-      value: formatCurrency(technicianEarnings),
-      icon: <Users className="h-5 w-5 text-indigo-500" />,
-      color: "bg-indigo-50 text-indigo-700",
-      iconColor: "bg-indigo-100"
+      value: technicianEarnings,
+      icon: <Users className="h-5 w-5 text-indigo-700" />,
+      bgColor: "bg-indigo-100",
     },
     {
       title: "Expenses",
-      value: formatCurrency(expenses),
-      icon: <Calculator className="h-5 w-5 text-red-500" />,
-      color: "bg-red-50 text-red-700",
-      iconColor: "bg-red-100"
+      value: expenses,
+      icon: <Calculator className="h-5 w-5 text-red-700" />,
+      bgColor: "bg-red-100",
     },
     {
       title: "Company Profit",
-      value: formatCurrency(profit),
-      icon: <DollarSign className="h-5 w-5 text-green-500" />,
-      color: "bg-green-50 text-green-700",
-      iconColor: "bg-green-100"
+      value: profit,
+      icon: <DollarSign className="h-5 w-5 text-green-700" />,
+      bgColor: "bg-green-100",
     }
   ];
 
@@ -89,15 +85,18 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card, index) => (
-          <Card key={index} className={`border-l-4 border-l-${card.color.split(' ')[0].replace('bg-', '')}-400`}>
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
-                  <p className="text-2xl font-bold mt-1">{card.value}</p>
-                </div>
-                <div className={`p-2 rounded-full ${card.iconColor}`}>
+          <Card key={index}>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className={`p-2 ${card.bgColor} rounded-full`}>
                   {card.icon}
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">{card.title}</p>
+                  <p className="text-2xl font-bold">{formatCurrency(card.value)}</p>
+                  {dateRangeText && (
+                    <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+                  )}
                 </div>
               </div>
             </CardContent>
