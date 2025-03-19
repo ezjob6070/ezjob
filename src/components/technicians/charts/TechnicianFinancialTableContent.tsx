@@ -40,7 +40,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
             <TableHead className="text-right">Completed Jobs</TableHead>
             <TableHead className="text-right">Cancelled Jobs</TableHead>
             <TableHead className="text-right">Revenue</TableHead>
-            <TableHead className="text-right">Total Revenue</TableHead>
+            <TableHead className="text-right">Company Profit</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
