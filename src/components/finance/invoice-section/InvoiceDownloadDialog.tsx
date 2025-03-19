@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Dialog, 
@@ -59,11 +58,11 @@ const InvoiceDownloadDialog: React.FC<InvoiceDownloadDialogProps> = ({
   const handleDownload = () => {
     // In a real app, this would call an API endpoint to generate and download the invoice
     
-    // For now, we'll just show a success toast
+    // For now, we'll just show a success toast - changed from "success" to "default"
     toast({
       title: `Invoice for ${technician?.name} downloaded`,
       description: `Downloaded as ${fileFormat.toUpperCase()} for period ${dateRange?.from ? dateRange.from.toLocaleDateString() : ''} to ${dateRange?.to ? dateRange.to.toLocaleDateString() : ''}`,
-      variant: "success",
+      variant: "default",
     });
     
     onOpenChange(false);

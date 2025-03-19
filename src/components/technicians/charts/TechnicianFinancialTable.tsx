@@ -17,6 +17,7 @@ import TechnicianFinancialFilterBar from "@/components/technicians/charts/Techni
 import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
 
 interface TechnicianFinancialTableProps {
+  filteredTechnicians: Technician[]; // Added this prop to fix the type error
   displayedTechnicians: Technician[];
   selectedTechnicianNames: string[];
   toggleTechnician: (name: string) => void;
@@ -31,6 +32,7 @@ interface TechnicianFinancialTableProps {
 }
 
 const TechnicianFinancialTable = ({
+  filteredTechnicians, // Added this prop
   displayedTechnicians,
   selectedTechnicianNames,
   toggleTechnician,
