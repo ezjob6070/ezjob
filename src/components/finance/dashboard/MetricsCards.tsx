@@ -18,15 +18,15 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <Card className="border-l-4 border-l-blue-500 shadow-sm">
+      <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 text-lg font-bold">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 text-lg font-bold">
               $
             </div>
-            <div className="flex-1">
+            <div>
               <div className="text-sm text-muted-foreground mb-1">
-                Total Revenue
+                Total Revenue from All Technicians
               </div>
               <div className="text-2xl font-bold text-blue-600">
                 {formatCurrency(totalRevenue)}
@@ -39,15 +39,15 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="border-l-4 border-l-red-500 shadow-sm">
+      <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 text-lg font-bold">
+            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 text-lg font-bold">
               $
             </div>
-            <div className="flex-1">
+            <div>
               <div className="text-sm text-muted-foreground mb-1">
-                Technician Earnings
+                Technician Earnings from All Technicians
               </div>
               <div className="text-2xl font-bold text-red-600">
                 {formatCurrency(totalEarnings)}
@@ -60,15 +60,15 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="border-l-4 border-l-green-500 shadow-sm">
+      <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500 text-lg font-bold">
+            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 text-lg font-bold">
               $
             </div>
-            <div className="flex-1">
+            <div>
               <div className="text-sm text-muted-foreground mb-1">
-                Company Profit
+                Company Profit from All Technicians
               </div>
               <div className="text-2xl font-bold text-green-600">
                 {formatCurrency(companyProfit)}
