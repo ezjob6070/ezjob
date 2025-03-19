@@ -1,8 +1,6 @@
-
 import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { TrendingUp, Users, Calculator, DollarSign } from "lucide-react";
 import { Technician } from "@/types/technician";
 
 export interface PaymentBreakdownCardsProps {
@@ -49,37 +47,6 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
   
   const { revenue, technicianEarnings, expenses, profit } = calculatedMetrics;
 
-  const cards = [
-    {
-      title: "Total Revenue",
-      value: revenue,
-      icon: <TrendingUp className="h-5 w-5 text-blue-700" />,
-      bgColor: "bg-blue-100",
-      textColor: "text-sky-600"
-    },
-    {
-      title: "Technician Earnings",
-      value: technicianEarnings,
-      icon: <Users className="h-5 w-5 text-indigo-700" />,
-      bgColor: "bg-indigo-100",
-      textColor: "text-red-600"
-    },
-    {
-      title: "Expenses",
-      value: expenses,
-      icon: <Calculator className="h-5 w-5 text-red-700" />,
-      bgColor: "bg-red-100",
-      textColor: "text-red-600"
-    },
-    {
-      title: "Company Profit",
-      value: profit,
-      icon: <DollarSign className="h-5 w-5 text-green-700" />,
-      bgColor: "bg-green-100",
-      textColor: "text-emerald-600"
-    }
-  ];
-
   return (
     <div>
       {dateRangeText && (
@@ -88,26 +55,61 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {cards.map((card, index) => (
-          <Card key={index}>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className={`p-2 ${card.bgColor} rounded-full`}>
-                  {card.icon}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-black">{card.title}</p>
-                  <p className={`text-2xl font-bold ${card.textColor}`}>
-                    {formatCurrency(card.value)}
-                  </p>
-                  {dateRangeText && (
-                    <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card>
+          <CardContent className="pt-6">
+            <div>
+              <p className="text-sm font-medium text-black">Total Revenue</p>
+              <p className="text-2xl font-bold text-sky-600">
+                {formatCurrency(revenue)}
+              </p>
+              {dateRangeText && (
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div>
+              <p className="text-sm font-medium text-black">Technician Earnings</p>
+              <p className="text-2xl font-bold text-red-600">
+                {formatCurrency(technicianEarnings)}
+              </p>
+              {dateRangeText && (
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div>
+              <p className="text-sm font-medium text-black">Expenses</p>
+              <p className="text-2xl font-bold text-red-600">
+                {formatCurrency(expenses)}
+              </p>
+              {dateRangeText && (
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div>
+              <p className="text-sm font-medium text-black">Company Profit</p>
+              <p className="text-2xl font-bold text-emerald-600">
+                {formatCurrency(profit)}
+              </p>
+              {dateRangeText && (
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
