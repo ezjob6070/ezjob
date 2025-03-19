@@ -108,9 +108,9 @@ const TechnicianDateFilter: React.FC<TechnicianDateFilterProps> = ({
   return (
     <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="flex flex-col items-start px-4 py-2 h-auto min-h-[3rem] relative">
+        <Button variant="outline" className="flex flex-col items-start px-4 py-2 h-auto min-h-[3rem] relative bg-white hover:bg-gray-50 border-gray-200 text-gray-700">
           <div className="flex items-center gap-2 font-medium">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 text-gray-500" />
             {getDateDisplayText()}
           </div>
           <div className="text-xs text-muted-foreground mt-0.5">
