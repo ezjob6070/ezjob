@@ -14,6 +14,7 @@ import TechnicianList from "./invoice-section/TechnicianList";
 import InvoiceFilterOptions from "./invoice-section/InvoiceFilterOptions";
 import SelectedTechnicianCard from "./invoice-section/SelectedTechnicianCard";
 import InvoicePreviewDialog from "./invoice-section/InvoicePreviewDialog";
+import CustomInvoiceCard from "./invoice-section/CustomInvoiceCard";
 
 interface TechnicianInvoiceSectionProps {
   activeTechnicians: Technician[];
@@ -252,6 +253,14 @@ const TechnicianInvoiceSection: React.FC<TechnicianInvoiceSectionProps> = ({
                   handleDatePresetSelection={handleDatePresetSelection}
                 />
               )}
+              
+              {/* Custom Invoice Card */}
+              <CustomInvoiceCard 
+                technicians={filteredTechnicians}
+                selectedTechnician={selectedTechnician}
+                dateRange={date}
+                setDateRange={setDate}
+              />
               
               {/* Selected Technician Info */}
               {selectedTechnician && (
