@@ -72,7 +72,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
                   <span className="font-semibold text-green-600">{technician.completedJobs || 0}</span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <span className="font-semibold text-orange-500">{technician.cancelledJobs || 0}</span>
+                  <span className="font-semibold text-red-600">{technician.cancelledJobs || 0}</span>
                 </TableCell>
                 <TableCell className="text-right">
                   <span className="font-semibold text-blue-600">{formatCurrency(technician.totalRevenue || 0)}</span>
