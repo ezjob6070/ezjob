@@ -37,7 +37,7 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-500 to-indigo-700">
+    <div className="h-screen flex flex-col bg-white">
       <Header />
       
       <div className="flex-1 flex overflow-hidden pt-16">
@@ -45,9 +45,9 @@ const Layout = () => {
         <Sidebar isMobile={isMobile} />
         
         <main 
-          className="flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg ml-16"
+          className="flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 ml-16"
         >
-          <div className="w-full mx-auto animate-fade-in rounded-xl bg-white/95 backdrop-blur-sm p-4 md:p-6 shadow-lg">
+          <div className="w-full mx-auto animate-fade-in">
             <div className="max-w-full overflow-x-hidden">
               <Outlet />
             </div>
