@@ -1,5 +1,5 @@
 
-import { TechniciansFinance } from "@/components/technicians/TechniciansFinance";
+import TechniciansFinance from "@/components/technicians/TechniciansFinance";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { useFinanceData } from "@/hooks/useFinanceData";
 
