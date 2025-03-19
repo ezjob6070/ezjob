@@ -26,7 +26,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
   if (!technician || !metrics) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <Card>
         <CardContent className="pt-6">
           <div>
@@ -59,6 +59,15 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
           <div>
             <p className="text-sm font-medium text-black">Total Revenue</p>
             <p className="text-2xl font-bold text-sky-600">{formatCurrency(metrics.revenue || 0)}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
+          <div>
+            <p className="text-sm font-medium text-black">Company Profit</p>
+            <p className="text-2xl font-bold text-emerald-600">{formatCurrency(metrics.profit || 0)}</p>
           </div>
         </CardContent>
       </Card>
