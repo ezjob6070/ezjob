@@ -40,7 +40,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
             <TableHead className="text-right">Completed Jobs</TableHead>
             <TableHead className="text-right">Cancelled Jobs</TableHead>
             <TableHead className="text-right">Revenue</TableHead>
-            <TableHead className="text-right">Earnings</TableHead>
+            <TableHead className="text-right">Total Revenue</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -78,7 +78,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
                   <span className="font-semibold text-blue-600">{formatCurrency(technician.totalRevenue || 0)}</span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <span className="font-semibold text-purple-600">{formatCurrency(earnings)}</span>
+                  <span className="font-semibold text-green-600">{formatCurrency(earnings)}</span>
                 </TableCell>
               </TableRow>
             );
