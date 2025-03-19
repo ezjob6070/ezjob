@@ -70,7 +70,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               <DollarSign className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-black">Total Revenue</p>
+              <p className="text-base font-semibold text-black">Total Revenue</p>
               <p className="text-2xl font-bold text-sky-600">{formatCurrency(metrics.totalRevenue)}</p>
             </div>
           </div>
@@ -79,7 +79,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
               <ArrowDown className="h-5 w-5 text-red-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-black">Technician Earnings</p>
+              <p className="text-base font-semibold text-black">Technician Earnings</p>
               <p className="text-2xl font-bold text-red-600">-{formatCurrency(metrics.earnings || 0)}</p>
             </div>
           </div>
@@ -120,7 +120,7 @@ const TechnicianDetailCard: React.FC<TechnicianDetailCardProps> = ({
                 <Settings className="h-5 w-5 text-green-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-black">Company Profit</p>
+                <p className="text-base font-semibold text-black">Company Profit</p>
                 <p className="text-xl font-semibold text-emerald-600">{metrics.profit ? formatCurrency(metrics.profit) : 'N/A'}</p>
               </div>
             </div>

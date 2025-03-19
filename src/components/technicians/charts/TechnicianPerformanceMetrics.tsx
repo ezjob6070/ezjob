@@ -57,7 +57,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
       <Card>
         <CardContent className="pt-6">
           <div>
-            <p className="text-sm font-medium text-black">Total Revenue</p>
+            <p className="text-base font-semibold text-black">Total Revenue</p>
             <p className="text-2xl font-bold text-sky-600">{formatCurrency(metrics.revenue || 0)}</p>
           </div>
         </CardContent>
@@ -66,7 +66,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
       <Card>
         <CardContent className="pt-6">
           <div>
-            <p className="text-sm font-medium text-black">Company Profit</p>
+            <p className="text-base font-semibold text-black">Company Profit</p>
             <p className="text-2xl font-bold text-emerald-600">{formatCurrency(metrics.profit || 0)}</p>
           </div>
         </CardContent>
