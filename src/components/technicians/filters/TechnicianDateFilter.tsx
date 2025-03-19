@@ -31,12 +31,12 @@ const TechnicianDateFilter: React.FC<TechnicianDateFilterProps> = ({
   const today = new Date();
   
   const getDateDisplayText = () => {
-    if (!localDateRange?.from) return "Today";
+    if (!localDateRange?.from) return "Choose custom range";
     
     if (localDateRange.to && 
         isSameDay(localDateRange.from, localDateRange.to) && 
         isSameDay(localDateRange.from, today)) {
-      return "Today";
+      return "Choose custom range";
     }
     
     if (localDateRange.to && isSameDay(localDateRange.from, localDateRange.to)) {

@@ -158,10 +158,10 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
       {/* Payment Type Filter */}
       <Select value={paymentTypeFilter} onValueChange={setPaymentTypeFilter}>
         <SelectTrigger className="w-[180px] bg-white border-gray-200 text-gray-700">
-          <SelectValue placeholder="Payment Type" />
+          <SelectValue placeholder="Payment Rate" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Payment Types</SelectItem>
+          <SelectItem value="all">All Payment Rates</SelectItem>
           <SelectItem value="percentage">Percentage Based</SelectItem>
           <SelectItem value="flat">Flat Rate</SelectItem>
           <SelectItem value="hourly">Hourly</SelectItem>
