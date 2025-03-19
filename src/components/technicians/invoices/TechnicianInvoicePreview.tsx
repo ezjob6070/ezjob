@@ -44,6 +44,7 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
   const technicianEarnings = totalRevenue * (technician.paymentType === "percentage" ? technician.paymentRate / 100 : 1);
   const partsValue = totalRevenue * 0.2; // Assuming parts are 20% of total revenue
   const companyProfit = totalRevenue - technicianEarnings - partsValue;
+  const technicianOwesToCompany = 0; // This would be calculated if technician owes money
   
   return (
     <Card className="shadow-lg border">
@@ -95,6 +96,9 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
               {settings.showCompanyProfit && (
                 <p><span className="font-medium">Company Profit:</span> {formatCurrency(companyProfit)}</p>
               )}
+              {technicianOwesToCompany > 0 && (
+                <p className="text-red-600"><span className="font-medium">Technician Owes Company:</span> {formatCurrency(technicianOwesToCompany)}</p>
+              )}
             </div>
           </div>
         </div>
@@ -108,9 +112,14 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
                 <TableHead>Job Title</TableHead>
                 {settings.showJobDate && <TableHead>Date</TableHead>}
                 {settings.showJobAddress && <TableHead>Address</TableHead>}
-                <TableHead>Amount</TableHead>
-                {settings.showTechnicianEarnings && <TableHead>Technician Earnings</TableHead>}
-                {settings.showPartsValue && <TableHead>Parts</TableHead>}
+                <TableHead>Total Amount</TableHead>
+                {settings.showTechnicianEarnings && (
+                  <>
+                    <TableHead>Tech Rate</TableHead>
+                    <TableHead>Tech Earnings</TableHead>
+                  </>
+                )}
+                {settings.showPartsValue && <TableHead>Parts Value</TableHead>}
                 {settings.showCompanyProfit && <TableHead>Company Profit</TableHead>}
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -119,6 +128,7 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
               {technicianJobs.length > 0 ? (
                 technicianJobs.map((job) => {
                   const jobAmount = job.amount || 0;
+                  const techRate = technician.paymentType === "percentage" ? technician.paymentRate : Math.round((technician.paymentRate / jobAmount) * 100);
                   const jobTechEarnings = jobAmount * (technician.paymentType === "percentage" ? technician.paymentRate / 100 : 1);
                   const jobPartsValue = jobAmount * 0.2;
                   const jobCompanyProfit = jobAmount - jobTechEarnings - jobPartsValue;
@@ -137,7 +147,10 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
                       )}
                       <TableCell>{formatCurrency(jobAmount)}</TableCell>
                       {settings.showTechnicianEarnings && (
-                        <TableCell>{formatCurrency(jobTechEarnings)}</TableCell>
+                        <>
+                          <TableCell>{techRate}%</TableCell>
+                          <TableCell>{formatCurrency(jobTechEarnings)}</TableCell>
+                        </>
                       )}
                       {settings.showPartsValue && (
                         <TableCell>{formatCurrency(jobPartsValue)}</TableCell>
@@ -162,7 +175,7 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-4">
+                  <TableCell colSpan={11} className="text-center py-4">
                     No jobs found for the selected filters.
                   </TableCell>
                 </TableRow>
@@ -170,20 +183,91 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
             </TableBody>
           </Table>
         </div>
+
+        {technicianJobs.length > 0 && (
+          <div className="mt-4 border-t pt-4">
+            <h3 className="text-lg font-semibold mb-2">Totals</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Revenue</p>
+                <p className="text-lg font-bold">{formatCurrency(totalRevenue)}</p>
+              </div>
+              {settings.showTechnicianEarnings && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Technician Earnings</p>
+                  <p className="text-lg font-bold">{formatCurrency(technicianEarnings)}</p>
+                </div>
+              )}
+              {settings.showPartsValue && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Parts Value</p>
+                  <p className="text-lg font-bold">{formatCurrency(partsValue)}</p>
+                </div>
+              )}
+              {settings.showCompanyProfit && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Company Profit</p>
+                  <p className="text-lg font-bold">{formatCurrency(companyProfit)}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         
         {settings.showDetails && technicianJobs.length > 0 && (
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold mb-4">Job Notes</h3>
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4">Job Notes and Details</h3>
             <div className="space-y-4">
-              {technicianJobs.map((job) => (
-                job.notes ? (
+              {technicianJobs.map((job) => {
+                const jobAmount = job.amount || 0;
+                const techRate = technician.paymentType === "percentage" ? technician.paymentRate : Math.round((technician.paymentRate / jobAmount) * 100);
+                const jobTechEarnings = jobAmount * (technician.paymentType === "percentage" ? technician.paymentRate / 100 : 1);
+                const jobPartsValue = jobAmount * 0.2;
+                const jobCompanyProfit = jobAmount - jobTechEarnings - jobPartsValue;
+                
+                return job.notes ? (
                   <div key={`${job.id}-notes`} className="p-4 border rounded-md">
                     <p className="font-medium">{job.title} - {job.clientName}</p>
                     <p className="text-sm mt-1">{job.description}</p>
-                    <p className="text-sm text-muted-foreground mt-2 italic">Notes: {job.notes}</p>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Total Amount</p>
+                        <p className="font-medium">{formatCurrency(jobAmount)}</p>
+                      </div>
+                      
+                      {settings.showTechnicianEarnings && (
+                        <>
+                          <div>
+                            <p className="text-muted-foreground">Tech Rate</p>
+                            <p className="font-medium">{techRate}%</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Tech Earnings</p>
+                            <p className="font-medium">{formatCurrency(jobTechEarnings)}</p>
+                          </div>
+                        </>
+                      )}
+                      
+                      {settings.showPartsValue && (
+                        <div>
+                          <p className="text-muted-foreground">Parts Value</p>
+                          <p className="font-medium">{formatCurrency(jobPartsValue)}</p>
+                        </div>
+                      )}
+                      
+                      {settings.showCompanyProfit && (
+                        <div>
+                          <p className="text-muted-foreground">Company Profit</p>
+                          <p className="font-medium">{formatCurrency(jobCompanyProfit)}</p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground mt-3 italic">Notes: {job.notes}</p>
                   </div>
-                ) : null
-              ))}
+                ) : null;
+              })}
             </div>
           </div>
         )}
@@ -193,6 +277,9 @@ const TechnicianInvoicePreview: React.FC<TechnicianInvoicePreviewProps> = ({
             <div>
               <p className="text-sm text-muted-foreground">
                 Thank you for your services.
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                This document serves as an official record of completed jobs and compensation.
               </p>
             </div>
             <div className="text-right">
