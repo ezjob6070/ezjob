@@ -12,13 +12,8 @@ import { Technician } from "@/types/technician";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
+import InvoiceDownloadDialog from "@/components/finance/invoice-section/InvoiceDownloadDialog";
 
 interface TechnicianFinancialTableContentProps {
   displayedTechnicians: Technician[];
@@ -38,14 +33,6 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
     e.stopPropagation(); // Prevent the row click from triggering
     setActiveTechnician(technician);
     setDownloadDialogOpen(true);
-  };
-
-  const handleDownloadInvoice = () => {
-    toast({
-      title: "Download Started",
-      description: `Downloading invoice for ${activeTechnician?.name}...`,
-    });
-    setDownloadDialogOpen(false);
   };
 
   if (displayedTechnicians.length === 0) {
@@ -126,27 +113,12 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
         </Table>
       </div>
 
-      {/* Download Dialog */}
-      <Dialog open={downloadDialogOpen} onOpenChange={setDownloadDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Download Invoice for {activeTechnician?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <p>Select the invoice format you would like to download:</p>
-            <div className="grid grid-cols-2 gap-2">
-              <Button onClick={handleDownloadInvoice} className="flex items-center">
-                <Download className="h-4 w-4 mr-2" />
-                PDF Invoice
-              </Button>
-              <Button onClick={handleDownloadInvoice} variant="outline" className="flex items-center">
-                <Download className="h-4 w-4 mr-2" />
-                Excel Format
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Invoice Download Dialog with filters */}
+      <InvoiceDownloadDialog 
+        open={downloadDialogOpen} 
+        onOpenChange={setDownloadDialogOpen} 
+        technician={activeTechnician} 
+      />
     </>
   );
 };
