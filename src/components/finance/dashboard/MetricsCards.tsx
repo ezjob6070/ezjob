@@ -34,7 +34,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         variant="finance"
         valueClassName="text-blue-600 text-3xl"
       >
-        <p className="text-sm text-muted-foreground mt-1">All revenue from completed jobs</p>
+        <p className="text-sm text-muted-foreground -mt-3 mb-2">All revenue from completed jobs</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
@@ -47,7 +47,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         variant="finance"
         valueClassName="text-red-600 text-3xl"
       >
-        <p className="text-sm text-muted-foreground mt-1">Total amounts paid to technicians</p>
+        <p className="text-sm text-muted-foreground -mt-3 mb-2">Total amounts paid to technicians</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
@@ -60,7 +60,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         variant="finance"
         valueClassName="text-emerald-600 text-3xl"
       >
-        <p className="text-sm text-muted-foreground mt-1">Net profit after all expenses</p>
+        <p className="text-sm text-muted-foreground -mt-3 mb-2">Net profit after all expenses</p>
       </DashboardMetricCard>
     </div>
   );

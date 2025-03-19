@@ -63,10 +63,10 @@ const DashboardMetricCard = ({
         )}
       </CardHeader>
       <CardContent>
+        {children}
+        
         <div className={cn("text-2xl font-bold mb-1", valueClassName)}>{value}</div>
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
-        
-        {children}
         
         {trend && (
           <div className="flex items-center mt-2">

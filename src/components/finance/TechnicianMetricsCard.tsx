@@ -42,7 +42,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Completed Jobs</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1">Successfully finished services</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-2">Successfully finished services</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{technician.completedJobs}</div>
@@ -57,7 +57,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Cancelled Jobs</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1">Jobs that didn't complete</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-2">Jobs that didn't complete</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{technician.cancelledJobs}</div>
@@ -72,7 +72,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Total Income</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1">Revenue from all jobs</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-2">Revenue from all jobs</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</div>
@@ -87,7 +87,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Expenses</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1">Operational costs</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-2">Operational costs</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-red-600">-{formatCurrency(expenses)}</div>
@@ -102,7 +102,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Technician Earnings</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1">Paid to technician</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-2">Paid to technician</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-red-600">-{formatCurrency(technicianEarnings)}</div>
@@ -117,7 +117,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               </div>
               <CardTitle className="text-base font-semibold text-gray-900">Company Profit</CardTitle>
             </div>
-            <CardDescription className="text-xs mt-1">Net earnings from services</CardDescription>
+            <CardDescription className="text-xs mt-1 mb-2">Net earnings from services</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>

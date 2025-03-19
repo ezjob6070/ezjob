@@ -53,7 +53,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           variant="finance"
           valueClassName="text-blue-600 text-3xl"
         >
-          <p className="text-sm text-muted-foreground mt-1">Gross revenue from all services</p>
+          <p className="text-sm text-muted-foreground mb-3">Gross revenue from all services</p>
         </DashboardMetricCard>
         
         <DashboardMetricCard
@@ -66,7 +66,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           variant="finance"
           valueClassName="text-red-600 text-3xl"
         >
-          <p className="text-sm text-muted-foreground mt-1">All costs and operational expenses</p>
+          <p className="text-sm text-muted-foreground mb-3">All costs and operational expenses</p>
         </DashboardMetricCard>
         
         <DashboardMetricCard
@@ -79,7 +79,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           variant="finance"
           valueClassName="text-emerald-600 text-3xl"
         >
-          <p className="text-sm text-muted-foreground mt-1">Company earnings after all costs</p>
+          <p className="text-sm text-muted-foreground mb-3">Company earnings after all costs</p>
         </DashboardMetricCard>
       </div>
     </div>
