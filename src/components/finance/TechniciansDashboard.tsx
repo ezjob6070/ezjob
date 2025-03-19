@@ -6,7 +6,7 @@ import TechnicianFinancialTable from "@/components/technicians/charts/Technician
 import { DateRange } from "react-day-picker";
 import DashboardMetrics from "./dashboard/MetricsCards";
 import TechnicianDetailPanel from "./dashboard/TechnicianDetailPanel";
-import TechnicianDateFilter from "@/components/technicians/filters/TechnicianDateFilter";
+import { SortOption } from "@/hooks/useTechniciansData";
 
 interface TechniciansDashboardProps {
   activeTechnicians: any[];
@@ -28,6 +28,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
   const [filteredTechnicians, setFilteredTechnicians] = useState(activeTechnicians);
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("");
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
 
   const technicianNames = activeTechnicians.map(tech => tech.name);
 
@@ -67,6 +68,10 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     }
   };
 
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+  };
+
   const prepareMetricsData = () => {
     if (!selectedTechnician) return null;
     
@@ -91,19 +96,6 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
           <CardDescription>Search, filter, and analyze technician earnings and profitability</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2 mb-6">
-              <TechnicianDateFilter 
-                localDateRange={localDateRange}
-                setLocalDateRange={setLocalDateRange}
-                showDateFilter={showDateFilter}
-                setShowDateFilter={setShowDateFilter}
-                clearFilters={clearFilters}
-                applyFilters={applyFilters}
-              />
-            </div>
-          </div>
-
           <DashboardMetrics 
             totalRevenue={totalRevenue}
             totalEarnings={totalEarnings}
@@ -124,6 +116,9 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
             setLocalDateRange={setLocalDateRange}
             onTechnicianSelect={handleTechnicianSelect}
             selectedTechnicianId={selectedTechnician?.id}
+            sortOption={sortOption}
+            onSortChange={handleSortChange}
+            technicianNames={technicianNames}
           />
         </CardContent>
       </Card>

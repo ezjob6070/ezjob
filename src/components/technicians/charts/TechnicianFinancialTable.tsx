@@ -27,6 +27,9 @@ interface TechnicianFinancialTableProps {
   setLocalDateRange: (range: DateRange | undefined) => void;
   onTechnicianSelect: (technician: Technician) => void;
   selectedTechnicianId?: string;
+  sortOption: SortOption;
+  onSortChange: (option: SortOption) => void;
+  technicianNames: string[];
 }
 
 const TechnicianFinancialTable = ({
@@ -41,15 +44,13 @@ const TechnicianFinancialTable = ({
   localDateRange,
   setLocalDateRange,
   onTechnicianSelect,
-  selectedTechnicianId
+  selectedTechnicianId,
+  sortOption,
+  onSortChange,
+  technicianNames
 }: TechnicianFinancialTableProps) => {
   const [appliedFilters, setAppliedFilters] = useState(false);
-  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
-  const technicianNames = displayedTechnicians.map(tech => tech.name);
-
-  const handleSort = (option: SortOption) => {
-    setSortOption(option);
-  };
+  const [showDateFilter, setShowDateFilter] = useState(false);
 
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow border-t-0 rounded-t-none">
@@ -62,7 +63,18 @@ const TechnicianFinancialTable = ({
       
       <TechnicianFinancialFilterBar
         sortOption={sortOption}
-        onSortChange={handleSort}
+        onSortChange={onSortChange}
+        technicianNames={technicianNames}
+        selectedTechnicians={selectedTechnicianNames}
+        toggleTechnician={toggleTechnician}
+        clearFilters={clearFilters}
+        applyFilters={applyFilters}
+        paymentTypeFilter={paymentTypeFilter}
+        setPaymentTypeFilter={setPaymentTypeFilter}
+        localDateRange={localDateRange}
+        setLocalDateRange={setLocalDateRange}
+        showDateFilter={showDateFilter}
+        setShowDateFilter={setShowDateFilter}
       />
       
       <CardContent className="p-3 sm:p-4">
