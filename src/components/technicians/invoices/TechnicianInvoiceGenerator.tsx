@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import { Technician } from "@/types/technician";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { FileText, X, Download, Printer } from "lucide-react";
+import { FileText, Download, Printer, X } from "lucide-react";
 import TechnicianInvoiceDialog from "./TechnicianInvoiceDialog";
 import TechnicianInvoicePreview from "./TechnicianInvoicePreview";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface TechnicianInvoiceGeneratorProps {
   technicians: Technician[];
@@ -45,16 +45,25 @@ const TechnicianInvoiceGenerator: React.FC<TechnicianInvoiceGeneratorProps> = ({
     });
     setDialogOpen(false);
     setPreviewOpen(true);
-    console.log("Invoice settings:", settings);
   };
 
   const handleGenerateInvoice = () => {
-    toast.success("Invoice generated successfully!");
+    toast({
+      title: "Success",
+      description: "Invoice generated successfully!",
+    });
     setPreviewOpen(false);
   };
 
+  const handleDownloadInvoice = () => {
+    toast({
+      title: "Download Started",
+      description: "Invoice is being downloaded...",
+    });
+  };
+
   return (
-    <div>
+    <div className="grid grid-cols-2 gap-2">
       <Button 
         onClick={() => {
           if (selectedTechnician) {
@@ -62,13 +71,27 @@ const TechnicianInvoiceGenerator: React.FC<TechnicianInvoiceGeneratorProps> = ({
           } else if (technicians.length > 0) {
             handleOpenInvoiceDialog(technicians[0]);
           } else {
-            toast.error("No technicians available");
+            toast({
+              title: "Error",
+              description: "No technicians available",
+              variant: "destructive"
+            });
           }
         }}
-        className="w-full md:w-auto"
+        className="flex items-center gap-2"
+        variant="outline"
       >
-        <FileText className="mr-2 h-4 w-4" />
-        Generate Invoice
+        <FileText className="h-4 w-4" />
+        Create Invoice
+      </Button>
+
+      <Button 
+        onClick={handleDownloadInvoice}
+        className="flex items-center gap-2"
+        variant="outline"
+      >
+        <Download className="h-4 w-4" />
+        Download Invoice
       </Button>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

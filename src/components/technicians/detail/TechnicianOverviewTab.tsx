@@ -5,6 +5,7 @@ import { Users, Phone, AtSign, MapPin, Calendar } from "lucide-react";
 import { Technician } from "@/types/technician";
 import TechnicianDetailCard from "@/components/technicians/charts/TechnicianDetailCard";
 import JobsRevenueComparison from "@/components/technicians/JobsRevenueComparison";
+import TechnicianInvoiceGenerator from "@/components/technicians/invoices/TechnicianInvoiceGenerator";
 
 interface TechnicianOverviewTabProps {
   technician: Technician;
@@ -53,6 +54,14 @@ const TechnicianOverviewTab: React.FC<TechnicianOverviewTabProps> = ({ technicia
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm">Hired: {formatDate(technician.hireDate)}</span>
+          </div>
+          
+          {/* Invoice buttons bar */}
+          <div className="mt-6 pt-4 border-t">
+            <TechnicianInvoiceGenerator 
+              technicians={[technician]} 
+              selectedTechnician={technician}
+            />
           </div>
         </CardContent>
       </Card>
