@@ -13,11 +13,15 @@ export interface TechnicianPerformanceMetricsProps {
     profit?: number;
     partsValue?: number;
   };
+  jobStatus?: string;
+  onJobStatusChange?: (status: string) => void;
 }
 
 const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> = ({
   technician,
-  metrics
+  metrics,
+  jobStatus = "all",
+  onJobStatusChange
 }) => {
   if (!technician || !metrics) return null;
 

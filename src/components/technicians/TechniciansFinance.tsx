@@ -18,6 +18,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import EntityFilter, { Entity } from "@/components/finance/EntityFilter";
 import { X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
@@ -38,6 +39,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   const [sortColumn, setSortColumn] = useState<keyof TechnicianFinanceRecord>("totalRevenue");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedTechnicianIds, setSelectedTechnicianIds] = useState<string[]>([]);
+  const [jobStatus, setJobStatus] = useState<string>("all");
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -68,6 +70,11 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
       );
     }
     
+    // Filter by job status
+    if (jobStatus !== "all") {
+      filtered = filtered.filter(transaction => transaction.status === jobStatus);
+    }
+    
     // Filter by date range
     if (dateRange.from && dateRange.to) {
       filtered = filtered.filter(transaction => {
@@ -78,7 +85,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     }
     
     setFilteredTransactions(filtered);
-  }, [selectedTechnicianIds, dateRange, transactions, technicians]);
+  }, [selectedTechnicianIds, jobStatus, dateRange, transactions, technicians]);
 
   // Calculate financial metrics for each technician
   const technicianFinances: TechnicianFinanceRecord[] = technicians
@@ -86,7 +93,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     .map(technician => {
       // Filter transactions for this technician
       const technicianTransactions = filteredTransactions.filter(
-        t => t.technicianName === technician.name && t.status === "completed"
+        t => t.technicianName === technician.name
       );
       
       // Payment transactions
@@ -173,6 +180,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     setSelectedTechnicianIds([]);
     setDateRange({ from: undefined, to: undefined });
     setSearchTerm("");
+    setJobStatus("all");
   };
 
   return (
@@ -216,7 +224,20 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
           </PopoverContent>
         </Popover>
         
-        {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm) && (
+        {/* Job Status Filter */}
+        <Select value={jobStatus} onValueChange={setJobStatus}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Job Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Jobs</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm || jobStatus !== "all") && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1">
             <X className="h-4 w-4" />
             Clear Filters
