@@ -52,7 +52,9 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all"
           variant="finance"
           valueClassName="text-blue-600 text-3xl"
-        />
+        >
+          <p className="text-sm text-muted-foreground mt-1">Gross revenue from all services</p>
+        </DashboardMetricCard>
         
         <DashboardMetricCard
           title="Total Expenses"
@@ -63,7 +65,9 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all"
           variant="finance"
           valueClassName="text-red-600 text-3xl"
-        />
+        >
+          <p className="text-sm text-muted-foreground mt-1">All costs and operational expenses</p>
+        </DashboardMetricCard>
         
         <DashboardMetricCard
           title="Net Profit"
@@ -74,7 +78,9 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
           variant="finance"
           valueClassName="text-emerald-600 text-3xl"
-        />
+        >
+          <p className="text-sm text-muted-foreground mt-1">Company earnings after all costs</p>
+        </DashboardMetricCard>
       </div>
     </div>
   );

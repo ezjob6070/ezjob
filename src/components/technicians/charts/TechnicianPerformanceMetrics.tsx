@@ -43,7 +43,9 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         trend={completedJobsTrend}
         className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100 hover:shadow-md transition-all"
         variant="finance"
-      />
+      >
+        <p className="text-sm text-muted-foreground mt-1">Successfully finished services</p>
+      </DashboardMetricCard>
       
       <DashboardMetricCard
         title="Rating"
@@ -53,7 +55,9 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         trend={ratingTrend}
         className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all"
         variant="finance"
-      />
+      >
+        <p className="text-sm text-muted-foreground mt-1">Customer satisfaction score</p>
+      </DashboardMetricCard>
       
       <DashboardMetricCard
         title="Average Job Value"
@@ -64,10 +68,12 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all"
         variant="finance"
         valueClassName="text-violet-600"
-      />
+      >
+        <p className="text-sm text-muted-foreground mt-1">Average revenue per service</p>
+      </DashboardMetricCard>
       
       <DashboardMetricCard
-        title="Total Revenue"
+        title="Total Income"
         value={formatCurrency(metrics.revenue || 0)}
         icon={<CircleDollarSign size={20} className="text-sky-500" />}
         description="All completed jobs"
@@ -75,7 +81,9 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-100 hover:shadow-md transition-all"
         variant="finance"
         valueClassName="text-blue-600"
-      />
+      >
+        <p className="text-sm text-muted-foreground mt-1">Gross revenue generated</p>
+      </DashboardMetricCard>
 
       <DashboardMetricCard
         title="Company Profit"
@@ -86,7 +94,9 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
         variant="finance"
         valueClassName="text-emerald-600"
-      />
+      >
+        <p className="text-sm text-muted-foreground mt-1">Profit after all expenses</p>
+      </DashboardMetricCard>
     </div>
   );
 };
