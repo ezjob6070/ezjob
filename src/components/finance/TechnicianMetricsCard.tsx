@@ -72,7 +72,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{formatCurrency(technician.totalRevenue)}</div>
+            <div className="text-2xl font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</div>
           </CardContent>
         </Card>
 
@@ -114,7 +114,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(companyProfit)}</div>
+            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
             <p className="text-xs text-muted-foreground mt-1">{profitMargin}% margin</p>
           </CardContent>
         </Card>

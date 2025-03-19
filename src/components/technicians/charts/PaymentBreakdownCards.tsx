@@ -55,24 +55,28 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
       value: revenue,
       icon: <TrendingUp className="h-5 w-5 text-blue-700" />,
       bgColor: "bg-blue-100",
+      textColor: "text-sky-600"
     },
     {
       title: "Technician Earnings",
       value: technicianEarnings,
       icon: <Users className="h-5 w-5 text-indigo-700" />,
       bgColor: "bg-indigo-100",
+      textColor: "text-red-600"
     },
     {
       title: "Expenses",
       value: expenses,
       icon: <Calculator className="h-5 w-5 text-red-700" />,
       bgColor: "bg-red-100",
+      textColor: "text-red-600"
     },
     {
       title: "Company Profit",
       value: profit,
       icon: <DollarSign className="h-5 w-5 text-green-700" />,
       bgColor: "bg-green-100",
+      textColor: "text-emerald-600"
     }
   ];
 
@@ -93,7 +97,9 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium text-black">{card.title}</p>
-                  <p className="text-2xl font-bold">{formatCurrency(card.value)}</p>
+                  <p className={`text-2xl font-bold ${card.textColor}`}>
+                    {formatCurrency(card.value)}
+                  </p>
                   {dateRangeText && (
                     <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
                   )}

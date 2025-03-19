@@ -46,7 +46,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
             </div>
             <div>
               <p className="text-sm font-medium text-black">Rating</p>
-              <p className="text-2xl font-bold">{(technician.rating || 0).toFixed(1)}★</p>
+              <p className="text-2xl font-bold text-amber-600">{(technician.rating || 0).toFixed(1)}★</p>
             </div>
           </div>
         </CardContent>
@@ -60,7 +60,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
             </div>
             <div>
               <p className="text-sm font-medium text-black">Average Job Value</p>
-              <p className="text-2xl font-bold">{formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}</p>
+              <p className="text-2xl font-bold text-purple-600">{formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}</p>
             </div>
           </div>
         </CardContent>
@@ -74,7 +74,7 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
             </div>
             <div>
               <p className="text-sm font-medium text-black">Total Revenue</p>
-              <p className="text-2xl font-bold">{formatCurrency(metrics.revenue || 0)}</p>
+              <p className="text-2xl font-bold text-sky-600">{formatCurrency(metrics.revenue || 0)}</p>
             </div>
           </div>
         </CardContent>
