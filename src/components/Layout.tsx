@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import GlobalDateRangeFilter from "./GlobalDateRangeFilter";
 import useWindowSize from "@/hooks/use-window-size";
 
 const Layout = () => {
@@ -48,9 +47,6 @@ const Layout = () => {
         <main 
           className="flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg ml-16"
         >
-          <div className="mb-4">
-            <GlobalDateRangeFilter />
-          </div>
           <div className="w-full mx-auto animate-fade-in rounded-xl bg-white/95 backdrop-blur-sm p-4 md:p-6 shadow-lg">
             <div className="max-w-full overflow-x-hidden">
               <Outlet />
