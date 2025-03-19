@@ -37,8 +37,8 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
           <TableRow>
             <TableHead>Technician</TableHead>
             <TableHead>Payment Type</TableHead>
-            <TableHead className="text-right">Hourly Rate</TableHead>
             <TableHead className="text-right">Completed Jobs</TableHead>
+            <TableHead className="text-right">Cancelled Jobs</TableHead>
             <TableHead className="text-right">Revenue</TableHead>
             <TableHead className="text-right">Earnings</TableHead>
           </TableRow>
@@ -69,16 +69,16 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
                   }
                 </TableCell>
                 <TableCell className="text-right">
-                  {formatCurrency(technician.hourlyRate)}
+                  <span className="font-semibold text-green-600">{technician.completedJobs || 0}</span>
                 </TableCell>
                 <TableCell className="text-right">
-                  {technician.completedJobs || 0}
+                  <span className="font-semibold text-orange-500">{technician.cancelledJobs || 0}</span>
                 </TableCell>
                 <TableCell className="text-right">
-                  {formatCurrency(technician.totalRevenue || 0)}
+                  <span className="font-semibold text-blue-600">{formatCurrency(technician.totalRevenue || 0)}</span>
                 </TableCell>
                 <TableCell className="text-right">
-                  {formatCurrency(earnings)}
+                  <span className="font-semibold text-purple-600">{formatCurrency(earnings)}</span>
                 </TableCell>
               </TableRow>
             );
