@@ -109,11 +109,11 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex flex-wrap gap-2 mb-4">
       <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+          <Button variant="outline" className="flex items-center gap-2 bg-white hover:bg-gray-50 border-gray-200 text-gray-700">
+            <Calendar className="h-4 w-4 text-gray-500" />
             {date?.from ? (
               date.to ? (
                 <>
@@ -155,8 +155,8 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
 
       <Popover open={showTechnicianFilter} onOpenChange={setShowTechnicianFilter}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
+          <Button variant="outline" className="flex items-center gap-2 bg-white hover:bg-gray-50 border-gray-200 text-gray-700">
+            <Filter className="h-4 w-4 text-gray-500" />
             {selectedTechnicians.length > 0 
               ? `${selectedTechnicians.length} technicians selected` 
               : "Filter Technicians"
@@ -215,8 +215,8 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
 
       <Popover open={showPaymentRateFilter} onOpenChange={setShowPaymentRateFilter}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
+          <Button variant="outline" className="flex items-center gap-2 bg-white hover:bg-gray-50 border-gray-200 text-gray-700">
+            <Filter className="h-4 w-4 text-gray-500" />
             {paymentTypeFilter !== "all" 
               ? `Payment Rate: ${paymentTypeFilter}` 
               : "Payment Rate"
@@ -245,7 +245,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
       </Popover>
 
       {appliedFilters && (
-        <Button variant="ghost" size="sm" onClick={clearFilters}>
+        <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700 hover:bg-gray-50" onClick={clearFilters}>
           Clear All Filters
         </Button>
       )}
