@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusIcon, UserPlusIcon, CalendarPlusIcon, FileTextIcon, XIcon } from 'lucide-react';
+import { PlusIcon, UserPlusIcon, CalendarPlusIcon, FileTextIcon, XIcon, ClipboardListIcon, CalculatorIcon, BriefcaseIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import AddClientModal from './AddClientModal';
@@ -28,6 +28,33 @@ const QuickActions = () => {
     setIsOpen(false);
   };
 
+  const handleCreateJob = () => {
+    toast({
+      title: "Creating New Job",
+      description: "Navigating to job creation screen",
+    });
+    navigate('/jobs', { state: { openCreateModal: true } });
+    setIsOpen(false);
+  };
+
+  const handleCreateEstimate = () => {
+    toast({
+      title: "Creating New Estimate",
+      description: "Navigating to estimate creation screen",
+    });
+    navigate('/estimates', { state: { openCreateModal: true } });
+    setIsOpen(false);
+  };
+
+  const handleCreateTask = () => {
+    toast({
+      title: "Creating New Task",
+      description: "Navigating to task creation screen",
+    });
+    navigate('/tasks', { state: { openCreateModal: true } });
+    setIsOpen(false);
+  };
+
   return (
     <>
       <div className="fixed bottom-8 right-8 z-50">
@@ -37,13 +64,45 @@ const QuickActions = () => {
               <TooltipTrigger asChild>
                 <button 
                   className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-blue-600 hover:scale-110 transition-transform"
-                  onClick={() => console.log('Add note')}
+                  onClick={handleCreateTask}
                 >
-                  <FileTextIcon size={20} />
+                  <ClipboardListIcon size={20} />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Add Note</p>
+                <p>Create Task</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-blue-600 hover:scale-110 transition-transform"
+                  onClick={handleCreateEstimate}
+                >
+                  <CalculatorIcon size={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Create Estimate</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-blue-600 hover:scale-110 transition-transform"
+                  onClick={handleCreateJob}
+                >
+                  <BriefcaseIcon size={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Create Job</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -76,6 +135,22 @@ const QuickActions = () => {
               </TooltipTrigger>
               <TooltipContent>
                 <p>Add Client</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-blue-600 hover:scale-110 transition-transform"
+                  onClick={() => console.log('Add note')}
+                >
+                  <FileTextIcon size={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Add Note</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
