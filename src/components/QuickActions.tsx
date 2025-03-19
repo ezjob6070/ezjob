@@ -5,10 +5,15 @@ import { PlusIcon, UserPlusIcon, CalendarPlusIcon, FileTextIcon, XIcon, Clipboar
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import AddClientModal from './AddClientModal';
+import CreateJobModal from './jobs/CreateJobModal';
+import { Job } from './jobs/JobTypes';
+import { initialTechnicians } from '@/data/technicians';
+import { JOB_SOURCES } from '@/hooks/jobs/useJobSourceData';
 
 const QuickActions = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [showCreateJobModal, setShowCreateJobModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -28,12 +33,18 @@ const QuickActions = () => {
     setIsOpen(false);
   };
 
-  const handleCreateJob = () => {
+  const handleAddJob = (job: Job) => {
     toast({
-      title: "Creating New Job",
-      description: "Navigating to job creation screen",
+      title: "Job created",
+      description: `New job for ${job.clientName} has been created and is in progress.`,
     });
-    navigate('/jobs', { state: { openCreateModal: true } });
+    setShowCreateJobModal(false);
+    setIsOpen(false);
+    navigate('/jobs');
+  };
+
+  const handleCreateJob = () => {
+    setShowCreateJobModal(true);
     setIsOpen(false);
   };
 
@@ -54,6 +65,18 @@ const QuickActions = () => {
     navigate('/tasks', { state: { openCreateModal: true } });
     setIsOpen(false);
   };
+
+  // Convert technicians data to format expected by CreateJobModal
+  const technicianOptions = initialTechnicians.map(tech => ({ 
+    id: tech.id, 
+    name: tech.name 
+  }));
+
+  // Convert job sources data to format expected by CreateJobModal
+  const jobSourceOptions = JOB_SOURCES.map(source => ({ 
+    id: source.id, 
+    name: source.name 
+  }));
 
   return (
     <>
@@ -164,10 +187,19 @@ const QuickActions = () => {
         </button>
       </div>
 
+      {/* Modals */}
       <AddClientModal 
         open={showAddClientModal}
         onOpenChange={setShowAddClientModal}
         onAddClient={handleAddClient}
+      />
+
+      <CreateJobModal
+        open={showCreateJobModal}
+        onOpenChange={setShowCreateJobModal}
+        onAddJob={handleAddJob}
+        technicians={technicianOptions}
+        jobSources={jobSourceOptions}
       />
     </>
   );
