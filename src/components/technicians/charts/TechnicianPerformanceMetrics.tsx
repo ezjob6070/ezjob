@@ -41,10 +41,11 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         icon={<Trophy size={20} className="text-indigo-500" />}
         description="Total completed jobs"
         trend={completedJobsTrend}
-        className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100 hover:shadow-md transition-all h-full"
         variant="finance"
+        valueClassName="text-indigo-600 text-2xl font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground mt-1">Successfully finished services</p>
+        <p className="text-sm text-muted-foreground">Successfully finished services</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
@@ -53,10 +54,11 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         icon={<Star size={20} className="text-amber-500" />}
         description="Average client rating"
         trend={ratingTrend}
-        className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all h-full"
         variant="finance"
+        valueClassName="text-amber-600 text-2xl font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground mt-1">Customer satisfaction score</p>
+        <p className="text-sm text-muted-foreground">Customer satisfaction score</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
@@ -65,11 +67,11 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         icon={<BarChart3 size={20} className="text-violet-500" />}
         description="Per completed job"
         trend={avgJobValueTrend}
-        className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all h-full"
         variant="finance"
-        valueClassName="text-violet-600"
+        valueClassName="text-violet-600 text-2xl font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground mt-1">Average revenue per service</p>
+        <p className="text-sm text-muted-foreground">Average revenue per service</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
@@ -78,11 +80,11 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         icon={<CircleDollarSign size={20} className="text-sky-500" />}
         description="All completed jobs"
         trend={revenueTrend}
-        className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-100 hover:shadow-md transition-all h-full"
         variant="finance"
-        valueClassName="text-blue-600"
+        valueClassName="text-blue-600 text-2xl font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground mt-1">Gross revenue generated</p>
+        <p className="text-sm text-muted-foreground">Gross revenue generated</p>
       </DashboardMetricCard>
 
       <DashboardMetricCard
@@ -91,11 +93,11 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
         icon={<TrendingUp size={20} className="text-emerald-500" />}
         description="Net company earnings"
         trend={profitTrend}
-        className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
+        className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all h-full"
         variant="finance"
-        valueClassName="text-emerald-600"
+        valueClassName="text-emerald-600 text-2xl font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground mt-1">Profit after all expenses</p>
+        <p className="text-sm text-muted-foreground">Profit after all expenses</p>
       </DashboardMetricCard>
     </div>
   );

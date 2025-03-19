@@ -14,12 +14,12 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      <Card className="h-full">
-        <CardContent className="pt-4 pb-3 flex flex-col h-full">
+      <Card className="h-full bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all">
+        <CardContent className="pt-6 pb-6 flex flex-col h-full">
           <div>
             <p className="text-xl font-semibold text-gray-900">Total Income</p>
             <p className="text-sm text-muted-foreground mb-2">All completed transactions</p>
-            <p className="text-2xl md:text-3xl font-bold text-blue-600">{formatCurrency(report.totalRevenue)}</p>
+            <p className="text-2xl font-bold text-blue-600 mt-1">{formatCurrency(report.totalRevenue)}</p>
             <p className="text-xs text-muted-foreground mt-2">
               {report.transactions.filter(t => t.category === "payment" && t.status === "completed").length} completed payments
             </p>
@@ -27,12 +27,12 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
         </CardContent>
       </Card>
       
-      <Card className="h-full">
-        <CardContent className="pt-4 pb-3 flex flex-col h-full">
+      <Card className="h-full bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all">
+        <CardContent className="pt-6 pb-6 flex flex-col h-full">
           <div>
             <p className="text-xl font-semibold text-gray-900">Company Profit</p>
             <p className="text-sm text-muted-foreground mb-2">Net earnings after expenses</p>
-            <p className="text-2xl md:text-3xl font-bold text-emerald-600">{formatCurrency(report.companyProfit)}</p>
+            <p className="text-2xl font-bold text-emerald-600 mt-1">{formatCurrency(report.companyProfit)}</p>
             <div className="flex items-center mt-2">
               <span className={`text-xs font-medium ${profitMargin > 30 ? "text-green-500" : "text-amber-500"}`}>
                 {profitMargin.toFixed(1)}% margin
@@ -42,12 +42,12 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
         </CardContent>
       </Card>
       
-      <Card className="h-full">
-        <CardContent className="pt-4 pb-3 flex flex-col h-full">
+      <Card className="h-full bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all">
+        <CardContent className="pt-6 pb-6 flex flex-col h-full">
           <div>
             <p className="text-xl font-semibold text-gray-900">Expenses</p>
             <p className="text-sm text-muted-foreground mb-2">Total costs and payments</p>
-            <p className="text-2xl md:text-3xl font-bold text-red-600">{formatCurrency(report.totalExpenses + report.technicianPayments)}</p>
+            <p className="text-2xl font-bold text-red-600 mt-1">{formatCurrency(report.totalExpenses + report.technicianPayments)}</p>
             <p className="text-xs text-muted-foreground mt-2">
               {formatCurrency(report.technicianPayments)} to technicians
             </p>
