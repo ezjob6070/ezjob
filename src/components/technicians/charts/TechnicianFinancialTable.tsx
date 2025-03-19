@@ -68,24 +68,20 @@ const TechnicianFinancialTable = ({
       
       <CardContent className="p-3 sm:p-4">
         <div className="mb-4">
-          <div className="flex flex-wrap items-center gap-3 p-3 border border-gray-100 rounded-md">
-            <TechnicianFilters
-              date={localDateRange}
-              setDate={setLocalDateRange}
-              selectedTechnicians={selectedTechnicianNames}
-              setSelectedTechnicians={(techs) => {
-                // This just updates the UI. The actual filtering logic is in the parent
-              }}
-              technicianNames={technicianNames}
-              paymentTypeFilter={paymentTypeFilter}
-              setPaymentTypeFilter={setPaymentTypeFilter}
-              appliedFilters={appliedFilters}
-              setAppliedFilters={setAppliedFilters}
-              clearFilters={clearFilters}
-            />
-            
-            {/* Removed the Apply Filters button */}
-          </div>
+          <TechnicianFilters
+            date={localDateRange}
+            setDate={setLocalDateRange}
+            selectedTechnicians={selectedTechnicianNames}
+            setSelectedTechnicians={(techs) => {
+              // This just updates the UI. The actual filtering logic is in the parent
+            }}
+            technicianNames={technicianNames}
+            paymentTypeFilter={paymentTypeFilter}
+            setPaymentTypeFilter={setPaymentTypeFilter}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            clearFilters={clearFilters}
+          />
         </div>
 
         <div className="overflow-x-auto">
