@@ -24,15 +24,15 @@ export const MetricsCard: React.FC<MetricsCardProps> = ({
   dateRangeText
 }) => {
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-center gap-4">
+    <Card className="border-l-4 shadow-sm hover:shadow-md transition-shadow" style={{ borderLeftColor: textColor.includes('blue') ? '#3b82f6' : textColor.includes('red') ? '#ef4444' : '#22c55e' }}>
+      <CardContent className="pt-4 p-4">
+        <div className="flex items-center gap-3">
           <div className={`p-2 ${bgColor} rounded-full`}>
-            <DollarSignIcon className={`h-5 w-5 ${iconColor}`} />
+            <DollarSignIcon className={`h-4 w-4 ${iconColor}`} />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">{title}</p>
-            <p className={`text-2xl font-bold ${textColor}`}>
+            <p className="text-xs sm:text-sm text-muted-foreground">{title}</p>
+            <p className={`text-xl sm:text-2xl font-bold ${textColor}`}>
               {isNegative && "-"}{formatCurrency(value)}
             </p>
             {dateRangeText && (
@@ -59,9 +59,9 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
   dateRangeText
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
       <MetricsCard
-        title="Total Revenue from All Technicians"
+        title="Total Revenue"
         value={totalRevenue}
         iconColor="text-blue-700"
         bgColor="bg-blue-100"
@@ -70,7 +70,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
       />
       
       <MetricsCard
-        title="Technician Earnings from All Technicians"
+        title="Technician Earnings"
         value={totalEarnings}
         iconColor="text-red-700"
         bgColor="bg-red-100"
@@ -80,7 +80,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
       />
       
       <MetricsCard
-        title="Company Profit from All Technicians"
+        title="Company Profit"
         value={companyProfit}
         iconColor="text-green-700"
         bgColor="bg-green-100"

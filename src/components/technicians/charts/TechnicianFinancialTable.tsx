@@ -17,7 +17,7 @@ import TechnicianFinancialFilterBar from "@/components/technicians/charts/Techni
 import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
 
 interface TechnicianFinancialTableProps {
-  filteredTechnicians: Technician[]; // Added this prop to fix the type error
+  filteredTechnicians: Technician[];
   displayedTechnicians: Technician[];
   selectedTechnicianNames: string[];
   toggleTechnician: (name: string) => void;
@@ -32,7 +32,7 @@ interface TechnicianFinancialTableProps {
 }
 
 const TechnicianFinancialTable = ({
-  filteredTechnicians, // Added this prop
+  filteredTechnicians,
   displayedTechnicians,
   selectedTechnicianNames,
   toggleTechnician,
@@ -46,7 +46,7 @@ const TechnicianFinancialTable = ({
   selectedTechnicianId
 }: TechnicianFinancialTableProps) => {
   const [appliedFilters, setAppliedFilters] = useState(false);
-  const [sortOption, setSortOption] = useState<SortOption>("revenue-high"); // Default sort by revenue high to low
+  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
   const technicianNames = displayedTechnicians.map(tech => tech.name);
 
   const handleSort = (option: SortOption) => {
@@ -54,9 +54,9 @@ const TechnicianFinancialTable = ({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle>Technician Financial Performance</CardTitle>
+    <Card className="shadow-sm hover:shadow-md transition-shadow border-t-0 rounded-t-none">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl">Technician Financial Performance</CardTitle>
         <CardDescription>
           Financial performance metrics for each technician in the selected time period.
         </CardDescription>
@@ -67,9 +67,9 @@ const TechnicianFinancialTable = ({
         onSortChange={handleSort}
       />
       
-      <CardContent>
-        <div className="mb-6">
-          <div className="flex flex-wrap items-center gap-4">
+      <CardContent className="p-3 sm:p-4">
+        <div className="mb-4">
+          <div className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 rounded-md border border-gray-100">
             <TechnicianFilters
               date={localDateRange}
               setDate={setLocalDateRange}
@@ -93,16 +93,18 @@ const TechnicianFinancialTable = ({
           </div>
         </div>
 
-        <TechnicianFinancialTableContent
-          displayedTechnicians={displayedTechnicians}
-          onTechnicianSelect={onTechnicianSelect}
-          selectedTechnicianId={selectedTechnicianId}
-          localDateRange={localDateRange}
-        />
+        <div className="overflow-x-auto">
+          <TechnicianFinancialTableContent
+            displayedTechnicians={displayedTechnicians}
+            onTechnicianSelect={onTechnicianSelect}
+            selectedTechnicianId={selectedTechnicianId}
+            localDateRange={localDateRange}
+          />
+        </div>
       </CardContent>
       
-      <CardFooter className="flex justify-between border-t px-6 py-4">
-        <div className="text-xs text-muted-foreground">
+      <CardFooter className="flex justify-between border-t px-4 py-3 text-xs">
+        <div className="text-muted-foreground">
           Showing {displayedTechnicians.length} technicians
         </div>
       </CardFooter>

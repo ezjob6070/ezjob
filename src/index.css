@@ -103,3 +103,50 @@ html { font-family: 'Inter', sans-serif; }
 @supports (font-variation-settings: normal) {
   html { font-family: 'Inter var', sans-serif; }
 }
+
+/* Responsive table styles */
+.table-container {
+  @apply w-full overflow-x-auto;
+}
+
+.table-responsive {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+/* Card responsive styles */
+.dashboard-card {
+  @apply bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200;
+}
+
+.card-content {
+  @apply p-4;
+}
+
+/* Improved responsive padding */
+@screen sm {
+  .card-content {
+    @apply p-6;
+  }
+}
+
+/* Metrics cards */
+.metrics-card {
+  @apply relative overflow-hidden rounded-lg border p-3;
+}
+
+.metrics-card-blue {
+  @apply border-l-4 border-l-blue-500;
+}
+
+.metrics-card-red {
+  @apply border-l-4 border-l-red-500;
+}
+
+.metrics-card-green {
+  @apply border-l-4 border-l-green-500;
+}
+
+/* Filter bar styling */
+.filter-bar {
+  @apply flex flex-wrap items-center gap-2 p-3 bg-gray-50 rounded-md border border-gray-100;
+}

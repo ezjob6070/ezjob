@@ -58,7 +58,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-4 py-4">
       <DashboardHeader />
       
       <DashboardCalendar date={date} setDate={setDate} />
@@ -72,7 +72,7 @@ const Dashboard = () => {
         detailedBusinessMetrics={detailedBusinessMetrics}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <TicketsStatusCard 
           taskCounts={dashboardTaskCounts}
           totalTasks={totalTasks}

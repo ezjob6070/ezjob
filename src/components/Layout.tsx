@@ -4,11 +4,13 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import GlobalDateRangeFilter from "./GlobalDateRangeFilter";
+import useWindowSize from "@/hooks/use-window-size";
 
 const Layout = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
+  const { width } = useWindowSize();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -44,12 +46,12 @@ const Layout = () => {
         <Sidebar isMobile={isMobile} />
         
         <main 
-          className="flex-1 overflow-auto p-6 transition-all duration-300 bg-white/10 backdrop-blur-lg ml-16"
+          className="flex-1 overflow-auto p-4 transition-all duration-300 bg-white/10 backdrop-blur-lg ml-16"
         >
           <div className="mb-4">
             <GlobalDateRangeFilter />
           </div>
-          <div className="max-w-6xl mx-auto animate-fade-in rounded-xl bg-white/90 backdrop-blur-sm p-6 shadow-lg">
+          <div className="w-full mx-auto animate-fade-in rounded-xl bg-white/90 backdrop-blur-sm p-4 md:p-6 shadow-lg">
             <Outlet />
           </div>
         </main>

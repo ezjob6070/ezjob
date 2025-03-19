@@ -19,14 +19,14 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
   onSortChange
 }) => {
   return (
-    <div className="flex justify-between items-center px-6 py-2 border-b">
+    <div className="flex justify-between items-center px-4 py-2 border-b">
       <div className="text-sm text-muted-foreground">
         Filter and sort technicians
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
+        <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Sort by:</span>
         <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[140px] sm:w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
