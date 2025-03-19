@@ -55,7 +55,7 @@ const DashboardMetricCard = ({
       className
     )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-gray-900">{title}</CardTitle>
+        <CardTitle className="text-lg font-semibold text-gray-900">{title}</CardTitle>
         {icon && (
           <div className="p-2 rounded-full bg-white shadow-sm">
             {icon}

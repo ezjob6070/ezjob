@@ -44,14 +44,14 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <DashboardMetricCard
-          title="Total Revenue"
+          title="Total Income"
           value={formatCurrency(totalRevenue)}
           icon={<Banknote size={20} className="text-blue-500" />}
           description={`Period: ${getDateRangeDisplay()}`}
           trend={{ value: "8.3%", isPositive: true }}
           className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all"
           variant="finance"
-          valueClassName="text-blue-600"
+          valueClassName="text-blue-600 text-3xl"
         />
         
         <DashboardMetricCard
@@ -62,7 +62,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           trend={{ value: "4.2%", isPositive: false }}
           className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all"
           variant="finance"
-          valueClassName="text-red-600"
+          valueClassName="text-red-600 text-3xl"
         />
         
         <DashboardMetricCard
@@ -73,7 +73,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           trend={{ value: `${Math.abs(profitMargin - 25).toFixed(1)}%`, isPositive: isProfitPositive }}
           className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
           variant="finance"
-          valueClassName="text-emerald-600"
+          valueClassName="text-emerald-600 text-3xl"
         />
       </div>
     </div>

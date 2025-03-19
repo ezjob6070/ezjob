@@ -40,11 +40,11 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-blue-100 rounded-full">
                 <Briefcase className="h-4 w-4 text-blue-700" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-900">Completed Jobs</CardTitle>
+              <CardTitle className="text-base font-semibold text-gray-900">Completed Jobs</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{technician.completedJobs}</div>
+            <div className="text-3xl font-bold">{technician.completedJobs}</div>
           </CardContent>
         </Card>
 
@@ -54,11 +54,11 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-red-100 rounded-full">
                 <BanIcon className="h-4 w-4 text-red-700" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-900">Cancelled Jobs</CardTitle>
+              <CardTitle className="text-base font-semibold text-gray-900">Cancelled Jobs</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{technician.cancelledJobs}</div>
+            <div className="text-3xl font-bold">{technician.cancelledJobs}</div>
           </CardContent>
         </Card>
 
@@ -68,11 +68,11 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-blue-100 rounded-full">
                 <DollarSign className="h-4 w-4 text-blue-700" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-900">Total Revenue</CardTitle>
+              <CardTitle className="text-base font-semibold text-gray-900">Total Income</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</div>
+            <div className="text-3xl font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</div>
           </CardContent>
         </Card>
 
@@ -82,11 +82,11 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-red-100 rounded-full">
                 <ArrowDown className="h-4 w-4 text-red-700" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-900">Expenses</CardTitle>
+              <CardTitle className="text-base font-semibold text-gray-900">Expenses</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">-{formatCurrency(expenses)}</div>
+            <div className="text-3xl font-bold text-red-600">-{formatCurrency(expenses)}</div>
           </CardContent>
         </Card>
 
@@ -96,11 +96,11 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-red-100 rounded-full">
                 <ArrowDown className="h-4 w-4 text-red-700" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-900">Technician Earnings</CardTitle>
+              <CardTitle className="text-base font-semibold text-gray-900">Technician Earnings</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">-{formatCurrency(technicianEarnings)}</div>
+            <div className="text-3xl font-bold text-red-600">-{formatCurrency(technicianEarnings)}</div>
           </CardContent>
         </Card>
 
@@ -110,11 +110,11 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
               <div className="p-2 bg-green-100 rounded-full">
                 <PiggyBank className="h-4 w-4 text-green-700" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-900">Company Profit</CardTitle>
+              <CardTitle className="text-base font-semibold text-gray-900">Company Profit</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
+            <div className="text-3xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
             <p className="text-xs text-muted-foreground mt-1">{profitMargin}% margin</p>
           </CardContent>
         </Card>
