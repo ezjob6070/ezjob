@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
-import { Download, FileText, FilePieChart, Printer } from "lucide-react";
+import { Download, FileText, FilePieChart, Printer, FileSpreadsheet } from "lucide-react";
 
 interface ReportGeneratorProps {
   dateRange: DateRange | undefined;
@@ -22,7 +22,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange }) => {
   };
 
   return (
-    <Card className="shadow-sm border-muted bg-gradient-to-br from-blue-50 to-indigo-50">
+    <Card className="shadow-sm border-muted bg-gradient-to-br from-slate-50 to-blue-50">
       <CardHeader>
         <CardTitle className="text-lg">Generate Financial Reports</CardTitle>
         <CardDescription>Export comprehensive reports for selected period: {formatDateRange()}</CardDescription>
@@ -47,7 +47,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange }) => {
           </Button>
           
           <Button variant="outline" className="border-emerald-200 bg-white hover:bg-emerald-50 flex items-center gap-2 h-auto py-3">
-            <Download className="h-4 w-4 text-emerald-600" />
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
             <div className="text-left">
               <div className="font-medium">CSV Export</div>
               <div className="text-xs text-muted-foreground">Raw transaction data</div>
@@ -57,7 +57,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ dateRange }) => {
       </CardContent>
       
       <CardFooter className="flex justify-end">
-        <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
+        <Button className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 gap-2 text-white shadow-sm">
           <Printer className="h-4 w-4" />
           Print Financial Summary
         </Button>

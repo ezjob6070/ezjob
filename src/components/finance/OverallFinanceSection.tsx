@@ -1,9 +1,8 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { DateRange } from "react-day-picker";
-import { Banknote, Wallet, PiggyBank, TrendingUp, TrendingDown } from "lucide-react";
+import { Banknote, Wallet, PiggyBank } from "lucide-react";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 
@@ -51,7 +50,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           description={`Period: ${getDateRangeDisplay()}`}
           trend={{ value: "8.3%", isPositive: true }}
           className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all"
-          variant="gradient"
+          variant="finance"
         />
         
         <DashboardMetricCard
@@ -61,7 +60,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           description={`Period: ${getDateRangeDisplay()}`}
           trend={{ value: "4.2%", isPositive: false }}
           className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all"
-          variant="gradient"
+          variant="finance"
         />
         
         <DashboardMetricCard
@@ -71,7 +70,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           description={`${profitMargin.toFixed(1)}% profit margin`}
           trend={{ value: `${Math.abs(profitMargin - 25).toFixed(1)}%`, isPositive: isProfitPositive }}
           className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
-          variant="gradient"
+          variant="finance"
         />
       </div>
     </div>

@@ -1,34 +1,8 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import React from "react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-
-interface MetricsCardProps {
-  title: string;
-  value: number;
-  iconColor: string;
-  dateRangeText?: string;
-}
-
-const MetricsCard: React.FC<MetricsCardProps> = ({
-  title,
-  value,
-  iconColor,
-  dateRangeText
-}) => {
-  return (
-    <Card>
-      <CardContent className="pt-6">
-        <div>
-          <p className="text-sm font-medium text-black">{title}</p>
-          <p className={`text-2xl font-bold ${iconColor}`}>{formatCurrency(value)}</p>
-          {dateRangeText && (
-            <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+import { CircleDollarSign, BadgeDollarSign, PiggyBank } from "lucide-react";
+import DashboardMetricCard from "@/components/DashboardMetricCard";
 
 interface DashboardMetricsProps {
   totalRevenue: number;
@@ -43,27 +17,41 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
   companyProfit,
   dateRangeText
 }) => {
+  // Calculate trends (placeholder values)
+  const revenueTrend = { value: "6.2%", isPositive: true };
+  const earningsTrend = { value: "3.8%", isPositive: true };
+  const profitTrend = { value: "5.1%", isPositive: true };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-      <MetricsCard
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <DashboardMetricCard
         title="Total Revenue"
-        value={totalRevenue}
-        iconColor="text-sky-600"
-        dateRangeText={dateRangeText}
+        value={formatCurrency(totalRevenue)}
+        icon={<CircleDollarSign size={20} className="text-blue-500" />}
+        description={`Period: ${dateRangeText || 'All time'}`}
+        trend={revenueTrend}
+        className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all"
+        variant="finance"
       />
       
-      <MetricsCard
+      <DashboardMetricCard
         title="Technician Earnings"
-        value={totalEarnings}
-        iconColor="text-red-600"
-        dateRangeText={dateRangeText}
+        value={formatCurrency(totalEarnings)}
+        icon={<BadgeDollarSign size={20} className="text-violet-500" />}
+        description={`Period: ${dateRangeText || 'All time'}`}
+        trend={earningsTrend}
+        className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all"
+        variant="finance"
       />
       
-      <MetricsCard
+      <DashboardMetricCard
         title="Company Profit"
-        value={companyProfit}
-        iconColor="text-emerald-600"
-        dateRangeText={dateRangeText}
+        value={formatCurrency(companyProfit)}
+        icon={<PiggyBank size={20} className="text-emerald-500" />}
+        description={`Period: ${dateRangeText || 'All time'}`}
+        trend={profitTrend}
+        className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
+        variant="finance"
       />
     </div>
   );

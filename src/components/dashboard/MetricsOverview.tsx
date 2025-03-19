@@ -1,6 +1,6 @@
 
 import React from "react";
-import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon, TrendingUp, TrendingDown } from "lucide-react";
+import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon } from "lucide-react";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 
 type MetricsOverviewProps = {
@@ -33,7 +33,7 @@ const MetricsOverview = ({
         description="Total calls this month"
         trend={{ value: "12%", isPositive: true }}
         className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-100 hover:shadow-md transition-all"
-        variant="gradient"
+        variant="finance"
         onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title.includes('call')))}
       />
       <DashboardMetricCard
@@ -43,7 +43,7 @@ const MetricsOverview = ({
         description="Active jobs in progress"
         trend={{ value: "8%", isPositive: true }}
         className="bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 hover:shadow-md transition-all"
-        variant="gradient"
+        variant="finance"
         onClick={() => openDetailDialog('tasks', 'Job Details', detailedTasksData)}
       />
       <DashboardMetricCard
@@ -53,7 +53,7 @@ const MetricsOverview = ({
         description="Revenue this month"
         trend={{ value: "5%", isPositive: false }}
         className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
-        variant="gradient"
+        variant="finance"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
       />
       <DashboardMetricCard
@@ -63,7 +63,7 @@ const MetricsOverview = ({
         description="Commission earned"
         trend={{ value: "7%", isPositive: true }}
         className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all"
-        variant="gradient"
+        variant="finance"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
       />
     </div>

@@ -17,7 +17,7 @@ type DashboardMetricCardProps = {
   onClick?: () => void;
   className?: string;
   children?: React.ReactNode;
-  variant?: 'default' | 'glass' | 'outline' | 'gradient';
+  variant?: 'default' | 'glass' | 'outline' | 'gradient' | 'finance';
 };
 
 const DashboardMetricCard = ({
@@ -39,6 +39,8 @@ const DashboardMetricCard = ({
         return 'bg-transparent border-2 hover:border-primary/50';
       case 'gradient':
         return 'hover:shadow-md transition-all duration-300';
+      case 'finance':
+        return 'border-none hover:shadow-md transition-all duration-300';
       default:
         return 'bg-white hover:shadow-md';
     }
