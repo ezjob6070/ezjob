@@ -1,11 +1,11 @@
 
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { DateRange } from "react-day-picker";
-import CompactDateRangePicker from "./CompactDateRangePicker";
-import { format } from "date-fns";
-import { CalendarIcon, ArrowRightIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Banknote, Wallet, PiggyBank, TrendingUp, TrendingDown } from "lucide-react";
+import DateRangeSelector from "@/components/finance/DateRangeSelector";
+import DashboardMetricCard from "@/components/DashboardMetricCard";
 
 interface OverallFinanceSectionProps {
   totalRevenue: number;
@@ -22,68 +22,57 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
   date,
   setDate
 }) => {
-  // Format the date range for display
-  const getDateRangeText = () => {
-    if (!date?.from) return "No date selected";
-    if (!date.to) return `${format(date.from, "MMM dd, yyyy")}`;
-    return (
-      <div className="flex items-center text-sm text-muted-foreground">
-        <CalendarIcon className="h-4 w-4 mr-1" />
-        <span>{format(date.from, "MMM dd, yyyy")}</span>
-        <ArrowRightIcon className="h-3 w-3 mx-1" />
-        <span>{format(date.to, "MMM dd, yyyy")}</span>
-      </div>
-    );
+  // Calculate profit margin for trend display
+  const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+  const isProfitPositive = profitMargin > 25; // Example threshold
+  
+  // Format date range for display in description
+  const getDateRangeDisplay = () => {
+    if (!date?.from) return "All time";
+    
+    const from = date.from.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const to = date.to ? date.to.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : from;
+    
+    return `${from} - ${to}`;
   };
 
-  const dateRangeText = date?.from && date?.to ? 
-    `${format(date.from, "MMM d")} - ${format(date.to, "MMM d, yyyy")}` : 
-    "All time";
-
   return (
-    <div className="mb-8">
-      <div className="mb-6">
-        <div className="flex flex-col items-center">
-          <div className="w-full flex justify-center mb-2">
-            <CompactDateRangePicker date={date} setDate={setDate} />
-          </div>
-          <div className="mb-4">
-            {getDateRangeText()}
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row justify-between gap-4 items-start lg:items-center">
+        <h2 className="text-xl font-bold tracking-tight">Financial Overview</h2>
+        <DateRangeSelector date={date} setDate={setDate} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div>
-              <p className="text-sm font-medium text-black">Total Income</p>
-              <p className="text-2xl font-bold text-sky-600">{formatCurrency(totalRevenue)}</p>
-              <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div>
-              <p className="text-sm font-medium text-black">Total Expenses</p>
-              <p className="text-2xl font-bold text-red-600">{formatCurrency(totalExpenses)}</p>
-              <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div>
-              <p className="text-sm font-medium text-black">Net Company Profit</p>
-              <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                {totalProfit >= 0 ? formatCurrency(totalProfit) : `-${formatCurrency(Math.abs(totalProfit))}`}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
-            </div>
-          </CardContent>
-        </Card>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <DashboardMetricCard
+          title="Total Revenue"
+          value={formatCurrency(totalRevenue)}
+          icon={<Banknote size={20} className="text-blue-500" />}
+          description={`Period: ${getDateRangeDisplay()}`}
+          trend={{ value: "8.3%", isPositive: true }}
+          className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all"
+          variant="gradient"
+        />
+        
+        <DashboardMetricCard
+          title="Total Expenses"
+          value={formatCurrency(totalExpenses)}
+          icon={<Wallet size={20} className="text-red-500" />}
+          description={`Period: ${getDateRangeDisplay()}`}
+          trend={{ value: "4.2%", isPositive: false }}
+          className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all"
+          variant="gradient"
+        />
+        
+        <DashboardMetricCard
+          title="Net Profit"
+          value={formatCurrency(totalProfit)}
+          icon={<PiggyBank size={20} className="text-emerald-500" />}
+          description={`${profitMargin.toFixed(1)}% profit margin`}
+          trend={{ value: `${Math.abs(profitMargin - 25).toFixed(1)}%`, isPositive: isProfitPositive }}
+          className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all"
+          variant="gradient"
+        />
       </div>
     </div>
   );
