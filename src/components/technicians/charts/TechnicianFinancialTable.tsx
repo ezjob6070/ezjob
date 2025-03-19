@@ -1,6 +1,5 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { 
   Card, 
   CardContent, 
@@ -85,11 +84,7 @@ const TechnicianFinancialTable = ({
               clearFilters={clearFilters}
             />
             
-            <div className="ml-auto">
-              <Button variant="outline" size="sm" onClick={applyFilters}>
-                Apply Filters
-              </Button>
-            </div>
+            {/* Removed the Apply Filters button */}
           </div>
         </div>
 
