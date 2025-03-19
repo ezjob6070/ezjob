@@ -1,12 +1,5 @@
 
 import React from "react";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { SortOption } from "@/hooks/useTechniciansData";
 
 interface TechnicianFinancialFilterBarProps {
@@ -22,22 +15,6 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
     <div className="flex justify-between items-center px-4 py-2 border-b">
       <div className="text-sm text-muted-foreground">
         Filter and sort technicians
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Sort by:</span>
-        <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
-          <SelectTrigger className="w-[140px] sm:w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="revenue-high">Revenue (High to Low)</SelectItem>
-            <SelectItem value="revenue-low">Revenue (Low to High)</SelectItem>
-            <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-            <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-            <SelectItem value="jobs-high">Jobs (High to Low)</SelectItem>
-            <SelectItem value="jobs-low">Jobs (Low to High)</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );
