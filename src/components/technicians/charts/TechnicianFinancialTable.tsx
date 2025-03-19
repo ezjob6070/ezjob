@@ -1,113 +1,65 @@
-import React, { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Technician } from "@/types/technician";
+
+import React from "react";
 import { DateRange } from "react-day-picker";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import TechnicianFilters from "@/components/finance/technician-filters/TechnicianFilters";
-import { SortOption } from "@/hooks/useTechniciansData";
-import TechnicianFinancialFilterBar from "@/components/technicians/charts/TechnicianFinancialFilterBar";
-import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Technician } from "@/types/technician";
+import TechnicianFinancialTableContent from "./TechnicianFinancialTableContent";
 
 interface TechnicianFinancialTableProps {
-  filteredTechnicians: Technician[];
   displayedTechnicians: Technician[];
-  selectedTechnicianNames: string[];
-  toggleTechnician: (name: string) => void;
-  clearFilters: () => void;
-  applyFilters: () => void;
-  paymentTypeFilter: string;
-  setPaymentTypeFilter: (filter: string) => void;
-  localDateRange: DateRange | undefined;
-  setLocalDateRange: (range: DateRange | undefined) => void;
+  selectedTechnicianId: string | undefined;
   onTechnicianSelect: (technician: Technician) => void;
-  selectedTechnicianId?: string;
+  dateRange?: DateRange;
 }
 
-const TechnicianFinancialTable = ({
-  filteredTechnicians,
+const TechnicianFinancialTable: React.FC<TechnicianFinancialTableProps> = ({
   displayedTechnicians,
-  selectedTechnicianNames,
-  toggleTechnician,
-  clearFilters,
-  applyFilters,
-  paymentTypeFilter,
-  setPaymentTypeFilter,
-  localDateRange,
-  setLocalDateRange,
+  selectedTechnicianId,
   onTechnicianSelect,
-  selectedTechnicianId
-}: TechnicianFinancialTableProps) => {
-  const [appliedFilters, setAppliedFilters] = useState(false);
-  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
-  const technicianNames = filteredTechnicians.map(tech => tech.name);
-
-  const handleSort = (option: SortOption) => {
-    setSortOption(option);
-  };
-
+  dateRange,
+}) => {
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle>Technician Financial Performance</CardTitle>
-        <CardDescription>
-          Financial performance metrics for each technician in the selected time period.
-        </CardDescription>
+      <CardHeader>
+        <CardTitle>Technician Financial Summary</CardTitle>
       </CardHeader>
-      
-      <TechnicianFinancialFilterBar
-        sortOption={sortOption}
-        onSortChange={handleSort}
-      />
-      
       <CardContent>
-        <div className="mb-6">
-          <TechnicianFilters
-            date={localDateRange}
-            setDate={setLocalDateRange}
-            selectedTechnicians={selectedTechnicianNames}
-            setSelectedTechnicians={(techs) => {
-              // This just updates the UI. The actual filtering logic is in the parent
-            }}
-            technicianNames={technicianNames}
-            paymentTypeFilter={paymentTypeFilter}
-            setPaymentTypeFilter={setPaymentTypeFilter}
-            appliedFilters={appliedFilters}
-            setAppliedFilters={setAppliedFilters}
-            clearFilters={clearFilters}
-          />
-        </div>
-
-        <TechnicianFinancialTableContent
-          displayedTechnicians={displayedTechnicians}
-          onTechnicianSelect={onTechnicianSelect}
-          selectedTechnicianId={selectedTechnicianId}
-        />
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="all">All Technicians</TabsTrigger>
+            <TabsTrigger value="percentage">Percentage Based</TabsTrigger>
+            <TabsTrigger value="fixed">Fixed Rate</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="all" className="mt-0">
+            <TechnicianFinancialTableContent 
+              displayedTechnicians={displayedTechnicians}
+              onTechnicianSelect={onTechnicianSelect}
+              selectedTechnicianId={selectedTechnicianId}
+              dateRange={dateRange}
+            />
+          </TabsContent>
+          
+          <TabsContent value="percentage" className="mt-0">
+            <TechnicianFinancialTableContent 
+              displayedTechnicians={displayedTechnicians.filter(tech => tech.paymentType === "percentage")}
+              onTechnicianSelect={onTechnicianSelect}
+              selectedTechnicianId={selectedTechnicianId}
+              dateRange={dateRange}
+            />
+          </TabsContent>
+          
+          <TabsContent value="fixed" className="mt-0">
+            <TechnicianFinancialTableContent 
+              displayedTechnicians={displayedTechnicians.filter(tech => tech.paymentType === "fixed")}
+              onTechnicianSelect={onTechnicianSelect}
+              selectedTechnicianId={selectedTechnicianId}
+              dateRange={dateRange}
+            />
+          </TabsContent>
+        </Tabs>
       </CardContent>
-      
-      <CardFooter className="flex justify-between border-t px-6 py-4">
-        <div className="text-xs text-muted-foreground">
-          Showing {displayedTechnicians.length} of {filteredTechnicians.length} technicians
-        </div>
-        <Button variant="outline" size="sm" onClick={applyFilters}>
-          Apply Filters
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

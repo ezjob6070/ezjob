@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { DateRange } from "react-day-picker";
 import { Technician } from "@/types/technician";
 import { Input } from "@/components/ui/input";
 import { Search, Download } from "lucide-react";
@@ -13,6 +14,7 @@ interface TechnicianListProps {
   onSelectTechnician: (technician: Technician) => void;
   searchQuery: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  dateRange?: DateRange;
 }
 
 const TechnicianList: React.FC<TechnicianListProps> = ({
@@ -21,6 +23,7 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
   onSelectTechnician,
   searchQuery,
   onSearchChange,
+  dateRange,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
   const [activeTechnician, setActiveTechnician] = useState<Technician | null>(null);
@@ -85,7 +88,8 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
       <InvoiceDownloadDialog 
         open={downloadDialogOpen} 
         onOpenChange={setDownloadDialogOpen} 
-        technician={activeTechnician} 
+        technician={activeTechnician}
+        initialDateRange={dateRange}
       />
     </div>
   );

@@ -1,258 +1,60 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
-import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
+
+import { useState } from "react";
+import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
-import DashboardMetrics from "./dashboard/MetricsCards";
-import TechnicianDetailPanel from "./dashboard/TechnicianDetailPanel";
-import { Button } from "@/components/ui/button";
-import { Calendar, ChevronDown } from "lucide-react";
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
+import { useGlobalDateRange } from "@/components/GlobalDateRangeFilter";
 
 interface TechniciansDashboardProps {
-  activeTechnicians: any[];
+  activeTechnicians: Technician[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
 
-const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
-  activeTechnicians,
-  searchQuery,
-  setSearchQuery
-}) => {
-  const today = new Date();
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: today,
-    to: today,
-  });
-  const [appliedFilters, setAppliedFilters] = useState(false);
-  const [filteredTechnicians, setFilteredTechnicians] = useState(activeTechnicians);
-  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("");
-  const [showDateFilter, setShowDateFilter] = useState(false);
+const TechniciansDashboard = ({ 
+  activeTechnicians, 
+  searchQuery, 
+  setSearchQuery 
+}: TechniciansDashboardProps) => {
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string | undefined>(undefined);
+  const { dateRange } = useGlobalDateRange();
 
-  const technicianNames = activeTechnicians.map(tech => tech.name);
-
-  const {
-    paymentTypeFilter,
-    setPaymentTypeFilter,
-    selectedTechnicianNames,
-    setSelectedTechnicianNames,
-    selectedTechnician,
-    localDateRange,
-    setLocalDateRange,
-    displayedTechnicians,
-    financialMetrics,
-    selectedTechnicianMetrics,
-    dateRangeText,
-    toggleTechnician,
-    clearFilters,
-    applyFilters,
-    handleTechnicianSelect
-  } = useTechnicianFinancials(filteredTechnicians, dateRange);
-
-  useEffect(() => {
-    const filtered = activeTechnicians;
-    setFilteredTechnicians(filtered);
-  }, [activeTechnicians]);
-
-  // Calculate totals for all filtered technicians
-  const totalRevenue = financialMetrics?.totalRevenue || 0;
-  const totalEarnings = financialMetrics?.technicianEarnings || 0;
-  const companyProfit = financialMetrics?.companyProfit || 0;
-
-  const handleTechnicianChange = (techId: string) => {
-    setSelectedTechnicianId(techId);
-    const tech = activeTechnicians.find(t => t.id === techId);
-    if (tech) {
-      handleTechnicianSelect(tech);
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  const prepareMetricsData = () => {
-    if (!selectedTechnician) return null;
-    
-    return {
-      revenue: selectedTechnician.totalRevenue || 0,
-      earnings: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
-      expenses: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.20 : 0,
-      profit: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
-      totalJobs: 42,
-      completedJobs: 38,
-      cancelledJobs: 4,
-    };
+  // Filter technicians based on search query
+  const filteredTechnicians = activeTechnicians.filter(tech => 
+    tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tech.specialty.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleTechnicianSelect = (tech: Technician) => {
+    setSelectedTechnicianId(prev => prev === tech.id ? undefined : tech.id);
   };
-
-  const mockMetrics = prepareMetricsData();
-
-  const handleDatePreset = (preset: string) => {
-    const today = new Date();
-    let from: Date;
-    let to: Date = today;
-
-    switch (preset) {
-      case "today":
-        from = today;
-        break;
-      case "yesterday":
-        from = new Date(today);
-        from.setDate(today.getDate() - 1);
-        to = new Date(from);
-        break;
-      case "thisWeek":
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
-        from = startOfWeek;
-        break;
-      case "lastWeek":
-        const lastWeekStart = new Date(today);
-        lastWeekStart.setDate(today.getDate() - today.getDay() - 6);
-        from = lastWeekStart;
-        const lastWeekEnd = new Date(lastWeekStart);
-        lastWeekEnd.setDate(lastWeekStart.getDate() + 6);
-        to = lastWeekEnd;
-        break;
-      case "thisMonth":
-        from = new Date(today.getFullYear(), today.getMonth(), 1);
-        to = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        break;
-      case "lastMonth":
-        from = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        to = new Date(today.getFullYear(), today.getMonth(), 0);
-        break;
-      default:
-        from = today;
-    }
-    
-    setLocalDateRange({ from, to });
-    setAppliedFilters(true);
-    setShowDateFilter(false);
-  };
-
-  const getDateDisplayText = () => {
-    if (!localDateRange?.from) return "Today";
-    
-    if (localDateRange.to && 
-        isSameDay(localDateRange.from, localDateRange.to) && 
-        isSameDay(localDateRange.from, today)) {
-      return "Today";
-    }
-    
-    if (localDateRange.to && isSameDay(localDateRange.from, localDateRange.to)) {
-      return format(localDateRange.from, "MMM d, yyyy");
-    }
-    
-    if (localDateRange.to) {
-      return `${format(localDateRange.from, "MMM d")} - ${format(localDateRange.to, "MMM d, yyyy")}`;
-    }
-    
-    return format(localDateRange.from, "MMM d, yyyy");
-  };
-
-  const getTodayFormattedDate = () => {
-    return format(today, "MMM d, yyyy");
-  };
-  
-  function isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
-  }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Technician Financial Performance</CardTitle>
-          <CardDescription>Search, filter, and analyze technician earnings and profitability</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2 mb-6">
-              <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="flex flex-col items-start px-4 py-2 h-auto min-h-[3rem] relative">
-                    <div className="flex items-center gap-2 font-medium">
-                      <Calendar className="h-4 w-4" />
-                      {getDateDisplayText()}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      {isSameDay(localDateRange?.from || today, today) ? 
-                        getTodayFormattedDate() : 
-                        "Click to select custom range"}
-                    </div>
-                    <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <div className="p-3 border-b">
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("today")}>Today</Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("yesterday")}>Yesterday</Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("thisWeek")}>This Week</Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("lastWeek")}>Last Week</Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("thisMonth")}>This Month</Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDatePreset("lastMonth")}>Last Month</Button>
-                    </div>
-                    <div className="text-sm font-medium mb-2">Custom Range</div>
-                    <CalendarComponent
-                      mode="range"
-                      selected={localDateRange}
-                      onSelect={setLocalDateRange}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </div>
-                  <div className="p-3 flex justify-between">
-                    <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
-                    <Button variant="default" size="sm" onClick={() => {
-                      applyFilters();
-                      setShowDateFilter(false);
-                    }}>Apply</Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-
-          <DashboardMetrics 
-            totalRevenue={totalRevenue}
-            totalEarnings={totalEarnings}
-            companyProfit={companyProfit}
-            dateRangeText={dateRangeText}
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search technicians..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
-          
-          <TechnicianFinancialTable
-            filteredTechnicians={filteredTechnicians}
-            displayedTechnicians={displayedTechnicians}
-            selectedTechnicianNames={selectedTechnicianNames}
-            toggleTechnician={toggleTechnician}
-            clearFilters={clearFilters}
-            applyFilters={applyFilters}
-            paymentTypeFilter={paymentTypeFilter}
-            setPaymentTypeFilter={setPaymentTypeFilter}
-            localDateRange={localDateRange}
-            setLocalDateRange={setLocalDateRange}
-            onTechnicianSelect={handleTechnicianSelect}
-            selectedTechnicianId={selectedTechnician?.id}
-          />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {selectedTechnician && (
-        <TechnicianDetailPanel 
-          selectedTechnician={selectedTechnician}
-          selectedTechnicianMetrics={mockMetrics}
-          dateRangeText={dateRangeText}
-        />
-      )}
+      <TechnicianFinancialTable 
+        displayedTechnicians={filteredTechnicians}
+        selectedTechnicianId={selectedTechnicianId}
+        onTechnicianSelect={handleTechnicianSelect}
+        dateRange={dateRange}
+      />
     </div>
   );
 };

@@ -1,324 +1,210 @@
 
 import React, { useState } from "react";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 import { Technician } from "@/types/technician";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import { Check, Download, FileText, Table } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-  DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Download, Filter, Calendar, X } from "lucide-react";
-import { DateRange } from "react-day-picker";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { toast } from "@/components/ui/use-toast";
+import { useGlobalDateRange } from "@/components/GlobalDateRangeFilter";
 
 interface InvoiceDownloadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   technician: Technician | null;
+  initialDateRange?: DateRange;
 }
 
 const InvoiceDownloadDialog: React.FC<InvoiceDownloadDialogProps> = ({
   open,
   onOpenChange,
-  technician
+  technician,
+  initialDateRange,
 }) => {
-  const [activeTab, setActiveTab] = useState<"filters" | "preview">("filters");
-  const [fileType, setFileType] = useState<"pdf" | "excel">("pdf");
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
-    to: new Date(),
-  });
-  
-  // Filter options
-  const [filterOptions, setFilterOptions] = useState({
-    showCompletedJobs: true,
-    showCancelledJobs: false,
-    showInProgressJobs: false,
-    showJobDate: true,
-    showJobAddress: true,
-    showCompanyProfit: false,
-    showTechnicianEarnings: true,
-    showJobDetails: true,
-    showPaymentMethods: true,
+  // Get global date context
+  const globalDateContext = useGlobalDateRange();
+
+  // Initialize with passed date range, fall back to global range, or default to current month
+  const [date, setDate] = useState<DateRange | undefined>(
+    initialDateRange || globalDateContext?.dateRange || {
+      from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      to: new Date(),
+    }
+  );
+
+  const [options, setOptions] = useState({
+    includeCompletedJobs: true,
+    includeCancelledJobs: false,
+    includeInProgressJobs: false,
+    includeMaterials: true,
+    includeTravelExpenses: true,
+    showProfitBreakdown: true,
+    showClientDetails: true,
+    pdfFormat: true,
+    excelFormat: false,
   });
 
-  const handleCheckboxChange = (field: string) => {
-    setFilterOptions(prev => ({
+  const handleOptionChange = (option: keyof typeof options) => {
+    setOptions((prev) => ({
       ...prev,
-      [field]: !prev[field as keyof typeof filterOptions]
+      [option]: !prev[option],
     }));
   };
 
-  const handleDownload = () => {
+  const handleDownload = (format: "pdf" | "excel") => {
+    const formatName = format === "pdf" ? "PDF" : "Excel";
+    
+    // Get formatted date range for the toast message
+    const dateRangeText = date?.from 
+      ? date.to 
+        ? `${format(date.from, "MMM d, yyyy")} - ${format(date.to, "MMM d, yyyy")}`
+        : format(date.from, "MMM d, yyyy")
+      : "all time";
+    
     toast({
-      title: "Download Started",
-      description: `Downloading ${fileType.toUpperCase()} invoice for ${technician?.name} with your selected filters.`,
+      title: `Invoice ${formatName} Downloaded`,
+      description: `${technician?.name}'s invoice for ${dateRangeText} has been downloaded.`,
+      duration: 5000,
     });
+    
     onOpenChange(false);
   };
 
-  if (!technician) return null;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[500px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Download Invoice for {technician.name}</DialogTitle>
+          <DialogTitle>Download {technician?.name}'s Invoice</DialogTitle>
+          <DialogDescription>
+            Select options to include in the {technician?.name}'s invoice.
+          </DialogDescription>
         </DialogHeader>
-        
-        <div className="flex border rounded-md mb-4">
-          <button
-            className={cn(
-              "flex-1 py-2 text-center text-sm font-medium",
-              activeTab === "filters" 
-                ? "bg-blue-50 text-blue-700 border-b-2 border-blue-700" 
-                : "text-gray-600 hover:bg-gray-50"
-            )}
-            onClick={() => setActiveTab("filters")}
-          >
-            <Filter className="h-4 w-4 inline-block mr-2" />
-            Filter Options
-          </button>
-          <button
-            className={cn(
-              "flex-1 py-2 text-center text-sm font-medium",
-              activeTab === "preview" 
-                ? "bg-blue-50 text-blue-700 border-b-2 border-blue-700" 
-                : "text-gray-600 hover:bg-gray-50"
-            )}
-            onClick={() => setActiveTab("preview")}
-          >
-            <Download className="h-4 w-4 inline-block mr-2" />
-            Download Options
-          </button>
+        <div className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Date Range</h3>
+            <DatePickerWithRange date={date} setDate={setDate} className="w-full" />
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Job Status to Include</h3>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="completed-jobs" 
+                  checked={options.includeCompletedJobs}
+                  onCheckedChange={() => handleOptionChange("includeCompletedJobs")}
+                />
+                <Label htmlFor="completed-jobs">Completed Jobs</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="cancelled-jobs" 
+                  checked={options.includeCancelledJobs}
+                  onCheckedChange={() => handleOptionChange("includeCancelledJobs")}
+                />
+                <Label htmlFor="cancelled-jobs">Cancelled Jobs</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="in-progress-jobs" 
+                  checked={options.includeInProgressJobs}
+                  onCheckedChange={() => handleOptionChange("includeInProgressJobs")}
+                />
+                <Label htmlFor="in-progress-jobs">In Progress Jobs</Label>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Expense Details</h3>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="materials" 
+                  checked={options.includeMaterials}
+                  onCheckedChange={() => handleOptionChange("includeMaterials")}
+                />
+                <Label htmlFor="materials">Include Materials</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="travel" 
+                  checked={options.includeTravelExpenses}
+                  onCheckedChange={() => handleOptionChange("includeTravelExpenses")}
+                />
+                <Label htmlFor="travel">Include Travel Expenses</Label>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Additional Options</h3>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="profit">Show Profit Breakdown</Label>
+              <Switch
+                id="profit"
+                checked={options.showProfitBreakdown}
+                onCheckedChange={() => handleOptionChange("showProfitBreakdown")}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="client-details">Show Client Details</Label>
+              <Switch
+                id="client-details"
+                checked={options.showClientDetails}
+                onCheckedChange={() => handleOptionChange("showClientDetails")}
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">File Format</h3>
+            <div className="flex gap-2">
+              <Button
+                variant={options.pdfFormat ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setOptions(prev => ({...prev, pdfFormat: true, excelFormat: false}))}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                PDF
+                {options.pdfFormat && <Check className="h-4 w-4 ml-2" />}
+              </Button>
+              <Button
+                variant={options.excelFormat ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setOptions(prev => ({...prev, pdfFormat: false, excelFormat: true}))}
+              >
+                <Table className="h-4 w-4 mr-2" />
+                Excel
+                {options.excelFormat && <Check className="h-4 w-4 ml-2" />}
+              </Button>
+            </div>
+          </div>
         </div>
-        
-        {activeTab === "filters" && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Date Range</Label>
-              <DatePickerWithRange date={date} setDate={setDate} />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Job Status</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showCompletedJobs"
-                    checked={filterOptions.showCompletedJobs}
-                    onCheckedChange={() => handleCheckboxChange("showCompletedJobs")}
-                  />
-                  <label
-                    htmlFor="showCompletedJobs"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Completed
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showCancelledJobs"
-                    checked={filterOptions.showCancelledJobs}
-                    onCheckedChange={() => handleCheckboxChange("showCancelledJobs")}
-                  />
-                  <label
-                    htmlFor="showCancelledJobs"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Cancelled
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showInProgressJobs"
-                    checked={filterOptions.showInProgressJobs}
-                    onCheckedChange={() => handleCheckboxChange("showInProgressJobs")}
-                  />
-                  <label
-                    htmlFor="showInProgressJobs"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    In Progress
-                  </label>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Display Options</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showJobDate"
-                    checked={filterOptions.showJobDate}
-                    onCheckedChange={() => handleCheckboxChange("showJobDate")}
-                  />
-                  <label
-                    htmlFor="showJobDate"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Job Date
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showJobAddress"
-                    checked={filterOptions.showJobAddress}
-                    onCheckedChange={() => handleCheckboxChange("showJobAddress")}
-                  />
-                  <label
-                    htmlFor="showJobAddress"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Job Address
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showTechnicianEarnings"
-                    checked={filterOptions.showTechnicianEarnings}
-                    onCheckedChange={() => handleCheckboxChange("showTechnicianEarnings")}
-                  />
-                  <label
-                    htmlFor="showTechnicianEarnings"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Technician Earnings
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showCompanyProfit"
-                    checked={filterOptions.showCompanyProfit}
-                    onCheckedChange={() => handleCheckboxChange("showCompanyProfit")}
-                  />
-                  <label
-                    htmlFor="showCompanyProfit"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Company Profit
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showJobDetails"
-                    checked={filterOptions.showJobDetails}
-                    onCheckedChange={() => handleCheckboxChange("showJobDetails")}
-                  />
-                  <label
-                    htmlFor="showJobDetails"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Job Details
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="showPaymentMethods"
-                    checked={filterOptions.showPaymentMethods}
-                    onCheckedChange={() => handleCheckboxChange("showPaymentMethods")}
-                  />
-                  <label
-                    htmlFor="showPaymentMethods"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Payment Methods
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {activeTab === "preview" && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">File Format</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant={fileType === "pdf" ? "default" : "outline"} 
-                  className="flex items-center gap-2"
-                  onClick={() => setFileType("pdf")}
-                >
-                  <Download className="h-4 w-4" />
-                  PDF Format
-                </Button>
-                <Button 
-                  variant={fileType === "excel" ? "default" : "outline"} 
-                  className="flex items-center gap-2"
-                  onClick={() => setFileType("excel")}
-                >
-                  <Download className="h-4 w-4" />
-                  Excel Format
-                </Button>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Invoice Period</Label>
-              <Select defaultValue="custom">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="current-month">Current Month</SelectItem>
-                  <SelectItem value="last-month">Last Month</SelectItem>
-                  <SelectItem value="last-quarter">Last Quarter</SelectItem>
-                  <SelectItem value="custom">Custom Range</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="p-4 bg-blue-50 rounded-md">
-              <h3 className="font-medium text-blue-700 mb-2">Download Summary</h3>
-              <ul className="text-sm space-y-1 text-blue-600">
-                <li>Technician: {technician.name}</li>
-                <li>Date Range: {date?.from && date?.to ? `${date.from.toLocaleDateString()} to ${date.to.toLocaleDateString()}` : 'All time'}</li>
-                <li>Format: {fileType.toUpperCase()}</li>
-                <li>
-                  Job Status: {[
-                    filterOptions.showCompletedJobs ? 'Completed' : '',
-                    filterOptions.showCancelledJobs ? 'Cancelled' : '',
-                    filterOptions.showInProgressJobs ? 'In Progress' : ''
-                  ].filter(Boolean).join(', ')}
-                </li>
-                <li>
-                  Data Included: {[
-                    filterOptions.showJobDate ? 'Job Date' : '',
-                    filterOptions.showJobAddress ? 'Job Address' : '',
-                    filterOptions.showTechnicianEarnings ? 'Earnings' : '',
-                    filterOptions.showCompanyProfit ? 'Company Profit' : '',
-                    filterOptions.showJobDetails ? 'Job Details' : '',
-                    filterOptions.showPaymentMethods ? 'Payment Methods' : ''
-                  ].filter(Boolean).join(', ')}
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
-        
-        <DialogFooter className="mt-4">
+        <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            <X className="h-4 w-4 mr-2" />
             Cancel
           </Button>
-          <Button onClick={handleDownload}>
-            <Download className="h-4 w-4 mr-2" />
-            Download Invoice
+          <Button 
+            onClick={() => handleDownload(options.pdfFormat ? "pdf" : "excel")}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Download {options.pdfFormat ? "PDF" : "Excel"}
           </Button>
         </DialogFooter>
       </DialogContent>
