@@ -1,3 +1,4 @@
+
 import React from "react";
 import { 
   Popover, 
@@ -30,12 +31,12 @@ const TechnicianDateFilter: React.FC<TechnicianDateFilterProps> = ({
   const today = new Date();
   
   const getDateDisplayText = () => {
-    if (!localDateRange?.from) return "Choose custom range";
+    if (!localDateRange?.from) return "Custom range";
     
     if (localDateRange.to && 
         isSameDay(localDateRange.from, localDateRange.to) && 
         isSameDay(localDateRange.from, today)) {
-      return "Choose custom range";
+      return "Custom range";
     }
     
     if (localDateRange.to && isSameDay(localDateRange.from, localDateRange.to)) {
