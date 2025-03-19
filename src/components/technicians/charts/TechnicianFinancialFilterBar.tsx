@@ -8,8 +8,6 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { SortOption } from "@/hooks/useTechniciansData";
-import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
 
 interface TechnicianFinancialFilterBarProps {
   sortOption: SortOption;
@@ -28,7 +26,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
         <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
