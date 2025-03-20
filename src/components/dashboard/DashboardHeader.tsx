@@ -1,9 +1,8 @@
 
 import React, { useState } from "react";
-import { MailIcon, Bell, Search, Calendar, BarChart3, Home } from "lucide-react";
+import { MailIcon, Bell, Calendar, BarChart3, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { useWindowSize } from "@/hooks/use-window-size";
 
 const DashboardHeader = () => {
@@ -28,14 +27,6 @@ const DashboardHeader = () => {
           </div>
         </div>
         <div className="flex items-center flex-wrap gap-2 md:gap-4">
-          <div className="relative flex-grow max-w-xs">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-blue-400" />
-            <Input 
-              type="search" 
-              placeholder="Search dashboard..." 
-              className="w-full md:w-64 bg-white/80 backdrop-blur-sm border-blue-100 pl-9 focus:border-blue-300 focus:ring-blue-200"
-            />
-          </div>
           {!isMobile && (
             <Button 
               variant="outline" 

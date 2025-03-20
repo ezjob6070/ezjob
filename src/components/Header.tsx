@@ -1,6 +1,5 @@
 
-import { MenuIcon, XIcon, BellIcon, SearchIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { MenuIcon, XIcon, BellIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,14 +35,6 @@ const Header = ({ isSidebarOpen, toggleSidebar, isMobile }: HeaderProps = {}) =>
               {isSidebarOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
             </Button>
           )}
-
-          <div className="hidden md:flex items-center relative w-64">
-            <SearchIcon className="absolute left-3 text-muted-foreground" size={16} />
-            <Input
-              placeholder="Search..."
-              className="pl-9 bg-secondary border-none"
-            />
-          </div>
         </div>
 
         <div className="flex items-center space-x-4">
