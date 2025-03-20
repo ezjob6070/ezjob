@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWindowSize } from "@/hooks/use-window-size";
 
-const DashboardHeader = () => {
+const DashboardHeader = ({ onTabChange }: { onTabChange?: (tab: string) => void }) => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const { width } = useWindowSize();
   const isMobile = width < 768;
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+    if (onTabChange) {
+      onTabChange(value);
+    }
   };
 
   return (
