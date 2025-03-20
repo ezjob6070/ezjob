@@ -13,7 +13,8 @@ const JobHeaderActions: React.FC<JobHeaderActionsProps> = ({
   toggleJobSourceSidebar 
 }) => {
   return (
-    <div className="flex justify-end w-full">
+    <div className="flex justify-between items-center w-full">
+      <h1 className="text-2xl font-bold tracking-tight">Jobs Management</h1>
       <Button 
         onClick={onCreateJob} 
         variant="default" 
