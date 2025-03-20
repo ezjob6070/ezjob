@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import useWindowSize from "@/hooks/use-window-size";
+import { cn } from "@/lib/utils";
 
 const Layout = () => {
   const [isScrolled, setIsScrolled] = useState(false);
