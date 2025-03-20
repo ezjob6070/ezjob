@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Header from "./Header";
 import useWindowSize from "@/hooks/use-window-size";
 
 const Layout = () => {
@@ -38,8 +37,6 @@ const Layout = () => {
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      <Header />
-      
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar is now fixed position with controlled width */}
         <Sidebar isMobile={isMobile} />
