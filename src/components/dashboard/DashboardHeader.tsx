@@ -1,17 +1,27 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Bell, Calendar, BarChart3, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWindowSize } from "@/hooks/use-window-size";
 
-const DashboardHeader = ({ onTabChange }: { onTabChange?: (tab: string) => void }) => {
-  const [activeTab, setActiveTab] = useState("dashboard");
+interface DashboardHeaderProps {
+  onTabChange?: (tab: string) => void;
+  activeTab?: string;
+}
+
+const DashboardHeader = ({ onTabChange, activeTab = "dashboard" }: DashboardHeaderProps) => {
+  const [localActiveTab, setLocalActiveTab] = useState(activeTab);
   const { width } = useWindowSize();
   const isMobile = width < 768;
+  
+  // Update local state when parent state changes
+  useEffect(() => {
+    setLocalActiveTab(activeTab);
+  }, [activeTab]);
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    setLocalActiveTab(value);
     if (onTabChange) {
       onTabChange(value);
     }
@@ -41,7 +51,7 @@ const DashboardHeader = ({ onTabChange }: { onTabChange?: (tab: string) => void 
         </div>
       </div>
       
-      <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="w-full">
+      <Tabs value={localActiveTab} onValueChange={handleTabChange} className="w-full">
         <div className="border-b border-gray-100">
           <TabsList className="bg-transparent p-0 w-full md:w-auto justify-start">
             <TabsTrigger 

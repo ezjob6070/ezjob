@@ -295,7 +295,7 @@ const Index = () => {
 
   return (
     <div className="space-y-4 py-4">
-      <DashboardHeader onTabChange={handleTabChange} />
+      <DashboardHeader activeTab={activeTab} onTabChange={handleTabChange} />
       
       {renderContent()}
       
