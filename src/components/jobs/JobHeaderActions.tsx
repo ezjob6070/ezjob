@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import JobHeader from "./JobHeader";
+import { PlusIcon } from "lucide-react";
 
 interface JobHeaderActionsProps {
   onCreateJob: () => void;
@@ -13,10 +13,16 @@ const JobHeaderActions: React.FC<JobHeaderActionsProps> = ({
   toggleJobSourceSidebar 
 }) => {
   return (
-    <JobHeader 
-      onCreateJob={onCreateJob} 
-      extraActions={null}
-    />
+    <div className="flex justify-end w-full">
+      <Button 
+        onClick={onCreateJob} 
+        variant="default" 
+        className="bg-blue-500 hover:bg-blue-600"
+      >
+        <PlusIcon className="h-4 w-4 mr-2" />
+        New Job
+      </Button>
+    </div>
   );
 };
 
