@@ -1,5 +1,5 @@
 
-import { MenuIcon, XIcon, BellIcon } from "lucide-react";
+import { MenuIcon, XIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,12 +37,7 @@ const Header = ({ isSidebarOpen, toggleSidebar, isMobile }: HeaderProps = {}) =>
           )}
         </div>
 
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <BellIcon size={20} />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-destructive rounded-full" />
-          </Button>
-
+        <div className="flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative p-0 h-8 w-8 rounded-full">
