@@ -4,42 +4,47 @@ import { MailIcon, Bell, Search, Calendar, BarChart3, Home } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { useWindowSize } from "@/hooks/use-window-size";
 
 const DashboardHeader = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { width } = useWindowSize();
+  const isMobile = width < 768;
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 via-white to-indigo-50 -mx-6 -mt-6 px-6 pt-6 pb-6 border-b shadow-sm">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-gradient-to-r from-blue-50 via-white to-indigo-50 -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-4 pt-4 pb-4 md:px-6 md:pt-6 md:pb-6 border-b shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 gap-4 md:gap-0">
         <div className="flex items-center">
-          <div className="mr-4 bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-lg shadow-sm">
-            <Home className="h-6 w-6 text-white" />
+          <div className="mr-3 md:mr-4 bg-gradient-to-br from-blue-500 to-indigo-600 p-2 md:p-3 rounded-lg shadow-sm">
+            <Home className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Hello, Alex Johnson</h1>
-            <p className="text-blue-600">Welcome to your Uleadz CRM dashboard</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Hello, Alex Johnson</h1>
+            <p className="text-blue-600 text-sm md:text-base">Welcome to your Uleadz CRM dashboard</p>
           </div>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
+        <div className="flex items-center flex-wrap gap-2 md:gap-4">
+          <div className="relative flex-grow max-w-xs">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-blue-400" />
             <Input 
               type="search" 
               placeholder="Search dashboard..." 
-              className="w-64 bg-white/80 backdrop-blur-sm border-blue-100 pl-9 focus:border-blue-300 focus:ring-blue-200"
+              className="w-full md:w-64 bg-white/80 backdrop-blur-sm border-blue-100 pl-9 focus:border-blue-300 focus:ring-blue-200"
             />
           </div>
-          <Button 
-            variant="outline" 
-            className="border-blue-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-blue-600"
-          >
-            <MailIcon className="mr-2 h-4 w-4" />
-            <span>Send Reports</span>
-          </Button>
+          {!isMobile && (
+            <Button 
+              variant="outline" 
+              className="border-blue-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-blue-600"
+            >
+              <MailIcon className="mr-2 h-4 w-4" />
+              <span>Send Reports</span>
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -51,29 +56,29 @@ const DashboardHeader = () => {
         </div>
       </div>
       
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex space-x-8">
-          <div className="flex flex-col">
-            <span className="text-sm text-gray-500">Active Tasks</span>
-            <span className="text-xl font-bold text-blue-700">28</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4 md:gap-0">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 md:gap-8">
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Active Tasks</span>
+            <span className="text-lg md:text-xl font-bold text-blue-700">28</span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm text-gray-500">Pending Jobs</span>
-            <span className="text-xl font-bold text-indigo-700">13</span>
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Pending Jobs</span>
+            <span className="text-lg md:text-xl font-bold text-indigo-700">13</span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm text-gray-500">Completed (MTD)</span>
-            <span className="text-xl font-bold text-teal-700">42</span>
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Completed (MTD)</span>
+            <span className="text-lg md:text-xl font-bold text-teal-700">42</span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm text-gray-500">Conversion Rate</span>
-            <span className="text-xl font-bold text-emerald-700">24.8%</span>
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Conversion Rate</span>
+            <span className="text-lg md:text-xl font-bold text-emerald-700">24.8%</span>
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center">
           <Button 
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-sm"
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-sm w-full md:w-auto"
           >
             + New Task
           </Button>
@@ -81,7 +86,7 @@ const DashboardHeader = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
-        <TabsList className="bg-blue-50/80 backdrop-blur-sm p-1 border border-blue-100 rounded-lg">
+        <TabsList className="bg-blue-50/80 backdrop-blur-sm p-1 border border-blue-100 rounded-lg w-full md:w-auto overflow-x-auto">
           <TabsTrigger 
             value="dashboard" 
             className="rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"
@@ -152,7 +157,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">42%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '42%' }}></div>
+                      <div className="bg-blue-500 h-2 rounded-full" style={{ width: '42%' }}></div>
                     </div>
                     
                     <div className="flex justify-between">
@@ -160,7 +165,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">28%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '28%' }}></div>
+                      <div className="bg-indigo-500 h-2 rounded-full" style={{ width: '28%' }}></div>
                     </div>
                     
                     <div className="flex justify-between">
@@ -168,7 +173,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">18%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '18%' }}></div>
+                      <div className="bg-purple-500 h-2 rounded-full" style={{ width: '18%' }}></div>
                     </div>
                     
                     <div className="flex justify-between">
@@ -176,7 +181,7 @@ const DashboardHeader = () => {
                       <span className="font-medium">12%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-gray-500 h-2 rounded-full" style={{ width: '12%' }}></div>
+                      <div className="bg-teal-500 h-2 rounded-full" style={{ width: '12%' }}></div>
                     </div>
                   </div>
                 </div>
@@ -185,32 +190,32 @@ const DashboardHeader = () => {
                   <h3 className="font-medium text-gray-700 mb-3">Engagement Metrics</h3>
                   <div className="space-y-4">
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-4">
-                        <span className="text-lg font-bold">85%</span>
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3 md:mr-4">
+                        <span className="text-base md:text-lg font-bold">85%</span>
                       </div>
                       <div>
                         <p className="font-medium">Email Open Rate</p>
-                        <p className="text-sm text-gray-500">↑ 5% improvement</p>
+                        <p className="text-xs md:text-sm text-green-600">↑ 5% improvement</p>
                       </div>
                     </div>
                     
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-4">
-                        <span className="text-lg font-bold">62%</span>
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-3 md:mr-4">
+                        <span className="text-base md:text-lg font-bold">62%</span>
                       </div>
                       <div>
                         <p className="font-medium">Follow-up Response</p>
-                        <p className="text-sm text-gray-500">↑ 3% improvement</p>
+                        <p className="text-xs md:text-sm text-green-600">↑ 3% improvement</p>
                       </div>
                     </div>
                     
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-4">
-                        <span className="text-lg font-bold">78%</span>
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mr-3 md:mr-4">
+                        <span className="text-base md:text-lg font-bold">78%</span>
                       </div>
                       <div>
                         <p className="font-medium">Client Retention</p>
-                        <p className="text-sm text-gray-500">↑ 7% improvement</p>
+                        <p className="text-xs md:text-sm text-green-600">↑ 7% improvement</p>
                       </div>
                     </div>
                   </div>

@@ -45,7 +45,7 @@ const Layout = () => {
         <Sidebar isMobile={isMobile} />
         
         <main 
-          className="flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 ml-16"
+          className="flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 ml-16 max-w-full"
         >
           <div className="w-full mx-auto animate-fade-in">
             <div className="max-w-full overflow-x-hidden">
