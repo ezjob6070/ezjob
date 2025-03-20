@@ -20,6 +20,7 @@ type DashboardMetricCardProps = {
   children?: React.ReactNode;
   variant?: 'default' | 'glass' | 'outline' | 'gradient' | 'finance' | 'vibrant' | 'accent';
   accentColor?: string;
+  dateRangeText?: string;
 };
 
 const DashboardMetricCard = ({
@@ -33,7 +34,8 @@ const DashboardMetricCard = ({
   valueClassName,
   children,
   variant = 'default',
-  accentColor
+  accentColor,
+  dateRangeText
 }: DashboardMetricCardProps) => {
   const getCardClass = () => {
     switch (variant) {
@@ -96,6 +98,15 @@ const DashboardMetricCard = ({
             variant === 'vibrant' ? "text-white/80" : "text-muted-foreground"
           )}>
             {description}
+          </p>
+        )}
+        
+        {dateRangeText && (
+          <p className={cn(
+            "text-[0.65rem] mt-1", 
+            variant === 'vibrant' ? "text-white/60" : "text-muted-foreground"
+          )}>
+            {dateRangeText}
           </p>
         )}
         

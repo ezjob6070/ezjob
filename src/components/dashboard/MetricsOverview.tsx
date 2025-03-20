@@ -2,6 +2,8 @@
 import React from "react";
 import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon } from "lucide-react";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 type MetricsOverviewProps = {
   financialMetrics: {
@@ -14,6 +16,7 @@ type MetricsOverviewProps = {
   detailedTasksData: any[];
   detailedRevenueData: any[];
   detailedBusinessMetrics: any[];
+  dateRange?: DateRange;
 };
 
 const MetricsOverview = ({ 
@@ -22,8 +25,23 @@ const MetricsOverview = ({
   openDetailDialog,
   detailedTasksData,
   detailedRevenueData,
-  detailedBusinessMetrics
+  detailedBusinessMetrics,
+  dateRange
 }: MetricsOverviewProps) => {
+  // Format the date range for display
+  const dateRangeText = () => {
+    if (!dateRange?.from) return "";
+    
+    if (dateRange.to) {
+      if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
+        return `for ${format(dateRange.from, "MMM d, yyyy")}`;
+      }
+      return `for ${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
+    }
+    
+    return `for ${format(dateRange.from, "MMM d, yyyy")}`;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
       <DashboardMetricCard
@@ -36,6 +54,7 @@ const MetricsOverview = ({
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title.includes('call')))}
+        dateRangeText={dateRangeText()}
       />
       <DashboardMetricCard
         title="Jobs"
@@ -47,6 +66,7 @@ const MetricsOverview = ({
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('tasks', 'Job Details', detailedTasksData)}
+        dateRangeText={dateRangeText()}
       />
       <DashboardMetricCard
         title="Total Revenue"
@@ -58,6 +78,7 @@ const MetricsOverview = ({
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
+        dateRangeText={dateRangeText()}
       />
       <DashboardMetricCard
         title="Company's Cut"
@@ -69,6 +90,7 @@ const MetricsOverview = ({
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
+        dateRangeText={dateRangeText()}
       />
     </div>
   );
