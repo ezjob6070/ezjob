@@ -43,6 +43,7 @@ const QuickActions = () => {
     navigate('/jobs');
   };
 
+  // Updated to directly open the modal instead of navigating
   const handleCreateJob = () => {
     setShowCreateJobModal(true);
     setIsOpen(false);
