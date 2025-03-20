@@ -50,7 +50,7 @@ const MetricsOverview = ({
         icon={<PhoneCallIcon size={20} className="text-white" />}
         description="Total calls this month"
         trend={{ value: "12%", isPositive: true }}
-        className="bg-gradient-to-br from-purple-500 to-violet-600"
+        className="bg-gradient-to-br from-purple-500 to-violet-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title.includes('call')))}
@@ -62,7 +62,7 @@ const MetricsOverview = ({
         icon={<BriefcaseIcon size={20} className="text-white" />}
         description="Active jobs in progress"
         trend={{ value: "8%", isPositive: true }}
-        className="bg-gradient-to-br from-yellow-400 to-yellow-500"
+        className="bg-gradient-to-br from-yellow-400 to-yellow-500 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('tasks', 'Job Details', detailedTasksData)}
@@ -74,7 +74,7 @@ const MetricsOverview = ({
         icon={<CalculatorIcon size={20} className="text-white" />}
         description="Revenue this month"
         trend={{ value: "5%", isPositive: false }}
-        className="bg-gradient-to-br from-blue-500 to-blue-600"
+        className="bg-gradient-to-br from-blue-500 to-blue-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
@@ -86,7 +86,7 @@ const MetricsOverview = ({
         icon={<DollarSignIcon size={20} className="text-white" />}
         description="Net profit earned"
         trend={{ value: "7%", isPositive: true }}
-        className="bg-gradient-to-br from-red-500 to-red-600"
+        className="bg-gradient-to-br from-red-500 to-red-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
