@@ -70,6 +70,7 @@ const Dashboard = () => {
         detailedTasksData={detailedTasksData}
         detailedRevenueData={detailedRevenueData}
         detailedBusinessMetrics={detailedBusinessMetrics}
+        dateRange={date}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
