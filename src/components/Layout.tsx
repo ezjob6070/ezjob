@@ -40,7 +40,7 @@ const Layout = () => {
     <div className="h-screen flex flex-col bg-white">
       <Header />
       
-      <div className="flex-1 flex overflow-hidden pt-16">
+      <div className="flex-1 flex overflow-hidden">
         {/* Sidebar is now fixed position with controlled width */}
         <Sidebar isMobile={isMobile} />
         

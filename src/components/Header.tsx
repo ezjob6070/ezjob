@@ -19,30 +19,11 @@ type HeaderProps = {
 
 const Header = ({ isSidebarOpen, toggleSidebar, isMobile }: HeaderProps = {}) => {
   return (
-    <header className={`h-16 border-b border-border fixed top-0 right-0 left-0 z-10 bg-card transition-all duration-300
+    <header className={`h-12 border-b border-border fixed top-0 right-0 left-0 z-10 bg-card transition-all duration-300
       ${isSidebarOpen && !isMobile ? 'pl-64' : 'pl-16'}
       ${isMobile ? 'pl-0' : ''}`}>
-      <div className="h-full px-4 flex items-center justify-between">
+      <div className="h-full px-4 flex items-center justify-end">
         <div className="flex items-center space-x-4">
-          {isMobile && toggleSidebar && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-              className="transition-all duration-300"
-            >
-              {isSidebarOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
-            </Button>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <BellIcon size={20} />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-destructive rounded-full" />
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative p-0 h-8 w-8 rounded-full">
