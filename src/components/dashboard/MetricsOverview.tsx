@@ -32,7 +32,7 @@ const MetricsOverview = ({
         icon={<PhoneCallIcon size={20} className="text-purple-500" />}
         description="Total calls this month"
         trend={{ value: "12%", isPositive: true }}
-        className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-100 hover:shadow-md transition-all"
+        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
         onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title.includes('call')))}
       />
@@ -42,7 +42,7 @@ const MetricsOverview = ({
         icon={<BriefcaseIcon size={20} className="text-blue-500" />}
         description="Active jobs in progress"
         trend={{ value: "8%", isPositive: true }}
-        className="bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 hover:shadow-md transition-all"
+        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
         onClick={() => openDetailDialog('tasks', 'Job Details', detailedTasksData)}
       />
@@ -52,7 +52,7 @@ const MetricsOverview = ({
         icon={<CalculatorIcon size={20} className="text-blue-500" />}
         description="Revenue this month"
         trend={{ value: "5%", isPositive: false }}
-        className="bg-gradient-to-br from-blue-50 to-sky-50 border-blue-100 hover:shadow-md transition-all"
+        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
         valueClassName="text-blue-600"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
@@ -63,7 +63,7 @@ const MetricsOverview = ({
         icon={<DollarSignIcon size={20} className="text-emerald-500" />}
         description="Commission earned"
         trend={{ value: "7%", isPositive: true }}
-        className="bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-100 hover:shadow-md transition-all"
+        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
         valueClassName="text-emerald-600"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}

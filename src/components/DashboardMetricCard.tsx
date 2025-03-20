@@ -42,15 +42,15 @@ const DashboardMetricCard = ({
       case 'gradient':
         return 'bg-gradient-to-br from-white to-blue-50/50 hover:shadow-md transition-all duration-300';
       case 'finance':
-        return 'bg-white border-none hover:shadow-md transition-all duration-300';
+        return 'bg-white border border-gray-100 hover:shadow-md transition-all duration-300';
       default:
-        return 'bg-white hover:shadow-md';
+        return 'bg-white hover:shadow-md border border-gray-100';
     }
   };
 
   return (
     <Card className={cn(
-      "overflow-hidden shadow-sm border border-gray-100", 
+      "overflow-hidden shadow-sm", 
       getCardClass(),
       className
     )}>
