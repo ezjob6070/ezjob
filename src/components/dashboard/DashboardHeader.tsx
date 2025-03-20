@@ -1,5 +1,7 @@
+
 import React, { useState } from "react";
-import { Calendar, BarChart3, Home } from "lucide-react";
+import { MailIcon, Bell, Calendar, BarChart3, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWindowSize } from "@/hooks/use-window-size";
 
@@ -14,6 +16,66 @@ const DashboardHeader = () => {
 
   return (
     <div className="bg-gradient-to-r from-blue-50 via-white to-indigo-50 -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-4 pt-4 pb-4 md:px-6 md:pt-6 md:pb-6 border-b shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 gap-4 md:gap-0">
+        <div className="flex items-center">
+          <div className="mr-3 md:mr-4 bg-gradient-to-br from-blue-500 to-indigo-600 p-2 md:p-3 rounded-lg shadow-sm">
+            <Home className="h-5 w-5 md:h-6 md:w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Hello, Alex Johnson</h1>
+            <p className="text-blue-600 text-sm md:text-base">Welcome to your Uleadz CRM dashboard</p>
+          </div>
+        </div>
+        <div className="flex items-center flex-wrap gap-2 md:gap-4">
+          {!isMobile && (
+            <Button 
+              variant="outline" 
+              className="border-blue-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-blue-600"
+            >
+              <MailIcon className="mr-2 h-4 w-4" />
+              <span>Send Reports</span>
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative text-blue-600 hover:bg-blue-100 hover:text-blue-700"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+          </Button>
+        </div>
+      </div>
+      
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4 md:gap-0">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 md:gap-8">
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Active Tasks</span>
+            <span className="text-lg md:text-xl font-bold text-blue-700">28</span>
+          </div>
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Pending Jobs</span>
+            <span className="text-lg md:text-xl font-bold text-indigo-700">13</span>
+          </div>
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Completed (MTD)</span>
+            <span className="text-lg md:text-xl font-bold text-teal-700">42</span>
+          </div>
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+            <span className="text-xs md:text-sm text-gray-500">Conversion Rate</span>
+            <span className="text-lg md:text-xl font-bold text-emerald-700">24.8%</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center">
+          <Button 
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-sm w-full md:w-auto"
+          >
+            + New Task
+          </Button>
+        </div>
+      </div>
+      
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
         <TabsList className="bg-blue-50/80 backdrop-blur-sm p-1 border border-blue-100 rounded-lg w-full md:w-auto overflow-x-auto">
           <TabsTrigger 
