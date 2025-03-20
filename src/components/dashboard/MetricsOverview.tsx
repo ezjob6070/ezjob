@@ -62,7 +62,7 @@ const MetricsOverview = ({
         icon={<BriefcaseIcon size={20} className="text-white" />}
         description="Active jobs in progress"
         trend={{ value: "8%", isPositive: true }}
-        className="bg-gradient-to-br from-blue-500 to-indigo-600"
+        className="bg-gradient-to-br from-yellow-400 to-yellow-500"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('tasks', 'Job Details', detailedTasksData)}
@@ -74,19 +74,19 @@ const MetricsOverview = ({
         icon={<CalculatorIcon size={20} className="text-white" />}
         description="Revenue this month"
         trend={{ value: "5%", isPositive: false }}
-        className="bg-gradient-to-br from-teal-500 to-emerald-600"
+        className="bg-gradient-to-br from-blue-500 to-blue-600"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
         dateRangeText={dateRangeText()}
       />
       <DashboardMetricCard
-        title="Company's Cut"
+        title="Company Net Profit"
         value={formatCurrency(financialMetrics.companysCut)}
         icon={<DollarSignIcon size={20} className="text-white" />}
-        description="Commission earned"
+        description="Net profit earned"
         trend={{ value: "7%", isPositive: true }}
-        className="bg-gradient-to-br from-amber-500 to-orange-600"
+        className="bg-gradient-to-br from-red-500 to-red-600"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
