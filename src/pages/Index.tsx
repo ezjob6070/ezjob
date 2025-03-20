@@ -101,6 +101,10 @@ const Index = () => {
     { month: 'Dec', calls: 48, jobs: 40, revenue: 9100 },
   ];
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
@@ -291,7 +295,7 @@ const Index = () => {
 
   return (
     <div className="space-y-4 py-4">
-      <DashboardHeader onTabChange={setActiveTab} />
+      <DashboardHeader onTabChange={handleTabChange} />
       
       {renderContent()}
       
