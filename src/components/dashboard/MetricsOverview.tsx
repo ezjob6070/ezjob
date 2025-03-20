@@ -29,45 +29,45 @@ const MetricsOverview = ({
       <DashboardMetricCard
         title="Calls"
         value="28"
-        icon={<PhoneCallIcon size={20} className="text-purple-500" />}
+        icon={<PhoneCallIcon size={20} className="text-white" />}
         description="Total calls this month"
         trend={{ value: "12%", isPositive: true }}
-        className="bg-purple-50 border border-purple-100 shadow-sm hover:shadow-md transition-all duration-200"
-        variant="finance"
-        valueClassName="text-purple-600"
+        className="bg-gradient-to-br from-purple-500 to-violet-600"
+        variant="vibrant"
+        valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title.includes('call')))}
       />
       <DashboardMetricCard
         title="Jobs"
         value="68"
-        icon={<BriefcaseIcon size={20} className="text-blue-500" />}
+        icon={<BriefcaseIcon size={20} className="text-white" />}
         description="Active jobs in progress"
         trend={{ value: "8%", isPositive: true }}
-        className="bg-blue-50 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-200"
-        variant="finance"
-        valueClassName="text-blue-600"
+        className="bg-gradient-to-br from-blue-500 to-indigo-600"
+        variant="vibrant"
+        valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('tasks', 'Job Details', detailedTasksData)}
       />
       <DashboardMetricCard
         title="Total Revenue"
         value={formatCurrency(financialMetrics.totalRevenue)}
-        icon={<CalculatorIcon size={20} className="text-teal-500" />}
+        icon={<CalculatorIcon size={20} className="text-white" />}
         description="Revenue this month"
         trend={{ value: "5%", isPositive: false }}
-        className="bg-teal-50 border border-teal-100 shadow-sm hover:shadow-md transition-all duration-200"
-        variant="finance"
-        valueClassName="text-teal-600"
+        className="bg-gradient-to-br from-teal-500 to-emerald-600"
+        variant="vibrant"
+        valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
       />
       <DashboardMetricCard
         title="Company's Cut"
         value={formatCurrency(financialMetrics.companysCut)}
-        icon={<DollarSignIcon size={20} className="text-emerald-500" />}
+        icon={<DollarSignIcon size={20} className="text-white" />}
         description="Commission earned"
         trend={{ value: "7%", isPositive: true }}
-        className="bg-emerald-50 border border-emerald-100 shadow-sm hover:shadow-md transition-all duration-200"
-        variant="finance"
-        valueClassName="text-emerald-600"
+        className="bg-gradient-to-br from-amber-500 to-orange-600"
+        variant="vibrant"
+        valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
       />
     </div>

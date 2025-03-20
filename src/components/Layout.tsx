@@ -37,7 +37,7 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50/30">
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar is now fixed position with controlled width */}
         <Sidebar isMobile={isMobile} />
@@ -49,7 +49,7 @@ const Layout = () => {
           )}
         >
           <div className="w-full mx-auto">
-            <div className="max-w-full overflow-x-hidden">
+            <div className="max-w-full overflow-x-hidden animate-fade-in">
               <Outlet />
             </div>
           </div>
