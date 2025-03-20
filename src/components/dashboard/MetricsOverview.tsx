@@ -32,8 +32,9 @@ const MetricsOverview = ({
         icon={<PhoneCallIcon size={20} className="text-purple-500" />}
         description="Total calls this month"
         trend={{ value: "12%", isPositive: true }}
-        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
+        className="bg-purple-50 border border-purple-100 shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
+        valueClassName="text-purple-600"
         onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title.includes('call')))}
       />
       <DashboardMetricCard
@@ -42,19 +43,20 @@ const MetricsOverview = ({
         icon={<BriefcaseIcon size={20} className="text-blue-500" />}
         description="Active jobs in progress"
         trend={{ value: "8%", isPositive: true }}
-        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
+        className="bg-blue-50 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
+        valueClassName="text-blue-600"
         onClick={() => openDetailDialog('tasks', 'Job Details', detailedTasksData)}
       />
       <DashboardMetricCard
         title="Total Revenue"
         value={formatCurrency(financialMetrics.totalRevenue)}
-        icon={<CalculatorIcon size={20} className="text-blue-500" />}
+        icon={<CalculatorIcon size={20} className="text-teal-500" />}
         description="Revenue this month"
         trend={{ value: "5%", isPositive: false }}
-        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
+        className="bg-teal-50 border border-teal-100 shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
-        valueClassName="text-blue-600"
+        valueClassName="text-teal-600"
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
       />
       <DashboardMetricCard
@@ -63,7 +65,7 @@ const MetricsOverview = ({
         icon={<DollarSignIcon size={20} className="text-emerald-500" />}
         description="Commission earned"
         trend={{ value: "7%", isPositive: true }}
-        className="bg-white shadow-sm hover:shadow-md transition-all duration-200"
+        className="bg-emerald-50 border border-emerald-100 shadow-sm hover:shadow-md transition-all duration-200"
         variant="finance"
         valueClassName="text-emerald-600"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}

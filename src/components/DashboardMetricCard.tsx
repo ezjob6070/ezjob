@@ -42,7 +42,7 @@ const DashboardMetricCard = ({
       case 'gradient':
         return 'bg-gradient-to-br from-white to-blue-50/50 hover:shadow-md transition-all duration-300';
       case 'finance':
-        return 'bg-white border border-gray-100 hover:shadow-md transition-all duration-300';
+        return 'hover:shadow-md transition-all duration-300';
       default:
         return 'bg-white hover:shadow-md border border-gray-100';
     }
@@ -57,7 +57,7 @@ const DashboardMetricCard = ({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-4">
         <CardTitle className="text-sm font-medium text-gray-700">{title}</CardTitle>
         {icon && (
-          <div className="p-2 rounded-lg bg-primary/10 text-primary shadow-sm">
+          <div className="p-2 rounded-lg bg-white shadow-sm">
             {icon}
           </div>
         )}

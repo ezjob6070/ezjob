@@ -15,10 +15,10 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 via-white to-indigo-50 -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-4 pt-6 pb-6 md:px-6 md:pt-8 md:pb-8 border-b shadow-sm rounded-b-lg mb-8">
+    <div className="bg-white border-b shadow-sm rounded-b-lg -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-4 pt-6 pb-6 md:px-6 md:pt-8 md:pb-8 mb-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 md:gap-6">
         <div className="flex items-center">
-          <div className="mr-4 bg-gradient-to-br from-blue-600 to-indigo-700 p-3 rounded-lg shadow-md">
+          <div className="mr-4 bg-blue-600 p-3 rounded-lg shadow-md">
             <Home className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -48,19 +48,19 @@ const DashboardHeader = () => {
       </div>
       
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mb-6">
-        <div className="flex flex-col bg-white rounded-lg p-4 border border-blue-100 shadow-sm hover:shadow-md transition-all">
+        <div className="flex flex-col bg-purple-50 border-l-4 border-l-purple-500 rounded-lg p-4 border border-purple-100 shadow-sm hover:shadow-md transition-all">
           <span className="text-sm text-gray-500 mb-1">Active Tasks</span>
-          <span className="text-xl font-bold text-blue-700">28</span>
+          <span className="text-xl font-bold text-purple-700">28</span>
         </div>
-        <div className="flex flex-col bg-white rounded-lg p-4 border border-blue-100 shadow-sm hover:shadow-md transition-all">
+        <div className="flex flex-col bg-blue-50 border-l-4 border-l-blue-500 rounded-lg p-4 border border-blue-100 shadow-sm hover:shadow-md transition-all">
           <span className="text-sm text-gray-500 mb-1">Pending Jobs</span>
-          <span className="text-xl font-bold text-indigo-700">13</span>
+          <span className="text-xl font-bold text-blue-700">13</span>
         </div>
-        <div className="flex flex-col bg-white rounded-lg p-4 border border-blue-100 shadow-sm hover:shadow-md transition-all">
+        <div className="flex flex-col bg-teal-50 border-l-4 border-l-teal-500 rounded-lg p-4 border border-teal-100 shadow-sm hover:shadow-md transition-all">
           <span className="text-sm text-gray-500 mb-1">Completed (MTD)</span>
           <span className="text-xl font-bold text-teal-700">42</span>
         </div>
-        <div className="flex flex-col bg-white rounded-lg p-4 border border-blue-100 shadow-sm hover:shadow-md transition-all">
+        <div className="flex flex-col bg-emerald-50 border-l-4 border-l-emerald-500 rounded-lg p-4 border border-emerald-100 shadow-sm hover:shadow-md transition-all">
           <span className="text-sm text-gray-500 mb-1">Conversion Rate</span>
           <span className="text-xl font-bold text-emerald-700">24.8%</span>
         </div>
@@ -94,14 +94,14 @@ const DashboardHeader = () => {
         </Tabs>
         
         <Button 
-          className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-md transition-all hidden md:flex"
+          className="bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all hidden md:flex"
         >
           + New Task
         </Button>
       </div>
       
       <Button 
-        className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-md w-full transition-all md:hidden mb-4"
+        className="bg-blue-600 hover:bg-blue-700 text-white shadow-md w-full transition-all md:hidden mb-4"
       >
         + New Task
       </Button>
