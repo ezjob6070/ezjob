@@ -50,12 +50,12 @@ const DashboardMetricCard = ({
 
   return (
     <Card className={cn(
-      "overflow-hidden", 
+      "overflow-hidden shadow-sm", 
       getCardClass(),
       className
     )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
-        <CardTitle className="text-lg font-semibold text-gray-900">{title}</CardTitle>
+        <CardTitle className="text-sm font-medium text-gray-700">{title}</CardTitle>
         {icon && (
           <div className="p-1.5 rounded-full bg-white shadow-sm">
             {icon}
@@ -69,7 +69,7 @@ const DashboardMetricCard = ({
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
         
         {trend && (
-          <div className="flex items-center mt-1">
+          <div className="flex items-center mt-2">
             <div className={cn(
               "flex items-center p-1 rounded-md bg-opacity-10 w-fit",
               trend.isPositive ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"

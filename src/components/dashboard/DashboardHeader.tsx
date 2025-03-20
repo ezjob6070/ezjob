@@ -15,10 +15,10 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 via-white to-indigo-50 -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-4 pt-4 pb-4 md:px-6 md:pt-6 md:pb-6 border-b shadow-sm">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 gap-4 md:gap-0">
+    <div className="bg-gradient-to-r from-blue-50 via-white to-indigo-50 -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-4 pt-5 pb-5 md:px-6 md:pt-6 md:pb-6 border-b shadow-sm rounded-b-lg">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-5 md:mb-6 gap-4 md:gap-0">
         <div className="flex items-center">
-          <div className="mr-3 md:mr-4 bg-gradient-to-br from-blue-500 to-indigo-600 p-2 md:p-3 rounded-lg shadow-sm">
+          <div className="mr-3 md:mr-4 bg-gradient-to-br from-blue-600 to-indigo-700 p-2.5 md:p-3 rounded-lg shadow-md">
             <Home className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </div>
           <div>
@@ -30,7 +30,7 @@ const DashboardHeader = () => {
           {!isMobile && (
             <Button 
               variant="outline" 
-              className="border-blue-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-blue-600"
+              className="border-blue-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-blue-600 shadow-sm"
             >
               <MailIcon className="mr-2 h-4 w-4" />
               <span>Send Reports</span>
@@ -47,21 +47,21 @@ const DashboardHeader = () => {
         </div>
       </div>
       
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4 md:gap-0">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 md:gap-8">
-          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4 md:gap-0">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 md:gap-6">
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all">
             <span className="text-xs md:text-sm text-gray-500">Active Tasks</span>
             <span className="text-lg md:text-xl font-bold text-blue-700">28</span>
           </div>
-          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all">
             <span className="text-xs md:text-sm text-gray-500">Pending Jobs</span>
             <span className="text-lg md:text-xl font-bold text-indigo-700">13</span>
           </div>
-          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all">
             <span className="text-xs md:text-sm text-gray-500">Completed (MTD)</span>
             <span className="text-lg md:text-xl font-bold text-teal-700">42</span>
           </div>
-          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100">
+          <div className="flex flex-col bg-white/70 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all">
             <span className="text-xs md:text-sm text-gray-500">Conversion Rate</span>
             <span className="text-lg md:text-xl font-bold text-emerald-700">24.8%</span>
           </div>
@@ -69,7 +69,7 @@ const DashboardHeader = () => {
         
         <div className="flex items-center">
           <Button 
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-sm w-full md:w-auto"
+            className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-md w-full md:w-auto transition-all"
           >
             + New Task
           </Button>
@@ -77,7 +77,7 @@ const DashboardHeader = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
-        <TabsList className="bg-blue-50/80 backdrop-blur-sm p-1 border border-blue-100 rounded-lg w-full md:w-auto overflow-x-auto">
+        <TabsList className="bg-blue-50/80 backdrop-blur-sm p-1 border border-blue-100 rounded-lg w-full md:w-auto overflow-x-auto shadow-sm">
           <TabsTrigger 
             value="dashboard" 
             className="rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"
@@ -109,17 +109,17 @@ const DashboardHeader = () => {
           <div className="mt-6 bg-white rounded-lg shadow-sm p-4 text-gray-800">
             <h2 className="text-xl font-bold mb-4">Statistics Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 shadow-sm">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-all">
                 <h3 className="font-medium text-blue-700">Conversion Rate</h3>
                 <p className="text-2xl font-bold mt-2">24.8%</p>
                 <p className="text-sm text-green-600 mt-1">↑ 2.1% from last month</p>
               </div>
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100 shadow-sm">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100 shadow-sm hover:shadow-md transition-all">
                 <h3 className="font-medium text-purple-700">Average Response Time</h3>
                 <p className="text-2xl font-bold mt-2">3.2 hours</p>
                 <p className="text-sm text-green-600 mt-1">↑ 15% faster than target</p>
               </div>
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-lg border border-emerald-100 shadow-sm">
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-lg border border-emerald-100 shadow-sm hover:shadow-md transition-all">
                 <h3 className="font-medium text-emerald-700">Customer Satisfaction</h3>
                 <p className="text-2xl font-bold mt-2">4.8/5.0</p>
                 <p className="text-sm text-green-600 mt-1">↑ 0.2 from previous quarter</p>
@@ -132,7 +132,7 @@ const DashboardHeader = () => {
           <div className="mt-6 bg-white rounded-lg shadow-sm p-4 text-gray-800">
             <h2 className="text-xl font-bold mb-4">Analytics Dashboard</h2>
             <div className="space-y-6">
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
                 <h3 className="font-medium text-gray-700 mb-3">Performance Trends</h3>
                 <div className="h-40 flex items-center justify-center border border-dashed border-gray-300 rounded">
                   <p className="text-gray-500">Performance chart visualization would appear here</p>
@@ -140,7 +140,7 @@ const DashboardHeader = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
                   <h3 className="font-medium text-gray-700 mb-3">Lead Sources</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between">
@@ -177,11 +177,11 @@ const DashboardHeader = () => {
                   </div>
                 </div>
                 
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
                   <h3 className="font-medium text-gray-700 mb-3">Engagement Metrics</h3>
                   <div className="space-y-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3 md:mr-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3 md:mr-4 shadow-sm">
                         <span className="text-base md:text-lg font-bold">85%</span>
                       </div>
                       <div>
@@ -191,7 +191,7 @@ const DashboardHeader = () => {
                     </div>
                     
                     <div className="flex items-center">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-3 md:mr-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-3 md:mr-4 shadow-sm">
                         <span className="text-base md:text-lg font-bold">62%</span>
                       </div>
                       <div>
@@ -201,7 +201,7 @@ const DashboardHeader = () => {
                     </div>
                     
                     <div className="flex items-center">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mr-3 md:mr-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mr-3 md:mr-4 shadow-sm">
                         <span className="text-base md:text-lg font-bold">78%</span>
                       </div>
                       <div>

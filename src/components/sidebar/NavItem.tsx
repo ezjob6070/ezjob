@@ -11,14 +11,14 @@ export const SubNavItem = ({ item, currentPath }: SubNavItemProps) => {
       <Link
         to={item.href!}
         className={cn(
-          "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors duration-200",
+          "flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200",
           currentPath === item.href
-            ? "bg-blue-700 text-white"
-            : "text-white/80 hover:bg-blue-700 hover:text-white"
+            ? "bg-blue-600 text-white shadow-sm"
+            : "text-white/80 hover:bg-blue-600 hover:text-white"
         )}
       >
         {item.icon}
-        <span>{item.label}</span>
+        <span className="text-sm">{item.label}</span>
       </Link>
     </li>
   );
@@ -33,24 +33,24 @@ const NavItem = ({ item, isExpanded, onToggleExpand, currentPath }: NavItemProps
         <button
           onClick={onToggleExpand}
           className={cn(
-            "flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-colors duration-200",
+            "flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-all duration-200",
             (item.children.some(child => currentPath === child.href))
-              ? "bg-blue-700 text-white"
-              : "text-white/80 hover:bg-blue-700 hover:text-white"
+              ? "bg-blue-600 text-white shadow-sm"
+              : "text-white/80 hover:bg-blue-600 hover:text-white"
           )}
         >
           <div className="flex items-center gap-3">
             {item.icon}
-            <span>{item.label}</span>
+            <span className="text-sm font-medium">{item.label}</span>
           </div>
           {isExpanded ? (
-            <ChevronUpIcon size={16} />
+            <ChevronUpIcon size={16} className="opacity-70" />
           ) : (
-            <ChevronDownIcon size={16} />
+            <ChevronDownIcon size={16} className="opacity-70" />
           )}
         </button>
         {isExpanded && (
-          <ul className="mt-2 ml-4 space-y-2">
+          <ul className="mt-1.5 ml-3 space-y-1">
             {item.children.map((child) => (
               <SubNavItem key={child.href} item={child} currentPath={currentPath} />
             ))}
@@ -65,14 +65,14 @@ const NavItem = ({ item, isExpanded, onToggleExpand, currentPath }: NavItemProps
     <Link
       to={item.href!}
       className={cn(
-        "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200",
+        "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200",
         currentPath === item.href
-          ? "bg-blue-700 text-white"
-          : "text-white/80 hover:bg-blue-700 hover:text-white"
+          ? "bg-blue-600 text-white shadow-sm"
+          : "text-white/80 hover:bg-blue-600 hover:text-white"
       )}
     >
       {item.icon}
-      <span>{item.label}</span>
+      <span className="text-sm font-medium">{item.label}</span>
     </Link>
   );
 };

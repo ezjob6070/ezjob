@@ -36,13 +36,16 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-gray-50">
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar is now fixed position with controlled width */}
         <Sidebar isMobile={isMobile} />
         
         <main 
-          className="flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 ml-16 max-w-full"
+          className={cn(
+            "flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 ml-16",
+            isScrolled && "bg-white/80 backdrop-blur-sm"
+          )}
         >
           <div className="w-full mx-auto animate-fade-in">
             <div className="max-w-full overflow-x-hidden">

@@ -52,42 +52,42 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
 
   return (
     <aside
-      className="fixed left-0 top-16 bottom-0 z-30 transition-all duration-300 ease-in-out"
+      className="fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div 
         className={cn(
-          "h-full bg-blue-600 overflow-hidden transition-all duration-300",
+          "h-full bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg overflow-hidden transition-all duration-300",
           isHovering ? "w-64" : "w-16"
         )}
       >
-        <div className={cn("py-4", isHovering ? "px-4" : "px-2")}>
+        <div className={cn("py-5", isHovering ? "px-5" : "px-3")}>
           {isHovering ? (
             <div className="flex items-center justify-between">
-              <span className="font-bold text-lg text-white">Dashboard</span>
+              <span className="font-bold text-lg text-white">Uleadz CRM</span>
               <button 
                 onClick={cycleIndustry}
-                className="p-1 rounded-md hover:bg-blue-700 transition-colors text-white"
+                className="p-1.5 rounded-md hover:bg-blue-600 transition-all text-white/90 hover:text-white"
               >
-                <MenuIcon size={20} />
+                <MenuIcon size={18} />
               </button>
             </div>
           ) : (
             <div className="flex justify-center">
               <button
                 onClick={cycleIndustry}
-                className="p-1 rounded-md hover:bg-blue-700 transition-colors text-white"
+                className="p-1.5 rounded-md hover:bg-blue-600 transition-colors text-white/90 hover:text-white"
               >
-                <MenuIcon size={20} />
+                <MenuIcon size={18} />
               </button>
             </div>
           )}
         </div>
 
-        <nav className={cn("flex-1 py-2", isHovering ? "px-4" : "px-2")}>
+        <nav className={cn("flex-1 py-3", isHovering ? "px-4" : "px-2")}>
           {isHovering ? (
-            <ul className="space-y-2">
+            <ul className="space-y-1.5">
               {navItems.map((item) => (
                 <li key={item.href || item.label}>
                   <NavItem 
@@ -107,10 +107,10 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
                     <Link 
                       to={item.href} 
                       className={cn(
-                        "p-2 rounded-lg transition-colors duration-200 flex justify-center",
+                        "p-2 rounded-lg transition-all duration-200 flex justify-center",
                         location.pathname === item.href
-                          ? "bg-blue-700 text-white"
-                          : "text-white/80 hover:bg-blue-700 hover:text-white"
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "text-white/80 hover:bg-blue-600 hover:text-white"
                       )}
                       title={item.label}
                     >
@@ -120,10 +120,10 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
                   {item.children && (
                     <button
                       className={cn(
-                        "p-2 rounded-lg transition-colors duration-200 flex justify-center",
+                        "p-2 rounded-lg transition-all duration-200 flex justify-center",
                         (item.children.some(child => location.pathname === child.href))
-                          ? "bg-blue-700 text-white"
-                          : "text-white/80 hover:bg-blue-700 hover:text-white"
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "text-white/80 hover:bg-blue-600 hover:text-white"
                       )}
                       title={item.label}
                     >
@@ -136,18 +136,18 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           )}
         </nav>
 
-        <div className={cn("p-4 border-t border-blue-700/50", !isHovering && "flex justify-center")}>
+        <div className={cn("p-4 mt-auto border-t border-blue-700/50", !isHovering && "flex justify-center")}>
           {isHovering ? (
-            <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-700 hover:text-white transition-colors duration-200">
-              <LogOutIcon size={20} />
+            <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200">
+              <LogOutIcon size={18} />
               <span>Sign out</span>
             </button>
           ) : (
             <button 
-              className="p-2 rounded-lg text-white/80 hover:bg-blue-700 hover:text-white transition-colors duration-200"
+              className="p-2 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200"
               title="Sign out"
             >
-              <LogOutIcon size={20} />
+              <LogOutIcon size={18} />
             </button>
           )}
         </div>
