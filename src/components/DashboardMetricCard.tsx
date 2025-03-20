@@ -40,9 +40,9 @@ const DashboardMetricCard = ({
       case 'outline':
         return 'bg-transparent border-2 hover:border-primary/50';
       case 'gradient':
-        return 'hover:shadow-md transition-all duration-300';
+        return 'bg-gradient-to-br from-white to-blue-50/50 hover:shadow-md transition-all duration-300';
       case 'finance':
-        return 'border-none hover:shadow-md transition-all duration-300';
+        return 'bg-white border-none hover:shadow-md transition-all duration-300';
       default:
         return 'bg-white hover:shadow-md';
     }
@@ -50,34 +50,34 @@ const DashboardMetricCard = ({
 
   return (
     <Card className={cn(
-      "overflow-hidden shadow-sm", 
+      "overflow-hidden shadow-sm border border-gray-100", 
       getCardClass(),
       className
     )}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-4">
         <CardTitle className="text-sm font-medium text-gray-700">{title}</CardTitle>
         {icon && (
-          <div className="p-1.5 rounded-full bg-white shadow-sm">
+          <div className="p-2 rounded-lg bg-primary/10 text-primary shadow-sm">
             {icon}
           </div>
         )}
       </CardHeader>
-      <CardContent className="py-1">
+      <CardContent className="py-3">
         {children}
         
         <div className={cn("text-2xl font-bold mb-1", valueClassName)}>{value}</div>
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
         
         {trend && (
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-3">
             <div className={cn(
-              "flex items-center p-1 rounded-md bg-opacity-10 w-fit",
+              "flex items-center p-1.5 rounded-md bg-opacity-10 w-fit",
               trend.isPositive ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
             )}>
               {trend.isPositive ? (
-                <TrendingUp className="mr-1 h-3 w-3" />
+                <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
               ) : (
-                <TrendingDown className="mr-1 h-3 w-3" />
+                <TrendingDown className="mr-1.5 h-3.5 w-3.5" />
               )}
               <span className="text-xs font-medium">
                 {trend.value}
@@ -90,7 +90,7 @@ const DashboardMetricCard = ({
           <Button 
             variant="ghost" 
             size="sm" 
-            className="mt-2 p-0 h-auto text-blue-600 hover:text-blue-700 hover:bg-transparent group"
+            className="mt-3 p-0 h-auto text-blue-600 hover:text-blue-700 hover:bg-transparent group"
             onClick={onClick}
           >
             <span className="text-xs">View Details</span>

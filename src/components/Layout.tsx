@@ -48,7 +48,7 @@ const Layout = () => {
             isScrolled && "bg-white/80 backdrop-blur-sm"
           )}
         >
-          <div className="w-full mx-auto animate-fade-in">
+          <div className="w-full mx-auto">
             <div className="max-w-full overflow-x-hidden">
               <Outlet />
             </div>
