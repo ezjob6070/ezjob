@@ -14,7 +14,7 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      <Card className="h-full bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all">
+      <Card className="h-full bg-gradient-to-br from-blue-50 via-blue-100/30 to-indigo-50 border-blue-200 hover:shadow-md transition-all">
         <CardContent className="pt-6 pb-6 flex flex-col h-full">
           <div>
             <p className="text-xl font-semibold text-gray-900">Total Income</p>
@@ -27,7 +27,7 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
         </CardContent>
       </Card>
       
-      <Card className="h-full bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all">
+      <Card className="h-full bg-gradient-to-br from-emerald-50 via-emerald-100/30 to-teal-50 border-emerald-200 hover:shadow-md transition-all">
         <CardContent className="pt-6 pb-6 flex flex-col h-full">
           <div>
             <p className="text-xl font-semibold text-gray-900">Company Profit</p>
@@ -42,7 +42,7 @@ const FinancialMetricsCards = ({ report }: FinancialMetricsCardsProps) => {
         </CardContent>
       </Card>
       
-      <Card className="h-full bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all">
+      <Card className="h-full bg-gradient-to-br from-red-50 via-red-100/30 to-rose-50 border-red-200 hover:shadow-md transition-all">
         <CardContent className="pt-6 pb-6 flex flex-col h-full">
           <div>
             <p className="text-xl font-semibold text-gray-900">Expenses</p>
