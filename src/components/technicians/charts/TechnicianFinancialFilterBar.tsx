@@ -161,7 +161,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
 
       {/* Payment Type Filter */}
       <Select value={paymentTypeFilter} onValueChange={setPaymentTypeFilter}>
-        <SelectTrigger className="w-[180px] bg-white border-gray-200 text-gray-900 font-medium">
+        <SelectTrigger className="w-[160px] bg-white border-gray-200 text-gray-900 font-medium">
           <SelectValue placeholder="Payment Rate" />
         </SelectTrigger>
         <SelectContent>
@@ -172,9 +172,9 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
         </SelectContent>
       </Select>
       
-      {/* Job Status Filter - New */}
+      {/* Job Status Filter */}
       <Select value={jobStatusFilter} onValueChange={setJobStatusFilter}>
-        <SelectTrigger className="w-[180px] bg-white border-gray-200 text-gray-900 font-medium">
+        <SelectTrigger className="w-[140px] bg-white border-gray-200 text-gray-900 font-medium">
           <SelectValue placeholder="Job Status" />
         </SelectTrigger>
         <SelectContent>

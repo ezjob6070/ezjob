@@ -50,7 +50,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
         applyFilters={applyFilters}
       />
       
-      <div className="w-56">
+      <div className="w-44">
         <Select value={paymentTypeFilter} onValueChange={setPaymentTypeFilter}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Payment Type" />
@@ -63,7 +63,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
         </Select>
       </div>
       
-      <div className="w-56">
+      <div className="w-40">
         <Select value={jobStatusFilter} onValueChange={setJobStatusFilter}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Job Status" />
