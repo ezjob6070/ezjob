@@ -71,7 +71,7 @@ const TechnicianList: React.FC<TechnicianListProps> = ({
                 onClick={(e) => handleDownloadClick(tech, e)}
               >
                 <Download className="h-4 w-4 mr-1" />
-                Download Invoice
+                Download
               </Button>
             </div>
           </div>

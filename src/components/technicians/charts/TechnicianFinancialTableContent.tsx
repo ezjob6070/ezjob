@@ -59,7 +59,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
               <TableHead className="text-right">Parts</TableHead>
               <TableHead className="text-right">Revenue</TableHead>
               <TableHead className="text-right">Company Profit</TableHead>
-              <TableHead>Download</TableHead>
+              <TableHead>Download Invoice</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -116,7 +116,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
                       onClick={(e) => handleDownloadClick(technician, e)}
                     >
                       <Download className="h-4 w-4" />
-                      Download Invoice
+                      Download
                     </Button>
                   </TableCell>
                 </TableRow>
