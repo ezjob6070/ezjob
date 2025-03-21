@@ -116,7 +116,7 @@ const TechnicianFinancialTableContent: React.FC<TechnicianFinancialTableContentP
                       onClick={(e) => handleDownloadClick(technician, e)}
                     >
                       <Download className="h-4 w-4" />
-                      Download
+                      Download Invoice
                     </Button>
                   </TableCell>
                 </TableRow>
