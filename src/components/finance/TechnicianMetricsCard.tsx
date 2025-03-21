@@ -25,7 +25,7 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
     : '0';
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-semibold">{technician.name}'s Performance</h3>
@@ -34,93 +34,81 @@ const TechnicianMetricsCard = ({ technician, dateRangeText }: TechnicianMetricsC
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Card className="h-[120px]">
-          <CardHeader className="pb-1 pt-3">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-blue-100 rounded-full">
-                <Briefcase className="h-4 w-4 text-blue-700" />
+        <Card className="h-[100px]">
+          <CardContent className="pt-4 pb-2">
+            <div className="flex items-center space-x-2 mb-1">
+              <div className="p-1 bg-blue-100 rounded-full">
+                <Briefcase className="h-3.5 w-3.5 text-blue-700" />
               </div>
-              <CardTitle className="text-base font-semibold text-gray-900">Completed Jobs</CardTitle>
+              <p className="text-sm font-semibold text-gray-900">Completed Jobs</p>
             </div>
-            <CardDescription className="text-xs mt-1 mb-1">Successfully finished services</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold">{technician.completedJobs}</div>
+            <p className="text-xs text-muted-foreground mb-1">Successfully finished services</p>
+            <p className="text-lg font-bold">{technician.completedJobs}</p>
           </CardContent>
         </Card>
 
-        <Card className="h-[120px]">
-          <CardHeader className="pb-1 pt-3">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-red-100 rounded-full">
-                <BanIcon className="h-4 w-4 text-red-700" />
+        <Card className="h-[100px]">
+          <CardContent className="pt-4 pb-2">
+            <div className="flex items-center space-x-2 mb-1">
+              <div className="p-1 bg-red-100 rounded-full">
+                <BanIcon className="h-3.5 w-3.5 text-red-700" />
               </div>
-              <CardTitle className="text-base font-semibold text-gray-900">Cancelled Jobs</CardTitle>
+              <p className="text-sm font-semibold text-gray-900">Cancelled Jobs</p>
             </div>
-            <CardDescription className="text-xs mt-1 mb-1">Jobs that didn't complete</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold">{technician.cancelledJobs}</div>
+            <p className="text-xs text-muted-foreground mb-1">Jobs that didn't complete</p>
+            <p className="text-lg font-bold">{technician.cancelledJobs}</p>
           </CardContent>
         </Card>
 
-        <Card className="h-[120px]">
-          <CardHeader className="pb-1 pt-3">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-blue-100 rounded-full">
-                <DollarSign className="h-4 w-4 text-blue-700" />
+        <Card className="h-[100px]">
+          <CardContent className="pt-4 pb-2">
+            <div className="flex items-center space-x-2 mb-1">
+              <div className="p-1 bg-blue-100 rounded-full">
+                <DollarSign className="h-3.5 w-3.5 text-blue-700" />
               </div>
-              <CardTitle className="text-base font-semibold text-gray-900">Total Income</CardTitle>
+              <p className="text-sm font-semibold text-gray-900">Total Income</p>
             </div>
-            <CardDescription className="text-xs mt-1 mb-1">Revenue from all jobs</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</div>
+            <p className="text-xs text-muted-foreground mb-1">Revenue from all jobs</p>
+            <p className="text-lg font-bold text-sky-600">{formatCurrency(technician.totalRevenue)}</p>
           </CardContent>
         </Card>
 
-        <Card className="h-[120px]">
-          <CardHeader className="pb-1 pt-3">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-red-100 rounded-full">
-                <ArrowDown className="h-4 w-4 text-red-700" />
+        <Card className="h-[100px]">
+          <CardContent className="pt-4 pb-2">
+            <div className="flex items-center space-x-2 mb-1">
+              <div className="p-1 bg-red-100 rounded-full">
+                <ArrowDown className="h-3.5 w-3.5 text-red-700" />
               </div>
-              <CardTitle className="text-base font-semibold text-gray-900">Expenses</CardTitle>
+              <p className="text-sm font-semibold text-gray-900">Expenses</p>
             </div>
-            <CardDescription className="text-xs mt-1 mb-1">Operational costs</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-red-600">-{formatCurrency(expenses)}</div>
+            <p className="text-xs text-muted-foreground mb-1">Operational costs</p>
+            <p className="text-lg font-bold text-red-600">-{formatCurrency(expenses)}</p>
           </CardContent>
         </Card>
 
-        <Card className="h-[120px]">
-          <CardHeader className="pb-1 pt-3">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-red-100 rounded-full">
-                <ArrowDown className="h-4 w-4 text-red-700" />
+        <Card className="h-[100px]">
+          <CardContent className="pt-4 pb-2">
+            <div className="flex items-center space-x-2 mb-1">
+              <div className="p-1 bg-red-100 rounded-full">
+                <ArrowDown className="h-3.5 w-3.5 text-red-700" />
               </div>
-              <CardTitle className="text-base font-semibold text-gray-900">Technician Earnings</CardTitle>
+              <p className="text-sm font-semibold text-gray-900">Technician Earnings</p>
             </div>
-            <CardDescription className="text-xs mt-1 mb-1">Paid to technician</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-red-600">-{formatCurrency(technicianEarnings)}</div>
+            <p className="text-xs text-muted-foreground mb-1">Paid to technician</p>
+            <p className="text-lg font-bold text-red-600">-{formatCurrency(technicianEarnings)}</p>
           </CardContent>
         </Card>
 
-        <Card className="h-[120px]">
-          <CardHeader className="pb-1 pt-3">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-green-100 rounded-full">
-                <PiggyBank className="h-4 w-4 text-green-700" />
+        <Card className="h-[100px]">
+          <CardContent className="pt-4 pb-2">
+            <div className="flex items-center space-x-2 mb-1">
+              <div className="p-1 bg-green-100 rounded-full">
+                <PiggyBank className="h-3.5 w-3.5 text-green-700" />
               </div>
-              <CardTitle className="text-base font-semibold text-gray-900">Company Profit</CardTitle>
+              <p className="text-sm font-semibold text-gray-900">Company Profit</p>
             </div>
-            <CardDescription className="text-xs mt-1 mb-1">Net earnings from services</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(companyProfit)}</div>
+            <p className="text-xs text-muted-foreground mb-1">Net earnings from services</p>
+            <p className="text-lg font-bold text-emerald-600">{formatCurrency(companyProfit)}</p>
             <p className="text-xs text-muted-foreground">{profitMargin}% margin</p>
           </CardContent>
         </Card>

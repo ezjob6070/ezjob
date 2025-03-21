@@ -46,40 +46,40 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
         <DashboardMetricCard
           title="Total Income"
           value={formatCurrency(totalRevenue)}
-          icon={<Banknote size={20} className="text-blue-500" />}
+          icon={<Banknote size={18} className="text-blue-500" />}
           description={`Period: ${getDateRangeDisplay()}`}
           trend={{ value: "8.3%", isPositive: true }}
-          className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all h-[140px]"
+          className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 hover:shadow-md transition-all h-[120px]"
           variant="finance"
-          valueClassName="text-blue-600 text-3xl"
+          valueClassName="text-blue-600 text-xl md:text-2xl"
         >
-          <p className="text-sm text-muted-foreground mb-2">Gross revenue from all services</p>
+          <p className="text-xs text-muted-foreground mb-1">Gross revenue from all services</p>
         </DashboardMetricCard>
         
         <DashboardMetricCard
           title="Total Expenses"
           value={formatCurrency(totalExpenses)}
-          icon={<Wallet size={20} className="text-red-500" />}
+          icon={<Wallet size={18} className="text-red-500" />}
           description={`Period: ${getDateRangeDisplay()}`}
           trend={{ value: "4.2%", isPositive: false }}
-          className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all h-[140px]"
+          className="bg-gradient-to-br from-red-50 to-rose-50 border-red-100 hover:shadow-md transition-all h-[120px]"
           variant="finance"
-          valueClassName="text-red-600 text-3xl"
+          valueClassName="text-red-600 text-xl md:text-2xl"
         >
-          <p className="text-sm text-muted-foreground mb-2">All costs and operational expenses</p>
+          <p className="text-xs text-muted-foreground mb-1">All costs and operational expenses</p>
         </DashboardMetricCard>
         
         <DashboardMetricCard
           title="Net Profit"
           value={formatCurrency(totalProfit)}
-          icon={<PiggyBank size={20} className="text-emerald-500" />}
+          icon={<PiggyBank size={18} className="text-emerald-500" />}
           description={`${profitMargin.toFixed(1)}% profit margin`}
           trend={{ value: `${Math.abs(profitMargin - 25).toFixed(1)}%`, isPositive: isProfitPositive }}
-          className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all h-[140px]"
+          className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all h-[120px]"
           variant="finance"
-          valueClassName="text-emerald-600 text-3xl"
+          valueClassName="text-emerald-600 text-xl md:text-2xl"
         >
-          <p className="text-sm text-muted-foreground mb-2">Company earnings after all costs</p>
+          <p className="text-xs text-muted-foreground mb-1">Company earnings after all costs</p>
         </DashboardMetricCard>
       </div>
     </div>

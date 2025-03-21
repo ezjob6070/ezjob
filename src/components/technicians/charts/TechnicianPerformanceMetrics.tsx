@@ -38,66 +38,66 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
       <DashboardMetricCard
         title="Completed Jobs"
         value={technician.completedJobs || 0}
-        icon={<Trophy size={20} className="text-indigo-500" />}
+        icon={<Trophy size={16} className="text-indigo-500" />}
         description="Total completed jobs"
         trend={completedJobsTrend}
-        className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100 hover:shadow-md transition-all h-full"
+        className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100 hover:shadow-md transition-all h-[110px]"
         variant="finance"
-        valueClassName="text-indigo-600 text-2xl font-bold mt-1"
+        valueClassName="text-indigo-600 text-lg font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground">Successfully finished services</p>
+        <p className="text-xs text-muted-foreground">Successfully finished services</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
         title="Rating"
         value={`${(technician.rating || 0).toFixed(1)}★`}
-        icon={<Star size={20} className="text-amber-500" />}
+        icon={<Star size={16} className="text-amber-500" />}
         description="Average client rating"
         trend={ratingTrend}
-        className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all h-full"
+        className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all h-[110px]"
         variant="finance"
-        valueClassName="text-amber-600 text-2xl font-bold mt-1"
+        valueClassName="text-amber-600 text-lg font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground">Customer satisfaction score</p>
+        <p className="text-xs text-muted-foreground">Customer satisfaction score</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
         title="Average Job Value"
         value={formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}
-        icon={<BarChart3 size={20} className="text-violet-500" />}
+        icon={<BarChart3 size={16} className="text-violet-500" />}
         description="Per completed job"
         trend={avgJobValueTrend}
-        className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all h-full"
+        className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all h-[110px]"
         variant="finance"
-        valueClassName="text-violet-600 text-2xl font-bold mt-1"
+        valueClassName="text-violet-600 text-lg font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground">Average revenue per service</p>
+        <p className="text-xs text-muted-foreground">Average revenue per service</p>
       </DashboardMetricCard>
       
       <DashboardMetricCard
         title="Total Income"
         value={formatCurrency(metrics.revenue || 0)}
-        icon={<CircleDollarSign size={20} className="text-sky-500" />}
+        icon={<CircleDollarSign size={16} className="text-sky-500" />}
         description="All completed jobs"
         trend={revenueTrend}
-        className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-100 hover:shadow-md transition-all h-full"
+        className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-100 hover:shadow-md transition-all h-[110px]"
         variant="finance"
-        valueClassName="text-blue-600 text-2xl font-bold mt-1"
+        valueClassName="text-blue-600 text-lg font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground">Gross revenue generated</p>
+        <p className="text-xs text-muted-foreground">Gross revenue generated</p>
       </DashboardMetricCard>
 
       <DashboardMetricCard
         title="Company Profit"
         value={formatCurrency(metrics.profit || 0)}
-        icon={<TrendingUp size={20} className="text-emerald-500" />}
+        icon={<TrendingUp size={16} className="text-emerald-500" />}
         description="Net company earnings"
         trend={profitTrend}
-        className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all h-full"
+        className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all h-[110px]"
         variant="finance"
-        valueClassName="text-emerald-600 text-2xl font-bold mt-1"
+        valueClassName="text-emerald-600 text-lg font-bold mt-1"
       >
-        <p className="text-sm text-muted-foreground">Profit after all expenses</p>
+        <p className="text-xs text-muted-foreground">Profit after all expenses</p>
       </DashboardMetricCard>
     </div>
   );

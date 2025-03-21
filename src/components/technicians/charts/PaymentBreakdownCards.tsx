@@ -56,11 +56,11 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="h-[110px]">
+          <CardContent className="pt-4">
             <div>
               <p className="text-sm font-medium text-black">Total Revenue</p>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-lg font-bold text-blue-600">
                 {formatCurrency(revenue)}
               </p>
               {dateRangeText && (
@@ -70,11 +70,11 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
           </CardContent>
         </Card>
         
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="h-[110px]">
+          <CardContent className="pt-4">
             <div>
               <p className="text-sm font-medium text-black">Technician Earnings</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-lg font-bold text-red-600">
                 {formatCurrency(technicianEarnings)}
               </p>
               {dateRangeText && (
@@ -84,11 +84,11 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
           </CardContent>
         </Card>
         
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="h-[110px]">
+          <CardContent className="pt-4">
             <div>
               <p className="text-sm font-medium text-black">Expenses</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-lg font-bold text-red-600">
                 {formatCurrency(expenses)}
               </p>
               {dateRangeText && (
@@ -98,11 +98,11 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
           </CardContent>
         </Card>
         
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="h-[110px]">
+          <CardContent className="pt-4">
             <div>
               <p className="text-sm font-medium text-black">Company Profit</p>
-              <p className="text-2xl font-bold text-emerald-600">
+              <p className="text-lg font-bold text-emerald-600">
                 {formatCurrency(profit)}
               </p>
               {dateRangeText && (
