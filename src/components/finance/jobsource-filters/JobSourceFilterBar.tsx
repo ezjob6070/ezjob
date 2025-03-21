@@ -113,7 +113,7 @@ const JobSourceFilterBar: React.FC<JobSourceFilterBarProps> = ({
       <div className="ml-auto">
         <TechnicianSortFilter 
           sortBy={sortBy} 
-          setSortBy={setSortBy} 
+          setSortBy={setSortBy}
         />
       </div>
 

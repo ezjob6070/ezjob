@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { JobSource, FinancialTransaction } from "@/types/finance";
+import { JobSource, FinancialTransaction, TimeFrame } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import JobSourceTable from "./job-sources/JobSourceTable";
 import { SortOption } from "@/hooks/useTechniciansData";
@@ -48,7 +48,7 @@ const JobSourceFinanceSection: React.FC<JobSourceFinanceSectionProps> = ({
     companyProfit,
     technicianPayments: 0,
     transactions: filteredTransactions,
-    timeFrame: "custom",
+    timeFrame: "custom" as TimeFrame,
     startDate: dateRange.from || new Date(),
     endDate: dateRange.to || new Date()
   };
@@ -100,7 +100,6 @@ const JobSourceFinanceSection: React.FC<JobSourceFinanceSectionProps> = ({
         />
       )}
       
-      {/* Add the invoice section, similar to the technician section */}
       <JobSourceInvoiceSection jobSources={jobSources} />
     </div>
   );

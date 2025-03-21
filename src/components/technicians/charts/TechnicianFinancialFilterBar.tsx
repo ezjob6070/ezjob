@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { SortOption } from "@/hooks/useTechniciansData";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Filter, UserPlus } from "lucide-react";
@@ -202,10 +202,10 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
           <DropdownMenuItem onClick={() => onSortChange("revenue-low")} className={sortOption === "revenue-low" ? "bg-secondary" : ""}>
             Revenue: Low to High
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onSortChange("name-asc")} className={sortOption === "name-asc" ? "bg-secondary" : ""}>
+          <DropdownMenuItem onClick={() => onSortChange("name-asc" as SortOption)} className={sortOption === "name-asc" ? "bg-secondary" : ""}>
             Name: A to Z
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onSortChange("name-desc")} className={sortOption === "name-desc" ? "bg-secondary" : ""}>
+          <DropdownMenuItem onClick={() => onSortChange("name-desc" as SortOption)} className={sortOption === "name-desc" ? "bg-secondary" : ""}>
             Name: Z to A
           </DropdownMenuItem>
         </DropdownMenuContent>

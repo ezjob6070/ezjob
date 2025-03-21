@@ -1,4 +1,3 @@
-
 export type SortOption = 
   | "revenue-high" 
   | "revenue-low" 
@@ -7,4 +6,9 @@ export type SortOption =
   | "jobs-high" 
   | "jobs-low" 
   | "profit-high" 
-  | "profit-low";
+  | "profit-low"
+  | "newest"
+  | "oldest"
+  | "name-asc"
+  | "name-desc"
+  | "default";

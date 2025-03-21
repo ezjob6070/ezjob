@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Technician } from "@/types/technician";
-import useTechniciansData from "@/hooks/useTechniciansData";
+import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";

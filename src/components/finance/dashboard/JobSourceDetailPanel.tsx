@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { JobSource } from "@/types/finance";
+import { JobSource, TimeFrame } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import FinancialMetricsCards from "../FinancialMetricsCards";
 import InvoiceButton from "../InvoiceButton";
@@ -22,7 +22,7 @@ const JobSourceDetailPanel: React.FC<JobSourceDetailPanelProps> = ({
     companyProfit: selectedJobSource.companyProfit || 0,
     technicianPayments: 0, // Job sources don't have technician payments directly
     transactions: [], // Job sources don't have direct transactions in this structure
-    timeFrame: "custom",
+    timeFrame: "custom" as TimeFrame,
     startDate: new Date(),
     endDate: new Date()
   };
