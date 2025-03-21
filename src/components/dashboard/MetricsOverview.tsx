@@ -86,7 +86,7 @@ const MetricsOverview = ({
         icon={<DollarSignIcon size={20} className="text-white" />}
         description="Net profit earned"
         trend={{ value: "7%", isPositive: true }}
-        className="bg-gradient-to-br from-red-500 to-red-600 cursor-pointer hover:shadow-lg transition-all duration-300"
+        className="bg-gradient-to-br from-green-500 to-green-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
