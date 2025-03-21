@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { JobSource } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import FinancialMetricsCards from "../FinancialMetricsCards";
+import InvoiceButton from "../InvoiceButton";
 
 interface JobSourceDetailPanelProps {
   selectedJobSource: JobSource;
@@ -20,7 +21,10 @@ const JobSourceDetailPanel: React.FC<JobSourceDetailPanelProps> = ({
     totalExpenses: selectedJobSource.expenses || 0,
     companyProfit: selectedJobSource.companyProfit || 0,
     technicianPayments: 0, // Job sources don't have technician payments directly
-    transactions: [] // Job sources don't have direct transactions in this structure
+    transactions: [], // Job sources don't have direct transactions in this structure
+    timeFrame: "custom",
+    startDate: new Date(),
+    endDate: new Date()
   };
 
   return (
@@ -39,6 +43,13 @@ const JobSourceDetailPanel: React.FC<JobSourceDetailPanelProps> = ({
       
       <CardContent className="space-y-4">
         <FinancialMetricsCards report={jobSourceReport} />
+        
+        <div className="flex justify-end">
+          <InvoiceButton 
+            entityName={selectedJobSource.name}
+            entityType="jobSource" 
+          />
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           <Card className="bg-gray-50">

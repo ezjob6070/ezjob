@@ -8,6 +8,7 @@ import { SortOption } from "@/hooks/useTechniciansData";
 import { DateRange } from "react-day-picker";
 import JobSourceDetailPanel from "./dashboard/JobSourceDetailPanel";
 import FinancialMetricsCards from "./FinancialMetricsCards";
+import JobSourceInvoiceSection from "./JobSourceInvoiceSection";
 
 interface JobSourceFinanceSectionProps {
   jobSources: JobSource[];
@@ -46,7 +47,10 @@ const JobSourceFinanceSection: React.FC<JobSourceFinanceSectionProps> = ({
     totalExpenses,
     companyProfit,
     technicianPayments: 0,
-    transactions: filteredTransactions
+    transactions: filteredTransactions,
+    timeFrame: "custom",
+    startDate: dateRange.from || new Date(),
+    endDate: dateRange.to || new Date()
   };
 
   const dateRangeText = dateRange.from && dateRange.to 
@@ -95,6 +99,9 @@ const JobSourceFinanceSection: React.FC<JobSourceFinanceSectionProps> = ({
           dateRangeText={dateRangeText}
         />
       )}
+      
+      {/* Add the invoice section, similar to the technician section */}
+      <JobSourceInvoiceSection jobSources={jobSources} />
     </div>
   );
 };
