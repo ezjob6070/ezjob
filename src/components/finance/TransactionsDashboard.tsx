@@ -1,17 +1,34 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { FinancialTransaction } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import TransactionsSection from "@/components/finance/TransactionsSection";
+import { DateRange } from "react-day-picker";
+import DateRangeFilter from "@/components/finance/technician-filters/DateRangeFilter";
 
 interface TransactionsDashboardProps {
   filteredTransactions: FinancialTransaction[];
 }
 
 const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
-  filteredTransactions
+  filteredTransactions: initialTransactions
 }) => {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  
+  // Filter transactions by date range if selected
+  const filteredTransactions = React.useMemo(() => {
+    if (!dateRange?.from) return initialTransactions;
+    
+    return initialTransactions.filter(transaction => {
+      const transactionDate = new Date(transaction.date);
+      if (dateRange.to) {
+        return transactionDate >= dateRange.from && transactionDate <= dateRange.to;
+      }
+      return transactionDate.toDateString() === dateRange.from.toDateString();
+    });
+  }, [initialTransactions, dateRange]);
+  
   // Calculate totals for the dashboard cards
   const totalTransactions = filteredTransactions.length;
   
@@ -26,34 +43,45 @@ const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
   return (
     <div className="space-y-8">
       <Card>
-        <CardHeader>
-          <CardDescription>Track payment flow and analyze patterns</CardDescription>
+        <CardHeader className="pb-2">
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div>
+              <CardDescription>Track payment flow and analyze patterns</CardDescription>
+            </div>
+            <DateRangeFilter date={dateRange} setDate={setDateRange} />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <Card className="bg-blue-50">
+            <Card className="bg-blue-50 h-[110px]">
               <CardContent className="p-4">
-                <h3 className="text-lg font-medium">Total Transactions</h3>
-                <p className="text-3xl font-bold mt-2">{totalTransactions}</p>
-                <p className="text-sm text-muted-foreground mt-1">in selected period</p>
+                <h3 className="text-sm font-medium">Total Transactions</h3>
+                <p className="text-2xl font-bold mt-1">{totalTransactions}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dateRange?.from ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to ? dateRange.to.toLocaleDateString() : dateRange.from.toLocaleDateString()}` : 'all time'}
+                </p>
               </CardContent>
             </Card>
-            <Card className="bg-green-50">
+            <Card className="bg-green-50 h-[110px]">
               <CardContent className="p-4">
-                <h3 className="text-lg font-medium">Total Revenue</h3>
-                <p className="text-3xl font-bold mt-2">
+                <h3 className="text-sm font-medium">Total Revenue</h3>
+                <p className="text-2xl font-bold mt-1">
                   {formatCurrency(totalRevenue)}
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">from completed payments</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dateRange?.from ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to ? dateRange.to.toLocaleDateString() : dateRange.from.toLocaleDateString()}` : 'all time'}
+                </p>
               </CardContent>
             </Card>
-            <Card className="bg-red-50">
+            <Card className="bg-red-50 h-[110px]">
               <CardContent className="p-4">
-                <h3 className="text-lg font-medium">Total Expenses</h3>
-                <p className="text-3xl font-bold mt-2">
+                <h3 className="text-sm font-medium">Total Expenses</h3>
+                <p className="text-2xl font-bold mt-1">
                   {formatCurrency(totalExpenses)}
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">from expense transactions</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dateRange?.from ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to ? dateRange.to.toLocaleDateString() : dateRange.from.toLocaleDateString()}` : 'all time'}
+                </p>
               </CardContent>
             </Card>
           </div>
