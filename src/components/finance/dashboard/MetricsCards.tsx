@@ -36,7 +36,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         trend={revenueTrend}
         className="bg-gradient-to-br from-blue-50 via-blue-100/30 to-indigo-50 border-blue-200 hover:shadow-md transition-all h-[110px] w-full"
         variant="finance"
-        valueClassName="text-blue-600 text-lg md:text-xl font-bold mt-1"
+        valueClassName="text-blue-600 text-base md:text-lg font-bold mt-0.5"
       >
         <p className="text-xs text-muted-foreground">All revenue from completed jobs</p>
       </DashboardMetricCard>
@@ -49,7 +49,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         trend={earningsTrend}
         className="bg-gradient-to-br from-red-50 via-red-100/30 to-rose-50 border-red-200 hover:shadow-md transition-all h-[110px] w-full"
         variant="finance"
-        valueClassName="text-red-600 text-lg md:text-xl font-bold mt-1"
+        valueClassName="text-red-600 text-base md:text-lg font-bold mt-0.5"
       >
         <p className="text-xs text-muted-foreground">Total amounts paid to technicians</p>
       </DashboardMetricCard>
@@ -62,7 +62,7 @@ const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         trend={profitTrend}
         className="bg-gradient-to-br from-emerald-50 via-emerald-100/30 to-teal-50 border-emerald-200 hover:shadow-md transition-all h-[110px] w-full"
         variant="finance"
-        valueClassName="text-emerald-600 text-lg md:text-xl font-bold mt-1"
+        valueClassName="text-emerald-600 text-base md:text-lg font-bold mt-0.5"
       >
         <p className="text-xs text-muted-foreground">Net profit after all expenses</p>
       </DashboardMetricCard>
