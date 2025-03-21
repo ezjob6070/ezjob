@@ -55,62 +55,58 @@ const PaymentBreakdownCards: React.FC<PaymentBreakdownCardsProps> = ({
           Financial breakdown: {dateRangeText}
         </div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="h-[110px]">
-          <CardContent className="p-3">
+          <CardContent className="pt-4">
             <div>
-              <p className="text-sm font-semibold text-black">Total Revenue</p>
-              <p className="text-xs text-muted-foreground mb-0.5">All income</p>
-              <p className="text-base md:text-lg font-bold text-blue-600">
+              <p className="text-sm font-medium text-black">Total Revenue</p>
+              <p className="text-lg font-bold text-blue-600">
                 {formatCurrency(revenue)}
               </p>
               {dateRangeText && (
-                <p className="text-xs text-muted-foreground mt-0.5">Period: {dateRangeText}</p>
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
               )}
             </div>
           </CardContent>
         </Card>
         
         <Card className="h-[110px]">
-          <CardContent className="p-3">
+          <CardContent className="pt-4">
             <div>
-              <p className="text-sm font-semibold text-black">Technician Earnings</p>
-              <p className="text-xs text-muted-foreground mb-0.5">Payments to technicians</p>
-              <p className="text-base md:text-lg font-bold text-red-600">
+              <p className="text-sm font-medium text-black">Technician Earnings</p>
+              <p className="text-lg font-bold text-red-600">
                 {formatCurrency(technicianEarnings)}
               </p>
               {dateRangeText && (
-                <p className="text-xs text-muted-foreground mt-0.5">Period: {dateRangeText}</p>
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
               )}
             </div>
           </CardContent>
         </Card>
         
         <Card className="h-[110px]">
-          <CardContent className="p-3">
+          <CardContent className="pt-4">
             <div>
-              <p className="text-sm font-semibold text-black">Expenses</p>
-              <p className="text-xs text-muted-foreground mb-0.5">Operational costs</p>
-              <p className="text-base md:text-lg font-bold text-red-600">
+              <p className="text-sm font-medium text-black">Expenses</p>
+              <p className="text-lg font-bold text-red-600">
                 {formatCurrency(expenses)}
               </p>
               {dateRangeText && (
-                <p className="text-xs text-muted-foreground mt-0.5">Period: {dateRangeText}</p>
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
               )}
             </div>
           </CardContent>
         </Card>
         
         <Card className="h-[110px]">
-          <CardContent className="p-3">
+          <CardContent className="pt-4">
             <div>
-              <p className="text-sm font-semibold text-black">Company Profit</p>
-              <p className="text-xs text-muted-foreground mb-0.5">Net earnings</p>
-              <p className="text-base md:text-lg font-bold text-emerald-600">
+              <p className="text-sm font-medium text-black">Company Profit</p>
+              <p className="text-lg font-bold text-emerald-600">
                 {formatCurrency(profit)}
               </p>
               {dateRangeText && (
-                <p className="text-xs text-muted-foreground mt-0.5">Period: {dateRangeText}</p>
+                <p className="text-xs text-muted-foreground mt-1">{dateRangeText}</p>
               )}
             </div>
           </CardContent>
