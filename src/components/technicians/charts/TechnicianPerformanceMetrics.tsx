@@ -3,7 +3,7 @@ import React from "react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Technician } from "@/types/technician";
 import { Trophy, Star, BarChart3, CircleDollarSign, TrendingUp } from "lucide-react";
-import DashboardMetricCard from "@/components/DashboardMetricCard";
+import { Card, CardContent } from "@/components/ui/card";
 
 export interface TechnicianPerformanceMetricsProps {
   technician: Technician;
@@ -35,70 +35,85 @@ const TechnicianPerformanceMetrics: React.FC<TechnicianPerformanceMetricsProps> 
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-full overflow-x-hidden">
-      <DashboardMetricCard
-        title="Completed Jobs"
-        value={technician.completedJobs || 0}
-        icon={<Trophy size={20} className="text-indigo-500" />}
-        description="Total completed jobs"
-        trend={completedJobsTrend}
-        className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100 hover:shadow-md transition-all h-full"
-        variant="finance"
-        valueClassName="text-indigo-600 text-2xl font-bold mt-1"
-      >
-        <p className="text-sm text-muted-foreground">Successfully finished services</p>
-      </DashboardMetricCard>
+      <Card className="h-[110px] bg-gradient-to-br from-indigo-50 via-indigo-100/30 to-purple-50 border-indigo-200 hover:shadow-md transition-all">
+        <CardContent className="p-4">
+          <h3 className="text-sm font-medium text-gray-900">Completed Jobs</h3>
+          <p className="text-2xl font-bold text-indigo-600 mt-1">{technician.completedJobs || 0}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground mt-1">
+              Successfully finished services
+            </p>
+            <div className="flex items-center bg-indigo-100 text-indigo-600 text-xs font-medium p-1 rounded">
+              <Trophy size={12} className="mr-1" />
+              <span>+{completedJobsTrend.value}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
-      <DashboardMetricCard
-        title="Rating"
-        value={`${(technician.rating || 0).toFixed(1)}★`}
-        icon={<Star size={20} className="text-amber-500" />}
-        description="Average client rating"
-        trend={ratingTrend}
-        className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 hover:shadow-md transition-all h-full"
-        variant="finance"
-        valueClassName="text-amber-600 text-2xl font-bold mt-1"
-      >
-        <p className="text-sm text-muted-foreground">Customer satisfaction score</p>
-      </DashboardMetricCard>
+      <Card className="h-[110px] bg-gradient-to-br from-amber-50 via-amber-100/30 to-yellow-50 border-amber-200 hover:shadow-md transition-all">
+        <CardContent className="p-4">
+          <h3 className="text-sm font-medium text-gray-900">Rating</h3>
+          <p className="text-2xl font-bold text-amber-600 mt-1">{(technician.rating || 0).toFixed(1)}★</p>
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground mt-1">
+              Customer satisfaction score
+            </p>
+            <div className="flex items-center bg-amber-100 text-amber-600 text-xs font-medium p-1 rounded">
+              <Star size={12} className="mr-1" />
+              <span>+{ratingTrend.value}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
-      <DashboardMetricCard
-        title="Average Job Value"
-        value={formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}
-        icon={<BarChart3 size={20} className="text-violet-500" />}
-        description="Per completed job"
-        trend={avgJobValueTrend}
-        className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 hover:shadow-md transition-all h-full"
-        variant="finance"
-        valueClassName="text-violet-600 text-2xl font-bold mt-1"
-      >
-        <p className="text-sm text-muted-foreground">Average revenue per service</p>
-      </DashboardMetricCard>
+      <Card className="h-[110px] bg-gradient-to-br from-violet-50 via-violet-100/30 to-purple-50 border-violet-200 hover:shadow-md transition-all">
+        <CardContent className="p-4">
+          <h3 className="text-sm font-medium text-gray-900">Average Job Value</h3>
+          <p className="text-2xl font-bold text-violet-600 mt-1">{formatCurrency(metrics.revenue ? metrics.revenue / (technician.completedJobs || 1) : 0)}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground mt-1">
+              Average revenue per service
+            </p>
+            <div className="flex items-center bg-violet-100 text-violet-600 text-xs font-medium p-1 rounded">
+              <BarChart3 size={12} className="mr-1" />
+              <span>+{avgJobValueTrend.value}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
-      <DashboardMetricCard
-        title="Total Income"
-        value={formatCurrency(metrics.revenue || 0)}
-        icon={<CircleDollarSign size={20} className="text-sky-500" />}
-        description="All completed jobs"
-        trend={revenueTrend}
-        className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-100 hover:shadow-md transition-all h-full"
-        variant="finance"
-        valueClassName="text-blue-600 text-2xl font-bold mt-1"
-      >
-        <p className="text-sm text-muted-foreground">Gross revenue generated</p>
-      </DashboardMetricCard>
+      <Card className="h-[110px] bg-gradient-to-br from-blue-50 via-blue-100/30 to-sky-50 border-blue-200 hover:shadow-md transition-all">
+        <CardContent className="p-4">
+          <h3 className="text-sm font-medium text-gray-900">Total Income</h3>
+          <p className="text-2xl font-bold text-blue-600 mt-1">{formatCurrency(metrics.revenue || 0)}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground mt-1">
+              Gross revenue generated
+            </p>
+            <div className="flex items-center bg-blue-100 text-blue-600 text-xs font-medium p-1 rounded">
+              <CircleDollarSign size={12} className="mr-1" />
+              <span>+{revenueTrend.value}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <DashboardMetricCard
-        title="Company Profit"
-        value={formatCurrency(metrics.profit || 0)}
-        icon={<TrendingUp size={20} className="text-emerald-500" />}
-        description="Net company earnings"
-        trend={profitTrend}
-        className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-all h-full"
-        variant="finance"
-        valueClassName="text-emerald-600 text-2xl font-bold mt-1"
-      >
-        <p className="text-sm text-muted-foreground">Profit after all expenses</p>
-      </DashboardMetricCard>
+      <Card className="h-[110px] bg-gradient-to-br from-emerald-50 via-emerald-100/30 to-teal-50 border-emerald-200 hover:shadow-md transition-all">
+        <CardContent className="p-4">
+          <h3 className="text-sm font-medium text-gray-900">Company Profit</h3>
+          <p className="text-2xl font-bold text-emerald-600 mt-1">{formatCurrency(metrics.profit || 0)}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground mt-1">
+              Profit after expenses
+            </p>
+            <div className="flex items-center bg-emerald-100 text-emerald-600 text-xs font-medium p-1 rounded">
+              <TrendingUp size={12} className="mr-1" />
+              <span>+{profitTrend.value}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
