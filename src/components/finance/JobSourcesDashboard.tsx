@@ -1,18 +1,18 @@
 
-import React, { useState } from "react";
-import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
-import { JobSource, FinancialTransaction } from "@/types/finance";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { JobSource } from "@/types/finance";
 import { DateRange } from "react-day-picker";
-import JobSourceInvoiceSection from "@/components/finance/JobSourceInvoiceSection";
-import JobSourceCircleCharts from "@/components/finance/JobSourceCircleCharts";
-import JobSourceFilters from "@/components/finance/job-sources/JobSourceFilters";
-import JobSourceSearchFilter from "@/components/finance/job-sources/JobSourceSearchFilter";
-import JobSourcesTable from "@/components/finance/job-sources/JobSourcesTable";
-import { searchJobSource } from "@/components/finance/job-sources/JobSourceUtils";
+import DashboardMetrics from "./dashboard/MetricsCards";
+import JobSourceTable from "./job-sources/JobSourceTable";
+import JobSourceDetailPanel from "./dashboard/JobSourceDetailPanel";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { SortOption } from "@/hooks/useTechniciansData";
 
 interface JobSourcesDashboardProps {
   filteredJobSources: JobSource[];
-  filteredTransactions: FinancialTransaction[];
+  filteredTransactions: any[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
@@ -23,100 +23,138 @@ const JobSourcesDashboard: React.FC<JobSourcesDashboardProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
-  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
-  const [appliedFilters, setAppliedFilters] = useState(false);
-  const [categories] = useState<string[]>([
-    "Online", "Social Media", "Referral", "Directory", "Advertisement", "Others"
-  ]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  const jobSourceNames = filteredJobSources.map(source => source.name);
-
-  const clearFilters = () => {
-    setSelectedJobSources([]);
-    setSelectedCategories([]);
-    setDate(undefined);
-    setAppliedFilters(false);
-  };
-
-  // Apply all the filters to get the final list of job sources
-  const filteredSources = filteredJobSources.filter(source => {
-    const matchesSelectedSources = 
-      !appliedFilters || 
-      selectedJobSources.length === 0 || 
-      selectedJobSources.includes(source.name);
-
-    const matchesCategory = 
-      selectedCategories.length === 0 || 
-      (source.category && selectedCategories.includes(source.category)) ||
-      (!source.category && selectedCategories.includes("Others"));
-    
-    let matchesDateRange = true;
-    if (appliedFilters && date?.from && source.createdAt) {
-      const sourceDate = new Date(source.createdAt);
-      matchesDateRange = sourceDate >= date.from;
-      
-      if (date.to && matchesDateRange) {
-        matchesDateRange = sourceDate <= date.to;
-      }
-    }
-    
-    return matchesSelectedSources && matchesCategory && matchesDateRange;
+  const today = new Date();
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: today,
+    to: today,
   });
+  const [appliedFilters, setAppliedFilters] = useState(false);
+  const [selectedJobSourceId, setSelectedJobSourceId] = useState<string>("");
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
+  const [displayedJobSources, setDisplayedJobSources] = useState<JobSource[]>(filteredJobSources);
+  const [selectedJobSource, setSelectedJobSource] = useState<JobSource | null>(null);
 
-  // Apply the search filter
-  const searchFilteredSources = filteredSources.filter(source => 
-    searchJobSource(source, searchQuery)
+  // Calculate totals for all filtered job sources
+  const totalRevenue = filteredJobSources.reduce(
+    (sum, source) => sum + (source.totalRevenue || 0), 
+    0
+  );
+  const totalExpenses = filteredJobSources.reduce(
+    (sum, source) => sum + (source.expenses || 0), 
+    0
+  );
+  const companyProfit = filteredJobSources.reduce(
+    (sum, source) => sum + (source.companyProfit || 0), 
+    0
   );
 
+  const dateRangeText = dateRange.from && dateRange.to 
+    ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
+    : "All time";
+
+  useEffect(() => {
+    setDisplayedJobSources(filteredJobSources);
+  }, [filteredJobSources]);
+
+  const handleJobSourceSelect = (jobSource: JobSource) => {
+    if (selectedJobSource?.id === jobSource.id) {
+      setSelectedJobSource(null);
+      setSelectedJobSourceId("");
+    } else {
+      setSelectedJobSource(jobSource);
+      setSelectedJobSourceId(jobSource.id);
+    }
+  };
+
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+    
+    // Sort job sources based on the selected option
+    const sortedSources = [...displayedJobSources].sort((a, b) => {
+      switch (option) {
+        case "revenue-high":
+          return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+        case "revenue-low":
+          return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+        case "profit-high":
+          return (b.companyProfit || 0) - (a.companyProfit || 0);
+        case "profit-low":
+          return (a.companyProfit || 0) - (b.companyProfit || 0);
+        case "jobs-high":
+          return (b.totalJobs || 0) - (a.totalJobs || 0);
+        case "jobs-low":
+          return (a.totalJobs || 0) - (b.totalJobs || 0);
+        default:
+          return 0;
+      }
+    });
+    
+    setDisplayedJobSources(sortedSources);
+  };
+
+  // Search function
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    if (!query.trim()) {
+      setDisplayedJobSources(filteredJobSources);
+    } else {
+      const lowercaseQuery = query.toLowerCase();
+      const filtered = filteredJobSources.filter(source => 
+        source.name.toLowerCase().includes(lowercaseQuery) ||
+        (source.category && source.category.toLowerCase().includes(lowercaseQuery))
+      );
+      setDisplayedJobSources(filtered);
+    }
+  };
+
   return (
-    <div className="space-y-8">
-      <JobSourceFilters
-        date={date}
-        setDate={setDate}
-        selectedJobSources={selectedJobSources}
-        setSelectedJobSources={setSelectedJobSources}
-        jobSourceNames={jobSourceNames}
-        appliedFilters={appliedFilters}
-        setAppliedFilters={setAppliedFilters}
-        clearFilters={clearFilters}
-      />
-      
-      <JobSourceCircleCharts 
-        filteredJobSources={filteredSources} 
-        date={date}
-      />
-      
-      <JobSourceInvoiceSection 
-        jobSources={filteredSources} 
-      />
-      
+    <div className="space-y-6">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardDescription>Financial metrics for job sources</CardDescription>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {selectedCategories.length > 0 && (
-              <div className="text-sm px-3 py-1 rounded-full bg-slate-100 text-slate-700">
-                {selectedCategories.length === 1 
-                  ? `Category: ${selectedCategories[0]}` 
-                  : `${selectedCategories.length} categories`}
-              </div>
-            )}
-          </div>
+        <CardHeader>
+          <CardTitle>Job Source Financial Performance</CardTitle>
+          <CardDescription>Search, filter, and analyze job source revenue and profitability</CardDescription>
         </CardHeader>
         <CardContent>
-          <JobSourceSearchFilter
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+          <DashboardMetrics 
+            totalRevenue={totalRevenue}
+            totalEarnings={totalExpenses}
+            companyProfit={companyProfit}
+            dateRangeText={dateRangeText}
           />
-
-          <JobSourcesTable sources={searchFilteredSources} />
+          
+          <div className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search job sources..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+            </div>
+          </div>
+          
+          <JobSourceTable 
+            jobSources={displayedJobSources}
+            selectedJobSourceId={selectedJobSourceId}
+            onJobSourceSelect={handleJobSourceSelect}
+            sortOption={sortOption}
+            onSortChange={handleSortChange}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+          />
         </CardContent>
       </Card>
+
+      {selectedJobSource && (
+        <JobSourceDetailPanel 
+          selectedJobSource={selectedJobSource}
+          dateRangeText={dateRangeText}
+        />
+      )}
     </div>
   );
 };
