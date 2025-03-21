@@ -19,6 +19,8 @@ interface TechnicianFinancialFilterBarProps {
   setLocalDateRange: (date: DateRange | undefined) => void;
   sortBy: SortOption;
   setSortBy: (value: SortOption) => void;
+  jobStatusFilter?: string;
+  setJobStatusFilter?: (status: string) => void;
 }
 
 const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> = ({
@@ -32,7 +34,9 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
   localDateRange,
   setLocalDateRange,
   sortBy,
-  setSortBy
+  setSortBy,
+  jobStatusFilter = "all",
+  setJobStatusFilter = () => {}
 }) => {
   const [showDateFilter, setShowDateFilter] = useState(false);
 
@@ -58,6 +62,19 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
           </SelectContent>
         </Select>
       </div>
+      
+      <div className="w-56">
+        <Select value={jobStatusFilter} onValueChange={setJobStatusFilter}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Job Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <TechnicianDateFilter 
         localDateRange={localDateRange}
@@ -75,7 +92,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
         />
       </div>
 
-      {(selectedTechnicians.length > 0 || paymentTypeFilter !== "all") && (
+      {(selectedTechnicians.length > 0 || paymentTypeFilter !== "all" || jobStatusFilter !== "all") && (
         <div className="text-sm text-muted-foreground">
           Showing {selectedTechnicians.length > 0 ? selectedTechnicians.length : "all"} technician(s)
         </div>

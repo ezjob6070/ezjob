@@ -35,6 +35,8 @@ interface TechnicianFinancialFilterBarProps {
   setLocalDateRange: (range: DateRange | undefined) => void;
   showDateFilter: boolean;
   setShowDateFilter: (show: boolean) => void;
+  jobStatusFilter?: string;
+  setJobStatusFilter?: (status: string) => void;
 }
 
 const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> = ({
@@ -50,7 +52,9 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
   localDateRange,
   setLocalDateRange,
   showDateFilter,
-  setShowDateFilter
+  setShowDateFilter,
+  jobStatusFilter = "all",
+  setJobStatusFilter = () => {}
 }) => {
   const [showTechnicianFilter, setShowTechnicianFilter] = React.useState(false);
   const [techSearchQuery, setTechSearchQuery] = React.useState("");
@@ -168,6 +172,18 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
         </SelectContent>
       </Select>
       
+      {/* Job Status Filter - New */}
+      <Select value={jobStatusFilter} onValueChange={setJobStatusFilter}>
+        <SelectTrigger className="w-[180px] bg-white border-gray-200 text-gray-900 font-medium">
+          <SelectValue placeholder="Job Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          <SelectItem value="completed">Completed</SelectItem>
+          <SelectItem value="cancelled">Cancelled</SelectItem>
+        </SelectContent>
+      </Select>
+      
       {/* Sort Order Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -196,7 +212,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
       </DropdownMenu>
 
       {/* Applied Filters Indicator */}
-      {(selectedTechnicians.length > 0 || paymentTypeFilter !== "all") && (
+      {(selectedTechnicians.length > 0 || paymentTypeFilter !== "all" || jobStatusFilter !== "all") && (
         <div className="text-sm text-gray-900 font-medium ml-2">
           Showing {selectedTechnicians.length > 0 ? selectedTechnicians.length : "all"} technician(s)
         </div>
