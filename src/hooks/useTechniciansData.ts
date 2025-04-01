@@ -5,18 +5,18 @@ import { DateRange } from "react-day-picker";
 import { initialTechnicians } from "@/data/technicians";
 
 export type SortOption = 
+  | "newest" 
+  | "oldest" 
+  | "name-asc" 
+  | "name-desc" 
   | "revenue-high" 
-  | "revenue-low" 
+  | "revenue-low"
   | "earnings-high" 
   | "earnings-low" 
   | "jobs-high" 
   | "jobs-low" 
   | "profit-high" 
   | "profit-low"
-  | "newest"
-  | "oldest"
-  | "name-asc"
-  | "name-desc"
   | "default";
 
 export const useTechniciansData = () => {
@@ -75,6 +75,20 @@ export const useTechniciansData = () => {
           return (b.totalRevenue || 0) - (a.totalRevenue || 0);
         case "revenue-low":
           return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+        case "earnings-high":
+          return ((b.totalRevenue || 0) * (b.paymentRate / 100)) - ((a.totalRevenue || 0) * (a.paymentRate / 100));
+        case "earnings-low":
+          return ((a.totalRevenue || 0) * (a.paymentRate / 100)) - ((b.totalRevenue || 0) * (b.paymentRate / 100));
+        case "jobs-high":
+          return (b.completedJobs || 0) - (a.completedJobs || 0);
+        case "jobs-low":
+          return (a.completedJobs || 0) - (b.completedJobs || 0);
+        case "profit-high":
+          return (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4)) 
+               - (a.totalRevenue || 0) + ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+        case "profit-low":
+          return (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4)) 
+               - (b.totalRevenue || 0) + ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
         default:
           return 0;
       }

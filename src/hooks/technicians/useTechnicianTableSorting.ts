@@ -1,8 +1,7 @@
 
 import { useState } from "react";
 import { Technician } from "@/types/technician";
-
-export type SortOption = "default" | "name-asc" | "name-desc" | "profit-high" | "profit-low";
+import { SortOption } from "@/hooks/useTechniciansData";
 
 export const useTechnicianTableSorting = (technicians: Technician[]) => {
   const [sortBy, setSortBy] = useState<SortOption>("default");
@@ -15,13 +14,21 @@ export const useTechnicianTableSorting = (technicians: Technician[]) => {
       case "name-desc":
         return b.name.localeCompare(a.name);
       case "profit-high":
-        const profitA = a.totalRevenue - (a.totalRevenue * (a.paymentType === "percentage" ? a.paymentRate / 100 : 1)) - (a.totalRevenue * 0.33);
-        const profitB = b.totalRevenue - (b.totalRevenue * (b.paymentType === "percentage" ? b.paymentRate / 100 : 1)) - (b.totalRevenue * 0.33);
+        const profitA = (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+        const profitB = (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
         return profitB - profitA;
       case "profit-low":
-        const profitC = a.totalRevenue - (a.totalRevenue * (a.paymentType === "percentage" ? a.paymentRate / 100 : 1)) - (a.totalRevenue * 0.33);
-        const profitD = b.totalRevenue - (b.totalRevenue * (b.paymentType === "percentage" ? b.paymentRate / 100 : 1)) - (b.totalRevenue * 0.33);
+        const profitC = (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+        const profitD = (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
         return profitC - profitD;
+      case "revenue-high":
+        return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+      case "revenue-low":
+        return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+      case "newest":
+        return new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime();
+      case "oldest":
+        return new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime();
       default:
         return 0;
     }

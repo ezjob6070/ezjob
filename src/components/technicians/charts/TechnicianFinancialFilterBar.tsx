@@ -196,16 +196,20 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => onSortChange("revenue-high")} className={sortOption === "revenue-high" ? "bg-secondary" : ""}>
+          <DropdownMenuItem onClick={() => onSortChange("revenue-high")} 
+                           className={sortOption === "revenue-high" ? "bg-secondary" : ""}>
             Revenue: High to Low
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onSortChange("revenue-low")} className={sortOption === "revenue-low" ? "bg-secondary" : ""}>
+          <DropdownMenuItem onClick={() => onSortChange("revenue-low")} 
+                           className={sortOption === "revenue-low" ? "bg-secondary" : ""}>
             Revenue: Low to High
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onSortChange("name-asc" as SortOption)} className={sortOption === "name-asc" ? "bg-secondary" : ""}>
+          <DropdownMenuItem onClick={() => onSortChange("name-asc")} 
+                           className={sortOption === "name-asc" ? "bg-secondary" : ""}>
             Name: A to Z
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onSortChange("name-desc" as SortOption)} className={sortOption === "name-desc" ? "bg-secondary" : ""}>
+          <DropdownMenuItem onClick={() => onSortChange("name-desc")} 
+                           className={sortOption === "name-desc" ? "bg-secondary" : ""}>
             Name: Z to A
           </DropdownMenuItem>
         </DropdownMenuContent>
