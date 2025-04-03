@@ -9,7 +9,7 @@ type SidebarHeaderProps = {
 const SidebarHeader = ({ industry, onCycleIndustry }: SidebarHeaderProps) => {
   return (
     <div className="h-16 flex items-center justify-between px-6 border-b border-sidebar-border">
-      <h1 className="text-xl font-semibold tracking-tight">Essence CRM</h1>
+      <h1 className="text-xl font-semibold tracking-tight">Easy Job CRM</h1>
       <div className="flex items-center">
         <button 
           onClick={onCycleIndustry}

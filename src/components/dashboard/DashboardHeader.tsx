@@ -36,7 +36,7 @@ const DashboardHeader = ({ onTabChange, activeTab = "dashboard" }: DashboardHead
           </div>
           <div>
             <h1 className="text-xl md:text-2xl font-bold text-gray-800">Hello, Alex Johnson</h1>
-            <p className="text-indigo-600 text-sm md:text-base font-medium">Welcome to your Uleadz CRM dashboard</p>
+            <p className="text-indigo-600 text-sm md:text-base font-medium">Welcome to your Easy Job dashboard</p>
           </div>
         </div>
         <div className="flex items-center">
