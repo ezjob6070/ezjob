@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
-import { CalendarIcon, Clock, ImageIcon, FileSignature, Send, Search } from "lucide-react";
+import { CalendarIcon, Clock, ImageIcon, FileSignature, Send } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -39,8 +39,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import MultiSelectDropdown from "./filters/MultiSelectDropdown";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -64,8 +63,8 @@ const formSchema = z.object({
   clientPhone: z.string().min(10, "Phone number must be at least 10 characters"),
   clientEmail: z.string().email("Invalid email").optional().or(z.literal("")),
   clientAddress: z.string().min(5, "Address must be at least 5 characters"),
-  technicianId: z.string().min(1, "Please select a technician"),
-  jobSourceId: z.string().optional(),
+  technicianIds: z.array(z.string()).min(1, "Please select at least one technician"),
+  jobSourceIds: z.array(z.string()).optional(),
   date: z.date({
     required_error: "Please select a date",
   }),
@@ -76,7 +75,6 @@ const formSchema = z.object({
   amount: z.coerce.number().optional(),
   notes: z.string().optional(),
   parts: z.string().optional(),
-  // New fields
   hasSignature: z.boolean().default(false),
   sendNotification: z.boolean().default(false),
 });
@@ -98,8 +96,8 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       clientPhone: "",
       clientEmail: "",
       clientAddress: "",
-      technicianId: "",
-      jobSourceId: "",
+      technicianIds: [],
+      jobSourceIds: [],
       timeSelection: "preset",
       presetTime: "",
       startTime: "09:00",
@@ -112,33 +110,22 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     },
   });
 
-  // State for technician search
-  const [technicianOpen, setTechnicianOpen] = useState(false);
-  const [technicianSearch, setTechnicianSearch] = useState("");
-
-  // Filter technicians based on search
-  const filteredTechnicians = technicians.filter(tech =>
-    tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
-  );
-
-  // State for signature and images
+  // States for UI management
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [signaturePad, setSignaturePad] = useState(false);
+  const [selectedTechnicians, setSelectedTechnicians] = useState<{ id: string; name: string }[]>([]);
+  const [selectedJobSources, setSelectedJobSources] = useState<{ id: string; name: string }[]>([]);
   
-  // Watch the timeSelection field to conditionally show/hide time fields
+  // Watch form values
   const timeSelection = form.watch("timeSelection");
   const hasSignature = form.watch("hasSignature");
   const clientEmail = form.watch("clientEmail");
   const sendNotification = form.watch("sendNotification");
-  const selectedTechnicianId = form.watch("technicianId");
-
-  // Get selected technician name
-  const selectedTechnician = technicians.find(tech => tech.id === selectedTechnicianId);
 
   const onSubmit = (values: FormValues) => {
-    // Find technician name
-    const technician = technicians.find(tech => tech.id === values.technicianId);
+    // Find primary technician (first selected)
+    const primaryTechnician = technicians.find(tech => tech.id === values.technicianIds[0]);
     
     // Create date with time if not all day
     let scheduledDate = new Date(values.date);
@@ -177,8 +164,8 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       id: uuidv4(),
       clientName: values.clientName,
       clientId: uuidv4().slice(0, 8),
-      technicianName: technician?.name || "",
-      technicianId: values.technicianId,
+      technicianName: primaryTechnician?.name || "",
+      technicianId: values.technicianIds[0],
       date: scheduledDate,
       scheduledDate: scheduledDate,
       isAllDay: isAllDay,
@@ -212,11 +199,29 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       newJob.clientPhone = values.clientPhone;
     }
 
-    if (values.jobSourceId) {
-      newJob.jobSourceId = values.jobSourceId;
-      const source = jobSources.find(src => src.id === values.jobSourceId);
+    // Add all selected technicians
+    if (values.technicianIds.length > 1) {
+      newJob.assignedTechnicians = values.technicianIds.map(id => {
+        const tech = technicians.find(t => t.id === id);
+        return { id, name: tech?.name || "" };
+      });
+    }
+
+    // Add all selected job sources
+    if (values.jobSourceIds && values.jobSourceIds.length > 0) {
+      // Set primary job source
+      newJob.jobSourceId = values.jobSourceIds[0];
+      const source = jobSources.find(src => src.id === values.jobSourceIds[0]);
       if (source) {
         newJob.jobSourceName = source.name;
+      }
+
+      // Add additional job sources if any
+      if (values.jobSourceIds.length > 1) {
+        newJob.additionalJobSources = values.jobSourceIds.slice(1).map(id => {
+          const source = jobSources.find(src => src.id === id);
+          return { id, name: source?.name || "" };
+        });
       }
     }
 
@@ -244,7 +249,8 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     setSignatureData(null);
     setImages([]);
     setSignaturePad(false);
-    setTechnicianSearch("");
+    setSelectedTechnicians([]);
+    setSelectedJobSources([]);
   };
 
   // Format time for display
@@ -276,6 +282,19 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     } else {
       setSignatureData(null);
     }
+  };
+
+  // Update form when technician selection changes
+  const handleTechnicianChange = (selected: { id: string; name: string }[]) => {
+    setSelectedTechnicians(selected);
+    form.setValue('technicianIds', selected.map(tech => tech.id));
+    form.trigger('technicianIds');
+  };
+
+  // Update form when job source selection changes
+  const handleJobSourceChange = (selected: { id: string; name: string }[]) => {
+    setSelectedJobSources(selected);
+    form.setValue('jobSourceIds', selected.map(source => source.id));
   };
 
   return (
@@ -386,65 +405,26 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Technician Selector with Search */}
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
                 <FormField
                   control={form.control}
-                  name="technicianId"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Technician *</FormLabel>
-                      <Popover open={technicianOpen} onOpenChange={setTechnicianOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={technicianOpen}
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? selectedTechnician?.name || "Select technician"
-                                : "Select technician"}
-                              <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[300px] p-0">
-                          <Command>
-                            <div className="relative">
-                              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                              <CommandInput
-                                placeholder="Search technicians..."
-                                className="pl-8"
-                                value={technicianSearch}
-                                onValueChange={setTechnicianSearch}
-                              />
-                            </div>
-                            <CommandEmpty>No technicians found</CommandEmpty>
-                            <CommandGroup className="max-h-52 overflow-y-auto">
-                              {filteredTechnicians.map((tech) => (
-                                <CommandItem
-                                  key={tech.id}
-                                  value={tech.id}
-                                  onSelect={() => {
-                                    form.setValue("technicianId", tech.id);
-                                    setTechnicianOpen(false);
-                                  }}
-                                >
-                                  {tech.name}
-                                  {tech.id === field.value && (
-                                    <span className="ml-auto flex h-4 w-4 items-center justify-center">✓</span>
-                                  )}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                  name="technicianIds"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Technicians *</FormLabel>
+                      <FormControl>
+                        <MultiSelectDropdown
+                          options={technicians}
+                          selected={selectedTechnicians}
+                          onChange={handleTechnicianChange}
+                          placeholder="Select technicians"
+                          emptyMessage="No technicians found"
+                          searchPlaceholder="Search technicians..."
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        You can select multiple technicians for this job.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -453,27 +433,23 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 {jobSources.length > 0 && (
                   <FormField
                     control={form.control}
-                    name="jobSourceId"
-                    render={({ field }) => (
+                    name="jobSourceIds"
+                    render={() => (
                       <FormItem>
-                        <FormLabel>Job Source (Optional)</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a job source" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {jobSources.map((source) => (
-                              <SelectItem key={source.id} value={source.id}>
-                                {source.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormLabel>Job Sources (Optional)</FormLabel>
+                        <FormControl>
+                          <MultiSelectDropdown
+                            options={jobSources}
+                            selected={selectedJobSources}
+                            onChange={handleJobSourceChange}
+                            placeholder="Select job sources"
+                            emptyMessage="No job sources found"
+                            searchPlaceholder="Search job sources..."
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          You can select multiple job sources for this job.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -667,7 +643,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 />
               </div>
 
-              {/* New section for attachments and signature */}
+              {/* Additional options section */}
               <div className="border-t pt-4 mt-2">
                 <h3 className="text-lg font-medium mb-3">Additional Options</h3>
                 
@@ -709,7 +685,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 </div>
                 
-                {/* Signature Capture */}
+                {/* Signature section */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between">
                     <FormField
@@ -760,7 +736,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 </div>
                 
-                {/* Send notification to client */}
+                {/* Notification section */}
                 <div className="mb-2">
                   <FormField
                     control={form.control}
@@ -798,7 +774,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 </div>
               </div>
-              
             </div>
 
             <DialogFooter>

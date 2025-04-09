@@ -1,44 +1,36 @@
 
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
+export type JobStatus = "pending" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "scheduled";
 
-export type PaymentMethod = "credit_card" | "cash" | "check" | "zelle" | "venmo" | "paypal";
+export type PaymentMethod = "cash" | "credit" | "check" | "other" | "credit_card" | "zelle";
 
-export interface Job {
+export type Job = {
   id: string;
+  clientId?: string;
   clientName: string;
   title?: string;
-  status: JobStatus;
+  technicianId: string;
+  technicianName: string;
   date: Date;
-  scheduledDate?: Date;
-  isAllDay?: boolean;
-  technicianId?: string;
-  technicianName?: string;
-  address?: string;
+  scheduledDate: Date;
+  isAllDay: boolean;
+  status: JobStatus;
+  address: string;
   amount?: number;
   actualAmount?: number;
-  paymentMethod?: PaymentMethod;
-  description?: string;
   notes?: string;
-  cancellationReason?: string;
-  source?: string;
-  // Additional properties
-  clientId?: string;
   clientEmail?: string;
   clientPhone?: string;
-  jobSourceId?: string;
-  jobSourceName?: string;
   parts?: string[];
-  createdAt?: Date;
-  // New fields for signature and images
   signature?: string;
+  completedDate?: Date;
   hasImages?: boolean;
   imageCount?: number;
-  images?: string[];
-}
-
-export interface JobTab {
-  id: string;
-  label: string;
-  status: JobStatus | "all";
-  count: number;
-}
+  jobSourceId?: string;
+  jobSourceName?: string;
+  assignedTechnicians?: { id: string; name: string }[];
+  additionalJobSources?: { id: string; name: string }[];
+  paymentMethod?: PaymentMethod;
+  source?: string;
+  cancellationReason?: string;
+  description?: string;
+};
