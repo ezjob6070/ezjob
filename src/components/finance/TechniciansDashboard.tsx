@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useTechnicianFinancials } from "@/hooks/technicians/useTechnicianFinancials";
@@ -6,6 +5,7 @@ import TechnicianFinancialTable from "@/components/technicians/charts/Technician
 import { DateRange } from "react-day-picker";
 import DashboardMetrics from "./dashboard/MetricsCards";
 import TechnicianDetailPanel from "./dashboard/TechnicianDetailPanel";
+// Import SortOption correctly
 import { SortOption } from "@/hooks/useTechniciansData";
 
 interface TechniciansDashboardProps {
