@@ -39,25 +39,25 @@ const MultiSelectDropdown = ({
 }: MultiSelectDropdownProps) => {
   const [open, setOpen] = useState(false);
   
-  // Make sure we're working with arrays to prevent "undefined is not iterable" error
-  const safeOptions = Array.isArray(options) ? options : [];
-  const safeSelected = Array.isArray(selected) ? selected : [];
-  
   const handleSelect = (option: Option) => {
-    if (safeSelected.some(item => item.id === option.id)) {
-      onChange(safeSelected.filter(item => item.id !== option.id));
+    if (selected.some(item => item.id === option.id)) {
+      onChange(selected.filter(item => item.id !== option.id));
     } else {
-      onChange([...safeSelected, option]);
+      onChange([...selected, option]);
     }
   };
   
   const handleRemove = (option: Option) => {
-    onChange(safeSelected.filter(item => item.id !== option.id));
+    onChange(selected.filter(item => item.id !== option.id));
   };
   
   const handleClear = () => {
     onChange([]);
   };
+
+  // Ensure we have valid arrays before proceeding
+  const safeOptions = Array.isArray(options) ? options : [];
+  const safeSelected = Array.isArray(selected) ? selected : [];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

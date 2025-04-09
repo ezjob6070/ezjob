@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -11,12 +10,7 @@ import AmountFilter from "@/components/jobs/AmountFilter";
 import PaymentMethodFilter from "@/components/jobs/PaymentMethodFilter";
 import { isSameDay, isToday, format } from "date-fns";
 
-interface JobsFilterPopoversProps {
-  technicianNames: string[];
-  jobSourceNames: string[];
-}
-
-export const JobsFilterPopovers = ({ technicianNames, jobSourceNames }: JobsFilterPopoversProps) => {
+export const JobsFilterPopovers = () => {
   const {
     datePopoverOpen, setDatePopoverOpen,
     techPopoverOpen, setTechPopoverOpen,
@@ -103,14 +97,14 @@ export const JobsFilterPopovers = ({ technicianNames, jobSourceNames }: JobsFilt
             </Button>
           </PopoverTrigger>
           <PopoverContent 
-            className="w-auto p-0" 
+            className="w-auto p-4" 
             align="start" 
             side="bottom" 
             sideOffset={5}
             avoidCollisions={false}
           >
             <TechnicianFilter
-              technicians={technicianNames}
+              technicians={[]} // This will be populated from props
               selectedNames={selectedTechnicians}
               onToggle={toggleTechnician}
               onSelectAll={selectAllTechnicians}
@@ -131,14 +125,14 @@ export const JobsFilterPopovers = ({ technicianNames, jobSourceNames }: JobsFilt
             </Button>
           </PopoverTrigger>
           <PopoverContent 
-            className="w-auto p-0" 
+            className="w-auto p-4" 
             align="start" 
             side="bottom" 
             sideOffset={5}
             avoidCollisions={false}
           >
             <JobSourceFilter
-              jobSourceNames={jobSourceNames}
+              jobSourceNames={[]} // This will be populated from props
               selectedJobSources={selectedJobSources}
               toggleJobSource={toggleJobSource}
               selectAllJobSources={selectAllJobSources}
@@ -159,7 +153,7 @@ export const JobsFilterPopovers = ({ technicianNames, jobSourceNames }: JobsFilt
             </Button>
           </PopoverTrigger>
           <PopoverContent 
-            className="w-auto p-0" 
+            className="w-auto p-4" 
             align="start" 
             side="bottom" 
             sideOffset={5}
@@ -181,7 +175,7 @@ export const JobsFilterPopovers = ({ technicianNames, jobSourceNames }: JobsFilt
             </Button>
           </PopoverTrigger>
           <PopoverContent 
-            className="w-auto p-0" 
+            className="w-auto p-4" 
             align="start" 
             side="bottom" 
             sideOffset={5}

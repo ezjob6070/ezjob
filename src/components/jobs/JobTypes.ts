@@ -1,7 +1,6 @@
+export type JobStatus = "pending" | "in_progress" | "completed" | "cancelled" | "rescheduled";
 
-export type JobStatus = "pending" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "scheduled";
-
-export type PaymentMethod = "cash" | "credit" | "check" | "other" | "credit_card" | "zelle";
+export type PaymentMethod = "cash" | "credit" | "check" | "other";
 
 export type Job = {
   id: string;
@@ -16,7 +15,6 @@ export type Job = {
   status: JobStatus;
   address: string;
   amount?: number;
-  actualAmount?: number;
   notes?: string;
   clientEmail?: string;
   clientPhone?: string;
@@ -29,8 +27,4 @@ export type Job = {
   jobSourceName?: string;
   assignedTechnicians?: { id: string; name: string }[];
   additionalJobSources?: { id: string; name: string }[];
-  paymentMethod?: PaymentMethod;
-  source?: string;
-  cancellationReason?: string;
-  description?: string;
 };
