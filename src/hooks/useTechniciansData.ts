@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
@@ -6,10 +7,18 @@ import { initialTechnicians } from "@/data/technicians";
 export type SortOption = 
   | 'default'
   | 'name'
+  | 'name-asc'
+  | 'name-desc'
   | 'date-newest'
   | 'date-oldest'
   | 'revenue-high'
-  | 'revenue-low';
+  | 'revenue-low'
+  | 'profit-high'
+  | 'profit-low'
+  | 'jobs-high'
+  | 'jobs-low'
+  | 'newest'
+  | 'oldest';
 
 export const useTechniciansData = () => {
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
@@ -41,9 +50,7 @@ export const useTechniciansData = () => {
 
     // Apply specialty filter
     if (selectedSpecialty) {
-      result = result.filter((tech) =>
-        tech.specialties.includes(selectedSpecialty)
-      );
+      result = result.filter((tech) => tech.specialty === selectedSpecialty);
     }
 
     // Apply sorting
@@ -58,15 +65,36 @@ export const useTechniciansData = () => {
     
     switch (option) {
       case "name":
+      case "name-asc":
         return sortedTechs.sort((a, b) => a.name.localeCompare(b.name));
+      case "name-desc":
+        return sortedTechs.sort((a, b) => b.name.localeCompare(a.name));
       case "date-newest":
+      case "newest":
         return sortedTechs.sort((a, b) => new Date(b.hireDate).getTime() - new Date(a.hireDate).getTime());
       case "date-oldest":
+      case "oldest":
         return sortedTechs.sort((a, b) => new Date(a.hireDate).getTime() - new Date(b.hireDate).getTime());
       case "revenue-high":
         return sortedTechs.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0));
       case "revenue-low":
         return sortedTechs.sort((a, b) => (a.totalRevenue || 0) - (b.totalRevenue || 0));
+      case "profit-high":
+        return sortedTechs.sort((a, b) => {
+          const profitA = (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+          const profitB = (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
+          return profitB - profitA;
+        });
+      case "profit-low":
+        return sortedTechs.sort((a, b) => {
+          const profitA = (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+          const profitB = (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
+          return profitA - profitB;
+        });
+      case "jobs-high":
+        return sortedTechs.sort((a, b) => (b.completedJobs || 0) - (a.completedJobs || 0));
+      case "jobs-low":
+        return sortedTechs.sort((a, b) => (a.completedJobs || 0) - (b.completedJobs || 0));
       default:
         return sortedTechs;
     }
@@ -76,9 +104,7 @@ export const useTechniciansData = () => {
   const getUniqueSpecialties = (): string[] => {
     const specialties = new Set<string>();
     technicians.forEach((tech) => {
-      tech.specialties.forEach((specialty) => {
-        specialties.add(specialty);
-      });
+      specialties.add(tech.specialty);
     });
     return Array.from(specialties).sort();
   };
@@ -92,9 +118,9 @@ export const useTechniciansData = () => {
     return Array.from(statuses).sort();
   };
 
-  // Get active technicians (status === "Active")
+  // Get active technicians (status === "active")
   const getActiveTechnicians = (): Technician[] => {
-    return technicians.filter((tech) => tech.status === "Active");
+    return technicians.filter((tech) => tech.status === "active");
   };
 
   return {
