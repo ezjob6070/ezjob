@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
-import { CalendarIcon, Clock, ImageIcon, FileSignature, Send } from "lucide-react";
+import { CalendarIcon, Clock, ImageIcon, FileSignature, Send, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,7 +26,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Job, JobStatus } from "./JobTypes";
@@ -39,6 +45,13 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -114,6 +127,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [signaturePad, setSignaturePad] = useState(false);
+  const [technicianDropdownOpen, setTechnicianDropdownOpen] = useState(false);
   
   // Watch the timeSelection field to conditionally show/hide time fields
   const timeSelection = form.watch("timeSelection");
@@ -377,23 +391,46 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Technician *</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a technician" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {technicians.map((tech) => (
-                            <SelectItem key={tech.id} value={tech.id}>
-                              {tech.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Popover open={technicianDropdownOpen} onOpenChange={setTechnicianDropdownOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={technicianDropdownOpen}
+                              className="w-full justify-between"
+                            >
+                              {field.value
+                                ? technicians.find(
+                                    (technician) => technician.id === field.value
+                                  )?.name
+                                : "Select a technician"}
+                              <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search technician..." />
+                            <CommandEmpty>No technician found.</CommandEmpty>
+                            <CommandGroup>
+                              {technicians.map((technician) => (
+                                <CommandItem
+                                  key={technician.id}
+                                  value={technician.name}
+                                  onSelect={() => {
+                                    form.setValue("technicianId", technician.id);
+                                    setTechnicianDropdownOpen(false);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  {technician.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}

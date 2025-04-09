@@ -4,7 +4,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
 import { initialTechnicians } from "@/data/technicians";
-import { SortOption } from "./useTechniciansData";
+
+export type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | 
+  "revenue-high" | "revenue-low" | "profit-high" | "profit-low" | "default";
 
 export const useTechniciansData = () => {
   const { toast } = useToast();
