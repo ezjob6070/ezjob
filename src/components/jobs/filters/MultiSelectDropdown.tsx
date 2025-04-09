@@ -55,6 +55,10 @@ const MultiSelectDropdown = ({
     onChange([]);
   };
 
+  // Ensure we have valid arrays before proceeding
+  const safeOptions = Array.isArray(options) ? options : [];
+  const safeSelected = Array.isArray(selected) ? selected : [];
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -67,11 +71,11 @@ const MultiSelectDropdown = ({
           onClick={() => setOpen(!open)}
         >
           <div className="flex gap-1 flex-wrap items-center">
-            {selected.length === 0 ? (
+            {safeSelected.length === 0 ? (
               <span className="text-muted-foreground">{placeholder}</span>
             ) : (
               <>
-                {selected.slice(0, maxDisplay).map(option => (
+                {safeSelected.slice(0, maxDisplay).map(option => (
                   <Badge 
                     key={option.id} 
                     variant="secondary"
@@ -80,8 +84,8 @@ const MultiSelectDropdown = ({
                     {option.name}
                   </Badge>
                 ))}
-                {selected.length > maxDisplay && (
-                  <Badge variant="secondary">+{selected.length - maxDisplay}</Badge>
+                {safeSelected.length > maxDisplay && (
+                  <Badge variant="secondary">+{safeSelected.length - maxDisplay}</Badge>
                 )}
               </>
             )}
@@ -89,7 +93,7 @@ const MultiSelectDropdown = ({
           <X 
             className={cn(
               "ml-2 h-4 w-4 shrink-0 opacity-50", 
-              selected.length === 0 ? "hidden" : "block cursor-pointer"
+              safeSelected.length === 0 ? "hidden" : "block cursor-pointer"
             )}
             onClick={(e) => {
               e.stopPropagation();
@@ -103,8 +107,8 @@ const MultiSelectDropdown = ({
           <CommandInput placeholder={searchPlaceholder} className="h-9" />
           <CommandEmpty>{emptyMessage}</CommandEmpty>
           <CommandGroup className="max-h-[200px] overflow-auto">
-            {options.map((option) => {
-              const isSelected = selected.some(item => item.id === option.id);
+            {safeOptions.map((option) => {
+              const isSelected = safeSelected.some(item => item.id === option.id);
               return (
                 <CommandItem
                   key={option.id}
@@ -118,13 +122,13 @@ const MultiSelectDropdown = ({
               );
             })}
           </CommandGroup>
-          {selected.length > 0 && (
+          {safeSelected.length > 0 && (
             <div className="border-t p-2">
               <div className="text-xs text-muted-foreground mb-2">
-                Selected {selected.length} {selected.length === 1 ? "item" : "items"}
+                Selected {safeSelected.length} {safeSelected.length === 1 ? "item" : "items"}
               </div>
               <div className="flex flex-wrap gap-1">
-                {selected.map(option => (
+                {safeSelected.map(option => (
                   <Badge 
                     key={option.id} 
                     variant="secondary" 
