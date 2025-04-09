@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Job, JobStatus } from "./JobTypes";
 import {
@@ -32,6 +33,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   onComplete,
   onReschedule,
 }) => {
+  // Changed to match the expected types
   const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled">("completed");
   const [actualAmount, setActualAmount] = useState<number>(job?.amount || 0);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>(
@@ -47,7 +49,15 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   useEffect(() => {
     // Set initial status based on current job status
     if (job) {
-      setStatus(job.status === "in_progress" ? "completed" : job.status);
+      // Only set status to one of the allowed values
+      if (job.status === "in_progress" || job.status === "scheduled") {
+        setStatus(job.status);
+      } else if (job.status === "completed" || job.status === "cancelled") {
+        setStatus(job.status);
+      } else {
+        setStatus("completed"); // Default to completed if unknown status
+      }
+      
       setActualAmount(job.amount || 0);
       setParts(job.parts ? job.parts.join(", ") : "");
       setCancellationReason(job.cancellationReason || "");

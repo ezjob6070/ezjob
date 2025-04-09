@@ -9,12 +9,15 @@ export const initialJobs: Job[] = [
     title: "Bathroom Plumbing Repair",
     status: "scheduled",
     date: new Date("2023-07-15"),
+    scheduledDate: new Date("2023-07-15"),
+    technicianId: "tech1",
     technicianName: "Michael Brown",
     address: "123 Main St, Anytown, CA 90210",
     amount: 450,
     paymentMethod: "credit_card",
     description: "Fix leaking pipe under sink and replace bathroom faucet",
-    notes: "Customer prefers afternoon appointment"
+    notes: "Customer prefers afternoon appointment",
+    isAllDay: false
   },
   {
     id: uuidv4(),
@@ -22,12 +25,15 @@ export const initialJobs: Job[] = [
     title: "AC Maintenance",
     status: "completed",
     date: new Date("2023-07-10"),
+    scheduledDate: new Date("2023-07-10"),
+    technicianId: "tech2",
     technicianName: "David Wilson",
     address: "456 Oak Ave, Springfield, CA 92831",
     amount: 250,
     paymentMethod: "check",
     description: "Annual AC system maintenance and filter replacement",
-    notes: "Customer is a VIP, extra attention to detail"
+    notes: "Customer is a VIP, extra attention to detail",
+    isAllDay: false
   },
   {
     id: uuidv4(),
@@ -35,12 +41,15 @@ export const initialJobs: Job[] = [
     title: "Electrical Panel Upgrade",
     status: "in_progress",
     date: new Date("2023-07-12"),
+    scheduledDate: new Date("2023-07-12"),
+    technicianId: "tech3",
     technicianName: "Jennifer Taylor",
     address: "789 Pine St, Riverside, CA 92501",
     amount: 1750,
     paymentMethod: "zelle",
     description: "Upgrade electrical panel from 100A to 200A service",
-    notes: "Need to coordinate with utility company for shutdown"
+    notes: "Need to coordinate with utility company for shutdown",
+    isAllDay: true
   },
   {
     id: uuidv4(),
@@ -48,12 +57,15 @@ export const initialJobs: Job[] = [
     title: "Drain Cleaning",
     status: "completed",
     date: new Date("2023-07-05"),
+    scheduledDate: new Date("2023-07-05"),
+    technicianId: "tech1",
     technicianName: "Michael Brown",
     address: "321 Elm St, Lakeside, CA 92040",
     amount: 175,
     paymentMethod: "cash",
     description: "Clear clogged kitchen sink drain",
-    notes: ""
+    notes: "",
+    isAllDay: false
   },
   {
     id: uuidv4(),
@@ -61,12 +73,15 @@ export const initialJobs: Job[] = [
     title: "New HVAC Installation",
     status: "scheduled",
     date: new Date("2023-07-25"),
+    scheduledDate: new Date("2023-07-25"),
+    technicianId: "tech2",
     technicianName: "David Wilson",
     address: "567 Maple Dr, Highland, CA 92346",
     amount: 5250,
     paymentMethod: "credit_card",
     description: "Install new high-efficiency HVAC system",
-    notes: "Customer requested no-contact service"
+    notes: "Customer requested no-contact service",
+    isAllDay: true
   },
   {
     id: uuidv4(),
@@ -74,12 +89,15 @@ export const initialJobs: Job[] = [
     title: "Water Heater Replacement",
     status: "completed",
     date: new Date("2023-06-28"),
+    scheduledDate: new Date("2023-06-28"),
+    technicianId: "tech1",
     technicianName: "Michael Brown",
     address: "890 Cedar Lane, Riverside, CA 92503",
     amount: 1200,
     paymentMethod: "credit_card",
     description: "Replace old water heater with new energy-efficient model",
-    notes: ""
+    notes: "",
+    isAllDay: false
   },
   {
     id: uuidv4(),
@@ -87,12 +105,15 @@ export const initialJobs: Job[] = [
     title: "Garbage Disposal Installation",
     status: "cancelled",
     date: new Date("2023-07-08"),
+    scheduledDate: new Date("2023-07-08"),
+    technicianId: "tech1",
     technicianName: "Michael Brown",
     address: "432 Birch St, San Bernardino, CA 92410",
     amount: 325,
     paymentMethod: "credit_card",
     description: "Install new garbage disposal unit in kitchen sink",
-    notes: "Customer cancelled due to emergency"
+    notes: "Customer cancelled due to emergency",
+    isAllDay: false
   },
   {
     id: uuidv4(),
@@ -100,12 +121,15 @@ export const initialJobs: Job[] = [
     title: "Ceiling Fan Installation",
     status: "completed",
     date: new Date("2023-06-15"),
+    scheduledDate: new Date("2023-06-15"),
+    technicianId: "tech3",
     technicianName: "Jennifer Taylor",
     address: "765 Willow Ave, Corona, CA 92879",
     amount: 275,
     paymentMethod: "zelle",
     description: "Install ceiling fan in master bedroom",
-    notes: ""
+    notes: "",
+    isAllDay: false
   },
   {
     id: uuidv4(),
@@ -113,12 +137,15 @@ export const initialJobs: Job[] = [
     title: "Electrical Troubleshooting",
     status: "cancelled",
     date: new Date("2023-07-20"),
+    scheduledDate: new Date("2023-07-20"),
+    technicianId: "tech3",
     technicianName: "Jennifer Taylor",
     address: "345 Redwood Dr, Moreno Valley, CA 92553",
     amount: 150,
     paymentMethod: "cash",
     description: "Diagnose and fix flickering lights in living room",
-    notes: "Cancelled - customer found another service"
+    notes: "Cancelled - customer found another service",
+    isAllDay: false
   },
   {
     id: uuidv4(),
@@ -126,11 +153,14 @@ export const initialJobs: Job[] = [
     title: "Smart Thermostat Installation",
     status: "completed",
     date: new Date("2023-07-02"),
+    scheduledDate: new Date("2023-07-02"),
+    technicianId: "tech2",
     technicianName: "David Wilson",
     address: "123 Peach St, Redlands, CA 92374",
     amount: 225,
     paymentMethod: "credit_card",
     description: "Install and program new smart thermostat system",
-    notes: "Customer has Nest account already"
+    notes: "Customer has Nest account already",
+    isAllDay: false
   }
 ];
