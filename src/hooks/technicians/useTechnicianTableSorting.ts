@@ -11,7 +11,9 @@ export type SortOption =
   | "revenue-high" 
   | "revenue-low" 
   | "newest" 
-  | "oldest";
+  | "oldest"
+  | "jobs-high"
+  | "jobs-low";
 
 export const useTechnicianTableSorting = (technicians: Technician[]) => {
   const [sortBy, setSortBy] = useState<SortOption>("default");
@@ -39,6 +41,10 @@ export const useTechnicianTableSorting = (technicians: Technician[]) => {
         return new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime();
       case "oldest":
         return new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime();
+      case "jobs-high":
+        return (b.completedJobs || 0) - (a.completedJobs || 0);
+      case "jobs-low":
+        return (a.completedJobs || 0) - (b.completedJobs || 0);
       default:
         return 0;
     }
