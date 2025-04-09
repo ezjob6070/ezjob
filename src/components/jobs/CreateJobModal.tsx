@@ -87,7 +87,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   open,
   onOpenChange,
   onAddJob,
-  technicians = [], // Default to empty array to prevent undefined errors
+  technicians,
   jobSources = [],
 }) => {
   const form = useForm<FormValues>({
@@ -116,12 +116,10 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   const [technicianOpen, setTechnicianOpen] = useState(false);
   const [technicianSearch, setTechnicianSearch] = useState("");
 
-  // Filter technicians based on search, ensure it's always an array
-  const filteredTechnicians = Array.isArray(technicians) 
-    ? technicians.filter(tech => 
-        tech && tech.name && tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
-      )
-    : [];
+  // Filter technicians based on search
+  const filteredTechnicians = technicians.filter(tech =>
+    tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
+  );
 
   // State for signature and images
   const [signatureData, setSignatureData] = useState<string | null>(null);
@@ -136,15 +134,11 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   const selectedTechnicianId = form.watch("technicianId");
 
   // Get selected technician name
-  const selectedTechnician = Array.isArray(technicians) 
-    ? technicians.find(tech => tech && tech.id === selectedTechnicianId)
-    : undefined;
+  const selectedTechnician = technicians.find(tech => tech.id === selectedTechnicianId);
 
   const onSubmit = (values: FormValues) => {
     // Find technician name
-    const technician = Array.isArray(technicians) 
-      ? technicians.find(tech => tech && tech.id === values.technicianId)
-      : undefined;
+    const technician = technicians.find(tech => tech.id === values.technicianId);
     
     // Create date with time if not all day
     let scheduledDate = new Date(values.date);
@@ -220,7 +214,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
 
     if (values.jobSourceId) {
       newJob.jobSourceId = values.jobSourceId;
-      const source = jobSources.find(src => src && src.id === values.jobSourceId);
+      const source = jobSources.find(src => src.id === values.jobSourceId);
       if (source) {
         newJob.jobSourceName = source.name;
       }
@@ -412,49 +406,43 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                                 !field.value && "text-muted-foreground"
                               )}
                             >
-                              {field.value && selectedTechnician
-                                ? selectedTechnician.name 
+                              {field.value
+                                ? selectedTechnician?.name || "Select technician"
                                 : "Select technician"}
                               <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-[300px] p-0">
-                          {Array.isArray(technicians) && technicians.length > 0 ? (
-                            <Command>
-                              <div className="relative">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                                <CommandInput
-                                  placeholder="Search technicians..."
-                                  className="pl-8"
-                                  value={technicianSearch}
-                                  onValueChange={setTechnicianSearch}
-                                />
-                              </div>
-                              <CommandEmpty>No technicians found</CommandEmpty>
-                              <CommandGroup className="max-h-52 overflow-y-auto">
-                                {filteredTechnicians.map((tech) => (
-                                  <CommandItem
-                                    key={tech.id}
-                                    value={tech.id}
-                                    onSelect={() => {
-                                      form.setValue("technicianId", tech.id);
-                                      setTechnicianOpen(false);
-                                    }}
-                                  >
-                                    {tech.name}
-                                    {tech.id === field.value && (
-                                      <span className="ml-auto flex h-4 w-4 items-center justify-center">✓</span>
-                                    )}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </Command>
-                          ) : (
-                            <div className="p-4 text-sm text-center text-muted-foreground">
-                              No technicians available
+                          <Command>
+                            <div className="relative">
+                              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                              <CommandInput
+                                placeholder="Search technicians..."
+                                className="pl-8"
+                                value={technicianSearch}
+                                onValueChange={setTechnicianSearch}
+                              />
                             </div>
-                          )}
+                            <CommandEmpty>No technicians found</CommandEmpty>
+                            <CommandGroup className="max-h-52 overflow-y-auto">
+                              {filteredTechnicians.map((tech) => (
+                                <CommandItem
+                                  key={tech.id}
+                                  value={tech.id}
+                                  onSelect={() => {
+                                    form.setValue("technicianId", tech.id);
+                                    setTechnicianOpen(false);
+                                  }}
+                                >
+                                  {tech.name}
+                                  {tech.id === field.value && (
+                                    <span className="ml-auto flex h-4 w-4 items-center justify-center">✓</span>
+                                  )}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -462,7 +450,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
 
-                {Array.isArray(jobSources) && jobSources.length > 0 && (
+                {jobSources.length > 0 && (
                   <FormField
                     control={form.control}
                     name="jobSourceId"
@@ -480,11 +468,9 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           </FormControl>
                           <SelectContent>
                             {jobSources.map((source) => (
-                              source && (
-                                <SelectItem key={source.id} value={source.id}>
-                                  {source.name}
-                                </SelectItem>
-                              )
+                              <SelectItem key={source.id} value={source.id}>
+                                {source.name}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
