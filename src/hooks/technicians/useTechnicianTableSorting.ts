@@ -1,7 +1,17 @@
 
 import { useState } from "react";
 import { Technician } from "@/types/technician";
-import { SortOption } from "@/hooks/useTechniciansData";
+
+export type SortOption = 
+  | "default" 
+  | "name-asc" 
+  | "name-desc" 
+  | "profit-high" 
+  | "profit-low" 
+  | "revenue-high" 
+  | "revenue-low" 
+  | "newest" 
+  | "oldest";
 
 export const useTechnicianTableSorting = (technicians: Technician[]) => {
   const [sortBy, setSortBy] = useState<SortOption>("default");
