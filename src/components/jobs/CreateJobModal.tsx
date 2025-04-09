@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
-import { CalendarIcon, Clock, ImageIcon, FileSignature, Send, Search } from "lucide-react";
+import { CalendarIcon, Clock, ImageIcon, FileSignature, Send } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -39,8 +39,6 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -112,15 +110,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     },
   });
 
-  // State for technician search
-  const [technicianOpen, setTechnicianOpen] = useState(false);
-  const [technicianSearch, setTechnicianSearch] = useState("");
-
-  // Filter technicians based on search
-  const filteredTechnicians = technicians.filter(tech =>
-    tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
-  );
-
   // State for signature and images
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
@@ -131,10 +120,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   const hasSignature = form.watch("hasSignature");
   const clientEmail = form.watch("clientEmail");
   const sendNotification = form.watch("sendNotification");
-  const selectedTechnicianId = form.watch("technicianId");
-
-  // Get selected technician name
-  const selectedTechnician = technicians.find(tech => tech.id === selectedTechnicianId);
 
   const onSubmit = (values: FormValues) => {
     // Find technician name
@@ -244,7 +229,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     setSignatureData(null);
     setImages([]);
     setSignaturePad(false);
-    setTechnicianSearch("");
   };
 
   // Format time for display
@@ -387,64 +371,29 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Technician Selector with Search */}
                 <FormField
                   control={form.control}
                   name="technicianId"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem>
                       <FormLabel>Technician *</FormLabel>
-                      <Popover open={technicianOpen} onOpenChange={setTechnicianOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={technicianOpen}
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? selectedTechnician?.name || "Select technician"
-                                : "Select technician"}
-                              <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[300px] p-0">
-                          <Command>
-                            <div className="relative">
-                              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                              <CommandInput
-                                placeholder="Search technicians..."
-                                className="pl-8"
-                                value={technicianSearch}
-                                onValueChange={setTechnicianSearch}
-                              />
-                            </div>
-                            <CommandEmpty>No technicians found</CommandEmpty>
-                            <CommandGroup className="max-h-52 overflow-y-auto">
-                              {filteredTechnicians.map((tech) => (
-                                <CommandItem
-                                  key={tech.id}
-                                  value={tech.id}
-                                  onSelect={() => {
-                                    form.setValue("technicianId", tech.id);
-                                    setTechnicianOpen(false);
-                                  }}
-                                >
-                                  {tech.name}
-                                  {tech.id === field.value && (
-                                    <span className="ml-auto flex h-4 w-4 items-center justify-center">✓</span>
-                                  )}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a technician" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {technicians.map((tech) => (
+                            <SelectItem key={tech.id} value={tech.id}>
+                              {tech.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
