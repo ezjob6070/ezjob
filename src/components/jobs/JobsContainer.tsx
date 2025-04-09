@@ -32,10 +32,7 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
       <JobsFilterBar />
       
       {/* Jobs Tabs and Table */}
-      <JobsFilterPopovers 
-        technicianNames={technicianNames}
-        jobSourceNames={jobSourceNames}
-      />
+      <JobsFilterPopovers />
       
       <JobTabs 
         jobs={filteredJobs} 

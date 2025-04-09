@@ -13,7 +13,6 @@ export type Technician = {
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
   specialty: string;
-  specialties?: string[]; // Add this as optional for backward compatibility
   paymentType: "percentage" | "flat" | "hourly";
   paymentRate: number;
   hourlyRate: number; // Required field, always a number
