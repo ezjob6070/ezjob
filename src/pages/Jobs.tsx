@@ -63,10 +63,14 @@ const Jobs = () => {
     closeStatusModal
   } = useJobsData(initialJobs, JOB_SOURCES.map(source => source.name));
 
-  // Set up technician data
-  const technicianNames = initialTechnicians.map(tech => tech.name);
-  const technicianOptions = initialTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
-  const jobSourceNames = JOB_SOURCES.map(source => source.name);
+  // Ensure technicians data is properly initialized and not undefined
+  const technicianOptions = initialTechnicians ? initialTechnicians.map(tech => ({
+    id: tech.id,
+    name: tech.name
+  })) : [];
+  
+  const technicianNames = initialTechnicians ? initialTechnicians.map(tech => tech.name) : [];
+  const jobSourceNames = JOB_SOURCES ? JOB_SOURCES.map(source => source.name) : [];
 
   // Handler functions
   const addCategory = (category: string) => {
@@ -163,7 +167,7 @@ const Jobs = () => {
           onAddJobSource={jobSourceData.handleAddJobSource}
           onEditJobSource={jobSourceData.handleEditJobSource}
           technicianOptions={technicianOptions}
-          jobSources={JOB_SOURCES}
+          jobSources={JOB_SOURCES.map(source => ({ id: source.id, name: source.name }))}
           allJobSources={jobSourceData.jobSources}
         />
       </div>
