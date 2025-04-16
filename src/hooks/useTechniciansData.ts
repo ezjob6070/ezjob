@@ -5,7 +5,7 @@ import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
 import { DateRange } from "react-day-picker";
 
-// Make sure this SortOption type is the same one used in TechnicianSortFilter.tsx
+// Export the SortOption type - make sure it matches what's used in TechnicianSortFilter.tsx
 export type SortOption = 
   | 'default'
   | 'name'
@@ -24,8 +24,8 @@ export type SortOption =
 
 export const useTechniciansData = () => {
   const { toast } = useToast();
-  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians || []);
-  const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>(initialTechnicians || []);
+  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
+  const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -34,19 +34,17 @@ export const useTechniciansData = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   
-  // Safely create categories using a fallback for undefined values
   const categories = Array.from(new Set(
-    (technicians || []).map(tech => tech.category || "Uncategorized")
+    technicians.map(tech => tech.category || "Uncategorized")
   ));
   
-  // Safely create departments using a fallback for undefined values
   const departments = Array.from(new Set(
-    (technicians || []).map(tech => tech.department || "General")
+    technicians.map(tech => tech.department || "General")
   ));
 
   // Filter technicians based on search query and filters
   useEffect(() => {
-    let result = [...(technicians || [])];
+    let result = [...technicians];
 
     // Apply search filter
     if (searchQuery) {

@@ -61,7 +61,7 @@ const Jobs = () => {
     handleRescheduleJob,
     openStatusModal,
     closeStatusModal
-  } = useJobsData(initialJobs, JOB_SOURCES ? JOB_SOURCES.map(source => source.name) : []);
+  } = useJobsData(initialJobs, JOB_SOURCES.map(source => source.name));
 
   // Ensure technicians data is properly initialized and not undefined
   const technicianOptions = initialTechnicians ? initialTechnicians.map(tech => ({
@@ -167,8 +167,8 @@ const Jobs = () => {
           onAddJobSource={jobSourceData.handleAddJobSource}
           onEditJobSource={jobSourceData.handleEditJobSource}
           technicianOptions={technicianOptions}
-          jobSources={JOB_SOURCES ? JOB_SOURCES.map(source => ({ id: source.id, name: source.name })) : []}
-          allJobSources={jobSourceData.jobSources || []}
+          jobSources={JOB_SOURCES.map(source => ({ id: source.id, name: source.name }))}
+          allJobSources={jobSourceData.jobSources}
         />
       </div>
     </JobsProvider>

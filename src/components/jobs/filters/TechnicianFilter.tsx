@@ -17,8 +17,8 @@ interface TechnicianFilterProps {
 }
 
 const TechnicianFilter = ({
-  technicians = [],
-  selectedNames = [],
+  technicians,
+  selectedNames,
   onToggle,
   onSelectAll,
   onDeselectAll
@@ -88,23 +88,23 @@ const TechnicianFilter = ({
 
       <ScrollArea className="h-72 pr-4">
         <div className="space-y-1">
-          {filteredTechnicians.length > 0 ? (
-            filteredTechnicians.map((name) => (
-              <div key={name} className="flex items-center">
-                <Checkbox
-                  id={`technician-${name}`}
-                  checked={selectedNames.includes(name)}
-                  onCheckedChange={() => onToggle(name)}
-                />
-                <Label
-                  htmlFor={`technician-${name}`}
-                  className="text-sm ml-2"
-                >
-                  {name}
-                </Label>
-              </div>
-            ))
-          ) : (
+          {filteredTechnicians.map((name) => (
+            <div key={name} className="flex items-center">
+              <Checkbox
+                id={`technician-${name}`}
+                checked={selectedNames.includes(name)}
+                onCheckedChange={() => onToggle(name)}
+              />
+              <Label
+                htmlFor={`technician-${name}`}
+                className="text-sm ml-2"
+              >
+                {name}
+              </Label>
+            </div>
+          ))}
+          
+          {filteredTechnicians.length === 0 && (
             <p className="text-sm text-muted-foreground py-2">
               No technicians found
             </p>
