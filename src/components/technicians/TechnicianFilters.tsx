@@ -68,6 +68,10 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   const [technicianDropdownOpen, setTechnicianDropdownOpen] = React.useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
+  // Create safe copies of arrays to prevent "undefined is not iterable" errors
+  const safeDepartments = departments || [];
+  const safeSelectedDepartments = selectedDepartments || [];
+  
   return (
     <div className="space-y-4 w-full">
       {/* Top row with main filters */}
@@ -99,14 +103,14 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         )}
 
         {/* Department filter if available */}
-        {departments.length > 0 && toggleDepartment && (
+        {safeDepartments.length > 0 && toggleDepartment && (
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <UserPlus className="h-4 w-4" />
                 Departments
-                {selectedDepartments.length > 0 && (
-                  <Badge variant="secondary" className="ml-1">{selectedDepartments.length}</Badge>
+                {safeSelectedDepartments.length > 0 && (
+                  <Badge variant="secondary" className="ml-1">{safeSelectedDepartments.length}</Badge>
                 )}
               </Button>
             </PopoverTrigger>
@@ -115,11 +119,11 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
                 <div className="font-medium">Filter by Department</div>
                 <Separator />
                 <div className="h-48 overflow-y-auto space-y-1">
-                  {departments.map((department) => (
+                  {safeDepartments.map((department) => (
                     <div key={department} className="flex items-center space-x-2">
                       <Checkbox 
                         id={`department-${department}`} 
-                        checked={selectedDepartments.includes(department)}
+                        checked={safeSelectedDepartments.includes(department)}
                         onCheckedChange={() => toggleDepartment(department)}
                       />
                       <Label htmlFor={`department-${department}`} className="cursor-pointer">{department}</Label>

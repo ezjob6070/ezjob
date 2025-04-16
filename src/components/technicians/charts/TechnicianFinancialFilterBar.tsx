@@ -59,26 +59,30 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
   const [showTechnicianFilter, setShowTechnicianFilter] = React.useState(false);
   const [techSearchQuery, setTechSearchQuery] = React.useState("");
 
-  const filteredTechnicianNames = technicianNames.filter(name =>
+  // Ensure arrays are not undefined to prevent errors
+  const safeTechnicianNames = technicianNames || [];
+  const safeSelectedTechnicians = selectedTechnicians || [];
+
+  const filteredTechnicianNames = safeTechnicianNames.filter(name =>
     name.toLowerCase().includes(techSearchQuery.toLowerCase())
   );
   
   const toggleAllTechnicians = (checked: boolean) => {
     if (checked) {
-      technicianNames.forEach(tech => {
-        if (!selectedTechnicians.includes(tech)) {
+      safeTechnicianNames.forEach(tech => {
+        if (!safeSelectedTechnicians.includes(tech)) {
           toggleTechnician(tech);
         }
       });
     } else {
-      selectedTechnicians.forEach(tech => {
+      safeSelectedTechnicians.forEach(tech => {
         toggleTechnician(tech);
       });
     }
   };
 
-  const allTechniciansSelected = technicianNames.length > 0 && 
-    technicianNames.every(tech => selectedTechnicians.includes(tech));
+  const allTechniciansSelected = safeTechnicianNames.length > 0 && 
+    safeTechnicianNames.every(tech => safeSelectedTechnicians.includes(tech));
   
   return (
     <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b">
@@ -97,11 +101,11 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
         <PopoverTrigger asChild>
           <Button variant="outline" className="bg-white hover:bg-gray-50 border-gray-200 text-gray-900 font-medium">
             <UserPlus className="h-4 w-4 mr-2 text-gray-700" />
-            {selectedTechnicians.length > 0 
-              ? `${selectedTechnicians.length} technicians` 
+            {safeSelectedTechnicians.length > 0 
+              ? `${safeSelectedTechnicians.length} technicians` 
               : "Filter Technicians"}
-            {selectedTechnicians.length > 0 && (
-              <Badge variant="secondary" className="ml-1">{selectedTechnicians.length}</Badge>
+            {safeSelectedTechnicians.length > 0 && (
+              <Badge variant="secondary" className="ml-1">{safeSelectedTechnicians.length}</Badge>
             )}
           </Button>
         </PopoverTrigger>
@@ -133,7 +137,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
                 <div key={tech} className="flex items-center space-x-2 py-1">
                   <Checkbox 
                     id={`tech-${tech}`} 
-                    checked={selectedTechnicians.includes(tech)}
+                    checked={safeSelectedTechnicians.includes(tech)}
                     onCheckedChange={() => toggleTechnician(tech)}
                   />
                   <label 
@@ -216,9 +220,9 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
       </DropdownMenu>
 
       {/* Applied Filters Indicator */}
-      {(selectedTechnicians.length > 0 || paymentTypeFilter !== "all" || jobStatusFilter !== "all") && (
+      {(safeSelectedTechnicians.length > 0 || paymentTypeFilter !== "all" || jobStatusFilter !== "all") && (
         <div className="text-sm text-gray-900 font-medium ml-2">
-          Showing {selectedTechnicians.length > 0 ? selectedTechnicians.length : "all"} technician(s)
+          Showing {safeSelectedTechnicians.length > 0 ? safeSelectedTechnicians.length : "all"} technician(s)
         </div>
       )}
     </div>

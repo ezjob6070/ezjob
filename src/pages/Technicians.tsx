@@ -23,12 +23,12 @@ const Technicians = () => {
     searchQuery,
     selectedTechnicians,
     selectedCategories,
-    selectedDepartments,
+    selectedDepartments = [], // Provide default empty array to avoid undefined
     statusFilter,
     sortOption,
     dateRange,
     categories,
-    departments,
+    departments = [], // Provide default empty array to avoid undefined
     handleAddTechnician,
     handleUpdateTechnician,
     handleSearchChange,
@@ -69,6 +69,9 @@ const Technicians = () => {
     
     handleUpdateTechnician(updatedTechnician);
   };
+
+  // Check if selectedDepartments is undefined or null, and provide a default value
+  const isSalaryDataVisible = !selectedDepartments || selectedDepartments.length === 0 || selectedDepartments.includes("Finance");
 
   return (
     <div className="space-y-8 py-8">
@@ -117,7 +120,7 @@ const Technicians = () => {
         selectedTechnicians={selectedTechnicians}
         onToggleSelect={toggleTechnician}
         onEditTechnician={handleEditTechnician}
-        showSalaryData={selectedDepartments.includes("Finance") || selectedDepartments.length === 0}
+        showSalaryData={isSalaryDataVisible}
       />
       
       <AddTechnicianModal 

@@ -6,8 +6,11 @@ import { SortOption } from "@/hooks/useTechniciansData";
 export const useTechnicianTableSorting = (technicians: Technician[]) => {
   const [sortBy, setSortBy] = useState<SortOption>("default");
   
+  // Ensure we have an array to work with
+  const techsToSort = technicians || [];
+  
   // Sort technicians based on selected sort option
-  const sortedTechnicians = [...technicians].sort((a, b) => {
+  const sortedTechnicians = [...techsToSort].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
         return a.name.localeCompare(b.name);
