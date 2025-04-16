@@ -26,13 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Job, JobStatus } from "./JobTypes";
@@ -45,13 +39,8 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 
 interface CreateJobModalProps {
   open: boolean;
@@ -98,7 +87,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   open,
   onOpenChange,
   onAddJob,
-  technicians,
+  technicians = [], // Default to empty array to prevent undefined errors
   jobSources = [],
 }) => {
   const form = useForm<FormValues>({
@@ -123,21 +112,39 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     },
   });
 
+  // State for technician search
+  const [technicianOpen, setTechnicianOpen] = useState(false);
+  const [technicianSearch, setTechnicianSearch] = useState("");
+
+  // Filter technicians based on search, ensure it's always an array
+  const filteredTechnicians = Array.isArray(technicians) 
+    ? technicians.filter(tech => 
+        tech && tech.name && tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
+      )
+    : [];
+
   // State for signature and images
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [signaturePad, setSignaturePad] = useState(false);
-  const [technicianDropdownOpen, setTechnicianDropdownOpen] = useState(false);
   
   // Watch the timeSelection field to conditionally show/hide time fields
   const timeSelection = form.watch("timeSelection");
   const hasSignature = form.watch("hasSignature");
   const clientEmail = form.watch("clientEmail");
   const sendNotification = form.watch("sendNotification");
+  const selectedTechnicianId = form.watch("technicianId");
+
+  // Get selected technician name
+  const selectedTechnician = Array.isArray(technicians) 
+    ? technicians.find(tech => tech && tech.id === selectedTechnicianId)
+    : undefined;
 
   const onSubmit = (values: FormValues) => {
     // Find technician name
-    const technician = technicians.find(tech => tech.id === values.technicianId);
+    const technician = Array.isArray(technicians) 
+      ? technicians.find(tech => tech && tech.id === values.technicianId)
+      : undefined;
     
     // Create date with time if not all day
     let scheduledDate = new Date(values.date);
@@ -213,7 +220,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
 
     if (values.jobSourceId) {
       newJob.jobSourceId = values.jobSourceId;
-      const source = jobSources.find(src => src.id === values.jobSourceId);
+      const source = jobSources.find(src => src && src.id === values.jobSourceId);
       if (source) {
         newJob.jobSourceName = source.name;
       }
@@ -243,6 +250,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     setSignatureData(null);
     setImages([]);
     setSignaturePad(false);
+    setTechnicianSearch("");
   };
 
   // Format time for display
@@ -385,50 +393,68 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Technician Selector with Search */}
                 <FormField
                   control={form.control}
                   name="technicianId"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Technician *</FormLabel>
-                      <Popover open={technicianDropdownOpen} onOpenChange={setTechnicianDropdownOpen}>
+                      <Popover open={technicianOpen} onOpenChange={setTechnicianOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
                               variant="outline"
                               role="combobox"
-                              aria-expanded={technicianDropdownOpen}
-                              className="w-full justify-between"
+                              aria-expanded={technicianOpen}
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
                             >
-                              {field.value
-                                ? technicians.find(
-                                    (technician) => technician.id === field.value
-                                  )?.name
-                                : "Select a technician"}
+                              {field.value && selectedTechnician
+                                ? selectedTechnician.name 
+                                : "Select technician"}
                               <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
-                          <Command>
-                            <CommandInput placeholder="Search technician..." />
-                            <CommandEmpty>No technician found.</CommandEmpty>
-                            <CommandGroup>
-                              {technicians.map((technician) => (
-                                <CommandItem
-                                  key={technician.id}
-                                  value={technician.name}
-                                  onSelect={() => {
-                                    form.setValue("technicianId", technician.id);
-                                    setTechnicianDropdownOpen(false);
-                                  }}
-                                  className="cursor-pointer"
-                                >
-                                  {technician.name}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
+                        <PopoverContent className="w-[300px] p-0">
+                          {Array.isArray(technicians) && technicians.length > 0 ? (
+                            <Command>
+                              <div className="relative">
+                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                <CommandInput
+                                  placeholder="Search technicians..."
+                                  className="pl-8"
+                                  value={technicianSearch}
+                                  onValueChange={setTechnicianSearch}
+                                />
+                              </div>
+                              <CommandEmpty>No technicians found</CommandEmpty>
+                              <CommandGroup className="max-h-52 overflow-y-auto">
+                                {filteredTechnicians.map((tech) => (
+                                  <CommandItem
+                                    key={tech.id}
+                                    value={tech.id}
+                                    onSelect={() => {
+                                      form.setValue("technicianId", tech.id);
+                                      setTechnicianOpen(false);
+                                    }}
+                                  >
+                                    {tech.name}
+                                    {tech.id === field.value && (
+                                      <span className="ml-auto flex h-4 w-4 items-center justify-center">✓</span>
+                                    )}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </Command>
+                          ) : (
+                            <div className="p-4 text-sm text-center text-muted-foreground">
+                              No technicians available
+                            </div>
+                          )}
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -436,7 +462,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
 
-                {jobSources.length > 0 && (
+                {Array.isArray(jobSources) && jobSources.length > 0 && (
                   <FormField
                     control={form.control}
                     name="jobSourceId"
@@ -454,9 +480,11 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           </FormControl>
                           <SelectContent>
                             {jobSources.map((source) => (
-                              <SelectItem key={source.id} value={source.id}>
-                                {source.name}
-                              </SelectItem>
+                              source && (
+                                <SelectItem key={source.id} value={source.id}>
+                                  {source.name}
+                                </SelectItem>
+                              )
                             ))}
                           </SelectContent>
                         </Select>
