@@ -5,7 +5,7 @@ import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
 import { DateRange } from "react-day-picker";
 
-// Export the SortOption type - make sure it matches what's used in TechnicianSortFilter.tsx
+// Export the SortOption type
 export type SortOption = 
   | 'default'
   | 'name'

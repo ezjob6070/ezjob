@@ -9,7 +9,6 @@ export const useTechnicianTableSorting = (technicians: Technician[]) => {
   // Sort technicians based on selected sort option
   const sortedTechnicians = [...technicians].sort((a, b) => {
     switch (sortBy) {
-      case "name":
       case "name-asc":
         return a.name.localeCompare(b.name);
       case "name-desc":

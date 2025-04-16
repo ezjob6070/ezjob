@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -97,7 +98,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   open,
   onOpenChange,
   onAddJob,
-  technicians = [],
+  technicians,
   jobSources = [],
 }) => {
   const form = useForm<FormValues>({
@@ -413,25 +414,19 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                             <CommandInput placeholder="Search technician..." />
                             <CommandEmpty>No technician found.</CommandEmpty>
                             <CommandGroup>
-                              {technicians && technicians.length > 0 ? (
-                                technicians.map((technician) => (
-                                  <CommandItem
-                                    key={technician.id}
-                                    value={technician.name}
-                                    onSelect={() => {
-                                      form.setValue("technicianId", technician.id);
-                                      setTechnicianDropdownOpen(false);
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    {technician.name}
-                                  </CommandItem>
-                                ))
-                              ) : (
-                                <CommandItem disabled value="no-technicians">
-                                  No technicians available
+                              {technicians.map((technician) => (
+                                <CommandItem
+                                  key={technician.id}
+                                  value={technician.name}
+                                  onSelect={() => {
+                                    form.setValue("technicianId", technician.id);
+                                    setTechnicianDropdownOpen(false);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  {technician.name}
                                 </CommandItem>
-                              )}
+                              ))}
                             </CommandGroup>
                           </Command>
                         </PopoverContent>
@@ -441,7 +436,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
 
-                {jobSources && jobSources.length > 0 && (
+                {jobSources.length > 0 && (
                   <FormField
                     control={form.control}
                     name="jobSourceId"
