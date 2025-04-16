@@ -5,13 +5,13 @@ import { useJobFilters } from "./useJobFilters";
 import { useJobActions } from "./useJobActions";
 import { UseJobsDataResult } from "./jobHookTypes";
 
-export const useJobsData = (initialJobs: Job[], jobSourceNames: string[] = []): UseJobsDataResult => {
+export const useJobsData = (initialJobs: Job[] = [], jobSourceNames: string[] = []): UseJobsDataResult => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [jobs, setJobs] = useState<Job[]>(initialJobs);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs);
+  const [jobs, setJobs] = useState<Job[]>(initialJobs || []);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs || []);
 
   // Get job filters functionality
-  const jobFilters = useJobFilters(jobSourceNames);
+  const jobFilters = useJobFilters(jobSourceNames || []);
   
   // Get job status actions functionality
   const jobActions = useJobActions(setJobs);

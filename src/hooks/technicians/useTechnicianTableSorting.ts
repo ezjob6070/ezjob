@@ -3,11 +3,11 @@ import { useState } from "react";
 import { Technician } from "@/types/technician";
 import { SortOption } from "@/hooks/useTechniciansData";
 
-export const useTechnicianTableSorting = (technicians: Technician[]) => {
+export const useTechnicianTableSorting = (technicians: Technician[] = []) => {
   const [sortBy, setSortBy] = useState<SortOption>("default");
   
   // Sort technicians based on selected sort option
-  const sortedTechnicians = [...technicians].sort((a, b) => {
+  const sortedTechnicians = [...(technicians || [])].sort((a, b) => {
     switch (sortBy) {
       case "name":
       case "name-asc":
