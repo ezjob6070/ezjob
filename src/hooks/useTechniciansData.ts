@@ -1,115 +1,210 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import { Technician } from "@/types/technician";
+import { DateRange } from "react-day-picker";
 import { initialTechnicians } from "@/data/technicians";
 
-// Export the SortOption type
 export type SortOption = 
-  | 'default'
-  | 'name'
-  | 'date-newest'
-  | 'date-oldest'
-  | 'revenue-high'
-  | 'revenue-low';
+  | "newest" 
+  | "oldest" 
+  | "name-asc" 
+  | "name-desc" 
+  | "revenue-high" 
+  | "revenue-low"
+  | "earnings-high" 
+  | "earnings-low" 
+  | "jobs-high" 
+  | "jobs-low" 
+  | "profit-high" 
+  | "profit-low"
+  | "default";
 
 export const useTechniciansData = () => {
+  const { toast } = useToast();
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
-  const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
-  const [sortOption, setSortOption] = useState<SortOption>("default");
+  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  
+  const categories = Array.from(new Set(
+    technicians.map(tech => tech.category || "Uncategorized")
+  ));
+  
+  const departments = Array.from(new Set(
+    technicians.map(tech => tech.department || "General")
+  ));
 
-  // Filter technicians based on search query and filters
-  useEffect(() => {
-    let result = [...technicians];
+  const filteredTechnicians = technicians
+    .filter(tech => {
+      const matchesSearch = searchQuery === "" || 
+        tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesCategory = selectedCategories.length === 0 || 
+        selectedCategories.includes(tech.category || "Uncategorized");
+      
+      const matchesStatus = statusFilter === "all" || 
+        tech.status === statusFilter;
+      
+      const matchesDepartment = selectedDepartments.length === 0 ||
+        selectedDepartments.includes(tech.department || "General");
+      
+      const matchesDateRange = !dateRange?.from ||
+        (tech.hireDate && new Date(tech.hireDate) >= dateRange.from &&
+         (!dateRange.to || new Date(tech.hireDate) <= dateRange.to));
+      
+      return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange;
+    })
+    .sort((a, b) => {
+      switch (sortOption) {
+        case "newest":
+          return new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime();
+        case "oldest":
+          return new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime();
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "revenue-high":
+          return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+        case "revenue-low":
+          return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+        case "earnings-high":
+          return ((b.totalRevenue || 0) * (b.paymentRate / 100)) - ((a.totalRevenue || 0) * (a.paymentRate / 100));
+        case "earnings-low":
+          return ((a.totalRevenue || 0) * (a.paymentRate / 100)) - ((b.totalRevenue || 0) * (b.paymentRate / 100));
+        case "jobs-high":
+          return (b.completedJobs || 0) - (a.completedJobs || 0);
+        case "jobs-low":
+          return (a.completedJobs || 0) - (b.completedJobs || 0);
+        case "profit-high":
+          return (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4)) 
+               - (a.totalRevenue || 0) + ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+        case "profit-low":
+          return (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4)) 
+               - (b.totalRevenue || 0) + ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
+        default:
+          return 0;
+      }
+    });
 
-    // Apply search filter
-    if (searchQuery) {
-      const lowerCaseQuery = searchQuery.toLowerCase();
-      result = result.filter(
-        (tech) =>
-          tech.name.toLowerCase().includes(lowerCaseQuery) ||
-          tech.email.toLowerCase().includes(lowerCaseQuery) ||
-          tech.phone.includes(searchQuery)
-      );
-    }
+  const handleAddTechnician = (newTechnician: Technician) => {
+    setTechnicians((prevTechnicians) => [newTechnician, ...prevTechnicians]);
+    toast({
+      title: "Success",
+      description: "New technician added successfully",
+    });
+  };
 
-    // Apply status filter
-    if (selectedStatus) {
-      result = result.filter((tech) => tech.status === selectedStatus);
-    }
-
-    // Apply specialty filter
-    if (selectedSpecialty) {
-      result = result.filter((tech) =>
-        tech.specialties.includes(selectedSpecialty)
-      );
-    }
-
-    // Apply sorting
-    result = sortTechnicians(result, sortOption);
-
-    setFilteredTechnicians(result);
-  }, [technicians, searchQuery, selectedStatus, selectedSpecialty, sortOption]);
-
-  // Sort technicians based on selected option
-  const sortTechnicians = (techs: Technician[], option: SortOption): Technician[] => {
-    const sortedTechs = [...techs];
+  const handleUpdateTechnician = (updatedTechnician: Technician) => {
+    setTechnicians((prevTechnicians) => 
+      prevTechnicians.map((tech) => 
+        tech.id === updatedTechnician.id ? updatedTechnician : tech
+      )
+    );
     
-    switch (option) {
-      case "name":
-        return sortedTechs.sort((a, b) => a.name.localeCompare(b.name));
-      case "date-newest":
-        return sortedTechs.sort((a, b) => new Date(b.hireDate).getTime() - new Date(a.hireDate).getTime());
-      case "date-oldest":
-        return sortedTechs.sort((a, b) => new Date(a.hireDate).getTime() - new Date(b.hireDate).getTime());
-      case "revenue-high":
-        return sortedTechs.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0));
-      case "revenue-low":
-        return sortedTechs.sort((a, b) => (a.totalRevenue || 0) - (b.totalRevenue || 0));
-      default:
-        return sortedTechs;
-    }
-  };
-
-  // Get all unique specialties from technicians
-  const getUniqueSpecialties = (): string[] => {
-    const specialties = new Set<string>();
-    technicians.forEach((tech) => {
-      tech.specialties.forEach((specialty) => {
-        specialties.add(specialty);
-      });
+    toast({
+      title: "Success",
+      description: "Technician updated successfully",
     });
-    return Array.from(specialties).sort();
   };
 
-  // Get all unique statuses from technicians
-  const getUniqueStatuses = (): string[] => {
-    const statuses = new Set<string>();
-    technicians.forEach((tech) => {
-      statuses.add(tech.status);
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const toggleTechnician = (technicianId: string) => {
+    setSelectedTechnicians(prev => {
+      if (prev.includes(technicianId)) {
+        return prev.filter(id => id !== technicianId);
+      } else {
+        return [...prev, technicianId];
+      }
     });
-    return Array.from(statuses).sort();
   };
 
-  // Get active technicians (status === "Active")
-  const getActiveTechnicians = (): Technician[] => {
-    return technicians.filter((tech) => tech.status === "Active");
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(category)) {
+        return prev.filter(c => c !== category);
+      } else {
+        return [...prev, category];
+      }
+    });
+  };
+  
+  const toggleDepartment = (department: string) => {
+    setSelectedDepartments(prev => {
+      if (prev.includes(department)) {
+        return prev.filter(d => d !== department);
+      } else {
+        return [...prev, department];
+      }
+    });
+  };
+
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+  };
+
+  const addCategory = (category: string) => {
+    toast({
+      title: "Category Added",
+      description: `New category "${category}" has been added.`,
+    });
+  };
+  
+  const exportTechnicians = () => {
+    const dataToExport = filteredTechnicians;
+    const json = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const href = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = 'technicians-export.json';
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+    
+    toast({
+      title: "Export Successful",
+      description: `Exported ${dataToExport.length} technicians to JSON.`,
+    });
   };
 
   return {
     technicians,
     filteredTechnicians,
     searchQuery,
-    setSearchQuery,
-    selectedStatus,
-    setSelectedStatus,
-    selectedSpecialty,
-    setSelectedSpecialty,
+    selectedTechnicians,
+    selectedCategories,
+    selectedDepartments,
+    statusFilter,
     sortOption,
-    setSortOption,
-    getUniqueSpecialties,
-    getUniqueStatuses,
-    getActiveTechnicians,
+    dateRange,
+    categories,
+    departments,
+    handleAddTechnician,
+    handleUpdateTechnician,
+    handleSearchChange,
+    toggleTechnician,
+    toggleCategory,
+    toggleDepartment,
+    handleSortChange,
+    setStatusFilter,
+    setDateRange,
+    addCategory,
+    exportTechnicians
   };
 };
+
+export default useTechniciansData;
