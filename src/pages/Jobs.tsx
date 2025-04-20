@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useJobsData } from "@/hooks/useJobsData";
 import { useJobSourceData, JOB_SOURCES } from "@/hooks/jobs/useJobSourceData";
 import { JOB_CATEGORIES } from "@/components/jobs/constants";
@@ -73,6 +73,12 @@ const Jobs = () => {
 
   const handleAddJob = (job: Job) => {
     addJob(job);
+    setIsCreateModalOpen(false); // Close modal after adding
+    
+    toast({
+      title: "Job Created",
+      description: `New job for ${job.clientName} has been added successfully.`,
+    });
   };
 
   const handleCancelJob = (jobId: string, reason?: string) => {

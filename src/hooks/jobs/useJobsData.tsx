@@ -10,6 +10,11 @@ export const useJobsData = (initialJobs: Job[], jobSourceNames: string[] = []): 
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs);
 
+  // Update local jobs state when initialJobs (globalJobs) changes
+  useEffect(() => {
+    setJobs(initialJobs);
+  }, [initialJobs]);
+
   // Get job filters functionality
   const jobFilters = useJobFilters(jobSourceNames);
   
