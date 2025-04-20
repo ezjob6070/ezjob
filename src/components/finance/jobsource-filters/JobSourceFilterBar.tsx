@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DateRange } from "react-day-picker";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 import CompactJobSourceFilter from "./CompactJobSourceFilter";

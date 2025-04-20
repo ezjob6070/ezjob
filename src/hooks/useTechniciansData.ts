@@ -1,11 +1,13 @@
-
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
 import { SortOption } from "@/types/sortOptions";
+import { useToast } from "@/components/ui/use-toast";
+import { initialTechnicians } from "@/data/technicians";
 
 export function useTechniciansData() {
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const { toast } = useToast();
+  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -15,6 +17,13 @@ export function useTechniciansData() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [categories, setCategories] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
+
+  const addCategory = (category: string) => {
+    toast({
+      title: "Category Added",
+      description: `New category "${category}" has been added.`,
+    });
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -110,7 +119,6 @@ export function useTechniciansData() {
         filtered.sort((a, b) => a.totalRevenue - b.totalRevenue);
         break;
       case "profit-high":
-        // Simple profit estimate: 40% of revenue
         filtered.sort((a, b) => (b.totalRevenue * 0.4) - (a.totalRevenue * 0.4));
         break;
       case "profit-low":
@@ -151,6 +159,7 @@ export function useTechniciansData() {
   };
 
   return {
+    technicians,
     filteredTechnicians,
     searchQuery,
     selectedTechnicians,
@@ -174,3 +183,5 @@ export function useTechniciansData() {
     exportTechnicians
   };
 }
+
+export default useTechniciansData;

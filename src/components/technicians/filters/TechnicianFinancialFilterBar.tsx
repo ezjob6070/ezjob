@@ -1,9 +1,11 @@
+
 import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TechnicianDateFilter from "./TechnicianDateFilter";
 import TechnicianSortFilter from "./TechnicianSortFilter";
 import { DateRange } from "react-day-picker";
 import { SortOption } from "@/types/sortOptions";
+import CompactTechnicianFilter from "../filters/CompactTechnicianFilter";
 
 interface TechnicianFinancialFilterBarProps {
   technicianNames: string[];

@@ -48,14 +48,15 @@ const Technicians = () => {
   };
 
   const handleSearchChangeAdapted = (query: string) => {
-    const event = {
+    const syntheticEvent = {
       target: { value: query }
     } as React.ChangeEvent<HTMLInputElement>;
-    handleSearchChange(event);
+    
+    handleSearchChange(syntheticEvent);
   };
 
   const handleSortChangeAdapted = (option: SortOption) => {
-    handleSortChange(option);
+    handleSortChange(option as any);
   };
 
   const handleUpdateTechnicianForm = (values: TechnicianEditFormValues) => {
@@ -113,7 +114,7 @@ const Technicians = () => {
           onTechnicianToggle={toggleTechnician}
           searchQuery={searchQuery}
           onSearchChange={handleSearchChangeAdapted}
-          sortOption={sortOption}
+          sortOption={sortOption as any}
           onSortChange={handleSortChangeAdapted}
           date={dateRange}
           setDate={setDateRange}

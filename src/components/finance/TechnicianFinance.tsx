@@ -5,14 +5,14 @@ import { useFinanceData } from "@/hooks/useFinanceData";
 import { Card, CardContent } from "@/components/ui/card";
 
 const TechnicianFinance = () => {
-  const { technicians } = useTechniciansData();
+  const { filteredTechnicians } = useTechniciansData();
   const { transactions } = useFinanceData();
   
   return (
     <Card className="border-none shadow-sm">
       <CardContent className="p-6">
         <TechniciansFinance 
-          technicians={technicians} 
+          technicians={filteredTechnicians} 
           transactions={transactions}
         />
       </CardContent>
