@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Technician } from '@/types/technician';
 import { technicians as initialTechnicians } from '@/data/technicians';
@@ -26,70 +25,10 @@ interface GlobalStateContextType {
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
 
 export function GlobalStateProvider({ children }: { children: ReactNode }) {
-  // Initialize state from localStorage or use default data
-  const [technicians, setTechnicians] = useState<Technician[]>(() => {
-    const saved = localStorage.getItem('technicians');
-    return saved ? JSON.parse(saved) : initialTechnicians;
-  });
-  
-  const [jobs, setJobs] = useState<Job[]>(() => {
-    const saved = localStorage.getItem('jobs');
-    return saved ? JSON.parse(saved) : initialJobs;
-  });
-  
-  const [jobSources, setJobSources] = useState<JobSource[]>(() => {
-    const saved = localStorage.getItem('jobSources');
-    if (saved) return JSON.parse(saved);
-    
-    // Default job sources if none exist in localStorage
-    return [
-      {
-        id: "1",
-        name: "Google Ads",
-        website: "https://ads.google.com",
-        phone: "(555) 123-4567",
-        email: "ads@google.com",
-        logoUrl: "https://source.unsplash.com/random/200x200/?google",
-        paymentType: "percentage",
-        paymentValue: 10,
-        isActive: true,
-        totalJobs: 0,
-        totalRevenue: 0,
-        profit: 0,
-        createdAt: new Date(),
-        notes: "Our primary advertising channel for service leads."
-      },
-      {
-        id: "2",
-        name: "Facebook Marketplace",
-        website: "https://facebook.com/marketplace",
-        phone: "(555) 234-5678",
-        email: "marketplace@facebook.com",
-        logoUrl: "https://source.unsplash.com/random/200x200/?facebook",
-        paymentType: "fixed",
-        paymentValue: 50,
-        isActive: true,
-        totalJobs: 0,
-        totalRevenue: 0,
-        profit: 0,
-        createdAt: new Date(),
-        notes: "Targeting local homeowners in need of services."
-      },
-      {
-        id: "3",
-        name: "Referral Program",
-        phone: "(555) 987-6543",
-        paymentType: "percentage",
-        paymentValue: 5,
-        isActive: true,
-        totalJobs: 0,
-        totalRevenue: 0,
-        profit: 0,
-        createdAt: new Date(),
-        notes: "Customer referrals - $50 credit for both referrer and new customer."
-      }
-    ];
-  });
+  // Initialize empty state
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobSources, setJobSources] = useState<JobSource[]>([]);
 
   // Save to localStorage whenever state changes
   useEffect(() => {
