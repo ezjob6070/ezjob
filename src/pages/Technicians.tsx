@@ -7,7 +7,7 @@ import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
-import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
+import TechnicianSearchBar from "@/components/technicians/TechnicianSearchBar";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
@@ -45,10 +45,6 @@ const Technicians = () => {
   const handleEditTechnician = (technician: Technician) => {
     setSelectedTechnician(technician);
     setShowEditModal(true);
-  };
-
-  const handleSearchChangeAdapted = (query: string) => {
-    handleSearchChange(query);
   };
 
   const handleSortChangeAdapted = (option: SortOption) => {
@@ -94,7 +90,7 @@ const Technicians = () => {
         <div className="mb-4">
           <TechnicianSearchBar
             searchQuery={searchQuery}
-            onSearchChange={handleSearchChangeAdapted}
+            onSearchChange={handleSearchChange}
           />
         </div>
         
@@ -109,7 +105,7 @@ const Technicians = () => {
           selectedTechnicians={selectedTechnicians}
           onTechnicianToggle={toggleTechnician}
           searchQuery={searchQuery}
-          onSearchChange={handleSearchChangeAdapted}
+          onSearchChange={handleSearchChange}
           sortOption={sortOption as any}
           onSortChange={handleSortChangeAdapted}
           date={dateRange}
