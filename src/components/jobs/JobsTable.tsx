@@ -62,7 +62,21 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
     return status.replace('_', ' ').replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  const formatDateTime = (date: Date, isAllDay?: boolean) => {
+  // Modified function to handle potential non-Date values
+  const formatDateTime = (dateInput: Date | string | null | undefined, isAllDay?: boolean) => {
+    // Check if dateInput exists and create a valid Date object
+    if (!dateInput) {
+      return <span>No date specified</span>;
+    }
+    
+    // Ensure we're working with a Date object
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    
+    // Validate the date is valid
+    if (isNaN(date.getTime())) {
+      return <span>Invalid date</span>;
+    }
+    
     if (isAllDay) {
       return (
         <div className="flex items-center">
