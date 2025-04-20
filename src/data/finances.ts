@@ -1,4 +1,6 @@
+
 import { FinancialTransaction } from "@/types/finance";
+import { calculateTechnicianProfit } from "@/components/dashboard/DashboardUtils";
 
 // Start with empty transactions
 export const sampleTransactions: FinancialTransaction[] = [];
