@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -48,14 +47,12 @@ interface CreateJobModalProps {
   jobSources?: { id: string; name: string }[];
 }
 
-// Time options for quick selection
 const timeOptions = [
   "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", 
   "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", 
   "04:00 PM", "05:00 PM", "06:00 PM"
 ];
 
-// Update the form schema with the new fields
 const formSchema = z.object({
   title: z.string().optional(),
   clientName: z.string().min(2, "Client name must be at least 2 characters"),
@@ -74,7 +71,6 @@ const formSchema = z.object({
   amount: z.coerce.number().optional(),
   notes: z.string().optional(),
   parts: z.string().optional(),
-  // New fields
   hasSignature: z.boolean().default(false),
   sendNotification: z.boolean().default(false),
 });
@@ -110,22 +106,23 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     },
   });
 
-  // State for signature and images
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [signaturePad, setSignaturePad] = useState(false);
-  
-  // Watch the timeSelection field to conditionally show/hide time fields
+  const [technicianSearch, setTechnicianSearch] = useState("");
+
+  const filteredTechnicians = technicians.filter(tech =>
+    tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
+  );
+
   const timeSelection = form.watch("timeSelection");
   const hasSignature = form.watch("hasSignature");
   const clientEmail = form.watch("clientEmail");
   const sendNotification = form.watch("sendNotification");
 
   const onSubmit = (values: FormValues) => {
-    // Find technician name
     const technician = technicians.find(tech => tech.id === values.technicianId);
     
-    // Create date with time if not all day
     let scheduledDate = new Date(values.date);
     const isAllDay = values.timeSelection === "allDay";
     
@@ -143,21 +140,17 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
         let hours = parseInt(timeString.split(":")[0]);
         const minutes = parseInt(timeString.split(":")[1]?.split(" ")[0] || "0");
         
-        // Convert 12-hour format to 24-hour if needed
         if (isPM && hours !== 12) hours += 12;
         if (!isPM && hours === 12) hours = 0;
         
         scheduledDate.setHours(hours, minutes, 0, 0);
       } else {
-        // Default to 9 AM if no time is specified
         scheduledDate.setHours(9, 0, 0, 0);
       }
     } else {
-      // For all-day events, set to start of day
       scheduledDate.setHours(0, 0, 0, 0);
     }
     
-    // Generate new job - defaulting to in_progress status
     const newJob: Job = {
       id: uuidv4(),
       clientName: values.clientName,
@@ -171,7 +164,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       status: "in_progress" as JobStatus,
     };
 
-    // Add optional fields
     if (values.title) {
       newJob.title = values.title;
     }
@@ -185,7 +177,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     }
 
     if (values.parts) {
-      // Convert string to string array by splitting on new lines or commas
       newJob.parts = values.parts.split(/[\n,]+/).map(part => part.trim()).filter(Boolean);
     }
 
@@ -205,22 +196,17 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       }
     }
 
-    // Add signature data if available
     if (signatureData) {
       newJob.signature = signatureData;
     }
 
-    // For images, in a real app we would upload them to storage and store URLs
-    // Here we'll just indicate that images were attached
     if (images.length > 0) {
       newJob.hasImages = true;
       newJob.imageCount = images.length;
     }
 
-    // Handle notification (in a real app, this would send an email)
     if (values.sendNotification && values.clientEmail) {
       console.log(`Sending notification to ${values.clientEmail} about new job`);
-      // In a real implementation, this would call an API to send an email
     }
 
     onAddJob(newJob);
@@ -231,7 +217,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     setSignaturePad(false);
   };
 
-  // Format time for display
   const formatTimeOption = (time: string) => {
     return (
       <div className="flex items-center">
@@ -241,7 +226,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     );
   };
 
-  // Handle file selection for images
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileArray = Array.from(e.target.files);
@@ -249,11 +233,9 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     }
   };
 
-  // Simulated signature pad (in a real app, use a proper signature library)
   const handleSignature = () => {
     setSignaturePad(!signaturePad);
     if (!signaturePad) {
-      // This would be replaced with actual signature data
       setTimeout(() => {
         setSignatureData("data:image/png;base64,signature-data-placeholder");
       }, 500);
@@ -387,11 +369,26 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {technicians.map((tech) => (
-                            <SelectItem key={tech.id} value={tech.id}>
-                              {tech.name}
-                            </SelectItem>
-                          ))}
+                          <div className="px-3 pb-2">
+                            <Input
+                              placeholder="Search technicians..."
+                              value={technicianSearch}
+                              onChange={(e) => setTechnicianSearch(e.target.value)}
+                              className="mb-2"
+                            />
+                          </div>
+                          <div className="max-h-[200px] overflow-y-auto">
+                            {filteredTechnicians.map((tech) => (
+                              <SelectItem key={tech.id} value={tech.id}>
+                                {tech.name}
+                              </SelectItem>
+                            ))}
+                            {filteredTechnicians.length === 0 && (
+                              <div className="px-3 py-2 text-sm text-muted-foreground">
+                                No technicians found
+                              </div>
+                            )}
+                          </div>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -616,11 +613,9 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 />
               </div>
 
-              {/* New section for attachments and signature */}
               <div className="border-t pt-4 mt-2">
                 <h3 className="text-lg font-medium mb-3">Additional Options</h3>
                 
-                {/* Image Upload */}
                 <div className="mb-4">
                   <h4 className="text-sm font-medium mb-2">Attach Images</h4>
                   <div className="flex items-center gap-3">
@@ -658,7 +653,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 </div>
                 
-                {/* Signature Capture */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between">
                     <FormField
@@ -709,7 +703,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 </div>
                 
-                {/* Send notification to client */}
                 <div className="mb-2">
                   <FormField
                     control={form.control}
