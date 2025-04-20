@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
@@ -40,8 +40,14 @@ const Technicians = () => {
     setStatusFilter,
     setDateRange,
     addCategory,
-    exportTechnicians
+    exportTechnicians,
+    setTechnicians
   } = useTechniciansData();
+  
+  // Sync technicians from GlobalState to local state in useTechniciansData
+  useEffect(() => {
+    setTechnicians(globalTechnicians);
+  }, [globalTechnicians, setTechnicians]);
 
   const handleEditTechnician = (technician: Technician) => {
     setSelectedTechnician(technician);
