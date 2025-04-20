@@ -12,7 +12,10 @@ export const dashboardTaskCounts = {
 
 export const dashboardFinancialMetrics = {
   totalRevenue: 0,
-  companysCut: 0
+  companysCut: 0,
+  avgJobValue: 0,
+  monthlyGrowth: 0,
+  conversionRate: 0
 };
 
 export const dashboardLeadSources = [];
