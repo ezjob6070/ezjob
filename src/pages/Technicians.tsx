@@ -25,12 +25,12 @@ const Technicians = () => {
     searchQuery,
     selectedTechnicians,
     selectedCategories,
-    selectedDepartments = [], // Provide default empty array to avoid undefined
+    selectedDepartments = [], 
     statusFilter,
     sortOption,
     dateRange,
     categories,
-    departments = [], // Provide default empty array to avoid undefined
+    departments = [], 
     handleSearchChange,
     toggleTechnician,
     toggleCategory,
@@ -48,15 +48,11 @@ const Technicians = () => {
   };
 
   const handleSearchChangeAdapted = (query: string) => {
-    const syntheticEvent = {
-      target: { value: query }
-    } as React.ChangeEvent<HTMLInputElement>;
-    
-    handleSearchChange(syntheticEvent);
+    handleSearchChange(query);
   };
 
   const handleSortChangeAdapted = (option: SortOption) => {
-    handleSortChange(option as any);
+    handleSortChange(option);
   };
 
   const handleUpdateTechnicianForm = (values: TechnicianEditFormValues) => {
@@ -98,7 +94,7 @@ const Technicians = () => {
         <div className="mb-4">
           <TechnicianSearchBar
             searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
+            onSearchChange={handleSearchChangeAdapted}
           />
         </div>
         
