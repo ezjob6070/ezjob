@@ -13,6 +13,7 @@ import { useFinanceData } from "@/hooks/useFinanceData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 const Finance = () => {
   const [activeTab, setActiveTab] = useState<FinanceTabId>("overview");
@@ -21,15 +22,13 @@ const Finance = () => {
     to: new Date(),
   });
   
+  const { technicians, jobs, jobSources } = useGlobalState();
+  
   const {
     showFilters,
     setShowFilters,
     selectedTechnicians,
     selectedJobSources,
-    totalRevenue,
-    totalExpenses,
-    totalProfit,
-    jobSources,
     filteredTransactions,
     filteredJobSources,
     expenseCategories,
@@ -43,6 +42,17 @@ const Finance = () => {
     searchQuery,
     setSearchQuery
   } = useFinanceData();
+  
+  // Calculate total metrics from actual job data
+  const totalRevenue = jobs
+    .filter(job => job.status === "completed" && (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to)))
+    .reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
+
+  // Estimate expenses as 40% of revenue for completed jobs
+  const totalExpenses = totalRevenue * 0.4;
+  
+  // Calculate profit as revenue minus expenses
+  const totalProfit = totalRevenue - totalExpenses;
 
   const handleTabChange = (value: string) => {
     setActiveTab(value as FinanceTabId);
@@ -101,13 +111,13 @@ const Finance = () => {
               <TabsContent value="technicians" className="mt-0">
                 <TechniciansDashboard 
                   key="technicians-dashboard"
-                  activeTechnicians={activeTechnicians}
+                  activeTechnicians={activeTechnicians.length > 0 ? activeTechnicians : technicians}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
                 />
                 
                 <div className="mt-8 w-full">
-                  <TechnicianInvoiceSection activeTechnicians={activeTechnicians} />
+                  <TechnicianInvoiceSection activeTechnicians={activeTechnicians.length > 0 ? activeTechnicians : technicians} />
                 </div>
               </TabsContent>
 

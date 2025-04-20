@@ -12,13 +12,22 @@ type JobStatsProps = {
 };
 
 const JobStats = ({ jobs, date }: JobStatsProps) => {
+  // Filter jobs based on date range if provided
+  const filteredJobs = date?.from 
+    ? jobs.filter(job => 
+        job.scheduledDate && 
+        new Date(job.scheduledDate) >= date.from! && 
+        (!date.to || new Date(job.scheduledDate) <= date.to!)
+      )
+    : jobs;
+    
   // Stats
-  const scheduledJobs = jobs.filter(job => job.status === "scheduled").length;
-  const completedJobs = jobs.filter(job => job.status === "completed").length;
-  const cancelledJobs = jobs.filter(job => job.status === "cancelled").length;
+  const scheduledJobs = filteredJobs.filter(job => job.status === "scheduled").length;
+  const completedJobs = filteredJobs.filter(job => job.status === "completed").length;
+  const cancelledJobs = filteredJobs.filter(job => job.status === "cancelled").length;
   
   // Calculate using actualAmount for completed jobs and regular amount for others
-  const totalRevenue = jobs.reduce((sum, job) => {
+  const totalRevenue = filteredJobs.reduce((sum, job) => {
     if (job.status === "completed" && job.actualAmount !== undefined) {
       return sum + job.actualAmount;
     }

@@ -8,6 +8,7 @@ import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
 import TransactionsSection from "@/components/finance/TransactionsSection";
 import ReportGenerator from "@/components/finance/ReportGenerator";
 import { DateRange } from "react-day-picker";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 interface OverviewDashboardProps {
   totalRevenue: number;
@@ -34,6 +35,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   date,
   setDate
 }) => {
+  const { jobs } = useGlobalState();
+  
   // Generate the profit breakdown data
   const profitBreakdown: ProfitBreakdownItem[] = [
     { name: "Operating Costs", value: totalProfit * 0.3, color: "#3b82f6" }, // blue
@@ -42,11 +45,22 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     { name: "Taxes", value: totalProfit * 0.15, color: "#ef4444" },          // red
   ];
 
-  // Revenue breakdown data
+  // Revenue breakdown data based on actual job payment methods (or using estimate if no data)
+  const completedJobs = jobs.filter(job => job.status === "completed");
+  const creditCardJobs = completedJobs.filter(job => job.paymentMethod === "credit_card").length;
+  const cashJobs = completedJobs.filter(job => job.paymentMethod === "cash").length;
+  const checkJobs = completedJobs.filter(job => job.paymentMethod === "check").length;
+  const totalJobsWithPayment = creditCardJobs + cashJobs + checkJobs;
+  
+  // Calculate revenue breakdown percentages or use defaults
+  const creditCardPercent = totalJobsWithPayment > 0 ? creditCardJobs / totalJobsWithPayment : 0.45;
+  const cashPercent = totalJobsWithPayment > 0 ? cashJobs / totalJobsWithPayment : 0.35;
+  const checkPercent = totalJobsWithPayment > 0 ? checkJobs / totalJobsWithPayment : 0.20;
+  
   const revenueBreakdown = [
-    { name: "Credit Card", value: totalRevenue * 0.45, color: "#0ea5e9" }, // sky blue
-    { name: "Cash", value: totalRevenue * 0.35, color: "#ec4899" }, // pink
-    { name: "Check", value: totalRevenue * 0.20, color: "#6366f1" },  // indigo
+    { name: "Credit Card", value: totalRevenue * creditCardPercent, color: "#0ea5e9" }, // sky blue
+    { name: "Cash", value: totalRevenue * cashPercent, color: "#ec4899" }, // pink
+    { name: "Check", value: totalRevenue * checkPercent, color: "#6366f1" },  // indigo
   ];
 
   return (
@@ -98,20 +112,42 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             
             {/* Expense breakdown list without donut chart */}
             <div className="space-y-4">
-              {expenseCategories.map((item) => (
-                <div key={item.name} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
-                    <span className="font-medium">{item.name}</span>
+              {expenseCategories.length > 0 ? (
+                expenseCategories.map((item) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-red-600">-{formatCurrency(item.value)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        ({totalExpenses > 0 ? ((item.value / totalExpenses) * 100).toFixed(1) : "0"}%)
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-red-600">-{formatCurrency(item.value)}</span>
-                    <span className="text-sm text-muted-foreground">
-                      ({totalExpenses > 0 ? ((item.value / totalExpenses) * 100).toFixed(1) : "0"}%)
-                    </span>
+                ))
+              ) : (
+                // Default expense categories if none provided
+                [
+                  { name: "Materials", value: totalExpenses * 0.5, color: "#ef4444" },
+                  { name: "Labor", value: totalExpenses * 0.3, color: "#f97316" },
+                  { name: "Overhead", value: totalExpenses * 0.2, color: "#8b5cf6" }
+                ].map((item) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-red-600">-{formatCurrency(item.value)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        ({totalExpenses > 0 ? ((item.value / totalExpenses) * 100).toFixed(1) : "0"}%)
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

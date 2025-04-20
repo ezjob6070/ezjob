@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -7,6 +8,7 @@ import { FinancialTransaction, JobSource } from "@/types/finance";
 import { sampleTransactions, getDateRangeForTimeFrame } from "@/data/finances";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 const FinanceOverview = () => {
   const [date, setDate] = useState<DateRange | undefined>({
@@ -14,65 +16,18 @@ const FinanceOverview = () => {
     to: new Date(),
   });
   const [transactions, setTransactions] = useState<FinancialTransaction[]>(sampleTransactions);
-  const [jobSources, setJobSources] = useState<JobSource[]>([]);
+  const { jobs, jobSources } = useGlobalState();
+  
+  // Calculate total metrics from actual job data
+  const totalRevenue = jobs
+    .filter(job => job.status === "completed" && (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to)))
+    .reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
 
-  useEffect(() => {
-    // Prepare job sources with financial data
-    const sources: JobSource[] = [
-      {
-        id: "js1",
-        name: "Website",
-        totalJobs: 120,
-        totalRevenue: 55000,
-        expenses: 12000,
-        companyProfit: 23000,
-        createdAt: new Date(),
-      },
-      {
-        id: "js2", 
-        name: "Referral",
-        totalJobs: 80,
-        totalRevenue: 40000,
-        expenses: 8000,
-        companyProfit: 18000,
-        createdAt: new Date(),
-      },
-      {
-        id: "js3",
-        name: "Google Ads",
-        totalJobs: 150,
-        totalRevenue: 70000,
-        expenses: 25000,
-        companyProfit: 30000,
-        createdAt: new Date(),
-      },
-      {
-        id: "js4",
-        name: "Social Media",
-        totalJobs: 65,
-        totalRevenue: 32000,
-        expenses: 10000,
-        companyProfit: 12000,
-        createdAt: new Date(),
-      },
-      {
-        id: "js5",
-        name: "Direct Call",
-        totalJobs: 95,
-        totalRevenue: 48000,
-        expenses: 9000,
-        companyProfit: 22000,
-        createdAt: new Date(),
-      },
-    ] as JobSource[];
-    
-    setJobSources(sources);
-  }, []);
-
-  // Calculate total metrics
-  const totalRevenue = jobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
-  const totalExpenses = jobSources.reduce((sum, source) => sum + (source.expenses || 0), 0);
-  const totalProfit = jobSources.reduce((sum, source) => sum + (source.companyProfit || 0), 0);
+  // Estimate expenses as 40% of revenue for completed jobs
+  const totalExpenses = totalRevenue * 0.4;
+  
+  // Calculate profit as revenue minus expenses
+  const totalProfit = totalRevenue - totalExpenses;
 
   return (
     <div className="container py-8">
