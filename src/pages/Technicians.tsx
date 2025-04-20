@@ -13,6 +13,7 @@ import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
+import { v4 as uuidv4 } from 'uuid';
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -56,6 +57,17 @@ const Technicians = () => {
 
   const handleSortChangeAdapted = (option: SortOption) => {
     handleSortChange(option);
+  };
+
+  const handleAddNewTechnician = (technicianData: any) => {
+    // Ensure the technician has a unique ID
+    const technicianWithId = {
+      ...technicianData,
+      id: uuidv4()
+    };
+    
+    addTechnician(technicianWithId);
+    setShowAddModal(false);
   };
 
   const handleUpdateTechnicianForm = (values: TechnicianEditFormValues) => {
@@ -134,7 +146,7 @@ const Technicians = () => {
       <AddTechnicianModal 
         open={showAddModal}
         onOpenChange={setShowAddModal}
-        onAddTechnician={addTechnician}
+        onAddTechnician={handleAddNewTechnician}
       />
 
       <EditTechnicianModal

@@ -1,14 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Technician } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 export const useTechnicianDetail = (technicianId: string | undefined) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { technicians: globalTechnicians } = useGlobalState();
   const [technician, setTechnician] = useState<Technician | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
@@ -20,7 +21,12 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    const techData = initialTechnicians.find(tech => tech.id === technicianId);
+    let techData = globalTechnicians.find(tech => tech.id === technicianId);
+    
+    if (!techData) {
+      techData = initialTechnicians.find(tech => tech.id === technicianId);
+    }
+    
     if (techData) {
       setTechnician(techData);
       setFilteredTechnicians([techData]);
@@ -34,7 +40,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
       });
       navigate("/technicians");
     }
-  }, [technicianId, navigate, toast]);
+  }, [technicianId, navigate, toast, globalTechnicians]);
 
   const handleUpdateTechnician = (values: TechnicianEditFormValues) => {
     if (!technician) return;
