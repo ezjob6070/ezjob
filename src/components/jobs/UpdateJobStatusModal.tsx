@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Job, JobStatus } from "./JobTypes";
 import {
@@ -100,7 +101,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
       onReschedule(job.id, scheduledDate, isAllDay);
     }
     
-    onOpenChange(false);
+    // No need to manually close the modal here - the parent component will handle it
   };
 
   return (

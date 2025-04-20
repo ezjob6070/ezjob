@@ -4,6 +4,7 @@ import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon } from "lu
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 type MetricsOverviewProps = {
   financialMetrics: {
@@ -28,6 +29,12 @@ const MetricsOverview = ({
   detailedBusinessMetrics,
   dateRange
 }: MetricsOverviewProps) => {
+  const { jobs } = useGlobalState();
+  
+  // Calculate real metrics from jobs data
+  const activeJobs = jobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
+  const completedJobs = jobs.filter(job => job.status === "completed").length;
+  
   // Format the date range for display
   const dateRangeText = () => {
     if (!dateRange?.from) return "";
@@ -46,7 +53,7 @@ const MetricsOverview = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
       <DashboardMetricCard
         title="Calls"
-        value="0"
+        value={completedJobs.toString()}
         icon={<PhoneCallIcon size={20} className="text-white" />}
         description="Total calls this month"
         trend={{ value: "0%", isPositive: true }}
@@ -58,7 +65,7 @@ const MetricsOverview = ({
       />
       <DashboardMetricCard
         title="Jobs"
-        value="0"
+        value={activeJobs.toString()}
         icon={<BriefcaseIcon size={20} className="text-white" />}
         description="Active jobs in progress"
         trend={{ value: "0%", isPositive: true }}

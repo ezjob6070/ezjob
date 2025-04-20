@@ -16,7 +16,14 @@ const JobStats = ({ jobs, date }: JobStatsProps) => {
   const scheduledJobs = jobs.filter(job => job.status === "scheduled").length;
   const completedJobs = jobs.filter(job => job.status === "completed").length;
   const cancelledJobs = jobs.filter(job => job.status === "cancelled").length;
-  const totalRevenue = jobs.reduce((sum, job) => sum + job.amount, 0);
+  
+  // Calculate using actualAmount for completed jobs and regular amount for others
+  const totalRevenue = jobs.reduce((sum, job) => {
+    if (job.status === "completed" && job.actualAmount !== undefined) {
+      return sum + job.actualAmount;
+    }
+    return sum + (job.amount || 0);
+  }, 0);
 
   // Format date range for display
   const getDateRangeText = () => {

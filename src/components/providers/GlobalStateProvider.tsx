@@ -163,6 +163,30 @@ export function GlobalStateProvider({ children }: { children: ReactNode }) {
           }));
         }
         
+        // Update job source data when job is completed
+        if (job.jobSourceId) {
+          setJobSources(sources => sources.map(source => {
+            if (source.id === job.jobSourceId) {
+              // Calculate actual profit based on the actual amount
+              const updatedRevenue = (source.totalRevenue || 0) + actualAmount;
+              let updatedProfit = 0;
+              
+              if (source.paymentType === "percentage") {
+                updatedProfit = updatedRevenue - (updatedRevenue * (source.paymentValue / 100));
+              } else { // fixed payment
+                updatedProfit = updatedRevenue - source.paymentValue;
+              }
+              
+              return {
+                ...source,
+                totalRevenue: updatedRevenue,
+                profit: updatedProfit
+              };
+            }
+            return source;
+          }));
+        }
+        
         return updatedJob;
       }
       return job;
