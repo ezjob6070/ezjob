@@ -43,12 +43,17 @@ const Finance = () => {
     setSearchQuery
   } = useFinanceData();
   
-  // Calculate total metrics from actual job data
-  const totalRevenue = jobs
-    .filter(job => job.status === "completed" && (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to)))
-    .reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
+  // Filter jobs based on date range
+  const filteredJobs = jobs.filter(job => 
+    job.status === "completed" && 
+    (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
+    (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
+  );
+  
+  // Calculate total metrics from filtered job data
+  const totalRevenue = filteredJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
 
-  // Estimate expenses as 40% of revenue for completed jobs
+  // Calculate expenses as 40% of revenue for completed jobs
   const totalExpenses = totalRevenue * 0.4;
   
   // Calculate profit as revenue minus expenses

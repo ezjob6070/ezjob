@@ -33,6 +33,12 @@ const JobStats = ({ jobs, date }: JobStatsProps) => {
     }
     return sum + (job.amount || 0);
   }, 0);
+  
+  // Calculate expenses as 40% of revenue
+  const totalExpenses = totalRevenue * 0.4;
+  
+  // Calculate profit
+  const totalProfit = totalRevenue - totalExpenses;
 
   // Format date range for display
   const getDateRangeText = () => {

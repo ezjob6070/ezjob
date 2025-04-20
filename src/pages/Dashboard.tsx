@@ -12,10 +12,10 @@ import ActivitySection from "@/components/dashboard/ActivitySection";
 import DashboardDetailDialog from "@/components/DashboardDetailDialog";
 import DashboardCalendar from "@/components/dashboard/DashboardCalendar";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 import {
   dashboardTaskCounts,
-  dashboardFinancialMetrics,
   dashboardLeadSources,
   dashboardJobTypePerformance,
   dashboardTopTechnicians,
@@ -45,6 +45,28 @@ const Dashboard = () => {
     from: new Date(),
     to: addDays(new Date(), 7),
   });
+  
+  const { jobs } = useGlobalState();
+  
+  // Filter completed jobs based on date range
+  const completedJobs = jobs.filter(job => 
+    job.status === "completed" && 
+    (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
+    (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
+  );
+  
+  // Calculate financial metrics
+  const totalRevenue = completedJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
+  const totalExpenses = totalRevenue * 0.4; // 40% of revenue
+  const companyProfit = totalRevenue - totalExpenses;
+  
+  // Create financial metrics object
+  const dashboardFinancialMetrics = {
+    totalRevenue: totalRevenue,
+    totalExpenses: totalExpenses,
+    companysCut: companyProfit,
+    profitMargin: totalRevenue > 0 ? (companyProfit / totalRevenue) * 100 : 0
+  };
 
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
 
