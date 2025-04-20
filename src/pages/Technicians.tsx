@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -7,7 +8,7 @@ import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
-import TechnicianSearchBar from "@/components/technicians/TechnicianSearchBar";
+import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
