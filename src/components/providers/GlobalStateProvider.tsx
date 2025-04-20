@@ -1,9 +1,8 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Technician } from '@/types/technician';
-import { technicians as initialTechnicians } from '@/data/technicians';
 import { JobSource } from '@/types/jobSource';
 import { Job } from '@/components/jobs/JobTypes';
-import { initialJobs } from '@/data/jobs';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from '@/components/ui/use-toast';
 
@@ -25,10 +24,21 @@ interface GlobalStateContextType {
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
 
 export function GlobalStateProvider({ children }: { children: ReactNode }) {
-  // Initialize empty state
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [jobSources, setJobSources] = useState<JobSource[]>([]);
+  // Initialize state from localStorage or empty arrays if not found
+  const [technicians, setTechnicians] = useState<Technician[]>(() => {
+    const savedTechnicians = localStorage.getItem('technicians');
+    return savedTechnicians ? JSON.parse(savedTechnicians) : [];
+  });
+  
+  const [jobs, setJobs] = useState<Job[]>(() => {
+    const savedJobs = localStorage.getItem('jobs');
+    return savedJobs ? JSON.parse(savedJobs) : [];
+  });
+  
+  const [jobSources, setJobSources] = useState<JobSource[]>(() => {
+    const savedJobSources = localStorage.getItem('jobSources');
+    return savedJobSources ? JSON.parse(savedJobSources) : [];
+  });
 
   // Save to localStorage whenever state changes
   useEffect(() => {
