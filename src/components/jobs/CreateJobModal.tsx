@@ -110,9 +110,14 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   const [images, setImages] = useState<File[]>([]);
   const [signaturePad, setSignaturePad] = useState(false);
   const [technicianSearch, setTechnicianSearch] = useState("");
+  const [jobSourceSearch, setJobSourceSearch] = useState("");
 
   const filteredTechnicians = technicians.filter(tech =>
     tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
+  );
+
+  const filteredJobSources = jobSources.filter(source =>
+    source.name.toLowerCase().includes(jobSourceSearch.toLowerCase())
   );
 
   const timeSelection = form.watch("timeSelection");
@@ -413,11 +418,26 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {jobSources.map((source) => (
-                              <SelectItem key={source.id} value={source.id}>
-                                {source.name}
-                              </SelectItem>
-                            ))}
+                            <div className="px-3 pb-2">
+                              <Input
+                                placeholder="Search job sources..."
+                                value={jobSourceSearch}
+                                onChange={(e) => setJobSourceSearch(e.target.value)}
+                                className="mb-2"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              {filteredJobSources.map((source) => (
+                                <SelectItem key={source.id} value={source.id}>
+                                  {source.name}
+                                </SelectItem>
+                              ))}
+                              {filteredJobSources.length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No job sources found
+                                </div>
+                              )}
+                            </div>
                           </SelectContent>
                         </Select>
                         <FormMessage />
