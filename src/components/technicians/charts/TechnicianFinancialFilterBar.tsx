@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Filter, UserPlus } from "lucide-react";
 import {

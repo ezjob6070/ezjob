@@ -1,5 +1,5 @@
 
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 import { Technician } from "@/types/technician";
 import TechnicianFinancialTable from "./charts/TechnicianFinancialTable";
 import { DateRange } from "react-day-picker";

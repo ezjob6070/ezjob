@@ -1,8 +1,8 @@
+
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
-
-export type SortOption = "name" | "rating" | "completedJobs" | "revenue" | "default";
+import { SortOption } from "@/types/sortOptions";
 
 export function useTechniciansData() {
   const [technicians, setTechnicians] = useState<Technician[]>([]);
@@ -48,10 +48,6 @@ export function useTechniciansData() {
     setSortOption(option);
   };
 
-  const addCategory = (newCategory: string) => {
-    setCategories((prevCategories) => [...prevCategories, newCategory]);
-  };
-
   const filteredTechnicians = useMemo(() => {
     let filtered = [...technicians];
 
@@ -90,16 +86,41 @@ export function useTechniciansData() {
 
     switch (sortOption) {
       case "name":
+      case "name-asc":
         filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "name-desc":
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
         break;
       case "rating":
         filtered.sort((a, b) => b.rating - a.rating);
         break;
       case "completedJobs":
+      case "jobs-high":
         filtered.sort((a, b) => b.completedJobs - a.completedJobs);
         break;
+      case "jobs-low":
+        filtered.sort((a, b) => a.completedJobs - b.completedJobs);
+        break;
       case "revenue":
+      case "revenue-high":
         filtered.sort((a, b) => b.totalRevenue - a.totalRevenue);
+        break;
+      case "revenue-low":
+        filtered.sort((a, b) => a.totalRevenue - b.totalRevenue);
+        break;
+      case "profit-high":
+        // Simple profit estimate: 40% of revenue
+        filtered.sort((a, b) => (b.totalRevenue * 0.4) - (a.totalRevenue * 0.4));
+        break;
+      case "profit-low":
+        filtered.sort((a, b) => (a.totalRevenue * 0.4) - (b.totalRevenue * 0.4));
+        break;
+      case "newest":
+        filtered.sort((a, b) => new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime());
+        break;
+      case "oldest":
+        filtered.sort((a, b) => new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime());
         break;
       default:
         break;

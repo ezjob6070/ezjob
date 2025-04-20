@@ -9,7 +9,7 @@ import { sampleTransactions } from "@/data/finances";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import JobSourceFinanceSection from "@/components/finance/JobSourceFinanceSection";
 import JobSourceFilterBar from "@/components/finance/jobsource-filters/JobSourceFilterBar";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 
 const FinanceJobSources = () => {
   const [date, setDate] = useState<DateRange | undefined>({

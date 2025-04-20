@@ -8,7 +8,7 @@ import JobSourceTable from "./job-sources/JobSourceTable";
 import JobSourceDetailPanel from "./dashboard/JobSourceDetailPanel";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 
 interface JobSourcesDashboardProps {
   filteredJobSources: JobSource[];

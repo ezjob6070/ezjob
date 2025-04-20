@@ -13,7 +13,7 @@ import { JobSource } from "@/types/finance";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ArrowUpDown } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 import {
   Popover,
   PopoverContent,

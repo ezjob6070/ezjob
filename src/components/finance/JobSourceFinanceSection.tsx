@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { JobSource, FinancialTransaction, TimeFrame } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import JobSourceTable from "./job-sources/JobSourceTable";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 import { DateRange } from "react-day-picker";
 import JobSourceDetailPanel from "./dashboard/JobSourceDetailPanel";
 import FinancialMetricsCards from "./FinancialMetricsCards";

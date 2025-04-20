@@ -2,7 +2,7 @@
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUpAZ, ArrowDownAZ, ArrowUp10, ArrowDown10, Calendar, DollarSign } from "lucide-react";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 
 interface TechnicianSortFilterProps {
   sortBy: SortOption;

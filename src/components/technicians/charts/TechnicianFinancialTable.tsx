@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 import TechnicianFinancialFilterBar from "@/components/technicians/charts/TechnicianFinancialFilterBar";
 import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
 

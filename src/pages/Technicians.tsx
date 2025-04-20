@@ -1,8 +1,6 @@
-
 import { useState } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
-import { SortOption } from "@/hooks/useTechniciansData";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
@@ -13,6 +11,7 @@ import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSear
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -48,6 +47,17 @@ const Technicians = () => {
     setShowEditModal(true);
   };
 
+  const handleSearchChangeAdapted = (query: string) => {
+    const event = {
+      target: { value: query }
+    } as React.ChangeEvent<HTMLInputElement>;
+    handleSearchChange(event);
+  };
+
+  const handleSortChangeAdapted = (option: SortOption) => {
+    handleSortChange(option);
+  };
+
   const handleUpdateTechnicianForm = (values: TechnicianEditFormValues) => {
     if (!selectedTechnician) return;
     
@@ -63,7 +73,6 @@ const Technicians = () => {
       cancelledJobs: selectedTechnician.cancelledJobs,
       totalRevenue: selectedTechnician.totalRevenue,
       rating: selectedTechnician.rating,
-      // Add support for profile image
       profileImage: values.profileImage || selectedTechnician.profileImage,
       imageUrl: values.profileImage || selectedTechnician.imageUrl,
     };
@@ -71,12 +80,10 @@ const Technicians = () => {
     updateTechnician(updatedTechnician);
   };
 
-  // Check if selectedDepartments is undefined or null, and provide a default value
   const isSalaryDataVisible = !selectedDepartments || selectedDepartments.length === 0 || selectedDepartments.includes("Finance");
 
   return (
     <div className="space-y-8 py-8">
-      {/* Add TechnicianTabs at the top */}
       <TechnicianTabs currentTab="list" />
       
       <TechniciansPageHeader 
@@ -105,9 +112,9 @@ const Technicians = () => {
           selectedTechnicians={selectedTechnicians}
           onTechnicianToggle={toggleTechnician}
           searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
+          onSearchChange={handleSearchChangeAdapted}
           sortOption={sortOption}
-          onSortChange={handleSortChange}
+          onSortChange={handleSortChangeAdapted}
           date={dateRange}
           setDate={setDateRange}
           departments={departments}

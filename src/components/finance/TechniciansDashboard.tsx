@@ -6,7 +6,7 @@ import TechnicianFinancialTable from "@/components/technicians/charts/Technician
 import { DateRange } from "react-day-picker";
 import DashboardMetrics from "./dashboard/MetricsCards";
 import TechnicianDetailPanel from "./dashboard/TechnicianDetailPanel";
-import { SortOption } from "@/hooks/useTechniciansData";
+import { SortOption } from "@/types/sortOptions";
 
 interface TechniciansDashboardProps {
   activeTechnicians: any[];
