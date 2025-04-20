@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
+import { TechnicianDateField } from "./form/TechnicianDateField";
 
 export interface AddTechnicianModalProps {
   open: boolean;
@@ -110,7 +110,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Technician Name</FormLabel>
+                    <FormLabel>Technician Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter name" {...field} />
                     </FormControl>
@@ -124,7 +124,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email (Optional)</FormLabel>
                     <FormControl>
                       <Input placeholder="email@example.com" {...field} />
                     </FormControl>
@@ -138,7 +138,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
                       <Input placeholder="Phone number" {...field} />
                     </FormControl>
@@ -152,9 +152,29 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                 name="specialty"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Specialty</FormLabel>
+                    <FormLabel>Specialty *</FormLabel>
                     <FormControl>
                       <Input placeholder="E.g., Plumbing, Electrical, etc." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <TechnicianDateField
+                control={form.control}
+                name="hireDate"
+                label="Hire Date *"
+              />
+              
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter address" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -227,63 +247,6 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                     </FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="Enter rate" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="hireDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Hire Date</FormLabel>
-                    <div className="grid gap-2">
-                      {date ? (
-                        <Button
-                          variant="outline"
-                          className="justify-start text-left font-normal"
-                          onClick={() => form.setValue("hireDate", format(date, "yyyy-MM-dd"))}
-                          type="button"
-                        >
-                          {format(date, "PPP")}
-                        </Button>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          className="justify-start text-left font-normal"
-                          type="button"
-                        >
-                          Pick a date
-                        </Button>
-                      )}
-                      <div className="border rounded-md p-3">
-                        <DatePicker
-                          mode="single"
-                          selected={date}
-                          onSelect={(date) => {
-                            setDate(date as Date);
-                            if (date) {
-                              form.setValue("hireDate", format(date as Date, "yyyy-MM-dd"));
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter address" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

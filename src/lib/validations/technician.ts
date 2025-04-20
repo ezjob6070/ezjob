@@ -8,13 +8,11 @@ export const technicianSchema = z.object({
   }),
   email: z.string().email({
     message: "Please enter a valid email address.",
-  }),
+  }).optional(),
   phone: z.string().min(10, {
     message: "Please enter a valid phone number.",
   }),
-  address: z.string().min(5, {
-    message: "Please enter a valid address.",
-  }),
+  address: z.string().optional(),
   specialty: z.string().min(2, {
     message: "Please enter a valid specialty.",
   }),
@@ -24,7 +22,7 @@ export const technicianSchema = z.object({
     message: "Please enter a valid payment rate.",
   }),
   hireDate: z.string().min(1, {
-    message: "Please enter a valid hire date.",
+    message: "Please select a hire date.",
   }),
   notes: z.string().optional(),
   contractType: z.string().optional(),

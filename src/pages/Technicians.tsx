@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { Technician } from "@/types/technician";
-import { useTechniciansData, SortOption } from "@/hooks/useTechniciansData";
+import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
+import { SortOption } from "@/hooks/technicians/useTechnicianTableSorting";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
