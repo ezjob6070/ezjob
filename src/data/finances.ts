@@ -1,97 +1,9 @@
-
 import { FinancialTransaction } from "@/types/finance";
-import { calculateCompanyProfit, calculateTechnicianProfit } from "@/components/dashboard/DashboardUtils";
 
-// Generate sample transactions for last 90 days
-const generateTransactions = (): FinancialTransaction[] => {
-  const transactions: FinancialTransaction[] = [];
-  const today = new Date();
-  
-  // Client names for randomization
-  const clients = [
-    "Acme Corp", 
-    "Smith Family", 
-    "Johnson Residence", 
-    "Tech Solutions Inc.", 
-    "Greenfield Apartments",
-    "Vista Properties",
-    "Sunshine Daycare",
-    "Mountain View Restaurant",
-    "Riverside Medical"
-  ];
-  
-  // Job titles for randomization
-  const jobs = [
-    "HVAC Installation", 
-    "Electrical Repair", 
-    "Plumbing Service", 
-    "Annual Maintenance", 
-    "Emergency Repair",
-    "System Upgrade",
-    "Inspection",
-    "Troubleshooting",
-    "Parts Replacement"
-  ];
-  
-  // Technician names
-  const technicians = [
-    "John Smith", 
-    "Sarah Johnson", 
-    "Mike Williams", 
-    "Rebecca Davis", 
-    "Tom Anderson"
-  ];
-  
-  // Job sources
-  const jobSources = [
-    { id: "js1", name: "Website" },
-    { id: "js2", name: "Referral" },
-    { id: "js3", name: "Google Ads" },
-    { id: "js4", name: "Social Media" },
-    { id: "js5", name: "Direct Call" },
-  ];
-  
-  // Generate random transactions for last 90 days
-  for (let i = 0; i < 150; i++) {
-    const dayOffset = Math.floor(Math.random() * 90);
-    const date = new Date(today);
-    date.setDate(date.getDate() - dayOffset);
-    
-    const clientName = clients[Math.floor(Math.random() * clients.length)];
-    const jobTitle = jobs[Math.floor(Math.random() * jobs.length)];
-    const amount = Math.floor(Math.random() * 3000) + 500; // $500 to $3500
-    const technicianName = technicians[Math.floor(Math.random() * technicians.length)];
-    const technicianRateIsPercentage = Math.random() > 0.5;
-    const technicianRate = technicianRateIsPercentage ? 
-      Math.floor(Math.random() * 30) + 20 : // 20% to 50%
-      Math.floor(Math.random() * 500) + 100; // $100 to $600 flat rate
-    
-    // Add job source
-    const jobSource = jobSources[Math.floor(Math.random() * jobSources.length)];
+// Start with empty transactions
+export const sampleTransactions: FinancialTransaction[] = [];
 
-    transactions.push({
-      id: `tr-${i}-${Date.now()}`,
-      date,
-      amount,
-      clientName,
-      jobTitle,
-      technicianName,
-      technicianRate,
-      technicianRateIsPercentage,
-      jobSourceId: jobSource.id,
-      jobSourceName: jobSource.name,
-      category: Math.random() > 0.1 ? "payment" : (Math.random() > 0.5 ? "expense" : "refund"),
-      status: Math.random() > 0.2 ? "completed" : (Math.random() > 0.5 ? "pending" : "failed"),
-      notes: Math.random() > 0.7 ? "Customer requested special service" : undefined
-    });
-  }
-  
-  return transactions.sort((a, b) => b.date.getTime() - a.date.getTime());
-};
-
-export const sampleTransactions = generateTransactions();
-
-// Helper function to filter transactions by date range
+// Keep the helper functions but remove mock data
 export const filterTransactionsByDateRange = (
   transactions: FinancialTransaction[],
   startDate: Date,
@@ -104,7 +16,6 @@ export const filterTransactionsByDateRange = (
   );
 };
 
-// Generate financial report for a specific time frame
 export const generateFinancialReport = (
   transactions: FinancialTransaction[],
   startDate: Date,
@@ -158,7 +69,6 @@ export const generateFinancialReport = (
   };
 };
 
-// Generate date ranges for common time periods
 export const getDateRangeForTimeFrame = (timeFrame: "day" | "week" | "month" | "year") => {
   const endDate = new Date();
   endDate.setHours(23, 59, 59, 999);
