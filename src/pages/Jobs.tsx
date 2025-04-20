@@ -1,10 +1,9 @@
 
 import { useState } from "react";
-import { initialJobs } from "@/data/jobs";
-import { initialTechnicians } from "@/data/technicians";
 import { useJobsData } from "@/hooks/useJobsData";
 import { useJobSourceData, JOB_SOURCES } from "@/hooks/jobs/useJobSourceData";
 import { JOB_CATEGORIES } from "@/components/jobs/constants";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import JobStats from "@/components/jobs/JobStats";
 import JobModals from "@/components/jobs/JobModals";
 import { Job } from "@/components/jobs/JobTypes";
@@ -14,6 +13,7 @@ import JobsContainer from "@/components/jobs/JobsContainer";
 import { JobsProvider } from "@/components/jobs/context/JobsContext";
 
 const Jobs = () => {
+  const { jobs: globalJobs, technicians: globalTechnicians, jobSources: globalJobSources, addJob, completeJob, cancelJob } = useGlobalState();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
   
@@ -27,10 +27,11 @@ const Jobs = () => {
   // Get job source related data and functions
   const jobSourceData = useJobSourceData();
   
+  // Map job source names from global state
+  const jobSourceNames = globalJobSources.map(source => source.name);
+  
   // Get jobs data and filter functionality
   const {
-    jobs,
-    setJobs,
     filteredJobs,
     searchTerm,
     setSearchTerm,
@@ -56,17 +57,14 @@ const Jobs = () => {
     deselectAllJobSources,
     clearFilters,
     applyFilters,
-    handleCancelJob,
-    handleCompleteJob,
     handleRescheduleJob,
     openStatusModal,
     closeStatusModal
-  } = useJobsData(initialJobs, JOB_SOURCES.map(source => source.name));
+  } = useJobsData(globalJobs, jobSourceNames);
 
   // Set up technician data
-  const technicianNames = initialTechnicians.map(tech => tech.name);
-  const technicianOptions = initialTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
-  const jobSourceNames = JOB_SOURCES.map(source => source.name);
+  const technicianNames = globalTechnicians.map(tech => tech.name);
+  const technicianOptions = globalTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
 
   // Handler functions
   const addCategory = (category: string) => {
@@ -74,11 +72,15 @@ const Jobs = () => {
   };
 
   const handleAddJob = (job: Job) => {
-    setJobs([job, ...jobs]);
-    toast({
-      title: "Job created",
-      description: `New job for ${job.clientName} has been created and is in progress.`,
-    });
+    addJob(job);
+  };
+
+  const handleCancelJob = (jobId: string, reason?: string) => {
+    cancelJob(jobId, reason);
+  };
+
+  const handleCompleteJob = (jobId: string, actualAmount: number) => {
+    completeJob(jobId, actualAmount);
   };
   
   // Create context value
@@ -95,7 +97,7 @@ const Jobs = () => {
     paymentPopoverOpen, setPaymentPopoverOpen,
     
     // Jobs data 
-    jobs,
+    jobs: globalJobs,
     filteredJobs,
     searchTerm,
     setSearchTerm,
@@ -138,6 +140,12 @@ const Jobs = () => {
     toggleJobSourceSidebar: jobSourceData.toggleJobSourceSidebar
   };
 
+  // Transform job sources for the JobModals component
+  const jobSourcesForModal = globalJobSources.map(source => ({
+    id: source.id,
+    name: source.name
+  }));
+
   return (
     <JobsProvider value={contextValue}>
       <div className="space-y-6 py-8">
@@ -163,8 +171,8 @@ const Jobs = () => {
           onAddJobSource={jobSourceData.handleAddJobSource}
           onEditJobSource={jobSourceData.handleEditJobSource}
           technicianOptions={technicianOptions}
-          jobSources={JOB_SOURCES}
-          allJobSources={jobSourceData.jobSources}
+          jobSources={jobSourcesForModal}
+          allJobSources={globalJobSources}
         />
       </div>
     </JobsProvider>

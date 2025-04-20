@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Technician } from "@/types/technician";
-import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
-import { SortOption } from "@/hooks/technicians/useTechnicianTableSorting";
+import { SortOption } from "@/hooks/useTechniciansData";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechnicianStats from "@/components/technicians/TechnicianStats";
@@ -11,14 +12,16 @@ import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeade
 import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import TechnicianTabs from "@/components/technicians/TechnicianTabs";
+import { useTechniciansData } from "@/hooks/useTechniciansData";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   
+  const { technicians: globalTechnicians, addTechnician, updateTechnician } = useGlobalState();
+  
   const {
-    technicians,
     filteredTechnicians,
     searchQuery,
     selectedTechnicians,
@@ -29,8 +32,6 @@ const Technicians = () => {
     dateRange,
     categories,
     departments = [], // Provide default empty array to avoid undefined
-    handleAddTechnician,
-    handleUpdateTechnician,
     handleSearchChange,
     toggleTechnician,
     toggleCategory,
@@ -67,7 +68,7 @@ const Technicians = () => {
       imageUrl: values.profileImage || selectedTechnician.imageUrl,
     };
     
-    handleUpdateTechnician(updatedTechnician);
+    updateTechnician(updatedTechnician);
   };
 
   // Check if selectedDepartments is undefined or null, and provide a default value
@@ -83,7 +84,7 @@ const Technicians = () => {
         exportTechnicians={exportTechnicians}
       />
 
-      <TechnicianStats technicians={technicians} />
+      <TechnicianStats technicians={globalTechnicians} />
       
       <div className="mb-6">
         <div className="mb-4">
@@ -100,7 +101,7 @@ const Technicians = () => {
           addCategory={addCategory}
           status={statusFilter}
           onStatusChange={setStatusFilter}
-          technicians={technicians}
+          technicians={globalTechnicians}
           selectedTechnicians={selectedTechnicians}
           onTechnicianToggle={toggleTechnician}
           searchQuery={searchQuery}
@@ -126,7 +127,7 @@ const Technicians = () => {
       <AddTechnicianModal 
         open={showAddModal}
         onOpenChange={setShowAddModal}
-        onAddTechnician={handleAddTechnician}
+        onAddTechnician={addTechnician}
       />
 
       <EditTechnicianModal

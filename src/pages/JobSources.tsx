@@ -4,72 +4,21 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { JobSource } from "@/types/jobSource";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import JobSourcesList from "@/components/jobSources/JobSourcesList";
 import CreateJobSourceModal from "@/components/jobSources/CreateJobSourceModal";
 import EditJobSourceModal from "@/components/jobSources/EditJobSourceModal";
 import JobSourceStats from "@/components/jobSources/JobSourceStats";
 
-const initialJobSources: JobSource[] = [
-  {
-    id: "1",
-    name: "Google Ads",
-    website: "https://ads.google.com",
-    phone: "(555) 123-4567",
-    email: "ads@google.com",
-    logoUrl: "https://source.unsplash.com/random/200x200/?google",
-    paymentType: "percentage",
-    paymentValue: 10,
-    isActive: true,
-    totalJobs: 24,
-    totalRevenue: 12500,
-    profit: 11250,
-    createdAt: new Date("2023-01-15"),
-    notes: "Our primary advertising channel for service leads."
-  },
-  {
-    id: "2",
-    name: "Facebook Marketplace",
-    website: "https://facebook.com/marketplace",
-    phone: "(555) 234-5678",
-    email: "marketplace@facebook.com",
-    logoUrl: "https://source.unsplash.com/random/200x200/?facebook",
-    paymentType: "fixed",
-    paymentValue: 50,
-    isActive: true,
-    totalJobs: 18,
-    totalRevenue: 8200,
-    profit: 7300,
-    createdAt: new Date("2023-02-10"),
-    notes: "Targeting local homeowners in need of services."
-  },
-  {
-    id: "3",
-    name: "Referral Program",
-    phone: "(555) 987-6543",
-    paymentType: "percentage",
-    paymentValue: 5,
-    isActive: true,
-    totalJobs: 32,
-    totalRevenue: 15800,
-    profit: 15010,
-    createdAt: new Date("2023-03-05"),
-    notes: "Customer referrals - $50 credit for both referrer and new customer."
-  },
-];
-
 const JobSources = () => {
   const { toast } = useToast();
-  const [jobSources, setJobSources] = useState<JobSource[]>(initialJobSources);
+  const { jobSources, addJobSource, updateJobSource } = useGlobalState();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedJobSource, setSelectedJobSource] = useState<JobSource | null>(null);
 
   const handleAddJobSource = (newJobSource: JobSource) => {
-    setJobSources((prev) => [newJobSource, ...prev]);
-    toast({
-      title: "Job Source Added",
-      description: "New job source has been added successfully.",
-    });
+    addJobSource(newJobSource);
   };
 
   const handleEditJobSource = (jobSource: JobSource) => {
@@ -78,15 +27,7 @@ const JobSources = () => {
   };
 
   const handleUpdateJobSource = (updatedJobSource: JobSource) => {
-    setJobSources((prev) =>
-      prev.map((source) =>
-        source.id === updatedJobSource.id ? updatedJobSource : source
-      )
-    );
-    toast({
-      title: "Job Source Updated",
-      description: "Job source has been updated successfully.",
-    });
+    updateJobSource(updatedJobSource);
   };
 
   return (

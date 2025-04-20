@@ -32,4 +32,5 @@ export const technicianSchema = z.object({
   hourlyRate: z.string().optional(),
   incentiveType: z.nativeEnum(IncentiveType).optional(),
   incentiveAmount: z.string().optional(),
+  profileImage: z.string().optional(),
 });
