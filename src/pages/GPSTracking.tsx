@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { MapPin, User } from "lucide-react";
+import { MapPin, User, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,19 +10,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { initialTechnicians } from "@/data/technicians";
 import TechnicianMap from "@/components/gps/TechnicianMap";
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const GPSTracking = () => {
   const [selectedTechnician, setSelectedTechnician] = useState<string>("all");
   const [refreshInterval, setRefreshInterval] = useState<string>("30");
   const [activeTab, setActiveTab] = useState<string>("map");
   const [mapApiKey, setMapApiKey] = useState<string>(localStorage.getItem("mapApiKey") || "");
+  const [technicianSearch, setTechnicianSearch] = useState("");
+  const [technicianCommandOpen, setTechnicianCommandOpen] = useState(false);
   
   // Mock technician location data
   const technicianLocations = initialTechnicians.map(tech => ({
     id: tech.id,
     name: tech.name,
     location: {
-      lat: 40.7128 + (Math.random() * 0.1 - 0.05), // Random positions around NYC
+      lat: 40.7128 + (Math.random() * 0.1 - 0.05),
       lng: -74.0060 + (Math.random() * 0.1 - 0.05)
     },
     lastUpdated: new Date().toISOString(),
@@ -33,10 +37,13 @@ const GPSTracking = () => {
   const filteredTechnicians = selectedTechnician === "all" 
     ? technicianLocations 
     : technicianLocations.filter(tech => tech.id === selectedTechnician);
+
+  const filteredTechnicianOptions = initialTechnicians.filter(tech => 
+    tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
+  );
   
   const handleSaveApiKey = () => {
     localStorage.setItem("mapApiKey", mapApiKey);
-    // Refresh the page to apply the new API key
     window.location.reload();
   };
   
@@ -58,25 +65,61 @@ const GPSTracking = () => {
             <CardTitle>Tracking Controls</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Technician Selection */}
+            {/* Technician Selection with Search */}
             <div className="space-y-2">
-              <Label htmlFor="technician-select" className="text-base font-semibold">Technician</Label>
-              <Select
-                value={selectedTechnician}
-                onValueChange={setSelectedTechnician}
-              >
-                <SelectTrigger id="technician-select">
-                  <SelectValue placeholder="Select Technician" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Technicians</SelectItem>
-                  {initialTechnicians.map(tech => (
-                    <SelectItem key={tech.id} value={tech.id}>
-                      {tech.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-base font-semibold">Technician</Label>
+              <Popover open={technicianCommandOpen} onOpenChange={setTechnicianCommandOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={technicianCommandOpen}
+                    className="w-full justify-between"
+                  >
+                    {selectedTechnician === "all" 
+                      ? "All Technicians"
+                      : initialTechnicians.find(tech => tech.id === selectedTechnician)?.name || "Select Technician"}
+                    <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search technician..."
+                      value={technicianSearch}
+                      onValueChange={setTechnicianSearch}
+                    />
+                    <CommandList>
+                      <CommandEmpty>No technician found.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="all"
+                          onSelect={() => {
+                            setSelectedTechnician("all");
+                            setTechnicianCommandOpen(false);
+                          }}
+                        >
+                          <User className="mr-2 h-4 w-4" />
+                          All Technicians
+                        </CommandItem>
+                        {filteredTechnicianOptions.map((tech) => (
+                          <CommandItem
+                            key={tech.id}
+                            value={tech.name}
+                            onSelect={() => {
+                              setSelectedTechnician(tech.id);
+                              setTechnicianCommandOpen(false);
+                            }}
+                          >
+                            <User className="mr-2 h-4 w-4" />
+                            {tech.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             
             {/* Refresh Rate */}
