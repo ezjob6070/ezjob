@@ -60,12 +60,24 @@ const Dashboard = () => {
   const totalExpenses = totalRevenue * 0.4; // 40% of revenue
   const companyProfit = totalRevenue - totalExpenses;
   
-  // Create financial metrics object
+  // Calculate average job value
+  const avgJobValue = completedJobs.length > 0 
+    ? totalRevenue / completedJobs.length 
+    : 0;
+  
+  // Since we don't have historical data for growth calculation, we'll use placeholder values
+  const monthlyGrowth = 5.2; // Placeholder: 5.2% monthly growth
+  const conversionRate = 75.5; // Placeholder: 75.5% conversion rate
+  
+  // Create financial metrics object with all required properties
   const dashboardFinancialMetrics = {
     totalRevenue: totalRevenue,
     totalExpenses: totalExpenses,
     companysCut: companyProfit,
-    profitMargin: totalRevenue > 0 ? (companyProfit / totalRevenue) * 100 : 0
+    profitMargin: totalRevenue > 0 ? (companyProfit / totalRevenue) * 100 : 0,
+    avgJobValue: avgJobValue,
+    monthlyGrowth: monthlyGrowth,
+    conversionRate: conversionRate
   };
 
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
