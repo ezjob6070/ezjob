@@ -46,22 +46,22 @@ const MetricsOverview = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
       <DashboardMetricCard
         title="Calls"
-        value="28"
+        value="0"
         icon={<PhoneCallIcon size={20} className="text-white" />}
         description="Total calls this month"
-        trend={{ value: "12%", isPositive: true }}
+        trend={{ value: "0%", isPositive: true }}
         className="bg-gradient-to-br from-purple-500 to-violet-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
-        onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title.includes('call')))}
+        onClick={() => openDetailDialog('tasks', 'Call Activity Details', detailedTasksData.filter(t => t.title?.includes('call') || false))}
         dateRangeText={dateRangeText()}
       />
       <DashboardMetricCard
         title="Jobs"
-        value="68"
+        value="0"
         icon={<BriefcaseIcon size={20} className="text-white" />}
         description="Active jobs in progress"
-        trend={{ value: "8%", isPositive: true }}
+        trend={{ value: "0%", isPositive: true }}
         className="bg-gradient-to-br from-yellow-400 to-yellow-500 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
@@ -73,7 +73,7 @@ const MetricsOverview = ({
         value={formatCurrency(financialMetrics.totalRevenue)}
         icon={<CalculatorIcon size={20} className="text-white" />}
         description="Revenue this month"
-        trend={{ value: "5%", isPositive: false }}
+        trend={{ value: "0%", isPositive: true }}
         className="bg-gradient-to-br from-blue-500 to-blue-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
@@ -85,7 +85,7 @@ const MetricsOverview = ({
         value={formatCurrency(financialMetrics.companysCut)}
         icon={<DollarSignIcon size={20} className="text-white" />}
         description="Net profit earned"
-        trend={{ value: "7%", isPositive: true }}
+        trend={{ value: "0%", isPositive: true }}
         className="bg-gradient-to-br from-green-500 to-green-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
