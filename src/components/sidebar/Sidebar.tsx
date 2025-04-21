@@ -1,36 +1,36 @@
-
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { LogOutIcon, MenuIcon } from "lucide-react";
+import { Building, Home, Wrench, LogOutIcon, MenuIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
 import NavItem from "./NavItem";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { toast } from "@/components/ui/use-toast";
 
 const Sidebar = ({ isMobile }: SidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
-    "leads-clients": true, // Start expanded
+    "leads-clients": true,
   });
   
-  // In a real implementation, this would come from user context or similar
-  const [currentIndustry, setCurrentIndustry] = useState<IndustryType>(INDUSTRY_TYPES[2]); // Default to general
+  const { currentIndustry, setCurrentIndustry } = useGlobalState();
   
-  // For demo purposes only - toggle between industries
-  const cycleIndustry = () => {
-    const currentIndex = INDUSTRY_TYPES.indexOf(currentIndustry);
-    const nextIndex = (currentIndex + 1) % INDUSTRY_TYPES.length;
-    const nextIndustry = INDUSTRY_TYPES[nextIndex];
-    setCurrentIndustry(nextIndustry);
+  const handleIndustryChange = (industry: IndustryType) => {
+    setCurrentIndustry(industry);
     
-    // Navigate to real estate dashboard when real_estate is selected
-    if (nextIndustry === 'real_estate' && location.pathname === '/') {
+    if (industry === 'real_estate' && location.pathname === '/') {
       navigate('/real-estate-dashboard');
-    } else if (nextIndustry !== 'real_estate' && location.pathname === '/real-estate-dashboard') {
+    } else if (industry !== 'real_estate' && location.pathname === '/real-estate-dashboard') {
       navigate('/');
     }
+
+    toast({
+      title: `Switched to ${industry.replace('_', ' ')} CRM`,
+      description: `Now viewing ${industry.replace('_', ' ')} dashboard`,
+    });
   };
 
   const toggleExpand = (key: string) => {
@@ -62,12 +62,52 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           isHovering ? "w-64" : "w-16"
         )}
       >
+        {/* Industry Selection at the top */}
+        <div className={cn("py-4", isHovering ? "px-3" : "px-2")}>
+          <div className={cn("flex flex-col gap-2", !isHovering && "items-center")}>
+            <button
+              onClick={() => handleIndustryChange('construction')}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                currentIndustry === 'construction' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
+              )}
+            >
+              <Building className="h-5 w-5" />
+              {isHovering && <span>Construction</span>}
+            </button>
+            <button
+              onClick={() => handleIndustryChange('real_estate')}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                currentIndustry === 'real_estate' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
+              )}
+            >
+              <Home className="h-5 w-5" />
+              {isHovering && <span>Real Estate</span>}
+            </button>
+            <button
+              onClick={() => handleIndustryChange('general')}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                currentIndustry === 'general' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
+              )}
+            >
+              <Wrench className="h-5 w-5" />
+              {isHovering && <span>Service</span>}
+            </button>
+          </div>
+        </div>
+
+        {/* Separator */}
+        <div className="mx-2 mb-4 border-t border-blue-600/50" />
+
+        {/* Rest of the sidebar */}
         <div className={cn("py-5", isHovering ? "px-5" : "px-3")}>
           {isHovering ? (
             <div className="flex items-center justify-between">
               <span className="font-bold text-lg text-white">Uleadz CRM</span>
               <button 
-                onClick={cycleIndustry}
+                onClick={() => {}}
                 className="p-1.5 rounded-md hover:bg-blue-600 transition-all text-white/90 hover:text-white"
               >
                 <MenuIcon size={18} />
@@ -76,7 +116,7 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           ) : (
             <div className="flex justify-center">
               <button
-                onClick={cycleIndustry}
+                onClick={() => {}}
                 className="p-1.5 rounded-md hover:bg-blue-600 transition-colors text-white/90 hover:text-white"
               >
                 <MenuIcon size={18} />
