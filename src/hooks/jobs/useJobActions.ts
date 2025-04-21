@@ -10,7 +10,11 @@ export const useJobActions = (setJobs: React.Dispatch<React.SetStateAction<Job[]
   const handleCancelJob = (jobId: string, cancellationReason?: string) => {
     setJobs(prevJobs =>
       prevJobs.map(job =>
-        job.id === jobId ? { ...job, status: "cancelled", cancellationReason } : job
+        job.id === jobId ? { 
+          ...job, 
+          status: "cancelled", 
+          cancellationReason: cancellationReason || "No reason provided" 
+        } : job
       )
     );
     
@@ -26,7 +30,11 @@ export const useJobActions = (setJobs: React.Dispatch<React.SetStateAction<Job[]
   const handleCompleteJob = (jobId: string, actualAmount: number) => {
     setJobs(prevJobs =>
       prevJobs.map(job =>
-        job.id === jobId ? { ...job, status: "completed", actualAmount } : job
+        job.id === jobId ? { 
+          ...job, 
+          status: "completed", 
+          actualAmount: actualAmount 
+        } : job
       )
     );
     

@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/components/jobs/JobTypes";
-import { initialJobs } from "@/data/jobs";
 import { isSameDay } from "date-fns";
 import JobsList from "@/components/calendar/components/JobsList";
 import { Task } from "@/components/calendar/types";
@@ -12,22 +11,36 @@ import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon } from "lucide-react";
 import CompactFilterBar from "@/components/schedule/CompactFilterBar";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 const Schedule = () => {
+  const { jobs: globalJobs } = useGlobalState();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [jobs, setJobs] = useState<Job[]>(initialJobs);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState("calendar");
 
-  const updateSelectedDateItems = (date: Date) => {
-    const filteredJobs = jobs.filter(job => isSameDay(job.date, date));
+  // Sync with global jobs
+  useEffect(() => {
+    setJobs(globalJobs);
+  }, [globalJobs]);
+
+  // Update jobs for selected date whenever jobs or date changes
+  useEffect(() => {
+    const filteredJobs = jobs.filter(job => {
+      if (!job.date) return false;
+      const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+      return isSameDay(jobDate, selectedDate);
+    });
     setJobsForSelectedDate(filteredJobs);
     
-    const filteredTasks = tasks.filter(task => isSameDay(task.dueDate, date));
+    const filteredTasks = tasks.filter(task => isSameDay(task.dueDate, selectedDate));
     setTasksForSelectedDate(filteredTasks);
-    
+  }, [jobs, tasks, selectedDate]);
+
+  const updateSelectedDateItems = (date: Date) => {
     setSelectedDate(date);
   };
 
@@ -42,11 +55,6 @@ const Schedule = () => {
     nextDay.setDate(nextDay.getDate() + 1);
     updateSelectedDateItems(nextDay);
   };
-
-  // Use useEffect instead of useState for initial loading
-  useEffect(() => {
-    updateSelectedDateItems(selectedDate);
-  }, []);
 
   return (
     <div className="space-y-6">

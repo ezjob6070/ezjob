@@ -16,6 +16,12 @@ const Jobs = () => {
   const { jobs: globalJobs, technicians: globalTechnicians, jobSources: globalJobSources, addJob, completeJob, cancelJob } = useGlobalState();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
+  const [localJobs, setLocalJobs] = useState<Job[]>([]);
+  
+  // Sync with global jobs
+  useEffect(() => {
+    setLocalJobs(globalJobs);
+  }, [globalJobs]);
   
   // Control state for filter popovers
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
@@ -60,7 +66,7 @@ const Jobs = () => {
     handleRescheduleJob,
     openStatusModal,
     closeStatusModal
-  } = useJobsData(globalJobs, jobSourceNames);
+  } = useJobsData(localJobs, jobSourceNames);
 
   // Set up technician data
   const technicianNames = globalTechnicians.map(tech => tech.name);
@@ -83,10 +89,48 @@ const Jobs = () => {
 
   const handleCancelJob = (jobId: string, reason?: string) => {
     cancelJob(jobId, reason);
+    
+    // Update local jobs state immediately 
+    setLocalJobs(prevJobs => 
+      prevJobs.map(job => 
+        job.id === jobId 
+          ? { ...job, status: "cancelled", cancellationReason: reason || "No reason provided" } 
+          : job
+      )
+    );
   };
 
   const handleCompleteJob = (jobId: string, actualAmount: number) => {
     completeJob(jobId, actualAmount);
+    
+    // Update local jobs state immediately
+    setLocalJobs(prevJobs => 
+      prevJobs.map(job => 
+        job.id === jobId 
+          ? { ...job, status: "completed", actualAmount } 
+          : job
+      )
+    );
+  };
+  
+  // Handle job rescheduling locally
+  const handleLocalRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
+    handleRescheduleJob(jobId, newDate, isAllDay);
+    
+    // Update local jobs state immediately
+    setLocalJobs(prevJobs => 
+      prevJobs.map(job => 
+        job.id === jobId 
+          ? { 
+              ...job, 
+              date: newDate,
+              scheduledDate: newDate,
+              isAllDay: isAllDay, 
+              status: "scheduled"
+            } 
+          : job
+      )
+    );
   };
   
   // Create context value
@@ -103,7 +147,7 @@ const Jobs = () => {
     paymentPopoverOpen, setPaymentPopoverOpen,
     
     // Jobs data 
-    jobs: globalJobs,
+    jobs: localJobs,
     filteredJobs,
     searchTerm,
     setSearchTerm,
@@ -134,7 +178,7 @@ const Jobs = () => {
     handleAddJob,
     handleCancelJob,
     handleCompleteJob,
-    handleRescheduleJob,
+    handleRescheduleJob: handleLocalRescheduleJob,
     
     // Job status modal
     selectedJob,

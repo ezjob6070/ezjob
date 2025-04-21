@@ -57,12 +57,12 @@ export function GlobalStateProvider({ children }: { children: ReactNode }) {
     // Ensure technician has a unique id and initialize statistics
     const newTechnician = {
       ...technician,
-      id: uuidv4(),
-      completedJobs: 0,
-      cancelledJobs: 0,
-      totalRevenue: 0,
-      rating: 5,
-      initials: technician.name.split(' ').map(n => n[0]).join('').toUpperCase()
+      id: technician.id || uuidv4(),
+      completedJobs: technician.completedJobs || 0,
+      cancelledJobs: technician.cancelledJobs || 0,
+      totalRevenue: technician.totalRevenue || 0,
+      rating: technician.rating || 5,
+      initials: technician.name ? technician.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'UN'
     };
     
     setTechnicians(prev => [newTechnician, ...prev]);
@@ -74,7 +74,10 @@ export function GlobalStateProvider({ children }: { children: ReactNode }) {
 
   const updateTechnician = (technician: Technician) => {
     setTechnicians(prev => 
-      prev.map(t => t.id === technician.id ? technician : t)
+      prev.map(t => t.id === technician.id ? {
+        ...technician,
+        initials: technician.name ? technician.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'UN'
+      } : t)
     );
     
     toast({
@@ -96,8 +99,10 @@ export function GlobalStateProvider({ children }: { children: ReactNode }) {
     // Ensure job has required fields and update related statistics
     const newJob = {
       ...job,
-      id: uuidv4(),
-      createdAt: new Date()
+      id: job.id || uuidv4(),
+      createdAt: job.createdAt || new Date(),
+      status: job.status || "scheduled",
+      date: job.date || new Date()
     };
     
     setJobs(prev => [newJob, ...prev]);
@@ -141,56 +146,57 @@ export function GlobalStateProvider({ children }: { children: ReactNode }) {
   };
   
   const completeJob = (jobId: string, actualAmount: number) => {
+    let updatedJob: Job | null = null;
+
     setJobs(prev => prev.map(job => {
       if (job.id === jobId) {
-        const updatedJob = {
+        updatedJob = {
           ...job,
           status: "completed" as const,
           actualAmount,
         };
-        
-        // Update technician statistics
-        if (job.technicianId) {
-          setTechnicians(techs => techs.map(tech => {
-            if (tech.id === job.technicianId) {
-              return {
-                ...tech,
-                completedJobs: (tech.completedJobs || 0) + 1,
-                totalRevenue: (tech.totalRevenue || 0) + actualAmount
-              };
-            }
-            return tech;
-          }));
-        }
-        
-        // Update job source data when job is completed
-        if (job.jobSourceId) {
-          setJobSources(sources => sources.map(source => {
-            if (source.id === job.jobSourceId) {
-              // Calculate actual profit based on the actual amount
-              const updatedRevenue = (source.totalRevenue || 0) + actualAmount;
-              let updatedProfit = 0;
-              
-              if (source.paymentType === "percentage") {
-                updatedProfit = updatedRevenue - (updatedRevenue * (source.paymentValue / 100));
-              } else { // fixed payment
-                updatedProfit = updatedRevenue - source.paymentValue;
-              }
-              
-              return {
-                ...source,
-                totalRevenue: updatedRevenue,
-                profit: updatedProfit
-              };
-            }
-            return source;
-          }));
-        }
-        
         return updatedJob;
       }
       return job;
     }));
+    
+    // Update technician statistics
+    if (updatedJob && updatedJob.technicianId) {
+      setTechnicians(techs => techs.map(tech => {
+        if (tech.id === updatedJob?.technicianId) {
+          return {
+            ...tech,
+            completedJobs: (tech.completedJobs || 0) + 1,
+            totalRevenue: (tech.totalRevenue || 0) + actualAmount
+          };
+        }
+        return tech;
+      }));
+    }
+    
+    // Update job source data when job is completed
+    if (updatedJob && updatedJob.jobSourceId) {
+      setJobSources(sources => sources.map(source => {
+        if (source.id === updatedJob?.jobSourceId) {
+          // Calculate actual profit based on the actual amount
+          const updatedRevenue = (source.totalRevenue || 0) + actualAmount;
+          let updatedProfit = 0;
+          
+          if (source.paymentType === "percentage") {
+            updatedProfit = updatedRevenue - (updatedRevenue * (source.paymentValue / 100));
+          } else { // fixed payment
+            updatedProfit = updatedRevenue - source.paymentValue;
+          }
+          
+          return {
+            ...source,
+            totalRevenue: updatedRevenue,
+            profit: updatedProfit
+          };
+        }
+        return source;
+      }));
+    }
     
     toast({
       title: "Job Completed",
@@ -199,31 +205,32 @@ export function GlobalStateProvider({ children }: { children: ReactNode }) {
   };
   
   const cancelJob = (jobId: string, reason?: string) => {
+    let updatedJob: Job | null = null;
+
     setJobs(prev => prev.map(job => {
       if (job.id === jobId) {
-        const updatedJob = {
+        updatedJob = {
           ...job,
           status: "cancelled" as const,
           cancellationReason: reason || "No reason provided"
         };
-        
-        // Update technician statistics
-        if (job.technicianId) {
-          setTechnicians(techs => techs.map(tech => {
-            if (tech.id === job.technicianId) {
-              return {
-                ...tech,
-                cancelledJobs: (tech.cancelledJobs || 0) + 1
-              };
-            }
-            return tech;
-          }));
-        }
-        
         return updatedJob;
       }
       return job;
     }));
+    
+    // Update technician statistics
+    if (updatedJob && updatedJob.technicianId) {
+      setTechnicians(techs => techs.map(tech => {
+        if (tech.id === updatedJob?.technicianId) {
+          return {
+            ...tech,
+            cancelledJobs: (tech.cancelledJobs || 0) + 1
+          };
+        }
+        return tech;
+      }));
+    }
     
     toast({
       title: "Job Cancelled",
@@ -235,11 +242,11 @@ export function GlobalStateProvider({ children }: { children: ReactNode }) {
     // Ensure job source has required fields
     const newJobSource = {
       ...jobSource,
-      id: uuidv4(),
-      totalJobs: 0,
-      totalRevenue: 0,
-      profit: 0,
-      createdAt: new Date()
+      id: jobSource.id || uuidv4(),
+      totalJobs: jobSource.totalJobs || 0,
+      totalRevenue: jobSource.totalRevenue || 0,
+      profit: jobSource.profit || 0,
+      createdAt: jobSource.createdAt || new Date()
     };
     
     setJobSources(prev => [newJobSource, ...prev]);

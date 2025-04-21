@@ -25,6 +25,25 @@ const TopRevenueTechniciansChart = ({ technicians }: TopRevenueTechniciansChartP
     );
   }
 
+  // Check if any technicians have revenue
+  const techniciansWithRevenue = technicians.filter(t => t.totalRevenue && t.totalRevenue > 0);
+  
+  if (techniciansWithRevenue.length === 0) {
+    return (
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Top 5 Technicians by Revenue</CardTitle>
+          <CardDescription>No revenue data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center items-center h-32 text-gray-500">
+            No revenue data available yet. Complete jobs to see technician revenue metrics.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // Calculate highest revenue for scaling
   const highestRevenue = Math.max(...technicians.map(t => t.totalRevenue || 0));
 

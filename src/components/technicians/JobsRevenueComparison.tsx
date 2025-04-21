@@ -28,13 +28,28 @@ const JobsRevenueComparison = ({ technicians }: JobsRevenueComparisonProps) => {
     .sort((a, b) => ((b.completedJobs || 0) + (b.cancelledJobs || 0)) - ((a.completedJobs || 0) + (a.cancelledJobs || 0)))
     .slice(0, 5);
 
-  // Format the data for the chart
+  // Format the data for the chart with safety checks
   const chartData = topTechnicians.map(tech => ({
     name: tech.name || "Unnamed",
     completedJobs: tech.completedJobs || 0,
     cancelledJobs: tech.cancelledJobs || 0,
     revenue: tech.totalRevenue || 0
   }));
+
+  // If we have no chart data or all values are 0, show empty state
+  if (chartData.length === 0 || chartData.every(item => item.completedJobs === 0 && item.cancelledJobs === 0 && item.revenue === 0)) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Jobs vs Revenue Comparison</CardTitle>
+          <CardDescription>No job performance data available yet</CardDescription>
+        </CardHeader>
+        <CardContent className="h-[400px] flex justify-center items-center text-gray-500">
+          Complete jobs to see performance comparison
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
