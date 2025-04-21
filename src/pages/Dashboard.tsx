@@ -1,7 +1,8 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
+import { toast } from "@/components/ui/use-toast";
+import { IndustryType } from "@/components/sidebar/sidebarTypes";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import MetricsOverview from "@/components/dashboard/MetricsOverview";
@@ -11,6 +12,7 @@ import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
 import ActivitySection from "@/components/dashboard/ActivitySection";
 import DashboardDetailDialog from "@/components/DashboardDetailDialog";
 import DashboardCalendar from "@/components/dashboard/DashboardCalendar";
+import IndustrySelector from "@/components/IndustrySelector";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
@@ -45,31 +47,28 @@ const Dashboard = () => {
     from: new Date(),
     to: addDays(new Date(), 7),
   });
-  
+
+  const [currentIndustry, setCurrentIndustry] = useState<IndustryType>("construction");
+
   const { jobs } = useGlobalState();
-  
-  // Filter completed jobs based on date range
+
   const completedJobs = jobs.filter(job => 
     job.status === "completed" && 
     (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
     (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
   );
-  
-  // Calculate financial metrics
+
   const totalRevenue = completedJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
-  const totalExpenses = totalRevenue * 0.4; // 40% of revenue
+  const totalExpenses = totalRevenue * 0.4;
   const companyProfit = totalRevenue - totalExpenses;
-  
-  // Calculate average job value
+
   const avgJobValue = completedJobs.length > 0 
     ? totalRevenue / completedJobs.length 
     : 0;
-  
-  // Since we don't have historical data for growth calculation, we'll use placeholder values
-  const monthlyGrowth = 5.2; // Placeholder: 5.2% monthly growth
-  const conversionRate = 75.5; // Placeholder: 75.5% conversion rate
-  
-  // Create financial metrics object with all required properties
+
+  const monthlyGrowth = 5.2;
+  const conversionRate = 75.5;
+
   const dashboardFinancialMetrics = {
     totalRevenue: totalRevenue,
     totalExpenses: totalExpenses,
@@ -91,9 +90,27 @@ const Dashboard = () => {
     });
   };
 
+  const handleIndustryChange = (industry: IndustryType) => {
+    setCurrentIndustry(industry);
+    
+    if (industry === 'real_estate') {
+      window.location.href = '/real-estate-dashboard';
+    }
+    
+    toast({
+      title: `Switched to ${industry.replace('_', ' ')} CRM`,
+      description: `Now viewing ${industry.replace('_', ' ')} dashboard`,
+    });
+  };
+
   return (
     <div className="space-y-4 py-4">
       <DashboardHeader />
+      
+      <IndustrySelector 
+        currentIndustry={currentIndustry} 
+        onIndustryChange={handleIndustryChange} 
+      />
       
       <DashboardCalendar date={date} setDate={setDate} />
       
