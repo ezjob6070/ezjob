@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { financeTabOptions, FinanceTabId } from "@/components/finance/FinanceTabConfig";
@@ -20,16 +19,14 @@ const Finance = () => {
   
   const { jobs } = useGlobalState();
   
-  // Filter jobs based on date range
   const filteredJobs = jobs.filter(job => 
     job.status === "completed" && 
     (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
     (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
   );
   
-  // Calculate total metrics from filtered job data
   const totalRevenue = filteredJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
-  const totalExpenses = totalRevenue * 0.4; // 40% expense ratio for real estate
+  const totalExpenses = totalRevenue * 0.4;
   const totalProfit = totalRevenue - totalExpenses;
 
   return (
@@ -85,9 +82,10 @@ const Finance = () => {
                     amount: job.actualAmount || job.amount || 0,
                     clientName: job.clientName || '',
                     jobTitle: job.description || '',
-                    category: 'payment', // Set default category
-                    status: job.status,
-                    propertyAddress: job.address || '' // Use address instead of location
+                    category: 'payment',
+                    status: job.status === "completed" ? "completed" : 
+                           job.status === "cancelled" ? "failed" : "pending",
+                    propertyAddress: job.address || ''
                   }))}
                 />
               </TabsContent>
