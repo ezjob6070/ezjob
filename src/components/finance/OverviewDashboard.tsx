@@ -139,6 +139,19 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     );
   }
   
+  // Define the missing variables for the default (non-real estate) view
+  const revenueBreakdown = [
+    { name: "Services", value: totalRevenue * 0.7, color: "#3b82f6" },
+    { name: "Products", value: totalRevenue * 0.2, color: "#10b981" },
+    { name: "Other", value: totalRevenue * 0.1, color: "#8b5cf6" }
+  ];
+  
+  const profitBreakdown = [
+    { name: "Reinvestment", value: totalProfit * 0.4, color: "#8b5cf6" },
+    { name: "Owners", value: totalProfit * 0.35, color: "#3b82f6" },
+    { name: "Savings", value: totalProfit * 0.25, color: "#10b981" }
+  ];
+  
   return (
     <div className="space-y-8">
       <OverallFinanceSection 

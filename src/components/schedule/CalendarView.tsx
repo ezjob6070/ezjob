@@ -16,6 +16,25 @@ interface CalendarViewProps {
   updateSelectedDateItems: (date: Date) => void;
 }
 
+// Define the event types more specifically
+interface JobEvent {
+  id: string;
+  title: string;
+  datetime: Date;
+  type: "meeting";
+  clientName?: string;
+}
+
+interface TaskEvent {
+  id: string;
+  title: string;
+  datetime: Date;
+  type: "deadline";
+  clientName?: string;
+}
+
+type Event = JobEvent | TaskEvent;
+
 // Helper function to ensure we have a valid Date object
 const ensureValidDate = (date: any): Date | null => {
   if (date instanceof Date && !isNaN(date.getTime())) {
@@ -49,7 +68,7 @@ const CalendarView = ({
         clientName: job.clientName,
       };
     })
-    .filter(event => event !== null);
+    .filter((event): event is JobEvent => event !== null);
 
   const taskEvents = tasks
     .map(task => {
@@ -64,13 +83,10 @@ const CalendarView = ({
         clientName: task.client.name,
       };
     })
-    .filter(event => event !== null);
+    .filter((event): event is TaskEvent => event !== null);
 
   // Combine events and ensure they all have valid datetime objects before sorting
   const upcomingEvents = [...jobEvents, ...taskEvents]
-    .filter((event): event is {id: string; title: string; datetime: Date; type: "meeting" | "deadline"; clientName?: string} => 
-      event !== null && event.datetime instanceof Date
-    )
     .sort((a, b) => a.datetime.getTime() - b.datetime.getTime())
     .slice(0, 5);
 
