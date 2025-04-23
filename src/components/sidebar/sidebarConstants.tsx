@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
-// Industry type constants - remove 'general'
-export const INDUSTRY_TYPES = ['construction', 'real_estate'] as const;
+// Industry type constants - change 'construction' to 'service'
+export const INDUSTRY_TYPES = ['service', 'real_estate'] as const;
 
 // Navigation items organized by category and industry
 export const getCommonNavItems = (): NavItem[] => [
@@ -80,31 +80,31 @@ export const getConstructionNavItems = (): NavItem[] => [
     label: "Jobs",
     icon: <BriefcaseIcon size={20} />,
     href: "/jobs",
-    industries: ['construction'],
+    industries: ['service'], // Change from 'construction' to 'service'
   },
   {
     label: "Technicians",
     icon: <WrenchIcon size={20} />,
     href: "/technicians",
-    industries: ['construction'],
+    industries: ['service'], // Change from 'construction' to 'service'
   },
   {
     label: "Employed",
     icon: <UserRoundIcon size={20} />,
     href: "/employed",
-    industries: ['construction'],
+    industries: ['service'], // Change from 'construction' to 'service'
   },
   {
     label: "GPS Tracking",
     icon: <MapIcon size={20} />,
     href: "/gps-tracking",
-    industries: ['construction'],
+    industries: ['service'], // Change from 'construction' to 'service'
   },
   {
     label: "Job Sources",
     icon: <BriefcaseIcon size={20} />,
     href: "/job-sources",
-    industries: ['construction'],
+    industries: ['service'], // Change from 'construction' to 'service'
   },
 ];
 
@@ -134,8 +134,8 @@ export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavI
     ...getCommonNavItems(),
   ];
   
-  // Add construction-specific items
-  if (currentIndustry === 'construction') {
+  // Add service-specific items
+  if (currentIndustry === 'service') {
     navItems = [...navItems, ...getConstructionNavItems()];
   }
   

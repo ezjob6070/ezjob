@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Building, Home, LogOutIcon, MenuIcon } from "lucide-react";
+import { Building, Home, LogOutIcon, MenuIcon, WrenchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
@@ -62,18 +62,17 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           isHovering ? "w-64" : "w-16"
         )}
       >
-        {/* Industry Selection at the top */}
         <div className={cn("py-4", isHovering ? "px-3" : "px-2")}>
           <div className={cn("flex flex-col gap-2", !isHovering && "items-center")}>
             <button
-              onClick={() => handleIndustryChange('construction')}
+              onClick={() => handleIndustryChange('service')}
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
-                currentIndustry === 'construction' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
+                currentIndustry === 'service' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
               )}
             >
-              <Building className="h-5 w-5" />
-              {isHovering && <span>Construction</span>}
+              <WrenchIcon className="h-5 w-5" />
+              {isHovering && <span>Service</span>}
             </button>
             <button
               onClick={() => handleIndustryChange('real_estate')}
@@ -88,10 +87,8 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           </div>
         </div>
 
-        {/* Separator */}
         <div className="mx-2 mb-4 border-t border-blue-600/50" />
 
-        {/* Rest of the sidebar */}
         <div className={cn("py-5", isHovering ? "px-5" : "px-3")}>
           {isHovering ? (
             <div className="flex items-center justify-between">
