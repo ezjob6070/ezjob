@@ -1,24 +1,18 @@
 
-import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import DateRangeFilter from "./technician-filters/DateRangeFilter";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import InvoiceButton from "./InvoiceButton";
+import { useState } from "react";
 
 interface PropertiesFinanceSectionProps {
   date?: DateRange;
 }
 
-const PropertiesFinanceSection = ({ date: initialDate }: PropertiesFinanceSectionProps) => {
+const PropertiesFinanceSection = ({ date }: PropertiesFinanceSectionProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [date, setDate] = useState<DateRange | undefined>(initialDate);
-  const [sortBy, setSortBy] = useState<"revenue" | "expenses" | "profit" | "roi">("revenue");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "under-contract" | "sold">("all");
 
   // Sample data for property financials
   const propertiesData = [
@@ -31,10 +25,7 @@ const PropertiesFinanceSection = ({ date: initialDate }: PropertiesFinanceSectio
       projectedProfit: 42500,
       roi: "15.2%",
       annualRevenue: 96000,
-      occupancyRate: "94%",
-      ownerName: "John Smith",
-      ownerPhone: "555-0123",
-      zipCode: "90210"
+      occupancyRate: "94%"
     },
     {
       address: "456 Commerce Ave",
@@ -45,10 +36,7 @@ const PropertiesFinanceSection = ({ date: initialDate }: PropertiesFinanceSectio
       projectedProfit: 62500,
       roi: "18.5%",
       annualRevenue: 180000,
-      occupancyRate: "100%",
-      ownerName: "Sarah Johnson",
-      ownerPhone: "555-0124",
-      zipCode: "90211"
+      occupancyRate: "100%"
     },
     {
       address: "789 Coastal Drive",
@@ -59,83 +47,27 @@ const PropertiesFinanceSection = ({ date: initialDate }: PropertiesFinanceSectio
       projectedProfit: 33750,
       roi: "13.8%",
       annualRevenue: 72000,
-      occupancyRate: "92%",
-      ownerName: "Mike Wilson",
-      ownerPhone: "555-0125",
-      zipCode: "90212"
+      occupancyRate: "92%"
     }
   ];
 
-  const filteredProperties = propertiesData
-    .filter(property => 
-      (statusFilter === "all" || property.status.toLowerCase().replace(" ", "-") === statusFilter) &&
-      (
-        property.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        property.zipCode.includes(searchQuery) ||
-        property.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        property.ownerPhone.includes(searchQuery)
-      )
-    )
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "revenue":
-          return b.annualRevenue - a.annualRevenue;
-        case "expenses":
-          return b.expenses - a.expenses;
-        case "profit":
-          return b.projectedProfit - a.projectedProfit;
-        case "roi":
-          return parseFloat(b.roi) - parseFloat(a.roi);
-        default:
-          return 0;
-      }
-    });
-
-  const totalValue = propertiesData.reduce((sum, property) => sum + property.listPrice, 0);
-  const totalRevenue = propertiesData.reduce((sum, property) => sum + property.annualRevenue, 0);
-  const totalExpenses = propertiesData.reduce((sum, property) => sum + property.expenses, 0);
-  const avgRoi = (propertiesData.reduce((sum, property) => sum + parseFloat(property.roi), 0) / propertiesData.length).toFixed(1);
+  const filteredProperties = propertiesData.filter(property =>
+    property.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    property.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Property Financial Analytics</h2>
-        <div className="flex items-center gap-4 flex-wrap">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by address, zip, owner..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          
-          <DateRangeFilter date={date} setDate={setDate} />
-          
-          <Select value={statusFilter} onValueChange={(value: "all" | "active" | "under-contract" | "sold") => setStatusFilter(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Properties</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="under-contract">Under Contract</SelectItem>
-              <SelectItem value="sold">Sold</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={sortBy} onValueChange={(value: "revenue" | "expenses" | "profit" | "roi") => setSortBy(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="revenue">Sort by Revenue</SelectItem>
-              <SelectItem value="expenses">Sort by Expenses</SelectItem>
-              <SelectItem value="profit">Sort by Profit</SelectItem>
-              <SelectItem value="roi">Sort by ROI</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="relative w-64">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search properties..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
+          />
         </div>
       </div>
 
@@ -143,31 +75,31 @@ const PropertiesFinanceSection = ({ date: initialDate }: PropertiesFinanceSectio
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardContent className="p-6">
             <div className="text-sm text-gray-600 mb-2">Total Property Value</div>
-            <div className="text-2xl font-bold text-blue-700">{formatCurrency(totalValue)}</div>
-            <div className="text-sm text-blue-600 mt-2">{propertiesData.length} properties</div>
+            <div className="text-2xl font-bold text-blue-700">{formatCurrency(2775000)}</div>
+            <div className="text-sm text-blue-600 mt-2">48 active listings</div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-emerald-50 to-teal-50">
           <CardContent className="p-6">
             <div className="text-sm text-gray-600 mb-2">Annual Revenue</div>
-            <div className="text-2xl font-bold text-emerald-700">{formatCurrency(totalRevenue)}</div>
+            <div className="text-2xl font-bold text-emerald-700">{formatCurrency(348000)}</div>
             <div className="text-sm text-emerald-600 mt-2">+8.5% YoY</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-50 to-rose-50">
+        <Card className="bg-gradient-to-br from-violet-50 to-purple-50">
           <CardContent className="p-6">
-            <div className="text-sm text-gray-600 mb-2">Total Expenses</div>
-            <div className="text-2xl font-bold text-red-700">-{formatCurrency(totalExpenses)}</div>
-            <div className="text-sm text-red-600 mt-2">-2.3% from last year</div>
+            <div className="text-sm text-gray-600 mb-2">Avg. ROI</div>
+            <div className="text-2xl font-bold text-violet-700">15.8%</div>
+            <div className="text-sm text-violet-600 mt-2">+2.3% from last year</div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-amber-50 to-orange-50">
           <CardContent className="p-6">
-            <div className="text-sm text-gray-600 mb-2">Average ROI</div>
-            <div className="text-2xl font-bold text-amber-700">{avgRoi}%</div>
+            <div className="text-sm text-gray-600 mb-2">Occupancy Rate</div>
+            <div className="text-2xl font-bold text-amber-700">95.3%</div>
             <div className="text-sm text-amber-600 mt-2">+1.2% from last month</div>
           </CardContent>
         </Card>
@@ -181,35 +113,27 @@ const PropertiesFinanceSection = ({ date: initialDate }: PropertiesFinanceSectio
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Property Details</TableHead>
-                <TableHead>Owner Info</TableHead>
+                <TableHead>Property Address</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">List Price</TableHead>
                 <TableHead className="text-right">Annual Revenue</TableHead>
                 <TableHead className="text-right">Expenses</TableHead>
                 <TableHead className="text-right">ROI</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right">Occupancy</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredProperties.map((property) => (
                 <TableRow key={property.address}>
-                  <TableCell>
-                    <div className="font-medium">{property.address}</div>
-                    <div className="text-sm text-muted-foreground">{property.zipCode}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div>{property.ownerName}</div>
-                    <div className="text-sm text-muted-foreground">{property.ownerPhone}</div>
-                  </TableCell>
+                  <TableCell className="font-medium">{property.address}</TableCell>
+                  <TableCell>{property.type}</TableCell>
                   <TableCell>{property.status}</TableCell>
                   <TableCell className="text-right">{formatCurrency(property.listPrice)}</TableCell>
                   <TableCell className="text-right text-blue-600">{formatCurrency(property.annualRevenue)}</TableCell>
                   <TableCell className="text-right text-red-600">-{formatCurrency(property.expenses)}</TableCell>
                   <TableCell className="text-right text-emerald-600">{property.roi}</TableCell>
-                  <TableCell className="text-right">
-                    <InvoiceButton entityName={property.address} entityType="property" />
-                  </TableCell>
+                  <TableCell className="text-right">{property.occupancyRate}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
