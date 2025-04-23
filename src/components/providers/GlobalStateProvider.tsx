@@ -15,8 +15,8 @@ interface GlobalStateContextType {
   jobSources: JobSource[];
   setJobSources: React.Dispatch<React.SetStateAction<JobSource[]>>;
   addJob: (job: Job) => void;
-  completeJob: (jobId: string) => void;
-  cancelJob: (jobId: string) => void;
+  completeJob: (jobId: string, actualAmount?: number) => void;
+  cancelJob: (jobId: string, reason?: string) => void;
   addJobSource: (source: JobSource) => void;
   updateJobSource: (source: JobSource) => void;
   addTechnician: (technician: Technician) => void;
@@ -66,15 +66,19 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
     setJobs(prev => [...prev, job]);
   };
 
-  const completeJob = (jobId: string) => {
+  const completeJob = (jobId: string, actualAmount?: number) => {
     setJobs(prev => prev.map(job => 
-      job.id === jobId ? { ...job, status: 'completed' } : job
+      job.id === jobId 
+        ? { ...job, status: 'completed', actualAmount: actualAmount || job.actualAmount } 
+        : job
     ));
   };
 
-  const cancelJob = (jobId: string) => {
+  const cancelJob = (jobId: string, reason?: string) => {
     setJobs(prev => prev.map(job => 
-      job.id === jobId ? { ...job, status: 'cancelled' } : job
+      job.id === jobId 
+        ? { ...job, status: 'cancelled', cancellationReason: reason || job.cancellationReason } 
+        : job
     ));
   };
 
