@@ -3,12 +3,16 @@ import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { financeTabOptions, FinanceTabId } from "@/components/finance/FinanceTabConfig";
 import FinancePageHeader from "@/components/finance/FinancePageHeader";
-import RealEstateFinanceDashboard from "@/components/finance/RealEstateFinanceDashboard";
-import AgentsFinanceSection from "@/components/finance/AgentsFinanceSection";
-import PropertiesFinanceSection from "@/components/finance/PropertiesFinanceSection";
+import OverviewDashboard from "@/components/finance/OverviewDashboard";
+import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
+import TechniciansDashboard from "@/components/finance/TechniciansDashboard";
 import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
+import OfficeDashboard from "@/components/finance/OfficeDashboard";
+import SalariesDashboard from "@/components/finance/SalariesDashboard";
+import { useFinanceData } from "@/hooks/useFinanceData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 const Finance = () => {
@@ -18,7 +22,26 @@ const Finance = () => {
     to: new Date(),
   });
   
-  const { jobs } = useGlobalState();
+  const { technicians, jobs, jobSources } = useGlobalState();
+  
+  const {
+    showFilters,
+    setShowFilters,
+    selectedTechnicians,
+    selectedJobSources,
+    filteredTransactions,
+    filteredJobSources,
+    expenseCategories,
+    technicianNames,
+    jobSourceNames,
+    toggleTechnician,
+    toggleJobSource,
+    clearFilters,
+    applyFilters,
+    activeTechnicians,
+    searchQuery,
+    setSearchQuery
+  } = useFinanceData();
   
   // Filter jobs based on date range
   const filteredJobs = jobs.filter(job => 
@@ -29,8 +52,16 @@ const Finance = () => {
   
   // Calculate total metrics from filtered job data
   const totalRevenue = filteredJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
-  const totalExpenses = totalRevenue * 0.4; // 40% expense ratio for real estate
+
+  // Calculate expenses as 40% of revenue for completed jobs
+  const totalExpenses = totalRevenue * 0.4;
+  
+  // Calculate profit as revenue minus expenses
   const totalProfit = totalRevenue - totalExpenses;
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as FinanceTabId);
+  };
 
   return (
     <div className="container py-6">
@@ -41,7 +72,7 @@ const Finance = () => {
           <Tabs 
             defaultValue="overview" 
             value={activeTab}
-            onValueChange={(value) => setActiveTab(value as FinanceTabId)}
+            onValueChange={handleTabChange}
             className="w-full"
           >
             <div className="flex items-center justify-between p-4 border-b">
@@ -61,34 +92,57 @@ const Finance = () => {
 
             <div className="p-6">
               <TabsContent value="overview" className="mt-0">
-                <RealEstateFinanceDashboard 
+                <OverviewDashboard 
                   totalRevenue={totalRevenue}
                   totalExpenses={totalExpenses}
                   totalProfit={totalProfit}
+                  jobSources={jobSources}
+                  filteredTransactions={filteredTransactions}
+                  expenseCategories={expenseCategories}
                   date={date}
+                  setDate={setDate}
                 />
               </TabsContent>
 
-              <TabsContent value="properties" className="mt-0">
-                <PropertiesFinanceSection date={date} />
+              <TabsContent value="jobSources" className="mt-0">
+                <JobSourcesDashboard 
+                  filteredJobSources={filteredJobSources}
+                  filteredTransactions={filteredTransactions}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                />
               </TabsContent>
 
-              <TabsContent value="agents" className="mt-0">
-                <AgentsFinanceSection date={date} />
+              <TabsContent value="technicians" className="mt-0">
+                <TechniciansDashboard 
+                  key="technicians-dashboard"
+                  activeTechnicians={activeTechnicians.length > 0 ? activeTechnicians : technicians}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                />
+                
+                <div className="mt-8 w-full">
+                  <TechnicianInvoiceSection activeTechnicians={activeTechnicians.length > 0 ? activeTechnicians : technicians} />
+                </div>
               </TabsContent>
 
               <TabsContent value="transactions" className="mt-0">
                 <TransactionsDashboard 
-                  filteredTransactions={filteredJobs.map(job => ({
-                    id: job.id,
-                    date: new Date(job.scheduledDate || Date.now()),
-                    amount: job.actualAmount || job.amount || 0,
-                    clientName: job.clientName || '',
-                    jobTitle: job.description || '',
-                    category: 'payment', // Set default category
-                    status: job.status,
-                    propertyAddress: job.address || '' // Use address instead of location
-                  }))}
+                  filteredTransactions={filteredTransactions}
+                />
+              </TabsContent>
+
+              <TabsContent value="salaries" className="mt-0">
+                <SalariesDashboard
+                  dateRange={date}
+                  setDateRange={setDate}
+                />
+              </TabsContent>
+
+              <TabsContent value="office" className="mt-0">
+                <OfficeDashboard
+                  date={date}
+                  setDate={setDate}
                 />
               </TabsContent>
             </div>
