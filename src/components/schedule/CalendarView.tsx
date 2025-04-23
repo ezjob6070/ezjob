@@ -1,4 +1,3 @@
-
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, isSameDay } from "date-fns";
@@ -25,20 +24,27 @@ const CalendarView = ({
   updateSelectedDateItems,
 }: CalendarViewProps) => {
   const upcomingEvents = [
-    ...jobs.map(job => ({
-      id: job.id,
-      title: job.title,
-      datetime: job.date,
-      type: "meeting" as const,
-      clientName: job.clientName,
-    })),
-    ...tasks.map(task => ({
-      id: task.id,
-      title: task.title,
-      datetime: task.dueDate,
-      type: "deadline" as const,
-      clientName: task.client.name,
-    })),
+    ...jobs
+      .filter(job => job.date instanceof Date || (typeof job.date === 'string' && !isNaN(new Date(job.date).getTime())))
+      .map(job => {
+        const datetime = job.date instanceof Date ? job.date : new Date(job.date);
+        return {
+          id: job.id,
+          title: job.title,
+          datetime,
+          type: "meeting" as const,
+          clientName: job.clientName,
+        };
+      }),
+    ...tasks
+      .filter(task => task.dueDate instanceof Date && !isNaN(task.dueDate.getTime()))
+      .map(task => ({
+        id: task.id,
+        title: task.title,
+        datetime: task.dueDate,
+        type: "deadline" as const,
+        clientName: task.client.name,
+      })),
   ].sort((a, b) => a.datetime.getTime() - b.datetime.getTime())
    .slice(0, 5);
 

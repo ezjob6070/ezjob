@@ -41,23 +41,40 @@ const UpcomingEvents = ({ events }: UpcomingEventsProps) => {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
+  // Helper function to ensure we have a valid Date object
+  const ensureValidDate = (date: any): Date => {
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      return date;
+    }
+    // Return current date as fallback
+    return new Date();
+  };
+
   const isToday = (date: Date) => {
-    return date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear();
+    const validDate = ensureValidDate(date);
+    return validDate.getDate() === today.getDate() &&
+      validDate.getMonth() === today.getMonth() &&
+      validDate.getFullYear() === today.getFullYear();
   };
 
   const isTomorrow = (date: Date) => {
-    return date.getDate() === tomorrow.getDate() &&
-      date.getMonth() === tomorrow.getMonth() &&
-      date.getFullYear() === tomorrow.getFullYear();
+    const validDate = ensureValidDate(date);
+    return validDate.getDate() === tomorrow.getDate() &&
+      validDate.getMonth() === tomorrow.getMonth() &&
+      validDate.getFullYear() === tomorrow.getFullYear();
   };
 
   const getDateLabel = (date: Date) => {
-    if (isToday(date)) return "Today";
-    if (isTomorrow(date)) return "Tomorrow";
-    return format(date, "MMM d, yyyy");
+    const validDate = ensureValidDate(date);
+    if (isToday(validDate)) return "Today";
+    if (isTomorrow(validDate)) return "Tomorrow";
+    return format(validDate, "MMM d, yyyy");
   };
+
+  // Filter out events with invalid dates
+  const validEvents = events.filter(event => 
+    event.datetime instanceof Date && !isNaN(event.datetime.getTime())
+  );
 
   return (
     <Card className="h-full">
@@ -66,8 +83,8 @@ const UpcomingEvents = ({ events }: UpcomingEventsProps) => {
       </CardHeader>
       <CardContent className="p-0">
         <div className="divide-y">
-          {events.length > 0 ? (
-            events.map((event) => (
+          {validEvents.length > 0 ? (
+            validEvents.map((event) => (
               <div key={event.id} className="p-4 flex items-center">
                 <div
                   className={cn(
@@ -92,7 +109,7 @@ const UpcomingEvents = ({ events }: UpcomingEventsProps) => {
                     <span>{getDateLabel(event.datetime)}</span>
                   </div>
                   <span className="text-xs text-muted-foreground mt-0.5">
-                    {format(event.datetime, "h:mm a")}
+                    {format(ensureValidDate(event.datetime), "h:mm a")}
                   </span>
                 </div>
               </div>
