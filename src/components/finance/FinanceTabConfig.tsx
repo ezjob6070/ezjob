@@ -1,4 +1,5 @@
-import { BarChart3, Building, Home, Users, CreditCard, ChartBar } from "lucide-react";
+
+import { BarChart3, Building, Home, Users, CreditCard, ChartBar, ArrowUpDown } from "lucide-react";
 
 export const financeTabOptions = [
   { id: "overview", label: "Overview", icon: <BarChart3 className="h-5 w-5" /> },

@@ -82,12 +82,12 @@ const Finance = () => {
                   filteredTransactions={filteredJobs.map(job => ({
                     id: job.id,
                     date: new Date(job.scheduledDate || Date.now()),
-                    type: 'sale',
                     amount: job.actualAmount || job.amount || 0,
-                    description: job.description || '',
-                    status: job.status,
                     clientName: job.clientName || '',
-                    propertyAddress: job.location || ''
+                    jobTitle: job.description || '',
+                    category: 'payment', // Set default category
+                    status: job.status,
+                    propertyAddress: job.address || '' // Use address instead of location
                   }))}
                 />
               </TabsContent>
