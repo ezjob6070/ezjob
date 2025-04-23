@@ -1,18 +1,14 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { financeTabOptions, FinanceTabId } from "@/components/finance/FinanceTabConfig";
 import FinancePageHeader from "@/components/finance/FinancePageHeader";
-import OverviewDashboard from "@/components/finance/OverviewDashboard";
 import RealEstateFinanceDashboard from "@/components/finance/RealEstateFinanceDashboard";
-import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
-import TechniciansDashboard from "@/components/finance/TechniciansDashboard";
+import AgentsFinanceSection from "@/components/finance/AgentsFinanceSection";
+import PropertiesFinanceSection from "@/components/finance/PropertiesFinanceSection";
 import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
-import OfficeDashboard from "@/components/finance/OfficeDashboard";
-import SalariesDashboard from "@/components/finance/SalariesDashboard";
-import { useFinanceData } from "@/hooks/useFinanceData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 const Finance = () => {
@@ -22,29 +18,8 @@ const Finance = () => {
     to: new Date(),
   });
   
-  const { technicians, jobs, jobSources } = useGlobalState();
+  const { jobs } = useGlobalState();
   
-  const {
-    showFilters,
-    setShowFilters,
-    selectedTechnicians,
-    selectedJobSources,
-    filteredTransactions,
-    filteredJobSources,
-    expenseCategories,
-    technicianNames,
-    jobSourceNames,
-    toggleTechnician,
-    toggleJobSource,
-    clearFilters,
-    applyFilters,
-    activeTechnicians,
-    searchQuery,
-    setSearchQuery
-  } = useFinanceData();
-  
-  const currentIndustry = 'real_estate'; // Example industry variable
-
   // Filter jobs based on date range
   const filteredJobs = jobs.filter(job => 
     job.status === "completed" && 
@@ -54,16 +29,8 @@ const Finance = () => {
   
   // Calculate total metrics from filtered job data
   const totalRevenue = filteredJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
-
-  // Calculate expenses as 40% of revenue for completed jobs
-  const totalExpenses = totalRevenue * 0.4;
-  
-  // Calculate profit as revenue minus expenses
+  const totalExpenses = totalRevenue * 0.4; // 40% expense ratio for real estate
   const totalProfit = totalRevenue - totalExpenses;
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value as FinanceTabId);
-  };
 
   return (
     <div className="container py-6">
@@ -74,7 +41,7 @@ const Finance = () => {
           <Tabs 
             defaultValue="overview" 
             value={activeTab}
-            onValueChange={handleTabChange}
+            onValueChange={(value) => setActiveTab(value as FinanceTabId)}
             className="w-full"
           >
             <div className="flex items-center justify-between p-4 border-b">
@@ -94,66 +61,34 @@ const Finance = () => {
 
             <div className="p-6">
               <TabsContent value="overview" className="mt-0">
-                {currentIndustry === 'real_estate' ? (
-                  <RealEstateFinanceDashboard 
-                    totalRevenue={totalRevenue}
-                    totalExpenses={totalExpenses}
-                    totalProfit={totalProfit}
-                    date={date}
-                  />
-                ) : (
-                  <OverviewDashboard 
-                    totalRevenue={totalRevenue}
-                    totalExpenses={totalExpenses}
-                    totalProfit={totalProfit}
-                    jobSources={jobSources}
-                    filteredTransactions={filteredTransactions}
-                    expenseCategories={expenseCategories}
-                    date={date}
-                    setDate={setDate}
-                  />
-                )}
-              </TabsContent>
-
-              <TabsContent value="jobSources" className="mt-0">
-                <JobSourcesDashboard 
-                  filteredJobSources={filteredJobSources}
-                  filteredTransactions={filteredTransactions}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
+                <RealEstateFinanceDashboard 
+                  totalRevenue={totalRevenue}
+                  totalExpenses={totalExpenses}
+                  totalProfit={totalProfit}
+                  date={date}
                 />
               </TabsContent>
 
-              <TabsContent value="technicians" className="mt-0">
-                <TechniciansDashboard 
-                  key="technicians-dashboard"
-                  activeTechnicians={activeTechnicians.length > 0 ? activeTechnicians : technicians}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                />
-                
-                <div className="mt-8 w-full">
-                  <TechnicianInvoiceSection activeTechnicians={activeTechnicians.length > 0 ? activeTechnicians : technicians} />
-                </div>
+              <TabsContent value="properties" className="mt-0">
+                <PropertiesFinanceSection date={date} />
+              </TabsContent>
+
+              <TabsContent value="agents" className="mt-0">
+                <AgentsFinanceSection date={date} />
               </TabsContent>
 
               <TabsContent value="transactions" className="mt-0">
                 <TransactionsDashboard 
-                  filteredTransactions={filteredTransactions}
-                />
-              </TabsContent>
-
-              <TabsContent value="salaries" className="mt-0">
-                <SalariesDashboard
-                  dateRange={date}
-                  setDateRange={setDate}
-                />
-              </TabsContent>
-
-              <TabsContent value="office" className="mt-0">
-                <OfficeDashboard
-                  date={date}
-                  setDate={setDate}
+                  filteredTransactions={filteredJobs.map(job => ({
+                    id: job.id,
+                    date: new Date(job.scheduledDate || Date.now()),
+                    type: 'sale',
+                    amount: job.actualAmount || job.amount || 0,
+                    description: job.description || '',
+                    status: job.status,
+                    clientName: job.clientName || '',
+                    propertyAddress: job.location || ''
+                  }))}
                 />
               </TabsContent>
             </div>
