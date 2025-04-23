@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { financeTabOptions, FinanceTabId } from "@/components/finance/FinanceTabConfig";
 import FinancePageHeader from "@/components/finance/FinancePageHeader";
 import OverviewDashboard from "@/components/finance/OverviewDashboard";
+import RealEstateFinanceDashboard from "@/components/finance/RealEstateFinanceDashboard";
 import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
 import TechniciansDashboard from "@/components/finance/TechniciansDashboard";
 import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
@@ -43,6 +43,8 @@ const Finance = () => {
     setSearchQuery
   } = useFinanceData();
   
+  const currentIndustry = 'real_estate'; // Example industry variable
+
   // Filter jobs based on date range
   const filteredJobs = jobs.filter(job => 
     job.status === "completed" && 
@@ -92,16 +94,25 @@ const Finance = () => {
 
             <div className="p-6">
               <TabsContent value="overview" className="mt-0">
-                <OverviewDashboard 
-                  totalRevenue={totalRevenue}
-                  totalExpenses={totalExpenses}
-                  totalProfit={totalProfit}
-                  jobSources={jobSources}
-                  filteredTransactions={filteredTransactions}
-                  expenseCategories={expenseCategories}
-                  date={date}
-                  setDate={setDate}
-                />
+                {currentIndustry === 'real_estate' ? (
+                  <RealEstateFinanceDashboard 
+                    totalRevenue={totalRevenue}
+                    totalExpenses={totalExpenses}
+                    totalProfit={totalProfit}
+                    date={date}
+                  />
+                ) : (
+                  <OverviewDashboard 
+                    totalRevenue={totalRevenue}
+                    totalExpenses={totalExpenses}
+                    totalProfit={totalProfit}
+                    jobSources={jobSources}
+                    filteredTransactions={filteredTransactions}
+                    expenseCategories={expenseCategories}
+                    date={date}
+                    setDate={setDate}
+                  />
+                )}
               </TabsContent>
 
               <TabsContent value="jobSources" className="mt-0">
