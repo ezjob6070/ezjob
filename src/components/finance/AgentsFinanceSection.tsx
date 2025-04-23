@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -125,7 +126,7 @@ const AgentsFinanceSection = ({ date: initialDate }: AgentsFinanceSectionProps) 
           <Card className="bg-gradient-to-br from-blue-50 to-indigo-50">
             <CardContent className="p-6">
               <div className="text-sm text-gray-600 mb-2">Total Commission</div>
-              <div className="text-2xl font-bold text-blue-700">{formatCurrency(22350)}</div>
+              <div className="text-2xl font-bold text-red-700">-{formatCurrency(22350)}</div>
               <div className="text-sm text-blue-600 mt-2">+8.3% from last month</div>
             </CardContent>
           </Card>
