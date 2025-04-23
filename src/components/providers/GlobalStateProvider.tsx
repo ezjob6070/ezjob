@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Job } from "@/components/jobs/JobTypes";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";
@@ -32,8 +31,11 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
   });
 
   const [currentIndustry, setCurrentIndustry] = useState<IndustryType>(() => {
-    const savedIndustry = localStorage.getItem('currentIndustry');
-    return (savedIndustry as IndustryType) || 'construction';
+    const savedIndustry = localStorage.getItem('currentIndustry') as IndustryType | null;
+    if (savedIndustry === 'construction') {
+      return 'service';
+    }
+    return (savedIndustry === 'service' || savedIndustry === 'real_estate') ? savedIndustry : 'service';
   });
 
   const [technicians, setTechnicians] = useState<Technician[]>(() => {
