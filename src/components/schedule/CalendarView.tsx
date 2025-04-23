@@ -1,3 +1,4 @@
+
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, isSameDay } from "date-fns";
@@ -15,6 +16,17 @@ interface CalendarViewProps {
   updateSelectedDateItems: (date: Date) => void;
 }
 
+// Helper function to ensure we have a valid Date object
+const ensureValidDate = (date: any): Date | null => {
+  if (date instanceof Date && !isNaN(date.getTime())) {
+    return date;
+  }
+  if (typeof date === 'string' && !isNaN(new Date(date).getTime())) {
+    return new Date(date);
+  }
+  return null;
+};
+
 const CalendarView = ({
   jobs,
   tasks,
@@ -23,37 +35,68 @@ const CalendarView = ({
   tasksForSelectedDate,
   updateSelectedDateItems,
 }: CalendarViewProps) => {
-  const upcomingEvents = [
-    ...jobs
-      .filter(job => job.date instanceof Date || (typeof job.date === 'string' && !isNaN(new Date(job.date).getTime())))
-      .map(job => {
-        const datetime = job.date instanceof Date ? job.date : new Date(job.date);
-        return {
-          id: job.id,
-          title: job.title,
-          datetime,
-          type: "meeting" as const,
-          clientName: job.clientName,
-        };
-      }),
-    ...tasks
-      .filter(task => task.dueDate instanceof Date && !isNaN(task.dueDate.getTime()))
-      .map(task => ({
+  // Process jobs and tasks to create upcoming events with validated dates
+  const jobEvents = jobs
+    .map(job => {
+      const datetime = ensureValidDate(job.date);
+      if (!datetime) return null;
+      
+      return {
+        id: job.id,
+        title: job.title,
+        datetime,
+        type: "meeting" as const,
+        clientName: job.clientName,
+      };
+    })
+    .filter(event => event !== null);
+
+  const taskEvents = tasks
+    .map(task => {
+      const datetime = ensureValidDate(task.dueDate);
+      if (!datetime) return null;
+      
+      return {
         id: task.id,
         title: task.title,
-        datetime: task.dueDate,
+        datetime,
         type: "deadline" as const,
         clientName: task.client.name,
-      })),
-  ].sort((a, b) => a.datetime.getTime() - b.datetime.getTime())
-   .slice(0, 5);
+      };
+    })
+    .filter(event => event !== null);
+
+  // Combine events and ensure they all have valid datetime objects before sorting
+  const upcomingEvents = [...jobEvents, ...taskEvents]
+    .filter(event => event !== null)
+    .sort((a, b) => {
+      // Extra safety check before accessing getTime()
+      if (!a || !b || !a.datetime || !b.datetime) return 0;
+      return a.datetime.getTime() - b.datetime.getTime();
+    })
+    .slice(0, 5) as Array<{
+      id: string;
+      title: string;
+      datetime: Date;
+      type: "meeting" | "call" | "deadline";
+      clientName?: string;
+    }>;
 
   const getDayClassName = (date: Date) => {
-    const hasJobs = jobs.some(job => isSameDay(job.date, date));
-    const hasTasks = tasks.some(task => isSameDay(task.dueDate, date));
-    const hasHighPriorityTasks = tasks.some(task => 
-      isSameDay(task.dueDate, date) && task.priority === 'high'
-    );
+    const hasJobs = jobs.some(job => {
+      const jobDate = ensureValidDate(job.date);
+      return jobDate && isSameDay(jobDate, date);
+    });
+    
+    const hasTasks = tasks.some(task => {
+      const taskDate = ensureValidDate(task.dueDate);
+      return taskDate && isSameDay(taskDate, date);
+    });
+    
+    const hasHighPriorityTasks = tasks.some(task => {
+      const taskDate = ensureValidDate(task.dueDate);
+      return taskDate && isSameDay(taskDate, date) && task.priority === 'high';
+    });
     
     if (hasHighPriorityTasks) return "bg-red-100 text-red-900 font-medium";
     if (hasJobs && hasTasks) return "bg-purple-100 text-purple-900 font-medium";
@@ -84,8 +127,14 @@ const CalendarView = ({
                 className="border rounded-md shadow-sm w-full max-w-4xl mx-auto"
                 modifiers={{
                   hasEvents: (date) => 
-                    jobs.some(job => isSameDay(job.date, date)) || 
-                    tasks.some(task => isSameDay(task.dueDate, date)),
+                    jobs.some(job => {
+                      const jobDate = ensureValidDate(job.date);
+                      return jobDate && isSameDay(jobDate, date);
+                    }) || 
+                    tasks.some(task => {
+                      const taskDate = ensureValidDate(task.dueDate);
+                      return taskDate && isSameDay(taskDate, date);
+                    }),
                 }}
                 modifiersClassNames={{
                   hasEvents: "font-bold",
@@ -109,14 +158,26 @@ const CalendarView = ({
                         {...props}
                       >
                         <span className="text-base">{format(date, "d")}</span>
-                        {(jobs.some(job => isSameDay(job.date, date)) || 
-                          tasks.some(task => isSameDay(task.dueDate, date))) && 
+                        {(jobs.some(job => {
+                          const jobDate = ensureValidDate(job.date);
+                          return jobDate && isSameDay(jobDate, date);
+                        }) || 
+                          tasks.some(task => {
+                            const taskDate = ensureValidDate(task.dueDate);
+                            return taskDate && isSameDay(taskDate, date);
+                          })) && 
                           !isSelected && (
                           <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
-                            {jobs.some(job => isSameDay(job.date, date)) && (
+                            {jobs.some(job => {
+                              const jobDate = ensureValidDate(job.date);
+                              return jobDate && isSameDay(jobDate, date);
+                            }) && (
                               <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                             )}
-                            {tasks.some(task => isSameDay(task.dueDate, date)) && (
+                            {tasks.some(task => {
+                              const taskDate = ensureValidDate(task.dueDate);
+                              return taskDate && isSameDay(taskDate, date);
+                            }) && (
                               <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
                             )}
                           </div>

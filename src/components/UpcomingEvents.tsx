@@ -71,10 +71,15 @@ const UpcomingEvents = ({ events }: UpcomingEventsProps) => {
     return format(validDate, "MMM d, yyyy");
   };
 
-  // Filter out events with invalid dates
-  const validEvents = events.filter(event => 
-    event.datetime instanceof Date && !isNaN(event.datetime.getTime())
-  );
+  // Ensure all events have valid datetime objects - this is defensive programming
+  // since we should have already validated in CalendarView
+  const validEvents = events
+    .filter(event => event && event.datetime instanceof Date && !isNaN(event.datetime.getTime()))
+    .map(event => ({
+      ...event,
+      // Ensure datetime is a valid Date object
+      datetime: ensureValidDate(event.datetime)
+    }));
 
   return (
     <Card className="h-full">
@@ -109,7 +114,7 @@ const UpcomingEvents = ({ events }: UpcomingEventsProps) => {
                     <span>{getDateLabel(event.datetime)}</span>
                   </div>
                   <span className="text-xs text-muted-foreground mt-0.5">
-                    {format(ensureValidDate(event.datetime), "h:mm a")}
+                    {format(event.datetime, "h:mm a")}
                   </span>
                 </div>
               </div>
