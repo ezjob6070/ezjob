@@ -71,8 +71,7 @@ const UpcomingEvents = ({ events }: UpcomingEventsProps) => {
     return format(validDate, "MMM d, yyyy");
   };
 
-  // Ensure all events have valid datetime objects - this is defensive programming
-  // since we should have already validated in CalendarView
+  // Ensure all events have valid datetime objects
   const validEvents = events
     .filter(event => event && event.datetime instanceof Date && !isNaN(event.datetime.getTime()))
     .map(event => ({

@@ -43,7 +43,7 @@ const CalendarView = ({
       
       return {
         id: job.id,
-        title: job.title,
+        title: job.title || "Unnamed Job",
         datetime,
         type: "meeting" as const,
         clientName: job.clientName,
@@ -68,19 +68,11 @@ const CalendarView = ({
 
   // Combine events and ensure they all have valid datetime objects before sorting
   const upcomingEvents = [...jobEvents, ...taskEvents]
-    .filter(event => event !== null)
-    .sort((a, b) => {
-      // Extra safety check before accessing getTime()
-      if (!a || !b || !a.datetime || !b.datetime) return 0;
-      return a.datetime.getTime() - b.datetime.getTime();
-    })
-    .slice(0, 5) as Array<{
-      id: string;
-      title: string;
-      datetime: Date;
-      type: "meeting" | "call" | "deadline";
-      clientName?: string;
-    }>;
+    .filter((event): event is {id: string; title: string; datetime: Date; type: "meeting" | "deadline"; clientName?: string} => 
+      event !== null && event.datetime instanceof Date
+    )
+    .sort((a, b) => a.datetime.getTime() - b.datetime.getTime())
+    .slice(0, 5);
 
   const getDayClassName = (date: Date) => {
     const hasJobs = jobs.some(job => {

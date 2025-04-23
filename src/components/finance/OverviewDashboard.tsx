@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -37,6 +38,20 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   setDate
 }) => {
   const { currentIndustry } = useGlobalState();
+  
+  // Define revenue breakdown data
+  const revenueBreakdown = [
+    { name: "Services", value: totalRevenue * 0.7, color: "#3b82f6" },
+    { name: "Products", value: totalRevenue * 0.2, color: "#10b981" },
+    { name: "Consultations", value: totalRevenue * 0.1, color: "#8b5cf6" }
+  ];
+  
+  // Define profit breakdown data
+  const profitBreakdown = [
+    { name: "Net Income", value: totalProfit * 0.6, color: "#059669" },
+    { name: "Reinvestment", value: totalProfit * 0.25, color: "#6366f1" },
+    { name: "Reserves", value: totalProfit * 0.15, color: "#8b5cf6" }
+  ];
   
   if (currentIndustry === 'real_estate') {
     return (
