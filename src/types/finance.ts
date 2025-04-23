@@ -47,3 +47,5 @@ export type ProfitBreakdownItem = {
   color: string;
 };
 
+// Adding entityType for finance-related components
+export type FinanceEntityType = "technician" | "jobSource" | "client" | "agent" | "property";
