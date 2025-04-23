@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { JobSource, FinancialTransaction, ProfitBreakdownItem } from "@/types/finance";
+import { JobSource, FinancialTransaction } from "@/types/finance";
 import OverallFinanceSection from "@/components/finance/OverallFinanceSection";
 import TransactionsSection from "@/components/finance/TransactionsSection";
 import ReportGenerator from "@/components/finance/ReportGenerator";
@@ -138,8 +138,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       </div>
     );
   }
-  
-  // Define the missing variables for the default (non-real estate) view
+
+  // Define the variables for the default (non-real estate) view
   const revenueBreakdown = [
     { name: "Services", value: totalRevenue * 0.7, color: "#3b82f6" },
     { name: "Products", value: totalRevenue * 0.2, color: "#10b981" },

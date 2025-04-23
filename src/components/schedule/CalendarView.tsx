@@ -22,7 +22,7 @@ interface JobEvent {
   title: string;
   datetime: Date;
   type: "meeting";
-  clientName?: string;
+  clientName: string;
 }
 
 interface TaskEvent {
@@ -30,7 +30,7 @@ interface TaskEvent {
   title: string;
   datetime: Date;
   type: "deadline";
-  clientName?: string;
+  clientName: string;
 }
 
 type Event = JobEvent | TaskEvent;
@@ -58,7 +58,7 @@ const CalendarView = ({
   const jobEvents = jobs
     .map(job => {
       const datetime = ensureValidDate(job.date);
-      if (!datetime) return null;
+      if (!datetime || !job.clientName) return null;
       
       return {
         id: job.id,
@@ -73,7 +73,7 @@ const CalendarView = ({
   const taskEvents = tasks
     .map(task => {
       const datetime = ensureValidDate(task.dueDate);
-      if (!datetime) return null;
+      if (!datetime || !task.client?.name) return null;
       
       return {
         id: task.id,
