@@ -30,6 +30,8 @@ import TechnicianAltercation from "./pages/TechnicianAltercation";
 import TechnicianAnalytics from "./pages/TechnicianAnalytics";
 import TechnicianDetail from "./pages/TechnicianDetail";
 import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
+import Properties from "./pages/Properties";
+import Listings from "./pages/Listings";
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
@@ -49,6 +51,8 @@ function App() {
                   <Route index element={<Dashboard />} />
                   <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
                   <Route path="agents" element={<RealEstateAgents />} />
+                  <Route path="properties" element={<Properties />} />
+                  <Route path="listings" element={<Listings />} />
                   <Route path="clients" element={<Clients />} />
                   <Route path="clients/:id" element={<ClientDetail />} />
                   <Route path="leads" element={<Leads />} />

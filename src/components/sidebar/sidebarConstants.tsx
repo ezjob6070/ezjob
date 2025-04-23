@@ -131,14 +131,26 @@ export const getRealEstateNavItems = (): NavItem[] => [
 ];
 
 export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavItem[] => {
-  // Combine and filter based on current industry
-  return [
+  let navItems = [
     ...getCommonNavItems(),
-    ...getConstructionNavItems().filter(item => 
-      !item.industries || item.industries.includes(currentIndustry)
-    ),
-    ...getRealEstateNavItems().filter(item => 
-      !item.industries || item.industries.includes(currentIndustry)
-    ),
   ];
+  
+  // Add construction-specific items
+  if (currentIndustry === 'construction') {
+    navItems = [...navItems, ...getConstructionNavItems()];
+  }
+  
+  // Add real estate-specific items
+  if (currentIndustry === 'real_estate') {
+    navItems = [...navItems, ...getRealEstateNavItems()];
+  }
+  
+  // For general industry, we can add some of the construction items if needed
+  if (currentIndustry === 'general') {
+    navItems = [...navItems, ...getConstructionNavItems().filter(item => 
+      !item.industries || item.industries.includes('general')
+    )];
+  }
+  
+  return navItems;
 };
