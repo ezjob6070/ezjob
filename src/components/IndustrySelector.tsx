@@ -1,5 +1,5 @@
 
-import { Building, Home, Wrench } from "lucide-react";
+import { Building, Home } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";
 
@@ -19,10 +19,6 @@ const IndustrySelector = ({ currentIndustry, onIndustryChange }: IndustrySelecto
         <ToggleGroupItem value="real_estate" aria-label="Real Estate CRM" className="gap-2">
           <Home className="h-5 w-5" />
           <span className="hidden md:inline">Real Estate</span>
-        </ToggleGroupItem>
-        <ToggleGroupItem value="general" aria-label="Service CRM" className="gap-2">
-          <Wrench className="h-5 w-5" />
-          <span className="hidden md:inline">Service</span>
         </ToggleGroupItem>
       </ToggleGroup>
     </div>
