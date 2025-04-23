@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,6 +8,8 @@ import TransactionsSection from "@/components/finance/TransactionsSection";
 import ReportGenerator from "@/components/finance/ReportGenerator";
 import { DateRange } from "react-day-picker";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import AgentsFinanceSection from "@/components/finance/AgentsFinanceSection";
+import PropertiesFinanceSection from "@/components/finance/PropertiesFinanceSection";
 
 interface OverviewDashboardProps {
   totalRevenue: number;
@@ -35,34 +36,39 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   date,
   setDate
 }) => {
-  const { jobs } = useGlobalState();
+  const { currentIndustry } = useGlobalState();
   
-  // Generate the profit breakdown data
-  const profitBreakdown: ProfitBreakdownItem[] = [
-    { name: "Operating Costs", value: totalProfit * 0.3, color: "#3b82f6" }, // blue
-    { name: "Reinvestment", value: totalProfit * 0.25, color: "#10b981" },   // green
-    { name: "Owner Dividends", value: totalProfit * 0.30, color: "#f59e0b" }, // amber
-    { name: "Taxes", value: totalProfit * 0.15, color: "#ef4444" },          // red
-  ];
-
-  // Revenue breakdown data based on actual job payment methods (or using estimate if no data)
-  const completedJobs = jobs.filter(job => job.status === "completed");
-  const creditCardJobs = completedJobs.filter(job => job.paymentMethod === "credit_card").length;
-  const cashJobs = completedJobs.filter(job => job.paymentMethod === "cash").length;
-  const checkJobs = completedJobs.filter(job => job.paymentMethod === "check").length;
-  const totalJobsWithPayment = creditCardJobs + cashJobs + checkJobs;
+  if (currentIndustry === 'real_estate') {
+    return (
+      <div className="space-y-8">
+        <OverallFinanceSection 
+          totalRevenue={totalRevenue} 
+          totalExpenses={totalExpenses} 
+          totalProfit={totalProfit}
+          date={date}
+          setDate={setDate}
+        />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <AgentsFinanceSection 
+            activeAgents={[]} 
+            dateRange={date} 
+            setDateRange={setDate}
+          />
+          <PropertiesFinanceSection 
+            properties={[]} 
+            dateRange={date} 
+            setDateRange={setDate}
+          />
+        </div>
+        
+        <ReportGenerator dateRange={date} />
+        
+        <TransactionsSection filteredTransactions={filteredTransactions.slice(0, 5)} />
+      </div>
+    );
+  }
   
-  // Calculate revenue breakdown percentages or use defaults
-  const creditCardPercent = totalJobsWithPayment > 0 ? creditCardJobs / totalJobsWithPayment : 0.45;
-  const cashPercent = totalJobsWithPayment > 0 ? cashJobs / totalJobsWithPayment : 0.35;
-  const checkPercent = totalJobsWithPayment > 0 ? checkJobs / totalJobsWithPayment : 0.20;
-  
-  const revenueBreakdown = [
-    { name: "Credit Card", value: totalRevenue * creditCardPercent, color: "#0ea5e9" }, // sky blue
-    { name: "Cash", value: totalRevenue * cashPercent, color: "#ec4899" }, // pink
-    { name: "Check", value: totalRevenue * checkPercent, color: "#6366f1" },  // indigo
-  ];
-
   return (
     <div className="space-y-8">
       <OverallFinanceSection 
@@ -82,7 +88,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardContent>
             <div className="text-xl font-bold mb-4 text-blue-600">{formatCurrency(totalRevenue)}</div>
             
-            {/* Revenue breakdown list without donut chart */}
             <div className="space-y-4">
               {revenueBreakdown.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
@@ -110,7 +115,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardContent>
             <div className="text-xl font-bold mb-4 text-red-600">-{formatCurrency(totalExpenses)}</div>
             
-            {/* Expense breakdown list without donut chart */}
             <div className="space-y-4">
               {expenseCategories.length > 0 ? (
                 expenseCategories.map((item) => (
@@ -128,7 +132,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                   </div>
                 ))
               ) : (
-                // Default expense categories if none provided
                 [
                   { name: "Materials", value: totalExpenses * 0.5, color: "#ef4444" },
                   { name: "Labor", value: totalExpenses * 0.3, color: "#f97316" },
@@ -162,7 +165,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               {totalProfit >= 0 ? formatCurrency(totalProfit) : `-${formatCurrency(Math.abs(totalProfit))}`}
             </div>
             
-            {/* Profit allocation breakdown list without donut chart */}
             <div className="space-y-4">
               {profitBreakdown.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
@@ -187,10 +189,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
       </div>
       
-      {/* Report Generator - Added here as requested */}
       <ReportGenerator dateRange={date} />
       
-      {/* Top Job Sources moved down */}
       <Card>
         <CardHeader>
           <CardTitle>Top Job Sources</CardTitle>

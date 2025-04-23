@@ -32,9 +32,6 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
 
   const [currentIndustry, setCurrentIndustry] = useState<IndustryType>(() => {
     const savedIndustry = localStorage.getItem('currentIndustry') as IndustryType | null;
-    if (savedIndustry === 'construction') {
-      return 'service';
-    }
     return (savedIndustry === 'service' || savedIndustry === 'real_estate') ? savedIndustry : 'service';
   });
 
