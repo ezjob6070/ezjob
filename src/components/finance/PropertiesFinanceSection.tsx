@@ -1,10 +1,9 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRange } from "react-day-picker";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { FinanceEntityType } from "@/types/finance";
-
-// Add other imports as needed
 
 interface PropertiesFinanceSectionProps {
   properties: any[];
@@ -17,22 +16,50 @@ const PropertiesFinanceSection: React.FC<PropertiesFinanceSectionProps> = ({
   dateRange,
   setDateRange
 }) => {
-  // Component state and logic
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Entity type for this finance section
-  const entityType: FinanceEntityType = "property";
-  
-  // Other component functionality...
+  // Mock data for demonstration
+  const propertyMetrics = [
+    {
+      address: "123 Main St",
+      listPrice: 750000,
+      status: "Listed",
+      daysOnMarket: 15,
+      viewings: 8
+    },
+    {
+      address: "456 Oak Ave",
+      listPrice: 525000,
+      status: "Under Contract",
+      daysOnMarket: 32,
+      viewings: 12
+    }
+  ];
 
   return (
-    <Card className="mb-8">
+    <Card className="h-full">
       <CardHeader>
-        <CardTitle>Property Finance</CardTitle>
+        <CardTitle>Property Performance</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Component content */}
-        <div>Property finance information will be displayed here</div>
+        <div className="space-y-4">
+          {propertyMetrics.map((property) => (
+            <div key={property.address} className="p-4 border rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-semibold">{property.address}</h3>
+                <span className={`font-medium ${
+                  property.status === "Listed" ? "text-blue-600" : "text-green-600"
+                }`}>{property.status}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                <div>List Price: {formatCurrency(property.listPrice)}</div>
+                <div>Days on Market: {property.daysOnMarket}</div>
+                <div>Total Viewings: {property.viewings}</div>
+                <div>Potential Commission: {formatCurrency(property.listPrice * 0.03)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

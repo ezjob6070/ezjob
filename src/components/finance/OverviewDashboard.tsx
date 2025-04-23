@@ -39,21 +39,20 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 }) => {
   const { currentIndustry } = useGlobalState();
   
-  // Define revenue breakdown data
-  const revenueBreakdown = [
-    { name: "Services", value: totalRevenue * 0.7, color: "#3b82f6" },
-    { name: "Products", value: totalRevenue * 0.2, color: "#10b981" },
-    { name: "Consultations", value: totalRevenue * 0.1, color: "#8b5cf6" }
-  ];
-  
-  // Define profit breakdown data
-  const profitBreakdown = [
-    { name: "Net Income", value: totalProfit * 0.6, color: "#059669" },
-    { name: "Reinvestment", value: totalProfit * 0.25, color: "#6366f1" },
-    { name: "Reserves", value: totalProfit * 0.15, color: "#8b5cf6" }
-  ];
-  
   if (currentIndustry === 'real_estate') {
+    // Real estate specific breakdown
+    const realEstateRevenueBreakdown = [
+      { name: "Sales Commission", value: totalRevenue * 0.6, color: "#3b82f6" },
+      { name: "Rental Commission", value: totalRevenue * 0.25, color: "#10b981" },
+      { name: "Property Management", value: totalRevenue * 0.15, color: "#8b5cf6" }
+    ];
+    
+    const realEstateExpenseBreakdown = [
+      { name: "Marketing", value: totalExpenses * 0.4, color: "#ef4444" },
+      { name: "Agent Commissions", value: totalExpenses * 0.35, color: "#f97316" },
+      { name: "Administrative", value: totalExpenses * 0.25, color: "#8b5cf6" }
+    ];
+    
     return (
       <div className="space-y-8">
         <OverallFinanceSection 
@@ -63,6 +62,62 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           date={date}
           setDate={setDate}
         />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Breakdown</CardTitle>
+              <CardDescription>Real estate revenue sources</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold mb-4 text-blue-600">{formatCurrency(totalRevenue)}</div>
+              
+              <div className="space-y-4">
+                {realEstateRevenueBreakdown.map((item) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-blue-600">{formatCurrency(item.value)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        ({totalRevenue > 0 ? ((item.value / totalRevenue) * 100).toFixed(1) : "0"}%)
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Expense Breakdown</CardTitle>
+              <CardDescription>Real estate operational costs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold mb-4 text-red-600">-{formatCurrency(totalExpenses)}</div>
+              
+              <div className="space-y-4">
+                {realEstateExpenseBreakdown.map((item) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-red-600">-{formatCurrency(item.value)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        ({totalExpenses > 0 ? ((item.value / totalExpenses) * 100).toFixed(1) : "0"}%)
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <AgentsFinanceSection 
