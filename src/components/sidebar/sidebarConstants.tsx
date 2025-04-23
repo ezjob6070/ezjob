@@ -1,4 +1,3 @@
-
 import { 
   HomeIcon, 
   UsersIcon, 
@@ -18,8 +17,8 @@ import {
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
-// Industry type constants
-export const INDUSTRY_TYPES = ['construction', 'real_estate', 'general'] as const;
+// Industry type constants - remove 'general'
+export const INDUSTRY_TYPES = ['construction', 'real_estate'] as const;
 
 // Navigation items organized by category and industry
 export const getCommonNavItems = (): NavItem[] => [
@@ -143,13 +142,6 @@ export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavI
   // Add real estate-specific items
   if (currentIndustry === 'real_estate') {
     navItems = [...navItems, ...getRealEstateNavItems()];
-  }
-  
-  // For general industry, we can add some of the construction items if needed
-  if (currentIndustry === 'general') {
-    navItems = [...navItems, ...getConstructionNavItems().filter(item => 
-      !item.industries || item.industries.includes('general')
-    )];
   }
   
   return navItems;
