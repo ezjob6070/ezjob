@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -73,8 +72,16 @@ function App() {
                   <Route path="employed" element={<Employed />} />
                   <Route path="employed/employee/:id" element={<EmployeeDetail />} />
                   <Route path="settings" element={<Settings />} />
+                  
+                  {/* Construction Routes */}
+                  <Route path="projects" element={<Navigate to="/construction/projects" replace />} />
+                  <Route path="equipment" element={<Navigate to="/construction/equipment" replace />} />
+                  <Route path="materials" element={<Navigate to="/construction/materials" replace />} />
+                  <Route path="safety-reports" element={<Navigate to="/construction/safety" replace />} />
+                  <Route path="inspections" element={<Navigate to="/construction/inspections" replace />} />
+                  
+                  <Route path="*" element={<NotFound />} />
                 </Route>
-                <Route path="*" element={<NotFound />} />
               </Routes>
               <QuickActions />
             </BrowserRouter>

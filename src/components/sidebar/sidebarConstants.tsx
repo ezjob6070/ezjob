@@ -13,12 +13,17 @@ import {
   UserRoundIcon,
   CalendarIcon,
   BuildingIcon,
-  HomeIcon as HouseIcon
+  HomeIcon as HouseIcon,
+  HardHatIcon,
+  ConstructionIcon,
+  TruckIcon,
+  LayersIcon,
+  ClipboardCheckIcon
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
-// Industry type constants - change 'construction' to 'service'
-export const INDUSTRY_TYPES = ['service', 'real_estate'] as const;
+// Update industry types to include construction
+export const INDUSTRY_TYPES = ['service', 'real_estate', 'construction'] as const;
 
 // Navigation items organized by category and industry
 export const getCommonNavItems = (): NavItem[] => [
@@ -75,36 +80,70 @@ export const getCommonNavItems = (): NavItem[] => [
   },
 ];
 
-export const getConstructionNavItems = (): NavItem[] => [
+export const getServiceNavItems = (): NavItem[] => [
   {
     label: "Jobs",
     icon: <BriefcaseIcon size={20} />,
     href: "/jobs",
-    industries: ['service'], // Change from 'construction' to 'service'
+    industries: ['service'],
   },
   {
     label: "Technicians",
     icon: <WrenchIcon size={20} />,
     href: "/technicians",
-    industries: ['service'], // Change from 'construction' to 'service'
+    industries: ['service'],
   },
   {
     label: "Employed",
     icon: <UserRoundIcon size={20} />,
     href: "/employed",
-    industries: ['service'], // Change from 'construction' to 'service'
+    industries: ['service'],
   },
   {
     label: "GPS Tracking",
     icon: <MapIcon size={20} />,
     href: "/gps-tracking",
-    industries: ['service'], // Change from 'construction' to 'service'
+    industries: ['service'],
   },
   {
     label: "Job Sources",
     icon: <BriefcaseIcon size={20} />,
     href: "/job-sources",
-    industries: ['service'], // Change from 'construction' to 'service'
+    industries: ['service'],
+  },
+];
+
+// Add construction specific nav items
+export const getConstructionNavItems = (): NavItem[] => [
+  {
+    label: "Projects",
+    icon: <ConstructionIcon size={20} />,
+    href: "/projects",
+    industries: ['construction'],
+  },
+  {
+    label: "Equipment",
+    icon: <TruckIcon size={20} />,
+    href: "/equipment",
+    industries: ['construction'],
+  },
+  {
+    label: "Materials",
+    icon: <LayersIcon size={20} />,
+    href: "/materials",
+    industries: ['construction'],
+  },
+  {
+    label: "Safety Reports",
+    icon: <HardHatIcon size={20} />,
+    href: "/safety-reports",
+    industries: ['construction'],
+  },
+  {
+    label: "Inspections",
+    icon: <ClipboardCheckIcon size={20} />,
+    href: "/inspections",
+    industries: ['construction'],
   },
 ];
 
@@ -136,12 +175,17 @@ export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavI
   
   // Add service-specific items
   if (currentIndustry === 'service') {
-    navItems = [...navItems, ...getConstructionNavItems()];
+    navItems = [...navItems, ...getServiceNavItems()];
   }
   
   // Add real estate-specific items
   if (currentIndustry === 'real_estate') {
     navItems = [...navItems, ...getRealEstateNavItems()];
+  }
+  
+  // Add construction-specific items
+  if (currentIndustry === 'construction') {
+    navItems = [...navItems, ...getConstructionNavItems()];
   }
   
   return navItems;
