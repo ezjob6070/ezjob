@@ -2,18 +2,13 @@
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { 
-  Building, 
-  Home, 
   LogOutIcon, 
   MenuIcon, 
-  WrenchIcon, 
-  Construction, 
   ArrowLeftCircle,
-  LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SidebarProps, IndustryType } from "./sidebarTypes";
-import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
+import { SidebarProps } from "./sidebarTypes";
+import { getIndustrySpecificNavItems } from "./sidebarConstants";
 import NavItem from "./NavItem";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { toast } from "@/components/ui/use-toast";
@@ -27,24 +22,8 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
     "leads-clients": true,
   });
   
-  const { currentIndustry, setCurrentIndustry } = useGlobalState();
+  const { currentIndustry } = useGlobalState();
   
-  const handleIndustryChange = (industry: IndustryType) => {
-    setCurrentIndustry(industry);
-    
-    // Navigate based on current industry
-    if (industry === 'real_estate') {
-      navigate('/real-estate-dashboard');
-    } else {
-      navigate('/dashboard');
-    }
-
-    toast({
-      title: `Switched to ${industry.replace('_', ' ')} CRM`,
-      description: `Now viewing ${industry.replace('_', ' ')} dashboard`,
-    });
-  };
-
   const goToWelcomePage = () => {
     navigate('/');
   };
@@ -79,54 +58,7 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
         )}
       >
         <div className={cn("py-4", isHovering ? "px-3" : "px-2")}>
-          <div className={cn("flex flex-col gap-2", !isHovering && "items-center")}>
-            <button
-              onClick={() => handleIndustryChange('service')}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
-                currentIndustry === 'service' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
-              )}
-            >
-              <WrenchIcon className="h-5 w-5" />
-              {isHovering && <span>Service</span>}
-            </button>
-            <button
-              onClick={() => handleIndustryChange('real_estate')}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
-                currentIndustry === 'real_estate' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
-              )}
-            >
-              <Home className="h-5 w-5" />
-              {isHovering && <span>Real Estate</span>}
-            </button>
-            <button
-              onClick={() => handleIndustryChange('construction')}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
-                currentIndustry === 'construction' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
-              )}
-            >
-              <Construction className="h-5 w-5" />
-              {isHovering && <span>Construction</span>}
-            </button>
-            <button
-              onClick={() => handleIndustryChange('general')}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
-                currentIndustry === 'general' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
-              )}
-            >
-              <LayoutDashboard className="h-5 w-5" />
-              {isHovering && <span>General</span>}
-            </button>
-          </div>
-        </div>
-
-        <div className="mx-2 mb-4 border-t border-blue-600/50" />
-
-        {/* Choose Different Category Button - More prominent */}
-        <div className={cn("px-2", isHovering && "px-4")}>
+          {/* Choose Different Category Button - More prominent */}
           <Button
             variant="outline"
             onClick={goToWelcomePage}
@@ -241,3 +173,4 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
 };
 
 export default Sidebar;
+
