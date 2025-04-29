@@ -1,3 +1,4 @@
+
 import { 
   HomeIcon, 
   UsersIcon, 
@@ -255,13 +256,25 @@ export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavI
     navItems = [...navItems, ...getRealEstateNavItems()];
   }
   
-  // Add construction-specific items
+  // Add construction-specific items with customized dashboard
   if (currentIndustry === 'construction') {
+    // Replace the dashboard link for construction
+    navItems = navItems.map(item => 
+      item.label === "Dashboard" 
+        ? { ...item, href: "/construction-dashboard" } 
+        : item
+    );
     navItems = [...navItems, ...getConstructionNavItems()];
   }
   
-  // Add general-specific items
+  // Add general-specific items with customized dashboard
   if (currentIndustry === 'general') {
+    // Replace the dashboard link for general
+    navItems = navItems.map(item => 
+      item.label === "Dashboard" 
+        ? { ...item, href: "/general-dashboard" } 
+        : item
+    );
     navItems = [...navItems, ...getGeneralNavItems()];
   }
   

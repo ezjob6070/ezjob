@@ -8,6 +8,8 @@ import Layout from "./components/Layout";
 import Welcome from "./pages/Welcome";
 import Dashboard from "./pages/Dashboard";
 import RealEstateDashboard from "./pages/RealEstateDashboard";
+import ConstructionDashboard from "./pages/ConstructionDashboard";
+import GeneralDashboard from "./pages/GeneralDashboard";
 import RealEstateAgents from "./pages/RealEstateAgents";
 import Clients from "./pages/Clients";
 import Leads from "./pages/Leads";
@@ -65,8 +67,12 @@ function App() {
                 
                 {/* Main layout with sidebar for all app pages */}
                 <Route path="/" element={<Layout />}>
+                  {/* Dashboard routes for different industries */}
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
+                  <Route path="construction-dashboard" element={<ConstructionDashboard />} />
+                  <Route path="general-dashboard" element={<GeneralDashboard />} />
+                  
                   <Route path="agents" element={<RealEstateAgents />} />
                   <Route path="properties" element={<Properties />} />
                   <Route path="listings" element={<Listings />} />
