@@ -26,10 +26,6 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
   
   const goToWelcomePage = () => {
     navigate('/');
-    toast({
-      title: "Choose a different category",
-      description: "Select your preferred industry type"
-    });
   };
 
   const toggleExpand = (key: string) => {
@@ -62,17 +58,17 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
         )}
       >
         <div className={cn("py-4", isHovering ? "px-3" : "px-2")}>
+          {/* Choose Different Category Button - More prominent */}
           <Button
-            variant="default"
+            variant="outline"
             onClick={goToWelcomePage}
             className={cn(
-              "w-full bg-purple-600 hover:bg-purple-700 text-white border border-purple-500/30 flex items-center justify-center gap-2 shadow-md transition-all",
-              isHovering ? "py-2 px-3" : "p-2"
+              "w-full bg-blue-600 text-white hover:bg-blue-700 hover:text-white border-blue-500 flex items-center justify-center gap-2",
+              !isHovering && "p-2"
             )}
-            style={{ borderRadius: '0.5rem' }}
           >
             <ArrowLeftCircle size={isHovering ? 18 : 16} />
-            {isHovering && <span className="text-sm font-medium">Choose Category</span>}
+            {isHovering && <span>Choose Different Category</span>}
           </Button>
         </div>
 
@@ -177,3 +173,4 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
 };
 
 export default Sidebar;
+
