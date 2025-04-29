@@ -26,6 +26,7 @@ import JobSources from "./pages/JobSources";
 import GPSTracking from "./pages/GPSTracking";
 import Employed from "./pages/Employed";
 import EmployeeDetail from "./pages/EmployeeDetail";
+import AddEmployee from "./pages/AddEmployee";
 import Schedule from "./pages/Schedule";
 import TechnicianAltercation from "./pages/TechnicianAltercation";
 import TechnicianAnalytics from "./pages/TechnicianAnalytics";
@@ -88,6 +89,7 @@ function App() {
                   <Route path="job-sources" element={<JobSources />} />
                   <Route path="employed" element={<Employed />} />
                   <Route path="employed/employee/:id" element={<EmployeeDetail />} />
+                  <Route path="employed/add" element={<AddEmployee />} />
                   <Route path="settings" element={<Settings />} />
                   
                   {/* Construction Routes */}

@@ -1,3 +1,4 @@
+
 import { 
   HomeIcon, 
   UsersIcon, 
@@ -24,7 +25,8 @@ import {
   PhoneIcon,
   MessageSquareIcon,
   GlobeIcon,
-  DatabaseIcon
+  DatabaseIcon,
+  UserIcon
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
@@ -187,6 +189,25 @@ export const getGeneralNavItems = (): NavItem[] => [
     label: "Contacts",
     icon: <UsersIcon size={20} />,
     href: "/contacts",
+    industries: ['general'],
+  },
+  {
+    label: "Employees",
+    icon: <UserIcon size={20} />,
+    children: [
+      {
+        label: "All Employees",
+        icon: <UsersIcon size={20} />,
+        href: "/employed",
+        industries: ['general'],
+      },
+      {
+        label: "Add Employee", 
+        icon: <UserPlusIcon size={20} />,
+        href: "/employed/add",
+        industries: ['general'],
+      }
+    ],
     industries: ['general'],
   },
   {
