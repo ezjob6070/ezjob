@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Building, Home, LogOutIcon, MenuIcon, WrenchIcon, Construction } from "lucide-react";
+import { Building, Home, LogOutIcon, MenuIcon, WrenchIcon, Construction, ArrowLeftCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
@@ -22,16 +22,20 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
   const handleIndustryChange = (industry: IndustryType) => {
     setCurrentIndustry(industry);
     
-    if (industry === 'real_estate' && location.pathname === '/') {
+    if (industry === 'real_estate' && location.pathname === '/dashboard') {
       navigate('/real-estate-dashboard');
     } else if (industry !== 'real_estate' && location.pathname === '/real-estate-dashboard') {
-      navigate('/');
+      navigate('/dashboard');
     }
 
     toast({
       title: `Switched to ${industry.replace('_', ' ')} CRM`,
       description: `Now viewing ${industry.replace('_', ' ')} dashboard`,
     });
+  };
+
+  const goToWelcomePage = () => {
+    navigate('/');
   };
 
   const toggleExpand = (key: string) => {
@@ -176,17 +180,35 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
 
         <div className={cn("p-4 mt-auto border-t border-blue-700/50", !isHovering && "flex justify-center")}>
           {isHovering ? (
-            <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200">
-              <LogOutIcon size={18} />
-              <span>Sign out</span>
-            </button>
+            <>
+              <button 
+                className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200 mb-2"
+                onClick={goToWelcomePage}
+              >
+                <ArrowLeftCircle size={18} />
+                <span>Category Selection</span>
+              </button>
+              <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200">
+                <LogOutIcon size={18} />
+                <span>Sign out</span>
+              </button>
+            </>
           ) : (
-            <button 
-              className="p-2 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200"
-              title="Sign out"
-            >
-              <LogOutIcon size={18} />
-            </button>
+            <>
+              <button 
+                className="p-2 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200 mb-2"
+                title="Category Selection"
+                onClick={goToWelcomePage}
+              >
+                <ArrowLeftCircle size={18} />
+              </button>
+              <button 
+                className="p-2 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200"
+                title="Sign out"
+              >
+                <LogOutIcon size={18} />
+              </button>
+            </>
           )}
         </div>
       </div>

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
+import Welcome from "./pages/Welcome";
 import Dashboard from "./pages/Dashboard";
 import RealEstateDashboard from "./pages/RealEstateDashboard";
 import RealEstateAgents from "./pages/RealEstateAgents";
@@ -55,8 +56,12 @@ function App() {
             <Sonner />
             <BrowserRouter>
               <Routes>
+                {/* Welcome page as the initial route */}
+                <Route path="/" element={<Welcome />} />
+                
+                {/* Main layout with sidebar for all app pages */}
                 <Route path="/" element={<Layout />}>
-                  <Route index element={<Dashboard />} />
+                  <Route path="dashboard" element={<Dashboard />} />
                   <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
                   <Route path="agents" element={<RealEstateAgents />} />
                   <Route path="properties" element={<Properties />} />
