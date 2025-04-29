@@ -259,7 +259,7 @@ const ConstructionDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value) => [formatCurrency(value), '']} />
+                <Tooltip formatter={(value: number) => [formatCurrency(value), '']} />
                 <Legend />
                 <Area type="monotone" dataKey="budget" stroke="#8884d8" fillOpacity={1} fill="url(#colorBudget)" name="Planned Budget" />
                 <Area type="monotone" dataKey="actual" stroke="#82ca9d" fillOpacity={1} fill="url(#colorActual)" name="Actual Expense" />
