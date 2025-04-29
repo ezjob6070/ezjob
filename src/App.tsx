@@ -1,47 +1,42 @@
 
-import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import "./App.css";
-
-// Layout Component
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
-
-// Page Components
-import Index from "./pages/Index";
+import Welcome from "./pages/Welcome";
 import Dashboard from "./pages/Dashboard";
 import RealEstateDashboard from "./pages/RealEstateDashboard";
-import Leads from "./pages/Leads";
+import RealEstateAgents from "./pages/RealEstateAgents";
 import Clients from "./pages/Clients";
+import Leads from "./pages/Leads";
 import ClientDetail from "./pages/ClientDetail";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
-import Schedule from "./pages/Schedule";
-import Estimates from "./pages/Estimates";
-import Payments from "./pages/Payments";
-import Finance from "./pages/Finance";
-import FinanceOverview from "./pages/finance/FinanceOverview";
-import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
-import FinanceJobSources from "./pages/finance/FinanceJobSources";
-import FinanceTransactions from "./pages/finance/FinanceTransactions";
 import Settings from "./pages/Settings";
-
-// Service Industry Pages
+import NotFound from "./pages/NotFound";
+import QuickActions from "./components/QuickActions";
 import Jobs from "./pages/Jobs";
+import Payments from "./pages/Payments";
 import Technicians from "./pages/Technicians";
-import TechnicianDetail from "./pages/TechnicianDetail";
-import TechnicianAltercation from "./pages/TechnicianAltercation";
-import TechnicianAnalytics from "./pages/TechnicianAnalytics";
+import Estimates from "./pages/Estimates";
+import Finance from "./pages/Finance";
+import JobSources from "./pages/JobSources";
+import GPSTracking from "./pages/GPSTracking";
 import Employed from "./pages/Employed";
 import EmployeeDetail from "./pages/EmployeeDetail";
-import GPSTracking from "./pages/GPSTracking";
-import JobSources from "./pages/JobSources";
-
-// Real Estate Pages
+import Schedule from "./pages/Schedule";
+import TechnicianAltercation from "./pages/TechnicianAltercation";
+import TechnicianAnalytics from "./pages/TechnicianAnalytics";
+import TechnicianDetail from "./pages/TechnicianDetail";
+import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
 import Properties from "./pages/Properties";
-import RealEstateAgents from "./pages/RealEstateAgents";
 import Listings from "./pages/Listings";
+import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
+import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
-// Construction Pages
+// Import construction pages
 import Projects from "./pages/construction/Projects";
 import Equipment from "./pages/construction/Equipment";
 import Materials from "./pages/construction/Materials";
@@ -49,92 +44,77 @@ import Contractors from "./pages/construction/Contractors";
 import SafetyReports from "./pages/construction/SafetyReports";
 import Inspections from "./pages/construction/Inspections";
 
-// General CRM Pages
+// Import general category pages
 import Contacts from "./pages/general/Contacts";
-import GeneralDashboard from "./pages/general/Dashboard";
 
-// Error Pages
-import NotFound from "./pages/NotFound";
-
-// Providers
-import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
-import { Toaster } from "./components/ui/toaster";
+const queryClient = new QueryClient();
 
 function App() {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
   return (
     <GlobalStateProvider>
-      <Router>
-        <Toaster />
-        {!isOnline && (
-          <div className="fixed top-0 left-0 w-full bg-red-500 text-white text-center py-2 z-50">
-            You are currently offline. Some features may not be available.
-          </div>
-        )}
-        <Routes>
-          <Route path="/" element={<Layout><Index /></Layout>} />
-          <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/real-estate-dashboard" element={<Layout><RealEstateDashboard /></Layout>} />
-          <Route path="/leads" element={<Layout><Leads /></Layout>} />
-          <Route path="/clients" element={<Layout><Clients /></Layout>} />
-          <Route path="/clients/:id" element={<Layout><ClientDetail /></Layout>} />
-          <Route path="/tasks" element={<Layout><Tasks /></Layout>} />
-          <Route path="/tasks/:id" element={<Layout><TaskDetail /></Layout>} />
-          <Route path="/schedule" element={<Layout><Schedule /></Layout>} />
-          <Route path="/estimates" element={<Layout><Estimates /></Layout>} />
-          <Route path="/payments" element={<Layout><Payments /></Layout>} />
-          <Route path="/finance" element={<Layout><Finance /></Layout>} />
-          <Route path="/finance/overview" element={<Layout><FinanceOverview /></Layout>} />
-          <Route path="/finance/technicians" element={<Layout><FinanceTechnicians /></Layout>} />
-          <Route path="/finance/job-sources" element={<Layout><FinanceJobSources /></Layout>} />
-          <Route path="/finance/transactions" element={<Layout><FinanceTransactions /></Layout>} />
-          <Route path="/settings" element={<Layout><Settings /></Layout>} />
-          
-          {/* Service Industry Routes */}
-          <Route path="/jobs" element={<Layout><Jobs /></Layout>} />
-          <Route path="/technicians" element={<Layout><Technicians /></Layout>} />
-          <Route path="/technicians/:id" element={<Layout><TechnicianDetail /></Layout>} />
-          <Route path="/technicians/analytics" element={<Layout><TechnicianAnalytics /></Layout>} />
-          <Route path="/technicians/altercation" element={<Layout><TechnicianAltercation /></Layout>} />
-          <Route path="/employed" element={<Layout><Employed /></Layout>} />
-          <Route path="/employed/:id" element={<Layout><EmployeeDetail /></Layout>} />
-          <Route path="/gps-tracking" element={<Layout><GPSTracking /></Layout>} />
-          <Route path="/job-sources" element={<Layout><JobSources /></Layout>} />
-          
-          {/* Real Estate Industry Routes */}
-          <Route path="/properties" element={<Layout><Properties /></Layout>} />
-          <Route path="/agents" element={<Layout><RealEstateAgents /></Layout>} />
-          <Route path="/listings" element={<Layout><Listings /></Layout>} />
-          
-          {/* Construction Industry Routes */}
-          <Route path="/projects" element={<Layout><Projects /></Layout>} />
-          <Route path="/equipment" element={<Layout><Equipment /></Layout>} />
-          <Route path="/materials" element={<Layout><Materials /></Layout>} />
-          <Route path="/contractors" element={<Layout><Contractors /></Layout>} />
-          <Route path="/safety-reports" element={<Layout><SafetyReports /></Layout>} />
-          <Route path="/inspections" element={<Layout><Inspections /></Layout>} />
-
-          {/* General CRM Routes */}
-          <Route path="/contacts" element={<Layout><Contacts /></Layout>} />
-          <Route path="/general-dashboard" element={<Layout><GeneralDashboard /></Layout>} />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
+      <GlobalDateProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Welcome page as the initial route */}
+                <Route path="/" element={<Welcome />} />
+                
+                {/* Main layout with sidebar for all app pages */}
+                <Route path="/" element={<Layout />}>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
+                  <Route path="agents" element={<RealEstateAgents />} />
+                  <Route path="properties" element={<Properties />} />
+                  <Route path="listings" element={<Listings />} />
+                  <Route path="clients" element={<Clients />} />
+                  <Route path="clients/:id" element={<ClientDetail />} />
+                  <Route path="leads" element={<Leads />} />
+                  <Route path="tasks" element={<Tasks />} />
+                  <Route path="tasks/:id" element={<TaskDetail />} />
+                  <Route path="jobs" element={<Jobs />} />
+                  <Route path="schedule" element={<Schedule />} />
+                  <Route path="payments" element={<Payments />} />
+                  <Route path="technicians" element={<Technicians />} />
+                  <Route path="technicians/analytics" element={<TechnicianAnalytics />} />
+                  <Route path="technicians/:id" element={<TechnicianDetail />} />
+                  <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
+                  <Route path="estimates" element={<Estimates />} />
+                  <Route path="finance" element={<Finance />} />
+                  <Route path="finance/technicians" element={<FinanceTechnicians />} />
+                  <Route path="gps-tracking" element={<GPSTracking />} />
+                  <Route path="job-sources" element={<JobSources />} />
+                  <Route path="employed" element={<Employed />} />
+                  <Route path="employed/employee/:id" element={<EmployeeDetail />} />
+                  <Route path="settings" element={<Settings />} />
+                  
+                  {/* Construction Routes */}
+                  <Route path="projects" element={<Projects />} />
+                  <Route path="equipment" element={<Equipment />} />
+                  <Route path="materials" element={<Materials />} />
+                  <Route path="contractors" element={<Contractors />} />
+                  <Route path="safety-reports" element={<SafetyReports />} />
+                  <Route path="inspections" element={<Inspections />} />
+                  
+                  {/* General Category Routes */}
+                  <Route path="contacts" element={<Contacts />} />
+                  <Route path="communications" element={<Navigate to="/contacts" replace />} />
+                  <Route path="general-projects" element={<Navigate to="/contacts" replace />} />
+                  <Route path="office-management" element={<Navigate to="/contacts" replace />} />
+                  <Route path="customer-support" element={<Navigate to="/contacts" replace />} />
+                  <Route path="marketing" element={<Navigate to="/contacts" replace />} />
+                  <Route path="knowledge-base" element={<Navigate to="/contacts" replace />} />
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+              <QuickActions />
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </GlobalDateProvider>
     </GlobalStateProvider>
   );
 }
