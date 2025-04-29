@@ -1,84 +1,119 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { HardHatIcon } from "lucide-react";
+import { ShieldAlert, AlertTriangle, CheckCircle, PlusIcon, HardHatIcon } from "lucide-react";
+import { AddConstructionItemModal } from "@/components/construction/AddConstructionItemModal";
+import { toast } from "sonner";
+
+interface SafetyReport {
+  id: number;
+  project: string;
+  description: string;
+  date: string;
+  severity: "Low" | "Medium" | "High";
+  status: "Open" | "In Progress" | "Resolved";
+  reportedBy: string;
+}
 
 export default function SafetyReports() {
-  const reports = [
-    { id: 1, projectName: "City Center Tower", date: "2023-04-15", violations: 0, incidents: 0, status: "Compliant" },
-    { id: 2, projectName: "Harbor Bridge", date: "2023-04-12", violations: 2, incidents: 0, status: "Minor Violations" },
-    { id: 3, projectName: "Residential Complex", date: "2023-04-10", violations: 0, incidents: 1, status: "Incident Reported" },
-    { id: 4, projectName: "Office Plaza", date: "2023-04-08", violations: 5, incidents: 0, status: "Major Violations" },
-    { id: 5, projectName: "Woodland Homes", date: "2023-04-05", violations: 0, incidents: 0, status: "Compliant" },
-  ];
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [safetyReports, setSafetyReports] = useState<SafetyReport[]>([
+    { id: 1, project: "City Center Tower - Phase 1", description: "Exposed electrical wiring near elevator shaft", date: "2023-04-10", severity: "High", status: "In Progress", reportedBy: "John Doe" },
+    { id: 2, project: "City Center Tower - Phase 2", description: "Missing guardrails on 3rd floor", date: "2023-04-05", severity: "Medium", status: "Open", reportedBy: "Jane Smith" },
+    { id: 3, project: "City Center Tower - Phase 1", description: "Improper storage of flammable materials", date: "2023-04-01", severity: "High", status: "Resolved", reportedBy: "Mike Johnson" },
+    { id: 4, project: "City Center Tower - Phase 3", description: "Trip hazard in stairwell", date: "2023-03-28", severity: "Low", status: "Resolved", reportedBy: "Sarah Williams" },
+    { id: 5, project: "City Center Tower - Phase 2", description: "Inadequate ventilation in basement", date: "2023-03-25", severity: "Medium", status: "In Progress", reportedBy: "Robert Brown" },
+  ]);
+
+  // Calculate summary stats
+  const openCount = safetyReports.filter(item => item.status === "Open").length;
+  const inProgressCount = safetyReports.filter(item => item.status === "In Progress").length;
+  const resolvedCount = safetyReports.filter(item => item.status === "Resolved").length;
+
+  const handleAddSafetyReport = (data: any) => {
+    const newReport: SafetyReport = {
+      id: safetyReports.length + 1,
+      project: data.project,
+      description: data.description || "",
+      date: data.date,
+      severity: data.severity as "Low" | "Medium" | "High",
+      status: "Open",
+      reportedBy: "Current User", // In a real app, this would come from authentication
+    };
+    
+    setSafetyReports([...safetyReports, newReport]);
+    toast.success("Safety report submitted successfully");
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Safety Reports</h1>
-          <p className="text-muted-foreground">Monitor and manage safety compliance</p>
+          <p className="text-muted-foreground">Track and manage safety issues across projects</p>
         </div>
-        <Button className="gap-2">
-          <HardHatIcon className="h-4 w-4" />
-          <span>New Safety Report</span>
+        <Button className="gap-2" onClick={() => setShowAddModal(true)}>
+          <PlusIcon className="h-4 w-4" />
+          <span>Report Safety Issue</span>
         </Button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Safety Compliance</CardTitle>
+            <CardTitle className="text-lg">Open Issues</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="text-2xl font-bold">85%</div>
-            <div className="text-sm text-muted-foreground">Overall compliance rate</div>
-            
-            <div className="mt-4">
-              <div className="flex justify-between text-sm mb-1">
-                <span>Compliant Sites</span>
-                <span className="font-medium">85%</span>
+            <div className="flex items-center gap-4">
+              <div className="bg-amber-100 rounded-full p-3">
+                <AlertTriangle className="h-6 w-6 text-amber-700" />
               </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className="bg-green-500 h-full" style={{ width: "85%" }}></div>
+              <div>
+                <div className="text-2xl font-bold">{openCount}</div>
+                <div className="text-sm text-muted-foreground">Require Action</div>
               </div>
             </div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Monthly Incidents</CardTitle>
+            <CardTitle className="text-lg">In Progress</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="flex justify-between">
-              <div>
-                <div className="text-2xl font-bold">1</div>
-                <div className="text-sm text-muted-foreground">Incidents This Month</div>
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-100 rounded-full p-3">
+                <ShieldAlert className="h-6 w-6 text-blue-700" />
               </div>
               <div>
-                <div className="text-sm font-medium text-green-600">-50%</div>
-                <div className="text-sm text-muted-foreground">From Last Month</div>
+                <div className="text-2xl font-bold">{inProgressCount}</div>
+                <div className="text-sm text-muted-foreground">Being Addressed</div>
               </div>
             </div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Safety Training</CardTitle>
+            <CardTitle className="text-lg">Resolved</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="text-2xl font-bold">98%</div>
-            <div className="text-sm text-muted-foreground">Workers Fully Trained</div>
+            <div className="flex items-center gap-4">
+              <div className="bg-green-100 rounded-full p-3">
+                <CheckCircle className="h-6 w-6 text-green-700" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{resolvedCount}</div>
+                <div className="text-sm text-muted-foreground">Issues Fixed</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Safety Reports</CardTitle>
+          <CardTitle>Safety Reports List</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -86,36 +121,52 @@ export default function SafetyReports() {
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Project</TableHead>
-                <TableHead>Inspection Date</TableHead>
-                <TableHead>Violations</TableHead>
-                <TableHead>Incidents</TableHead>
+                <TableHead>Issue</TableHead>
+                <TableHead>Severity</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Date Reported</TableHead>
+                <TableHead>Reported By</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {reports.map((report) => (
+              {safetyReports.map((report) => (
                 <TableRow key={report.id}>
                   <TableCell className="font-medium">#{report.id}</TableCell>
-                  <TableCell>{report.projectName}</TableCell>
-                  <TableCell>{report.date}</TableCell>
-                  <TableCell>{report.violations}</TableCell>
-                  <TableCell>{report.incidents}</TableCell>
+                  <TableCell>{report.project}</TableCell>
+                  <TableCell>{report.description}</TableCell>
                   <TableCell>
                     <span className={`inline-block px-2 py-1 text-xs rounded ${
-                      report.status === 'Compliant' ? 'bg-green-100 text-green-700' :
-                      report.status === 'Minor Violations' ? 'bg-amber-100 text-amber-700' :
-                      report.status === 'Incident Reported' ? 'bg-orange-100 text-orange-700' :
+                      report.severity === 'Low' ? 'bg-green-100 text-green-700' :
+                      report.severity === 'Medium' ? 'bg-amber-100 text-amber-700' :
                       'bg-red-100 text-red-700'
+                    }`}>
+                      {report.severity}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-block px-2 py-1 text-xs rounded ${
+                      report.status === 'Open' ? 'bg-amber-100 text-amber-700' :
+                      report.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                      'bg-green-100 text-green-700'
                     }`}>
                       {report.status}
                     </span>
                   </TableCell>
+                  <TableCell>{report.date}</TableCell>
+                  <TableCell>{report.reportedBy}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      <AddConstructionItemModal
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
+        type="safety-report"
+        onSubmit={handleAddSafetyReport}
+      />
     </div>
   );
 }
