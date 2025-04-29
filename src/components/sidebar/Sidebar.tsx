@@ -8,7 +8,8 @@ import {
   MenuIcon, 
   WrenchIcon, 
   Construction, 
-  ArrowLeftCircle 
+  ArrowLeftCircle,
+  LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
@@ -108,6 +109,16 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
             >
               <Construction className="h-5 w-5" />
               {isHovering && <span>Construction</span>}
+            </button>
+            <button
+              onClick={() => handleIndustryChange('general')}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                currentIndustry === 'general' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
+              )}
+            >
+              <LayoutDashboard className="h-5 w-5" />
+              {isHovering && <span>General</span>}
             </button>
           </div>
         </div>

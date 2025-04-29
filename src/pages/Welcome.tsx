@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Construction, WrenchIcon, Home } from "lucide-react";
+import { Construction, WrenchIcon, Home, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
@@ -38,7 +38,7 @@ const Welcome = () => {
         <p className="text-xl text-blue-700">Please select your industry to get started</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl">
         {/* Service Industry */}
         <Card 
           className={`hover:shadow-xl transition-all duration-300 transform ${
@@ -99,6 +99,27 @@ const Welcome = () => {
               Manage projects, equipment, materials, contractors, and inspections
             </p>
             <Button className="mt-6 w-full bg-orange-600 hover:bg-orange-700">Select Construction</Button>
+          </CardContent>
+        </Card>
+
+        {/* General CRM */}
+        <Card 
+          className={`hover:shadow-xl transition-all duration-300 transform ${
+            hoveredCategory === 'general' ? 'scale-105' : ''
+          } cursor-pointer border-2 ${hoveredCategory === 'general' ? 'border-blue-500' : 'border-transparent'}`}
+          onClick={() => handleCategorySelect('general')}
+          onMouseEnter={() => setHoveredCategory('general')}
+          onMouseLeave={() => setHoveredCategory(null)}
+        >
+          <CardContent className="p-8 flex flex-col items-center text-center">
+            <div className="bg-purple-100 p-6 rounded-full mb-6">
+              <LayoutDashboard size={64} className="text-purple-600" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">General</h2>
+            <p className="text-gray-600">
+              General office and business CRM with contacts, communications, and project management
+            </p>
+            <Button className="mt-6 w-full bg-purple-600 hover:bg-purple-700">Select General</Button>
           </CardContent>
         </Card>
       </div>

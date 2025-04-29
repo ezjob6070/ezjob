@@ -1,7 +1,7 @@
 
 import { INDUSTRY_TYPES } from "./sidebarConstants";
 
-export type IndustryType = 'service' | 'real_estate' | 'construction';
+export type IndustryType = 'service' | 'real_estate' | 'construction' | 'general';
 
 export type NavItem = {
   label: string;

@@ -44,6 +44,9 @@ import Contractors from "./pages/construction/Contractors";
 import SafetyReports from "./pages/construction/SafetyReports";
 import Inspections from "./pages/construction/Inspections";
 
+// Import general category pages
+import Contacts from "./pages/general/Contacts";
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -94,6 +97,15 @@ function App() {
                   <Route path="contractors" element={<Contractors />} />
                   <Route path="safety-reports" element={<SafetyReports />} />
                   <Route path="inspections" element={<Inspections />} />
+                  
+                  {/* General Category Routes */}
+                  <Route path="contacts" element={<Contacts />} />
+                  <Route path="communications" element={<Navigate to="/contacts" replace />} />
+                  <Route path="general-projects" element={<Navigate to="/contacts" replace />} />
+                  <Route path="office-management" element={<Navigate to="/contacts" replace />} />
+                  <Route path="customer-support" element={<Navigate to="/contacts" replace />} />
+                  <Route path="marketing" element={<Navigate to="/contacts" replace />} />
+                  <Route path="knowledge-base" element={<Navigate to="/contacts" replace />} />
                   
                   <Route path="*" element={<NotFound />} />
                 </Route>

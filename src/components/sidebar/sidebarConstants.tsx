@@ -1,4 +1,3 @@
-
 import { 
   HomeIcon, 
   UsersIcon, 
@@ -20,12 +19,17 @@ import {
   TruckIcon,
   LayersIcon,
   ClipboardCheckIcon,
-  Users
+  Users,
+  LayoutDashboardIcon,
+  PhoneIcon,
+  MessageSquareIcon,
+  GlobeIcon,
+  DatabaseIcon
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
-// Update industry types to include construction
-export const INDUSTRY_TYPES = ['service', 'real_estate', 'construction'] as const;
+// Update industry types to include general
+export const INDUSTRY_TYPES = ['service', 'real_estate', 'construction', 'general'] as const;
 
 // Navigation items organized by category and industry
 export const getCommonNavItems = (): NavItem[] => [
@@ -82,6 +86,7 @@ export const getCommonNavItems = (): NavItem[] => [
   },
 ];
 
+// Add service specific nav items with direct links
 export const getServiceNavItems = (): NavItem[] => [
   {
     label: "Jobs",
@@ -176,6 +181,52 @@ export const getRealEstateNavItems = (): NavItem[] => [
   },
 ];
 
+// Add general category specific nav items
+export const getGeneralNavItems = (): NavItem[] => [
+  {
+    label: "Contacts",
+    icon: <UsersIcon size={20} />,
+    href: "/contacts",
+    industries: ['general'],
+  },
+  {
+    label: "Communications",
+    icon: <MessageSquareIcon size={20} />,
+    href: "/communications",
+    industries: ['general'],
+  },
+  {
+    label: "Projects",
+    icon: <ClipboardListIcon size={20} />,
+    href: "/general-projects",
+    industries: ['general'],
+  },
+  {
+    label: "Office Management",
+    icon: <LayoutDashboardIcon size={20} />,
+    href: "/office-management",
+    industries: ['general'],
+  },
+  {
+    label: "Customer Support",
+    icon: <PhoneIcon size={20} />,
+    href: "/customer-support",
+    industries: ['general'],
+  },
+  {
+    label: "Marketing",
+    icon: <GlobeIcon size={20} />,
+    href: "/marketing",
+    industries: ['general'],
+  },
+  {
+    label: "Knowledge Base",
+    icon: <DatabaseIcon size={20} />,
+    href: "/knowledge-base",
+    industries: ['general'],
+  },
+];
+
 export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavItem[] => {
   let navItems = [
     ...getCommonNavItems(),
@@ -200,6 +251,11 @@ export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavI
   // Add construction-specific items
   if (currentIndustry === 'construction') {
     navItems = [...navItems, ...getConstructionNavItems()];
+  }
+  
+  // Add general-specific items
+  if (currentIndustry === 'general') {
+    navItems = [...navItems, ...getGeneralNavItems()];
   }
   
   return navItems;
