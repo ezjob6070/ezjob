@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Eye, UserRoundX } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Edit, Eye, UserRoundX, UserPlus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -75,75 +75,88 @@ const EmployeesList = ({ employees, onEditEmployee }: EmployeesListProps) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Employee</TableHead>
-            <TableHead>Position</TableHead>
-            <TableHead>Department</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="hidden md:table-cell">Hire Date</TableHead>
-            <TableHead className="hidden lg:table-cell">Email</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {employees.map((employee) => (
-            <TableRow key={employee.id}>
-              <TableCell className="font-medium">
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    {employee.profileImage || employee.photo ? (
-                      <AvatarImage src={employee.profileImage || employee.photo} alt={employee.name} />
-                    ) : (
-                      <AvatarFallback>
-                        {employee.initials || getInitials(employee.name)}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <span>{employee.name}</span>
-                </div>
-              </TableCell>
-              <TableCell>{employee.position}</TableCell>
-              <TableCell>{employee.department}</TableCell>
-              <TableCell>
-                <Badge variant="outline" className={cn("font-normal", getStatusBadgeVariant(employee.status))}>
-                  {employee.status.charAt(0).toUpperCase() + employee.status.slice(1).toLowerCase()}
-                </Badge>
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                {new Date(employee.dateHired || employee.hireDate).toLocaleDateString()}
-              </TableCell>
-              <TableCell className="hidden lg:table-cell">
-                <span className="text-muted-foreground">{employee.email}</span>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    onClick={() => onEditEmployee(employee)}
-                    aria-label="Edit employee"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    asChild
-                    aria-label="View employee details"
-                  >
-                    <Link to={`/employed/employee/${employee.id}`}>
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </TableCell>
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button 
+          asChild
+          className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900"
+        >
+          <Link to="/employed/add">
+            <UserPlus className="mr-2 h-4 w-4" /> Add New Employee
+          </Link>
+        </Button>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Employee</TableHead>
+              <TableHead>Position</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="hidden md:table-cell">Hire Date</TableHead>
+              <TableHead className="hidden lg:table-cell">Email</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {employees.map((employee) => (
+              <TableRow key={employee.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      {employee.profileImage || employee.photo ? (
+                        <AvatarImage src={employee.profileImage || employee.photo} alt={employee.name} />
+                      ) : (
+                        <AvatarFallback>
+                          {employee.initials || getInitials(employee.name)}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <span>{employee.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{employee.position}</TableCell>
+                <TableCell>{employee.department}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={cn("font-normal", getStatusBadgeVariant(employee.status))}>
+                    {employee.status.charAt(0).toUpperCase() + employee.status.slice(1).toLowerCase()}
+                  </Badge>
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {new Date(employee.dateHired || employee.hireDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  <span className="text-muted-foreground">{employee.email}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button 
+                      size="icon" 
+                      variant="ghost" 
+                      onClick={() => onEditEmployee(employee)}
+                      aria-label="Edit employee"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      asChild
+                      aria-label="View employee details"
+                    >
+                      <Link to={`/employed/employee/${employee.id}`}>
+                        <Eye className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { 
   HomeIcon, 
   UsersIcon, 
@@ -193,21 +192,8 @@ export const getGeneralNavItems = (): NavItem[] => [
   },
   {
     label: "Employees",
-    icon: <UserIcon size={20} />,
-    children: [
-      {
-        label: "All Employees",
-        icon: <UsersIcon size={20} />,
-        href: "/employed",
-        industries: ['general'],
-      },
-      {
-        label: "Add Employee", 
-        icon: <UserPlusIcon size={20} />,
-        href: "/employed/add",
-        industries: ['general'],
-      }
-    ],
+    icon: <UserRoundIcon size={20} />,
+    href: "/employed",
     industries: ['general'],
   },
   {
