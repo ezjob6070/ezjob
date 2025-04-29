@@ -35,6 +35,13 @@ import Listings from "./pages/Listings";
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
+// Import construction pages
+import Projects from "./pages/construction/Projects";
+import Equipment from "./pages/construction/Equipment";
+import Materials from "./pages/construction/Materials";
+import SafetyReports from "./pages/construction/SafetyReports";
+import Inspections from "./pages/construction/Inspections";
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -75,11 +82,11 @@ function App() {
                   <Route path="settings" element={<Settings />} />
                   
                   {/* Construction Routes */}
-                  <Route path="projects" element={<Navigate to="/construction/projects" replace />} />
-                  <Route path="equipment" element={<Navigate to="/construction/equipment" replace />} />
-                  <Route path="materials" element={<Navigate to="/construction/materials" replace />} />
-                  <Route path="safety-reports" element={<Navigate to="/construction/safety" replace />} />
-                  <Route path="inspections" element={<Navigate to="/construction/inspections" replace />} />
+                  <Route path="projects" element={<Projects />} />
+                  <Route path="equipment" element={<Equipment />} />
+                  <Route path="materials" element={<Materials />} />
+                  <Route path="safety-reports" element={<SafetyReports />} />
+                  <Route path="inspections" element={<Inspections />} />
                   
                   <Route path="*" element={<NotFound />} />
                 </Route>

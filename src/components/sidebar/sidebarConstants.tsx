@@ -114,7 +114,7 @@ export const getServiceNavItems = (): NavItem[] => [
   },
 ];
 
-// Add construction specific nav items
+// Add construction specific nav items with direct links
 export const getConstructionNavItems = (): NavItem[] => [
   {
     label: "Projects",
