@@ -39,6 +39,7 @@ import { GlobalStateProvider } from "./components/providers/GlobalStateProvider"
 import Projects from "./pages/construction/Projects";
 import Equipment from "./pages/construction/Equipment";
 import Materials from "./pages/construction/Materials";
+import Contractors from "./pages/construction/Contractors";
 import SafetyReports from "./pages/construction/SafetyReports";
 import Inspections from "./pages/construction/Inspections";
 
@@ -85,6 +86,7 @@ function App() {
                   <Route path="projects" element={<Projects />} />
                   <Route path="equipment" element={<Equipment />} />
                   <Route path="materials" element={<Materials />} />
+                  <Route path="contractors" element={<Contractors />} />
                   <Route path="safety-reports" element={<SafetyReports />} />
                   <Route path="inspections" element={<Inspections />} />
                   

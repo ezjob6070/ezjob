@@ -19,7 +19,8 @@ import {
   ConstructionIcon,
   TruckIcon,
   LayersIcon,
-  ClipboardCheckIcon
+  ClipboardCheckIcon,
+  Users
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
@@ -132,6 +133,12 @@ export const getConstructionNavItems = (): NavItem[] => [
     label: "Materials",
     icon: <LayersIcon size={20} />,
     href: "/materials",
+    industries: ['construction'],
+  },
+  {
+    label: "Contractors",
+    icon: <Users size={20} />,
+    href: "/contractors",
     industries: ['construction'],
   },
   {
