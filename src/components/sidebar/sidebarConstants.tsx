@@ -32,7 +32,7 @@ export const getCommonNavItems = (): NavItem[] => [
   {
     label: "Dashboard",
     icon: <HomeIcon size={20} />,
-    href: "/",
+    href: "/dashboard",
   },
   {
     label: "Leads & Clients",
@@ -188,6 +188,12 @@ export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavI
   
   // Add real estate-specific items
   if (currentIndustry === 'real_estate') {
+    // Replace the dashboard link for real estate
+    navItems = navItems.map(item => 
+      item.label === "Dashboard" 
+        ? { ...item, href: "/real-estate-dashboard" } 
+        : item
+    );
     navItems = [...navItems, ...getRealEstateNavItems()];
   }
   

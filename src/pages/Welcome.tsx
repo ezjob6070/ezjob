@@ -20,9 +20,9 @@ const Welcome = () => {
     if (industry === 'real_estate') {
       navigate('/real-estate-dashboard');
     } else if (industry === 'construction') {
-      navigate('/projects');
+      navigate('/dashboard');
     } else {
-      navigate('/');
+      navigate('/dashboard');
     }
 
     toast({

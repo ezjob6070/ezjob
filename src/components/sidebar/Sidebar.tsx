@@ -1,13 +1,22 @@
 
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Building, Home, LogOutIcon, MenuIcon, WrenchIcon, Construction, ArrowLeftCircle } from "lucide-react";
+import { 
+  Building, 
+  Home, 
+  LogOutIcon, 
+  MenuIcon, 
+  WrenchIcon, 
+  Construction, 
+  ArrowLeftCircle 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
 import NavItem from "./NavItem";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 
 const Sidebar = ({ isMobile }: SidebarProps) => {
   const location = useLocation();
@@ -22,9 +31,10 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
   const handleIndustryChange = (industry: IndustryType) => {
     setCurrentIndustry(industry);
     
-    if (industry === 'real_estate' && location.pathname === '/dashboard') {
+    // Navigate based on current industry
+    if (industry === 'real_estate') {
       navigate('/real-estate-dashboard');
-    } else if (industry !== 'real_estate' && location.pathname === '/real-estate-dashboard') {
+    } else {
       navigate('/dashboard');
     }
 
@@ -104,7 +114,24 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
 
         <div className="mx-2 mb-4 border-t border-blue-600/50" />
 
-        <div className={cn("py-5", isHovering ? "px-5" : "px-3")}>
+        {/* Choose Different Category Button - More prominent */}
+        <div className={cn("px-2", isHovering && "px-4")}>
+          <Button
+            variant="outline"
+            onClick={goToWelcomePage}
+            className={cn(
+              "w-full bg-blue-600 text-white hover:bg-blue-700 hover:text-white border-blue-500 flex items-center justify-center gap-2",
+              !isHovering && "p-2"
+            )}
+          >
+            <ArrowLeftCircle size={isHovering ? 18 : 16} />
+            {isHovering && <span>Choose Different Category</span>}
+          </Button>
+        </div>
+
+        <div className="mx-2 my-4 border-t border-blue-600/50" />
+
+        <div className={cn("py-3", isHovering ? "px-5" : "px-3")}>
           {isHovering ? (
             <div className="flex items-center justify-between">
               <span className="font-bold text-lg text-white">Uleadz CRM</span>
@@ -181,13 +208,6 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
         <div className={cn("p-4 mt-auto border-t border-blue-700/50", !isHovering && "flex justify-center")}>
           {isHovering ? (
             <>
-              <button 
-                className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200 mb-2"
-                onClick={goToWelcomePage}
-              >
-                <ArrowLeftCircle size={18} />
-                <span>Category Selection</span>
-              </button>
               <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200">
                 <LogOutIcon size={18} />
                 <span>Sign out</span>
@@ -195,13 +215,6 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
             </>
           ) : (
             <>
-              <button 
-                className="p-2 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200 mb-2"
-                title="Category Selection"
-                onClick={goToWelcomePage}
-              >
-                <ArrowLeftCircle size={18} />
-              </button>
               <button 
                 className="p-2 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200"
                 title="Sign out"
