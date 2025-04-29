@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { 
@@ -61,17 +62,17 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
         )}
       >
         <div className={cn("py-4", isHovering ? "px-3" : "px-2")}>
-          {/* Choose Different Category Button - Enhanced styling */}
           <Button
-            variant="secondary"
+            variant="default"
             onClick={goToWelcomePage}
             className={cn(
-              "w-full bg-purple-600 hover:bg-purple-700 text-white border-purple-500 flex items-center justify-center gap-2 shadow-md",
-              isHovering ? "p-2" : "p-1"
+              "w-full bg-purple-600 hover:bg-purple-700 text-white border border-purple-500/30 flex items-center justify-center gap-2 shadow-md transition-all",
+              isHovering ? "py-2 px-3" : "p-2"
             )}
+            style={{ borderRadius: '0.5rem' }}
           >
             <ArrowLeftCircle size={isHovering ? 18 : 16} />
-            {isHovering && <span>Choose Category</span>}
+            {isHovering && <span className="text-sm font-medium">Choose Category</span>}
           </Button>
         </div>
 
