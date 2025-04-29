@@ -1,3 +1,4 @@
+
 import { INDUSTRY_TYPES } from "./sidebarConstants";
 
 export type IndustryType = 'service' | 'real_estate' | 'construction';

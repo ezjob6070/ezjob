@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Building, Home, LogOutIcon, MenuIcon, WrenchIcon } from "lucide-react";
+import { Building, Home, LogOutIcon, MenuIcon, WrenchIcon, Construction } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarProps, IndustryType } from "./sidebarTypes";
 import { INDUSTRY_TYPES, getIndustrySpecificNavItems } from "./sidebarConstants";
@@ -83,6 +84,16 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
             >
               <Home className="h-5 w-5" />
               {isHovering && <span>Real Estate</span>}
+            </button>
+            <button
+              onClick={() => handleIndustryChange('construction')}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                currentIndustry === 'construction' ? "bg-blue-600 text-white" : "text-white/80 hover:bg-blue-600 hover:text-white"
+              )}
+            >
+              <Construction className="h-5 w-5" />
+              {isHovering && <span>Construction</span>}
             </button>
           </div>
         </div>
