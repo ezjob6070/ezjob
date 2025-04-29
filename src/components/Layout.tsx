@@ -1,11 +1,15 @@
 
-import { useState, useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useState, useEffect, ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import useWindowSize from "@/hooks/use-window-size";
 import { cn } from "@/lib/utils";
 
-const Layout = () => {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
@@ -50,7 +54,7 @@ const Layout = () => {
         >
           <div className="w-full mx-auto">
             <div className="max-w-full overflow-x-hidden animate-fade-in">
-              <Outlet />
+              {children}
             </div>
           </div>
         </main>
