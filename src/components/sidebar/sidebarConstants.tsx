@@ -24,7 +24,8 @@ import {
   PhoneIcon,
   MessageSquareIcon,
   GlobeIcon,
-  DatabaseIcon
+  DatabaseIcon,
+  UserIcon
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
@@ -190,6 +191,12 @@ export const getGeneralNavItems = (): NavItem[] => [
     industries: ['general'],
   },
   {
+    label: "Employees",
+    icon: <UserIcon size={20} />,
+    href: "/employed",
+    industries: ['general'],
+  },
+  {
     label: "Communications",
     icon: <MessageSquareIcon size={20} />,
     href: "/communications",
@@ -255,6 +262,12 @@ export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavI
   
   // Add general-specific items
   if (currentIndustry === 'general') {
+    // Replace the dashboard link for general
+    navItems = navItems.map(item => 
+      item.label === "Dashboard" 
+        ? { ...item, href: "/general-dashboard" } 
+        : item
+    );
     navItems = [...navItems, ...getGeneralNavItems()];
   }
   
