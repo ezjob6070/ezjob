@@ -9,9 +9,9 @@ export interface Employee {
   department: string;
   location: string;
   hireDate: string;
-  status: EmployeeStatus;
+  status: string;  // Changed from EmployeeStatus to string
   salary: number;
-  salaryBasis: SalaryBasis;
+  salaryBasis: string;  // Changed from SalaryBasis to string
   manager: string;
   emergencyContact: EmergencyContact;
   documents: EmployeeDocument[];
@@ -33,6 +33,10 @@ export interface Employee {
   incentiveAmount?: number;
   dateOfBirth?: string;
   certifications?: string[];
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  rating?: number;
 }
 
 export type EmployeeStatus = "active" | "inactive" | "on_leave" | "terminated" | "pending" | "contract" | "probation";

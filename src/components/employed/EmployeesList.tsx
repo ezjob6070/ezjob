@@ -1,7 +1,6 @@
-
-import { Link } from "react-router-dom";
 import { Employee, EMPLOYEE_STATUS } from "@/types/employee";
-import { 
+import { Button } from "@/components/ui/button";
+import {
   Table,
   TableBody,
   TableCell,
@@ -9,154 +8,138 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Edit, Eye, UserRoundX, UserPlus } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { format, formatDistanceToNow } from "date-fns";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EllipsisVertical, Eye, Edit, UserMinus, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-interface EmployeesListProps {
+type EmployeesListProps = {
   employees: Employee[];
   onEditEmployee: (employee: Employee) => void;
-}
+};
 
-const getStatusBadgeVariant = (status: string) => {
+const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+};
+
+const getStatusColor = (status: string) => {
   switch (status) {
-    case "active":
-      return "bg-green-100 text-green-800 hover:bg-green-200";
-    case "inactive":
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200";
-    case "on_leave":
-      return "bg-amber-100 text-amber-800 hover:bg-amber-200";
-    case "terminated":
-      return "bg-red-100 text-red-800 hover:bg-red-200";
-    case "contract":
-      return "bg-blue-100 text-blue-800 hover:bg-blue-200";
-    case "probation":
-      return "bg-purple-100 text-purple-800 hover:bg-purple-200";
-    case "pending":
-      return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
+    case EMPLOYEE_STATUS.ACTIVE:
+      return "bg-green-100 text-green-800";
+    case EMPLOYEE_STATUS.INACTIVE:
+      return "bg-gray-100 text-gray-800";
+    case EMPLOYEE_STATUS.ON_LEAVE:
+      return "bg-amber-100 text-amber-800";
+    case EMPLOYEE_STATUS.TERMINATED:
+      return "bg-red-100 text-red-800";
+    case EMPLOYEE_STATUS.PENDING:
+      return "bg-blue-100 text-blue-800";
+    case EMPLOYEE_STATUS.CONTRACT:
+      return "bg-indigo-100 text-indigo-800";
+    case EMPLOYEE_STATUS.PROBATION:
+      return "bg-purple-100 text-purple-800";
     default:
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+      return "bg-gray-100 text-gray-800";
   }
 };
 
-const getInitials = (name: string): string => {
-  return name
-    .split(' ')
-    .map(part => part[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2);
+const formatSalary = (salary: number, basis: string) => {
+  if (basis === "hourly") {
+    return `$${salary.toFixed(2)}/hr`;
+  } else {
+    return `$${salary.toLocaleString()}/yr`;
+  }
 };
 
 const EmployeesList = ({ employees, onEditEmployee }: EmployeesListProps) => {
-  if (employees.length === 0) {
-    return (
-      <Card className="border-dashed border-2">
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <div className="rounded-full bg-blue-100 p-3 mb-4">
-            <UserRoundX className="h-8 w-8 text-blue-600" />
-          </div>
-          <h3 className="text-lg font-medium mb-2">No Employees Found</h3>
-          <p className="text-muted-foreground text-center mb-6">
-            No employees match your current filter criteria or none have been added yet.
-          </p>
-          <Button 
-            asChild
-            className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900"
-          >
-            <Link to="/employed/add">Add Your First Employee</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
+  const navigate = useNavigate();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  
+  const viewEmployee = (employee: Employee) => {
+    navigate(`/employed/${employee.id}`);
+  };
+  
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button 
-          asChild
-          className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900"
-        >
-          <Link to="/employed/add">
-            <UserPlus className="mr-2 h-4 w-4" /> Add New Employee
-          </Link>
-        </Button>
-      </div>
-      
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Employee</TableHead>
-              <TableHead>Position</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">Hire Date</TableHead>
-              <TableHead className="hidden lg:table-cell">Email</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+    <div className="w-full overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Photo</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Position</TableHead>
+            <TableHead>Department</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Salary</TableHead>
+            <TableHead>Hire Date</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {employees.map((employee) => (
+            <TableRow key={employee.id}>
+              <TableCell>
+                <Avatar>
+                  {employee.profileImage ? (
+                    <AvatarImage src={employee.profileImage} alt={employee.name} />
+                  ) : (
+                    <AvatarFallback>{getInitials(employee.name)}</AvatarFallback>
+                  )}
+                </Avatar>
+              </TableCell>
+              <TableCell className="font-medium">{employee.name}</TableCell>
+              <TableCell>{employee.position}</TableCell>
+              <TableCell>{employee.department}</TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(employee.status)}>
+                  {employee.status}
+                </Badge>
+              </TableCell>
+              <TableCell>{formatSalary(employee.salary, employee.salaryBasis)}</TableCell>
+              <TableCell>
+                {employee.hireDate ? format(new Date(employee.hireDate), "MMM dd, yyyy") : "N/A"}
+              </TableCell>
+              <TableCell className="text-right">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <EllipsisVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => viewEmployee(employee)}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onEditEmployee(employee)}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <UserMinus className="mr-2 h-4 w-4" />
+                      Remove
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {employees.map((employee) => (
-              <TableRow key={employee.id}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      {employee.profileImage || employee.photo ? (
-                        <AvatarImage src={employee.profileImage || employee.photo} alt={employee.name} />
-                      ) : (
-                        <AvatarFallback>
-                          {employee.initials || getInitials(employee.name)}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <span>{employee.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{employee.position}</TableCell>
-                <TableCell>{employee.department}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={cn("font-normal", getStatusBadgeVariant(employee.status))}>
-                    {employee.status.charAt(0).toUpperCase() + employee.status.slice(1).toLowerCase()}
-                  </Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {new Date(employee.dateHired || employee.hireDate).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="hidden lg:table-cell">
-                  <span className="text-muted-foreground">{employee.email}</span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      onClick={() => onEditEmployee(employee)}
-                      aria-label="Edit employee"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      asChild
-                      aria-label="View employee details"
-                    >
-                      <Link to={`/employed/employee/${employee.id}`}>
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

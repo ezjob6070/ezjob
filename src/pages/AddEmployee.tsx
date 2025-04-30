@@ -16,9 +16,9 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { 
   Employee, 
-  EmployeeStatus, 
-  SalaryBasis, 
+  EMPLOYEE_STATUS,
   EMPLOYEE_STATUS_OPTIONS,
+  SALARY_BASIS,
   SALARY_BASIS_OPTIONS
 } from "@/types/employee";
 import { ArrowLeft } from "lucide-react";
@@ -33,9 +33,9 @@ const AddEmployee = () => {
     department: "",
     email: "",
     phone: "",
-    status: EmployeeStatus.ACTIVE,
+    status: EMPLOYEE_STATUS.ACTIVE,
     salary: 0,
-    salaryBasis: SalaryBasis.HOURLY,
+    salaryBasis: SALARY_BASIS.HOURLY,
     hireDate: new Date().toISOString().split('T')[0],
     dateHired: new Date().toISOString().split('T')[0],
   });

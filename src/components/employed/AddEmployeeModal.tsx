@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Employee, EmployeeStatus, SalaryBasis } from "@/types/employee";
+import { Employee, EMPLOYEE_STATUS, SALARY_BASIS } from "@/types/employee";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload } from "lucide-react";
 import { v4 as uuidv4 } from 'uuid';
@@ -122,11 +123,11 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
       phone: formData.phone,
       position: formData.position,
       department: formData.department,
-      status: EmployeeStatus.ACTIVE,
+      status: EMPLOYEE_STATUS.ACTIVE,
       dateHired: currentDate.toISOString(),
       hireDate: currentDate.toISOString(),
       salary: parseFloat(formData.salary) || 50000,
-      salaryBasis: SalaryBasis.YEARLY,
+      salaryBasis: SALARY_BASIS.YEARLY,
       address: formData.address,
       skills: formData.skills,
       performanceRating: 3,
@@ -136,6 +137,8 @@ const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModa
       cancelledJobs: 0,
       totalRevenue: 0,
       rating: 4.5,
+      location: "",
+      manager: ""
     };
 
     onAddEmployee(newEmployee);

@@ -1,51 +1,63 @@
 
 import { useState } from "react";
+import { EmployeeDocument, DOCUMENT_TYPE } from "@/types/employee";
+import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/components/ui/use-toast";
-import { Employee, EmployeeDocument, type DocumentType, DOCUMENT_TYPE } from "@/types/employee";
 
-export const useEmployeeDocuments = (employee?: Employee) => {
+export const useEmployeeDocuments = (employeeId: string) => {
   const { toast } = useToast();
-  const [documents, setDocuments] = useState<EmployeeDocument[]>(employee?.documents || []);
-  const [isUploading, setIsUploading] = useState(false);
 
-  const handleUploadDocument = (documentData: any) => {
-    setIsUploading(true);
+  const uploadDocument = async (documentData: any): Promise<EmployeeDocument> => {
+    // In a real app, this would be an API call
+    // For demo purposes, we'll create a mock document
+
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Simulate API call with a delay
-    setTimeout(() => {
-      const newDocument: EmployeeDocument = {
-        id: `doc-${Math.random().toString(36).substr(2, 9)}`,
-        name: documentData.name,
-        url: URL.createObjectURL(documentData.file),
-        uploadDate: new Date().toISOString(),
-        type: documentData.type as DocumentType,
-        expiryDate: documentData.expiryDate?.toISOString(),
-        notes: documentData.notes,
-      };
-      
-      setDocuments(prev => [newDocument, ...prev]);
-      setIsUploading(false);
-      
-      toast({
-        title: "Document uploaded",
-        description: `${documentData.name} has been added to employee documents.`,
-      });
-    }, 1500);
-  };
-
-  const handleDeleteDocument = (documentId: string) => {
-    setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+    const currentDate = new Date().toISOString();
     
-    toast({
-      title: "Document removed",
-      description: "The document has been removed successfully."
-    });
+    const newDocument: EmployeeDocument = {
+      id: `doc-${uuidv4().slice(0, 8)}`,
+      name: documentData.name,
+      url: documentData.url || "/documents/placeholder.pdf",
+      uploadDate: currentDate,
+      dateUploaded: currentDate,
+      type: documentData.type || DOCUMENT_TYPE.OTHER,
+      expiryDate: documentData.expiryDate,
+      notes: documentData.notes
+    };
+    
+    // In a real app, we'd save this document to a database
+    // For demo purposes, we'll just return the new document
+    
+    return newDocument;
   };
-
+  
+  const deleteDocument = async (documentId: string): Promise<void> => {
+    // In a real app, this would be an API call
+    // For demo purposes, we'll simulate success
+    
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Return success
+    return;
+  };
+  
+  const updateDocument = async (document: EmployeeDocument): Promise<EmployeeDocument> => {
+    // In a real app, this would be an API call
+    // For demo purposes, we'll simulate success
+    
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Return the updated document
+    return document;
+  };
+  
   return {
-    documents,
-    isUploading,
-    handleUploadDocument,
-    handleDeleteDocument
+    uploadDocument,
+    deleteDocument,
+    updateDocument,
   };
 };
