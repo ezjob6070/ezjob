@@ -22,7 +22,7 @@ export interface Employee {
   taxPercentage?: number;
   address?: string;
   skills?: string[];
-  education?: string;
+  education?: string[];  // Changed from string to string[] to match usage in EmployeeDetail.tsx
   background?: string;
   performanceRating?: number;
   profileImage?: string;
@@ -57,7 +57,7 @@ export interface EmployeeDocument {
   name: string;
   url: string;
   uploadDate?: string;
-  type?: DocumentType;
+  type?: string; // Changed from DocumentType to string
   dateUploaded?: string;
   expiryDate?: string;
   notes?: string;
@@ -111,9 +111,9 @@ export const RESUME_STATUS = {
 export interface EmployeeNote {
   id: string;
   content: string;
-  date: string;
-  author: string;
-  createdAt?: string;
+  date?: string; // Made optional to match usage
+  author?: string; // Made optional to match usage
+  createdAt?: string | Date; // Added Date type to match usage in EmployeeDetail.tsx
   createdBy?: string;
 }
 
@@ -200,3 +200,34 @@ export const RESUME_STATUS_OPTIONS = [
   { value: "approved", label: "Approved" },
   { value: "pending", label: "Pending" }
 ];
+
+// Helper functions
+export const getInitials = (name: string): string => {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+};
+
+// Helper function for document type labels
+export const getDocumentTypeLabel = (type: string): string => {
+  switch (type) {
+    case DOCUMENT_TYPE.ID:
+      return "ID Document";
+    case DOCUMENT_TYPE.RESUME:
+      return "Resume";
+    case DOCUMENT_TYPE.CERTIFICATE:
+      return "Certificate";
+    case DOCUMENT_TYPE.CONTRACT:
+      return "Contract";
+    case DOCUMENT_TYPE.PASSPORT:
+      return "Passport";
+    case DOCUMENT_TYPE.DRIVERS_LICENSE:
+      return "Driver's License";
+    case DOCUMENT_TYPE.WORK_PERMIT:
+      return "Work Permit";
+    default:
+      return "Other Document";
+  }
+};

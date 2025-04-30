@@ -1,376 +1,312 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
-import { Employee, EMPLOYEE_STATUS, SALARY_BASIS } from "@/types/employee";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload } from "lucide-react";
-import { v4 as uuidv4 } from 'uuid';
+import {
+  Employee,
+  EMPLOYEE_STATUS,
+  SALARY_BASIS
+} from "@/types/employee";
+import { v4 as uuidv4 } from "uuid";
 
-type AddEmployeeModalProps = {
+const employeeSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(6, "Phone must be at least 6 characters"),
+  position: z.string().min(2, "Position must be at least 2 characters"),
+  department: z.string().min(2, "Department must be at least 2 characters"),
+  status: z.string(),
+  salary: z.coerce.number().positive("Salary must be positive"),
+  salaryBasis: z.string(),
+  location: z.string().optional(),
+  address: z.string().optional(),
+});
+
+type EmployeeFormValues = z.infer<typeof employeeSchema>;
+
+interface AddEmployeeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddEmployee: (employee: Employee) => void;
-};
+}
 
-const DEPARTMENTS = [
-  "Human Resources",
-  "Engineering",
-  "Marketing",
-  "Finance",
-  "Sales",
-  "Customer Support",
-  "Operations",
-  "Research & Development",
-  "Legal",
-  "Executive",
-];
-
-const POSITIONS = [
-  "Software Developer",
-  "Marketing Specialist",
-  "HR Manager",
-  "Accountant",
-  "Customer Service Rep",
-  "Project Manager",
-  "Sales Representative",
-  "Product Manager",
-  "UX Designer",
-  "Data Analyst",
-  "Finance Manager",
-  "Operations Coordinator",
-];
-
-const AddEmployeeModal = ({ open, onOpenChange, onAddEmployee }: AddEmployeeModalProps) => {
+export default function AddEmployeeModal({
+  open,
+  onOpenChange,
+  onAddEmployee,
+}: AddEmployeeModalProps) {
   const { toast } = useToast();
   
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    position: "",
-    department: "",
-    address: "",
-    salary: "",
-    skills: [] as string[],
-    profileImage: "",
-  });
-  
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [skillInput, setSkillInput] = useState("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      
-      const fileUrl = URL.createObjectURL(file);
-      setSelectedImage(file);
-      setPreviewUrl(fileUrl);
-      
-      setFormData(prev => ({ ...prev, profileImage: fileUrl }));
-    }
-  };
-
-  const addSkill = () => {
-    if (skillInput.trim() && !formData.skills.includes(skillInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        skills: [...prev.skills, skillInput.trim()]
-      }));
-      setSkillInput("");
-    }
-  };
-
-  const removeSkill = (skillToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: prev.skills.filter(skill => skill !== skillToRemove)
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.position || !formData.department) {
-      toast({
-        title: "Error",
-        description: "Please fill all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const initials = formData.name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-
-    const currentDate = new Date();
-    const newEmployee: Employee = {
-      id: `emp-${uuidv4().slice(0, 8)}`,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      position: formData.position,
-      department: formData.department,
-      status: EMPLOYEE_STATUS.ACTIVE,
-      dateHired: currentDate.toISOString(),
-      hireDate: currentDate.toISOString(),
-      salary: parseFloat(formData.salary) || 50000,
-      salaryBasis: SALARY_BASIS.YEARLY,
-      address: formData.address,
-      skills: formData.skills,
-      performanceRating: 3,
-      profileImage: formData.profileImage || undefined,
-      initials,
-      completedJobs: 0,
-      cancelledJobs: 0,
-      totalRevenue: 0,
-      rating: 4.5,
-      location: "",
-      manager: ""
-    };
-
-    onAddEmployee(newEmployee);
-    
-    setFormData({
+  const form = useForm<EmployeeFormValues>({
+    resolver: zodResolver(employeeSchema),
+    defaultValues: {
       name: "",
       email: "",
       phone: "",
       position: "",
       department: "",
+      status: EMPLOYEE_STATUS.ACTIVE,
+      salary: 0,
+      salaryBasis: SALARY_BASIS.ANNUAL,
+      location: "Main Office",
       address: "",
-      salary: "",
-      skills: [],
-      profileImage: "",
-    });
-    setPreviewUrl("");
-    setSelectedImage(null);
-    setSkillInput("");
-    
-    onOpenChange(false);
-  };
+    },
+  });
 
+  const onSubmit = (values: EmployeeFormValues) => {
+    try {
+      const currentDate = new Date().toISOString();
+      
+      const newEmployee: Employee = {
+        id: `emp-${uuidv4().slice(0, 8)}`,
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        position: values.position,
+        department: values.department,
+        status: values.status,
+        dateHired: currentDate,
+        hireDate: currentDate,
+        salary: values.salary,
+        salaryBasis: values.salaryBasis,
+        address: values.address || "",
+        location: values.location || "Main Office",
+        manager: "",
+        emergencyContact: { name: "", phone: "" },
+        documents: [],
+        notes: []
+      };
+      
+      onAddEmployee(newEmployee);
+      
+      toast({
+        title: "Employee Added",
+        description: `${values.name} has been successfully added.`,
+      });
+      
+      form.reset();
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error adding employee:", error);
+      toast({
+        title: "Error",
+        description: "There was an error adding the employee. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Employee</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid gap-2">
-            <Label>Profile Picture</Label>
-            <div className="flex flex-col items-center">
-              <div className="mb-3">
-                {previewUrl ? (
-                  <Avatar className="h-24 w-24 border-2 border-primary/20">
-                    <AvatarImage src={previewUrl} alt={formData.name || "Profile"} />
-                    <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
-                      {formData.name ? formData.name.split(" ").map(n => n[0]).join("") : "+"}
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <Avatar className="h-24 w-24 border-2 border-primary/20">
-                    <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xl">
-                      +
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-              </div>
-              
-              <div className="flex gap-2">
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <div className="flex items-center gap-1 px-3 py-1.5 text-sm border rounded-md hover:bg-accent">
-                    <Upload className="h-4 w-4" />
-                    <span>Upload</span>
-                  </div>
-                  <input 
-                    id="image-upload" 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*" 
-                    onChange={handleImageChange}
-                  />
-                </label>
-                
-                {previewUrl && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      setPreviewUrl("");
-                      setSelectedImage(null);
-                      setFormData(prev => ({ ...prev, profileImage: "" }));
-                    }}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="John Smith"
-                required
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="john@example.com"
-                required
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="(555) 123-4567"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="123 Main St, City, State, ZIP"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="position">Position *</Label>
-              <select
-                id="position"
-                name="position"
-                value={formData.position}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                required
-              >
-                <option value="" disabled>Select position</option>
-                {POSITIONS.map((position) => (
-                  <option key={position} value={position}>
-                    {position}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="department">Department *</Label>
-              <select
-                id="department"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                required
-              >
-                <option value="" disabled>Select department</option>
-                {DEPARTMENTS.map((department) => (
-                  <option key={department} value={department}>
-                    {department}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="salary">Salary ($) *</Label>
-              <Input
-                id="salary"
-                name="salary"
-                type="number"
-                value={formData.salary}
-                onChange={handleChange}
-                placeholder="50000"
-                min="0"
-                step="1000"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-2 col-span-2">
-            <Label>Skills</Label>
-            <div className="flex gap-2">
-              <Input 
-                value={skillInput} 
-                onChange={(e) => setSkillInput(e.target.value)} 
-                placeholder="Add a skill"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addSkill();
-                  }
-                }}
-              />
-              <Button type="button" variant="outline" onClick={addSkill}>Add</Button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.skills.map((skill, index) => (
-                <div key={index} className="flex items-center rounded-full bg-blue-100 text-blue-700 px-3 py-1 text-sm">
-                  {skill}
-                  <button
-                    type="button"
-                    className="ml-2 text-blue-500 hover:text-blue-700"
-                    onClick={() => removeSkill(skill)}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  </button>
-                </div>
-              ))}
-              {!formData.skills.length && (
-                <span className="text-sm text-muted-foreground">No skills added yet</span>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
+            />
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="john@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+1 234 567 8900" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Add Employee</Button>
-          </DialogFooter>
-        </form>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="position"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Position</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Software Engineer" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="department"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Department</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Engineering" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={EMPLOYEE_STATUS.ACTIVE}>Active</SelectItem>
+                        <SelectItem value={EMPLOYEE_STATUS.INACTIVE}>Inactive</SelectItem>
+                        <SelectItem value={EMPLOYEE_STATUS.ON_LEAVE}>On Leave</SelectItem>
+                        <SelectItem value={EMPLOYEE_STATUS.PENDING}>Pending</SelectItem>
+                        <SelectItem value={EMPLOYEE_STATUS.CONTRACT}>Contract</SelectItem>
+                        <SelectItem value={EMPLOYEE_STATUS.PROBATION}>Probation</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a location" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Main Office">Main Office</SelectItem>
+                        <SelectItem value="Branch Office">Branch Office</SelectItem>
+                        <SelectItem value="Remote">Remote</SelectItem>
+                        <SelectItem value="Field">Field</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="123 Main St, City, State" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="salary"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Salary</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="salaryBasis"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Salary Basis</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select basis" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={SALARY_BASIS.HOURLY}>Hourly</SelectItem>
+                        <SelectItem value={SALARY_BASIS.ANNUAL}>Annual</SelectItem>
+                        <SelectItem value={SALARY_BASIS.COMMISSION}>Commission</SelectItem>
+                        <SelectItem value={SALARY_BASIS.WEEKLY}>Weekly</SelectItem>
+                        <SelectItem value={SALARY_BASIS.MONTHLY}>Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <DialogFooter>
+              <Button type="submit">Add Employee</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
-};
-
-export default AddEmployeeModal;
+}

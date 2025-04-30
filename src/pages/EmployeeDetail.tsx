@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
@@ -9,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Employee, EmployeeNote, SalaryBasis } from "@/types/employee";
+import { Employee, EmployeeNote, SALARY_BASIS } from "@/types/employee";
 import { initialEmployees } from "@/data/employees";
 import EmployeeDocuments from "@/components/employed/EmployeeDocuments";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,7 +44,9 @@ const EmployeeDetail = () => {
     const note: EmployeeNote = {
       id: `note-${Date.now()}`,
       content: newNote,
-      createdAt: new Date(),
+      date: new Date().toISOString(),
+      author: "Current User", // In a real app, get from auth context
+      createdAt: new Date().toISOString(),
       createdBy: "Current User" // In a real app, get from auth context
     };
     
@@ -117,9 +120,9 @@ const EmployeeDetail = () => {
 
   // Format salary based on basis
   const formatSalary = () => {
-    if (!employee.salaryBasis || employee.salaryBasis === SalaryBasis.YEARLY) {
+    if (!employee.salaryBasis || employee.salaryBasis === SALARY_BASIS.YEARLY) {
       return `$${employee.salary.toLocaleString()}/year`;
-    } else if (employee.salaryBasis === SalaryBasis.MONTHLY) {
+    } else if (employee.salaryBasis === SALARY_BASIS.MONTHLY) {
       return `$${employee.salary.toLocaleString()}/month`;
     } else {
       return `$${employee.salary.toLocaleString()}/week`;
@@ -239,7 +242,7 @@ const EmployeeDetail = () => {
                 <Separator />
                 <div className="flex justify-between py-2">
                   <span className="text-sm text-muted-foreground">Hired:</span>
-                  <span className="text-sm font-medium">{format(employee.dateHired, "MMM d, yyyy")}</span>
+                  <span className="text-sm font-medium">{employee.dateHired && format(new Date(employee.dateHired), "MMM d, yyyy")}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between py-2">
@@ -255,7 +258,7 @@ const EmployeeDetail = () => {
                     <div className="flex justify-between py-2">
                       <span className="text-sm text-muted-foreground">Birth Date:</span>
                       <span className="text-sm font-medium">
-                        {format(employee.dateOfBirth, "MMM d, yyyy")}
+                        {format(new Date(employee.dateOfBirth), "MMM d, yyyy")}
                       </span>
                     </div>
                   </>
@@ -332,7 +335,7 @@ const EmployeeDetail = () => {
                       {employee.emergencyContact && (
                         <>
                           <span>{employee.emergencyContact.name}</span>
-                          <span> ({employee.emergencyContact.relationship}): </span>
+                          <span> ({employee.emergencyContact.relationship || employee.emergencyContact.relation || 'Contact'}): </span>
                           <span>{employee.emergencyContact.phone}</span>
                         </>
                       )}
@@ -352,9 +355,13 @@ const EmployeeDetail = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {employee.skills.map((skill, index) => (
-                      <Badge key={index} variant="secondary">{skill}</Badge>
-                    ))}
+                    {employee.skills && employee.skills.length > 0 ? (
+                      employee.skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary">{skill}</Badge>
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No skills recorded.</p>
+                    )}
                   </div>
                   
                   {employee.performanceRating && (
@@ -390,13 +397,17 @@ const EmployeeDetail = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {employee.education && employee.education.length > 0 ? (
+                  {employee.education && Array.isArray(employee.education) && employee.education.length > 0 ? (
                     <div className="space-y-4">
                       {employee.education.map((edu, index) => (
                         <div key={index} className="border-l-2 border-primary pl-4 py-1">
                           <p className="text-sm">{edu}</p>
                         </div>
                       ))}
+                    </div>
+                  ) : employee.education && typeof employee.education === 'string' ? (
+                    <div className="border-l-2 border-primary pl-4 py-1">
+                      <p className="text-sm">{employee.education}</p>
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground">No education records available.</p>
@@ -407,8 +418,15 @@ const EmployeeDetail = () => {
             
             <TabsContent value="documents" className="space-y-6">
               <EmployeeDocuments 
-                employee={employee}
-                onUpdateEmployee={handleUpdateEmployee}
+                employeeId={employee.id}
+                documents={employee.documents}
+                onUpdateEmployee={(updatedDocuments) => {
+                  const updatedEmployee = {
+                    ...employee,
+                    documents: updatedDocuments
+                  };
+                  setEmployee(updatedEmployee);
+                }}
               />
             </TabsContent>
             
@@ -447,8 +465,15 @@ const EmployeeDetail = () => {
                         <div key={note.id} className="bg-muted p-4 rounded-md">
                           <p className="text-sm mb-2">{note.content}</p>
                           <div className="flex justify-between items-center text-xs text-muted-foreground">
-                            <span>By: {note.createdBy}</span>
-                            <span>{format(note.createdAt, "MMM d, yyyy h:mm a")}</span>
+                            <span>By: {note.createdBy || note.author || 'Unknown'}</span>
+                            <span>
+                              {note.createdAt && format(
+                                typeof note.createdAt === 'string' 
+                                  ? new Date(note.createdAt)
+                                  : note.createdAt, 
+                                "MMM d, yyyy h:mm a"
+                              )}
+                            </span>
                           </div>
                         </div>
                       ))}
