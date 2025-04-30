@@ -28,7 +28,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-001",
       notes: "Customer requests work to begin at 8:00 AM sharp",
       attachments: [],
-      createdAt: subDays(today, 10).toISOString()
+      createdAt: new Date(subDays(today, 10).toISOString())
     },
     {
       id: uuidv4(),
@@ -49,7 +49,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-002",
       notes: "Building manager will provide access to electrical rooms",
       attachments: [],
-      createdAt: subDays(today, 7).toISOString()
+      createdAt: new Date(subDays(today, 7).toISOString())
     },
     {
       id: uuidv4(),
@@ -71,7 +71,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-003",
       notes: "Additional damage found behind wall, repair completed successfully",
       attachments: [],
-      createdAt: subDays(today, 5).toISOString()
+      createdAt: new Date(subDays(today, 5).toISOString())
     },
     {
       id: uuidv4(),
@@ -92,7 +92,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-004",
       notes: "Work to be performed after school hours only",
       attachments: [],
-      createdAt: subDays(today, 14).toISOString()
+      createdAt: new Date(subDays(today, 14).toISOString())
     },
     {
       id: uuidv4(),
@@ -113,7 +113,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-005",
       notes: "Client requests detailed written report with photographs",
       attachments: [],
-      createdAt: subDays(today, 9).toISOString()
+      createdAt: new Date(subDays(today, 9).toISOString())
     },
     {
       id: uuidv4(),
@@ -135,7 +135,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-006",
       notes: "All work completed according to specifications",
       attachments: [],
-      createdAt: subDays(today, 20).toISOString()
+      createdAt: new Date(subDays(today, 20).toISOString())
     },
     {
       id: uuidv4(),
@@ -155,7 +155,7 @@ const generateDemoJobs = (): Job[] => {
       amount: 9800,
       notes: "Client has requested specific eco-friendly paint brand",
       attachments: [],
-      createdAt: subDays(today, 8).toISOString()
+      createdAt: new Date(subDays(today, 8).toISOString())
     },
     {
       id: uuidv4(),
@@ -176,7 +176,7 @@ const generateDemoJobs = (): Job[] => {
       actualAmount: 7400,
       notes: "Additional damage discovered during repair, client approved extra work",
       attachments: [],
-      createdAt: subDays(today, 15).toISOString()
+      createdAt: new Date(subDays(today, 15).toISOString())
     },
     {
       id: uuidv4(),
@@ -196,7 +196,7 @@ const generateDemoJobs = (): Job[] => {
       amount: 3200,
       notes: "Building has 8 separate HVAC units to be serviced",
       attachments: [],
-      createdAt: subDays(today, 12).toISOString()
+      createdAt: new Date(subDays(today, 12).toISOString())
     },
     {
       id: uuidv4(),
@@ -217,7 +217,7 @@ const generateDemoJobs = (): Job[] => {
       actualAmount: 12800,
       notes: "Client extremely satisfied with quality of work",
       attachments: [],
-      createdAt: subDays(today, 18).toISOString()
+      createdAt: new Date(subDays(today, 18).toISOString())
     }
   ];
 };

@@ -25,7 +25,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "HVAC",
       certifications: ["NATE Certification", "EPA 608 Certification"],
       skills: ["Commercial HVAC", "Refrigeration", "System Design"],
-      avatarUrl: "/avatars/tech-1.jpg",
+      imageUrl: "/avatars/tech-1.jpg",
       yearsExperience: 8
     },
     {
@@ -48,7 +48,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Electrical",
       certifications: ["Master Electrician License", "OSHA Safety Certification"],
       skills: ["Commercial Wiring", "Lighting Systems", "PLC Programming"],
-      avatarUrl: "/avatars/tech-2.jpg",
+      imageUrl: "/avatars/tech-2.jpg",
       yearsExperience: 10
     },
     {
@@ -71,7 +71,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Plumbing",
       certifications: ["Journeyman Plumber License", "Backflow Prevention Certification"],
       skills: ["Commercial Plumbing", "Water Heater Installation", "Leak Detection"],
-      avatarUrl: "/avatars/tech-3.jpg",
+      imageUrl: "/avatars/tech-3.jpg",
       yearsExperience: 5
     },
     {
@@ -94,7 +94,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Carpentry",
       certifications: ["Master Carpenter Certification", "Cabinet Installation Specialist"],
       skills: ["Finish Carpentry", "Cabinet Installation", "Custom Woodworking"],
-      avatarUrl: "/avatars/tech-4.jpg",
+      imageUrl: "/avatars/tech-4.jpg",
       yearsExperience: 7
     },
     {
@@ -117,7 +117,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Masonry",
       certifications: ["Journeyman Mason", "Historic Restoration Specialist"],
       skills: ["Brick and Stone", "Concrete Work", "Historic Restoration"],
-      avatarUrl: "/avatars/tech-5.jpg",
+      imageUrl: "/avatars/tech-5.jpg",
       yearsExperience: 12
     },
     {
@@ -140,7 +140,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Equipment",
       certifications: ["CDL Class A", "OSHA Heavy Equipment Certification"],
       skills: ["Excavator Operation", "Bulldozer", "Crane Operation"],
-      avatarUrl: "/avatars/tech-6.jpg",
+      imageUrl: "/avatars/tech-6.jpg",
       yearsExperience: 15
     },
     {
@@ -163,7 +163,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Finishing",
       certifications: ["Lead-Safe Certification", "Decorative Finishing Specialist"],
       skills: ["Drywall", "Painting", "Decorative Finishes"],
-      avatarUrl: "/avatars/tech-7.jpg",
+      imageUrl: "/avatars/tech-7.jpg",
       yearsExperience: 6
     },
     {
@@ -186,7 +186,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Roofing",
       certifications: ["Master Roofer Certification", "Fall Protection Safety Training"],
       skills: ["Shingle Roofing", "Metal Roofing", "Commercial Flat Roofs"],
-      avatarUrl: "/avatars/tech-8.jpg",
+      imageUrl: "/avatars/tech-8.jpg",
       yearsExperience: 9
     },
     {
@@ -209,7 +209,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "HVAC",
       certifications: ["HVAC Excellence Certification", "Indoor Air Quality Certification"],
       skills: ["Preventive Maintenance", "System Diagnostics", "Filter Systems"],
-      avatarUrl: "/avatars/tech-9.jpg",
+      imageUrl: "/avatars/tech-9.jpg",
       yearsExperience: 7
     },
     {
@@ -232,7 +232,7 @@ const createSampleTechnicians = (): Technician[] => {
       category: "Flooring",
       certifications: ["CFI Certification", "Luxury Vinyl Installation Specialist"],
       skills: ["Hardwood Installation", "Tile Work", "Vinyl and Laminate"],
-      avatarUrl: "/avatars/tech-10.jpg",
+      imageUrl: "/avatars/tech-10.jpg",
       yearsExperience: 8
     }
   ];

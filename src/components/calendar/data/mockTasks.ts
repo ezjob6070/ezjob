@@ -15,7 +15,7 @@ export const mockTasks: Task[] = [
     allDay: false,
     description: "Install new HVAC system at City Center Tower",
     location: "Downtown Financial District",
-    client: "Metropolitan Development Corp",
+    client: { name: "Metropolitan Development Corp" },
     technician: "John Smith",
     status: "scheduled",
     color: "#3b82f6", // blue
@@ -29,7 +29,7 @@ export const mockTasks: Task[] = [
     allDay: false,
     description: "Perform electrical safety inspection for office building",
     location: "North Innovation District",
-    client: "TechFuture Investments",
+    client: { name: "TechFuture Investments" },
     technician: "Sarah Johnson",
     status: "scheduled",
     color: "#10b981", // green
@@ -43,7 +43,7 @@ export const mockTasks: Task[] = [
     allDay: false,
     description: "Fix water leak in hotel basement",
     location: "Harbor District",
-    client: "Global Hospitality Group",
+    client: { name: "Global Hospitality Group" },
     technician: "Michael Rodriguez",
     status: "scheduled",
     color: "#f59e0b", // amber
@@ -57,7 +57,7 @@ export const mockTasks: Task[] = [
     allDay: true,
     description: "Install custom woodworking for community center",
     location: "Cedar Grove Neighborhood",
-    client: "City of Cedar Grove",
+    client: { name: "City of Cedar Grove" },
     technician: "Jennifer Lopez",
     status: "scheduled",
     color: "#8b5cf6", // purple
@@ -71,7 +71,7 @@ export const mockTasks: Task[] = [
     allDay: false,
     description: "Check foundation work at industrial park",
     location: "Eastern Industrial Zone",
-    client: "Summit Logistics Corp",
+    client: { name: "Summit Logistics Corp" },
     technician: "David Washington",
     status: "scheduled",
     color: "#ef4444", // red
@@ -85,7 +85,7 @@ export const mockTasks: Task[] = [
     allDay: false,
     description: "Deliver heavy machinery to medical center site",
     location: "Parkside District",
-    client: "Regional Healthcare Systems",
+    client: { name: "Regional Healthcare Systems" },
     technician: "Robert Garcia",
     status: "scheduled",
     color: "#0ea5e9", // sky blue
@@ -99,7 +99,7 @@ export const mockTasks: Task[] = [
     allDay: true,
     description: "Complete interior painting at retail expansion",
     location: "West Commercial District",
-    client: "Westview Retail Properties",
+    client: { name: "Westview Retail Properties" },
     technician: "Emily Chen",
     status: "scheduled",
     color: "#ec4899", // pink
@@ -113,7 +113,7 @@ export const mockTasks: Task[] = [
     allDay: false,
     description: "Fix roof leak at residential complex",
     location: "Riverside South",
-    client: "Riverfront Properties LLC",
+    client: { name: "Riverfront Properties LLC" },
     technician: "William Taylor",
     status: "scheduled",
     color: "#f59e0b", // amber
@@ -127,7 +127,7 @@ export const mockTasks: Task[] = [
     allDay: false,
     description: "Quarterly HVAC system maintenance",
     location: "Central Metro District",
-    client: "Metropolitan Transit Authority",
+    client: { name: "Metropolitan Transit Authority" },
     technician: "Olivia Martinez",
     status: "scheduled",
     color: "#3b82f6", // blue
@@ -141,7 +141,7 @@ export const mockTasks: Task[] = [
     allDay: true,
     description: "Install marble flooring in hotel lobby",
     location: "Harbor District",
-    client: "Global Hospitality Group",
+    client: { name: "Global Hospitality Group" },
     technician: "James Wilson",
     status: "scheduled",
     color: "#8b5cf6", // purple
