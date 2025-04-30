@@ -98,11 +98,10 @@ const Jobs = () => {
   const handleCancelJob = (jobId: string, reason?: string) => {
     cancelJob(jobId, reason);
     
-    // Use type assertion to avoid TypeScript errors
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
-          ? { ...job, status: "cancelled", cancellationReason: reason || "No reason provided" } as Job
+          ? { ...job, status: "cancelled" as const, cancellationReason: reason || "No reason provided" }
           : job
       )
     );
@@ -111,11 +110,10 @@ const Jobs = () => {
   const handleCompleteJob = (jobId: string, actualAmount: number) => {
     completeJob(jobId, actualAmount);
     
-    // Use type assertion to avoid TypeScript errors
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
-          ? { ...job, status: "completed", actualAmount } as Job
+          ? { ...job, status: "completed" as const, actualAmount }
           : job
       )
     );
@@ -125,7 +123,6 @@ const Jobs = () => {
   const handleLocalRescheduleJob = (jobId: string, newDate: string, isAllDay: boolean) => {
     handleRescheduleJob(jobId, newDate);
     
-    // Use type assertion to avoid TypeScript errors
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
@@ -134,8 +131,8 @@ const Jobs = () => {
               date: newDate, 
               scheduledDate: newDate,
               isAllDay: isAllDay, 
-              status: "scheduled" 
-            } as Job
+              status: "scheduled" as const
+            }
           : job
       )
     );

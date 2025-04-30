@@ -1,4 +1,3 @@
-
 // This is a minimal fix to address the TypeScript errors in Jobs.tsx
 // Only adding the missing properties to the existing hook
 
@@ -151,7 +150,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     
     if (searchTerm) {
       filtered = filtered.filter(job => 
-        (job.clientName || job.customerName || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.clientName || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (job.address || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (job.description || '')?.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -178,7 +177,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     
     if (amountRange) {
       filtered = filtered.filter(job => {
-        const amount = (job.amount || job.totalAmount || 0) as number;
+        const amount = job.amount || 0;
         return amount >= amountRange[0] && amount <= amountRange[1];
       });
     }

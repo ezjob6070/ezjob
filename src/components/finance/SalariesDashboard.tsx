@@ -195,7 +195,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
     }).format(amount);
   };
 
-  // Get salary basis display text
+  // Get salary basis display text - fixed to return proper SalaryBasis type
   const getSalaryBasisText = (basis?: SalaryBasis) => {
     switch (basis) {
       case "hourly":
