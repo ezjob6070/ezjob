@@ -16,9 +16,30 @@ export interface Employee {
   emergencyContact: EmergencyContact;
   documents: EmployeeDocument[];
   notes: EmployeeNote[];
+  // Add missing properties referenced in components
+  dateHired?: string;
+  reportsTo?: string;
+  taxPercentage?: number;
+  address?: string;
+  skills?: string[];
+  education?: string;
+  background?: string;
+  performanceRating?: number;
+  profileImage?: string;
+  photo?: string;
+  initials?: string;
 }
 
-export type EmployeeStatus = "active" | "inactive" | "on_leave" | "terminated";
+export type EmployeeStatus = "active" | "inactive" | "on_leave" | "terminated" | "pending";
+
+// Adding PENDING for the referenced constant in components
+export const EMPLOYEE_STATUS = {
+  ACTIVE: "active" as EmployeeStatus,
+  INACTIVE: "inactive" as EmployeeStatus,
+  ON_LEAVE: "on_leave" as EmployeeStatus,
+  TERMINATED: "terminated" as EmployeeStatus,
+  PENDING: "pending" as EmployeeStatus,
+};
 
 export interface EmployeeDocument {
   id: string;
@@ -40,9 +61,22 @@ export interface Resume {
   resumeUrl: string;
   coverLetterUrl?: string;
   notes?: string;
+  // Add missing properties referenced in components
+  candidateName?: string;
+  dateSubmitted?: string;
 }
 
-export type ResumeStatus = "new" | "reviewing" | "interview" | "rejected" | "hired";
+export type ResumeStatus = "new" | "reviewing" | "interview" | "rejected" | "hired" | "approved";
+
+// Adding constants for ResumeStatus that are referenced in the components
+export const RESUME_STATUS = {
+  NEW: "new" as ResumeStatus,
+  REVIEWING: "reviewing" as ResumeStatus,
+  INTERVIEW: "interview" as ResumeStatus,
+  REJECTED: "rejected" as ResumeStatus,
+  HIRED: "hired" as ResumeStatus,
+  APPROVED: "approved" as ResumeStatus,
+};
 
 export interface EmployeeNote {
   id: string;
@@ -60,6 +94,10 @@ export interface Report {
   date: string;
   documentUrl: string;
   shared: string[];
+  // Add missing properties referenced in components
+  employeeId?: string;
+  dateSubmitted?: string;
+  status?: string;
 }
 
 export interface EmergencyContact {
@@ -70,4 +108,19 @@ export interface EmergencyContact {
 }
 
 export type SalaryBasis = "hourly" | "annual" | "commission";
+
+// Adding the missing IncentiveType export that's causing the error
 export type IncentiveType = "bonus" | "commission" | "none";
+
+// Adding constants needed for dropdowns and selects
+export const SALARY_BASIS_OPTIONS = [
+  { value: "hourly", label: "Hourly" },
+  { value: "annual", label: "Annual" },
+  { value: "commission", label: "Commission" }
+];
+
+export const INCENTIVE_TYPE_OPTIONS = [
+  { value: "bonus", label: "Bonus" },
+  { value: "commission", label: "Commission" },
+  { value: "none", label: "None" }
+];
