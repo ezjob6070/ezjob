@@ -1,5 +1,5 @@
 
-import { Employee, EmployeeStatus, Report, Resume, ResumeStatus, EmployeeNote, SalaryBasis } from "@/types/employee";
+import { Employee, Report, Resume, EMPLOYEE_STATUS, RESUME_STATUS, SALARY_BASIS } from "@/types/employee";
 import { addDays, subDays } from "date-fns";
 
 // Generate demo employee data
@@ -16,9 +16,9 @@ const generateDemoEmployees = (): Employee[] => {
       department: "Operations",
       location: "Main Office",
       hireDate: subDays(today, 365 * 2 + 45).toISOString(),
-      status: "active" as EmployeeStatus,
+      status: EMPLOYEE_STATUS.ACTIVE,
       salary: 85000,
-      salaryBasis: "annual" as SalaryBasis,
+      salaryBasis: SALARY_BASIS.ANNUAL,
       manager: "Richard Miller",
       emergencyContact: {
         name: "Emma Brown",
@@ -43,9 +43,9 @@ const generateDemoEmployees = (): Employee[] => {
       department: "Engineering",
       location: "Main Office",
       hireDate: subDays(today, 365 + 78).toISOString(),
-      status: "active" as EmployeeStatus,
+      status: EMPLOYEE_STATUS.ACTIVE,
       salary: 72000,
-      salaryBasis: "annual" as SalaryBasis,
+      salaryBasis: SALARY_BASIS.ANNUAL,
       manager: "Alexander Brown",
       emergencyContact: {
         name: "Carlos Martinez",
@@ -69,9 +69,9 @@ const generateDemoEmployees = (): Employee[] => {
       department: "Operations",
       location: "Field",
       hireDate: subDays(today, 365 * 3 + 42).toISOString(),
-      status: "active" as EmployeeStatus,
+      status: EMPLOYEE_STATUS.ACTIVE,
       salary: 68000,
-      salaryBasis: "annual" as SalaryBasis,
+      salaryBasis: SALARY_BASIS.ANNUAL,
       manager: "Alexander Brown",
       emergencyContact: {
         name: "Tanya Johnson",
@@ -93,9 +93,9 @@ const generateDemoEmployees = (): Employee[] => {
       department: "Design",
       location: "Main Office",
       hireDate: subDays(today, 365 + 150).toISOString(),
-      status: "active" as EmployeeStatus,
+      status: EMPLOYEE_STATUS.ACTIVE,
       salary: 78000,
-      salaryBasis: "annual" as SalaryBasis,
+      salaryBasis: SALARY_BASIS.ANNUAL,
       manager: "Richard Miller",
       emergencyContact: {
         name: "James Taylor",
@@ -119,9 +119,9 @@ const generateDemoEmployees = (): Employee[] => {
       department: "Operations",
       location: "Field",
       hireDate: subDays(today, 365 * 2 + 200).toISOString(),
-      status: "active" as EmployeeStatus,
+      status: EMPLOYEE_STATUS.ACTIVE,
       salary: 31,
-      salaryBasis: "hourly" as SalaryBasis,
+      salaryBasis: SALARY_BASIS.HOURLY,
       manager: "Marcus Johnson",
       emergencyContact: {
         name: "Lisa Wilson",
@@ -150,11 +150,12 @@ const generateDemoResumes = (): Resume[] => {
       position: "Project Manager",
       experience: "8 years",
       education: "MBA, Construction Management",
-      status: "new" as ResumeStatus,
+      status: RESUME_STATUS.NEW,
       submittedDate: subDays(today, 3).toISOString(),
       resumeUrl: "/resumes/resume-001.pdf",
       coverLetterUrl: "/resumes/cover-001.pdf",
-      notes: "Strong experience with commercial projects"
+      notes: "Strong experience with commercial projects",
+      dateSubmitted: subDays(today, 3).toISOString()
     },
     {
       id: "resume-002",
@@ -164,10 +165,11 @@ const generateDemoResumes = (): Resume[] => {
       position: "Civil Engineer",
       experience: "5 years",
       education: "BS Civil Engineering",
-      status: "reviewing" as ResumeStatus,
+      status: RESUME_STATUS.REVIEWING,
       submittedDate: subDays(today, 7).toISOString(),
       resumeUrl: "/resumes/resume-002.pdf",
-      notes: "Experience with infrastructure projects"
+      notes: "Experience with infrastructure projects",
+      dateSubmitted: subDays(today, 7).toISOString()
     },
     {
       id: "resume-003",
@@ -177,11 +179,12 @@ const generateDemoResumes = (): Resume[] => {
       position: "Safety Officer",
       experience: "10 years",
       education: "BS Occupational Safety",
-      status: "interview" as ResumeStatus,
+      status: RESUME_STATUS.INTERVIEW,
       submittedDate: subDays(today, 14).toISOString(),
       resumeUrl: "/resumes/resume-003.pdf",
       coverLetterUrl: "/resumes/cover-003.pdf",
-      notes: "Extensive experience with OSHA regulations"
+      notes: "Extensive experience with OSHA regulations",
+      dateSubmitted: subDays(today, 14).toISOString()
     },
     {
       id: "resume-004",
@@ -191,10 +194,11 @@ const generateDemoResumes = (): Resume[] => {
       position: "Estimator",
       experience: "6 years",
       education: "BS Construction Management",
-      status: "rejected" as ResumeStatus,
+      status: RESUME_STATUS.REJECTED,
       submittedDate: subDays(today, 20).toISOString(),
       resumeUrl: "/resumes/resume-004.pdf",
-      notes: "Good experience but lacking software skills needed"
+      notes: "Good experience but lacking software skills needed",
+      dateSubmitted: subDays(today, 20).toISOString()
     },
     {
       id: "resume-005",
@@ -204,11 +208,12 @@ const generateDemoResumes = (): Resume[] => {
       position: "Interior Designer",
       experience: "4 years",
       education: "BFA Interior Design",
-      status: "new" as ResumeStatus,
+      status: RESUME_STATUS.NEW,
       submittedDate: subDays(today, 2).toISOString(),
       resumeUrl: "/resumes/resume-005.pdf",
       coverLetterUrl: "/resumes/cover-005.pdf",
-      notes: "Strong portfolio with commercial projects"
+      notes: "Strong portfolio with commercial projects",
+      dateSubmitted: subDays(today, 2).toISOString()
     }
   ];
 };

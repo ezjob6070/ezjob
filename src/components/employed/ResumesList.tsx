@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Resume, ResumeStatus } from "@/types/employee";
+import { Resume, RESUME_STATUS } from "@/types/employee";
 import { 
   Card, 
   CardContent, 
@@ -93,9 +93,9 @@ const ResumesList = ({ resumes, onStatusChange }: ResumesListProps) => {
                   <CardTitle>{resume.name || resume.candidateName}</CardTitle>
                   <Badge
                     variant={
-                      resume.status === ResumeStatus.PENDING 
+                      resume.status === RESUME_STATUS.PENDING 
                         ? "outline" 
-                        : resume.status === ResumeStatus.APPROVED 
+                        : resume.status === RESUME_STATUS.APPROVED 
                           ? "default" 
                           : "destructive"
                     }
@@ -118,7 +118,7 @@ const ResumesList = ({ resumes, onStatusChange }: ResumesListProps) => {
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar size={16} className="text-muted-foreground" />
-                  <span>Submitted on {format(resume.dateSubmitted, "MMM d, yyyy")}</span>
+                  <span>Submitted on {format(new Date(resume.dateSubmitted || resume.submittedDate), "MMM d, yyyy")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <FileText size={16} className="text-muted-foreground" />
@@ -135,7 +135,7 @@ const ResumesList = ({ resumes, onStatusChange }: ResumesListProps) => {
                 )}
               </CardContent>
               
-              {resume.status === ResumeStatus.PENDING && (
+              {resume.status === RESUME_STATUS.NEW && (
                 <CardFooter className="pt-2 flex justify-between gap-2">
                   <Button 
                     variant="outline" 

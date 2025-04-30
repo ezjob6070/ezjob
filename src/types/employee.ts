@@ -29,8 +29,10 @@ export interface Employee {
   photo?: string;
   initials?: string;
   hourlyRate?: number;
-  incentiveType?: string; // Changed from IncentiveType to string
+  incentiveType?: string;
   incentiveAmount?: number;
+  dateOfBirth?: string;
+  certifications?: string[];
 }
 
 export type EmployeeStatus = "active" | "inactive" | "on_leave" | "terminated" | "pending" | "contract" | "probation";
@@ -78,8 +80,8 @@ export interface Resume {
   phone: string;
   position: string;
   experience: string;
-  education?: string; // Added education to match usage
-  status: ResumeStatus;
+  education?: string;
+  status: string; // Changed from ResumeStatus to string
   submittedDate: string;
   resumeUrl: string;
   coverLetterUrl?: string;
@@ -89,7 +91,7 @@ export interface Resume {
   dateSubmitted?: string;
 }
 
-export type ResumeStatus = "new" | "reviewing" | "interview" | "rejected" | "hired" | "approved";
+export type ResumeStatus = "new" | "reviewing" | "interview" | "rejected" | "hired" | "approved" | "pending";
 
 // Adding constants for ResumeStatus that are referenced in the components
 export const RESUME_STATUS = {
@@ -98,7 +100,8 @@ export const RESUME_STATUS = {
   INTERVIEW: "interview",
   REJECTED: "rejected",
   HIRED: "hired",
-  APPROVED: "approved"
+  APPROVED: "approved",
+  PENDING: "pending"
 };
 
 export interface EmployeeNote {
@@ -106,6 +109,8 @@ export interface EmployeeNote {
   content: string;
   date: string;
   author: string;
+  createdAt?: string;
+  createdBy?: string;
 }
 
 export interface Report {
@@ -113,7 +118,7 @@ export interface Report {
   title: string;
   description: string;
   author: string;
-  department?: string; // Added department to match usage
+  department?: string;
   date: string;
   documentUrl: string;
   shared: string[];
@@ -180,4 +185,14 @@ export const EMPLOYEE_STATUS_OPTIONS = [
   { value: "pending", label: "Pending" },
   { value: "contract", label: "Contract" },
   { value: "probation", label: "Probation" }
+];
+
+export const RESUME_STATUS_OPTIONS = [
+  { value: "new", label: "New" },
+  { value: "reviewing", label: "Reviewing" },
+  { value: "interview", label: "Interview" },
+  { value: "rejected", label: "Rejected" },
+  { value: "hired", label: "Hired" },
+  { value: "approved", label: "Approved" },
+  { value: "pending", label: "Pending" }
 ];

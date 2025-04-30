@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -81,7 +80,10 @@ const Employed = () => {
     setResumes((prev) => 
       prev.map((resume) => 
         resume.id === id 
-          ? { ...resume, status: status === "approved" ? RESUME_STATUS.APPROVED : RESUME_STATUS.REJECTED } 
+          ? { 
+              ...resume, 
+              status: status === "approved" ? RESUME_STATUS.APPROVED : RESUME_STATUS.REJECTED 
+            } 
           : resume
       )
     );
