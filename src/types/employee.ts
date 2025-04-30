@@ -28,6 +28,9 @@ export interface Employee {
   profileImage?: string;
   photo?: string;
   initials?: string;
+  hourlyRate?: number;
+  incentiveType?: IncentiveType;
+  incentiveAmount?: number;
 }
 
 export type EmployeeStatus = "active" | "inactive" | "on_leave" | "terminated" | "pending";
@@ -45,8 +48,14 @@ export interface EmployeeDocument {
   id: string;
   name: string;
   url: string;
-  uploadDate?: string; // Added uploadDate to match usage
+  uploadDate?: string;
+  type?: DocumentType;
+  dateUploaded?: string;
+  expiryDate?: string;
+  notes?: string;
 }
+
+export type DocumentType = "resume" | "id" | "certificate" | "contract" | "other";
 
 export interface Resume {
   id: string;
@@ -109,7 +118,6 @@ export interface EmergencyContact {
 
 export type SalaryBasis = "hourly" | "annual" | "commission";
 
-// Adding the missing IncentiveType export that's causing the error
 export type IncentiveType = "bonus" | "commission" | "none";
 
 // Adding constants needed for dropdowns and selects

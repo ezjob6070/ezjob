@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -86,7 +87,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       totalRevenue: 0,
       rating: 5.0,
       // Default salary-related fields if they're used elsewhere
-      salaryBasis: values.paymentType === "hourly" ? SalaryBasis.HOURLY : undefined,
+      salaryBasis: values.paymentType === "hourly" ? "hourly" as SalaryBasis : undefined,
       hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : 0,
     };
     

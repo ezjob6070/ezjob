@@ -28,9 +28,9 @@ export const technicianSchema = z.object({
   contractType: z.string().optional(),
   position: z.string().optional(),
   department: z.string().optional(),
-  salaryBasis: z.nativeEnum(SalaryBasis).optional(),
+  salaryBasis: z.enum(["hourly", "annual", "commission"]).optional(),
   hourlyRate: z.string().optional(),
-  incentiveType: z.nativeEnum(IncentiveType).optional(),
+  incentiveType: z.enum(["bonus", "commission", "none"]).optional(),
   incentiveAmount: z.string().optional(),
   profileImage: z.string().optional(),
 });
