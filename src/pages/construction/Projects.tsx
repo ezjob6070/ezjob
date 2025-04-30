@@ -2,59 +2,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { HardHatIcon, Construction, Truck, PlusIcon } from "lucide-react";
+import { Construction, Truck, PlusIcon } from "lucide-react";
 import { AddConstructionItemModal } from "@/components/construction/AddConstructionItemModal";
 import { toast } from "sonner";
-
-interface Project {
-  id: number;
-  name: string;
-  type: string;
-  description: string;
-  location: string;
-  completion: number;
-  workers: number;
-  vehicles: number;
-  status: "Not Started" | "In Progress" | "Completed" | "On Hold";
-}
+import { initialProjects } from "@/data/projects";
+import { Project } from "@/types/project";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 
 export default function Projects() {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: 1,
-      name: "City Center Tower",
-      type: "Commercial Building",
-      description: "Phase 1",
-      location: "Downtown",
-      completion: 30,
-      workers: 6,
-      vehicles: 3,
-      status: "In Progress"
-    },
-    {
-      id: 2,
-      name: "City Center Tower",
-      type: "Commercial Building",
-      description: "Phase 2",
-      location: "Downtown",
-      completion: 60,
-      workers: 7,
-      vehicles: 4,
-      status: "In Progress"
-    },
-    {
-      id: 3,
-      name: "City Center Tower",
-      type: "Commercial Building",
-      description: "Phase 3",
-      location: "Downtown",
-      completion: 90,
-      workers: 8,
-      vehicles: 5,
-      status: "In Progress"
-    }
-  ]);
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
 
   const handleAddProject = (data: any) => {
     const newProject: Project = {
@@ -64,9 +21,14 @@ export default function Projects() {
       description: data.description || "",
       location: data.location,
       completion: 0,
-      workers: 5,
-      vehicles: 2,
-      status: "Not Started"
+      workers: Math.floor(Math.random() * 30) + 20,
+      vehicles: Math.floor(Math.random() * 10) + 5,
+      status: "Not Started",
+      startDate: new Date().toISOString().split('T')[0],
+      expectedEndDate: new Date(new Date().setMonth(new Date().getMonth() + 14)).toISOString().split('T')[0],
+      budget: Math.floor(Math.random() * 20000000) + 5000000,
+      actualSpent: 0,
+      clientName: data.clientName || "New Client"
     };
     
     setProjects([...projects, newProject]);
@@ -87,14 +49,14 @@ export default function Projects() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
+        {projects.slice(0, 6).map((project) => (
           <Card key={project.id}>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <CardTitle>{project.name}</CardTitle>
                 <div className="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded">{project.status}</div>
               </div>
-              <CardDescription>{project.type} - {project.description}</CardDescription>
+              <CardDescription>{project.type} - {project.location}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -105,9 +67,12 @@ export default function Projects() {
                 <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div className="bg-blue-600 h-full rounded-full" style={{ width: `${project.completion}%` }}></div>
                 </div>
+                <div className="text-xs text-muted-foreground">
+                  Budget: {formatCurrency(project.budget)}
+                </div>
                 <div className="flex justify-between pt-2">
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <HardHatIcon className="h-3.5 w-3.5" />
+                    <Construction className="h-3.5 w-3.5" />
                     <span>{project.workers} Workers</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
