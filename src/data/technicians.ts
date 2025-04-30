@@ -23,6 +23,10 @@ const createSampleTechnicians = (): Technician[] => {
       department: "Installation",
       position: "Lead Technician",
       category: "HVAC",
+      certifications: ["NATE Certification", "EPA 608 Certification"],
+      skills: ["Commercial HVAC", "Refrigeration", "System Design"],
+      avatarUrl: "/avatars/tech-1.jpg",
+      yearsExperience: 8
     },
     {
       id: "tech-2",
@@ -42,6 +46,10 @@ const createSampleTechnicians = (): Technician[] => {
       department: "Electrical",
       position: "Senior Technician",
       category: "Electrical",
+      certifications: ["Master Electrician License", "OSHA Safety Certification"],
+      skills: ["Commercial Wiring", "Lighting Systems", "PLC Programming"],
+      avatarUrl: "/avatars/tech-2.jpg",
+      yearsExperience: 10
     },
     {
       id: "tech-3",
@@ -61,6 +69,10 @@ const createSampleTechnicians = (): Technician[] => {
       department: "Plumbing",
       position: "Junior Technician",
       category: "Plumbing",
+      certifications: ["Journeyman Plumber License", "Backflow Prevention Certification"],
+      skills: ["Commercial Plumbing", "Water Heater Installation", "Leak Detection"],
+      avatarUrl: "/avatars/tech-3.jpg",
+      yearsExperience: 5
     },
     {
       id: "tech-4",
@@ -80,6 +92,10 @@ const createSampleTechnicians = (): Technician[] => {
       department: "Carpentry",
       position: "Lead Carpenter",
       category: "Carpentry",
+      certifications: ["Master Carpenter Certification", "Cabinet Installation Specialist"],
+      skills: ["Finish Carpentry", "Cabinet Installation", "Custom Woodworking"],
+      avatarUrl: "/avatars/tech-4.jpg",
+      yearsExperience: 7
     },
     {
       id: "tech-5",
@@ -99,6 +115,10 @@ const createSampleTechnicians = (): Technician[] => {
       department: "Masonry",
       position: "Senior Mason",
       category: "Masonry",
+      certifications: ["Journeyman Mason", "Historic Restoration Specialist"],
+      skills: ["Brick and Stone", "Concrete Work", "Historic Restoration"],
+      avatarUrl: "/avatars/tech-5.jpg",
+      yearsExperience: 12
     },
     {
       id: "tech-6",
@@ -118,6 +138,10 @@ const createSampleTechnicians = (): Technician[] => {
       department: "Equipment",
       position: "Equipment Operator",
       category: "Equipment",
+      certifications: ["CDL Class A", "OSHA Heavy Equipment Certification"],
+      skills: ["Excavator Operation", "Bulldozer", "Crane Operation"],
+      avatarUrl: "/avatars/tech-6.jpg",
+      yearsExperience: 15
     },
     {
       id: "tech-7",
@@ -137,6 +161,79 @@ const createSampleTechnicians = (): Technician[] => {
       department: "Finishing",
       position: "Interior Specialist",
       category: "Finishing",
+      certifications: ["Lead-Safe Certification", "Decorative Finishing Specialist"],
+      skills: ["Drywall", "Painting", "Decorative Finishes"],
+      avatarUrl: "/avatars/tech-7.jpg",
+      yearsExperience: 6
+    },
+    {
+      id: "tech-8",
+      name: "William Taylor",
+      email: "w.taylor@example.com",
+      phone: "555-678-9012",
+      specialty: "Roofing",
+      hireDate: "2023-01-20",
+      status: "active",
+      paymentType: "hourly",
+      paymentRate: 28,
+      hourlyRate: 28,
+      completedJobs: 52,
+      cancelledJobs: 3,
+      totalRevenue: 92800,
+      rating: 4.4,
+      department: "Exterior",
+      position: "Roofing Specialist",
+      category: "Roofing",
+      certifications: ["Master Roofer Certification", "Fall Protection Safety Training"],
+      skills: ["Shingle Roofing", "Metal Roofing", "Commercial Flat Roofs"],
+      avatarUrl: "/avatars/tech-8.jpg",
+      yearsExperience: 9
+    },
+    {
+      id: "tech-9",
+      name: "Olivia Martinez",
+      email: "o.martinez@example.com",
+      phone: "555-789-0123",
+      specialty: "HVAC Maintenance",
+      hireDate: "2023-02-05",
+      status: "active",
+      paymentType: "percentage",
+      paymentRate: 26,
+      hourlyRate: 24,
+      completedJobs: 92,
+      cancelledJobs: 4,
+      totalRevenue: 110500,
+      rating: 4.5,
+      department: "Maintenance",
+      position: "HVAC Maintenance Tech",
+      category: "HVAC",
+      certifications: ["HVAC Excellence Certification", "Indoor Air Quality Certification"],
+      skills: ["Preventive Maintenance", "System Diagnostics", "Filter Systems"],
+      avatarUrl: "/avatars/tech-9.jpg",
+      yearsExperience: 7
+    },
+    {
+      id: "tech-10",
+      name: "James Wilson",
+      email: "j.wilson@example.com",
+      phone: "555-890-1234",
+      specialty: "Flooring Installation",
+      hireDate: "2023-03-30",
+      status: "active",
+      paymentType: "flat",
+      paymentRate: 180,
+      hourlyRate: 25,
+      completedJobs: 34,
+      cancelledJobs: 2,
+      totalRevenue: 68200,
+      rating: 4.6,
+      department: "Flooring",
+      position: "Flooring Expert",
+      category: "Flooring",
+      certifications: ["CFI Certification", "Luxury Vinyl Installation Specialist"],
+      skills: ["Hardwood Installation", "Tile Work", "Vinyl and Laminate"],
+      avatarUrl: "/avatars/tech-10.jpg",
+      yearsExperience: 8
     }
   ];
 

@@ -13,7 +13,7 @@ const generateDemoEstimates = (): Estimate[] => {
       clientEmail: "contact@riverside-dev.example.com",
       clientPhone: "555-123-4567",
       status: "sent",
-      projectTitle: "Downtown Office Complex",
+      jobTitle: "Downtown Office Complex",
       description: "15-story office building with underground parking",
       amount: 4850000,
       createdAt: addDays(today, -14),
@@ -25,7 +25,11 @@ const generateDemoEstimates = (): Estimate[] => {
         { description: "Plumbing and HVAC", quantity: 1, unitPrice: 925000 },
         { description: "Interior Finishing", quantity: 1, unitPrice: 1100000 },
         { description: "Exterior and Landscaping", quantity: 1, unitPrice: 700000 }
-      ]
+      ],
+      clientAddress: "123 Main St, Downtown",
+      images: ["/placeholders/building-1.jpg", "/placeholders/blueprint-1.jpg"],
+      price: 4500000,
+      tax: 350000
     },
     {
       id: "est-002",
@@ -33,7 +37,7 @@ const generateDemoEstimates = (): Estimate[] => {
       clientEmail: "projects@greenfield.example.com",
       clientPhone: "555-987-6543",
       status: "in-process",
-      projectTitle: "Parkview Residential Complex",
+      jobTitle: "Parkview Residential Complex",
       description: "120-unit residential apartment complex with amenities",
       amount: 3250000,
       createdAt: addDays(today, -7),
@@ -44,7 +48,11 @@ const generateDemoEstimates = (): Estimate[] => {
         { description: "Building Construction (5 blocks)", quantity: 5, unitPrice: 450000 },
         { description: "Utilities and Infrastructure", quantity: 1, unitPrice: 625000 },
         { description: "Common Areas and Amenities", quantity: 1, unitPrice: 375000 }
-      ]
+      ],
+      clientAddress: "456 Park Ave, Midtown",
+      images: ["/placeholders/building-2.jpg", "/placeholders/site-plan-1.jpg"],
+      price: 3100000,
+      tax: 150000
     },
     {
       id: "est-003",
@@ -52,7 +60,7 @@ const generateDemoEstimates = (): Estimate[] => {
       clientEmail: "info@bayshore.example.com",
       clientPhone: "555-456-7890",
       status: "completed",
-      projectTitle: "Waterfront Retail Center",
+      jobTitle: "Waterfront Retail Center",
       description: "Shopping mall with 25 retail units and food court",
       amount: 2750000,
       createdAt: addDays(today, -30),
@@ -63,7 +71,11 @@ const generateDemoEstimates = (): Estimate[] => {
         { description: "Interior Build-out", quantity: 1, unitPrice: 850000 },
         { description: "Parking Area", quantity: 1, unitPrice: 350000 },
         { description: "Public Spaces and Landscaping", quantity: 1, unitPrice: 300000 }
-      ]
+      ],
+      clientAddress: "789 Harbor Dr, Waterfront District",
+      images: ["/placeholders/mall-1.jpg", "/placeholders/retail-space.jpg"],
+      price: 2600000,
+      tax: 150000
     },
     {
       id: "est-004",
@@ -71,7 +83,7 @@ const generateDemoEstimates = (): Estimate[] => {
       clientEmail: "facilities@mvsd.example.edu",
       clientPhone: "555-789-0123",
       status: "sent",
-      projectTitle: "Elementary School Renovation",
+      jobTitle: "Elementary School Renovation",
       description: "Complete renovation of North Ridge Elementary School",
       amount: 1850000,
       createdAt: addDays(today, -5),
@@ -83,7 +95,11 @@ const generateDemoEstimates = (): Estimate[] => {
         { description: "Gymnasium Refurbishment", quantity: 1, unitPrice: 275000 },
         { description: "Cafeteria Expansion", quantity: 1, unitPrice: 320000 },
         { description: "Playground Equipment", quantity: 1, unitPrice: 155000 }
-      ]
+      ],
+      clientAddress: "101 School Rd, Mountain View",
+      images: ["/placeholders/school-1.jpg", "/placeholders/playground.jpg"],
+      price: 1750000,
+      tax: 100000
     },
     {
       id: "est-005",
@@ -91,7 +107,7 @@ const generateDemoEstimates = (): Estimate[] => {
       clientEmail: "construction@sunrise-health.example.com",
       clientPhone: "555-345-6789",
       status: "in-process",
-      projectTitle: "Medical Office Building",
+      jobTitle: "Medical Office Building",
       description: "Three-story medical office building with specialized facilities",
       amount: 3125000,
       createdAt: addDays(today, -10),
@@ -102,7 +118,11 @@ const generateDemoEstimates = (): Estimate[] => {
         { description: "Medical Equipment Installation", quantity: 1, unitPrice: 875000 },
         { description: "Specialized Rooms (Operating, Imaging)", quantity: 1, unitPrice: 650000 },
         { description: "Office Spaces", quantity: 15, unitPrice: 16000 }
-      ]
+      ],
+      clientAddress: "555 Health Blvd, Medical District",
+      images: ["/placeholders/medical-1.jpg", "/placeholders/office-interior.jpg"],
+      price: 3000000,
+      tax: 125000
     },
     {
       id: "est-006",
@@ -110,7 +130,7 @@ const generateDemoEstimates = (): Estimate[] => {
       clientEmail: "development@hip.example.com",
       clientPhone: "555-234-5678",
       status: "completed",
-      projectTitle: "Warehouse Distribution Center",
+      jobTitle: "Warehouse Distribution Center",
       description: "150,000 sq ft distribution center with loading bays",
       amount: 2250000,
       createdAt: addDays(today, -45),
@@ -122,7 +142,11 @@ const generateDemoEstimates = (): Estimate[] => {
         { description: "Loading Dock Areas", quantity: 12, unitPrice: 45000 },
         { description: "Office Area Build-out", quantity: 1, unitPrice: 320000 },
         { description: "Paving and Site Work", quantity: 1, unitPrice: 290000 }
-      ]
+      ],
+      clientAddress: "888 Industry Way, Port District",
+      images: ["/placeholders/warehouse-1.jpg", "/placeholders/loading-dock.jpg"],
+      price: 2150000,
+      tax: 100000
     }
   ];
 };
