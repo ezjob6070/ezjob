@@ -29,7 +29,7 @@ export interface Employee {
   photo?: string;
   initials?: string;
   hourlyRate?: number;
-  incentiveType?: IncentiveType;
+  incentiveType?: string; // Changed from IncentiveType to string
   incentiveAmount?: number;
 }
 
@@ -55,7 +55,7 @@ export interface EmployeeDocument {
   notes?: string;
 }
 
-export type DocumentType = "resume" | "id" | "certificate" | "contract" | "other";
+export type DocumentType = "resume" | "id" | "certificate" | "contract" | "other" | "passport" | "drivers_license" | "work_permit";
 
 // Define DocumentType constants
 export const DOCUMENT_TYPE = {
@@ -139,6 +139,7 @@ export const SALARY_BASIS = {
   YEARLY: "yearly" as SalaryBasis
 };
 
+// Export IncentiveType to fix the error
 export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
 
 export const INCENTIVE_TYPE = {

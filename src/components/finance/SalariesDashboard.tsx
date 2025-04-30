@@ -98,7 +98,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         tenureMonths,
         hourlyRate: employee.hourlyRate || 0,
         incentiveAmount: employee.incentiveAmount || 0,
-        incentiveType: employee.incentiveType || IncentiveType.HOURLY
+        incentiveType: employee.incentiveType || "hourly"
       };
     });
   };
@@ -212,13 +212,13 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
   };
   
   // Get incentive type display text
-  const getIncentiveTypeText = (type?: IncentiveType) => {
+  const getIncentiveTypeText = (type?: string) => {
     switch (type) {
-      case IncentiveType.HOURLY:
+      case "hourly":
         return "Per Hour";
-      case IncentiveType.WEEKLY:
+      case "weekly":
         return "Per Week";
-      case IncentiveType.MONTHLY:
+      case "monthly":
         return "Per Month";
       default:
         return "N/A";
