@@ -1,69 +1,55 @@
 
 import { format } from "date-fns";
-import { FileText, Eye, Trash2, Calendar } from "lucide-react";
+import { FileText, Eye, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { EmployeeDocument, DocumentType } from "@/types/employee";
+import { EmployeeDocument } from "@/types/employee";
 
 interface DocumentListItemProps {
   document: EmployeeDocument;
-  getDocumentTypeLabel: (type: DocumentType) => string;
-  onViewDocument: (document: EmployeeDocument) => void;
-  onDeleteDocument: (documentId: string) => void;
+  onView: () => void;
+  onDelete: () => void;
+  getDocumentTypeLabel: (type: string) => string;
 }
 
-const DocumentListItem = ({
-  document,
-  getDocumentTypeLabel,
-  onViewDocument,
-  onDeleteDocument
+const DocumentListItem = ({ 
+  document, 
+  onView, 
+  onDelete,
+  getDocumentTypeLabel 
 }: DocumentListItemProps) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "Not specified";
+    return format(new Date(dateString), "MMM dd, yyyy");
+  };
+
   return (
-    <div 
-      key={document.id} 
-      className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors"
-    >
-      <div className="flex items-center gap-3">
-        <FileText className="h-10 w-10 text-blue-500" />
-        <div>
-          <p className="font-medium">{document.name}</p>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Badge variant="outline">{getDocumentTypeLabel(document.type)}</Badge>
-            <span>Uploaded on {format(document.dateUploaded, "MMM d, yyyy")}</span>
-          </div>
-          
-          {document.expiryDate && (
-            <div className="flex items-center gap-1 text-sm mt-1">
-              <Calendar className="h-3 w-3" />
-              <span className={`${
-                new Date(document.expiryDate) < new Date() 
-                  ? "text-destructive" 
-                  : "text-muted-foreground"
-              }`}>
-                Expires: {format(document.expiryDate, "MMM d, yyyy")}
-              </span>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <FileText className="h-8 w-8 text-blue-500" />
+            <div>
+              <h4 className="text-sm font-medium">{document.name}</h4>
+              <p className="text-xs text-muted-foreground">
+                {document.type ? getDocumentTypeLabel(document.type) : "Other Document"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Uploaded: {formatDate(document.uploadDate || document.dateUploaded)}
+              </p>
             </div>
-          )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm" onClick={onView}>
+              <Eye className="h-4 w-4 mr-1" /> View
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onDelete} className="text-red-500 hover:text-red-700">
+              <Trash2 className="h-4 w-4 mr-1" /> Delete
+            </Button>
+          </div>
         </div>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => onViewDocument(document)}
-        >
-          <Eye className="h-4 w-4" />
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => onDeleteDocument(document.id)}
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

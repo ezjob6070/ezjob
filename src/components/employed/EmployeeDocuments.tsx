@@ -18,7 +18,7 @@ interface EmployeeDocumentsProps {
   onUpdateEmployee: (updatedDocuments: EmployeeDocument[]) => void;
 }
 
-const EmployeeDocuments = ({ employeeId, documents, onUpdateEmployee }: EmployeeDocumentsProps) => {
+const EmployeeDocuments = ({ employeeId, documents = [], onUpdateEmployee }: EmployeeDocumentsProps) => {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<EmployeeDocument | null>(null);
@@ -29,7 +29,7 @@ const EmployeeDocuments = ({ employeeId, documents, onUpdateEmployee }: Employee
   const handleDocumentUpload = async (documentData: any) => {
     try {
       const newDocument = await uploadDocument(documentData);
-      const updatedDocuments = [...documents, newDocument];
+      const updatedDocuments = [...(documents || []), newDocument];
       onUpdateEmployee(updatedDocuments);
       
       setShowUploadForm(false);
@@ -53,8 +53,9 @@ const EmployeeDocuments = ({ employeeId, documents, onUpdateEmployee }: Employee
     setShowViewDialog(true);
   };
 
-  const handleDeleteClick = (document: EmployeeDocument) => {
-    setSelectedDocument(document);
+  const handleDeleteClick = (documentId: string) => {
+    const document = documents?.find(doc => doc.id === documentId);
+    setSelectedDocument(document || null);
     setIsConfirmDeleteOpen(true);
   };
 
@@ -64,7 +65,7 @@ const EmployeeDocuments = ({ employeeId, documents, onUpdateEmployee }: Employee
     try {
       await deleteDocument(selectedDocument.id);
       
-      const updatedDocuments = documents.filter(doc => doc.id !== selectedDocument.id);
+      const updatedDocuments = (documents || []).filter(doc => doc.id !== selectedDocument.id);
       onUpdateEmployee(updatedDocuments);
       
       setIsConfirmDeleteOpen(false);
@@ -115,7 +116,7 @@ const EmployeeDocuments = ({ employeeId, documents, onUpdateEmployee }: Employee
         </Card>
       ) : (
         <DocumentsList 
-          documents={documents} 
+          documents={documents || []} 
           onViewDocument={handleViewDocument}
           onDeleteDocument={handleDeleteClick}
           getDocumentTypeLabel={getDocumentTypeLabel}

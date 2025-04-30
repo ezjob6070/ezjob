@@ -44,10 +44,16 @@ const TechnicianDetail = () => {
     );
   }
 
+  // Ensure certifications array is always available
+  const technicianWithDefaults = {
+    ...technician,
+    certifications: technician.certifications || []
+  };
+
   return (
     <div className="space-y-6">
       <TechnicianHeader 
-        technician={technician} 
+        technician={technicianWithDefaults} 
         onEditClick={() => setShowEditModal(true)} 
       />
 
@@ -60,12 +66,12 @@ const TechnicianDetail = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <TechnicianOverviewTab technician={technician} />
+          <TechnicianOverviewTab technician={technicianWithDefaults} />
         </TabsContent>
 
         <TabsContent value="financial" className="space-y-6">
           <TechnicianFinancialTab
-            technician={technician}
+            technician={technicianWithDefaults}
             filteredTechnicians={filteredTechnicians}
             displayedTechnicians={displayedTechnicians}
             selectedTechnicianNames={selectedTechnicianNames}
@@ -82,11 +88,11 @@ const TechnicianDetail = () => {
         </TabsContent>
 
         <TabsContent value="history" className="space-y-6">
-          <TechnicianJobHistory technician={technician} />
+          <TechnicianJobHistory technician={technicianWithDefaults} />
         </TabsContent>
 
         <TabsContent value="documents" className="space-y-6">
-          <TechnicianDocumentUpload technician={technician} />
+          <TechnicianDocumentUpload technician={technicianWithDefaults} />
         </TabsContent>
       </Tabs>
 
@@ -94,7 +100,7 @@ const TechnicianDetail = () => {
         open={showEditModal}
         onOpenChange={setShowEditModal}
         onUpdateTechnician={handleUpdateTechnician}
-        technician={technician}
+        technician={technicianWithDefaults}
       />
     </div>
   );

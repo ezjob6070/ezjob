@@ -7,7 +7,7 @@ import { CalendarDays, FileText, FileType, Clock } from "lucide-react";
 interface DocumentViewDialogProps {
   open: boolean;
   onOpenChange: () => void;
-  documentData: EmployeeDocument;
+  documentData: EmployeeDocument | null;
 }
 
 const DocumentViewDialog = ({ open, onOpenChange, documentData }: DocumentViewDialogProps) => {
@@ -15,6 +15,10 @@ const DocumentViewDialog = ({ open, onOpenChange, documentData }: DocumentViewDi
     if (!dateString) return "Not specified";
     return format(new Date(dateString), "MMM dd, yyyy");
   };
+  
+  if (!documentData) {
+    return null; // Don't render anything if no document data
+  }
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
