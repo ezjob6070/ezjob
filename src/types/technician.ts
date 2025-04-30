@@ -42,4 +42,5 @@ export type Technician = {
   jobCategories?: string[];
   performanceRating?: number;
   initials?: string;
+  yearsExperience?: number; // Added this field to match the data
 };

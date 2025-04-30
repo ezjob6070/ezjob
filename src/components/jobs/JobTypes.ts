@@ -9,7 +9,7 @@ export interface Job {
   title?: string;
   status: JobStatus;
   date: Date;
-  scheduledDate?: Date;
+  scheduledDate?: Date | string;
   isAllDay?: boolean;
   technicianId?: string;
   technicianName?: string;
@@ -27,8 +27,15 @@ export interface Job {
   clientPhone?: string;
   jobSourceId?: string;
   jobSourceName?: string;
+  jobSource?: string;
   parts?: string[];
   createdAt?: Date;
+  assignedTechId?: string;
+  assignedTechName?: string;
+  priority?: string;
+  estimateId?: string;
+  attachments?: any[];
+  jobNumber?: string;
   // New fields for signature and images
   signature?: string;
   hasImages?: boolean;

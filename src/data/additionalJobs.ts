@@ -17,7 +17,8 @@ export const additionalJobs: Job[] = (() => {
       clientPhone: "555-123-9876",
       address: "47 Suncrest Avenue, North Hills",
       description: "Installation of 24-panel solar array with battery backup system",
-      scheduledDate: addDays(today, 15).toISOString(),
+      scheduledDate: addDays(today, 15),
+      date: addDays(today, 15), // Add the required date field
       assignedTechId: "tech-11",
       assignedTechName: "Thomas Cooper",
       jobSource: "Website Inquiry",
@@ -26,7 +27,7 @@ export const additionalJobs: Job[] = (() => {
       amount: 28500,
       notes: "Customer is interested in tax credit information. Home has metal roof requiring special mounting hardware.",
       attachments: [],
-      createdAt: new Date(subDays(today, 5).toISOString())
+      createdAt: subDays(today, 5)
     },
     {
       id: uuidv4(),
@@ -37,7 +38,8 @@ export const additionalJobs: Job[] = (() => {
       clientPhone: "555-987-1234",
       address: "892 Technology Drive, West Heights",
       description: "Complete smart home setup including lighting, security, climate control and entertainment systems",
-      scheduledDate: addDays(today, 8).toISOString(),
+      scheduledDate: addDays(today, 8),
+      date: addDays(today, 8), // Add the required date field
       assignedTechId: "tech-12",
       assignedTechName: "Rebecca Wong",
       jobSource: "Trade Show",
@@ -47,7 +49,7 @@ export const additionalJobs: Job[] = (() => {
       estimateId: "est-007",
       notes: "Client has existing Nest thermostats that need to be integrated. Wants voice control throughout house.",
       attachments: [],
-      createdAt: new Date(subDays(today, 11).toISOString())
+      createdAt: subDays(today, 11)
     },
     {
       id: uuidv4(),
@@ -58,7 +60,8 @@ export const additionalJobs: Job[] = (() => {
       clientPhone: "555-567-3210",
       address: "1500 Commerce Parkway, Eastside",
       description: "Redesign of main entrance landscaping with water-efficient features",
-      scheduledDate: addDays(today, 20).toISOString(),
+      scheduledDate: addDays(today, 20),
+      date: addDays(today, 20), // Add the required date field
       assignedTechId: "tech-13",
       assignedTechName: "Marcus Johnson",
       jobSource: "Referral",
@@ -67,7 +70,7 @@ export const additionalJobs: Job[] = (() => {
       amount: 18200,
       notes: "Client wants drought-resistant plants and modern hardscaping. Site visit already completed.",
       attachments: [],
-      createdAt: new Date(subDays(today, 15).toISOString())
+      createdAt: subDays(today, 15)
     },
     {
       id: uuidv4(),
@@ -78,7 +81,8 @@ export const additionalJobs: Job[] = (() => {
       clientPhone: "555-222-8765",
       address: "350 Market Street, Financial District",
       description: "Interior design consultation for 5,000 sq ft office space renovation",
-      scheduledDate: addDays(today, 4).toISOString(),
+      scheduledDate: addDays(today, 4),
+      date: addDays(today, 4), // Add the required date field
       assignedTechId: "tech-14",
       assignedTechName: "Sophia Martinez",
       jobSource: "Website",
@@ -87,7 +91,7 @@ export const additionalJobs: Job[] = (() => {
       amount: 3500,
       notes: "Initial consultation only. Client may proceed with full design services afterward.",
       attachments: [],
-      createdAt: new Date(subDays(today, 6).toISOString())
+      createdAt: subDays(today, 6)
     },
     {
       id: uuidv4(),
@@ -98,7 +102,8 @@ export const additionalJobs: Job[] = (() => {
       clientPhone: "555-876-2345",
       address: "788 Luxury Avenue, Auto District",
       description: "Installation of comprehensive security system for high-end auto dealership",
-      scheduledDate: addDays(today, 12).toISOString(),
+      scheduledDate: addDays(today, 12),
+      date: addDays(today, 12), // Add the required date field
       assignedTechId: "tech-15",
       assignedTechName: "Derek Foster",
       jobSource: "Direct Call",
@@ -108,7 +113,7 @@ export const additionalJobs: Job[] = (() => {
       estimateId: "est-008",
       notes: "24/7 monitoring required. System must include perimeter sensors, motion detection, and HD cameras.",
       attachments: [],
-      createdAt: new Date(subDays(today, 8).toISOString())
+      createdAt: subDays(today, 8)
     },
     {
       id: uuidv4(),
@@ -119,7 +124,8 @@ export const additionalJobs: Job[] = (() => {
       clientPhone: "555-345-6789",
       address: "437 Maple Street, Brookside",
       description: "Complete kitchen renovation with new appliances, cabinets, countertops, and flooring",
-      scheduledDate: addDays(today, 25).toISOString(),
+      scheduledDate: addDays(today, 25),
+      date: addDays(today, 25), // Add the required date field
       assignedTechId: "tech-4",
       assignedTechName: "Jennifer Lopez",
       jobSource: "Referral",
@@ -129,7 +135,7 @@ export const additionalJobs: Job[] = (() => {
       estimateId: "est-009",
       notes: "Homeowners will be on vacation during first week of work. Key will be with neighbor.",
       attachments: [],
-      createdAt: new Date(subDays(today, 21).toISOString())
+      createdAt: subDays(today, 21)
     },
     {
       id: uuidv4(),
@@ -140,7 +146,8 @@ export const additionalJobs: Job[] = (() => {
       clientPhone: "555-999-8888",
       address: "2700 Highland Avenue, Midtown",
       description: "Emergency repair of leaking water main in building basement",
-      scheduledDate: addDays(today, 0).toISOString(), // Today
+      scheduledDate: today,
+      date: today, // Add the required date field
       assignedTechId: "tech-3",
       assignedTechName: "Michael Rodriguez",
       jobSource: "Emergency Call",
@@ -149,7 +156,7 @@ export const additionalJobs: Job[] = (() => {
       amount: 3800,
       notes: "Water currently shut off to building. Requires immediate attention.",
       attachments: [],
-      createdAt: new Date(subDays(today, 0).toISOString()) // Created today
+      createdAt: today
     }
   ];
 })();

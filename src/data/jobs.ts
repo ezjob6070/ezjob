@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Job } from '@/components/jobs/JobTypes';
 import { addDays, subDays } from 'date-fns';
@@ -17,7 +16,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-123-4567",
       address: "123 Main St, Downtown",
       description: "Complete HVAC system installation for new office building",
-      scheduledDate: addDays(today, 2).toISOString(),
+      scheduledDate: addDays(today, 2),
+      date: addDays(today, 2), // Fixed: Using Date object instead of string
       assignedTechId: "tech-1",
       assignedTechName: "John Smith",
       jobSource: "Website",
@@ -28,7 +28,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-001",
       notes: "Customer requests work to begin at 8:00 AM sharp",
       attachments: [],
-      createdAt: new Date(subDays(today, 10).toISOString())
+      createdAt: subDays(today, 10)
     },
     {
       id: uuidv4(),
@@ -39,7 +39,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-987-6543",
       address: "456 Park Ave, Midtown",
       description: "Annual electrical system inspection for apartment complex",
-      scheduledDate: addDays(today, 1).toISOString(),
+      scheduledDate: addDays(today, 1),
+      date: addDays(today, 1), // Fixed: Using Date object instead of string
       assignedTechId: "tech-2",
       assignedTechName: "Sarah Johnson",
       jobSource: "Referral",
@@ -49,7 +50,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-002",
       notes: "Building manager will provide access to electrical rooms",
       attachments: [],
-      createdAt: new Date(subDays(today, 7).toISOString())
+      createdAt: subDays(today, 7)
     },
     {
       id: uuidv4(),
@@ -60,7 +61,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-456-7890",
       address: "789 Harbor Dr, Waterfront District",
       description: "Emergency repair of burst pipe in mall basement",
-      scheduledDate: subDays(today, 2).toISOString(),
+      scheduledDate: subDays(today, 2),
+      date: subDays(today, 2), // Fixed: Using Date object instead of string
       assignedTechId: "tech-3",
       assignedTechName: "Michael Rodriguez",
       jobSource: "Direct Call",
@@ -71,7 +73,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-003",
       notes: "Additional damage found behind wall, repair completed successfully",
       attachments: [],
-      createdAt: new Date(subDays(today, 5).toISOString())
+      createdAt: subDays(today, 5)
     },
     {
       id: uuidv4(),
@@ -82,7 +84,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-789-0123",
       address: "101 School Rd, Mountain View",
       description: "Installation of custom bookshelves and trim in school library",
-      scheduledDate: addDays(today, 5).toISOString(),
+      scheduledDate: addDays(today, 5),
+      date: addDays(today, 5), // Fixed: Using Date object instead of string
       assignedTechId: "tech-4",
       assignedTechName: "Jennifer Lopez",
       jobSource: "Referral",
@@ -92,7 +95,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-004",
       notes: "Work to be performed after school hours only",
       attachments: [],
-      createdAt: new Date(subDays(today, 14).toISOString())
+      createdAt: subDays(today, 14)
     },
     {
       id: uuidv4(),
@@ -103,7 +106,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-345-6789",
       address: "555 Health Blvd, Medical District",
       description: "Structural inspection of building foundation prior to expansion",
-      scheduledDate: addDays(today, 3).toISOString(),
+      scheduledDate: addDays(today, 3),
+      date: addDays(today, 3), // Fixed: Using Date object instead of string
       assignedTechId: "tech-5",
       assignedTechName: "David Washington",
       jobSource: "Website",
@@ -113,7 +117,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-005",
       notes: "Client requests detailed written report with photographs",
       attachments: [],
-      createdAt: new Date(subDays(today, 9).toISOString())
+      createdAt: subDays(today, 9)
     },
     {
       id: uuidv4(),
@@ -124,7 +128,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-234-5678",
       address: "888 Industry Way, Port District",
       description: "Excavation work for new warehouse foundation",
-      scheduledDate: subDays(today, 5).toISOString(),
+      scheduledDate: subDays(today, 5),
+      date: subDays(today, 5), // Fixed: Using Date object instead of string
       assignedTechId: "tech-6",
       assignedTechName: "Robert Garcia",
       jobSource: "Repeat Client",
@@ -135,7 +140,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-006",
       notes: "All work completed according to specifications",
       attachments: [],
-      createdAt: new Date(subDays(today, 20).toISOString())
+      createdAt: subDays(today, 20)
     },
     {
       id: uuidv4(),
@@ -146,7 +151,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-876-5432",
       address: "Downtown Financial District",
       description: "Complete interior painting of new office space",
-      scheduledDate: addDays(today, 7).toISOString(),
+      scheduledDate: addDays(today, 7),
+      date: addDays(today, 7), // Fixed: Using Date object instead of string
       assignedTechId: "tech-7",
       assignedTechName: "Emily Chen",
       jobSource: "Repeat Client",
@@ -155,7 +161,7 @@ const generateDemoJobs = (): Job[] => {
       amount: 9800,
       notes: "Client has requested specific eco-friendly paint brand",
       attachments: [],
-      createdAt: new Date(subDays(today, 8).toISOString())
+      createdAt: subDays(today, 8)
     },
     {
       id: uuidv4(),
@@ -166,7 +172,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-765-4321",
       address: "Riverside South",
       description: "Repair of storm damage to apartment complex roof",
-      scheduledDate: subDays(today, 3).toISOString(),
+      scheduledDate: subDays(today, 3),
+      date: subDays(today, 3), // Fixed: Using Date object instead of string
       assignedTechId: "tech-8",
       assignedTechName: "William Taylor",
       jobSource: "Social Media",
@@ -176,7 +183,7 @@ const generateDemoJobs = (): Job[] => {
       actualAmount: 7400,
       notes: "Additional damage discovered during repair, client approved extra work",
       attachments: [],
-      createdAt: new Date(subDays(today, 15).toISOString())
+      createdAt: subDays(today, 15)
     },
     {
       id: uuidv4(),
@@ -187,7 +194,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-654-3210",
       address: "North Innovation District",
       description: "Quarterly maintenance of office building HVAC systems",
-      scheduledDate: addDays(today, 10).toISOString(),
+      scheduledDate: addDays(today, 10),
+      date: addDays(today, 10), // Fixed: Using Date object instead of string
       assignedTechId: "tech-9",
       assignedTechName: "Olivia Martinez",
       jobSource: "Google Ads",
@@ -196,7 +204,7 @@ const generateDemoJobs = (): Job[] => {
       amount: 3200,
       notes: "Building has 8 separate HVAC units to be serviced",
       attachments: [],
-      createdAt: new Date(subDays(today, 12).toISOString())
+      createdAt: subDays(today, 12)
     },
     {
       id: uuidv4(),
@@ -207,7 +215,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-543-2109",
       address: "Harbor District",
       description: "Installation of luxury vinyl tile in hotel lobby and restaurant",
-      scheduledDate: subDays(today, 1).toISOString(),
+      scheduledDate: subDays(today, 1),
+      date: subDays(today, 1), // Fixed: Using Date object instead of string
       assignedTechId: "tech-10",
       assignedTechName: "James Wilson",
       jobSource: "Trade Show",
@@ -217,7 +226,7 @@ const generateDemoJobs = (): Job[] => {
       actualAmount: 12800,
       notes: "Client extremely satisfied with quality of work",
       attachments: [],
-      createdAt: new Date(subDays(today, 18).toISOString())
+      createdAt: subDays(today, 18)
     }
   ];
 };

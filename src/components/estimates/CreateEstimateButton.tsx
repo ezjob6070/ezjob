@@ -76,9 +76,12 @@ const CreateEstimateButton = ({ onEstimateCreate }: CreateEstimateButtonProps) =
       images: images,
       price: values.price,
       tax: values.tax,
+      amount: values.price, // Set amount to match price
       status: "in-process", // Start as in-process
       createdAt: new Date(),
       updatedAt: new Date(),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      items: [] // Initialize with empty items array
     };
 
     onEstimateCreate(newEstimate);
