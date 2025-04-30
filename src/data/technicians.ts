@@ -1,6 +1,7 @@
 
 import { Technician } from "@/types/technician";
 import { getInitials } from "@/lib/utils";
+import { additionalTechnicians } from "./additionalTechnicians";
 
 // Create sample technicians with all required properties
 const createSampleTechnicians = (): Technician[] => {
@@ -244,7 +245,7 @@ const createSampleTechnicians = (): Technician[] => {
   }));
 };
 
-export const technicians = createSampleTechnicians();
+export const technicians = [...createSampleTechnicians(), ...additionalTechnicians];
 
 // Export the same array as initialTechnicians for consistent reference
 export const initialTechnicians = technicians;
