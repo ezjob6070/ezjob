@@ -89,10 +89,10 @@ export function TechnicianStatusFields({ control, showAdvancedFields = false }: 
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="HOURLY">Hourly</SelectItem>
-                    <SelectItem value="WEEKLY">Weekly</SelectItem>
-                    <SelectItem value="MONTHLY">Monthly</SelectItem>
-                    <SelectItem value="YEARLY">Yearly</SelectItem>
+                    <SelectItem value="hourly">Hourly</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -125,9 +125,9 @@ export function TechnicianStatusFields({ control, showAdvancedFields = false }: 
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="HOURLY">Per Hour</SelectItem>
-                    <SelectItem value="WEEKLY">Per Week</SelectItem>
-                    <SelectItem value="MONTHLY">Per Month</SelectItem>
+                    <SelectItem value="hourly">Per Hour</SelectItem>
+                    <SelectItem value="weekly">Per Week</SelectItem>
+                    <SelectItem value="monthly">Per Month</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

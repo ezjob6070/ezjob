@@ -1,117 +1,51 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { EmployeeDocument, DocumentType, Employee } from "@/types/employee";
+import { Employee, EmployeeDocument, type DocumentType, DOCUMENT_TYPE } from "@/types/employee";
 
-export const useEmployeeDocuments = (
-  employee: Employee,
-  onUpdateEmployee: (updatedEmployee: Employee) => void
-) => {
+export const useEmployeeDocuments = (employee?: Employee) => {
   const { toast } = useToast();
-  const [documents, setDocuments] = useState<EmployeeDocument[]>(employee.documents || []);
-  const [selectedDocument, setSelectedDocument] = useState<EmployeeDocument | null>(null);
-  const [showAddDocumentDialog, setShowAddDocumentDialog] = useState(false);
-  const [showViewDocumentDialog, setShowViewDocumentDialog] = useState(false);
-  
-  const [newDocument, setNewDocument] = useState({
-    type: DocumentType.ID,
-    name: "",
-    notes: "",
-    expiryDate: "",
-  });
-  
-  const getDocumentTypeLabel = (type: DocumentType) => {
-    switch (type) {
-      case DocumentType.ID: return "ID Card";
-      case DocumentType.PASSPORT: return "Passport";
-      case DocumentType.DRIVERS_LICENSE: return "Driver's License";
-      case DocumentType.WORK_PERMIT: return "Work Permit";
-      case DocumentType.OTHER: return "Other";
-    }
-  };
-  
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const documentUrl = URL.createObjectURL(file);
-      const currentDate = new Date();
-      
-      const newDocumentObj: EmployeeDocument = {
-        id: `doc-${Date.now()}`,
-        type: newDocument.type,
-        name: newDocument.name || file.name,
-        url: documentUrl,
-        dateUploaded: currentDate.toISOString(),
-        notes: newDocument.notes || undefined,
-        expiryDate: newDocument.expiryDate ? new Date(newDocument.expiryDate).toISOString() : undefined,
+  const [documents, setDocuments] = useState<EmployeeDocument[]>(employee?.documents || []);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleUploadDocument = (documentData: any) => {
+    setIsUploading(true);
+    
+    // Simulate API call with a delay
+    setTimeout(() => {
+      const newDocument: EmployeeDocument = {
+        id: `doc-${Math.random().toString(36).substr(2, 9)}`,
+        name: documentData.name,
+        url: URL.createObjectURL(documentData.file),
+        uploadDate: new Date().toISOString(),
+        type: documentData.type as DocumentType,
+        expiryDate: documentData.expiryDate?.toISOString(),
+        notes: documentData.notes,
       };
       
-      const updatedDocuments = [...documents, newDocumentObj];
-      setDocuments(updatedDocuments);
-      
-      const updatedEmployee = {
-        ...employee,
-        documents: updatedDocuments,
-      };
-      
-      onUpdateEmployee(updatedEmployee);
-      
-      setNewDocument({
-        type: DocumentType.ID,
-        name: "",
-        notes: "",
-        expiryDate: "",
-      });
-      
-      setShowAddDocumentDialog(false);
+      setDocuments(prev => [newDocument, ...prev]);
+      setIsUploading(false);
       
       toast({
-        title: "Document Uploaded",
-        description: "The document has been added to the employee's records",
+        title: "Document uploaded",
+        description: `${documentData.name} has been added to employee documents.`,
       });
-    }
+    }, 1500);
   };
-  
-  const handleViewDocument = (document: EmployeeDocument) => {
-    setSelectedDocument(document);
-    setShowViewDocumentDialog(true);
-  };
-  
+
   const handleDeleteDocument = (documentId: string) => {
-    const updatedDocuments = documents.filter(doc => doc.id !== documentId);
-    setDocuments(updatedDocuments);
-    
-    const updatedEmployee = {
-      ...employee,
-      documents: updatedDocuments,
-    };
-    
-    onUpdateEmployee(updatedEmployee);
+    setDocuments(prev => prev.filter(doc => doc.id !== documentId));
     
     toast({
-      title: "Document Deleted",
-      description: "The document has been removed from the employee's records",
+      title: "Document removed",
+      description: "The document has been removed successfully."
     });
-    
-    if (showViewDocumentDialog && selectedDocument?.id === documentId) {
-      setShowViewDocumentDialog(false);
-    }
   };
 
   return {
     documents,
-    selectedDocument,
-    showAddDocumentDialog,
-    showViewDocumentDialog,
-    newDocument,
-    getDocumentTypeLabel,
-    setShowAddDocumentDialog,
-    setShowViewDocumentDialog,
-    setNewDocument,
-    handleFileUpload,
-    handleViewDocument,
+    isUploading,
+    handleUploadDocument,
     handleDeleteDocument
   };
 };
-
-export default useEmployeeDocuments;

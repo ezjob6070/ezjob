@@ -1,5 +1,5 @@
 
-import { SalaryBasis, IncentiveType } from "@/types/employee";
+import { SALARY_BASIS, INCENTIVE_TYPE, SalaryBasis, IncentiveType } from "@/types/employee";
 
 // Helper function to determine badge variant
 export const getBadgeVariantFromStatus = (status: string) => {
@@ -35,13 +35,13 @@ export const formatHourlyRate = (amount?: number) => {
 export const getSalaryBasisText = (basis?: SalaryBasis) => {
   if (!basis) return "N/A";
   switch (basis) {
-    case SalaryBasis.HOURLY:
+    case "hourly":
       return "Hourly";
-    case SalaryBasis.WEEKLY:
+    case "weekly":
       return "Weekly";
-    case SalaryBasis.MONTHLY:
+    case "monthly":
       return "Monthly";
-    case SalaryBasis.YEARLY:
+    case "yearly":
       return "Yearly";
     default:
       return "N/A";
@@ -52,11 +52,11 @@ export const getSalaryBasisText = (basis?: SalaryBasis) => {
 export const getIncentiveTypeText = (type?: IncentiveType) => {
   if (!type) return "N/A";
   switch (type) {
-    case IncentiveType.HOURLY:
+    case "hourly":
       return "Per Hour";
-    case IncentiveType.WEEKLY:
+    case "weekly":
       return "Per Week";
-    case IncentiveType.MONTHLY:
+    case "monthly":
       return "Per Month";
     default:
       return "N/A";

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
@@ -67,11 +66,11 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
     return initialEmployees.map(employee => {
       // Calculate normalized monthly salary
       let monthlySalary = employee.salary;
-      if (employee.salaryBasis === SalaryBasis.WEEKLY) {
+      if (employee.salaryBasis === "weekly") {
         monthlySalary = employee.salary * 4.33; // Average weeks in a month
-      } else if (employee.salaryBasis === SalaryBasis.YEARLY) {
+      } else if (employee.salaryBasis === "yearly") {
         monthlySalary = employee.salary / 12;
-      } else if (employee.salaryBasis === SalaryBasis.HOURLY) {
+      } else if (employee.salaryBasis === "hourly") {
         // Assume 40 hours per week, 4.33 weeks per month
         monthlySalary = (employee.hourlyRate || 0) * 40 * 4.33;
       }
@@ -199,13 +198,13 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
   // Get salary basis display text
   const getSalaryBasisText = (basis?: SalaryBasis) => {
     switch (basis) {
-      case SalaryBasis.HOURLY:
+      case "hourly":
         return "Hourly";
-      case SalaryBasis.WEEKLY:
+      case "weekly":
         return "Weekly";
-      case SalaryBasis.MONTHLY:
+      case "monthly":
         return "Monthly";
-      case SalaryBasis.YEARLY:
+      case "yearly":
         return "Yearly";
       default:
         return "Yearly";

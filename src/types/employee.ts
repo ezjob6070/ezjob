@@ -57,6 +57,18 @@ export interface EmployeeDocument {
 
 export type DocumentType = "resume" | "id" | "certificate" | "contract" | "other";
 
+// Define DocumentType constants
+export const DOCUMENT_TYPE = {
+  ID: "id" as DocumentType,
+  RESUME: "resume" as DocumentType,
+  CERTIFICATE: "certificate" as DocumentType,
+  CONTRACT: "contract" as DocumentType,
+  PASSPORT: "passport" as DocumentType,
+  DRIVERS_LICENSE: "drivers_license" as DocumentType,
+  WORK_PERMIT: "work_permit" as DocumentType,
+  OTHER: "other" as DocumentType
+};
+
 export interface Resume {
   id: string;
   name: string;
@@ -116,19 +128,43 @@ export interface EmergencyContact {
   phone: string;
 }
 
-export type SalaryBasis = "hourly" | "annual" | "commission";
+export type SalaryBasis = "hourly" | "annual" | "commission" | "weekly" | "monthly" | "yearly";
 
-export type IncentiveType = "bonus" | "commission" | "none";
+export const SALARY_BASIS = {
+  HOURLY: "hourly" as SalaryBasis,
+  ANNUAL: "annual" as SalaryBasis,
+  COMMISSION: "commission" as SalaryBasis,
+  WEEKLY: "weekly" as SalaryBasis,
+  MONTHLY: "monthly" as SalaryBasis,
+  YEARLY: "yearly" as SalaryBasis
+};
+
+export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
+
+export const INCENTIVE_TYPE = {
+  BONUS: "bonus" as IncentiveType,
+  COMMISSION: "commission" as IncentiveType,
+  NONE: "none" as IncentiveType,
+  HOURLY: "hourly" as IncentiveType,
+  WEEKLY: "weekly" as IncentiveType,
+  MONTHLY: "monthly" as IncentiveType
+};
 
 // Adding constants needed for dropdowns and selects
 export const SALARY_BASIS_OPTIONS = [
   { value: "hourly", label: "Hourly" },
   { value: "annual", label: "Annual" },
-  { value: "commission", label: "Commission" }
+  { value: "commission", label: "Commission" },
+  { value: "weekly", label: "Weekly" },
+  { value: "monthly", label: "Monthly" },
+  { value: "yearly", label: "Yearly" }
 ];
 
 export const INCENTIVE_TYPE_OPTIONS = [
   { value: "bonus", label: "Bonus" },
   { value: "commission", label: "Commission" },
-  { value: "none", label: "None" }
+  { value: "none", label: "None" },
+  { value: "hourly", label: "Per Hour" },
+  { value: "weekly", label: "Per Week" },
+  { value: "monthly", label: "Per Month" }
 ];

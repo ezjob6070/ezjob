@@ -1,6 +1,5 @@
 
 import * as z from "zod";
-import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 export const technicianEditSchema = z.object({
   name: z.string().min(2, {
@@ -31,9 +30,9 @@ export const technicianEditSchema = z.object({
   notes: z.string().optional(),
   department: z.string().optional(),
   position: z.string().optional(),
-  salaryBasis: z.enum(["hourly", "annual", "commission"]).optional(),
+  salaryBasis: z.enum(["hourly", "annual", "commission", "weekly", "monthly", "yearly"]).optional(),
   hourlyRate: z.string().optional(),
-  incentiveType: z.enum(["bonus", "commission", "none"]).optional(),
+  incentiveType: z.enum(["bonus", "commission", "none", "hourly", "weekly", "monthly"]).optional(),
   incentiveAmount: z.string().optional(),
   profileImage: z.string().nullable().optional(),
 });
