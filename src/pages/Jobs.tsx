@@ -6,7 +6,7 @@ import { JOB_CATEGORIES, SERVICE_TYPES } from "@/components/jobs/constants";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import JobStats from "@/components/jobs/JobStats";
 import JobModals from "@/components/jobs/JobModals";
-import { Job } from "@/components/jobs/JobTypes";
+import { Job, AmountRange } from "@/components/jobs/JobTypes";
 import { toast } from "@/hooks/use-toast";
 import JobsHeader from "@/components/jobs/JobsHeader";
 import JobsContainer from "@/components/jobs/JobsContainer";
@@ -163,7 +163,7 @@ const Jobs = () => {
     selectedJobSources,
     selectedServiceTypes,
     date,
-    amountRange,
+    amountRange: amountRange as AmountRange | null,
     paymentMethod,
     hasActiveFilters,
     

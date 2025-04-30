@@ -3,6 +3,11 @@ export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
 
 export type PaymentMethod = "credit_card" | "cash" | "check" | "zelle" | "venmo" | "paypal";
 
+export interface AmountRange {
+  min: number;
+  max: number;
+}
+
 export interface Job {
   id: string;
   clientName: string;

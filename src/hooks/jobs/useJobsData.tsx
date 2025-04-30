@@ -1,9 +1,10 @@
+
 // This is a minimal fix to address the TypeScript errors in Jobs.tsx
 // Only adding the missing properties to the existing hook
 
 import { useState, useEffect } from 'react';
 import { initialJobs } from '@/data/jobs';
-import { Job } from '@/components/jobs/JobTypes';
+import { Job, AmountRange, PaymentMethod } from '@/components/jobs/JobTypes';
 import { JOB_CATEGORIES, SERVICE_TYPES } from '@/components/jobs/constants';
 
 export interface UseJobsDataResult {
@@ -20,8 +21,8 @@ export interface UseJobsDataResult {
   selectedCategories: string[];
   selectedJobSources: string[];
   date: string | null;
-  amountRange: [number, number] | null;
-  paymentMethod: string | null;
+  amountRange: AmountRange | null;
+  paymentMethod: PaymentMethod | null;
   appliedFilters: number;
   hasActiveFilters: boolean;
   selectedJob: Job | null;
@@ -30,8 +31,8 @@ export interface UseJobsDataResult {
   toggleCategory: (category: string) => void;
   toggleJobSource: (jobSource: string) => void;
   setDate: (date: string | null) => void;
-  setAmountRange: (range: [number, number] | null) => void;
-  setPaymentMethod: (method: string | null) => void;
+  setAmountRange: (range: AmountRange | null) => void;
+  setPaymentMethod: (method: PaymentMethod | null) => void;
   selectAllTechnicians: () => void;
   deselectAllTechnicians: () => void;
   selectAllJobSources: () => void;
@@ -55,8 +56,8 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
   const [date, setDate] = useState<string | null>(null);
-  const [amountRange, setAmountRange] = useState<[number, number] | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [hasActiveFilters, setHasActiveFilters] = useState<boolean>(false);
   const [appliedFilters, setAppliedFilters] = useState<number>(0);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -178,7 +179,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     if (amountRange) {
       filtered = filtered.filter(job => {
         const amount = job.amount || 0;
-        return amount >= amountRange[0] && amount <= amountRange[1];
+        return amount >= amountRange.min && amount <= amountRange.max;
       });
     }
     
@@ -204,7 +205,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const handleRescheduleJob = (jobId: string, newDate: string) => {
     const updatedJobs = jobs.map(job => 
       job.id === jobId ? { ...job, date: newDate } : job
-    ) as Job[];
+    );
     
     setJobs(updatedJobs);
     setFilteredJobs(updatedJobs);

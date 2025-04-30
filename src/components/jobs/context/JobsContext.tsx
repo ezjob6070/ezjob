@@ -1,9 +1,6 @@
 
 import { createContext, useContext, ReactNode } from "react";
-import { Job } from "@/components/jobs/JobTypes";
-import { DateRange } from "react-day-picker";
-import { AmountRange } from "@/components/jobs/AmountFilter";
-import { PaymentMethod } from "@/components/jobs/JobTypes";
+import { Job, AmountRange, PaymentMethod } from "@/components/jobs/JobTypes";
 
 // Define the context type
 interface JobsContextType {
