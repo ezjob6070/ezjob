@@ -45,7 +45,7 @@ export interface UseJobsDataResult {
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
 }
 
-export const useJobsData = (): UseJobsDataResult => {
+export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[] = []): UseJobsDataResult => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -65,15 +65,15 @@ export const useJobsData = (): UseJobsDataResult => {
 
   useEffect(() => {
     try {
-      // In a real app, this would be an API call
-      setJobs(initialJobs);
-      setFilteredJobs(initialJobs);
+      const jobsToUse = initialJobsData.length > 0 ? initialJobsData : initialJobs;
+      setJobs(jobsToUse);
+      setFilteredJobs(jobsToUse);
       setLoading(false);
     } catch (err) {
       setError(err as Error);
       setLoading(false);
     }
-  }, []);
+  }, [initialJobsData]);
 
   const toggleServiceType = (serviceType: string) => {
     setSelectedServiceTypes(prev => {
@@ -151,9 +151,9 @@ export const useJobsData = (): UseJobsDataResult => {
     
     if (searchTerm) {
       filtered = filtered.filter(job => 
-        job.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        (job.clientName || job.customerName || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.address || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.description || '')?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     
@@ -170,12 +170,15 @@ export const useJobsData = (): UseJobsDataResult => {
     }
     
     if (date) {
-      filtered = filtered.filter(job => job.date === date);
+      filtered = filtered.filter(job => {
+        const jobDate = job.date ? (typeof job.date === 'string' ? job.date : job.date.toISOString()) : '';
+        return jobDate === date;
+      });
     }
     
     if (amountRange) {
       filtered = filtered.filter(job => {
-        const amount = job.totalAmount || 0;
+        const amount = (job.amount || job.totalAmount || 0) as number;
         return amount >= amountRange[0] && amount <= amountRange[1];
       });
     }
@@ -202,7 +205,8 @@ export const useJobsData = (): UseJobsDataResult => {
   const handleRescheduleJob = (jobId: string, newDate: string) => {
     const updatedJobs = jobs.map(job => 
       job.id === jobId ? { ...job, date: newDate } : job
-    );
+    ) as Job[];
+    
     setJobs(updatedJobs);
     setFilteredJobs(updatedJobs);
   };
@@ -220,7 +224,8 @@ export const useJobsData = (): UseJobsDataResult => {
   const handleUpdateJobStatus = (jobId: string, newStatus: string) => {
     const updatedJobs = jobs.map(job => 
       job.id === jobId ? { ...job, status: newStatus } : job
-    );
+    ) as Job[];
+    
     setJobs(updatedJobs);
     setFilteredJobs(updatedJobs);
     closeStatusModal();

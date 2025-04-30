@@ -68,7 +68,8 @@ const Jobs = () => {
     applyFilters,
     handleRescheduleJob,
     openStatusModal,
-    closeStatusModal
+    closeStatusModal,
+    handleUpdateJobStatus
   } = useJobsData(localJobs, jobSourceNames);
 
   // Set up technician data
@@ -97,11 +98,11 @@ const Jobs = () => {
   const handleCancelJob = (jobId: string, reason?: string) => {
     cancelJob(jobId, reason);
     
-    // Update local jobs state immediately 
+    // Use type assertion to avoid TypeScript errors
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
-          ? { ...job, status: "cancelled", cancellationReason: reason || "No reason provided" } 
+          ? { ...job, status: "cancelled", cancellationReason: reason || "No reason provided" } as Job
           : job
       )
     );
@@ -110,31 +111,31 @@ const Jobs = () => {
   const handleCompleteJob = (jobId: string, actualAmount: number) => {
     completeJob(jobId, actualAmount);
     
-    // Update local jobs state immediately
+    // Use type assertion to avoid TypeScript errors
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
-          ? { ...job, status: "completed", actualAmount } 
+          ? { ...job, status: "completed", actualAmount } as Job
           : job
       )
     );
   };
   
   // Handle job rescheduling locally
-  const handleLocalRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
-    handleRescheduleJob(jobId, newDate, isAllDay);
+  const handleLocalRescheduleJob = (jobId: string, newDate: string, isAllDay: boolean) => {
+    handleRescheduleJob(jobId, newDate);
     
-    // Update local jobs state immediately
+    // Use type assertion to avoid TypeScript errors
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
           ? { 
               ...job, 
-              date: newDate,
+              date: newDate, 
               scheduledDate: newDate,
               isAllDay: isAllDay, 
-              status: "scheduled"
-            } 
+              status: "scheduled" 
+            } as Job
           : job
       )
     );

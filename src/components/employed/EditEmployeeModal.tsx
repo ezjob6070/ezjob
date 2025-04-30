@@ -68,20 +68,32 @@ export default function EditEmployeeModal({
 }: EditEmployeeModalProps) {
   const { toast } = useToast();
   
-  // Handle case when employee is null or undefined and provide default values
-  const employeeData = employee || {
+  // Provide a complete default object with all required properties
+  const defaultEmployee = {
     name: "",
     email: "",
     phone: "",
     position: "",
     department: "",
+    location: "",
     status: EMPLOYEE_STATUS.ACTIVE,
     salary: 0,
     salaryBasis: SALARY_BASIS.ANNUAL,
+    address: "",
+    manager: "",
+    reportsTo: "",
+    hourlyRate: 0,
+    incentiveType: "",
+    incentiveAmount: 0,
+    background: "",
     certifications: [],
     skills: [],
     education: [],
+    taxPercentage: 0,
   };
+  
+  // Handle case when employee is null or undefined and provide default values
+  const employeeData = employee || defaultEmployee;
   
   // Format the certifications, skills, education into comma-separated strings
   // Add null/undefined checks to avoid the error

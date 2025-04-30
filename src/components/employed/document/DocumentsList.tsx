@@ -19,13 +19,15 @@ const DocumentsList = ({
   getDocumentTypeLabel
 }: DocumentsListProps) => {
   // Add null check and default to empty array if documents is null or undefined
-  if (!documents || documents.length === 0) {
+  const documentsList = documents || [];
+  
+  if (documentsList.length === 0) {
     return <EmptyDocumentState />;
   }
   
   return (
     <div className="space-y-4">
-      {documents.map((document) => (
+      {documentsList.map((document) => (
         <DocumentListItem
           key={document.id}
           document={document}
