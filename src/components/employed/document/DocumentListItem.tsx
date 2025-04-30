@@ -20,8 +20,18 @@ const DocumentListItem = ({
 }: DocumentListItemProps) => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "Not specified";
-    return format(new Date(dateString), "MMM dd, yyyy");
+    try {
+      return format(new Date(dateString), "MMM dd, yyyy");
+    } catch (error) {
+      console.error("Invalid date format:", error);
+      return "Invalid date";
+    }
   };
+
+  // Safely handle document's properties with null checks
+  const documentName = document?.name || "Unnamed Document";
+  const documentType = document?.type ? getDocumentTypeLabel(document.type) : "Other Document";
+  const uploadDate = document?.uploadDate || document?.dateUploaded || undefined;
 
   return (
     <Card>
@@ -30,12 +40,12 @@ const DocumentListItem = ({
           <div className="flex items-center space-x-4">
             <FileText className="h-8 w-8 text-blue-500" />
             <div>
-              <h4 className="text-sm font-medium">{document.name}</h4>
+              <h4 className="text-sm font-medium">{documentName}</h4>
               <p className="text-xs text-muted-foreground">
-                {document.type ? getDocumentTypeLabel(document.type) : "Other Document"}
+                {documentType}
               </p>
               <p className="text-xs text-muted-foreground">
-                Uploaded: {formatDate(document.uploadDate || document.dateUploaded)}
+                Uploaded: {formatDate(uploadDate)}
               </p>
             </div>
           </div>

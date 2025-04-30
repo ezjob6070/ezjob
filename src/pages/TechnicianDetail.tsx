@@ -44,10 +44,12 @@ const TechnicianDetail = () => {
     );
   }
 
-  // Ensure certifications array is always available
+  // Ensure all required arrays exist to prevent null/undefined errors
   const technicianWithDefaults = {
     ...technician,
-    certifications: technician.certifications || []
+    certifications: technician.certifications || [],
+    skills: technician.skills || [],
+    jobCategories: technician.jobCategories || []
   };
 
   return (

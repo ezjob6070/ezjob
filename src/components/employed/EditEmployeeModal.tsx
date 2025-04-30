@@ -68,43 +68,61 @@ export default function EditEmployeeModal({
 }: EditEmployeeModalProps) {
   const { toast } = useToast();
   
+  // Handle case when employee is null or undefined and provide default values
+  const employeeData = employee || {
+    name: "",
+    email: "",
+    phone: "",
+    position: "",
+    department: "",
+    status: EMPLOYEE_STATUS.ACTIVE,
+    salary: 0,
+    salaryBasis: SALARY_BASIS.ANNUAL,
+    certifications: [],
+    skills: [],
+    education: [],
+  };
+  
   // Format the certifications, skills, education into comma-separated strings
-  const certificationsStr = employee.certifications ? employee.certifications.join(", ") : "";
-  const skillsStr = employee.skills ? employee.skills.join(", ") : "";
-  const educationStr = Array.isArray(employee.education) ? employee.education.join(", ") : employee.education || "";
+  // Add null/undefined checks to avoid the error
+  const certificationsStr = employeeData.certifications ? employeeData.certifications.join(", ") : "";
+  const skillsStr = employeeData.skills ? employeeData.skills.join(", ") : "";
+  const educationStr = Array.isArray(employeeData.education) 
+    ? employeeData.education.join(", ") 
+    : (employeeData.education || "");
   
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      name: employee.name,
-      email: employee.email,
-      phone: employee.phone,
-      position: employee.position,
-      department: employee.department,
-      location: employee.location || "",
-      status: employee.status,
-      salary: employee.salary,
-      salaryBasis: employee.salaryBasis,
-      address: employee.address || "",
-      manager: employee.manager || "",
-      reportsTo: employee.reportsTo || "",
-      hourlyRate: employee.hourlyRate || 0,
-      incentiveType: employee.incentiveType || "",
-      incentiveAmount: employee.incentiveAmount || 0,
-      background: employee.background || "",
+      name: employeeData.name,
+      email: employeeData.email,
+      phone: employeeData.phone || "",
+      position: employeeData.position,
+      department: employeeData.department,
+      location: employeeData.location || "",
+      status: employeeData.status,
+      salary: employeeData.salary,
+      salaryBasis: employeeData.salaryBasis,
+      address: employeeData.address || "",
+      manager: employeeData.manager || "",
+      reportsTo: employeeData.reportsTo || "",
+      hourlyRate: employeeData.hourlyRate || 0,
+      incentiveType: employeeData.incentiveType || "",
+      incentiveAmount: employeeData.incentiveAmount || 0,
+      background: employeeData.background || "",
       certifications: certificationsStr,
       skills: skillsStr,
       education: educationStr,
-      taxPercentage: employee.taxPercentage || 0,
+      taxPercentage: employeeData.taxPercentage || 0,
     },
   });
   
   useEffect(() => {
-    if (open) {
+    if (open && employee) {
       form.reset({
         name: employee.name,
         email: employee.email,
-        phone: employee.phone,
+        phone: employee.phone || "",
         position: employee.position,
         department: employee.department,
         location: employee.location || "",
@@ -128,6 +146,16 @@ export default function EditEmployeeModal({
 
   const onSubmit = (values: EmployeeFormValues) => {
     try {
+      if (!employee) {
+        console.error("Cannot update: Employee is null");
+        toast({
+          title: "Error",
+          description: "Cannot update employee: No employee data found.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       // Convert comma-separated strings back to arrays
       const certifications = values.certifications 
         ? values.certifications.split(',').map(cert => cert.trim()).filter(cert => cert)
@@ -182,6 +210,11 @@ export default function EditEmployeeModal({
       });
     }
   };
+  
+  // If the employee is null, we shouldn't show the dialog at all
+  if (!employee) {
+    return null;
+  }
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

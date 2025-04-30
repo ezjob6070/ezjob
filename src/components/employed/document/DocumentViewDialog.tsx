@@ -13,11 +13,17 @@ interface DocumentViewDialogProps {
 const DocumentViewDialog = ({ open, onOpenChange, documentData }: DocumentViewDialogProps) => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "Not specified";
-    return format(new Date(dateString), "MMM dd, yyyy");
+    try {
+      return format(new Date(dateString), "MMM dd, yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Invalid date";
+    }
   };
   
-  if (!documentData) {
-    return null; // Don't render anything if no document data
+  // Don't render if no document data or dialog is not open
+  if (!documentData || !open) {
+    return null;
   }
   
   return (
@@ -25,7 +31,7 @@ const DocumentViewDialog = ({ open, onOpenChange, documentData }: DocumentViewDi
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold mb-2">
-            {documentData.name}
+            {documentData.name || "Document"}
           </DialogTitle>
         </DialogHeader>
 
@@ -34,14 +40,16 @@ const DocumentViewDialog = ({ open, onOpenChange, documentData }: DocumentViewDi
           <div className="border-2 border-dashed border-gray-200 rounded-md p-8 bg-gray-50 flex flex-col items-center justify-center h-64">
             <FileText className="h-16 w-16 text-gray-400" />
             <p className="mt-4 text-sm text-gray-500">Document Preview</p>
-            <a
-              href={documentData.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 text-sm text-blue-600 hover:underline"
-            >
-              View Full Document
-            </a>
+            {documentData.url && (
+              <a
+                href={documentData.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 text-sm text-blue-600 hover:underline"
+              >
+                View Full Document
+              </a>
+            )}
           </div>
 
           {/* Document Details */}

@@ -1,7 +1,6 @@
 
-import { FileText, Eye, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { FileText } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { EmployeeDocument } from "@/types/employee";
 import EmptyDocumentState from "./EmptyDocumentState";
 import DocumentListItem from "./DocumentListItem";
@@ -14,11 +13,12 @@ interface DocumentsListProps {
 }
 
 const DocumentsList = ({ 
-  documents,
+  documents = [],
   onViewDocument,
   onDeleteDocument,
   getDocumentTypeLabel
 }: DocumentsListProps) => {
+  // Add null check and default to empty array if documents is null or undefined
   if (!documents || documents.length === 0) {
     return <EmptyDocumentState />;
   }
