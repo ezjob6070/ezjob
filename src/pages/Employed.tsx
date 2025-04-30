@@ -22,7 +22,7 @@ import UploadResumeModal from "@/components/employed/UploadResumeModal";
 import ReportsSection from "@/components/employed/ReportsSection";
 
 import { initialEmployees, initialResumes, employeeReports } from "@/data/employees";
-import { Employee, Resume, Report, ResumeStatus, EmployeeStatus } from "@/types/employee";
+import { Employee, Resume, Report, RESUME_STATUS, EMPLOYEE_STATUS } from "@/types/employee";
 
 const Employed = () => {
   const { toast } = useToast();
@@ -39,9 +39,9 @@ const Employed = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   
   // Stats calculation
-  const activeEmployees = employees.filter(emp => emp.status === EmployeeStatus.ACTIVE).length;
-  const pendingEmployees = employees.filter(emp => emp.status === EmployeeStatus.PENDING).length;
-  const inactiveEmployees = employees.filter(emp => emp.status === EmployeeStatus.INACTIVE).length;
+  const activeEmployees = employees.filter(emp => emp.status === EMPLOYEE_STATUS.ACTIVE).length;
+  const pendingEmployees = employees.filter(emp => emp.status === EMPLOYEE_STATUS.PENDING).length;
+  const inactiveEmployees = employees.filter(emp => emp.status === EMPLOYEE_STATUS.INACTIVE).length;
   const totalSalary = employees.reduce((sum, emp) => sum + emp.salary, 0);
   
   const handleAddEmployee = (newEmployee: Employee) => {
@@ -81,7 +81,7 @@ const Employed = () => {
     setResumes((prev) => 
       prev.map((resume) => 
         resume.id === id 
-          ? { ...resume, status: status === "approved" ? ResumeStatus.APPROVED : ResumeStatus.REJECTED } 
+          ? { ...resume, status: status === "approved" ? RESUME_STATUS.APPROVED : RESUME_STATUS.REJECTED } 
           : resume
       )
     );
@@ -158,9 +158,9 @@ const Employed = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Employees</SelectItem>
-                    <SelectItem value={EmployeeStatus.ACTIVE}>Active</SelectItem>
-                    <SelectItem value={EmployeeStatus.PENDING}>Pending</SelectItem>
-                    <SelectItem value={EmployeeStatus.INACTIVE}>Inactive</SelectItem>
+                    <SelectItem value={EMPLOYEE_STATUS.ACTIVE}>Active</SelectItem>
+                    <SelectItem value={EMPLOYEE_STATUS.PENDING}>Pending</SelectItem>
+                    <SelectItem value={EMPLOYEE_STATUS.INACTIVE}>Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

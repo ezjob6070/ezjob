@@ -3,7 +3,7 @@ import React from "react";
 import { Filter, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { EmployeeStatus } from "@/types/employee";
+import { EMPLOYEE_STATUS } from "@/types/employee";
 import {
   Select,
   SelectContent,
@@ -55,9 +55,9 @@ const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value={EmployeeStatus.ACTIVE}>Active</SelectItem>
-              <SelectItem value={EmployeeStatus.PENDING}>Pending</SelectItem>
-              <SelectItem value={EmployeeStatus.INACTIVE}>Inactive</SelectItem>
+              <SelectItem value={EMPLOYEE_STATUS.ACTIVE}>Active</SelectItem>
+              <SelectItem value={EMPLOYEE_STATUS.PENDING}>Pending</SelectItem>
+              <SelectItem value={EMPLOYEE_STATUS.INACTIVE}>Inactive</SelectItem>
             </SelectContent>
           </Select>
         </div>

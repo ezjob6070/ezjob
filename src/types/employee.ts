@@ -33,15 +33,17 @@ export interface Employee {
   incentiveAmount?: number;
 }
 
-export type EmployeeStatus = "active" | "inactive" | "on_leave" | "terminated" | "pending";
+export type EmployeeStatus = "active" | "inactive" | "on_leave" | "terminated" | "pending" | "contract" | "probation";
 
 // Adding PENDING for the referenced constant in components
 export const EMPLOYEE_STATUS = {
-  ACTIVE: "active" as EmployeeStatus,
-  INACTIVE: "inactive" as EmployeeStatus,
-  ON_LEAVE: "on_leave" as EmployeeStatus,
-  TERMINATED: "terminated" as EmployeeStatus,
-  PENDING: "pending" as EmployeeStatus,
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  ON_LEAVE: "on_leave",
+  TERMINATED: "terminated",
+  PENDING: "pending",
+  CONTRACT: "contract",
+  PROBATION: "probation"
 };
 
 export interface EmployeeDocument {
@@ -59,14 +61,14 @@ export type DocumentType = "resume" | "id" | "certificate" | "contract" | "other
 
 // Define DocumentType constants
 export const DOCUMENT_TYPE = {
-  ID: "id" as DocumentType,
-  RESUME: "resume" as DocumentType,
-  CERTIFICATE: "certificate" as DocumentType,
-  CONTRACT: "contract" as DocumentType,
-  PASSPORT: "passport" as DocumentType,
-  DRIVERS_LICENSE: "drivers_license" as DocumentType,
-  WORK_PERMIT: "work_permit" as DocumentType,
-  OTHER: "other" as DocumentType
+  ID: "id",
+  RESUME: "resume",
+  CERTIFICATE: "certificate",
+  CONTRACT: "contract",
+  PASSPORT: "passport",
+  DRIVERS_LICENSE: "drivers_license",
+  WORK_PERMIT: "work_permit",
+  OTHER: "other"
 };
 
 export interface Resume {
@@ -91,12 +93,12 @@ export type ResumeStatus = "new" | "reviewing" | "interview" | "rejected" | "hir
 
 // Adding constants for ResumeStatus that are referenced in the components
 export const RESUME_STATUS = {
-  NEW: "new" as ResumeStatus,
-  REVIEWING: "reviewing" as ResumeStatus,
-  INTERVIEW: "interview" as ResumeStatus,
-  REJECTED: "rejected" as ResumeStatus,
-  HIRED: "hired" as ResumeStatus,
-  APPROVED: "approved" as ResumeStatus,
+  NEW: "new",
+  REVIEWING: "reviewing",
+  INTERVIEW: "interview",
+  REJECTED: "rejected",
+  HIRED: "hired",
+  APPROVED: "approved"
 };
 
 export interface EmployeeNote {
@@ -131,24 +133,24 @@ export interface EmergencyContact {
 export type SalaryBasis = "hourly" | "annual" | "commission" | "weekly" | "monthly" | "yearly";
 
 export const SALARY_BASIS = {
-  HOURLY: "hourly" as SalaryBasis,
-  ANNUAL: "annual" as SalaryBasis,
-  COMMISSION: "commission" as SalaryBasis,
-  WEEKLY: "weekly" as SalaryBasis,
-  MONTHLY: "monthly" as SalaryBasis,
-  YEARLY: "yearly" as SalaryBasis
+  HOURLY: "hourly",
+  ANNUAL: "annual",
+  COMMISSION: "commission",
+  WEEKLY: "weekly",
+  MONTHLY: "monthly",
+  YEARLY: "yearly"
 };
 
 // Export IncentiveType to fix the error
 export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
 
 export const INCENTIVE_TYPE = {
-  BONUS: "bonus" as IncentiveType,
-  COMMISSION: "commission" as IncentiveType,
-  NONE: "none" as IncentiveType,
-  HOURLY: "hourly" as IncentiveType,
-  WEEKLY: "weekly" as IncentiveType,
-  MONTHLY: "monthly" as IncentiveType
+  BONUS: "bonus",
+  COMMISSION: "commission",
+  NONE: "none",
+  HOURLY: "hourly",
+  WEEKLY: "weekly",
+  MONTHLY: "monthly"
 };
 
 // Adding constants needed for dropdowns and selects
@@ -168,4 +170,14 @@ export const INCENTIVE_TYPE_OPTIONS = [
   { value: "hourly", label: "Per Hour" },
   { value: "weekly", label: "Per Week" },
   { value: "monthly", label: "Per Month" }
+];
+
+export const EMPLOYEE_STATUS_OPTIONS = [
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+  { value: "on_leave", label: "On Leave" },
+  { value: "terminated", label: "Terminated" },
+  { value: "pending", label: "Pending" },
+  { value: "contract", label: "Contract" },
+  { value: "probation", label: "Probation" }
 ];

@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Employee, EmployeeStatus } from "@/types/employee";
+import { Employee, EMPLOYEE_STATUS } from "@/types/employee";
 import { 
   Table,
   TableBody,
@@ -21,21 +21,21 @@ interface EmployeesListProps {
   onEditEmployee: (employee: Employee) => void;
 }
 
-const getStatusBadgeVariant = (status: EmployeeStatus) => {
+const getStatusBadgeVariant = (status: string) => {
   switch (status) {
-    case EmployeeStatus.ACTIVE:
+    case "active":
       return "bg-green-100 text-green-800 hover:bg-green-200";
-    case EmployeeStatus.INACTIVE:
+    case "inactive":
       return "bg-gray-100 text-gray-800 hover:bg-gray-200";
-    case EmployeeStatus.ON_LEAVE:
+    case "on_leave":
       return "bg-amber-100 text-amber-800 hover:bg-amber-200";
-    case EmployeeStatus.TERMINATED:
+    case "terminated":
       return "bg-red-100 text-red-800 hover:bg-red-200";
-    case EmployeeStatus.CONTRACT:
+    case "contract":
       return "bg-blue-100 text-blue-800 hover:bg-blue-200";
-    case EmployeeStatus.PROBATION:
+    case "probation":
       return "bg-purple-100 text-purple-800 hover:bg-purple-200";
-    case EmployeeStatus.PENDING:
+    case "pending":
       return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
     default:
       return "bg-gray-100 text-gray-800 hover:bg-gray-200";
