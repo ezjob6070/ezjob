@@ -1,7 +1,7 @@
 
 import React from "react";
 import JobsFilterBar from "./JobsFilterBar";
-import { JobsFilterPopovers } from "./JobsFilterPopovers";
+import JobsFilterPopovers from "./JobsFilterPopovers"; // Changed from named to default import
 import JobTabs from "./JobTabs";
 import { useJobsContext } from "./context/JobsContext";
 

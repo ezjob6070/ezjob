@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, Check, ChevronsUpDown, PlusCircle, Search, Settings } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown, Filter, PlusCircle, Search, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
@@ -302,15 +302,13 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0">
-          
-<JobSourceFilter
-  jobSources={[]}
-  selectedSources={selectedSources}
-  onToggle={toggleSource}
-  onSelectAll={selectAllSources}
-  onDeselectAll={deselectAllSources}
-/>
-
+          <JobSourceFilter
+            jobSources={jobSources}
+            selectedSources={selectedSources}
+            onToggle={toggleSource}
+            onSelectAll={selectAllSources}
+            onDeselectAll={deselectAllSources}
+          />
         </PopoverContent>
       </Popover>
 
