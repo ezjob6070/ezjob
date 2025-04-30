@@ -33,6 +33,7 @@ interface JobsContextType {
   selectedTechnicians: string[];
   selectedCategories: string[];
   selectedJobSources: string[];
+  selectedServiceTypes: string[];
   date: DateRange | undefined;
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
@@ -42,6 +43,7 @@ interface JobsContextType {
   toggleTechnician: (techName: string) => void;
   toggleCategory: (category: string) => void;
   toggleJobSource: (sourceName: string) => void;
+  toggleServiceType: (serviceType: string) => void;
   setDate: (date: DateRange | undefined) => void;
   setAmountRange: (range: AmountRange | null) => void;
   setPaymentMethod: (method: PaymentMethod | null) => void;

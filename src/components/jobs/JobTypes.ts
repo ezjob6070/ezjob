@@ -41,6 +41,9 @@ export interface Job {
   hasImages?: boolean;
   imageCount?: number;
   images?: string[];
+  // Add service category
+  category?: string;
+  serviceType?: string;
 }
 
 export interface JobTab {

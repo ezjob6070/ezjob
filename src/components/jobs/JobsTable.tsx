@@ -40,7 +40,8 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
     job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
     job.technicianName?.toLowerCase().includes(searchTerm.toLowerCase() || '') ||
-    job.jobSourceName?.toLowerCase().includes(searchTerm.toLowerCase() || '')
+    job.jobSourceName?.toLowerCase().includes(searchTerm.toLowerCase() || '') ||
+    job.category?.toLowerCase().includes(searchTerm.toLowerCase() || '')
   );
 
   const getStatusBadgeColor = (status: string) => {
@@ -55,6 +56,33 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
         return "bg-red-500 hover:bg-red-600";
       default:
         return "bg-gray-500 hover:bg-gray-600";
+    }
+  };
+
+  const getCategoryBadgeColor = (category?: string) => {
+    if (!category) return "bg-gray-200 text-gray-800";
+    
+    switch (category.toLowerCase()) {
+      case "hvac":
+        return "bg-blue-100 text-blue-800";
+      case "plumbing":
+        return "bg-cyan-100 text-cyan-800";
+      case "electrical":
+        return "bg-amber-100 text-amber-800";
+      case "remodeling":
+        return "bg-emerald-100 text-emerald-800";
+      case "security":
+        return "bg-violet-100 text-violet-800";
+      case "smart home":
+        return "bg-indigo-100 text-indigo-800";
+      case "renewable energy":
+        return "bg-green-100 text-green-800";
+      case "landscape":
+        return "bg-lime-100 text-lime-800";
+      case "interior design":
+        return "bg-fuchsia-100 text-fuchsia-800";
+      default:
+        return "bg-gray-200 text-gray-800";
     }
   };
 
@@ -104,6 +132,7 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
           <TableRow>
             <TableHead>Client</TableHead>
             <TableHead>Job</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead>Technician</TableHead>
             <TableHead>Source</TableHead>
             <TableHead>Date/Time</TableHead>
@@ -120,6 +149,18 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
               </TableCell>
               <TableCell>
                 {job.title || "No title specified"}
+              </TableCell>
+              <TableCell>
+                {job.category ? (
+                  <div className="flex items-center space-x-2">
+                    <Badge className={getCategoryBadgeColor(job.category)}>
+                      {job.category}
+                    </Badge>
+                    {job.serviceType && (
+                      <span className="text-xs text-gray-500">{job.serviceType}</span>
+                    )}
+                  </div>
+                ) : "Uncategorized"}
               </TableCell>
               <TableCell>
                 {job.technicianName || "Unassigned"}
@@ -168,7 +209,7 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
           ))}
           {filteredJobs.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={9} className="text-center py-4">
                 No jobs found.
               </TableCell>
             </TableRow>

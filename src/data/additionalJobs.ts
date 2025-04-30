@@ -27,7 +27,9 @@ export const additionalJobs: Job[] = (() => {
       amount: 28500,
       notes: "Customer is interested in tax credit information. Home has metal roof requiring special mounting hardware.",
       attachments: [],
-      createdAt: subDays(today, 5)
+      createdAt: subDays(today, 5),
+      category: "Renewable Energy",
+      serviceType: "Installation"
     },
     {
       id: uuidv4(),
@@ -49,7 +51,9 @@ export const additionalJobs: Job[] = (() => {
       estimateId: "est-007",
       notes: "Client has existing Nest thermostats that need to be integrated. Wants voice control throughout house.",
       attachments: [],
-      createdAt: subDays(today, 11)
+      createdAt: subDays(today, 11),
+      category: "Smart Home",
+      serviceType: "Installation"
     },
     {
       id: uuidv4(),
@@ -70,7 +74,9 @@ export const additionalJobs: Job[] = (() => {
       amount: 18200,
       notes: "Client wants drought-resistant plants and modern hardscaping. Site visit already completed.",
       attachments: [],
-      createdAt: subDays(today, 15)
+      createdAt: subDays(today, 15),
+      category: "Landscape",
+      serviceType: "Design"
     },
     {
       id: uuidv4(),
@@ -91,7 +97,9 @@ export const additionalJobs: Job[] = (() => {
       amount: 3500,
       notes: "Initial consultation only. Client may proceed with full design services afterward.",
       attachments: [],
-      createdAt: subDays(today, 6)
+      createdAt: subDays(today, 6),
+      category: "Interior Design",
+      serviceType: "Consultation"
     },
     {
       id: uuidv4(),
@@ -113,7 +121,9 @@ export const additionalJobs: Job[] = (() => {
       estimateId: "est-008",
       notes: "24/7 monitoring required. System must include perimeter sensors, motion detection, and HD cameras.",
       attachments: [],
-      createdAt: subDays(today, 8)
+      createdAt: subDays(today, 8),
+      category: "Security",
+      serviceType: "Installation"
     },
     {
       id: uuidv4(),
@@ -135,7 +145,9 @@ export const additionalJobs: Job[] = (() => {
       estimateId: "est-009",
       notes: "Homeowners will be on vacation during first week of work. Key will be with neighbor.",
       attachments: [],
-      createdAt: subDays(today, 21)
+      createdAt: subDays(today, 21),
+      category: "Remodeling",
+      serviceType: "Renovation"
     },
     {
       id: uuidv4(),
@@ -156,7 +168,9 @@ export const additionalJobs: Job[] = (() => {
       amount: 3800,
       notes: "Water currently shut off to building. Requires immediate attention.",
       attachments: [],
-      createdAt: today
+      createdAt: today,
+      category: "Plumbing",
+      serviceType: "Repair"
     }
   ];
 })();

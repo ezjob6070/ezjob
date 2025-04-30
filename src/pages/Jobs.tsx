@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useJobsData } from "@/hooks/useJobsData";
 import { useJobSourceData, JOB_SOURCES } from "@/hooks/jobs/useJobSourceData";
-import { JOB_CATEGORIES } from "@/components/jobs/constants";
+import { JOB_CATEGORIES, SERVICE_TYPES } from "@/components/jobs/constants";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import JobStats from "@/components/jobs/JobStats";
 import JobModals from "@/components/jobs/JobModals";
@@ -16,6 +16,7 @@ const Jobs = () => {
   const { jobs: globalJobs, technicians: globalTechnicians, jobSources: globalJobSources, addJob, completeJob, cancelJob } = useGlobalState();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
+  const [serviceTypes, setServiceTypes] = useState<string[]>(SERVICE_TYPES);
   const [localJobs, setLocalJobs] = useState<Job[]>([]);
   
   // Sync with global jobs
@@ -44,6 +45,7 @@ const Jobs = () => {
     selectedTechnicians,
     selectedCategories,
     selectedJobSources,
+    selectedServiceTypes,
     date,
     amountRange,
     paymentMethod,
@@ -54,6 +56,7 @@ const Jobs = () => {
     toggleTechnician,
     toggleCategory,
     toggleJobSource,
+    toggleServiceType,
     setDate,
     setAmountRange,
     setPaymentMethod,
@@ -75,6 +78,10 @@ const Jobs = () => {
   // Handler functions
   const addCategory = (category: string) => {
     setCategories(prev => [...prev, category]);
+  };
+
+  const addServiceType = (serviceType: string) => {
+    setServiceTypes(prev => [...prev, serviceType]);
   };
 
   const handleAddJob = (job: Job) => {
@@ -156,6 +163,7 @@ const Jobs = () => {
     selectedTechnicians,
     selectedCategories,
     selectedJobSources,
+    selectedServiceTypes,
     date,
     amountRange,
     paymentMethod,
@@ -165,6 +173,7 @@ const Jobs = () => {
     toggleTechnician,
     toggleCategory,
     toggleJobSource,
+    toggleServiceType,
     setDate,
     setAmountRange,
     setPaymentMethod,

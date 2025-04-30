@@ -10,6 +10,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
+  const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
   
   // Initialize date range to today
   const today = new Date();
@@ -35,6 +36,14 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
       prev.includes(category) 
         ? prev.filter(c => c !== category)
         : [...prev, category]
+    );
+  };
+
+  const toggleServiceType = (serviceType: string) => {
+    setSelectedServiceTypes(prev => 
+      prev.includes(serviceType) 
+        ? prev.filter(s => s !== serviceType)
+        : [...prev, serviceType]
     );
   };
 
@@ -67,6 +76,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     setSelectedTechnicians([]);
     setSelectedCategories([]);
     setSelectedJobSources([]);
+    setSelectedServiceTypes([]);
     // Reset date to today
     const resetToday = new Date();
     setDate({
@@ -86,6 +96,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     (appliedFilters && selectedTechnicians.length > 0) || 
     selectedCategories.length > 0 || 
     selectedJobSources.length > 0 ||
+    selectedServiceTypes.length > 0 ||
     !!amountRange || 
     !!paymentMethod;
 
@@ -108,9 +119,13 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
 
     if (selectedCategories.length > 0) {
       result = result.filter(job => 
-        job.title && selectedCategories.some(category => 
-          job.title!.toLowerCase().includes(category.toLowerCase())
-        )
+        job.category && selectedCategories.includes(job.category)
+      );
+    }
+
+    if (selectedServiceTypes.length > 0) {
+      result = result.filter(job => 
+        job.serviceType && selectedServiceTypes.includes(job.serviceType)
       );
     }
 
@@ -165,6 +180,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     selectedTechnicians,
     selectedCategories,
     selectedJobSources,
+    selectedServiceTypes,
     date,
     amountRange,
     paymentMethod,
@@ -180,6 +196,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     toggleTechnician,
     toggleCategory,
     toggleJobSource,
+    toggleServiceType,
     selectAllTechnicians,
     deselectAllTechnicians,
     selectAllJobSources,
