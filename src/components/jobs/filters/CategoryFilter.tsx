@@ -1,11 +1,17 @@
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { JOB_CATEGORIES } from "../constants";
+import { Check, ChevronDown, Tag } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { useState } from "react";
 
 interface CategoryFilterProps {
   categories: string[];
@@ -14,81 +20,53 @@ interface CategoryFilterProps {
   addCategory: (category: string) => void;
 }
 
-const CategoryFilter = ({
-  categories,
-  selectedCategory,
+const CategoryFilter = ({ 
+  selectedCategory, 
   toggleCategory,
+  categories = JOB_CATEGORIES,
   addCategory
 }: CategoryFilterProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newCategory, setNewCategory] = useState("");
-  
-  const filteredCategories = categories.filter(category =>
-    category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleAddCategory = () => {
-    if (newCategory.trim()) {
-      addCategory(newCategory.trim());
-      setNewCategory("");
+  // Format the display text for the dropdown trigger
+  const getSelectedCategoryText = () => {
+    if (selectedCategory.includes("All Categories") || selectedCategory.length === 0) {
+      return "All Categories";
+    } 
+    
+    if (selectedCategory.length === 1) {
+      return selectedCategory[0];
     }
+    
+    return `${selectedCategory.length} Categories`;
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <h3 className="text-sm font-medium">Category Filter</h3>
-      
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input 
-          placeholder="Search categories..." 
-          className="pl-8"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-
-      <ScrollArea className="h-60 pr-4">
-        <div className="space-y-1">
-          {filteredCategories.map((category) => (
-            <div key={category} className="flex items-center">
-              <Checkbox
-                id={`category-${category}`}
-                checked={selectedCategory.includes(category)}
-                onCheckedChange={() => toggleCategory(category)}
-              />
-              <Label
-                htmlFor={`category-${category}`}
-                className="text-sm ml-2"
-              >
-                {category}
-              </Label>
-            </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="w-full md:w-[200px]">
+          <Tag className="mr-2 h-4 w-4" />
+          <span className="flex-1 text-left">{getSelectedCategoryText()}</span>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-[200px]">
+        <ScrollArea className="h-[300px]">
+          {categories.map((category) => (
+            <DropdownMenuCheckboxItem
+              key={category}
+              checked={selectedCategory.includes(category)}
+              onCheckedChange={() => toggleCategory(category)}
+            >
+              <div className="flex items-center">
+                {selectedCategory.includes(category) && (
+                  <Badge variant="outline" className="mr-1 h-1 w-1 rounded-full bg-primary p-1" />
+                )}
+                <span>{category}</span>
+              </div>
+            </DropdownMenuCheckboxItem>
           ))}
-          
-          {filteredCategories.length === 0 && (
-            <p className="text-sm text-muted-foreground py-2">
-              No categories found
-            </p>
-          )}
-        </div>
-      </ScrollArea>
-      
-      <div className="space-y-2">
-        <h4 className="text-sm font-medium">Add New Category</h4>
-        <div className="flex space-x-2">
-          <Input
-            placeholder="New category name"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            className="flex-1"
-          />
-          <Button size="sm" onClick={handleAddCategory} disabled={!newCategory.trim()}>
-            Add
-          </Button>
-        </div>
-      </div>
-    </div>
+        </ScrollArea>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
