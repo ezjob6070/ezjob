@@ -1,6 +1,7 @@
 
 import { createContext, useContext, ReactNode } from "react";
 import { Job, AmountRange, PaymentMethod } from "@/components/jobs/JobTypes";
+import { DateRange } from "react-day-picker";
 
 // Define the context type
 interface JobsContextType {
@@ -31,7 +32,7 @@ interface JobsContextType {
   selectedCategories: string[];
   selectedJobSources: string[];
   selectedServiceTypes: string[];
-  date: string | null;  // Changed from DateRange to string | null to match useJobsData
+  date: DateRange | undefined;  // Updated to DateRange | undefined to be compatible
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
   hasActiveFilters: boolean;
@@ -41,7 +42,7 @@ interface JobsContextType {
   toggleCategory: (category: string) => void;
   toggleJobSource: (sourceName: string) => void;
   toggleServiceType: (serviceType: string) => void;
-  setDate: (date: string | null) => void; // Updated to match useJobsData
+  setDate: (date: DateRange | undefined) => void; // Updated to use DateRange
   setAmountRange: (range: AmountRange | null) => void;
   setPaymentMethod: (method: PaymentMethod | null) => void;
   selectAllTechnicians: () => void;
@@ -54,7 +55,7 @@ interface JobsContextType {
   handleAddJob: (job: Job) => void;
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount: number) => void;
-  handleRescheduleJob: (jobId: string, newDate: string, isAllDay: boolean) => void;
+  handleRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
   
   // Job status modal
   selectedJob: Job | null;

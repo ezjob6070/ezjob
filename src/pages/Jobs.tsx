@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import JobsHeader from "@/components/jobs/JobsHeader";
 import JobsContainer from "@/components/jobs/JobsContainer";
 import { JobsProvider } from "@/components/jobs/context/JobsContext";
+import { DateRange } from "react-day-picker";
 
 const Jobs = () => {
   const { jobs: globalJobs, technicians: globalTechnicians, jobSources: globalJobSources, addJob, completeJob, cancelJob } = useGlobalState();
@@ -120,9 +121,14 @@ const Jobs = () => {
   };
   
   // Handle job rescheduling locally
-  const handleLocalRescheduleJob = (jobId: string, newDate: string, isAllDay: boolean) => {
-    handleRescheduleJob(jobId, newDate);
+  const handleLocalRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
+    // Convert Date to string for compatibility with the handleRescheduleJob function
+    const dateString = newDate.toISOString();
     
+    // Call the handleRescheduleJob function from useJobsData
+    handleRescheduleJob(jobId, dateString);
+    
+    // Update local jobs state
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
@@ -137,6 +143,19 @@ const Jobs = () => {
       )
     );
   };
+  
+  // Create DateRange object from string date if needed
+  const getDateRangeFromString = (dateStr: string | null): DateRange | undefined => {
+    if (!dateStr) return undefined;
+    const parsedDate = new Date(dateStr);
+    return {
+      from: parsedDate,
+      to: parsedDate
+    };
+  };
+  
+  // Convert date from string to DateRange if needed
+  const dateRangeValue = typeof date === 'string' ? getDateRangeFromString(date) : date;
   
   // Create context value
   const contextValue = {
@@ -162,7 +181,7 @@ const Jobs = () => {
     selectedCategories,
     selectedJobSources,
     selectedServiceTypes,
-    date,
+    date: dateRangeValue, // Use the properly typed date value
     amountRange: amountRange as AmountRange | null,
     paymentMethod,
     hasActiveFilters,
@@ -210,7 +229,7 @@ const Jobs = () => {
         <JobsHeader />
 
         {/* Job Stats Cards */}
-        <JobStats jobs={filteredJobs} date={date} />
+        <JobStats jobs={filteredJobs} date={dateRangeValue} />
         
         {/* Jobs Container (Filter and Table) */}
         <JobsContainer 
@@ -228,7 +247,7 @@ const Jobs = () => {
           onAddJobSource={jobSourceData.handleAddJobSource}
           onEditJobSource={jobSourceData.handleEditJobSource}
           technicianOptions={technicianOptions}
-          jobSources={jobSourcesForModal}
+          jobSources={jobSourceNames.map((name, index) => ({ id: `source-${index}`, name }))}
           allJobSources={globalJobSources}
         />
       </div>

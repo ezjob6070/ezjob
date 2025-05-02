@@ -211,9 +211,9 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
     }
   };
   
-  // Get incentive type display text
+  // Get incentive type display text - fixed to properly handle IncentiveType
   const getIncentiveTypeText = (type?: IncentiveType) => {
-    switch (type as IncentiveType) {
+    switch (type) {
       case "hourly":
         return "Per Hour";
       case "weekly":
