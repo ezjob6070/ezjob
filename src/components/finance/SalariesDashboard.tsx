@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
@@ -195,8 +196,8 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
     }).format(amount);
   };
 
-  // Get salary basis display text - fixed to return proper SalaryBasis type
-  const getSalaryBasisText = (basis?: SalaryBasis) => {
+  // Get salary basis display text - fixed to handle proper types
+  const getSalaryBasisText = (basis?: string): string => {
     switch (basis) {
       case "hourly":
         return "Hourly";
@@ -206,13 +207,17 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         return "Monthly";
       case "yearly":
         return "Yearly";
+      case "annual":
+        return "Annual";
+      case "commission":
+        return "Commission";
       default:
         return "Yearly";
     }
   };
   
-  // Get incentive type display text - fixed to properly handle IncentiveType
-  const getIncentiveTypeText = (type?: IncentiveType) => {
+  // Get incentive type display text - fixed to properly handle types
+  const getIncentiveTypeText = (type?: string): string => {
     switch (type) {
       case "hourly":
         return "Per Hour";
@@ -220,8 +225,31 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         return "Per Week";
       case "monthly":
         return "Per Month";
+      case "bonus":
+        return "Bonus";
+      case "commission":
+        return "Commission";
+      case "none":
+        return "None";
       default:
         return "N/A";
+    }
+  };
+
+  // Format date safely function to prevent invalid date errors
+  const formatDateSafe = (dateStr: string): string => {
+    try {
+      const date = new Date(dateStr);
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return "Invalid date";
+      }
+      
+      return format(date, "MMM d, yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", dateStr, error);
+      return "Invalid date";
     }
   };
 
@@ -448,7 +476,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
                     <TableCell>{employee.department}</TableCell>
                     <TableCell>{employee.position}</TableCell>
                     <TableCell>
-                      {format(new Date(employee.dateHired), "MMM d, yyyy")}
+                      {formatDateSafe(employee.dateHired)}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{getSalaryBasisText(employee.salaryBasis)}</Badge>

@@ -27,6 +27,12 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
     setPaymentPopoverOpen
   } = useJobsContext();
 
+  // Create a wrapper function to convert Date to string for the handleRescheduleJob
+  const handleRescheduleJobWrapper = (jobId: string, newDate: Date, isAllDay: boolean) => {
+    // Convert the Date to a string before passing it to handleRescheduleJob
+    handleRescheduleJob(jobId, newDate, isAllDay);
+  };
+
   return (
     <div className="space-y-4">
       <JobsFilterBar />
@@ -57,7 +63,7 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
         searchTerm={searchTerm}
         onCancelJob={handleCancelJob}
         onCompleteJob={handleCompleteJob}
-        onRescheduleJob={handleRescheduleJob}
+        onRescheduleJob={handleRescheduleJobWrapper}
         onSearchChange={setSearchTerm}
         selectedJob={selectedJob}
         isStatusModalOpen={isStatusModalOpen}

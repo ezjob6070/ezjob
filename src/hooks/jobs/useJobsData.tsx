@@ -138,7 +138,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setSelectedTechnicians([]);
     setSelectedCategories([]);
     setSelectedJobSources([]);
-    setDate(null);
+    setDate(undefined);
     setAmountRange(null);
     setPaymentMethod(null);
     setSearchTerm('');
@@ -170,10 +170,13 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
       filtered = filtered.filter(job => job.jobSourceId && selectedJobSources.includes(job.jobSourceId));
     }
     
-    if (date) {
+    if (date?.from) {
       filtered = filtered.filter(job => {
-        const jobDate = job.date ? (typeof job.date === 'string' ? job.date : job.date.toISOString()) : '';
-        return jobDate === date;
+        if (!job.date) return false;
+        const jobDate = new Date(typeof job.date === 'string' ? job.date : job.date);
+        return date.from && date.to ? 
+          jobDate >= date.from && jobDate <= date.to : 
+          date.from && jobDate >= date.from;
       });
     }
     
@@ -193,7 +196,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     if (selectedTechnicians.length) filterCount++;
     if (selectedCategories.length) filterCount++;
     if (selectedJobSources.length) filterCount++;
-    if (date) filterCount++;
+    if (date?.from) filterCount++;
     if (amountRange) filterCount++;
     if (paymentMethod) filterCount++;
     if (searchTerm) filterCount++;

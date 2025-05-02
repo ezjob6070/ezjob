@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useJobsData } from "@/hooks/useJobsData";
-import { useJobSourceData, JOB_SOURCES } from "@/hooks/jobs/useJobSourceData";
+import { useJobSourceData } from "@/hooks/jobs/useJobSourceData";
 import { JOB_CATEGORIES, SERVICE_TYPES } from "@/components/jobs/constants";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import JobStats from "@/components/jobs/JobStats";
