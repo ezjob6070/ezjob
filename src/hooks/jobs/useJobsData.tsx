@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { initialJobs } from '@/data/jobs';
 import { Job, AmountRange, PaymentMethod } from '@/components/jobs/JobTypes';
 import { JOB_CATEGORIES, SERVICE_TYPES } from '@/components/jobs/constants';
+import { DateRange } from 'react-day-picker';
 
 export interface UseJobsDataResult {
   jobs: Job[];
@@ -20,7 +21,7 @@ export interface UseJobsDataResult {
   selectedTechnicians: string[];
   selectedCategories: string[];
   selectedJobSources: string[];
-  date: string | null;
+  date: DateRange | undefined;
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
   appliedFilters: number;
@@ -30,7 +31,7 @@ export interface UseJobsDataResult {
   toggleTechnician: (technicianId: string) => void;
   toggleCategory: (category: string) => void;
   toggleJobSource: (jobSource: string) => void;
-  setDate: (date: string | null) => void;
+  setDate: (date: DateRange | undefined) => void;
   setAmountRange: (range: AmountRange | null) => void;
   setPaymentMethod: (method: PaymentMethod | null) => void;
   selectAllTechnicians: () => void;
@@ -55,7 +56,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
-  const [date, setDate] = useState<string | null>(null);
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [hasActiveFilters, setHasActiveFilters] = useState<boolean>(false);

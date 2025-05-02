@@ -122,11 +122,8 @@ const Jobs = () => {
   
   // Handle job rescheduling locally
   const handleLocalRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
-    // Convert Date to string for compatibility with the handleRescheduleJob function
-    const dateString = newDate.toISOString();
-    
     // Call the handleRescheduleJob function from useJobsData
-    handleRescheduleJob(jobId, dateString);
+    handleRescheduleJob(jobId, newDate.toISOString());
     
     // Update local jobs state
     setLocalJobs(prevJobs => 
@@ -156,6 +153,18 @@ const Jobs = () => {
   
   // Convert date from string to DateRange if needed
   const dateRangeValue = typeof date === 'string' ? getDateRangeFromString(date) : date;
+
+  // Fixed setDate wrapper function to ensure correct type
+  const handleSetDate = (newDate: DateRange | undefined) => {
+    if (setDate && typeof setDate === 'function') {
+      // Convert DateRange to string if the hook expects a string
+      if (newDate?.from) {
+        setDate(newDate);
+      } else {
+        setDate(undefined);
+      }
+    }
+  };
   
   // Create context value
   const contextValue = {
@@ -191,7 +200,7 @@ const Jobs = () => {
     toggleCategory,
     toggleJobSource,
     toggleServiceType,
-    setDate,
+    setDate: handleSetDate, // Use the wrapper function
     setAmountRange,
     setPaymentMethod,
     selectAllTechnicians,
