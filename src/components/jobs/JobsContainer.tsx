@@ -27,9 +27,9 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
     setPaymentPopoverOpen
   } = useJobsContext();
 
-  // Create a wrapper function to convert Date to string for the handleRescheduleJob
+  // Create a wrapper function to properly handle Date objects for handleRescheduleJob
   const handleRescheduleJobWrapper = (jobId: string, newDate: Date, isAllDay: boolean) => {
-    // Convert the Date to a string before passing it to handleRescheduleJob
+    // Directly pass the Date object to handleRescheduleJob
     handleRescheduleJob(jobId, newDate, isAllDay);
   };
 

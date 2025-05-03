@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { initialEmployees } from "@/data/employees";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -87,9 +87,9 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
       // Calculate tenure in months
       const hireDate = new Date(employee.dateHired);
       const now = new Date();
-      const tenureMonths = 
+      const tenureMonths = isValid(hireDate) ? 
         (now.getFullYear() - hireDate.getFullYear()) * 12 + 
-        (now.getMonth() - hireDate.getMonth());
+        (now.getMonth() - hireDate.getMonth()) : 0;
       
       return {
         ...employee,
@@ -99,7 +99,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         tenureMonths,
         hourlyRate: employee.hourlyRate || 0,
         incentiveAmount: employee.incentiveAmount || 0,
-        incentiveType: employee.incentiveType || "hourly"
+        incentiveType: employee.incentiveType || "hourly" as IncentiveType
       };
     });
   };
@@ -197,7 +197,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
   };
 
   // Get salary basis display text - fixed to handle proper types
-  const getSalaryBasisText = (basis?: string): string => {
+  const getSalaryBasisText = (basis?: SalaryBasis): string => {
     switch (basis) {
       case "hourly":
         return "Hourly";
@@ -217,7 +217,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
   };
   
   // Get incentive type display text - fixed to properly handle types
-  const getIncentiveTypeText = (type?: string): string => {
+  const getIncentiveTypeText = (type?: IncentiveType): string => {
     switch (type) {
       case "hourly":
         return "Per Hour";
@@ -242,7 +242,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
       const date = new Date(dateStr);
       
       // Check if the date is valid
-      if (isNaN(date.getTime())) {
+      if (!isValid(date)) {
         return "Invalid date";
       }
       

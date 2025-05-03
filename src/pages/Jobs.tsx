@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useJobsData } from "@/hooks/useJobsData";
 import { useJobSourceData } from "@/hooks/jobs/useJobSourceData";
@@ -123,7 +122,7 @@ const Jobs = () => {
   // Handle job rescheduling locally
   const handleLocalRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
     // Call the handleRescheduleJob function from useJobsData
-    handleRescheduleJob(jobId, newDate.toISOString());
+    handleRescheduleJob(jobId, newDate);
     
     // Update local jobs state
     setLocalJobs(prevJobs => 
@@ -144,11 +143,20 @@ const Jobs = () => {
   // Create DateRange object from string date if needed
   const getDateRangeFromString = (dateStr: string | null): DateRange | undefined => {
     if (!dateStr) return undefined;
-    const parsedDate = new Date(dateStr);
-    return {
-      from: parsedDate,
-      to: parsedDate
-    };
+    try {
+      const parsedDate = new Date(dateStr);
+      if (isNaN(parsedDate.getTime())) {
+        console.error("Invalid date string:", dateStr);
+        return undefined;
+      }
+      return {
+        from: parsedDate,
+        to: parsedDate
+      };
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      return undefined;
+    }
   };
   
   // Convert date from string to DateRange if needed
@@ -157,12 +165,7 @@ const Jobs = () => {
   // Fixed setDate wrapper function to ensure correct type
   const handleSetDate = (newDate: DateRange | undefined) => {
     if (setDate && typeof setDate === 'function') {
-      // Convert DateRange to string if the hook expects a string
-      if (newDate?.from) {
-        setDate(newDate);
-      } else {
-        setDate(undefined);
-      }
+      setDate(newDate);
     }
   };
   

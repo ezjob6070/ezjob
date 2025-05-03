@@ -1,4 +1,3 @@
-
 // This is a minimal fix to address the TypeScript errors in Jobs.tsx
 // Only adding the missing properties to the existing hook
 
@@ -40,7 +39,7 @@ export interface UseJobsDataResult {
   deselectAllJobSources: () => void;
   clearFilters: () => void;
   applyFilters: () => void;
-  handleRescheduleJob: (jobId: string, newDate: string) => void;
+  handleRescheduleJob: (jobId: string, newDate: Date | string) => void;
   openStatusModal: (job: Job) => void;
   closeStatusModal: () => void;
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
@@ -206,9 +205,11 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setFilteredJobs(filtered);
   };
 
-  const handleRescheduleJob = (jobId: string, newDate: string) => {
+  const handleRescheduleJob = (jobId: string, newDate: Date | string) => {
+    const dateValue = typeof newDate === 'string' ? new Date(newDate) : newDate;
+    
     const updatedJobs = jobs.map(job => 
-      job.id === jobId ? { ...job, date: newDate } : job
+      job.id === jobId ? { ...job, date: dateValue } : job
     );
     
     setJobs(updatedJobs);
