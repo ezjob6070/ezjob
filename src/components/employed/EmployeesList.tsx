@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -12,8 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { format, isValid } from 'date-fns';
-import { Employee, EMPLOYEE_STATUS } from '@/types/employee';
+import { format, isValid, parseISO } from 'date-fns';
+import { Employee, EMPLOYEE_STATUS, getInitials } from '@/types/employee';
 import { Edit, FileText, DollarSign } from 'lucide-react';
 
 interface EmployeesListProps {
@@ -25,7 +24,7 @@ const EmployeesList: React.FC<EmployeesListProps> = ({ employees, onEditEmployee
   const formatDateSafely = (dateString?: string) => {
     if (!dateString) return 'Not available';
     try {
-      const date = new Date(dateString);
+      const date = parseISO(dateString);
       return isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid date';
     } catch {
       return 'Invalid date';
@@ -40,13 +39,20 @@ const EmployeesList: React.FC<EmployeesListProps> = ({ employees, onEditEmployee
         return 'bg-red-100 text-red-800 border-red-200';
       case EMPLOYEE_STATUS.PENDING:
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case EMPLOYEE_STATUS.ON_LEAVE:
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case EMPLOYEE_STATUS.CONTRACT:
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case EMPLOYEE_STATUS.PROBATION:
+        return 'bg-orange-100 text-orange-800 border-orange-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(part => part[0]).join('').toUpperCase();
+  // Use the utility function from types
+  const getEmployeeInitials = (name: string) => {
+    return getInitials(name);
   };
 
   return (
@@ -74,7 +80,7 @@ const EmployeesList: React.FC<EmployeesListProps> = ({ employees, onEditEmployee
                         <AvatarImage src={employee.profileImage} alt={employee.name} />
                       ) : (
                         <AvatarFallback className="bg-indigo-100 text-indigo-600">
-                          {getInitials(employee.name)}
+                          {getEmployeeInitials(employee.name)}
                         </AvatarFallback>
                       )}
                     </Avatar>

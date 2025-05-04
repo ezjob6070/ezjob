@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Employee, EmployeeNote, SALARY_BASIS } from "@/types/employee";
 import { initialEmployees } from "@/data/employees";
 import EmployeeDocuments from "@/components/employed/EmployeeDocuments";

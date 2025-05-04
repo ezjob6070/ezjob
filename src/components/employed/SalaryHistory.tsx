@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format, isValid } from "date-fns";
-import { toast } from "@/hooks/use-toast";
+import { format, isValid, parseISO } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 import { Calendar, DollarSign, PlusCircle, BadgeDollarSign } from "lucide-react";
 import { SalaryHistory, Employee } from "@/types/employee";
 
@@ -36,6 +35,7 @@ const SalaryHistoryComponent: React.FC<SalaryHistoryProps> = ({
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
   const [type, setType] = useState<"regular" | "bonus" | "commission" | "raise">("regular");
+  const { toast } = useToast();
 
   const handleAddPayment = () => {
     if (!amount || isNaN(Number(amount))) {
@@ -87,7 +87,7 @@ const SalaryHistoryComponent: React.FC<SalaryHistoryProps> = ({
 
   const formatDate = (dateString: string) => {
     try {
-      const date = new Date(dateString);
+      const date = parseISO(dateString);
       return isValid(date) ? format(date, "MMM d, yyyy") : "Invalid date";
     } catch {
       return "Invalid date";

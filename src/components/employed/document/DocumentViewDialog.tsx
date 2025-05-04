@@ -58,7 +58,7 @@ const DocumentViewDialog = ({ open, onOpenChange, documentData }: DocumentViewDi
               <FileType className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm">
                 <span className="font-medium">Type:</span>{" "}
-                {documentData.type ? getDocumentTypeLabel(documentData.type) : "Other Document"}
+                {documentData.type ? getDocumentTypeLabel(documentData.type.toString()) : "Other Document"}
               </span>
             </div>
             

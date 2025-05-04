@@ -2,7 +2,10 @@
 export enum EMPLOYEE_STATUS {
   ACTIVE = "active",
   INACTIVE = "inactive",
-  PENDING = "pending"
+  PENDING = "pending",
+  ON_LEAVE = "on_leave",
+  CONTRACT = "contract", 
+  PROBATION = "probation"
 }
 
 export enum RESUME_STATUS {
@@ -10,7 +13,8 @@ export enum RESUME_STATUS {
   REVIEWING = "reviewing",
   INTERVIEW = "interview",
   APPROVED = "approved",
-  REJECTED = "rejected"
+  REJECTED = "rejected",
+  HIRED = "hired"
 }
 
 export enum SALARY_BASIS {
@@ -31,8 +35,24 @@ export enum INCENTIVE_TYPE {
   NONE = "none"
 }
 
-export type SalaryBasis = typeof SALARY_BASIS[keyof typeof SALARY_BASIS];
-export type IncentiveType = typeof INCENTIVE_TYPE[keyof typeof INCENTIVE_TYPE];
+export enum DOCUMENT_TYPE {
+  ID = "id",
+  CONTRACT = "contract",
+  CERTIFICATION = "certification",
+  LICENSE = "license",
+  MEDICAL = "medical",
+  TAX = "tax",
+  EDUCATION = "education",
+  OTHER = "other"
+}
+
+export type SalaryBasis = SALARY_BASIS;
+export type IncentiveType = INCENTIVE_TYPE;
+
+// Create options arrays for select inputs
+export const SALARY_BASIS_OPTIONS = Object.values(SALARY_BASIS);
+export const INCENTIVE_TYPE_OPTIONS = Object.values(INCENTIVE_TYPE);
+export const EMPLOYEE_STATUS_OPTIONS = Object.values(EMPLOYEE_STATUS);
 
 export interface Document {
   id: string;
@@ -42,6 +62,13 @@ export interface Document {
   type?: string;
   size?: number;
   uploadedBy?: string;
+}
+
+export interface EmployeeDocument extends Document {
+  dateUploaded?: string;
+  expiryDate?: string;
+  notes?: string;
+  type?: DOCUMENT_TYPE | string;
 }
 
 export interface EmployeeNote {
@@ -83,7 +110,7 @@ export interface Employee {
   salaryBasis?: SalaryBasis;
   manager: string;
   emergencyContact?: EmergencyContact;
-  documents?: Document[];
+  documents?: Document[] | EmployeeDocument[];
   notes?: EmployeeNote[];
   profileImage?: string;
   initials?: string;
@@ -127,4 +154,32 @@ export interface Report {
   date: string;
   documentUrl: string;
   shared: string[];
+  employeeId?: string;
+  dateSubmitted?: string;
+  status?: string;
 }
+
+// Utility function to get a user-friendly label for document types
+export const getDocumentTypeLabel = (type: string): string => {
+  const typeMap: Record<string, string> = {
+    [DOCUMENT_TYPE.ID]: 'Identification',
+    [DOCUMENT_TYPE.CONTRACT]: 'Employment Contract',
+    [DOCUMENT_TYPE.CERTIFICATION]: 'Certification',
+    [DOCUMENT_TYPE.LICENSE]: 'License',
+    [DOCUMENT_TYPE.MEDICAL]: 'Medical Record',
+    [DOCUMENT_TYPE.TAX]: 'Tax Document',
+    [DOCUMENT_TYPE.EDUCATION]: 'Educational Document',
+    [DOCUMENT_TYPE.OTHER]: 'Other Document'
+  };
+  
+  return typeMap[type] || 'Document';
+};
+
+// Utility function to get initials from name
+export const getInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase();
+};
