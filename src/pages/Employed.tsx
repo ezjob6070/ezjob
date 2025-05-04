@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { initialEmployees } from "@/data/employees";
 import { initialResumes } from "@/data/employees";
-import { Employee } from "@/types/employee";
+import { Employee, EMPLOYEE_STATUS, RESUME_STATUS } from "@/types/employee";
 import EmployeesList from "@/components/employed/EmployeesList";
 import ResumesList from "@/components/employed/ResumesList";
 import AddEmployeeModal from "@/components/employed/AddEmployeeModal";
@@ -16,15 +16,18 @@ import EmployeeSearchBar from "@/components/employed/EmployeeSearchBar";
 import EmployeeFilters from "@/components/employed/EmployeeFilters";
 import ReportsSection from "@/components/employed/ReportsSection";
 import { employeeReports } from "@/data/employees";
+import { useToast } from "@/hooks/use-toast";
 
 const Employed = () => {
   const [addEmployeeOpen, setAddEmployeeOpen] = useState(false);
   const [uploadResumeOpen, setUploadResumeOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [employees, setEmployees] = useState(initialEmployees);
+  const [resumes, setResumes] = useState(initialResumes);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState<string[]>([]);
+  const { toast } = useToast();
 
   const filteredEmployees = useMemo(() => {
     return employees.filter(employee => {
@@ -37,7 +40,7 @@ const Employed = () => {
 
       // Status filter
       const matchesStatus = selectedStatus.length === 0 || 
-        selectedStatus.includes(employee.status);
+        selectedStatus.includes(employee.status.toString());
 
       // Department filter
       const matchesDepartment = selectedDepartment.length === 0 || 
@@ -72,13 +75,41 @@ const Employed = () => {
     setSelectedEmployee(null);
   };
 
+  const handleAddEmployee = (employee: Employee) => {
+    setEmployees(prev => [...prev, employee]);
+    toast({
+      title: "Employee Added",
+      description: `${employee.name} has been added successfully.`
+    });
+  };
+
+  const handleUploadResume = (resume: Resume) => {
+    setResumes(prev => [...prev, resume]);
+    toast({
+      title: "Resume Uploaded",
+      description: `Resume for ${resume.name} has been uploaded successfully.`
+    });
+  };
+
+  const handleResumeStatusChange = (resume: Resume, newStatus: RESUME_STATUS) => {
+    setResumes(prevResumes => 
+      prevResumes.map(res => 
+        res.id === resume.id ? { ...res, status: newStatus } : res
+      )
+    );
+    toast({
+      title: "Resume Status Updated",
+      description: `${resume.name}'s resume status changed to ${newStatus}.`
+    });
+  };
+
   const availableDepartments = useMemo(() => {
     const departments = new Set(employees.map(emp => emp.department));
     return Array.from(departments);
   }, [employees]);
 
   const availableStatuses = useMemo(() => {
-    const statuses = new Set(employees.map(emp => emp.status));
+    const statuses = new Set(employees.map(emp => emp.status.toString()));
     return Array.from(statuses);
   }, [employees]);
 
@@ -140,7 +171,10 @@ const Employed = () => {
                   </Button>
                 </Link>
               </div>
-              <ResumesList resumes={initialResumes} />
+              <ResumesList 
+                resumes={resumes} 
+                onStatusChange={handleResumeStatusChange}
+              />
             </div>
           </TabsContent>
           
@@ -156,11 +190,13 @@ const Employed = () => {
       <AddEmployeeModal
         open={addEmployeeOpen}
         onClose={() => setAddEmployeeOpen(false)}
+        onAddEmployee={handleAddEmployee}
       />
 
       <UploadResumeModal
         open={uploadResumeOpen}
         onClose={() => setUploadResumeOpen(false)}
+        onUploadResume={handleUploadResume}
       />
 
       {selectedEmployee && (

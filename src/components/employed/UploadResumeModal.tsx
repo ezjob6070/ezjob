@@ -1,245 +1,272 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-import { Resume, RESUME_STATUS } from "@/types/employee";
-import { Upload } from "lucide-react";
-import { v4 as uuidv4 } from 'uuid';
 
-type UploadResumeModalProps = {
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Resume, RESUME_STATUS } from '@/types/employee';
+import { v4 as uuidv4 } from 'uuid';
+import { Upload } from 'lucide-react';
+
+export interface UploadResumeModalProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onUploadResume: (resume: Resume) => void;
+  onClose: () => void;
+  onUploadResume?: (resume: Resume) => void;
+}
+
+const defaultResume: Partial<Resume> = {
+  name: '',
+  email: '',
+  phone: '',
+  position: '',
+  experience: '',
+  education: '',
+  status: RESUME_STATUS.NEW,
+  notes: '',
 };
 
-const UploadResumeModal = ({ open, onOpenChange, onUploadResume }: UploadResumeModalProps) => {
-  const { toast } = useToast();
-  
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    position: "",
-    experience: "",
-    education: "",
-    notes: "",
-    resumeUrl: "",
-    coverLetterUrl: "",
-  });
-  
+const UploadResumeModal: React.FC<UploadResumeModalProps> = ({ open, onClose, onUploadResume }) => {
+  const [resume, setResume] = useState<Partial<Resume>>(defaultResume);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [coverLetterFile, setCoverLetterFile] = useState<File | null>(null);
+  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setResume(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectChange = (name: string, value: string) => {
+    setResume(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setResumeFile(file);
-      
-      // In a real app, you would upload this to a server and get a URL
-      // For demo purposes, we'll create a temporary object URL
-      const fileUrl = URL.createObjectURL(file);
-      setFormData(prev => ({ ...prev, resumeUrl: fileUrl }));
+      setResumeFile(e.target.files[0]);
     }
   };
-  
-  const handleCoverLetterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleCoverLetterFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setCoverLetterFile(file);
-      
-      const fileUrl = URL.createObjectURL(file);
-      setFormData(prev => ({ ...prev, coverLetterUrl: fileUrl }));
+      setCoverLetterFile(e.target.files[0]);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.position || !formData.resumeUrl) {
+    if (!resumeFile) {
       toast({
-        title: "Error",
-        description: "Please fill all required fields and upload a resume",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please upload a resume file',
+        variant: 'destructive',
       });
       return;
     }
-
-    const currentDate = new Date().toISOString();
+    
+    // In a real app, you would upload the file to a server here
+    // For now, we'll just create a fake URL
+    const resumeUrl = resumeFile ? URL.createObjectURL(resumeFile) : '';
+    const coverLetterUrl = coverLetterFile ? URL.createObjectURL(coverLetterFile) : undefined;
+    const now = new Date().toISOString();
     
     const newResume: Resume = {
+      ...resume,
       id: `resume-${uuidv4().slice(0, 8)}`,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      position: formData.position,
-      experience: formData.experience,
-      education: formData.education || undefined,
-      status: RESUME_STATUS.NEW,
-      submittedDate: currentDate,
-      resumeUrl: formData.resumeUrl,
-      coverLetterUrl: formData.coverLetterUrl || undefined,
-      notes: formData.notes || undefined,
-      dateSubmitted: currentDate,
+      submittedDate: now,
+      dateSubmitted: now,
+      name: resume.name || '',
+      email: resume.email || '',
+      phone: resume.phone || '',
+      position: resume.position || '',
+      experience: resume.experience || '',
+      education: resume.education || '',
+      status: resume.status as RESUME_STATUS || RESUME_STATUS.NEW,
+      resumeUrl,
+      coverLetterUrl,
     };
-
-    onUploadResume(newResume);
     
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      position: "",
-      experience: "",
-      education: "",
-      notes: "",
-      resumeUrl: "",
-      coverLetterUrl: "",
+    if (onUploadResume) {
+      onUploadResume(newResume);
+    }
+    
+    toast({
+      title: 'Resume Uploaded',
+      description: `Resume for ${newResume.name} has been uploaded successfully.`,
     });
+    
+    setResume(defaultResume);
     setResumeFile(null);
     setCoverLetterFile(null);
-    
-    onOpenChange(false);
+    onClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Upload New Resume</DialogTitle>
+          <DialogTitle>Upload Resume</DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
+        
+        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Candidate Name</Label>
+              <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
                 name="name"
-                value={formData.name}
+                value={resume.name}
                 onChange={handleChange}
                 required
               />
             </div>
-
+            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                value={formData.email}
+                value={resume.email}
                 onChange={handleChange}
                 required
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+            
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone">Phone</Label>
               <Input
                 id="phone"
                 name="phone"
-                value={formData.phone}
+                value={resume.phone}
                 onChange={handleChange}
                 required
               />
             </div>
-
+            
             <div className="space-y-2">
               <Label htmlFor="position">Position Applied For</Label>
               <Input
                 id="position"
                 name="position"
-                value={formData.position}
+                value={resume.position}
                 onChange={handleChange}
                 required
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+            
             <div className="space-y-2">
               <Label htmlFor="experience">Years of Experience</Label>
               <Input
                 id="experience"
                 name="experience"
-                value={formData.experience}
+                value={resume.experience}
                 onChange={handleChange}
                 required
               />
             </div>
-
+            
             <div className="space-y-2">
-              <Label htmlFor="education">Education (Optional)</Label>
+              <Label htmlFor="education">Education</Label>
               <Input
                 id="education"
                 name="education"
-                value={formData.education}
+                value={resume.education}
                 onChange={handleChange}
+                required
               />
             </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={resume.status?.toString()}
+                onValueChange={(value) => handleSelectChange('status', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(RESUME_STATUS).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="resumeUrl">Resume URL</Label>
-            <Input
-              id="resumeUrl"
-              name="resumeUrl"
-              value={formData.resumeUrl}
-              onChange={handleResumeUpload}
-              placeholder="/resumes/resume-file.pdf"
-            />
-            <p className="text-xs text-muted-foreground">
-              In a real app, you would upload a file here
-            </p>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="resume" className="block mb-2">Resume File</Label>
+              <div className="flex items-center">
+                <label
+                  htmlFor="resume"
+                  className="cursor-pointer flex items-center gap-2 border border-dashed border-gray-300 rounded-md p-3 flex-grow hover:bg-gray-50"
+                >
+                  <Upload className="h-5 w-5 text-gray-500" />
+                  <span className="text-sm text-gray-500">
+                    {resumeFile ? resumeFile.name : "Click to upload resume"}
+                  </span>
+                </label>
+                <Input
+                  id="resume"
+                  type="file"
+                  onChange={handleResumeFileChange}
+                  className="hidden"
+                  accept=".pdf,.doc,.docx"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="coverLetter" className="block mb-2">Cover Letter (Optional)</Label>
+              <div className="flex items-center">
+                <label
+                  htmlFor="coverLetter"
+                  className="cursor-pointer flex items-center gap-2 border border-dashed border-gray-300 rounded-md p-3 flex-grow hover:bg-gray-50"
+                >
+                  <Upload className="h-5 w-5 text-gray-500" />
+                  <span className="text-sm text-gray-500">
+                    {coverLetterFile ? coverLetterFile.name : "Click to upload cover letter"}
+                  </span>
+                </label>
+                <Input
+                  id="coverLetter"
+                  type="file"
+                  onChange={handleCoverLetterFileChange}
+                  className="hidden"
+                  accept=".pdf,.doc,.docx"
+                />
+              </div>
+            </div>
           </div>
-
+          
           <div className="space-y-2">
-            <Label htmlFor="coverLetterUrl">Cover Letter URL</Label>
-            <Input
-              id="coverLetterUrl"
-              name="coverLetterUrl"
-              value={formData.coverLetterUrl}
-              onChange={handleCoverLetterUpload}
-              placeholder="/resumes/cover-letter-file.pdf"
-            />
-            <p className="text-xs text-muted-foreground">
-              In a real app, you would upload a file here
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Label htmlFor="notes">Notes</Label>
             <Textarea
               id="notes"
               name="notes"
-              value={formData.notes}
+              value={resume.notes || ''}
               onChange={handleChange}
-              placeholder="Additional notes about the candidate..."
               rows={3}
+              placeholder="Additional notes about the candidate..."
             />
           </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+          
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Upload Resume</Button>
-          </DialogFooter>
+            <Button type="submit">
+              Upload Resume
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

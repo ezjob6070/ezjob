@@ -20,6 +20,13 @@ const EmployeeSearchBar: React.FC<EmployeeSearchBarProps> = ({
     onSearch(searchQuery);
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    // Real-time search as user types
+    onSearch(value);
+  };
+
   return (
     <form onSubmit={handleSearch} className="relative w-full sm:max-w-md">
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -28,7 +35,7 @@ const EmployeeSearchBar: React.FC<EmployeeSearchBarProps> = ({
         placeholder={placeholder}
         className="pl-9 pr-12"
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={handleChange}
       />
       <Button 
         type="submit"

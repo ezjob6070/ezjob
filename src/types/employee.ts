@@ -146,12 +146,12 @@ export interface Employee {
   location: string;
   hireDate: string;
   dateHired?: string;
-  status: string;
+  status: EMPLOYEE_STATUS | string;
   salary: number;
-  salaryBasis?: SalaryBasis;
+  salaryBasis?: SALARY_BASIS;
   manager: string;
   emergencyContact?: EmergencyContact;
-  documents?: Document[] | EmployeeDocument[];
+  documents?: EmployeeDocument[] | Document[];
   notes?: EmployeeNote[];
   profileImage?: string;
   initials?: string;
@@ -165,7 +165,7 @@ export interface Employee {
   background?: string;
   performanceRating?: number;
   reportsTo?: string;
-  incentiveType?: IncentiveType;
+  incentiveType?: INCENTIVE_TYPE;
   incentiveAmount?: number;
   salaryHistory?: SalaryHistory[];
   performanceMetrics?: PerformanceMetric[];
@@ -187,7 +187,7 @@ export interface Resume {
   position: string;
   experience: string;
   education: string;
-  status: string;
+  status: RESUME_STATUS | string;
   submittedDate: string;
   resumeUrl: string;
   coverLetterUrl?: string;

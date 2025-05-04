@@ -1,106 +1,129 @@
 
-import React from "react";
-import { Filter, Users } from "lucide-react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { EMPLOYEE_STATUS } from "@/types/employee";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
-  DropdownMenuGroup,
-} from "@/components/ui/dropdown-menu";
+import { Filter, CheckCircle, Briefcase } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
-interface EmployeeFiltersProps {
-  departmentFilter: string;
-  setDepartmentFilter: (value: string) => void;
+export interface EmployeeFiltersProps {
   departments: string[];
-  statusFilter: string;
-  setStatusFilter: (value: string) => void;
-  searchQuery: string;
-  setSearchQuery: (value: string) => void;
+  statuses: string[]; 
+  onStatusChange: (statuses: string[]) => void;
+  onDepartmentChange: (departments: string[]) => void;
 }
 
 const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
-  departmentFilter,
-  setDepartmentFilter,
   departments,
-  statusFilter,
-  setStatusFilter,
-  searchQuery,
-  setSearchQuery,
+  statuses,
+  onStatusChange,
+  onDepartmentChange
 }) => {
-  return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2">
-          <Users className="text-muted-foreground h-5 w-5" />
-          <span className="font-medium">Status:</span>
-          <Select 
-            value={statusFilter} 
-            onValueChange={setStatusFilter}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value={EMPLOYEE_STATUS.ACTIVE}>Active</SelectItem>
-              <SelectItem value={EMPLOYEE_STATUS.PENDING}>Pending</SelectItem>
-              <SelectItem value={EMPLOYEE_STATUS.INACTIVE}>Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
 
-        <div className="flex items-center gap-2">
-          <span className="font-medium">Department:</span>
-          <Select
-            value={departmentFilter}
-            onValueChange={setDepartmentFilter}
-          >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="All Departments" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              {departments.map((department) => (
-                <SelectItem key={department} value={department}>
-                  {department}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      
-      <div className="relative w-full sm:w-64">
-        <Input
-          placeholder="Search by name, email, phone..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full"
-        />
-        {searchQuery && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-0 top-0 h-full"
-            onClick={() => setSearchQuery("")}
-          >
-            ×
+  const handleStatusChange = (status: string) => {
+    const updatedStatuses = selectedStatuses.includes(status)
+      ? selectedStatuses.filter(s => s !== status)
+      : [...selectedStatuses, status];
+    
+    setSelectedStatuses(updatedStatuses);
+    onStatusChange(updatedStatuses);
+  };
+
+  const handleDepartmentChange = (department: string) => {
+    const updatedDepartments = selectedDepartments.includes(department)
+      ? selectedDepartments.filter(d => d !== department)
+      : [...selectedDepartments, department];
+    
+    setSelectedDepartments(updatedDepartments);
+    onDepartmentChange(updatedDepartments);
+  };
+
+  const clearFilters = () => {
+    setSelectedStatuses([]);
+    setSelectedDepartments([]);
+    onStatusChange([]);
+    onDepartmentChange([]);
+    setOpen(false);
+  };
+
+  const applyFilters = () => {
+    setOpen(false);
+  };
+
+  const totalFilters = selectedStatuses.length + selectedDepartments.length;
+
+  return (
+    <div className="flex items-center">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="relative">
+            <Filter className="mr-2 h-4 w-4" />
+            <span>Filters</span>
+            {totalFilters > 0 && (
+              <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center rounded-full">
+                {totalFilters}
+              </Badge>
+            )}
           </Button>
-        )}
-      </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium leading-none flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Status
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {statuses.map(status => (
+                  <div key={status} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`status-${status}`} 
+                      checked={selectedStatuses.includes(status)}
+                      onCheckedChange={() => handleStatusChange(status)}
+                    />
+                    <Label htmlFor={`status-${status}`}>{status}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div className="space-y-2">
+              <h4 className="font-medium leading-none flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                Department
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {departments.map(department => (
+                  <div key={department} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`department-${department}`} 
+                      checked={selectedDepartments.includes(department)}
+                      onCheckedChange={() => handleDepartmentChange(department)}
+                    />
+                    <Label htmlFor={`department-${department}`}>{department}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex justify-between pt-2">
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                Clear filters
+              </Button>
+              <Button size="sm" onClick={applyFilters}>
+                Apply filters
+              </Button>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

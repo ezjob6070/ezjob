@@ -1,312 +1,240 @@
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Employee,
-  EMPLOYEE_STATUS,
-  SALARY_BASIS
-} from "@/types/employee";
-import { v4 as uuidv4 } from "uuid";
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Employee, EMPLOYEE_STATUS, SALARY_BASIS } from '@/types/employee';
+import { v4 as uuidv4 } from 'uuid';
 
-const employeeSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(6, "Phone must be at least 6 characters"),
-  position: z.string().min(2, "Position must be at least 2 characters"),
-  department: z.string().min(2, "Department must be at least 2 characters"),
-  status: z.string(),
-  salary: z.coerce.number().positive("Salary must be positive"),
-  salaryBasis: z.string(),
-  location: z.string().optional(),
-  address: z.string().optional(),
-});
-
-type EmployeeFormValues = z.infer<typeof employeeSchema>;
-
-interface AddEmployeeModalProps {
+export interface AddEmployeeModalProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onAddEmployee: (employee: Employee) => void;
+  onClose: () => void;
+  onAddEmployee?: (employee: Employee) => void;
 }
 
-export default function AddEmployeeModal({
-  open,
-  onOpenChange,
-  onAddEmployee,
-}: AddEmployeeModalProps) {
-  const { toast } = useToast();
-  
-  const form = useForm<EmployeeFormValues>({
-    resolver: zodResolver(employeeSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      position: "",
-      department: "",
-      status: EMPLOYEE_STATUS.ACTIVE,
-      salary: 0,
-      salaryBasis: SALARY_BASIS.ANNUAL,
-      location: "Main Office",
-      address: "",
-    },
-  });
+const defaultEmployee: Partial<Employee> = {
+  name: '',
+  email: '',
+  phone: '',
+  position: '',
+  department: '',
+  location: 'Main Office',
+  status: EMPLOYEE_STATUS.ACTIVE,
+  salary: 0,
+  salaryBasis: SALARY_BASIS.ANNUAL,
+  manager: '',
+};
 
-  const onSubmit = (values: EmployeeFormValues) => {
-    try {
-      const currentDate = new Date().toISOString();
-      
-      const newEmployee: Employee = {
-        id: `emp-${uuidv4().slice(0, 8)}`,
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        position: values.position,
-        department: values.department,
-        status: values.status,
-        dateHired: currentDate,
-        hireDate: currentDate,
-        salary: values.salary,
-        salaryBasis: values.salaryBasis,
-        address: values.address || "",
-        location: values.location || "Main Office",
-        manager: "",
-        emergencyContact: { name: "", phone: "" },
-        documents: [],
-        notes: []
-      };
-      
-      onAddEmployee(newEmployee);
-      
-      toast({
-        title: "Employee Added",
-        description: `${values.name} has been successfully added.`,
-      });
-      
-      form.reset();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error adding employee:", error);
-      toast({
-        title: "Error",
-        description: "There was an error adding the employee. Please try again.",
-        variant: "destructive",
-      });
-    }
+const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose, onAddEmployee }) => {
+  const [employee, setEmployee] = useState<Partial<Employee>>(defaultEmployee);
+  const { toast } = useToast();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEmployee(prev => ({ ...prev, [name]: value }));
   };
-  
+
+  const handleSelectChange = (name: string, value: string) => {
+    setEmployee(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newEmployee: Employee = {
+      ...employee,
+      id: `emp-${uuidv4().slice(0, 8)}`,
+      hireDate: new Date().toISOString(),
+      name: employee.name || '',
+      email: employee.email || '',
+      phone: employee.phone || '',
+      position: employee.position || '',
+      department: employee.department || '',
+      status: employee.status || EMPLOYEE_STATUS.ACTIVE,
+      salary: Number(employee.salary) || 0,
+      salaryBasis: employee.salaryBasis as SALARY_BASIS,
+      manager: employee.manager || '',
+      location: employee.location || 'Main Office',
+      documents: [],
+      notes: [],
+    };
+
+    if (onAddEmployee) {
+      onAddEmployee(newEmployee);
+    }
+    
+    toast({
+      title: 'Employee Added',
+      description: `${newEmployee.name} has been added successfully.`,
+    });
+    
+    setEmployee(defaultEmployee);
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Employee</DialogTitle>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={employee.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
                 name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="john@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                type="email"
+                value={employee.email}
+                onChange={handleChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
                 name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+1 234 567 8900" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={employee.phone}
+                onChange={handleChange}
+                required
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
+            <div className="space-y-2">
+              <Label htmlFor="position">Position</Label>
+              <Input
+                id="position"
                 name="position"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Position</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Software Engineer" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={employee.position}
+                onChange={handleChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="department">Department</Label>
+              <Input
+                id="department"
                 name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Engineering" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={employee.department}
+                onChange={handleChange}
+                required
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={EMPLOYEE_STATUS.ACTIVE}>Active</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.INACTIVE}>Inactive</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.ON_LEAVE}>On Leave</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.PENDING}>Pending</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.CONTRACT}>Contract</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.PROBATION}>Probation</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a location" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Main Office">Main Office</SelectItem>
-                        <SelectItem value="Branch Office">Branch Office</SelectItem>
-                        <SelectItem value="Remote">Remote</SelectItem>
-                        <SelectItem value="Field">Field</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={employee.status?.toString()}
+                onValueChange={(value) => handleSelectChange('status', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(EMPLOYEE_STATUS).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="123 Main St, City, State" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
+            <div className="space-y-2">
+              <Label htmlFor="salary">Salary</Label>
+              <Input
+                id="salary"
                 name="salary"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Salary</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="salaryBasis"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Salary Basis</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select basis" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={SALARY_BASIS.HOURLY}>Hourly</SelectItem>
-                        <SelectItem value={SALARY_BASIS.ANNUAL}>Annual</SelectItem>
-                        <SelectItem value={SALARY_BASIS.COMMISSION}>Commission</SelectItem>
-                        <SelectItem value={SALARY_BASIS.WEEKLY}>Weekly</SelectItem>
-                        <SelectItem value={SALARY_BASIS.MONTHLY}>Monthly</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                type="number"
+                value={employee.salary?.toString()}
+                onChange={handleChange}
+                required
               />
             </div>
             
-            <DialogFooter>
-              <Button type="submit">Add Employee</Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            <div className="space-y-2">
+              <Label htmlFor="salaryBasis">Salary Basis</Label>
+              <Select
+                value={employee.salaryBasis}
+                onValueChange={(value) => handleSelectChange('salaryBasis', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select salary basis" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(SALARY_BASIS).map((basis) => (
+                    <SelectItem key={basis} value={basis}>
+                      {basis.charAt(0).toUpperCase() + basis.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="manager">Manager</Label>
+              <Input
+                id="manager"
+                name="manager"
+                value={employee.manager}
+                onChange={handleChange}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                name="location"
+                value={employee.location}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="background">Professional Background</Label>
+            <Textarea
+              id="background"
+              name="background"
+              value={employee.background || ''}
+              onChange={handleChange}
+              rows={4}
+            />
+          </div>
+          
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              Add Employee
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default AddEmployeeModal;

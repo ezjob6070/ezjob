@@ -1,591 +1,315 @@
 
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Employee,
-  EMPLOYEE_STATUS,
-  SALARY_BASIS,
-  INCENTIVE_TYPE,
-  getInitials
-} from "@/types/employee";
-import { format } from "date-fns";
+import React, { useEffect, useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Employee, EMPLOYEE_STATUS, INCENTIVE_TYPE, SALARY_BASIS } from '@/types/employee';
+import { format } from 'date-fns';
 
-const employeeSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(6, "Phone must be at least 6 characters"),
-  position: z.string().min(2, "Position must be at least 2 characters"),
-  department: z.string().min(2, "Department must be at least 2 characters"),
-  location: z.string(),
-  status: z.string(),
-  salary: z.coerce.number().positive("Salary must be positive"),
-  salaryBasis: z.string(),
-  address: z.string().optional(),
-  manager: z.string().optional(),
-  reportsTo: z.string().optional(),
-  hourlyRate: z.coerce.number().optional(),
-  incentiveType: z.string().optional(),
-  incentiveAmount: z.coerce.number().optional(),
-  background: z.string().optional(),
-  certifications: z.string().optional(),
-  skills: z.string().optional(),
-  education: z.string().optional(),
-  taxPercentage: z.coerce.number().optional(),
-});
-
-type EmployeeFormValues = z.infer<typeof employeeSchema>;
-
-interface EditEmployeeModalProps {
+export interface EditEmployeeModalProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onUpdateEmployee: (employee: Employee) => void;
+  onClose: () => void;
   employee: Employee;
+  onEmployeeUpdate: (employee: Employee) => void;
 }
 
-export default function EditEmployeeModal({
-  open,
-  onOpenChange,
-  onUpdateEmployee,
-  employee,
-}: EditEmployeeModalProps) {
+const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({ 
+  open, 
+  onClose, 
+  employee, 
+  onEmployeeUpdate 
+}) => {
+  const [editedEmployee, setEditedEmployee] = useState<Employee>({ ...employee });
   const { toast } = useToast();
-  
-  // Provide a complete default object with all required properties
-  const defaultEmployee = {
-    name: "",
-    email: "",
-    phone: "",
-    position: "",
-    department: "",
-    location: "",
-    status: EMPLOYEE_STATUS.ACTIVE,
-    salary: 0,
-    salaryBasis: SALARY_BASIS.ANNUAL,
-    address: "",
-    manager: "",
-    reportsTo: "",
-    hourlyRate: 0,
-    incentiveType: "",
-    incentiveAmount: 0,
-    background: "",
-    certifications: [],
-    skills: [],
-    education: [],
-    taxPercentage: 0,
-  };
-  
-  // Handle case when employee is null or undefined and provide default values
-  const employeeData = employee || defaultEmployee;
-  
-  // Format the certifications, skills, education into comma-separated strings
-  // Add null/undefined checks to avoid the error
-  const certificationsStr = employeeData.certifications ? employeeData.certifications.join(", ") : "";
-  const skillsStr = employeeData.skills ? employeeData.skills.join(", ") : "";
-  const educationStr = Array.isArray(employeeData.education) 
-    ? employeeData.education.join(", ") 
-    : (employeeData.education || "");
-  
-  const form = useForm<EmployeeFormValues>({
-    resolver: zodResolver(employeeSchema),
-    defaultValues: {
-      name: employeeData.name,
-      email: employeeData.email,
-      phone: employeeData.phone || "",
-      position: employeeData.position,
-      department: employeeData.department,
-      location: employeeData.location || "",
-      status: employeeData.status,
-      salary: employeeData.salary,
-      salaryBasis: employeeData.salaryBasis,
-      address: employeeData.address || "",
-      manager: employeeData.manager || "",
-      reportsTo: employeeData.reportsTo || "",
-      hourlyRate: employeeData.hourlyRate || 0,
-      incentiveType: employeeData.incentiveType || "",
-      incentiveAmount: employeeData.incentiveAmount || 0,
-      background: employeeData.background || "",
-      certifications: certificationsStr,
-      skills: skillsStr,
-      education: educationStr,
-      taxPercentage: employeeData.taxPercentage || 0,
-    },
-  });
-  
-  useEffect(() => {
-    if (open && employee) {
-      form.reset({
-        name: employee.name,
-        email: employee.email,
-        phone: employee.phone || "",
-        position: employee.position,
-        department: employee.department,
-        location: employee.location || "",
-        status: employee.status,
-        salary: employee.salary,
-        salaryBasis: employee.salaryBasis,
-        address: employee.address || "",
-        manager: employee.manager || "",
-        reportsTo: employee.reportsTo || "",
-        hourlyRate: employee.hourlyRate || 0,
-        incentiveType: employee.incentiveType || "",
-        incentiveAmount: employee.incentiveAmount || 0,
-        background: employee.background || "",
-        certifications: certificationsStr,
-        skills: skillsStr,
-        education: educationStr,
-        taxPercentage: employee.taxPercentage || 0,
-      });
-    }
-  }, [open, employee, certificationsStr, skillsStr, educationStr, form]);
 
-  const onSubmit = (values: EmployeeFormValues) => {
+  useEffect(() => {
+    setEditedEmployee({ ...employee });
+  }, [employee]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditedEmployee(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setEditedEmployee(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditedEmployee(prev => ({ ...prev, [name]: Number(value) }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Make sure all required fields are filled
+    if (!editedEmployee.name || !editedEmployee.email || !editedEmployee.position) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Ensure salary basis is of the correct enum type
+    const updatedEmployee: Employee = {
+      ...editedEmployee,
+      salaryBasis: editedEmployee.salaryBasis as SALARY_BASIS,
+      incentiveType: editedEmployee.incentiveType as INCENTIVE_TYPE,
+      status: editedEmployee.status as EMPLOYEE_STATUS
+    };
+    
+    onEmployeeUpdate(updatedEmployee);
+    
+    toast({
+      title: 'Employee Updated',
+      description: `${updatedEmployee.name}'s information has been updated successfully.`,
+    });
+    
+    onClose();
+  };
+
+  const formatDateForInput = (dateString?: string) => {
+    if (!dateString) return '';
     try {
-      if (!employee) {
-        console.error("Cannot update: Employee is null");
-        toast({
-          title: "Error",
-          description: "Cannot update employee: No employee data found.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Convert comma-separated strings back to arrays
-      const certifications = values.certifications 
-        ? values.certifications.split(',').map(cert => cert.trim()).filter(cert => cert)
-        : [];
-      
-      const skills = values.skills
-        ? values.skills.split(',').map(skill => skill.trim()).filter(skill => skill)
-        : [];
-      
-      const education = values.education
-        ? values.education.split(',').map(edu => edu.trim()).filter(edu => edu)
-        : [];
-      
-      const updatedEmployee: Employee = {
-        ...employee,
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        position: values.position,
-        department: values.department,
-        location: values.location,
-        status: values.status,
-        salary: values.salary,
-        salaryBasis: values.salaryBasis,
-        address: values.address,
-        manager: values.manager || "",
-        reportsTo: values.reportsTo || "",
-        hourlyRate: values.hourlyRate,
-        incentiveType: values.incentiveType,
-        incentiveAmount: values.incentiveAmount,
-        background: values.background,
-        certifications: certifications,
-        skills: skills,
-        education: education,
-        taxPercentage: values.taxPercentage,
-      };
-      
-      onUpdateEmployee(updatedEmployee);
-      
-      toast({
-        title: "Employee Updated",
-        description: `${values.name}'s information has been successfully updated.`,
-      });
-      
-      onOpenChange(false);
+      const date = new Date(dateString);
+      return format(date, 'yyyy-MM-dd');
     } catch (error) {
-      console.error("Error updating employee:", error);
-      toast({
-        title: "Error",
-        description: "There was an error updating the employee. Please try again.",
-        variant: "destructive",
-      });
+      console.error('Error formatting date:', error);
+      return '';
     }
   };
-  
-  // If the employee is null, we shouldn't show the dialog at all
-  if (!employee) {
-    return null;
-  }
-  
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Employee</DialogTitle>
+          <DialogTitle>Edit Employee: {employee.name}</DialogTitle>
         </DialogHeader>
         
-        <div className="flex items-center gap-4 my-4">
-          <Avatar className="h-16 w-16">
-            {employee.profileImage ? (
-              <AvatarImage src={employee.profileImage} alt={employee.name} />
-            ) : (
-              <AvatarFallback>{getInitials(employee.name)}</AvatarFallback>
-            )}
-          </Avatar>
-          <div>
-            <h3 className="font-medium">{employee.name}</h3>
-            <p className="text-sm text-muted-foreground">{employee.position}</p>
-            <p className="text-xs text-muted-foreground">Employee since {employee.dateHired && format(new Date(employee.dateHired), "MMM yyyy")}</p>
-          </div>
-        </div>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
+        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
                 name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={editedEmployee.name}
+                onChange={handleChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
                 name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                type="email"
+                value={editedEmployee.email}
+                onChange={handleChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
                 name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={editedEmployee.phone}
+                onChange={handleChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="position">Position</Label>
+              <Input
+                id="position"
                 name="position"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Position</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={editedEmployee.position}
+                onChange={handleChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="department">Department</Label>
+              <Input
+                id="department"
                 name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={editedEmployee.department}
+                onChange={handleChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
                 name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select location" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Main Office">Main Office</SelectItem>
-                        <SelectItem value="Branch Office">Branch Office</SelectItem>
-                        <SelectItem value="Remote">Remote</SelectItem>
-                        <SelectItem value="Field">Field</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={EMPLOYEE_STATUS.ACTIVE}>Active</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.INACTIVE}>Inactive</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.ON_LEAVE}>On Leave</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.PENDING}>Pending</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.CONTRACT}>Contract</SelectItem>
-                        <SelectItem value={EMPLOYEE_STATUS.PROBATION}>Probation</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={editedEmployee.location}
+                onChange={handleChange}
               />
             </div>
             
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={String(editedEmployee.status)}
+                onValueChange={(value) => handleSelectChange('status', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(EMPLOYEE_STATUS).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
+            <div className="space-y-2">
+              <Label htmlFor="hireDate">Hire Date</Label>
+              <Input
+                id="hireDate"
+                name="hireDate"
+                type="date"
+                value={formatDateForInput(editedEmployee.hireDate || editedEmployee.dateHired)}
+                onChange={handleChange}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="salary">Salary</Label>
+              <Input
+                id="salary"
                 name="salary"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Salary</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                type="number"
+                value={editedEmployee.salary}
+                onChange={handleNumberChange}
+                required
               />
-              
-              <FormField
-                control={form.control}
-                name="salaryBasis"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Salary Basis</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select basis" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={SALARY_BASIS.HOURLY}>Hourly</SelectItem>
-                        <SelectItem value={SALARY_BASIS.ANNUAL}>Annual</SelectItem>
-                        <SelectItem value={SALARY_BASIS.WEEKLY}>Weekly</SelectItem>
-                        <SelectItem value={SALARY_BASIS.MONTHLY}>Monthly</SelectItem>
-                        <SelectItem value={SALARY_BASIS.YEARLY}>Yearly</SelectItem>
-                        <SelectItem value={SALARY_BASIS.COMMISSION}>Commission</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="salaryBasis">Salary Basis</Label>
+              <Select
+                value={String(editedEmployee.salaryBasis)}
+                onValueChange={(value) => handleSelectChange('salaryBasis', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select salary basis" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(SALARY_BASIS).map((basis) => (
+                    <SelectItem key={basis} value={basis}>
+                      {basis.charAt(0).toUpperCase() + basis.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="incentiveType">Incentive Type</Label>
+              <Select
+                value={String(editedEmployee.incentiveType || INCENTIVE_TYPE.NONE)}
+                onValueChange={(value) => handleSelectChange('incentiveType', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select incentive type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(INCENTIVE_TYPE).map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="incentiveAmount">Incentive Amount</Label>
+              <Input
+                id="incentiveAmount"
+                name="incentiveAmount"
+                type="number"
+                value={editedEmployee.incentiveAmount || 0}
+                onChange={handleNumberChange}
               />
-              
-              <FormField
-                control={form.control}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="manager">Manager</Label>
+              <Input
+                id="manager"
                 name="manager"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Manager</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="taxPercentage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tax Percentage</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="0" max="100" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={editedEmployee.manager}
+                onChange={handleChange}
               />
             </div>
             
-            {/* Advanced Financial Info Section */}
-            <div className="p-4 border rounded-lg space-y-4">
-              <h3 className="font-medium">Additional Financial Information</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="hourlyRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hourly Rate</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.01" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="incentiveType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Incentive Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="">None</SelectItem>
-                          <SelectItem value={INCENTIVE_TYPE.BONUS}>Bonus</SelectItem>
-                          <SelectItem value={INCENTIVE_TYPE.COMMISSION}>Commission</SelectItem>
-                          <SelectItem value={INCENTIVE_TYPE.HOURLY}>Per Hour</SelectItem>
-                          <SelectItem value={INCENTIVE_TYPE.WEEKLY}>Per Week</SelectItem>
-                          <SelectItem value={INCENTIVE_TYPE.MONTHLY}>Per Month</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="incentiveAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Incentive Amount</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.01" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-            
-            {/* Background and Skills Section */}
-            <div>
-              <FormField
-                control={form.control}
-                name="background"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Professional Background</FormLabel>
-                    <FormControl>
-                      <Textarea rows={3} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <div className="space-y-2">
+              <Label htmlFor="performanceRating">Performance Rating (1-5)</Label>
+              <Input
+                id="performanceRating"
+                name="performanceRating"
+                type="number"
+                min="1"
+                max="5"
+                step="0.1"
+                value={editedEmployee.performanceRating || ''}
+                onChange={handleNumberChange}
               />
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="skills"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Skills (comma-separated)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Leadership, Project Management, etc." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="certifications"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Certifications (comma-separated)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="PMP, OSHA, etc." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <FormField
-              control={form.control}
-              name="education"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Education (comma-separated)</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} placeholder="BS Civil Engineering, MBA, etc." />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="address">Address</Label>
+            <Input
+              id="address"
+              name="address"
+              value={editedEmployee.address || ''}
+              onChange={handleChange}
             />
-            
-            <DialogFooter>
-              <Button type="submit">Save Changes</Button>
-            </DialogFooter>
-          </form>
-        </Form>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="background">Professional Background</Label>
+            <Textarea
+              id="background"
+              name="background"
+              value={editedEmployee.background || ''}
+              onChange={handleChange}
+              rows={3}
+            />
+          </div>
+          
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              Save Changes
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default EditEmployeeModal;
