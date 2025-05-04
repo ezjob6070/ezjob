@@ -1,8 +1,9 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload, Filter, Search, Users } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { 
@@ -19,6 +20,7 @@ import AddEmployeeModal from "@/components/employed/AddEmployeeModal";
 import EditEmployeeModal from "@/components/employed/EditEmployeeModal";
 import UploadResumeModal from "@/components/employed/UploadResumeModal";
 import ReportsSection from "@/components/employed/ReportsSection";
+import EmployeeSearchBar from "@/components/employed/EmployeeSearchBar";
 
 import { initialEmployees, initialResumes, employeeReports } from "@/data/employees";
 import { Employee, Resume, Report, RESUME_STATUS, EMPLOYEE_STATUS } from "@/types/employee";
@@ -94,10 +96,17 @@ const Employed = () => {
     });
   };
 
-  // Filter employees based on status filter
-  const filteredEmployeesByStatus = employeeStatusFilter === "all" 
-    ? employees 
-    : employees.filter(emp => emp.status === employeeStatusFilter);
+  // Filter employees based on status filter and search query
+  const filteredEmployees = employees
+    .filter(emp => employeeStatusFilter === "all" || emp.status === employeeStatusFilter)
+    .filter(emp => {
+      if (!searchQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return emp.name.toLowerCase().includes(query) || 
+             emp.position.toLowerCase().includes(query) ||
+             emp.department.toLowerCase().includes(query) ||
+             emp.email.toLowerCase().includes(query);
+    });
   
   return (
     <div className="space-y-8 py-8">
@@ -145,6 +154,9 @@ const Employed = () => {
         </TabsList>
         
         <TabsContent value="employees" className="mt-6">
+          {/* Search Bar */}
+          <EmployeeSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          
           {/* Employee Status Filter */}
           {activeTab === "employees" && (
             <div className="mb-6 flex flex-wrap gap-4 items-center justify-between">
@@ -169,7 +181,7 @@ const Employed = () => {
               
               <div className="flex items-center text-sm text-muted-foreground">
                 <span className="mr-2">
-                  {filteredEmployeesByStatus.length} {filteredEmployeesByStatus.length === 1 ? 'employee' : 'employees'} found
+                  {filteredEmployees.length} {filteredEmployees.length === 1 ? 'employee' : 'employees'} found
                 </span>
               </div>
             </div>
@@ -284,7 +296,7 @@ const Employed = () => {
           </div>
 
           <EmployeesList 
-            employees={filteredEmployeesByStatus} 
+            employees={filteredEmployees} 
             onEditEmployee={handleEditEmployee}
           />
         </TabsContent>

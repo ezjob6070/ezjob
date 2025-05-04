@@ -1,164 +1,253 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { FilePlus, Trash2, Eye, FileText, X } from "lucide-react";
-import { format } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
-import { EmployeeDocument, getDocumentTypeLabel } from "@/types/employee";
-import { useEmployeeDocuments } from "@/hooks/employed/useEmployeeDocuments";
-import DocumentsList from "./document/DocumentsList";
-import DocumentUploadForm from "./document/DocumentUploadForm";
-import DocumentViewDialog from "./document/DocumentViewDialog";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format, isValid } from "date-fns";
+import { toast } from "@/hooks/use-toast";
+import { FilePlus, Download, Trash2, FileText } from "lucide-react";
+import { Document } from "@/types/employee";
+import { Badge } from "@/components/ui/badge";
 
 interface EmployeeDocumentsProps {
   employeeId: string;
-  documents: EmployeeDocument[];
-  onUpdateEmployee: (updatedDocuments: EmployeeDocument[]) => void;
+  documents?: Document[];
+  onUpdateEmployee: (documents: Document[]) => void;
 }
 
-const EmployeeDocuments = ({ employeeId, documents = [], onUpdateEmployee }: EmployeeDocumentsProps) => {
-  const [showUploadForm, setShowUploadForm] = useState(false);
-  const [showViewDialog, setShowViewDialog] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<EmployeeDocument | null>(null);
-  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-  const { toast } = useToast();
-  const { uploadDocument, deleteDocument } = useEmployeeDocuments(employeeId);
+const EmployeeDocuments: React.FC<EmployeeDocumentsProps> = ({
+  employeeId,
+  documents = [],
+  onUpdateEmployee,
+}) => {
+  const [documentName, setDocumentName] = useState("");
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleDocumentUpload = async (documentData: any) => {
-    try {
-      const newDocument = await uploadDocument(documentData);
-      const updatedDocuments = [...(documents || []), newDocument];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setDocumentFile(file);
+      if (!documentName) {
+        // Set document name from filename if not already set
+        setDocumentName(file.name.split(".")[0]);
+      }
+    }
+  };
+
+  const handleAddDocument = () => {
+    if (!documentName) {
+      toast({
+        title: "Error",
+        description: "Please enter a document name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!documentFile) {
+      toast({
+        title: "Error",
+        description: "Please select a document to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+
+    // In a real app, you would upload the file to a server here
+    // For now, we'll simulate a file upload with a timeout
+    setTimeout(() => {
+      const newDocument: Document = {
+        id: `doc-${Date.now()}`,
+        name: documentName,
+        url: URL.createObjectURL(documentFile), // This URL will only work during the current session
+        uploadDate: new Date().toISOString(),
+        type: documentFile.type,
+        size: documentFile.size,
+        uploadedBy: "Current User", // In a real app, get from auth context
+      };
+
+      const updatedDocuments = [...documents, newDocument];
       onUpdateEmployee(updatedDocuments);
-      
-      setShowUploadForm(false);
-      
+
+      // Reset form
+      setDocumentName("");
+      setDocumentFile(null);
+      setIsUploading(false);
+
       toast({
         title: "Document Uploaded",
-        description: `${documentData.name} has been successfully uploaded.`,
+        description: "Employee document has been added successfully",
       });
-    } catch (error) {
-      console.error("Error uploading document:", error);
-      toast({
-        title: "Upload Error",
-        description: "There was a problem uploading the document.",
-        variant: "destructive",
-      });
-    }
+    }, 1000);
   };
 
-  const handleViewDocument = (document: EmployeeDocument) => {
-    setSelectedDocument(document);
-    setShowViewDialog(true);
+  const handleDeleteDocument = (documentId: string) => {
+    const updatedDocuments = documents.filter((doc) => doc.id !== documentId);
+    onUpdateEmployee(updatedDocuments);
+
+    toast({
+      title: "Document Removed",
+      description: "The document has been removed successfully",
+    });
   };
 
-  const handleDeleteClick = (documentId: string) => {
-    const document = documents?.find(doc => doc.id === documentId);
-    setSelectedDocument(document || null);
-    setIsConfirmDeleteOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!selectedDocument) return;
-    
+  const formatDate = (dateString: string) => {
     try {
-      await deleteDocument(selectedDocument.id);
-      
-      const updatedDocuments = (documents || []).filter(doc => doc.id !== selectedDocument.id);
-      onUpdateEmployee(updatedDocuments);
-      
-      setIsConfirmDeleteOpen(false);
-      setSelectedDocument(null);
-      
-      toast({
-        title: "Document Deleted",
-        description: `${selectedDocument.name} has been successfully deleted.`,
-      });
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      toast({
-        title: "Delete Error",
-        description: "There was a problem deleting the document.",
-        variant: "destructive",
-      });
+      const date = new Date(dateString);
+      return isValid(date) ? format(date, "MMM d, yyyy") : "Invalid date";
+    } catch {
+      return "Invalid date";
     }
   };
 
-  const handleCancel = () => {
-    setShowUploadForm(false);
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return "Unknown";
+    const units = ["B", "KB", "MB", "GB"];
+    let size = bytes;
+    let unitIndex = 0;
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+
+    return `${size.toFixed(1)} ${units[unitIndex]}`;
+  };
+
+  // Determine document type from MIME type or file extension
+  const getDocumentType = (doc: Document) => {
+    if (!doc.type && !doc.url) return "Unknown";
+
+    if (doc.type) {
+      if (doc.type.includes("pdf")) return "PDF";
+      if (doc.type.includes("image")) return "Image";
+      if (doc.type.includes("word")) return "Word";
+      if (doc.type.includes("excel") || doc.type.includes("sheet")) return "Excel";
+    }
+
+    // Try to determine from URL if type not available
+    const url = doc.url.toLowerCase();
+    if (url.endsWith(".pdf")) return "PDF";
+    if (url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png")) return "Image";
+    if (url.endsWith(".doc") || url.endsWith(".docx")) return "Word";
+    if (url.endsWith(".xls") || url.endsWith(".xlsx")) return "Excel";
+
+    return "Unknown";
   };
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Documents</h2>
-        <Button onClick={() => setShowUploadForm(true)} className="gap-2">
-          <FilePlus className="h-4 w-4" />
-          Upload Document
-        </Button>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FilePlus className="h-5 w-5" />
+            Upload Document
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Document Name</label>
+                <Input
+                  type="text"
+                  value={documentName}
+                  onChange={(e) => setDocumentName(e.target.value)}
+                  placeholder="Enter document name"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Document File</label>
+                <Input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <Button
+              onClick={handleAddDocument}
+              disabled={isUploading || !documentName || !documentFile}
+            >
+              {isUploading ? "Uploading..." : "Upload Document"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      {showUploadForm ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Upload New Document</CardTitle>
-            <CardDescription>
-              Add a document to this employee's record
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DocumentUploadForm 
-              onSubmit={handleDocumentUpload}
-              onCancel={handleCancel}
-            />
-          </CardContent>
-        </Card>
-      ) : (
-        <DocumentsList 
-          documents={documents || []} 
-          onViewDocument={handleViewDocument}
-          onDeleteDocument={handleDeleteClick}
-          getDocumentTypeLabel={getDocumentTypeLabel}
-        />
-      )}
-
-      {selectedDocument && (
-        <>
-          {/* Document Viewer Dialog */}
-          <DocumentViewDialog 
-            open={showViewDialog}
-            onOpenChange={() => setShowViewDialog(false)}
-            documentData={selectedDocument}
-          />
-
-          {/* Confirm Delete Dialog */}
-          <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to delete '{selectedDocument.name}'? This action cannot be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsConfirmDeleteOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleConfirmDelete}
-                >
-                  Delete
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Employee Documents
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {documents.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Document</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Upload Date</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {documents.map((doc) => (
+                  <TableRow key={doc.id}>
+                    <TableCell className="font-medium">{doc.name}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{getDocumentType(doc)}</Badge>
+                    </TableCell>
+                    <TableCell>{formatDate(doc.uploadDate)}</TableCell>
+                    <TableCell>{formatFileSize(doc.size)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                        >
+                          <a href={doc.url} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4 mr-1" />
+                            View
+                          </a>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700"
+                          onClick={() => handleDeleteDocument(doc.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No documents added yet. Upload a document to get started.
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </>
   );
 };

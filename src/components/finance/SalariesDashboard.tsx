@@ -19,7 +19,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Employee, SalaryBasis, IncentiveType } from "@/types/employee";
+import { Employee, SALARY_BASIS, INCENTIVE_TYPE } from "@/types/employee";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -67,11 +67,11 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
     return initialEmployees.map(employee => {
       // Calculate normalized monthly salary
       let monthlySalary = employee.salary;
-      if (employee.salaryBasis === "weekly") {
+      if (employee.salaryBasis === SALARY_BASIS.WEEKLY) {
         monthlySalary = employee.salary * 4.33; // Average weeks in a month
-      } else if (employee.salaryBasis === "yearly") {
+      } else if (employee.salaryBasis === SALARY_BASIS.YEARLY) {
         monthlySalary = employee.salary / 12;
-      } else if (employee.salaryBasis === "hourly") {
+      } else if (employee.salaryBasis === SALARY_BASIS.HOURLY) {
         // Assume 40 hours per week, 4.33 weeks per month
         monthlySalary = (employee.hourlyRate || 0) * 40 * 4.33;
       }
@@ -85,7 +85,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
       const netSalary = monthlySalary - taxAmount;
       
       // Calculate tenure in months
-      const hireDate = new Date(employee.dateHired);
+      const hireDate = new Date(employee.dateHired || employee.hireDate || '');
       const now = new Date();
       const tenureMonths = isValid(hireDate) ? 
         (now.getFullYear() - hireDate.getFullYear()) * 12 + 
@@ -99,7 +99,7 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
         tenureMonths,
         hourlyRate: employee.hourlyRate || 0,
         incentiveAmount: employee.incentiveAmount || 0,
-        incentiveType: employee.incentiveType || "hourly" as IncentiveType
+        incentiveType: employee.incentiveType || INCENTIVE_TYPE.NONE
       };
     });
   };
@@ -197,19 +197,19 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
   };
 
   // Get salary basis display text - fixed to handle proper types
-  const getSalaryBasisText = (basis?: SalaryBasis): string => {
+  const getSalaryBasisText = (basis?: typeof SALARY_BASIS[keyof typeof SALARY_BASIS]): string => {
     switch (basis) {
-      case "hourly":
+      case SALARY_BASIS.HOURLY:
         return "Hourly";
-      case "weekly":
+      case SALARY_BASIS.WEEKLY:
         return "Weekly";
-      case "monthly":
+      case SALARY_BASIS.MONTHLY:
         return "Monthly";
-      case "yearly":
+      case SALARY_BASIS.YEARLY:
         return "Yearly";
-      case "annual":
+      case SALARY_BASIS.ANNUAL:
         return "Annual";
-      case "commission":
+      case SALARY_BASIS.COMMISSION:
         return "Commission";
       default:
         return "Yearly";
@@ -217,19 +217,19 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
   };
   
   // Get incentive type display text - fixed to properly handle types
-  const getIncentiveTypeText = (type?: IncentiveType): string => {
+  const getIncentiveTypeText = (type?: typeof INCENTIVE_TYPE[keyof typeof INCENTIVE_TYPE]): string => {
     switch (type) {
-      case "hourly":
+      case INCENTIVE_TYPE.HOURLY:
         return "Per Hour";
-      case "weekly":
-        return "Per Week";
-      case "monthly":
-        return "Per Month";
-      case "bonus":
+      case INCENTIVE_TYPE.WEEKLY:
+        return "Weekly";
+      case INCENTIVE_TYPE.MONTHLY:
+        return "Monthly";
+      case INCENTIVE_TYPE.BONUS:
         return "Bonus";
-      case "commission":
+      case INCENTIVE_TYPE.COMMISSION:
         return "Commission";
-      case "none":
+      case INCENTIVE_TYPE.NONE:
         return "None";
       default:
         return "N/A";
@@ -238,6 +238,8 @@ const SalariesDashboard: React.FC<SalariesDashboardProps> = ({
 
   // Format date safely function to prevent invalid date errors
   const formatDateSafe = (dateStr: string): string => {
+    if (!dateStr) return "Not available";
+    
     try {
       const date = new Date(dateStr);
       

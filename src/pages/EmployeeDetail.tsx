@@ -1,18 +1,19 @@
 
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus, FileBadge, Upload } from "lucide-react";
+import { format, isValid } from "date-fns";
+import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus, FileBadge, Upload, DollarSign, IdCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Employee, EmployeeNote, SALARY_BASIS } from "@/types/employee";
 import { initialEmployees } from "@/data/employees";
 import EmployeeDocuments from "@/components/employed/EmployeeDocuments";
+import SalaryHistoryComponent from "@/components/employed/SalaryHistory";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const EmployeeDetail = () => {
@@ -33,6 +34,9 @@ const EmployeeDetail = () => {
       }
       if (!foundEmployee.documents) {
         foundEmployee.documents = [];
+      }
+      if (!foundEmployee.salaryHistory) {
+        foundEmployee.salaryHistory = [];
       }
       setEmployee(foundEmployee);
     }
@@ -136,6 +140,25 @@ const EmployeeDetail = () => {
     .join('')
     .toUpperCase();
   
+  // Format date safely to prevent invalid date errors
+  const formatDateSafe = (dateStr?: string) => {
+    if (!dateStr) return "Not available";
+    
+    try {
+      const date = new Date(dateStr);
+      
+      // Check if the date is valid
+      if (!isValid(date)) {
+        return "Not available";
+      }
+      
+      return format(date, "MMM d, yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", dateStr, error);
+      return "Not available";
+    }
+  };
+  
   return (
     <div className="space-y-8 py-8">
       <div className="flex items-center gap-4">
@@ -221,7 +244,7 @@ const EmployeeDetail = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                    <span className="text-sm">{employee.address}</span>
+                    <span className="text-sm">{employee.address || employee.location}</span>
                   </div>
                 </div>
               </div>
@@ -230,7 +253,10 @@ const EmployeeDetail = () => {
           
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle className="text-lg">Employee ID</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <IdCard className="h-5 w-5" />
+                Employee ID
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-sm font-mono bg-muted p-2 rounded">{employee.id}</div>
@@ -242,7 +268,7 @@ const EmployeeDetail = () => {
                 <Separator />
                 <div className="flex justify-between py-2">
                   <span className="text-sm text-muted-foreground">Hired:</span>
-                  <span className="text-sm font-medium">{employee.dateHired && format(new Date(employee.dateHired), "MMM d, yyyy")}</span>
+                  <span className="text-sm font-medium">{formatDateSafe(employee.dateHired || employee.hireDate)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between py-2">
@@ -258,7 +284,7 @@ const EmployeeDetail = () => {
                     <div className="flex justify-between py-2">
                       <span className="text-sm text-muted-foreground">Birth Date:</span>
                       <span className="text-sm font-medium">
-                        {format(new Date(employee.dateOfBirth), "MMM d, yyyy")}
+                        {formatDateSafe(employee.dateOfBirth)}
                       </span>
                     </div>
                   </>
@@ -281,12 +307,16 @@ const EmployeeDetail = () => {
         
         <div className="md:col-span-2">
           <Tabs defaultValue="background" className="w-full">
-            <TabsList className="grid grid-cols-5 mb-8">
+            <TabsList className="grid grid-cols-6 mb-8">
               <TabsTrigger value="background">Background</TabsTrigger>
               <TabsTrigger value="skills">Skills</TabsTrigger>
               <TabsTrigger value="education">Education</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
+              <TabsTrigger value="salary" className="flex items-center">
+                <DollarSign className="h-4 w-4 mr-1" />
+                Salary
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="background" className="space-y-6">
@@ -429,6 +459,13 @@ const EmployeeDetail = () => {
                 }}
               />
             </TabsContent>
+
+            <TabsContent value="salary" className="space-y-6">
+              <SalaryHistoryComponent 
+                employee={employee}
+                onUpdateEmployee={handleUpdateEmployee}
+              />
+            </TabsContent>
             
             <TabsContent value="notes" className="space-y-6">
               <Card>
@@ -467,12 +504,7 @@ const EmployeeDetail = () => {
                           <div className="flex justify-between items-center text-xs text-muted-foreground">
                             <span>By: {note.createdBy || note.author || 'Unknown'}</span>
                             <span>
-                              {note.createdAt && format(
-                                typeof note.createdAt === 'string' 
-                                  ? new Date(note.createdAt)
-                                  : note.createdAt, 
-                                "MMM d, yyyy h:mm a"
-                              )}
+                              {formatDateSafe(note.createdAt || note.date)}
                             </span>
                           </div>
                         </div>
