@@ -1,339 +1,176 @@
 
-import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Upload, Filter, Search, Users } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { Plus } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { initialEmployees } from "@/data/employees";
+import { initialResumes } from "@/data/employees";
+import { Employee } from "@/types/employee";
 import EmployeesList from "@/components/employed/EmployeesList";
 import ResumesList from "@/components/employed/ResumesList";
 import AddEmployeeModal from "@/components/employed/AddEmployeeModal";
 import EditEmployeeModal from "@/components/employed/EditEmployeeModal";
 import UploadResumeModal from "@/components/employed/UploadResumeModal";
-import ReportsSection from "@/components/employed/ReportsSection";
 import EmployeeSearchBar from "@/components/employed/EmployeeSearchBar";
-
-import { initialEmployees, initialResumes, employeeReports } from "@/data/employees";
-import { Employee, Resume, Report, RESUME_STATUS, EMPLOYEE_STATUS } from "@/types/employee";
+import EmployeeFilters from "@/components/employed/EmployeeFilters";
+import ReportsSection from "@/components/employed/ReportsSection";
+import { employeeReports } from "@/data/employees";
 
 const Employed = () => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("employees");
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
-  const [resumes, setResumes] = useState<Resume[]>(initialResumes);
-  const [reports, setReports] = useState<Report[]>(employeeReports);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [employeeStatusFilter, setEmployeeStatusFilter] = useState<string>("all");
-  
-  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
-  const [showEditEmployeeModal, setShowEditEmployeeModal] = useState(false);
-  const [showUploadResumeModal, setShowUploadResumeModal] = useState(false);
+  const [addEmployeeOpen, setAddEmployeeOpen] = useState(false);
+  const [uploadResumeOpen, setUploadResumeOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  
-  // Stats calculation
-  const activeEmployees = employees.filter(emp => emp.status === EMPLOYEE_STATUS.ACTIVE).length;
-  const pendingEmployees = employees.filter(emp => emp.status === EMPLOYEE_STATUS.PENDING).length;
-  const inactiveEmployees = employees.filter(emp => emp.status === EMPLOYEE_STATUS.INACTIVE).length;
-  const totalSalary = employees.reduce((sum, emp) => sum + emp.salary, 0);
-  
-  const handleAddEmployee = (newEmployee: Employee) => {
-    setEmployees((prev) => [newEmployee, ...prev]);
-    toast({
-      title: "Success",
-      description: "Employee has been added successfully",
+  const [employees, setEmployees] = useState(initialEmployees);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState<string[]>([]);
+
+  const filteredEmployees = useMemo(() => {
+    return employees.filter(employee => {
+      // Search filter
+      const matchesSearch = searchQuery === "" || 
+        employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        employee.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        employee.department.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Status filter
+      const matchesStatus = selectedStatus.length === 0 || 
+        selectedStatus.includes(employee.status);
+
+      // Department filter
+      const matchesDepartment = selectedDepartment.length === 0 || 
+        selectedDepartment.includes(employee.department);
+
+      return matchesSearch && matchesStatus && matchesDepartment;
     });
+  }, [employees, searchQuery, selectedStatus, selectedDepartment]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
-  
+
+  const handleStatusFilter = (statuses: string[]) => {
+    setSelectedStatus(statuses);
+  };
+
+  const handleDepartmentFilter = (departments: string[]) => {
+    setSelectedDepartment(departments);
+  };
+
   const handleEditEmployee = (employee: Employee) => {
     setSelectedEmployee(employee);
-    setShowEditEmployeeModal(true);
   };
-  
-  const handleUpdateEmployee = (updatedEmployee: Employee) => {
-    setEmployees((prevEmployees) => 
-      prevEmployees.map((emp) => 
+
+  const handleEmployeeUpdate = (updatedEmployee: Employee) => {
+    setEmployees(prevEmployees => 
+      prevEmployees.map(emp => 
         emp.id === updatedEmployee.id ? updatedEmployee : emp
       )
     );
-    toast({
-      title: "Success",
-      description: "Employee updated successfully",
-    });
-  };
-  
-  const handleUploadResume = (newResume: Resume) => {
-    setResumes((prev) => [newResume, ...prev]);
-    toast({
-      title: "Success",
-      description: "Resume has been uploaded successfully",
-    });
-  };
-  
-  const handleResumeStatusChange = (id: string, status: "approved" | "rejected") => {
-    setResumes((prev) => 
-      prev.map((resume) => 
-        resume.id === id 
-          ? { 
-              ...resume, 
-              status: status === "approved" ? RESUME_STATUS.APPROVED : RESUME_STATUS.REJECTED 
-            } 
-          : resume
-      )
-    );
-    
-    toast({
-      title: status === "approved" ? "Resume Approved" : "Resume Rejected",
-      description: `The resume has been ${status === "approved" ? "approved" : "rejected"} successfully`,
-    });
+    setSelectedEmployee(null);
   };
 
-  // Filter employees based on status filter and search query
-  const filteredEmployees = employees
-    .filter(emp => employeeStatusFilter === "all" || emp.status === employeeStatusFilter)
-    .filter(emp => {
-      if (!searchQuery) return true;
-      const query = searchQuery.toLowerCase();
-      return emp.name.toLowerCase().includes(query) || 
-             emp.position.toLowerCase().includes(query) ||
-             emp.department.toLowerCase().includes(query) ||
-             emp.email.toLowerCase().includes(query);
-    });
-  
+  const availableDepartments = useMemo(() => {
+    const departments = new Set(employees.map(emp => emp.department));
+    return Array.from(departments);
+  }, [employees]);
+
+  const availableStatuses = useMemo(() => {
+    const statuses = new Set(employees.map(emp => emp.status));
+    return Array.from(statuses);
+  }, [employees]);
+
   return (
-    <div className="space-y-8 py-8">
-      <div className="flex justify-between items-center">
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-            Employment Management
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage employees, review resumes, and track reports
+          <h1 className="text-3xl font-bold tracking-tight">Employment Management</h1>
+          <p className="text-muted-foreground">
+            Manage employees, candidates, and employment records
           </p>
         </div>
-        
-        <div className="flex gap-3">
-          {activeTab === "employees" && (
-            <Button 
-              onClick={() => setShowAddEmployeeModal(true)}
-              className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900"
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add Employee
-            </Button>
-          )}
-          
-          {activeTab === "resumes" && (
-            <Button 
-              onClick={() => setShowUploadResumeModal(true)}
-              className="bg-gradient-to-r from-emerald-600 to-emerald-800 hover:from-emerald-700 hover:to-emerald-900"
-            >
-              <Upload className="mr-2 h-4 w-4" /> Upload Resume
-            </Button>
-          )}
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={() => setAddEmployeeOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Employee
+          </Button>
+          <Button variant="outline" onClick={() => setUploadResumeOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Upload Resume
+          </Button>
         </div>
       </div>
-      
-      <Tabs 
-        defaultValue="employees" 
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full"
-      >
-        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto mb-8">
+
+      <Tabs defaultValue="employees" className="w-full">
+        <TabsList>
           <TabsTrigger value="employees">Employees</TabsTrigger>
           <TabsTrigger value="resumes">Resumes</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="employees" className="mt-6">
-          {/* Search Bar */}
-          <EmployeeSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          
-          {/* Employee Status Filter */}
-          {activeTab === "employees" && (
-            <div className="mb-6 flex flex-wrap gap-4 items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="text-muted-foreground h-5 w-5" />
-                <span className="font-medium">Status Filter:</span>
-                <Select 
-                  value={employeeStatusFilter} 
-                  onValueChange={setEmployeeStatusFilter}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Employees</SelectItem>
-                    <SelectItem value={EMPLOYEE_STATUS.ACTIVE}>Active</SelectItem>
-                    <SelectItem value={EMPLOYEE_STATUS.PENDING}>Pending</SelectItem>
-                    <SelectItem value={EMPLOYEE_STATUS.INACTIVE}>Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
+
+        <div className="mt-6">
+          <TabsContent value="employees">
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col md:flex-row gap-4 md:items-center">
+                <EmployeeSearchBar onSearch={handleSearch} />
+                <EmployeeFilters 
+                  departments={availableDepartments}
+                  statuses={availableStatuses}
+                  onStatusChange={handleStatusFilter}
+                  onDepartmentChange={handleDepartmentFilter}
+                />
               </div>
-              
-              <div className="flex items-center text-sm text-muted-foreground">
-                <span className="mr-2">
-                  {filteredEmployees.length} {filteredEmployees.length === 1 ? 'employee' : 'employees'} found
-                </span>
-              </div>
+              <EmployeesList 
+                employees={filteredEmployees} 
+                onEditEmployee={handleEditEmployee}
+              />
             </div>
-          )}
-
-          {/* Employee Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-white">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-muted-foreground"
-                >
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 1 0 7.75"></path>
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{employees.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Across {new Set(employees.map(e => e.department)).size} departments
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="bg-white">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Active Employees</CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-green-500"
-                >
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{activeEmployees}</div>
-                <p className="text-xs text-muted-foreground">
-                  {Math.round((activeEmployees / employees.length) * 100)}% of total workforce
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="bg-white">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Inactive Employees</CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-red-500"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{inactiveEmployees + pendingEmployees}</div>
-                <p className="text-xs text-muted-foreground">
-                  {pendingEmployees} pending, {inactiveEmployees} inactive
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="bg-white">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Total Salary</CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-blue-500"
-                >
-                  <line x1="12" y1="1" x2="12" y2="23"></line>
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">${totalSalary.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">
-                  ${Math.round(totalSalary / Math.max(activeEmployees, 1)).toLocaleString()} avg. per active employee
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <EmployeesList 
-            employees={filteredEmployees} 
-            onEditEmployee={handleEditEmployee}
-          />
-        </TabsContent>
-        
-        <TabsContent value="resumes" className="mt-6">
-          <ResumesList 
-            resumes={resumes} 
-            onStatusChange={handleResumeStatusChange} 
-          />
-        </TabsContent>
-        
-        <TabsContent value="reports" className="mt-6">
-          <ReportsSection 
-            reports={reports}
-            employees={employees}
-          />
-        </TabsContent>
+          </TabsContent>
+          
+          <TabsContent value="resumes">
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-end">
+                <Link to="/add-employee" className="inline-block">
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Employee from Resume
+                  </Button>
+                </Link>
+              </div>
+              <ResumesList resumes={initialResumes} />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="reports">
+            <ReportsSection
+              reports={employeeReports}
+              employees={employees}
+            />
+          </TabsContent>
+        </div>
       </Tabs>
-      
+
       <AddEmployeeModal
-        open={showAddEmployeeModal}
-        onOpenChange={setShowAddEmployeeModal}
-        onAddEmployee={handleAddEmployee}
+        open={addEmployeeOpen}
+        onClose={() => setAddEmployeeOpen(false)}
       />
-      
-      <EditEmployeeModal
-        open={showEditEmployeeModal}
-        onOpenChange={setShowEditEmployeeModal}
-        onUpdateEmployee={handleUpdateEmployee}
-        employee={selectedEmployee}
-      />
-      
+
       <UploadResumeModal
-        open={showUploadResumeModal}
-        onOpenChange={setShowUploadResumeModal}
-        onUploadResume={handleUploadResume}
+        open={uploadResumeOpen}
+        onClose={() => setUploadResumeOpen(false)}
       />
+
+      {selectedEmployee && (
+        <EditEmployeeModal
+          open={!!selectedEmployee}
+          onClose={() => setSelectedEmployee(null)}
+          employee={selectedEmployee}
+          onEmployeeUpdate={handleEmployeeUpdate}
+        />
+      )}
     </div>
   );
 };

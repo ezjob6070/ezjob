@@ -1,270 +1,380 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { v4 as uuidv4 } from "uuid";
-import { 
-  Employee, 
-  EMPLOYEE_STATUS,
-  EMPLOYEE_STATUS_OPTIONS,
-  SALARY_BASIS,
-  SALARY_BASIS_OPTIONS
-} from "@/types/employee";
-import { ArrowLeft } from "lucide-react";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { useNavigate } from 'react-router-dom';
+import { SALARY_BASIS, SALARY_BASIS_SELECT_OPTIONS, EMPLOYEE_STATUS, EMPLOYEE_STATUS_SELECT_OPTIONS } from '@/types/employee';
+import { useToast } from '@/hooks/use-toast';
 
 const AddEmployee = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [formData, setFormData] = useState<Partial<Employee>>({
-    name: "",
-    position: "",
-    department: "",
-    email: "",
-    phone: "",
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    position: '',
+    department: '',
+    location: '',
+    salary: '',
+    salaryBasis: SALARY_BASIS.ANNUAL,
     status: EMPLOYEE_STATUS.ACTIVE,
-    salary: 0,
-    salaryBasis: SALARY_BASIS.HOURLY,
-    hireDate: new Date().toISOString().split('T')[0],
-    dateHired: new Date().toISOString().split('T')[0],
+    hireDate: '',
+    address: '',
+    manager: '',
+    taxPercentage: '',
+    skills: '',
+    background: '',
+    emergencyContactName: '',
+    emergencyContactRelation: '',
+    emergencyContactPhone: '',
   });
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
   
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-  
-  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFormData(prev => ({ ...prev, salary: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Get existing employees from localStorage or initialize empty array
-    const existingEmployees = JSON.parse(localStorage.getItem('employees') || '[]');
+    // Validate required fields
+    const requiredFields = ['name', 'email', 'position', 'department', 'location', 'salary', 'hireDate'];
+    const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
-    // Create new employee with UUID
-    const newEmployee: Employee = {
-      ...formData as Employee,
-      id: uuidv4(),
-    };
+    if (missingFields.length > 0) {
+      toast({
+        title: "Missing Required Fields",
+        description: `Please fill in: ${missingFields.join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
     
-    // Add new employee to the array
-    const updatedEmployees = [newEmployee, ...existingEmployees];
-    
-    // Save back to localStorage
-    localStorage.setItem('employees', JSON.stringify(updatedEmployees));
-    
-    // Show success toast
+    // Success
     toast({
-      title: "Employee Added Successfully",
-      description: `${newEmployee.name} has been added to your employees`,
+      title: "Employee Added",
+      description: `${formData.name} has been added successfully.`,
     });
     
     // Navigate back to employees list
-    navigate("/employed");
+    navigate('/employed');
   };
   
   return (
-    <div className="space-y-6 py-8">
-      <div className="flex items-center">
-        <Button 
-          variant="outline" 
-          onClick={() => navigate("/employed")}
-          className="mr-4"
-          size="icon"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+    <div className="max-w-4xl mx-auto py-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-            Add New Employee
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Create a new employee record in the system
-          </p>
+          <h1 className="text-2xl font-bold">Add New Employee</h1>
+          <p className="text-muted-foreground">Enter employee information and personal details</p>
         </div>
       </div>
       
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle>Employee Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name *</Label>
-                <Input 
-                  id="name" 
-                  name="name" 
-                  value={formData.name} 
-                  onChange={handleInputChange} 
-                  placeholder="John Doe"
-                  required
-                />
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-6">
+          {/* Personal Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+              <CardDescription>Employee personal and contact details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="Enter full name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="Enter email address"
+                  />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address *</Label>
-                <Input 
-                  id="email" 
-                  name="email" 
-                  type="email" 
-                  value={formData.email} 
-                  onChange={handleInputChange} 
-                  placeholder="john.doe@example.com"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="Enter address"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Employment Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Employment Information</CardTitle>
+              <CardDescription>Job details and organizational placement</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="position">Position <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="position"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleInputChange}
+                    placeholder="Enter position"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="department">Department <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                    placeholder="Enter department"
+                  />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number *</Label>
-                <Input 
-                  id="phone" 
-                  name="phone" 
-                  value={formData.phone} 
-                  onChange={handleInputChange} 
-                  placeholder="(123) 456-7890"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="manager">Manager</Label>
+                  <Input
+                    id="manager"
+                    name="manager"
+                    value={formData.manager}
+                    onChange={handleInputChange}
+                    placeholder="Enter manager name"
+                  />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="position">Job Position *</Label>
-                <Input 
-                  id="position" 
-                  name="position" 
-                  value={formData.position} 
-                  onChange={handleInputChange} 
-                  placeholder="Sales Manager"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="hireDate">Hire Date <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="hireDate"
+                    name="hireDate"
+                    type="date"
+                    value={formData.hireDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status <span className="text-red-500">*</span></Label>
+                  <Select 
+                    value={formData.status}
+                    onValueChange={(value) => handleSelectChange('status', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EMPLOYEE_STATUS_SELECT_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="department">Department *</Label>
-                <Input 
-                  id="department" 
-                  name="department" 
-                  value={formData.department} 
-                  onChange={handleInputChange} 
-                  placeholder="Sales"
-                  required
-                />
+            </CardContent>
+          </Card>
+          
+          {/* Compensation */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Compensation</CardTitle>
+              <CardDescription>Salary and tax information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="salary">Salary <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="salary"
+                    name="salary"
+                    type="number"
+                    value={formData.salary}
+                    onChange={handleInputChange}
+                    placeholder="Enter salary amount"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="salaryBasis">Salary Basis</Label>
+                  <Select 
+                    value={formData.salaryBasis}
+                    onValueChange={(value) => handleSelectChange('salaryBasis', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select basis" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SALARY_BASIS_SELECT_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="taxPercentage">Tax Percentage (%)</Label>
+                  <Input
+                    id="taxPercentage"
+                    name="taxPercentage"
+                    type="number"
+                    value={formData.taxPercentage}
+                    onChange={handleInputChange}
+                    placeholder="Enter tax percentage"
+                  />
+                </div>
               </div>
-              
+            </CardContent>
+          </Card>
+          
+          {/* Skills & Background */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Skills & Background</CardTitle>
+              <CardDescription>Professional skills and experience</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="hireDate">Hire Date *</Label>
-                <Input 
-                  id="hireDate" 
-                  name="hireDate" 
-                  type="date" 
-                  value={formData.hireDate} 
+                <Label htmlFor="skills">Skills (comma separated)</Label>
+                <Input
+                  id="skills"
+                  name="skills"
+                  value={formData.skills}
                   onChange={handleInputChange}
-                  required
+                  placeholder="E.g. Project Management, Microsoft Office, Team Leadership"
                 />
               </div>
-              
               <div className="space-y-2">
-                <Label htmlFor="salary">Salary/Rate *</Label>
-                <Input 
-                  id="salary" 
-                  name="salary" 
-                  type="number" 
-                  value={formData.salary} 
-                  onChange={handleSalaryChange} 
-                  required
-                  min="0"
-                  step="0.01"
+                <Label htmlFor="background">Professional Background</Label>
+                <Textarea
+                  id="background"
+                  name="background"
+                  value={formData.background}
+                  onChange={handleInputChange}
+                  placeholder="Enter professional background and experience"
+                  rows={4}
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="salaryBasis">Salary Basis *</Label>
-                <Select 
-                  value={formData.salaryBasis} 
-                  onValueChange={(value) => handleSelectChange('salaryBasis', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select salary basis" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SALARY_BASIS_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            </CardContent>
+          </Card>
+          
+          {/* Emergency Contact */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Emergency Contact</CardTitle>
+              <CardDescription>Person to contact in case of emergency</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="emergencyContactName">Name</Label>
+                  <Input
+                    id="emergencyContactName"
+                    name="emergencyContactName"
+                    value={formData.emergencyContactName}
+                    onChange={handleInputChange}
+                    placeholder="Enter contact name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="emergencyContactRelation">Relationship</Label>
+                  <Input
+                    id="emergencyContactRelation"
+                    name="emergencyContactRelation"
+                    value={formData.emergencyContactRelation}
+                    onChange={handleInputChange}
+                    placeholder="E.g. Spouse, Parent, Sibling"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="emergencyContactPhone">Phone</Label>
+                  <Input
+                    id="emergencyContactPhone"
+                    name="emergencyContactPhone"
+                    value={formData.emergencyContactPhone}
+                    onChange={handleInputChange}
+                    placeholder="Enter contact phone"
+                  />
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="status">Status *</Label>
-                <Select 
-                  value={formData.status} 
-                  onValueChange={(value) => handleSelectChange('status', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select employee status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EMPLOYEE_STATUS_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input 
-                  id="address" 
-                  name="address" 
-                  value={formData.address || ''} 
-                  onChange={handleInputChange} 
-                  placeholder="123 Main St, City, State, ZIP"
-                />
-              </div>
-            </div>
-            
-            <div className="pt-4 flex justify-end space-x-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => navigate("/employed")}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white"
-              >
-                Save Employee
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+          
+          <CardFooter className="px-0 flex justify-end space-x-4">
+            <Button type="button" variant="outline" onClick={() => navigate('/employed')}>
+              Cancel
+            </Button>
+            <Button type="submit">Save Employee</Button>
+          </CardFooter>
+        </div>
+      </form>
     </div>
   );
 };

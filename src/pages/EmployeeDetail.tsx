@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format, isValid } from "date-fns";
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus, FileBadge, Upload, DollarSign, IdCard } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Calendar, Award, School, FileText, Star, Plus, FileBadge, Upload, DollarSign, IdCard, BarChart, ChartBar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,9 @@ import { initialEmployees } from "@/data/employees";
 import EmployeeDocuments from "@/components/employed/EmployeeDocuments";
 import SalaryHistoryComponent from "@/components/employed/SalaryHistory";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import EmployeeJobHistory from "@/components/employed/EmployeeJobHistory";
+import EmployeePerformance from "@/components/employed/EmployeePerformance";
+import EmployeeProjects from "@/components/employed/EmployeeProjects";
 
 const EmployeeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -307,10 +310,18 @@ const EmployeeDetail = () => {
         
         <div className="md:col-span-2">
           <Tabs defaultValue="background" className="w-full">
-            <TabsList className="grid grid-cols-6 mb-8">
+            <TabsList className="grid grid-cols-8 mb-8">
               <TabsTrigger value="background">Background</TabsTrigger>
               <TabsTrigger value="skills">Skills</TabsTrigger>
               <TabsTrigger value="education">Education</TabsTrigger>
+              <TabsTrigger value="performance" className="flex items-center">
+                <ChartBar className="h-4 w-4 mr-1" />
+                Performance
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="flex items-center">
+                <Briefcase className="h-4 w-4 mr-1" />
+                Projects
+              </TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
               <TabsTrigger value="salary" className="flex items-center">
@@ -444,6 +455,14 @@ const EmployeeDetail = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            <TabsContent value="performance">
+              <EmployeePerformance employee={employee} />
+            </TabsContent>
+            
+            <TabsContent value="projects">
+              <EmployeeProjects employee={employee} />
             </TabsContent>
             
             <TabsContent value="documents" className="space-y-6">

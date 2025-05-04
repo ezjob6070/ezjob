@@ -43,6 +43,10 @@ export enum DOCUMENT_TYPE {
   MEDICAL = "medical",
   TAX = "tax",
   EDUCATION = "education",
+  RESUME = "resume",
+  PASSPORT = "passport",
+  DRIVERS_LICENSE = "drivers_license",
+  WORK_PERMIT = "work_permit",
   OTHER = "other"
 }
 
@@ -53,6 +57,24 @@ export type IncentiveType = INCENTIVE_TYPE;
 export const SALARY_BASIS_OPTIONS = Object.values(SALARY_BASIS);
 export const INCENTIVE_TYPE_OPTIONS = Object.values(INCENTIVE_TYPE);
 export const EMPLOYEE_STATUS_OPTIONS = Object.values(EMPLOYEE_STATUS);
+
+// For form select components compatibility
+export const SALARY_BASIS_SELECT_OPTIONS = SALARY_BASIS_OPTIONS.map(basis => ({
+  value: basis,
+  label: basis.charAt(0).toUpperCase() + basis.slice(1).replace('_', ' ')
+}));
+
+export const INCENTIVE_TYPE_SELECT_OPTIONS = INCENTIVE_TYPE_OPTIONS.map(type => ({
+  value: type,
+  label: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')
+}));
+
+export const EMPLOYEE_STATUS_SELECT_OPTIONS = EMPLOYEE_STATUS_OPTIONS.map(status => ({
+  value: status,
+  label: status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')
+}));
+
+export const DOCUMENT_TYPE_OPTIONS = Object.values(DOCUMENT_TYPE);
 
 export interface Document {
   id: string;
@@ -95,6 +117,25 @@ export interface SalaryHistory {
   type: 'regular' | 'bonus' | 'commission' | 'raise';
 }
 
+export interface PerformanceMetric {
+  id: string;
+  metricName: string;
+  value: number;
+  maxValue: number;
+  date: string;
+  notes?: string;
+}
+
+export interface EmployeeProject {
+  id: string;
+  name: string;
+  role: string;
+  startDate: string;
+  endDate?: string;
+  status: 'active' | 'completed' | 'on-hold' | 'cancelled';
+  description?: string;
+}
+
 export interface Employee {
   id: string;
   name: string;
@@ -127,6 +168,15 @@ export interface Employee {
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
   salaryHistory?: SalaryHistory[];
+  performanceMetrics?: PerformanceMetric[];
+  projects?: EmployeeProject[];
+  completedProjects?: number;
+  activeProjects?: number;
+  totalHoursLogged?: number;
+  attendanceRate?: number;
+  lastReviewDate?: string;
+  nextReviewDate?: string;
+  yearsOfExperience?: number;
 }
 
 export interface Resume {
@@ -169,6 +219,10 @@ export const getDocumentTypeLabel = (type: string): string => {
     [DOCUMENT_TYPE.MEDICAL]: 'Medical Record',
     [DOCUMENT_TYPE.TAX]: 'Tax Document',
     [DOCUMENT_TYPE.EDUCATION]: 'Educational Document',
+    [DOCUMENT_TYPE.RESUME]: 'Resume',
+    [DOCUMENT_TYPE.PASSPORT]: 'Passport',
+    [DOCUMENT_TYPE.DRIVERS_LICENSE]: 'Driver\'s License',
+    [DOCUMENT_TYPE.WORK_PERMIT]: 'Work Permit',
     [DOCUMENT_TYPE.OTHER]: 'Other Document'
   };
   
