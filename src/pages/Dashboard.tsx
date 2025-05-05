@@ -115,7 +115,15 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-2 space-y-4">
           <MetricsOverview 
-            financialMetrics={dashboardFinancialMetrics}
+            financialMetrics={{
+              totalRevenue: dashboardFinancialMetrics.totalRevenue,
+              totalJobs: totalTasks, 
+              avgJobValue: dashboardFinancialMetrics.avgJobValue,
+              totalLeads: dashboardLeadSources.reduce((sum, source) => sum + source.value, 0),
+              conversionRate: dashboardFinancialMetrics.conversionRate,
+              monthlyGrowth: dashboardFinancialMetrics.monthlyGrowth,
+              monthlyData: detailedRevenueData.map(item => ({ name: item.month, value: item.revenue }))
+            }}
             formatCurrency={formatCurrency}
             detailedTasksData={detailedTasksData}
             detailedRevenueData={detailedRevenueData}
@@ -124,7 +132,12 @@ const Dashboard = () => {
           />
           
           <TicketsStatusCard 
-            taskCounts={dashboardTaskCounts}
+            taskCounts={{
+              new: dashboardTaskCounts.new,
+              inProgress: dashboardTaskCounts.inProgress,
+              completed: dashboardTaskCounts.completed,
+              cancelled: dashboardTaskCounts.cancelled
+            }}
             totalTasks={totalTasks}
             detailedTasksData={detailedTasksData}
             dateRange={dateRange}
@@ -187,7 +200,7 @@ const Dashboard = () => {
             events={dashboardEvents.map(event => ({
               id: event.id,
               title: event.title,
-              type: event.type === 'deadline' ? 'meeting' : event.type,
+              type: event.type === 'deadline' ? 'meeting' : (event.type === 'job' || event.type === 'call' ? event.type : 'meeting'),
               time: format(event.datetime, 'h:mm a'),
               date: format(event.datetime, 'MMM d, yyyy')
             }))}
