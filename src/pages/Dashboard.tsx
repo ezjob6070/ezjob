@@ -34,7 +34,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import StatCard from "@/components/StatCard";
-import Badge from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 import {
   dashboardTaskCounts,
