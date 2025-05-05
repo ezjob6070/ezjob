@@ -17,11 +17,11 @@ import {
   XCircleIcon,
   ClipboardIcon,
   AlertCircleIcon,
-  "phone" as PhoneIcon,
-  "user" as UserIcon,
-  "message-circle" as MessageCircleIcon,
-  "check" as CheckIcon,
-  "circle-x" as CircleXIcon,
+  Phone as PhoneIcon,
+  User as UserIcon,
+  MessageCircle as MessageCircleIcon,
+  Check as CheckIcon,
+  XCircle as CircleXIcon,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -867,3 +867,19 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+const callsData = {
+  total: 248,
+  converted: 168,
+  scheduled: 42,
+  missed: 38,
+  conversionRate: 68,
+  monthlyTrend: [
+    { month: "Jan", calls: 124, converted: 82 },
+    { month: "Feb", calls: 132, converted: 88 },
+    { month: "Mar", calls: 145, converted: 96 },
+    { month: "Apr", calls: 138, converted: 94 },
+    { month: "May", calls: 156, converted: 105 },
+    { month: "Jun", calls: 172, converted: 118 },
+  ]
+};
