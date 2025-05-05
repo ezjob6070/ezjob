@@ -7,7 +7,8 @@ import {
   ChevronDown, 
   Calendar as CalendarIcon,
   CalendarRange,
-  CalendarDays
+  CalendarDays,
+  CheckCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -133,11 +134,13 @@ const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({
 
   return (
     <div className="flex items-center justify-center w-full">
-      <Card className="w-full shadow-md border-blue-100 bg-gradient-to-r from-white to-blue-50">
-        <CardContent className="p-3">
+      <Card className="w-full shadow-md border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardContent className="p-3 relative">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <CalendarRange className="h-5 w-5 text-blue-600" />
+              <div className="bg-blue-500 p-1.5 rounded-full text-white shadow-sm">
+                <CalendarRange className="h-4 w-4" />
+              </div>
               <span className="font-medium text-blue-800">Date Range:</span>
             </div>
             
@@ -146,7 +149,7 @@ const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({
                 <Button 
                   variant="outline" 
                   className={cn(
-                    "flex-1 flex justify-between items-center px-4 py-2 bg-white border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800",
+                    "flex-1 flex justify-between items-center px-4 py-2 bg-white border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800 transition-all duration-200 shadow-sm",
                     date?.from && "text-blue-700 border-blue-300 bg-blue-50"
                   )}
                 >
@@ -154,142 +157,152 @@ const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({
                   <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="center">
+              <PopoverContent className="w-auto p-0 shadow-lg border border-blue-100" align="center">
                 <Tabs defaultValue="presets" className="w-full">
-                  <TabsList className="grid grid-cols-2">
-                    <TabsTrigger value="presets">Quick Select</TabsTrigger>
-                    <TabsTrigger value="calendar">Calendar</TabsTrigger>
+                  <TabsList className="grid grid-cols-2 p-1 bg-blue-50">
+                    <TabsTrigger value="presets" className="data-[state=active]:bg-white data-[state=active]:text-blue-700">Quick Select</TabsTrigger>
+                    <TabsTrigger value="calendar" className="data-[state=active]:bg-white data-[state=active]:text-blue-700">Calendar</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="presets" className="p-3 space-y-3">
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("today")}
-                      >
-                        <CalendarIcon className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>Today</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("yesterday")}
-                      >
-                        <CalendarIcon className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>Yesterday</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("this-week")}
-                      >
-                        <CalendarDays className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>This Week</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("last-week")}
-                      >
-                        <CalendarDays className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>Last Week</span>
-                      </Button>
+                  <TabsContent value="presets" className="p-4 space-y-4 bg-white">
+                    <div className="grid grid-cols-1 gap-2">
+                      <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Current</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("today")}
+                        >
+                          <CalendarIcon className="mr-2 h-3.5 w-3.5 text-blue-600" />
+                          <span>Today</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("this-week")}
+                        >
+                          <CalendarDays className="mr-2 h-3.5 w-3.5 text-blue-600" />
+                          <span>This Week</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("this-month")}
+                        >
+                          <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
+                          <span>This Month</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("this-year")}
+                        >
+                          <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
+                          <span>This Year</span>
+                        </Button>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("this-month")}
-                      >
-                        <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>This Month</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("last-month")}
-                      >
-                        <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>Last Month</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("next-week")}
-                      >
-                        <CalendarDays className="mr-2 h-3.5 w-3.5 text-green-600" />
-                        <span>Next Week</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("next-month")}
-                      >
-                        <CalendarRange className="mr-2 h-3.5 w-3.5 text-green-600" />
-                        <span>Next Month</span>
-                      </Button>
+                    <div className="grid grid-cols-1 gap-2">
+                      <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Past</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("yesterday")}
+                        >
+                          <CalendarIcon className="mr-2 h-3.5 w-3.5 text-purple-600" />
+                          <span>Yesterday</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("last-week")}
+                        >
+                          <CalendarDays className="mr-2 h-3.5 w-3.5 text-purple-600" />
+                          <span>Last Week</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("last-month")}
+                        >
+                          <CalendarRange className="mr-2 h-3.5 w-3.5 text-purple-600" />
+                          <span>Last Month</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("last-30-days")}
+                        >
+                          <CalendarRange className="mr-2 h-3.5 w-3.5 text-purple-600" />
+                          <span>Last 30 Days</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("last-90-days")}
+                        >
+                          <CalendarRange className="mr-2 h-3.5 w-3.5 text-purple-600" />
+                          <span>Last 90 Days</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("last-year")}
+                        >
+                          <CalendarRange className="mr-2 h-3.5 w-3.5 text-purple-600" />
+                          <span>Last Year</span>
+                        </Button>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("last-30-days")}
-                      >
-                        <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>Last 30 Days</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("last-90-days")}
-                      >
-                        <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>Last 90 Days</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("this-year")}
-                      >
-                        <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>This Year</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="justify-start"
-                        onClick={() => selectDatePreset("last-year")}
-                      >
-                        <CalendarRange className="mr-2 h-3.5 w-3.5 text-blue-600" />
-                        <span>Last Year</span>
-                      </Button>
+                    <div className="grid grid-cols-1 gap-2">
+                      <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Future</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("next-week")}
+                        >
+                          <CalendarDays className="mr-2 h-3.5 w-3.5 text-green-600" />
+                          <span>Next Week</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="justify-start hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          onClick={() => selectDatePreset("next-month")}
+                        >
+                          <CalendarRange className="mr-2 h-3.5 w-3.5 text-green-600" />
+                          <span>Next Month</span>
+                        </Button>
+                      </div>
                     </div>
                     
                     <Button
                       variant="default"
                       size="sm"
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
                       onClick={() => selectDatePreset("all-time")}
                     >
+                      <Calendar className="mr-2 h-4 w-4" />
                       All Time
                     </Button>
                   </TabsContent>
 
-                  <TabsContent value="calendar" className="p-3">
+                  <TabsContent value="calendar" className="p-4 bg-white">
                     <CalendarComponent
                       initialFocus
                       mode="range"
@@ -299,7 +312,7 @@ const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({
                       numberOfMonths={2}
                       className="pointer-events-auto"
                     />
-                    <div className="mt-3 flex justify-between">
+                    <div className="mt-4 flex justify-between">
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -326,12 +339,19 @@ const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({
                 variant="ghost" 
                 size="sm"
                 onClick={() => setDate(undefined)}
-                className="shrink-0 text-blue-700 hover:text-blue-800 hover:bg-blue-100"
+                className="shrink-0 text-blue-700 hover:text-blue-800 hover:bg-blue-100 transition-colors duration-200"
               >
                 Clear
               </Button>
             )}
           </div>
+
+          {date?.from && (
+            <div className="mt-2 flex items-center text-xs text-blue-600 bg-blue-50 p-1.5 rounded-md border border-blue-100">
+              <CheckCircle className="h-3 w-3 mr-1.5 text-green-500" />
+              Selected: {formatDateRange()}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

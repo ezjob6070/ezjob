@@ -684,8 +684,8 @@ const Dashboard = () => {
     <div className="space-y-4 py-4">
       <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
       
-      {/* Enhanced Date Range Filter - Moved to the top and styled better */}
-      <div className="mb-6">
+      {/* Enhanced Date Range Filter - Styled better with a dedicated card */}
+      <div className="mb-6 max-w-4xl mx-auto">
         <EnhancedDateRangeFilter date={date} setDate={setDate} />
       </div>
       
