@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -38,7 +37,6 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   const innerRadius = radius - thickness;
   const centerX = radius;
   const centerY = radius;
-  const labelRadius = radius + 25; // Increased label distance from the chart
   
   let currentAngle = 0;
   
@@ -154,8 +152,9 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
                 'Z'
               ].join(' ');
               
-              // Calculate midpoint angle for label positioning
+              // Calculate the position for the value label within the segment
               const midAngle = segment.startAngle + (segment.endAngle - segment.startAngle) / 2;
+              const labelRadius = innerRadius + (radius - innerRadius) / 2;
               const labelPos = polarToCartesian(centerX, centerY, labelRadius, midAngle);
               
               return (
@@ -173,39 +172,22 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
                     className="drop-shadow-lg hover:brightness-105 transition-all cursor-pointer"
                   />
                   
-                  {segment.value / total > 0.05 && (
-                    <g>
-                      <line
-                        x1={polarToCartesian(centerX, centerY, radius + 5, midAngle).x}
-                        y1={polarToCartesian(centerX, centerY, radius + 5, midAngle).y}
-                        x2={labelPos.x}
-                        y2={labelPos.y}
-                        stroke={segment.color}
-                        strokeWidth={2}
-                        className="opacity-75"
-                      />
-                      <circle
-                        cx={labelPos.x}
-                        cy={labelPos.y}
-                        r={20}
-                        fill="white"
-                        className="drop-shadow-sm"
-                      />
-                      <text
-                        x={labelPos.x}
-                        y={labelPos.y}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fill={segment.color}
-                        className="text-sm font-bold"
-                        style={animation ? {
-                          opacity: 1,
-                          transition: `opacity 1s ease-out ${0.5 + index * 0.1}s`
-                        } : undefined}
-                      >
-                        {segment.percentage}%
-                      </text>
-                    </g>
+                  {/* Job count label inside the segment */}
+                  {segment.value > 0 && (segment.endAngle - segment.startAngle) > 20 && (
+                    <text
+                      x={labelPos.x}
+                      y={labelPos.y}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill="white"
+                      className="text-sm font-bold drop-shadow-md"
+                      style={animation ? {
+                        opacity: 1,
+                        transition: `opacity 1s ease-out ${0.5 + index * 0.1}s`
+                      } : undefined}
+                    >
+                      {segment.value}
+                    </text>
                   )}
                 </g>
               );

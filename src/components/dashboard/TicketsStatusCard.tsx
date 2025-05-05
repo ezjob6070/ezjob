@@ -12,7 +12,7 @@ import {
   CalendarIcon
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DonutChart } from "@/components/DonutChart";
+import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import { 
   Popover, 
   PopoverContent, 
@@ -146,7 +146,7 @@ const TicketsStatusCard = ({
       <CardContent className="pb-6 pt-4">
         <div className="flex flex-col md:flex-row items-start justify-between">
           <div className="flex-1 mb-4 md:mb-0">
-            <DonutChart 
+            <EnhancedDonutChart 
               data={[
                 { name: "New Jobs", value: taskCounts.joby, color: "#3b82f6" },
                 { name: "In Progress", value: taskCounts.inProgress, color: "#8b5cf6" },
