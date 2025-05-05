@@ -38,6 +38,7 @@ import { Badge } from "@/components/ui/badge";
 
 import {
   dashboardTaskCounts,
+  dashboardFinancialMetrics,
   dashboardLeadSources,
   dashboardJobTypePerformance,
   dashboardTopTechnicians,
@@ -225,7 +226,7 @@ const Dashboard = () => {
                   </div>
                   
                   <div className="flex flex-col space-y-3">
-                    {revenueData.map((month, index) => (
+                    {revenueData.map((month) => (
                       <div key={month.name} className="space-y-1">
                         <div className="flex justify-between text-xs text-gray-500">
                           <span>{month.name}</span>
@@ -270,7 +271,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="grid grid-cols-12 gap-2 mt-2">
               {performanceData.map((data) => (
-                <div key={data.month || data.name} className="col-span-1">
+                <div key={data.month} className="col-span-1">
                   <div className="flex flex-col items-center">
                     <div className="relative w-full mb-1 h-32">
                       <div 
@@ -278,7 +279,7 @@ const Dashboard = () => {
                         style={{ height: `${(data.jobs / 50) * 100}%` }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-500">{data.month || data.name}</span>
+                    <span className="text-xs text-gray-500">{data.month}</span>
                   </div>
                 </div>
               ))}
@@ -309,7 +310,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="grid grid-cols-12 gap-2 mt-2">
               {performanceData.map((data) => (
-                <div key={data.month || data.name} className="col-span-1">
+                <div key={data.month} className="col-span-1">
                   <div className="flex flex-col items-center">
                     <div className="relative w-full mb-1 h-32">
                       <div 
@@ -321,7 +322,7 @@ const Dashboard = () => {
                         style={{ height: `${(data.calls / 50) * 100}%`, left: '25%' }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-500">{data.month || data.name}</span>
+                    <span className="text-xs text-gray-500">{data.month}</span>
                   </div>
                 </div>
               ))}

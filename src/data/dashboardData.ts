@@ -22,19 +22,19 @@ export const dashboardFinancialMetrics = {
 
 // Lead source data to populate the dashboard
 export const dashboardLeadSources = [
-  { source: "Website", count: 45, percentage: 32 },
-  { source: "Referral", count: 36, percentage: 25 },
-  { source: "Phone", count: 28, percentage: 19 },
-  { source: "Social Media", count: 18, percentage: 13 },
-  { source: "Email", count: 16, percentage: 11 }
+  { name: "Website", value: 45, percentage: 32 },
+  { name: "Referral", value: 36, percentage: 25 },
+  { name: "Phone", value: 28, percentage: 19 },
+  { name: "Social Media", value: 18, percentage: 13 },
+  { name: "Email", value: 16, percentage: 11 }
 ];
 
 // Job type performance data
 export const dashboardJobTypePerformance = [
-  { jobType: "Repair", count: 35, revenue: 89600, avgValue: 2560 },
-  { jobType: "Installation", count: 28, revenue: 126000, avgValue: 4500 },
-  { jobType: "Maintenance", count: 22, revenue: 33000, avgValue: 1500 },
-  { jobType: "Consultation", count: 10, revenue: 15000, avgValue: 1500 }
+  { name: "Repair", value: 35, revenue: 89600, avgValue: 2560 },
+  { name: "Installation", value: 28, revenue: 126000, avgValue: 4500 },
+  { name: "Maintenance", value: 22, revenue: 33000, avgValue: 1500 },
+  { name: "Consultation", value: 10, revenue: 15000, avgValue: 1500 }
 ];
 
 // Top technicians data
@@ -47,18 +47,18 @@ export const dashboardTopTechnicians = [
 
 // Recent activities for dashboard
 export const dashboardActivities = [
-  { user: "Michael Rodriguez", action: "completed", target: "AC Repair", time: "2 hours ago", icon: "check" },
-  { user: "Sarah Johnson", action: "started", target: "Water Heater Installation", time: "4 hours ago", icon: "play" },
-  { user: "David Williams", action: "rescheduled", target: "Duct Cleaning", time: "yesterday", icon: "calendar" },
-  { user: "Emily Garcia", action: "created", target: "Electrical Inspection", time: "yesterday", icon: "plus" },
-  { user: "System", action: "assigned", target: "Plumbing Emergency to Sarah Johnson", time: "2 days ago", icon: "user" }
+  { id: "act1", type: "task", title: "Completed AC Repair", time: "2 hours ago", user: { name: "Michael Rodriguez", initials: "MR" } },
+  { id: "act2", type: "task", title: "Started Water Heater Installation", time: "4 hours ago", user: { name: "Sarah Johnson", initials: "SJ" } },
+  { id: "act3", type: "meeting", title: "Rescheduled Duct Cleaning", time: "yesterday", user: { name: "David Williams", initials: "DW" } },
+  { id: "act4", type: "email", title: "Created Electrical Inspection", time: "yesterday", user: { name: "Emily Garcia", initials: "EG" } },
+  { id: "act5", type: "task", title: "Assigned Plumbing Emergency", time: "2 days ago", user: { name: "System", initials: "SY" }, client: { name: "Sarah Johnson", initials: "SJ" } }
 ];
 
 // Upcoming events
 export const dashboardEvents = [
-  { title: "Team Meeting", description: "Weekly progress review", date: new Date(new Date().setHours(new Date().getHours() + 24)), type: "meeting" },
-  { title: "Supplier Meeting", description: "New parts catalog review", date: new Date(new Date().setDate(new Date().getDate() + 3)), type: "business" },
-  { title: "Training Session", description: "New equipment handling", date: new Date(new Date().setDate(new Date().getDate() + 5)), type: "training" }
+  { id: "evt1", title: "Team Meeting", datetime: new Date(new Date().setHours(new Date().getHours() + 24)), type: "meeting" },
+  { id: "evt2", title: "Supplier Meeting", datetime: new Date(new Date().setDate(new Date().getDate() + 3)), type: "meeting", clientName: "Parts Supplier Inc." },
+  { id: "evt3", title: "Training Session", datetime: new Date(new Date().setDate(new Date().getDate() + 5)), type: "deadline" }
 ];
 
 // Detailed task data for dialog
