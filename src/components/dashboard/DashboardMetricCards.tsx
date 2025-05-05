@@ -12,6 +12,7 @@ interface DashboardMetricCardsProps {
   taskCounts: {
     completed: number;
     inProgress: number;
+    canceled: number;
     rescheduled: number;
   };
   totalTasks: number;
