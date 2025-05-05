@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -681,7 +682,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-4 py-4">
-      <DashboardHeader activeTab={activeTab} onTabChange={handleTabChange} />
+      <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
       
       {/* Enhanced Date Range Filter - Moved to the top and styled better */}
       <div className="mb-6">
