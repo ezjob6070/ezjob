@@ -123,8 +123,8 @@ const Dashboard = () => {
               conversionRate: dashboardFinancialMetrics.conversionRate,
               monthlyGrowth: dashboardFinancialMetrics.monthlyGrowth,
               monthlyData: detailedRevenueData.map(item => ({ 
-                name: item.date.substring(0, 7), // Using date instead of month
-                value: item.amount // Using amount instead of revenue
+                name: item.date.substring(0, 7), 
+                value: item.amount 
               }))
             }}
             formatCurrency={formatCurrency}
@@ -136,10 +136,10 @@ const Dashboard = () => {
           
           <TicketsStatusCard 
             taskCounts={{
-              new: dashboardTaskCounts.joby, // Using joby instead of new
+              new: dashboardTaskCounts.joby, 
               inProgress: dashboardTaskCounts.inProgress,
               completed: dashboardTaskCounts.completed,
-              cancelled: dashboardTaskCounts.canceled // Using canceled instead of cancelled
+              cancelled: dashboardTaskCounts.canceled 
             }}
             totalTasks={totalTasks}
             detailedTasksData={detailedTasksData}
