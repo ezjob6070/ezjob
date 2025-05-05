@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -24,8 +25,8 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   data,
   title,
   subtitle,
-  size = 300,
-  thickness = 50,
+  size = 320,
+  thickness = 60,
   className,
   animation = true,
   showLegend = true,

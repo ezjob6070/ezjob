@@ -71,43 +71,17 @@ const Dashboard = () => {
 
   const { jobs, currentIndustry } = useGlobalState();
 
-  const completedJobs = jobs.filter(job => 
-    job.status === "completed" && 
-    (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
-    (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
-  );
-
-  // Calculate the number of rescheduled jobs
-  const rescheduledJobs = jobs.filter(job => {
-    // @ts-ignore - we're handling this explicitly
-    const wasRescheduled = job.status === "scheduled" && job.previousStatus === "scheduled";
-    return wasRescheduled && 
-      (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
-      (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to));
-  }).length;
-
-  const totalRevenue = completedJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
+  // Use our predefined fake data
+  const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
+  const completedJobs = dashboardTaskCounts.completed;
+  const rescheduledJobs = 6; // Fake data for rescheduled jobs
+  const totalRevenue = dashboardFinancialMetrics.totalRevenue;
   const totalExpenses = totalRevenue * 0.4;
   const companyProfit = totalRevenue - totalExpenses;
-
-  const avgJobValue = completedJobs.length > 0 
-    ? totalRevenue / completedJobs.length 
-    : 0;
-
-  const monthlyGrowth = 5.2;
-  const conversionRate = 75.5;
-
-  const dashboardFinancialMetrics = {
-    totalRevenue: totalRevenue,
-    totalExpenses: totalExpenses,
-    companysCut: companyProfit,
-    profitMargin: totalRevenue > 0 ? (companyProfit / totalRevenue) * 100 : 0,
-    avgJobValue: avgJobValue,
-    monthlyGrowth: monthlyGrowth,
-    conversionRate: conversionRate
-  };
-
-  const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
+  const avgJobValue = dashboardFinancialMetrics.avgJobValue;
+  const monthlyGrowth = dashboardFinancialMetrics.monthlyGrowth;
+  const conversionRate = dashboardFinancialMetrics.conversionRate;
+  const totalJobs = totalTasks;
 
   const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
     setActiveDialog({
@@ -131,25 +105,25 @@ const Dashboard = () => {
 
   // Sample statistics data
   const revenueData = [
-    { name: 'Jan', revenue: 4000, target: 2400 },
-    { name: 'Feb', revenue: 3000, target: 2800 },
-    { name: 'Mar', revenue: 2000, target: 3200 },
-    { name: 'Apr', revenue: 2780, target: 3500 },
-    { name: 'May', revenue: 1890, target: 3800 },
-    { name: 'Jun', revenue: 2390, target: 4000 },
-    { name: 'Jul', revenue: 3490, target: 4200 },
-    { name: 'Aug', revenue: 4200, target: 4400 },
-    { name: 'Sep', revenue: 4800, target: 4600 },
-    { name: 'Oct', revenue: 5200, target: 4800 },
-    { name: 'Nov', revenue: 5600, target: 5000 },
-    { name: 'Dec', revenue: 6100, target: 5200 },
+    { name: 'Jan', revenue: 78000, target: 72000 },
+    { name: 'Feb', revenue: 82000, target: 75000 },
+    { name: 'Mar', revenue: 95000, target: 79000 },
+    { name: 'Apr', revenue: 89000, target: 82000 },
+    { name: 'May', revenue: 102000, target: 86000 },
+    { name: 'Jun', revenue: 115000, target: 90000 },
+    { name: 'Jul', revenue: 128000, target: 95000 },
+    { name: 'Aug', revenue: 142000, target: 100000 },
+    { name: 'Sep', revenue: 135000, target: 105000 },
+    { name: 'Oct', revenue: 152000, target: 110000 },
+    { name: 'Nov', revenue: 165000, target: 115000 },
+    { name: 'Dec', revenue: 178000, target: 120000 },
   ];
 
   const jobTypeData = [
-    { name: 'Repair', value: 42, color: '#4f46e5' },
-    { name: 'Installation', value: 28, color: '#0ea5e9' },
-    { name: 'Maintenance', value: 18, color: '#10b981' },
-    { name: 'Other', value: 12, color: '#f59e0b' },
+    { name: 'Repair', value: 42, color: '#4f46e5', gradientFrom: '#6366f1', gradientTo: '#4338ca' },
+    { name: 'Installation', value: 28, color: '#0ea5e9', gradientFrom: '#38bdf8', gradientTo: '#0284c7' },
+    { name: 'Maintenance', value: 18, color: '#10b981', gradientFrom: '#34d399', gradientTo: '#059669' },
+    { name: 'Other', value: 12, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
   ];
 
   // Create job status data for the circular visualization with enhanced colors and gradients
@@ -162,25 +136,21 @@ const Dashboard = () => {
     { name: 'Rescheduled', value: rescheduledJobs, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
   ];
 
-  const COLORS = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'];
-
   // Sample analytics data
   const performanceData = [
-    { month: 'Jan', calls: 24, jobs: 18, revenue: 4200 },
-    { month: 'Feb', calls: 28, jobs: 22, revenue: 5100 },
-    { month: 'Mar', calls: 32, jobs: 24, revenue: 5800 },
-    { month: 'Apr', calls: 35, jobs: 28, revenue: 6200 },
-    { month: 'May', calls: 30, jobs: 25, revenue: 5900 },
-    { name: 'Jun', calls: 27, jobs: 23, revenue: 5400 },
-    { name: 'Jul', calls: 29, jobs: 26, revenue: 6100 },
-    { name: 'Aug', calls: 33, jobs: 28, revenue: 6500 },
-    { name: 'Sep', calls: 37, jobs: 32, revenue: 7200 },
-    { name: 'Oct', calls: 42, jobs: 34, revenue: 7800 },
-    { name: 'Nov', calls: 45, jobs: 36, revenue: 8200 },
-    { name: 'Dec', calls: 48, jobs: 40, revenue: 9100 },
+    { month: 'Jan', calls: 64, jobs: 42, revenue: 78000 },
+    { month: 'Feb', calls: 68, jobs: 46, revenue: 82000 },
+    { month: 'Mar', calls: 72, jobs: 52, revenue: 95000 },
+    { month: 'Apr', calls: 75, jobs: 48, revenue: 89000 },
+    { month: 'May', calls: 80, jobs: 55, revenue: 102000 },
+    { month: 'Jun', calls: 87, jobs: 63, revenue: 115000 },
+    { month: 'Jul', calls: 92, jobs: 68, revenue: 128000 },
+    { month: 'Aug', calls: 98, jobs: 74, revenue: 142000 },
+    { month: 'Sep', calls: 90, jobs: 72, revenue: 135000 },
+    { month: 'Oct', calls: 105, jobs: 82, revenue: 152000 },
+    { month: 'Nov', calls: 112, jobs: 88, revenue: 165000 },
+    { month: 'Dec', calls: 124, jobs: 98, revenue: 178000 },
   ];
-
-  const totalJobs = completedJobs.length + jobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
 
   // Today's appointments data
   const todaysAppointments = [
@@ -203,7 +173,7 @@ const Dashboard = () => {
         />
         <StatCard
           title="Conversion Rate"
-          value="75.5%"
+          value={`${conversionRate}%`}
           icon={<TrendingUpIcon className="h-4 w-4" />}
           description="From lead to client"
           trend={{ value: "3.2% increase", isPositive: true }}
@@ -433,7 +403,7 @@ const Dashboard = () => {
                       <p className="text-blue-600 font-medium">Total Revenue</p>
                       <p className="text-3xl font-bold text-blue-800 mt-1">{formatCurrency(totalRevenue)}</p>
                       <p className="text-blue-600 text-sm mt-1">
-                        {formatCurrency(dashboardFinancialMetrics.avgJobValue)} avg per job
+                        {formatCurrency(avgJobValue)} avg per job
                       </p>
                     </div>
                     <div className="p-3 bg-white/60 rounded-full shadow-sm">
@@ -464,7 +434,7 @@ const Dashboard = () => {
                       <p className="text-emerald-600 font-medium">Net Profit</p>
                       <p className="text-3xl font-bold text-emerald-800 mt-1">{formatCurrency(companyProfit)}</p>
                       <p className="text-emerald-600 text-sm mt-1">
-                        {Math.round(dashboardFinancialMetrics.profitMargin)}% profit margin
+                        {Math.round((companyProfit / totalRevenue) * 100)}% profit margin
                       </p>
                     </div>
                     <div className="p-3 bg-white/60 rounded-full shadow-sm">
@@ -500,7 +470,7 @@ const Dashboard = () => {
                       <p className="text-purple-600 font-medium">Total Jobs</p>
                       <p className="text-3xl font-bold text-purple-800 mt-1">{totalJobs}</p>
                       <p className="text-purple-600 text-sm mt-1">
-                        {completedJobs.length} completed, {totalJobs - completedJobs.length} in progress
+                        {completedJobs} completed, {totalJobs - completedJobs} in progress
                       </p>
                     </div>
                     <div className="p-3 bg-white/60 rounded-full shadow-sm">
@@ -509,15 +479,15 @@ const Dashboard = () => {
                   </div>
                   <div className="mt-4 flex gap-2">
                     <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
-                      <span className="block text-sm font-semibold">{Math.round(completedJobs.length / totalJobs * 100)}%</span>
+                      <span className="block text-sm font-semibold">{Math.round(completedJobs / totalJobs * 100)}%</span>
                       Completion Rate
                     </div>
                     <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
-                      <span className="block text-sm font-semibold">{jobs.filter(job => job.status === "scheduled").length}</span>
+                      <span className="block text-sm font-semibold">{dashboardTaskCounts.submitted}</span>
                       Scheduled
                     </div>
                     <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
-                      <span className="block text-sm font-semibold">{jobs.filter(job => job.status === "in_progress").length}</span>
+                      <span className="block text-sm font-semibold">{dashboardTaskCounts.inProgress}</span>
                       In Progress
                     </div>
                   </div>
