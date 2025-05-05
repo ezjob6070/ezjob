@@ -410,57 +410,57 @@ const Dashboard = () => {
         return (
           <>            
             {/* Business Performance Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md">
-                <CardContent className="p-6">
+                <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-blue-600 font-medium">Total Revenue</p>
-                      <p className="text-3xl font-bold text-blue-800 mt-1">{formatCurrency(totalRevenue)}</p>
+                      <p className="text-2xl font-bold text-blue-800 mt-1">{formatCurrency(totalRevenue)}</p>
                       <p className="text-blue-600 text-sm mt-1">
                         {formatCurrency(avgJobValue)} avg per job
                       </p>
                     </div>
-                    <div className="p-3 bg-white/60 rounded-full shadow-sm">
-                      <DollarSignIcon className="h-6 w-6 text-blue-500" />
+                    <div className="p-2.5 bg-white/60 rounded-full shadow-sm">
+                      <DollarSignIcon className="h-5 w-5 text-blue-500" />
                     </div>
                   </div>
-                  <div className="mt-4 h-1.5 bg-blue-200 rounded-full">
+                  <div className="mt-3 h-1.5 bg-blue-200 rounded-full">
                     <div 
                       className="h-1.5 bg-blue-500 rounded-full" 
                       style={{ width: '78%' }}
                     ></div>
                   </div>
-                  <p className="text-blue-600 text-xs mt-2">
+                  <p className="text-blue-600 text-xs mt-1.5">
                     78% of quarterly target
                   </p>
                 </CardContent>
               </Card>
               
               <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-md">
-                <CardContent className="p-6">
+                <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-emerald-600 font-medium">Net Profit</p>
-                      <p className="text-3xl font-bold text-emerald-800 mt-1">{formatCurrency(companyProfit)}</p>
+                      <p className="text-2xl font-bold text-emerald-800 mt-1">{formatCurrency(companyProfit)}</p>
                       <p className="text-emerald-600 text-sm mt-1">
                         {Math.round((companyProfit / totalRevenue) * 100)}% profit margin
                       </p>
                     </div>
-                    <div className="p-3 bg-white/60 rounded-full shadow-sm">
-                      <PieChartIcon className="h-6 w-6 text-emerald-500" />
+                    <div className="p-2.5 bg-white/60 rounded-full shadow-sm">
+                      <PieChartIcon className="h-5 w-5 text-emerald-500" />
                     </div>
                   </div>
-                  <div className="mt-4 grid grid-cols-3 gap-1">
-                    <div className="p-2 bg-emerald-200/50 rounded text-center text-xs font-medium text-emerald-700">
+                  <div className="mt-3 grid grid-cols-3 gap-1">
+                    <div className="p-1.5 bg-emerald-200/50 rounded text-center text-xs font-medium text-emerald-700">
                       <span className="block text-sm font-semibold">{formatCurrency(totalExpenses * 0.4)}</span>
                       Labor
                     </div>
-                    <div className="p-2 bg-emerald-200/50 rounded text-center text-xs font-medium text-emerald-700">
+                    <div className="p-1.5 bg-emerald-200/50 rounded text-center text-xs font-medium text-emerald-700">
                       <span className="block text-sm font-semibold">{formatCurrency(totalExpenses * 0.3)}</span>
                       Materials
                     </div>
-                    <div className="p-2 bg-emerald-200/70 rounded text-center text-xs font-medium text-emerald-700">
+                    <div className="p-1.5 bg-emerald-200/70 rounded text-center text-xs font-medium text-emerald-700">
                       <span className="block text-sm font-semibold">{formatCurrency(totalExpenses * 0.3)}</span>
                       Operating
                     </div>
@@ -469,29 +469,29 @@ const Dashboard = () => {
               </Card>
               
               <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md">
-                <CardContent className="p-6">
+                <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-purple-600 font-medium">Total Jobs</p>
-                      <p className="text-3xl font-bold text-purple-800 mt-1">{totalJobs}</p>
+                      <p className="text-2xl font-bold text-purple-800 mt-1">{totalJobs}</p>
                       <p className="text-purple-600 text-sm mt-1">
                         {completedJobs} completed, {totalJobs - completedJobs} in progress
                       </p>
                     </div>
-                    <div className="p-3 bg-white/60 rounded-full shadow-sm">
-                      <ClipboardIcon className="h-6 w-6 text-purple-500" />
+                    <div className="p-2.5 bg-white/60 rounded-full shadow-sm">
+                      <ClipboardIcon className="h-5 w-5 text-purple-500" />
                     </div>
                   </div>
-                  <div className="mt-4 flex gap-2">
-                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                  <div className="mt-3 flex gap-2">
+                    <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
                       <span className="block text-sm font-semibold">{Math.round(completedJobs / totalJobs * 100)}%</span>
                       Completion Rate
                     </div>
-                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                    <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
                       <span className="block text-sm font-semibold">{dashboardTaskCounts.inProgress}</span>
                       In Progress
                     </div>
-                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                    <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
                       <span className="block text-sm font-semibold">{dashboardTaskCounts.rescheduled}</span>
                       Rescheduled
                     </div>
@@ -500,163 +500,153 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Enhanced Jobs Status Section - Now Full Width with more vibrant colors */}
-            <Card className="bg-white border-0 shadow-lg mb-6">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-medium">Jobs By Status</CardTitle>
-                <CardDescription>Overview of service requests and job status</CardDescription>
-              </CardHeader>
-              <CardContent className="pb-6">
-                <div className="flex flex-col md:flex-row items-center">
-                  <div className="flex-1 mb-4 md:mb-0 flex justify-center">
-                    <EnhancedDonutChart 
-                      data={jobStatusData}
-                      title={`${totalTasks}`}
-                      subtitle="Total Jobs"
-                      size={320} 
-                      thickness={60}
-                      gradients={true}
-                      animation={true}
-                      showLegend={false}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="grid grid-cols-2 gap-3">
-                      {jobStatusData.map((status, index) => (
-                        <div 
-                          key={index} 
-                          className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                          onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
-                            status.name === 'Completed' ? jobsByStatus.completed :
-                            status.name === 'In Progress' ? jobsByStatus.inProgress :
-                            status.name === 'Cancelled' ? jobsByStatus.canceled :
-                            jobsByStatus.rescheduled
-                          )}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center">
-                              <div 
-                                className="w-5 h-5 rounded-full mr-2 shadow-sm" 
-                                style={{ 
-                                  background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
-                                }}
-                              ></div>
-                              <span className="font-medium text-gray-700">{status.name}</span>
-                            </div>
-                            <span className="text-sm font-bold text-gray-900">{status.value}</span>
-                          </div>
-                          <div className="w-full h-3 bg-gray-100 rounded-full mt-1 overflow-hidden">
+            {/* New layout with Jobs Status and Call Tracking */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* Jobs Status Section - First two columns */}
+              <div className="md:col-span-2">
+                <Card className="bg-white border-0 shadow-md mb-4">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
+                    <CardDescription>Overview of service requests and job status</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <div className="flex flex-col md:flex-row items-center">
+                      <div className="flex-1 mb-4 md:mb-0 flex justify-center">
+                        <EnhancedDonutChart 
+                          data={jobStatusData}
+                          title={`${totalTasks}`}
+                          subtitle="Total Jobs"
+                          size={250} 
+                          thickness={50}
+                          gradients={true}
+                          animation={true}
+                          showLegend={false}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="grid grid-cols-2 gap-2">
+                          {jobStatusData.map((status, index) => (
                             <div 
-                              className="h-3 rounded-full transition-all duration-1000 ease-out"
-                              style={{ 
-                                width: `${(status.value / totalTasks) * 100}%`,
-                                background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
-                                boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
-                              }}
-                            ></div>
-                          </div>
-                          <div className="flex justify-between items-center mt-2">
-                            <Badge
-                              variant="outline"
-                              className="text-xs"
-                              style={{ 
-                                color: status.color, 
-                                borderColor: status.color,
-                                backgroundColor: `${status.color}10`
-                              }}
+                              key={index} 
+                              className="flex flex-col p-2 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                              onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
+                                status.name === 'Completed' ? jobsByStatus.completed :
+                                status.name === 'In Progress' ? jobsByStatus.inProgress :
+                                status.name === 'Cancelled' ? jobsByStatus.canceled :
+                                jobsByStatus.rescheduled
+                              )}
                             >
-                              {((status.value / totalTasks) * 100).toFixed(0)}%
-                            </Badge>
-                            <span className="text-xs text-gray-500">
-                              View all
-                            </span>
-                          </div>
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center">
+                                  <div 
+                                    className="w-4 h-4 rounded-full mr-2 shadow-sm" 
+                                    style={{ 
+                                      background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
+                                    }}
+                                  ></div>
+                                  <span className="font-medium text-sm text-gray-700">{status.name}</span>
+                                </div>
+                                <span className="text-sm font-bold text-gray-900">{status.value}</span>
+                              </div>
+                              <div className="w-full h-2 bg-gray-100 rounded-full mt-1 overflow-hidden">
+                                <div 
+                                  className="h-2 rounded-full transition-all duration-1000 ease-out"
+                                  style={{ 
+                                    width: `${(status.value / totalTasks) * 100}%`,
+                                    background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
+                                    boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
+                                  }}
+                                ></div>
+                              </div>
+                              <div className="flex justify-between items-center mt-1">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs"
+                                  style={{ 
+                                    color: status.color, 
+                                    borderColor: status.color,
+                                    backgroundColor: `${status.color}10`
+                                  }}
+                                >
+                                  {((status.value / totalTasks) * 100).toFixed(0)}%
+                                </Badge>
+                                <span className="text-xs text-gray-500">
+                                  View
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="mt-5 text-center">
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                    onClick={() => openDetailDialog('tasks', 'All Jobs', detailedTasksData)}
-                  >
-                    <ClipboardIcon className="h-4 w-4 mr-2" />
-                    View Detailed Job Report
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Call Tracking Section - New Section */}
-            <Card className="bg-white border-0 shadow-lg mb-6 mt-6">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-medium">Call Tracking & Conversion</CardTitle>
-                <CardDescription>Overview of incoming calls and customer conversion rate</CardDescription>
-              </CardHeader>
-              <CardContent className="pb-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Call Stats */}
-                  <div className="flex-1">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-blue-700">Total Calls</span>
-                          <div className="p-2 bg-blue-100 rounded-full">
-                            <PhoneIcon className="h-4 w-4 text-blue-600" />
+                  </CardContent>
+                </Card>
+
+                {/* Call Tracking Section - Under Jobs Status */}
+                <Card className="bg-white border-0 shadow-md">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-medium">Call Tracking & Conversion</CardTitle>
+                    <CardDescription>Overview of incoming calls and customer conversion rate</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <div className="grid grid-cols-4 gap-2 mb-3">
+                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-blue-700">Total Calls</span>
+                          <div className="p-1.5 bg-blue-100 rounded-full">
+                            <PhoneIcon className="h-3.5 w-3.5 text-blue-600" />
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-blue-800">{callsData.total}</div>
-                        <div className="text-xs text-blue-600 mt-1">Last 30 days</div>
+                        <div className="text-xl font-bold text-blue-800">{callsData.total}</div>
+                        <div className="text-xs text-blue-600 mt-0.5">Last 30 days</div>
                       </div>
                       
-                      <div className="bg-green-50 rounded-lg p-4 border border-green-100">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-green-700">Converted</span>
-                          <div className="p-2 bg-green-100 rounded-full">
-                            <UserIcon className="h-4 w-4 text-green-600" />
+                      <div className="bg-green-50 rounded-lg p-3 border border-green-100">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-green-700">Converted</span>
+                          <div className="p-1.5 bg-green-100 rounded-full">
+                            <UserIcon className="h-3.5 w-3.5 text-green-600" />
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-green-800">{callsData.converted}</div>
-                        <div className="text-xs text-green-600 mt-1">New customers</div>
+                        <div className="text-xl font-bold text-green-800">{callsData.converted}</div>
+                        <div className="text-xs text-green-600 mt-0.5">New customers</div>
                       </div>
                       
-                      <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-amber-700">Scheduled</span>
-                          <div className="p-2 bg-amber-100 rounded-full">
-                            <CalendarIcon className="h-4 w-4 text-amber-600" />
+                      <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-amber-700">Scheduled</span>
+                          <div className="p-1.5 bg-amber-100 rounded-full">
+                            <CalendarIcon className="h-3.5 w-3.5 text-amber-600" />
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-amber-800">{callsData.scheduled}</div>
-                        <div className="text-xs text-amber-600 mt-1">Follow-up calls</div>
+                        <div className="text-xl font-bold text-amber-800">{callsData.scheduled}</div>
+                        <div className="text-xs text-amber-600 mt-0.5">Follow-up</div>
                       </div>
                       
-                      <div className="bg-red-50 rounded-lg p-4 border border-red-100">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-red-700">Missed</span>
-                          <div className="p-2 bg-red-100 rounded-full">
-                            <CircleXIcon className="h-4 w-4 text-red-600" />
+                      <div className="bg-red-50 rounded-lg p-3 border border-red-100">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-red-700">Missed</span>
+                          <div className="p-1.5 bg-red-100 rounded-full">
+                            <CircleXIcon className="h-3.5 w-3.5 text-red-600" />
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-red-800">{callsData.missed}</div>
-                        <div className="text-xs text-red-600 mt-1">Opportunity loss</div>
+                        <div className="text-xl font-bold text-red-800">{callsData.missed}</div>
+                        <div className="text-xs text-red-600 mt-0.5">Opportunities</div>
                       </div>
                     </div>
                     
                     {/* Conversion Rate Indicator */}
-                    <div className="bg-gradient-to-r from-blue-50 to-green-50 p-5 rounded-lg border border-blue-100">
-                      <div className="flex justify-between items-center mb-2">
+                    <div className="bg-gradient-to-r from-blue-50 to-green-50 p-3 rounded-lg border border-blue-100">
+                      <div className="flex justify-between items-center mb-1">
                         <div>
-                          <h3 className="text-lg font-medium text-gray-800">Conversion Rate</h3>
-                          <p className="text-sm text-gray-600">Calls to customer conversion</p>
+                          <h3 className="text-sm font-medium text-gray-800">Conversion Rate</h3>
+                          <p className="text-xs text-gray-600">Calls to customer conversion</p>
                         </div>
-                        <div className="text-3xl font-bold text-blue-700">{callsData.conversionRate}%</div>
+                        <div className="text-xl font-bold text-blue-700">{callsData.conversionRate}%</div>
                       </div>
-                      <div className="w-full h-3 bg-gray-200 rounded-full mt-2">
+                      <div className="w-full h-2.5 bg-gray-200 rounded-full mt-1.5">
                         <div 
-                          className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500" 
+                          className="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-green-500" 
                           style={{ width: `${callsData.conversionRate}%` }}
                         ></div>
                       </div>
@@ -666,21 +656,70 @@ const Dashboard = () => {
                         <span className="text-xs text-gray-500">100%</span>
                       </div>
                       {callsData.conversionRate >= 65 ? (
-                        <div className="mt-3 text-green-600 text-sm flex items-center">
-                          <CheckIcon className="h-4 w-4 mr-1" />
+                        <div className="mt-2 text-green-600 text-xs flex items-center">
+                          <CheckIcon className="h-3 w-3 mr-1" />
                           <span>On track to hit quarterly target!</span>
                         </div>
                       ) : (
-                        <div className="mt-3 text-amber-600 text-sm flex items-center">
-                          <AlertCircleIcon className="h-4 w-4 mr-1" />
+                        <div className="mt-2 text-amber-600 text-xs flex items-center">
+                          <AlertCircleIcon className="h-3 w-3 mr-1" />
                           <span>Needs improvement - {70 - callsData.conversionRate}% below target</span>
                         </div>
                       )}
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Side Content - Today's Appointments */}
+              <div className="md:col-span-1">
+                <Card className="bg-white border-0 shadow-md h-full">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-medium">Today's Appointments</CardTitle>
+                    <CardDescription>Scheduled jobs for today</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <div className="space-y-3">
+                      {todaysAppointments.map((appointment, index) => (
+                        <div 
+                          key={index}
+                          className="p-3 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex justify-between">
+                            <div className="font-medium text-sm">{appointment.clientName}</div>
+                            <Badge 
+                              className={`text-xs ${
+                                appointment.priority === 'high' ? 'bg-red-100 text-red-800 hover:bg-red-200' : 
+                                appointment.priority === 'medium' ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 
+                                'bg-green-100 text-green-800 hover:bg-green-200'
+                              }`}
+                            >
+                              {appointment.priority}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">{appointment.time} - {appointment.jobType}</div>
+                          <div className="text-xs text-gray-500 mt-0.5 flex items-center">
+                            <BuildingIcon className="h-3 w-3 mr-1" />
+                            {appointment.address}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex justify-center mt-4">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-xs border-blue-200 text-blue-600 hover:bg-blue-50"
+                      >
+                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
+                        View Full Schedule
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
             
             <JobStatusDialog 
               open={statusDialog.open}
