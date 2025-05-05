@@ -1,7 +1,8 @@
 
 import React from 'react';
+import { cn } from '@/lib/utils';
 
-type DonutChartProps = {
+type EnhancedDonutChartProps = {
   data: {
     name: string;
     value: number;
@@ -11,14 +12,24 @@ type DonutChartProps = {
   subtitle?: string;
   size?: number;
   thickness?: number;
+  className?: string;
+  animation?: boolean;
+  showLegend?: boolean;
+  legendPosition?: 'bottom' | 'right';
+  gradients?: boolean;
 };
 
-export const DonutChart: React.FC<DonutChartProps> = ({
+export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   data,
   title,
   subtitle,
   size = 180,
   thickness = 30,
+  className,
+  animation = true,
+  showLegend = true,
+  legendPosition = 'bottom',
+  gradients = true,
 }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const radius = size / 2;
@@ -28,16 +39,19 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   
   let currentAngle = 0;
   
-  const segments = data.map((item) => {
+  const segments = data.map((item, index) => {
     const angle = (item.value / total) * 360;
     const startAngle = currentAngle;
     const endAngle = currentAngle + angle;
     currentAngle = endAngle;
     
+    const gradientId = `gradient-${index}`;
+    
     return {
       ...item,
       startAngle,
       endAngle,
+      gradientId,
     };
   });
   
@@ -79,11 +93,48 @@ export const DonutChart: React.FC<DonutChartProps> = ({
       end.y,
     ].join(" ");
   };
+
+  const getLighterColor = (color: string, amount: number = 0.3) => {
+    // Convert hex to RGB
+    let r = parseInt(color.substring(1, 3), 16);
+    let g = parseInt(color.substring(3, 5), 16);
+    let b = parseInt(color.substring(5, 7), 16);
+
+    // Make lighter
+    r = Math.min(255, r + Math.round((255 - r) * amount));
+    g = Math.min(255, g + Math.round((255 - g) * amount));
+    b = Math.min(255, b + Math.round((255 - b) * amount));
+
+    // Convert back to hex
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
   
   return (
-    <div className="flex flex-col items-center justify-center" style={{ width: size, height: size }}>
+    <div className={cn("flex flex-col items-center justify-center", 
+      legendPosition === 'right' ? "md:flex-row md:items-start" : "",
+      className
+    )} style={{ width: legendPosition === 'right' ? 'auto' : size, height: 'auto' }}>
       <div className="relative">
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          {/* Define gradients */}
+          {gradients && (
+            <defs>
+              {segments.map((segment, index) => (
+                <linearGradient 
+                  key={`gradient-${index}`} 
+                  id={segment.gradientId} 
+                  x1="0%" 
+                  y1="0%" 
+                  x2="100%" 
+                  y2="100%"
+                >
+                  <stop offset="0%" stopColor={segment.color} />
+                  <stop offset="100%" stopColor={getLighterColor(segment.color)} />
+                </linearGradient>
+              ))}
+            </defs>
+          )}
+
           {segments.length > 0 ? (
             segments.map((segment, index) => {
               const innerArc = createArc(
@@ -121,9 +172,15 @@ export const DonutChart: React.FC<DonutChartProps> = ({
                 <path
                   key={index}
                   d={d}
-                  fill={segment.color}
+                  fill={gradients ? `url(#${segment.gradientId})` : segment.color}
                   stroke="white"
                   strokeWidth={1}
+                  style={animation ? {
+                    transform: 'scale(1)',
+                    opacity: 1,
+                    transition: `opacity 0.5s ease-out, transform 0.5s ease-out ${index * 0.1}s`
+                  } : undefined}
+                  className="drop-shadow-sm"
                 />
               );
             })
@@ -143,6 +200,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
             cy={centerY}
             r={innerRadius}
             fill="white"
+            className="drop-shadow-sm"
           />
         </svg>
         
@@ -157,11 +215,19 @@ export const DonutChart: React.FC<DonutChartProps> = ({
         </div>
       </div>
       
-      {data.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+      {data.length > 0 && showLegend && (
+        <div className={cn(
+          legendPosition === 'bottom' ? "mt-4 grid grid-cols-2 gap-2 text-sm" : "ml-6 space-y-2 text-sm"
+        )}>
           {data.map((item, index) => (
             <div key={index} className="flex items-center">
-              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+              <div 
+                className="w-3 h-3 rounded-full mr-2" 
+                style={{ 
+                  backgroundColor: item.color,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                }}
+              ></div>
               <span className="truncate text-xs">{item.name}: {item.value}%</span>
             </div>
           ))}
@@ -171,4 +237,4 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   );
 };
 
-export default DonutChart;
+export default EnhancedDonutChart;

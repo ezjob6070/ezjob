@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
@@ -13,11 +12,15 @@ import {
   ActivityIcon,
   PieChartIcon,
   DollarSignIcon,
+  BuildingIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ClipboardIcon,
+  AlertCircleIcon,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import MetricsOverview from "@/components/dashboard/MetricsOverview";
-import TicketsStatusCard from "@/components/dashboard/TicketsStatusCard";
 import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
 import ActivitySection from "@/components/dashboard/ActivitySection";
@@ -28,8 +31,10 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DonutChart } from "@/components/DonutChart";
+import { Button } from "@/components/ui/button";
+import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import StatCard from "@/components/StatCard";
+import Badge from "@/components/ui/badge";
 
 import {
   dashboardTaskCounts,
@@ -143,6 +148,16 @@ const Dashboard = () => {
     { month: 'Oct', calls: 42, jobs: 34, revenue: 7800 },
     { month: 'Nov', calls: 45, jobs: 36, revenue: 8200 },
     { month: 'Dec', calls: 48, jobs: 40, revenue: 9100 },
+  ];
+
+  const totalJobs = completedJobs.length + jobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
+
+  // Today's appointments data
+  const todaysAppointments = [
+    { clientName: "Sarah Johnson", time: "09:30 AM", jobType: "Installation", address: "123 Main St", priority: "high" },
+    { clientName: "James Wilson", time: "11:00 AM", jobType: "Repair", address: "456 Oak Ave", priority: "medium" },
+    { clientName: "Emily Davis", time: "01:15 PM", jobType: "Maintenance", address: "789 Pine Rd", priority: "low" },
+    { clientName: "Michael Brown", time: "03:30 PM", jobType: "Inspection", address: "234 Elm St", priority: "medium" },
   ];
 
   const renderDashboardStats = () => {
@@ -365,8 +380,6 @@ const Dashboard = () => {
     );
   };
 
-  const totalJobs = completedJobs.length + jobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
-
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
@@ -376,107 +389,246 @@ const Dashboard = () => {
       default: // Dashboard tab
         return (
           <>
-            {renderDashboardStats()}
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 mb-6">
-              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white col-span-1">
+            {/* Business Performance Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-blue-100">Total Jobs</p>
-                      <p className="text-3xl font-bold mt-1">{totalJobs}</p>
-                      <p className="text-blue-100 text-sm mt-1">
-                        {completedJobs.length} completed, {totalJobs - completedJobs.length} in progress
+                      <p className="text-blue-600 font-medium">Total Revenue</p>
+                      <p className="text-3xl font-bold text-blue-800 mt-1">{formatCurrency(totalRevenue)}</p>
+                      <p className="text-blue-600 text-sm mt-1">
+                        {formatCurrency(dashboardFinancialMetrics.avgJobValue)} avg per job
                       </p>
                     </div>
-                    <BarChartIcon className="h-8 w-8 text-blue-100 opacity-80" />
+                    <div className="p-3 bg-white/60 rounded-full shadow-sm">
+                      <DollarSignIcon className="h-6 w-6 text-blue-500" />
+                    </div>
                   </div>
-                  <div className="mt-4 bg-white/20 h-1.5 rounded-full">
+                  <div className="mt-4 h-1.5 bg-blue-200 rounded-full">
                     <div 
-                      className="h-1.5 bg-white rounded-full" 
-                      style={{ width: `${(completedJobs.length / totalJobs) * 100}%` }}
+                      className="h-1.5 bg-blue-500 rounded-full" 
+                      style={{ width: '78%' }}
                     ></div>
                   </div>
-                  <p className="text-blue-100 text-xs mt-2">
-                    {Math.round((completedJobs.length / totalJobs) * 100)}% completion rate
+                  <p className="text-blue-600 text-xs mt-2">
+                    78% of quarterly target
                   </p>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white col-span-1">
+              <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-md">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-purple-100">Total Revenue</p>
-                      <p className="text-3xl font-bold mt-1">{formatCurrency(totalRevenue)}</p>
-                      <p className="text-purple-100 text-sm mt-1">
-                        {formatCurrency(dashboardFinancialMetrics.avgJobValue)} avg per job
+                      <p className="text-emerald-600 font-medium">Net Profit</p>
+                      <p className="text-3xl font-bold text-emerald-800 mt-1">{formatCurrency(companyProfit)}</p>
+                      <p className="text-emerald-600 text-sm mt-1">
+                        {Math.round(dashboardFinancialMetrics.profitMargin)}% profit margin
                       </p>
                     </div>
-                    <DollarSignIcon className="h-8 w-8 text-purple-100 opacity-80" />
+                    <div className="p-3 bg-white/60 rounded-full shadow-sm">
+                      <PieChartIcon className="h-6 w-6 text-emerald-500" />
+                    </div>
                   </div>
-                  <div className="mt-4 flex space-x-1">
-                    <div className="h-8 bg-white/20 rounded flex-1 flex items-center justify-center text-xs font-medium">
-                      Labor: {formatCurrency(totalRevenue * 0.4)}
+                  <div className="mt-4 grid grid-cols-3 gap-1">
+                    <div className="p-2 bg-emerald-200/50 rounded text-center text-xs font-medium text-emerald-700">
+                      <span className="block text-sm font-semibold">{formatCurrency(totalExpenses * 0.4)}</span>
+                      Labor
                     </div>
-                    <div className="h-8 bg-white/30 rounded flex-1 flex items-center justify-center text-xs font-medium">
-                      Materials: {formatCurrency(totalRevenue * 0.3)}
+                    <div className="p-2 bg-emerald-200/50 rounded text-center text-xs font-medium text-emerald-700">
+                      <span className="block text-sm font-semibold">{formatCurrency(totalExpenses * 0.3)}</span>
+                      Materials
                     </div>
-                    <div className="h-8 bg-white/40 rounded flex-1 flex items-center justify-center text-xs font-medium">
-                      Profit: {formatCurrency(totalRevenue * 0.3)}
+                    <div className="p-2 bg-emerald-200/70 rounded text-center text-xs font-medium text-emerald-700">
+                      <span className="block text-sm font-semibold">{formatCurrency(totalExpenses * 0.3)}</span>
+                      Operating
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white col-span-1">
+              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-green-100">Customer Satisfaction</p>
-                      <p className="text-3xl font-bold mt-1">96%</p>
-                      <p className="text-green-100 text-sm mt-1">
-                        Based on {totalJobs} job ratings
+                      <p className="text-purple-600 font-medium">Total Jobs</p>
+                      <p className="text-3xl font-bold text-purple-800 mt-1">{totalJobs}</p>
+                      <p className="text-purple-600 text-sm mt-1">
+                        {completedJobs.length} completed, {totalJobs - completedJobs.length} in progress
                       </p>
                     </div>
-                    <UsersIcon className="h-8 w-8 text-green-100 opacity-80" />
+                    <div className="p-3 bg-white/60 rounded-full shadow-sm">
+                      <ClipboardIcon className="h-6 w-6 text-purple-500" />
+                    </div>
                   </div>
-                  <div className="mt-4 grid grid-cols-5 gap-1">
-                    <div className="flex flex-col items-center">
-                      <div className="h-12 bg-white/20 rounded w-full"></div>
-                      <p className="text-xs mt-1">1★</p>
+                  <div className="mt-4 flex gap-2">
+                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                      <span className="block text-sm font-semibold">{Math.round(completedJobs.length / totalJobs * 100)}%</span>
+                      Completion Rate
                     </div>
-                    <div className="flex flex-col items-center">
-                      <div className="h-12 bg-white/20 rounded w-full"></div>
-                      <p className="text-xs mt-1">2★</p>
+                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                      <span className="block text-sm font-semibold">{jobs.filter(job => job.status === "scheduled").length}</span>
+                      Scheduled
                     </div>
-                    <div className="flex flex-col items-center">
-                      <div className="h-12 bg-white/20 rounded w-full"></div>
-                      <p className="text-xs mt-1">3★</p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div className="h-12 bg-white/30 rounded w-full"></div>
-                      <p className="text-xs mt-1">4★</p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div className="h-12 bg-white/40 rounded w-full"></div>
-                      <p className="text-xs mt-1">5★</p>
+                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                      <span className="block text-sm font-semibold">{jobs.filter(job => job.status === "in_progress").length}</span>
+                      In Progress
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
             
+            {/* Jobs Status Summary and Calendar View */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+              <Card className="md:col-span-2 bg-white border-0 shadow-md">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-medium">Jobs By Status</CardTitle>
+                  <CardDescription>Overview of service requests and job status</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-6">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                    <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-sm">
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 rounded-md flex items-center justify-center bg-blue-500 mr-3">
+                          <ClipboardIcon className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="font-medium text-blue-700">New Jobs</span>
+                      </div>
+                      <span className="text-2xl font-bold text-blue-900">{dashboardTaskCounts.joby}</span>
+                      <span className="text-xs text-blue-600 mt-1">12% of total requests</span>
+                    </div>
+                    
+                    <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 shadow-sm">
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 rounded-md flex items-center justify-center bg-indigo-500 mr-3">
+                          <ClockIcon className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="font-medium text-indigo-700">In Progress</span>
+                      </div>
+                      <span className="text-2xl font-bold text-indigo-900">{dashboardTaskCounts.inProgress}</span>
+                      <span className="text-xs text-indigo-600 mt-1">28% of total requests</span>
+                    </div>
+                    
+                    <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-green-50 to-green-100 border border-green-200 shadow-sm">
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 rounded-md flex items-center justify-center bg-green-500 mr-3">
+                          <CheckCircleIcon className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="font-medium text-green-700">Completed</span>
+                      </div>
+                      <span className="text-2xl font-bold text-green-900">{dashboardTaskCounts.completed}</span>
+                      <span className="text-xs text-green-600 mt-1">48% of total requests</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 shadow-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-amber-700 text-sm">Submitted</span>
+                        <span className="text-sm font-bold text-amber-900">{dashboardTaskCounts.submitted}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-amber-200 rounded-full mt-1">
+                        <div className="h-1.5 bg-amber-500 rounded-full" style={{ width: `${(dashboardTaskCounts.submitted / totalTasks) * 100}%` }}></div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 shadow-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-orange-700 text-sm">Draft</span>
+                        <span className="text-sm font-bold text-orange-900">{dashboardTaskCounts.draft}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-orange-200 rounded-full mt-1">
+                        <div className="h-1.5 bg-orange-500 rounded-full" style={{ width: `${(dashboardTaskCounts.draft / totalTasks) * 100}%` }}></div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-red-50 to-red-100 border border-red-200 shadow-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-red-700 text-sm">Canceled</span>
+                        <span className="text-sm font-bold text-red-900">{dashboardTaskCounts.canceled}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-red-200 rounded-full mt-1">
+                        <div className="h-1.5 bg-red-500 rounded-full" style={{ width: `${(dashboardTaskCounts.canceled / totalTasks) * 100}%` }}></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-5 text-center">
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                      onClick={() => openDetailDialog('tasks', 'All Jobs', detailedTasksData)}
+                    >
+                      <ClipboardIcon className="h-4 w-4 mr-2" />
+                      View Detailed Job Report
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white border-0 shadow-md">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-medium">Job Type Distribution</CardTitle>
+                  <CardDescription>Service breakdown by category</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center items-center pb-6">
+                  <EnhancedDonutChart
+                    data={jobTypeData}
+                    title={`${totalJobs}`}
+                    subtitle="Total Jobs"
+                    size={220}
+                    thickness={30}
+                    gradients={true}
+                    animation={true}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Today's Appointments section */}
+            <Card className="bg-white border-0 shadow-md mb-6">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-medium">Today's Appointments</CardTitle>
+                    <CardDescription>Scheduled visits and service calls</CardDescription>
+                  </div>
+                  <Button variant="outline" className="h-8 gap-1">
+                    <CalendarIcon className="h-3.5 w-3.5" />
+                    <span className="text-xs">View Calendar</span>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {todaysAppointments.map((apt, index) => (
+                    <div key={index} className="flex p-3 rounded-lg border hover:bg-gray-50 transition-colors">
+                      <div className={`w-1 self-stretch rounded-full mr-3 ${
+                        apt.priority === 'high' ? 'bg-red-500' : 
+                        apt.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'
+                      }`}></div>
+                      <div className="flex-1">
+                        <div className="flex justify-between">
+                          <h4 className="font-medium text-gray-900">{apt.clientName}</h4>
+                          <span className="text-sm font-medium text-blue-600">{apt.time}</span>
+                        </div>
+                        <div className="flex gap-2 mt-1">
+                          <Badge variant="secondary" className="text-xs h-5 bg-blue-100 text-blue-800">
+                            {apt.jobType}
+                          </Badge>
+                          <span className="text-xs text-gray-500">{apt.address}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            
             <DashboardCalendar date={date} setDate={setDate} />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6">
-              <TicketsStatusCard 
-                taskCounts={dashboardTaskCounts}
-                totalTasks={totalTasks}
-                openDetailDialog={openDetailDialog}
-                detailedTasksData={detailedTasksData}
-              />
-              
               <PerformanceCard 
                 leadSources={dashboardLeadSources}
                 jobTypePerformance={dashboardJobTypePerformance}
@@ -485,14 +637,14 @@ const Dashboard = () => {
                 openDetailDialog={openDetailDialog}
                 detailedBusinessMetrics={detailedBusinessMetrics}
               />
+              
+              <TopTechniciansCard 
+                topTechnicians={dashboardTopTechnicians}
+                formatCurrency={formatCurrency}
+                openDetailDialog={openDetailDialog}
+                detailedClientsData={detailedClientsData}
+              />
             </div>
-
-            <TopTechniciansCard 
-              topTechnicians={dashboardTopTechnicians}
-              formatCurrency={formatCurrency}
-              openDetailDialog={openDetailDialog}
-              detailedClientsData={detailedClientsData}
-            />
             
             <ActivitySection 
               activities={dashboardActivities}
