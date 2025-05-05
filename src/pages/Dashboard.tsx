@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -96,6 +97,15 @@ const Dashboard = () => {
   const monthlyGrowth = dashboardFinancialMetrics.monthlyGrowth;
   const conversionRate = dashboardFinancialMetrics.conversionRate;
   const totalJobs = totalTasks;
+
+  // Sample data for call tracking section
+  const callsData = {
+    total: 154,
+    converted: 98,
+    scheduled: 37,
+    missed: 19,
+    conversionRate: 63
+  };
 
   const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
     setActiveDialog({
@@ -564,12 +574,6 @@ const Dashboard = () => {
                         </div>
                       ))}
                     </div>
-                    {date?.from && (
-                      <div className="text-xs text-center text-gray-500 mt-4 p-2 bg-gray-50 rounded-md border border-gray-100">
-                        <CalendarIcon className="h-3 w-3 inline mr-1" />
-                        Period: {getDateRangeText()}
-                      </div>
-                    )}
                   </div>
                 </div>
                 
@@ -661,4 +665,53 @@ const Dashboard = () => {
                         <span className="text-xs text-gray-500">Target: 70%</span>
                         <span className="text-xs text-gray-500">100%</span>
                       </div>
-                      {callsData.conversionRate >= 65 ?
+                      {callsData.conversionRate >= 65 ? (
+                        <div className="mt-3 text-green-600 text-sm flex items-center">
+                          <CheckIcon className="h-4 w-4 mr-1" />
+                          <span>On track to hit quarterly target!</span>
+                        </div>
+                      ) : (
+                        <div className="mt-3 text-amber-600 text-sm flex items-center">
+                          <AlertCircleIcon className="h-4 w-4 mr-1" />
+                          <span>Needs improvement - {70 - callsData.conversionRate}% below target</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <JobStatusDialog 
+              open={statusDialog.open}
+              onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
+              status={statusDialog.status}
+              title={statusDialog.title}
+              data={statusDialog.data}
+            />
+            
+            <DashboardDetailDialog
+              open={activeDialog.open}
+              onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
+              title={activeDialog.title}
+              type={activeDialog.type}
+              data={activeDialog.data}
+            />
+          </>
+        );
+    }
+  };
+
+  return (
+    <div className="space-y-3 py-3">
+      <DashboardHeader 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+      />
+      
+      {renderContent()}
+    </div>
+  );
+};
+
+export default Dashboard;
