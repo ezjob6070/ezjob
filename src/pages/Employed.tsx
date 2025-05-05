@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { initialEmployees } from "@/data/employees";
 import { initialResumes } from "@/data/employees";
-import { Employee, EMPLOYEE_STATUS, RESUME_STATUS } from "@/types/employee";
+import { Employee, EMPLOYEE_STATUS, RESUME_STATUS, Resume } from "@/types/employee";
 import EmployeesList from "@/components/employed/EmployeesList";
 import ResumesList from "@/components/employed/ResumesList";
 import AddEmployeeModal from "@/components/employed/AddEmployeeModal";

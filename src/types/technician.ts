@@ -1,5 +1,5 @@
 
-import { SalaryBasis, IncentiveType } from "./employee";
+import { SalaryBasis, IncentiveType, SALARY_BASIS, INCENTIVE_TYPE } from "./employee";
 
 export type Technician = {
   id: string;

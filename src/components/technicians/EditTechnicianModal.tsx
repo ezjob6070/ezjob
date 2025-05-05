@@ -18,7 +18,7 @@ import { Technician } from "@/types/technician";
 import { technicianEditSchema, TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { TechnicianBasicInfoFields } from "@/components/technicians/TechnicianBasicInfoFields";
 import { TechnicianDateField } from "@/components/technicians/TechnicianDateField";
-import { TechnicianPaymentFields } from "@/components/technicians/form/TechnicianPaymentFields";
+import TechnicianPaymentFields from "@/components/technicians/form/TechnicianPaymentFields";
 import { TechnicianStatusFields } from "@/components/technicians/form/TechnicianStatusFields";
 import { TechnicianImageUpload } from "@/components/technicians/TechnicianImageUpload";
 import { SalaryBasis, IncentiveType } from "@/types/employee";

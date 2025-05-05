@@ -18,12 +18,14 @@ const TechnicianAltercation = () => {
 
   const handleUpdateTechnician = (values: TechnicianEditFormValues) => {
     // Convert form values to Technician type and ensure all required fields are present
+    if (!selectedTechnician) return;
+    
     const updatedTechnician: Technician = {
-      ...selectedTechnician!,
+      ...selectedTechnician,
       ...values,
       paymentRate: Number(values.paymentRate),
-      hourlyRate: Number(values.hourlyRate || selectedTechnician?.hourlyRate || 0), // Ensure hourlyRate is a number
-      incentiveAmount: values.incentiveAmount ? Number(values.incentiveAmount) : undefined // Convert to number or undefined
+      hourlyRate: Number(values.hourlyRate || selectedTechnician?.hourlyRate || 0),
+      incentiveAmount: values.incentiveAmount ? Number(values.incentiveAmount) : undefined
     };
     
     setTechnicians((prevTechnicians) => 
