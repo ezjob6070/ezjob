@@ -71,7 +71,7 @@ const DashboardHeader = ({
                           <Button 
                             variant="outline" 
                             size="icon" 
-                            className="ml-3 h-8 w-8 rounded-full bg-indigo-50 border-indigo-100 text-indigo-600 hover:bg-indigo-100"
+                            className="ml-3 h-8 w-8 rounded-full bg-indigo-50 border-indigo-100 text-indigo-600 hover:bg-indigo-100 hover:border-indigo-200 shadow-sm"
                           >
                             <CalendarRange className="h-4 w-4" />
                           </Button>
