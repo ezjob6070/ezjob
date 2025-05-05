@@ -1,4 +1,3 @@
-
 export enum EMPLOYEE_STATUS {
   ACTIVE = "active",
   INACTIVE = "inactive",
@@ -51,7 +50,7 @@ export enum DOCUMENT_TYPE {
 }
 
 export type SalaryBasis = SALARY_BASIS;
-export type IncentiveType = INCENTIVE_TYPE;
+export type IncentiveType = "hourly" | "weekly" | "monthly" | "bonus" | "commission" | "none";
 
 // Create options arrays for select inputs
 export const SALARY_BASIS_OPTIONS = Object.values(SALARY_BASIS);

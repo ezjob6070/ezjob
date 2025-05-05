@@ -33,7 +33,7 @@ export const technicianEditSchema = z.object({
   position: z.string().optional(),
   salaryBasis: z.enum(["hourly", "annual", "commission", "weekly", "monthly", "yearly"] as const).optional(),
   hourlyRate: z.string().optional(),
-  incentiveType: z.enum(["bonus", "commission", "none", "hourly", "weekly", "monthly"] as const).optional(),
+  incentiveType: z.enum(["hourly", "weekly", "monthly", "bonus", "commission", "none"] as const).optional(),
   incentiveAmount: z.string().optional(),
   profileImage: z.string().nullable().optional(),
 });

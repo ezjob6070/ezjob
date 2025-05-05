@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Control } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { IncentiveType, INCENTIVE_TYPE } from "@/types/employee";
+import { IncentiveType } from "@/types/employee";
 import { SalaryBasis } from "@/types/technician";
 
 interface TechnicianPaymentFieldsProps {
