@@ -1,5 +1,8 @@
 
-import { SalaryBasis, IncentiveType, SALARY_BASIS, INCENTIVE_TYPE } from "./employee";
+import { IncentiveType, INCENTIVE_TYPE } from "./employee";
+
+// Define SalaryBasis as a string enum or union type directly in this file
+export type SalaryBasis = "hourly" | "annual" | "commission" | "weekly" | "monthly" | "yearly";
 
 export type Technician = {
   id: string;
