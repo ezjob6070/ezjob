@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -25,12 +24,12 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   data,
   title,
   subtitle,
-  size = 180,
-  thickness = 30,
+  size = 300,
+  thickness = 50,
   className,
   animation = true,
   showLegend = true,
-  legendPosition = 'bottom',
+  legendPosition = 'right',
   gradients = true,
 }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -38,6 +37,7 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   const innerRadius = radius - thickness;
   const centerX = radius;
   const centerY = radius;
+  const labelRadius = radius + 25; // Increased label distance from the chart
   
   let currentAngle = 0;
   
@@ -54,6 +54,7 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
       startAngle,
       endAngle,
       gradientId,
+      percentage: ((item.value / total) * 100).toFixed(1)
     };
   });
   
@@ -112,55 +113,37 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   };
   
   return (
-    <div className={cn("flex flex-col items-center justify-center", 
+    <div className={cn(
+      "flex flex-col items-center justify-center",
       legendPosition === 'right' ? "md:flex-row md:items-start" : "",
       className
     )} style={{ width: legendPosition === 'right' ? 'auto' : size, height: 'auto' }}>
       <div className="relative">
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          {/* Define gradients */}
-          {gradients && (
-            <defs>
-              {segments.map((segment, index) => (
-                <linearGradient 
-                  key={`gradient-${index}`} 
-                  id={segment.gradientId} 
-                  x1="0%" 
-                  y1="0%" 
-                  x2="100%" 
-                  y2="100%"
-                >
-                  <stop offset="0%" stopColor={segment.gradientFrom || segment.color} />
-                  <stop offset="100%" stopColor={segment.gradientTo || getLighterColor(segment.color)} />
-                </linearGradient>
-              ))}
-            </defs>
-          )}
+          <defs>
+            {gradients && segments.map((segment, index) => (
+              <linearGradient
+                key={`gradient-${index}`}
+                id={segment.gradientId}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stopColor={segment.gradientFrom || segment.color} />
+                <stop offset="100%" stopColor={segment.gradientTo || getLighterColor(segment.color, 0.4)} />
+              </linearGradient>
+            ))}
+          </defs>
 
           {segments.length > 0 ? (
             segments.map((segment, index) => {
-              const innerArc = createArc(
-                centerX,
-                centerY,
-                innerRadius,
-                segment.startAngle,
-                segment.endAngle
-              );
-              
-              const outerArc = createArc(
-                centerX,
-                centerY,
-                radius,
-                segment.startAngle,
-                segment.endAngle
-              );
-              
-              const largeArcFlag = segment.endAngle - segment.startAngle <= 180 ? "0" : "1";
-              
               const startOuter = polarToCartesian(centerX, centerY, radius, segment.startAngle);
               const endOuter = polarToCartesian(centerX, centerY, radius, segment.endAngle);
               const startInner = polarToCartesian(centerX, centerY, innerRadius, segment.startAngle);
               const endInner = polarToCartesian(centerX, centerY, innerRadius, segment.endAngle);
+              
+              const largeArcFlag = segment.endAngle - segment.startAngle <= 180 ? "0" : "1";
               
               const d = [
                 `M ${startOuter.x} ${startOuter.y}`,
@@ -172,9 +155,7 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
               
               // Calculate midpoint angle for label positioning
               const midAngle = segment.startAngle + (segment.endAngle - segment.startAngle) / 2;
-              const labelRadius = radius + 15; // Position labels outside the chart
               const labelPos = polarToCartesian(centerX, centerY, labelRadius, midAngle);
-              const percentValue = ((segment.value / total) * 100).toFixed(1);
               
               return (
                 <g key={index}>
@@ -188,25 +169,42 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
                       opacity: 1,
                       transition: `opacity 0.8s ease-out, transform 0.8s ease-out ${index * 0.1}s`
                     } : undefined}
-                    className="drop-shadow-md"
+                    className="drop-shadow-lg hover:brightness-105 transition-all cursor-pointer"
                   />
                   
-                  {/* Add percentage labels at the outer edge of each segment */}
                   {segment.value / total > 0.05 && (
-                    <text
-                      x={labelPos.x}
-                      y={labelPos.y}
-                      textAnchor={labelPos.x > centerX ? "start" : "end"}
-                      dominantBaseline="middle"
-                      fill={segment.color}
-                      className="text-xs font-bold"
-                      style={animation ? {
-                        opacity: 1,
-                        transition: `opacity 1s ease-out ${0.5 + index * 0.1}s`
-                      } : undefined}
-                    >
-                      {percentValue}%
-                    </text>
+                    <g>
+                      <line
+                        x1={polarToCartesian(centerX, centerY, radius + 5, midAngle).x}
+                        y1={polarToCartesian(centerX, centerY, radius + 5, midAngle).y}
+                        x2={labelPos.x}
+                        y2={labelPos.y}
+                        stroke={segment.color}
+                        strokeWidth={2}
+                        className="opacity-75"
+                      />
+                      <circle
+                        cx={labelPos.x}
+                        cy={labelPos.y}
+                        r={20}
+                        fill="white"
+                        className="drop-shadow-sm"
+                      />
+                      <text
+                        x={labelPos.x}
+                        y={labelPos.y}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill={segment.color}
+                        className="text-sm font-bold"
+                        style={animation ? {
+                          opacity: 1,
+                          transition: `opacity 1s ease-out ${0.5 + index * 0.1}s`
+                        } : undefined}
+                      >
+                        {segment.percentage}%
+                      </text>
+                    </g>
                   )}
                 </g>
               );
@@ -237,27 +235,30 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
         >
           <span className="text-3xl font-bold">{title}</span>
           {subtitle && <span className="text-xs text-muted-foreground">{subtitle}</span>}
-          
           {data.length === 0 && <span className="text-xs text-gray-400 mt-1">No data available</span>}
         </div>
       </div>
       
       {data.length > 0 && showLegend && (
         <div className={cn(
-          legendPosition === 'bottom' ? "mt-4 grid grid-cols-2 gap-2 text-sm" : "ml-6 space-y-2 text-sm"
+          "mt-8 space-y-3",
+          legendPosition === 'right' ? "ml-8" : ""
         )}>
-          {data.map((item, index) => (
-            <div key={index} className="flex items-center">
+          {segments.map((item, index) => (
+            <div key={index} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
               <div 
-                className="w-3 h-3 rounded-full mr-2" 
+                className="w-4 h-4 rounded-full" 
                 style={{ 
                   background: item.gradientFrom && item.gradientTo 
                     ? `linear-gradient(135deg, ${item.gradientFrom}, ${item.gradientTo})` 
                     : item.color,
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                 }}
-              ></div>
-              <span className="truncate text-xs">{item.name}: {((item.value / total) * 100).toFixed(1)}%</span>
+              />
+              <span className="font-medium">{item.name}</span>
+              <span className="text-sm text-gray-500">
+                ({item.value} jobs - {item.percentage}%)
+              </span>
             </div>
           ))}
         </div>
