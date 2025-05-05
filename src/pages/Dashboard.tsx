@@ -78,11 +78,13 @@ const Dashboard = () => {
   );
 
   // Calculate the number of rescheduled jobs
-  const rescheduledJobs = jobs.filter(job => 
-    job.status === "scheduled" && job.previousStatus === "scheduled" && 
-    (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
-    (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
-  ).length;
+  const rescheduledJobs = jobs.filter(job => {
+    // @ts-ignore - we're handling this explicitly
+    const wasRescheduled = job.status === "scheduled" && job.previousStatus === "scheduled";
+    return wasRescheduled && 
+      (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
+      (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to));
+  }).length;
 
   const totalRevenue = completedJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
   const totalExpenses = totalRevenue * 0.4;
@@ -150,9 +152,9 @@ const Dashboard = () => {
     { name: 'Other', value: 12, color: '#f59e0b' },
   ];
 
-  // Create job status data for the circular visualization
+  // Create job status data for the circular visualization with enhanced colors
   const jobStatusData = [
-    { name: 'Completed', value: dashboardTaskCounts.completed, color: '#10b981' },
+    { name: 'Completed', value: dashboardTaskCounts.completed, color: '#22c55e' },
     { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6' },
     { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444' },
     { name: 'Submitted', value: dashboardTaskCounts.submitted, color: '#f59e0b' },
@@ -537,32 +539,32 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent className="pb-6">
                   <div className="flex flex-col md:flex-row items-center">
-                    <div className="flex-1 mb-4 md:mb-0">
+                    <div className="flex-1 mb-4 md:mb-0 flex justify-center">
                       <EnhancedDonutChart 
                         data={jobStatusData}
                         title={`${totalTasks}`}
                         subtitle="Total Jobs"
-                        size={220}
-                        thickness={35}
+                        size={280} 
+                        thickness={42}
                         gradients={true}
                         animation={true}
-                        showLegend={true}
+                        showLegend={false}
                       />
                     </div>
                     <div className="flex-1">
                       <div className="grid grid-cols-2 gap-3">
                         {jobStatusData.map((status, index) => (
-                          <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 shadow-sm">
+                          <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center">
-                                <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: status.color }}></div>
+                                <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: status.color }}></div>
                                 <span className="font-medium text-gray-700 text-sm">{status.name}</span>
                               </div>
                               <span className="text-sm font-bold text-gray-900">{status.value}</span>
                             </div>
-                            <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1">
+                            <div className="w-full h-2 bg-gray-200 rounded-full mt-1">
                               <div 
-                                className="h-1.5 rounded-full" 
+                                className="h-2 rounded-full" 
                                 style={{ 
                                   width: `${(status.value / totalTasks) * 100}%`,
                                   backgroundColor: status.color 
