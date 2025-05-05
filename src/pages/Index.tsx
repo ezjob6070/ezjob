@@ -109,21 +109,21 @@ const Index = () => {
     switch (activeTab) {
       case 'statistics':
         return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Annual Revenue vs Target</CardTitle>
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base">Annual Revenue vs Target</CardTitle>
                 </CardHeader>
-                <CardContent className="h-80">
+                <CardContent className="h-64 p-3">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={revenueData}>
+                    <LineChart data={revenueData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
+                      <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                      <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                      <Legend />
-                      <Line type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={2} activeDot={{ r: 8 }} name="Actual Revenue" />
+                      <Legend wrapperStyle={{ fontSize: '10px' }} />
+                      <Line type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={2} activeDot={{ r: 6 }} name="Actual Revenue" />
                       <Line type="monotone" dataKey="target" stroke="#10b981" strokeWidth={2} strokeDasharray="5 5" name="Target Revenue" />
                     </LineChart>
                   </ResponsiveContainer>
@@ -131,10 +131,10 @@ const Index = () => {
               </Card>
               
               <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Job Type Distribution</CardTitle>
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base">Job Type Distribution</CardTitle>
                 </CardHeader>
-                <CardContent className="h-80 flex items-center justify-center">
+                <CardContent className="h-64 p-3 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -143,7 +143,7 @@ const Index = () => {
                         cy="50%"
                         labelLine={false}
                         label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={100}
+                        outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                       >
@@ -159,17 +159,17 @@ const Index = () => {
             </div>
             
             <Card className="bg-white">
-              <CardHeader>
-                <CardTitle>Monthly Job Completion Rate</CardTitle>
+              <CardHeader className="py-3 px-4">
+                <CardTitle className="text-base">Monthly Job Completion Rate</CardTitle>
               </CardHeader>
-              <CardContent className="h-80">
+              <CardContent className="h-64 p-3">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={revenueData}>
+                  <BarChart data={revenueData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                    <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip />
-                    <Legend />
+                    <Legend wrapperStyle={{ fontSize: '10px' }} />
                     <Bar dataKey="revenue" name="Completed Jobs" fill="#4f46e5" />
                     <Bar dataKey="target" name="Total Jobs" fill="#94a3b8" />
                   </BarChart>
@@ -181,25 +181,25 @@ const Index = () => {
       
       case 'analytics':
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <Card className="bg-white">
-              <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
+              <CardHeader className="py-3 px-4">
+                <CardTitle className="text-base">Performance Metrics</CardTitle>
               </CardHeader>
-              <CardContent className="h-80">
+              <CardContent className="h-64 p-3">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={performanceData}>
+                  <LineChart data={performanceData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
+                    <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                    <YAxis yAxisId="left" tick={{ fontSize: 10 }} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} />
                     <Tooltip formatter={(value, name) => {
                       if (name === 'revenue') {
                         return [formatCurrency(Number(value)), 'Revenue'];
                       }
                       return [value, name];
                     }} />
-                    <Legend />
+                    <Legend wrapperStyle={{ fontSize: '10px' }} />
                     <Line yAxisId="left" type="monotone" dataKey="calls" stroke="#4f46e5" name="Calls" />
                     <Line yAxisId="left" type="monotone" dataKey="jobs" stroke="#10b981" name="Jobs" />
                     <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#f59e0b" name="Revenue" />
@@ -208,37 +208,37 @@ const Index = () => {
               </CardContent>
             </Card>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
-                <CardHeader>
-                  <CardTitle className="text-white">Conversion Rate</CardTitle>
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-white text-base">Conversion Rate</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold">84%</div>
-                  <p className="text-indigo-100">Calls to Jobs Conversion</p>
-                  <div className="mt-2 text-green-300 text-sm">↑ 4.2% from last month</div>
+                <CardContent className="py-2 px-4">
+                  <div className="text-2xl font-bold">84%</div>
+                  <p className="text-indigo-100 text-xs">Calls to Jobs Conversion</p>
+                  <div className="mt-1 text-green-300 text-xs">↑ 4.2% from last month</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
-                <CardHeader>
-                  <CardTitle className="text-white">Avg. Job Value</CardTitle>
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-white text-base">Avg. Job Value</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold">{formatCurrency(235)}</div>
-                  <p className="text-emerald-100">Per completed job</p>
-                  <div className="mt-2 text-green-300 text-sm">↑ 2.8% from last month</div>
+                <CardContent className="py-2 px-4">
+                  <div className="text-2xl font-bold">{formatCurrency(235)}</div>
+                  <p className="text-emerald-100 text-xs">Per completed job</p>
+                  <div className="mt-1 text-green-300 text-xs">↑ 2.8% from last month</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-gradient-to-br from-amber-500 to-amber-600 text-white">
-                <CardHeader>
-                  <CardTitle className="text-white">Technician Efficiency</CardTitle>
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-white text-base">Technician Efficiency</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold">92%</div>
-                  <p className="text-amber-100">On-time completion rate</p>
-                  <div className="mt-2 text-green-300 text-sm">↑ 1.5% from last month</div>
+                <CardContent className="py-2 px-4">
+                  <div className="text-2xl font-bold">92%</div>
+                  <p className="text-amber-100 text-xs">On-time completion rate</p>
+                  <div className="mt-1 text-green-300 text-xs">↑ 1.5% from last month</div>
                 </CardContent>
               </Card>
             </div>
@@ -249,6 +249,41 @@ const Index = () => {
         return (
           <>
             <DashboardCalendar date={date} setDate={setDate} />
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+              <Card className="bg-white shadow-sm border border-gray-100">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-medium">Revenue</h3>
+                    <span className="text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded">+{dashboardFinancialMetrics.monthlyGrowth}%</span>
+                  </div>
+                  <div className="text-xl font-bold">{formatCurrency(dashboardFinancialMetrics.totalRevenue)}</div>
+                  <div className="text-xs text-gray-500 mt-1">From {totalTasks} jobs</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white shadow-sm border border-gray-100">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-medium">Job Completion</h3>
+                    <span className="text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{Math.round((dashboardTaskCounts.completed / totalTasks) * 100)}%</span>
+                  </div>
+                  <div className="text-xl font-bold">{dashboardTaskCounts.completed}/{totalTasks}</div>
+                  <div className="text-xs text-gray-500 mt-1">{dashboardTaskCounts.inProgress} in progress</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white shadow-sm border border-gray-100">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-medium">Average Value</h3>
+                    <span className="text-xs text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">Per Job</span>
+                  </div>
+                  <div className="text-xl font-bold">{formatCurrency(dashboardFinancialMetrics.avgJobValue)}</div>
+                  <div className="text-xs text-gray-500 mt-1">Conversion rate: {dashboardFinancialMetrics.conversionRate}%</div>
+                </CardContent>
+              </Card>
+            </div>
             
             <MetricsOverview 
               financialMetrics={dashboardFinancialMetrics}
@@ -295,7 +330,7 @@ const Index = () => {
   };
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-3 py-3">
       <DashboardHeader activeTab={activeTab} onTabChange={handleTabChange} />
       
       {renderContent()}
