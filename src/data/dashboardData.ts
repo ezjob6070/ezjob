@@ -6,9 +6,9 @@ export const dashboardTaskCounts = {
   joby: 0,
   inProgress: 24,
   submitted: 18,
-  draft: 15,
   completed: 42,
-  canceled: 8
+  canceled: 8,
+  rescheduled: 6
 };
 
 // Enhanced financial metrics with realistic figures
@@ -47,21 +47,47 @@ export const dashboardTopTechnicians = [
 
 // Recent activities for dashboard
 export const dashboardActivities = [
-  { id: "act1", type: "task", title: "Completed AC Repair", time: "2 hours ago", user: { name: "Michael Rodriguez", initials: "MR" } },
-  { id: "act2", type: "task", title: "Started Water Heater Installation", time: "4 hours ago", user: { name: "Sarah Johnson", initials: "SJ" } },
-  { id: "act3", type: "meeting", title: "Rescheduled Duct Cleaning", time: "yesterday", user: { name: "David Williams", initials: "DW" } },
-  { id: "act4", type: "email", title: "Created Electrical Inspection", time: "yesterday", user: { name: "Emily Garcia", initials: "EG" } },
-  { id: "act5", type: "task", title: "Assigned Plumbing Emergency", time: "2 days ago", user: { name: "System", initials: "SY" }, client: { name: "Sarah Johnson", initials: "SJ" } }
+  { id: "act1", type: "task" as const, title: "Completed AC Repair", time: "2 hours ago", user: { name: "Michael Rodriguez", initials: "MR" } },
+  { id: "act2", type: "task" as const, title: "Started Water Heater Installation", time: "4 hours ago", user: { name: "Sarah Johnson", initials: "SJ" } },
+  { id: "act3", type: "meeting" as const, title: "Rescheduled Duct Cleaning", time: "yesterday", user: { name: "David Williams", initials: "DW" } },
+  { id: "act4", type: "email" as const, title: "Created Electrical Inspection", time: "yesterday", user: { name: "Emily Garcia", initials: "EG" } },
+  { id: "act5", type: "task" as const, title: "Assigned Plumbing Emergency", time: "2 days ago", user: { name: "System", initials: "SY" }, client: { name: "Sarah Johnson", initials: "SJ" } }
 ];
 
 // Upcoming events
 export const dashboardEvents = [
-  { id: "evt1", title: "Team Meeting", datetime: new Date(new Date().setHours(new Date().getHours() + 24)), type: "meeting" },
-  { id: "evt2", title: "Supplier Meeting", datetime: new Date(new Date().setDate(new Date().getDate() + 3)), type: "meeting", clientName: "Parts Supplier Inc." },
-  { id: "evt3", title: "Training Session", datetime: new Date(new Date().setDate(new Date().getDate() + 5)), type: "deadline" }
+  { id: "evt1", title: "Team Meeting", datetime: new Date(new Date().setHours(new Date().getHours() + 24)), type: "meeting" as const },
+  { id: "evt2", title: "Supplier Meeting", datetime: new Date(new Date().setDate(new Date().getDate() + 3)), type: "meeting" as const, clientName: "Parts Supplier Inc." },
+  { id: "evt3", title: "Training Session", datetime: new Date(new Date().setDate(new Date().getDate() + 5)), type: "deadline" as const }
 ];
 
-// Detailed task data for dialog
+// Detailed job data by status
+export const jobsByStatus = {
+  completed: [
+    { id: "JOB-1001", client: "Reynolds Family", address: "123 Oak St", taskType: "AC Repair", technician: "Michael Rodriguez", date: "2023-05-01", amount: 780 },
+    { id: "JOB-1004", client: "Garcia Home", address: "321 Elm St", taskType: "HVAC Installation", technician: "Sarah Johnson", date: "2023-05-01", amount: 3400 },
+    { id: "JOB-1007", client: "Williams Apartment", address: "159 Spruce Dr", taskType: "Appliance Repair", technician: "David Williams", date: "2023-05-02", amount: 245 },
+    { id: "JOB-1010", client: "Wilson Home", address: "802 Redwood Way", taskType: "Insulation", technician: "Emily Garcia", date: "2023-05-02", amount: 1870 }
+  ],
+  inProgress: [
+    { id: "JOB-1002", client: "Martin Residence", address: "456 Pine Ave", taskType: "Plumbing", technician: "Sarah Johnson", date: "2023-05-02", amount: 450 },
+    { id: "JOB-1008", client: "Davis Family", address: "753 Walnut Ct", taskType: "Duct Cleaning", technician: "Michael Rodriguez", date: "2023-05-03", amount: 550 }
+  ],
+  submitted: [
+    { id: "JOB-1003", client: "Franklin Building", address: "789 Maple Rd", taskType: "Electrical", technician: "Emily Garcia", date: "2023-05-03", amount: 1200 },
+    { id: "JOB-1005", client: "Thompson Office", address: "654 Cedar Ln", taskType: "Commercial HVAC", technician: "David Williams", date: "2023-05-04", amount: 4800 },
+    { id: "JOB-1009", client: "Miller Building", address: "426 Fir Pl", taskType: "Commercial Electric", technician: "Sarah Johnson", date: "2023-05-04", amount: 2750 }
+  ],
+  canceled: [
+    { id: "JOB-1006", client: "Johnson Residence", address: "987 Birch Blvd", taskType: "Water Heater", technician: "Michael Rodriguez", date: "2023-05-01", amount: 1350, reason: "Client cancelled due to emergency" }
+  ],
+  rescheduled: [
+    { id: "JOB-1011", client: "Parker Home", address: "345 Pine St", taskType: "HVAC Maintenance", technician: "David Williams", date: "2023-05-03", newDate: "2023-05-10", amount: 320 },
+    { id: "JOB-1012", client: "Adams Office", address: "567 Oak Ave", taskType: "Electrical Panel", technician: "Emily Garcia", date: "2023-05-04", newDate: "2023-05-12", amount: 890 }
+  ]
+};
+
+// Detailed tasks data for dialog
 export const detailedTasksData = [
   { id: "JOB-1001", client: "Reynolds Family", address: "123 Oak St", taskType: "AC Repair", status: "completed", date: "2023-05-01", amount: 780 },
   { id: "JOB-1002", client: "Martin Residence", address: "456 Pine Ave", taskType: "Plumbing", status: "in_progress", date: "2023-05-02", amount: 450 },

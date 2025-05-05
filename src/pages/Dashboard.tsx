@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -35,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import StatCard from "@/components/StatCard";
 import { Badge } from "@/components/ui/badge";
+import JobStatusDialog from "@/components/JobStatusDialog";
 
 import {
   dashboardTaskCounts,
@@ -48,7 +50,8 @@ import {
   detailedLeadsData,
   detailedRevenueData,
   detailedClientsData,
-  detailedBusinessMetrics
+  detailedBusinessMetrics,
+  jobsByStatus
 } from "@/data/dashboardData";
 
 const Dashboard = () => {
@@ -65,6 +68,18 @@ const Dashboard = () => {
     data: []
   });
 
+  const [statusDialog, setStatusDialog] = useState<{
+    open: boolean;
+    status: string;
+    title: string;
+    data: any[];
+  }>({
+    open: false,
+    status: '',
+    title: '',
+    data: []
+  });
+
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 7),
@@ -75,7 +90,7 @@ const Dashboard = () => {
   // Use our predefined fake data
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
   const completedJobs = dashboardTaskCounts.completed;
-  const rescheduledJobs = 6; // Fake data for rescheduled jobs
+  const rescheduledJobs = dashboardTaskCounts.rescheduled; 
   const totalRevenue = dashboardFinancialMetrics.totalRevenue;
   const totalExpenses = totalRevenue * 0.4;
   const companyProfit = totalRevenue - totalExpenses;
@@ -88,6 +103,15 @@ const Dashboard = () => {
     setActiveDialog({
       open: true,
       type,
+      title,
+      data
+    });
+  };
+
+  const openStatusDialog = (status: string, title: string, data: any[]) => {
+    setStatusDialog({
+      open: true,
+      status,
       title,
       data
     });
@@ -133,8 +157,7 @@ const Dashboard = () => {
     { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb' },
     { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444', gradientFrom: '#f87171', gradientTo: '#dc2626' },
     { name: 'Submitted', value: dashboardTaskCounts.submitted, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
-    { name: 'Draft', value: dashboardTaskCounts.draft, color: '#8b5cf6', gradientFrom: '#a78bfa', gradientTo: '#7c3aed' },
-    { name: 'Rescheduled', value: rescheduledJobs, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
+    { name: 'Rescheduled', value: dashboardTaskCounts.rescheduled, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
   ];
 
   // Sample analytics data
@@ -519,12 +542,23 @@ const Dashboard = () => {
                       gradients={true}
                       animation={true}
                       showLegend={false}
+                      hideTicks={true}
                     />
                   </div>
                   <div className="flex-1">
                     <div className="grid grid-cols-2 gap-3">
                       {jobStatusData.map((status, index) => (
-                        <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div 
+                          key={index} 
+                          className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                          onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
+                            status.name === 'Completed' ? jobsByStatus.completed :
+                            status.name === 'In Progress' ? jobsByStatus.inProgress :
+                            status.name === 'Cancelled' ? jobsByStatus.canceled :
+                            status.name === 'Submitted' ? jobsByStatus.submitted :
+                            jobsByStatus.rescheduled
+                          )}
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center">
                               <div 
@@ -548,9 +582,6 @@ const Dashboard = () => {
                             ></div>
                           </div>
                           <div className="flex justify-between items-center mt-2">
-                            <span className="text-xs text-gray-500">
-                              {((status.value / totalTasks) * 100).toFixed(1)}% of total
-                            </span>
                             <Badge
                               variant="outline"
                               className="text-xs"
@@ -560,8 +591,11 @@ const Dashboard = () => {
                                 backgroundColor: `${status.color}10`
                               }}
                             >
-                              {status.value} jobs
+                              {((status.value / totalTasks) * 100).toFixed(0)}%
                             </Badge>
+                            <span className="text-xs text-gray-500">
+                              View all
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -666,6 +700,14 @@ const Dashboard = () => {
         title={activeDialog.title}
         type={activeDialog.type}
         data={activeDialog.data}
+      />
+
+      <JobStatusDialog
+        open={statusDialog.open}
+        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
+        title={statusDialog.title}
+        status={statusDialog.status}
+        data={statusDialog.data}
       />
     </div>
   );
