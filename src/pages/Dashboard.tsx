@@ -544,11 +544,10 @@ const Dashboard = () => {
                         data={jobStatusData}
                         title={`${totalTasks}`}
                         subtitle="Total Jobs"
-                        size={280} 
-                        thickness={42}
+                        size={220} 
+                        thickness={30}
                         gradients={true}
                         animation={true}
-                        showLegend={false}
                       />
                     </div>
                     <div className="flex-1">
