@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -26,7 +25,7 @@ import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
 import ActivitySection from "@/components/dashboard/ActivitySection";
 import DashboardDetailDialog from "@/components/DashboardDetailDialog";
-import DashboardCalendar from "@/components/dashboard/DashboardCalendar";
+import EnhancedDateRangeFilter from "@/components/dashboard/EnhancedDateRangeFilter";
 import IndustrySelector from "@/components/IndustrySelector";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
@@ -411,12 +410,7 @@ const Dashboard = () => {
         return renderAnalyticsContent();
       default: // Dashboard tab
         return (
-          <>
-            {/* Move date filter to the top right under dashboard header */}
-            <div className="flex justify-end mb-6">
-              <DashboardCalendar date={date} setDate={setDate} />
-            </div>
-            
+          <>            
             {/* Business Performance Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md">
@@ -686,8 +680,13 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-5 py-4">
-      <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="space-y-4 py-4">
+      <DashboardHeader activeTab={activeTab} onTabChange={handleTabChange} />
+      
+      {/* Enhanced Date Range Filter - Moved to the top and styled better */}
+      <div className="mb-6">
+        <EnhancedDateRangeFilter date={date} setDate={setDate} />
+      </div>
       
       {renderContent()}
       
