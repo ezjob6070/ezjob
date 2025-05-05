@@ -1,110 +1,95 @@
 
 import React from "react";
-import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon } from "lucide-react";
-import DashboardMetricCard from "@/components/DashboardMetricCard";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
-import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
-type MetricsOverviewProps = {
+interface MetricsOverviewProps {
   financialMetrics: {
     totalRevenue: number;
-    companysCut: number;
-    [key: string]: any;
+    totalJobs: number;
+    avgJobValue: number;
+    totalLeads: number;
+    conversionRate: number;
+    monthlyGrowth: number;
+    monthlyData: Array<{
+      name: string;
+      value: number;
+    }>;
   };
-  formatCurrency: (amount: number) => string;
-  openDetailDialog: (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => void;
-  detailedTasksData: any[];
-  detailedRevenueData: any[];
-  detailedBusinessMetrics: any[];
-  dateRange?: DateRange;
-};
+  formatCurrency: (value: number) => string;
+  detailedTasksData?: any[];
+  detailedRevenueData?: any[];
+  detailedBusinessMetrics?: any[];
+  dateRange?: DateRange | undefined;
+}
 
 const MetricsOverview = ({ 
   financialMetrics, 
-  formatCurrency, 
-  openDetailDialog,
+  formatCurrency,
   detailedTasksData,
   detailedRevenueData,
   detailedBusinessMetrics,
   dateRange
 }: MetricsOverviewProps) => {
-  const { jobs } = useGlobalState();
-  
-  // Calculate real metrics from jobs data with date filtering
-  const filteredJobs = jobs.filter(job => 
-    (!dateRange?.from || (job.scheduledDate && new Date(job.scheduledDate) >= dateRange.from)) && 
-    (!dateRange?.to || (job.scheduledDate && new Date(job.scheduledDate) <= dateRange.to))
-  );
-  
-  const activeJobs = filteredJobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
-  const completedJobs = filteredJobs.filter(job => job.status === "completed").length;
-  
-  // Format the date range for display
-  const dateRangeText = () => {
-    if (!dateRange?.from) return "";
+  const formatDateRange = () => {
+    if (!dateRange?.from) return "All Time";
     
     if (dateRange.to) {
       if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
-        return `for ${format(dateRange.from, "MMM d, yyyy")}`;
+        return format(dateRange.from, "MMM d, yyyy");
       }
-      return `for ${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
+      return `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
     }
     
-    return `for ${format(dateRange.from, "MMM d, yyyy")}`;
+    return format(dateRange.from, "MMM d, yyyy");
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-      <DashboardMetricCard
-        title="Completed Jobs"
-        value={completedJobs.toString()}
-        icon={<PhoneCallIcon size={20} className="text-white" />}
-        description="Total completed jobs"
-        trend={{ value: "0%", isPositive: true }}
-        className="bg-gradient-to-br from-purple-500 to-violet-600 cursor-pointer hover:shadow-lg transition-all duration-300"
-        variant="vibrant"
-        valueClassName="text-white text-2xl font-bold"
-        onClick={() => openDetailDialog('tasks', 'Completed Jobs', detailedTasksData.filter(t => t.status === 'completed'))}
-        dateRangeText={dateRangeText()}
-      />
-      <DashboardMetricCard
-        title="Active Jobs"
-        value={activeJobs.toString()}
-        icon={<BriefcaseIcon size={20} className="text-white" />}
-        description="Active jobs in progress"
-        trend={{ value: "0%", isPositive: true }}
-        className="bg-gradient-to-br from-yellow-400 to-yellow-500 cursor-pointer hover:shadow-lg transition-all duration-300"
-        variant="vibrant"
-        valueClassName="text-white text-2xl font-bold"
-        onClick={() => openDetailDialog('tasks', 'Active Jobs', detailedTasksData.filter(t => t.status === 'in_progress' || t.status === 'scheduled'))}
-        dateRangeText={dateRangeText()}
-      />
-      <DashboardMetricCard
-        title="Total Revenue"
-        value={formatCurrency(financialMetrics.totalRevenue)}
-        icon={<CalculatorIcon size={20} className="text-white" />}
-        description="Revenue from completed jobs"
-        trend={{ value: "0%", isPositive: true }}
-        className="bg-gradient-to-br from-blue-500 to-blue-600 cursor-pointer hover:shadow-lg transition-all duration-300"
-        variant="vibrant"
-        valueClassName="text-white text-2xl font-bold"
-        onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
-        dateRangeText={dateRangeText()}
-      />
-      <DashboardMetricCard
-        title="Company Net Profit"
-        value={formatCurrency(financialMetrics.companysCut)}
-        icon={<DollarSignIcon size={20} className="text-white" />}
-        description="Net profit earned"
-        trend={{ value: "0%", isPositive: true }}
-        className="bg-gradient-to-br from-green-500 to-green-600 cursor-pointer hover:shadow-lg transition-all duration-300"
-        variant="vibrant"
-        valueClassName="text-white text-2xl font-bold"
-        onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
-        dateRangeText={dateRangeText()}
-      />
-    </div>
+    <Card className="bg-white shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center justify-between">
+          Monthly Performance
+          {dateRange?.from && (
+            <span className="text-xs font-normal text-muted-foreground">
+              {formatDateRange()}
+            </span>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[130px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={financialMetrics.monthlyData}>
+              <XAxis 
+                dataKey="name" 
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `$${value}`}
+              />
+              <Tooltip
+                formatter={(value: any) => [`${formatCurrency(value)}`, 'Revenue']}
+                cursor={{ fill: 'rgba(239, 246, 255, 0.6)' }}
+              />
+              <Bar
+                dataKey="value"
+                fill="rgba(37, 99, 235, 0.9)"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
