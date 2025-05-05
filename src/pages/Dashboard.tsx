@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -18,6 +17,11 @@ import {
   XCircleIcon,
   ClipboardIcon,
   AlertCircleIcon,
+  "phone" as PhoneIcon,
+  "user" as UserIcon,
+  "message-circle" as MessageCircleIcon,
+  "check" as CheckIcon,
+  "circle-x" as CircleXIcon,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -610,6 +614,158 @@ const Dashboard = () => {
                     View Detailed Job Report
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+            
+            {/* Call Tracking Section - New Section */}
+            <Card className="bg-white border-0 shadow-lg mb-6 mt-6">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-medium">Call Tracking & Conversion</CardTitle>
+                <CardDescription>Overview of incoming calls and customer conversion rate</CardDescription>
+              </CardHeader>
+              <CardContent className="pb-6">
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Call Stats */}
+                  <div className="flex-1">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-blue-700">Total Calls</span>
+                          <div className="p-2 bg-blue-100 rounded-full">
+                            <PhoneIcon className="h-4 w-4 text-blue-600" />
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-800">{callsData.total}</div>
+                        <div className="text-xs text-blue-600 mt-1">Last 30 days</div>
+                      </div>
+                      
+                      <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-green-700">Converted</span>
+                          <div className="p-2 bg-green-100 rounded-full">
+                            <UserIcon className="h-4 w-4 text-green-600" />
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-green-800">{callsData.converted}</div>
+                        <div className="text-xs text-green-600 mt-1">New customers</div>
+                      </div>
+                      
+                      <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-amber-700">Scheduled</span>
+                          <div className="p-2 bg-amber-100 rounded-full">
+                            <CalendarIcon className="h-4 w-4 text-amber-600" />
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-amber-800">{callsData.scheduled}</div>
+                        <div className="text-xs text-amber-600 mt-1">Follow-up calls</div>
+                      </div>
+                      
+                      <div className="bg-red-50 rounded-lg p-4 border border-red-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-red-700">Missed</span>
+                          <div className="p-2 bg-red-100 rounded-full">
+                            <CircleXIcon className="h-4 w-4 text-red-600" />
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-red-800">{callsData.missed}</div>
+                        <div className="text-xs text-red-600 mt-1">Opportunity loss</div>
+                      </div>
+                    </div>
+                    
+                    {/* Conversion Rate Indicator */}
+                    <div className="bg-gradient-to-r from-blue-50 to-green-50 p-5 rounded-lg border border-blue-100">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-800">Conversion Rate</h3>
+                          <p className="text-sm text-gray-600">Calls to customer conversion</p>
+                        </div>
+                        <div className="text-3xl font-bold text-blue-700">{callsData.conversionRate}%</div>
+                      </div>
+                      <div className="w-full h-3 bg-gray-200 rounded-full mt-2">
+                        <div 
+                          className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500" 
+                          style={{ width: `${callsData.conversionRate}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between mt-1">
+                        <span className="text-xs text-gray-500">0%</span>
+                        <span className="text-xs text-gray-500">Target: 70%</span>
+                        <span className="text-xs text-gray-500">100%</span>
+                      </div>
+                      {callsData.conversionRate >= 65 ? (
+                        <div className="mt-2 p-1.5 rounded bg-green-100 text-green-700 text-xs flex items-center">
+                          <CheckIcon className="h-3 w-3 mr-1" />
+                          On track to meet quarterly targets
+                        </div>
+                      ) : (
+                        <div className="mt-2 p-1.5 rounded bg-amber-100 text-amber-700 text-xs flex items-center">
+                          <AlertCircleIcon className="h-3 w-3 mr-1" />
+                          Below target - action required
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Monthly Trend Chart */}
+                  <div className="flex-1">
+                    <div className="bg-white p-4 rounded-lg border border-gray-200 h-full">
+                      <h3 className="text-sm font-medium text-gray-700 mb-4">Monthly Call Trends</h3>
+                      <div className="h-48">
+                        <div className="flex flex-col space-y-2">
+                          {callsData.monthlyTrend.map((month, i) => (
+                            <div key={i} className="space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="w-8 text-gray-500">{month.month}</span>
+                                <div className="flex-1 mx-2">
+                                  <div className="relative h-8">
+                                    {/* Total calls bar */}
+                                    <div 
+                                      className="absolute top-0 h-4 bg-blue-200 rounded-sm"
+                                      style={{ width: `${(month.calls / 150) * 100}%` }}
+                                    ></div>
+                                    {/* Converted calls bar */}
+                                    <div 
+                                      className="absolute top-0 h-4 bg-green-400 rounded-sm"
+                                      style={{ width: `${(month.converted / 150) * 100}%` }}
+                                    ></div>
+                                    
+                                    {/* Value labels */}
+                                    <div className="absolute top-5 left-0 text-xs text-gray-500">
+                                      {Math.round((month.converted / month.calls) * 100)}%
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-right">
+                                  <span className="text-blue-600">{month.calls}</span>
+                                  <span className="text-gray-400 mx-1">/</span>
+                                  <span className="text-green-600">{month.converted}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex justify-center mt-2 gap-4">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-blue-200 rounded mr-1"></div>
+                          <span className="text-xs text-gray-600">Total Calls</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-green-400 rounded mr-1"></div>
+                          <span className="text-xs text-gray-600">Converted</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {date?.from && (
+                  <div className="text-xs text-center text-gray-500 mt-4 p-2 bg-gray-50 rounded-md border border-gray-100">
+                    <CalendarIcon className="h-3 w-3 inline mr-1" />
+                    Period: {getDateRangeText()}
+                  </div>
+                )}
               </CardContent>
             </Card>
             
