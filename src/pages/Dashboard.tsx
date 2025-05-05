@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -78,6 +77,13 @@ const Dashboard = () => {
     (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
   );
 
+  // Calculate the number of rescheduled jobs
+  const rescheduledJobs = jobs.filter(job => 
+    job.status === "rescheduled" && 
+    (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
+    (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
+  ).length;
+
   const totalRevenue = completedJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
   const totalExpenses = totalRevenue * 0.4;
   const companyProfit = totalRevenue - totalExpenses;
@@ -142,6 +148,16 @@ const Dashboard = () => {
     { name: 'Installation', value: 28, color: '#0ea5e9' },
     { name: 'Maintenance', value: 18, color: '#10b981' },
     { name: 'Other', value: 12, color: '#f59e0b' },
+  ];
+
+  // Create job status data for the circular visualization
+  const jobStatusData = [
+    { name: 'Completed', value: dashboardTaskCounts.completed, color: '#10b981' },
+    { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6' },
+    { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444' },
+    { name: 'Submitted', value: dashboardTaskCounts.submitted, color: '#f59e0b' },
+    { name: 'Draft', value: dashboardTaskCounts.draft, color: '#8b5cf6' },
+    { name: 'Rescheduled', value: rescheduledJobs, color: '#ec4899' },
   ];
 
   const COLORS = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'];
@@ -401,6 +417,11 @@ const Dashboard = () => {
       default: // Dashboard tab
         return (
           <>
+            {/* Move date filter to the top right under dashboard header */}
+            <div className="flex justify-end mb-6">
+              <DashboardCalendar date={date} setDate={setDate} />
+            </div>
+            
             {/* Business Performance Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md">
@@ -515,79 +536,50 @@ const Dashboard = () => {
                   <CardDescription>Overview of service requests and job status</CardDescription>
                 </CardHeader>
                 <CardContent className="pb-6">
-                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                    <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-sm">
-                      <div className="flex items-center mb-2">
-                        <div className="w-8 h-8 rounded-md flex items-center justify-center bg-blue-500 mr-3">
-                          <ClipboardIcon className="h-4 w-4 text-white" />
-                        </div>
-                        <span className="font-medium text-blue-700">New Jobs</span>
+                  <div className="flex flex-col md:flex-row items-center">
+                    <div className="flex-1 mb-4 md:mb-0">
+                      <EnhancedDonutChart 
+                        data={jobStatusData}
+                        title={`${totalTasks}`}
+                        subtitle="Total Jobs"
+                        size={220}
+                        thickness={35}
+                        gradients={true}
+                        animation={true}
+                        showLegend={true}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="grid grid-cols-2 gap-3">
+                        {jobStatusData.map((status, index) => (
+                          <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 shadow-sm">
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center">
+                                <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: status.color }}></div>
+                                <span className="font-medium text-gray-700 text-sm">{status.name}</span>
+                              </div>
+                              <span className="text-sm font-bold text-gray-900">{status.value}</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1">
+                              <div 
+                                className="h-1.5 rounded-full" 
+                                style={{ 
+                                  width: `${(status.value / totalTasks) * 100}%`,
+                                  backgroundColor: status.color 
+                                }}
+                              ></div>
+                            </div>
+                            <span className="text-xs text-gray-500 mt-1">
+                              {Math.round((status.value / totalTasks) * 100)}% of total
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                      <span className="text-2xl font-bold text-blue-900">{dashboardTaskCounts.joby}</span>
-                      <span className="text-xs text-blue-600 mt-1">12% of total requests</span>
                       {date?.from && (
-                        <span className="text-xs text-blue-600 mt-1">Period: {getDateRangeText()}</span>
-                      )}
-                    </div>
-                    
-                    <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 shadow-sm">
-                      <div className="flex items-center mb-2">
-                        <div className="w-8 h-8 rounded-md flex items-center justify-center bg-indigo-500 mr-3">
-                          <ClockIcon className="h-4 w-4 text-white" />
+                        <div className="text-xs text-center text-gray-500 mt-3">
+                          Period: {getDateRangeText()}
                         </div>
-                        <span className="font-medium text-indigo-700">In Progress</span>
-                      </div>
-                      <span className="text-2xl font-bold text-indigo-900">{dashboardTaskCounts.inProgress}</span>
-                      <span className="text-xs text-indigo-600 mt-1">28% of total requests</span>
-                      {date?.from && (
-                        <span className="text-xs text-indigo-600 mt-1">Period: {getDateRangeText()}</span>
                       )}
-                    </div>
-                    
-                    <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-green-50 to-green-100 border border-green-200 shadow-sm">
-                      <div className="flex items-center mb-2">
-                        <div className="w-8 h-8 rounded-md flex items-center justify-center bg-green-500 mr-3">
-                          <CheckCircleIcon className="h-4 w-4 text-white" />
-                        </div>
-                        <span className="font-medium text-green-700">Completed</span>
-                      </div>
-                      <span className="text-2xl font-bold text-green-900">{dashboardTaskCounts.completed}</span>
-                      <span className="text-xs text-green-600 mt-1">48% of total requests</span>
-                      {date?.from && (
-                        <span className="text-xs text-green-600 mt-1">Period: {getDateRangeText()}</span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 shadow-sm">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-amber-700 text-sm">Submitted</span>
-                        <span className="text-sm font-bold text-amber-900">{dashboardTaskCounts.submitted}</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-amber-200 rounded-full mt-1">
-                        <div className="h-1.5 bg-amber-500 rounded-full" style={{ width: `${(dashboardTaskCounts.submitted / totalTasks) * 100}%` }}></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 shadow-sm">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-orange-700 text-sm">Draft</span>
-                        <span className="text-sm font-bold text-orange-900">{dashboardTaskCounts.draft}</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-orange-200 rounded-full mt-1">
-                        <div className="h-1.5 bg-orange-500 rounded-full" style={{ width: `${(dashboardTaskCounts.draft / totalTasks) * 100}%` }}></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-red-50 to-red-100 border border-red-200 shadow-sm">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-red-700 text-sm">Canceled</span>
-                        <span className="text-sm font-bold text-red-900">{dashboardTaskCounts.canceled}</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-red-200 rounded-full mt-1">
-                        <div className="h-1.5 bg-red-500 rounded-full" style={{ width: `${(dashboardTaskCounts.canceled / totalTasks) * 100}%` }}></div>
-                      </div>
                     </div>
                   </div>
                   
@@ -697,11 +689,6 @@ const Dashboard = () => {
   return (
     <div className="space-y-5 py-4">
       <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      {/* Date filter section at the top */}
-      <div className="flex justify-end mb-4">
-        <DashboardCalendar date={date} setDate={setDate} />
-      </div>
       
       {renderContent()}
       
