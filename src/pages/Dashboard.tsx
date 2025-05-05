@@ -141,13 +141,13 @@ const Dashboard = () => {
     { month: 'Mar', calls: 32, jobs: 24, revenue: 5800 },
     { month: 'Apr', calls: 35, jobs: 28, revenue: 6200 },
     { month: 'May', calls: 30, jobs: 25, revenue: 5900 },
-    { month: 'Jun', calls: 27, jobs: 23, revenue: 5400 },
-    { month: 'Jul', calls: 29, jobs: 26, revenue: 6100 },
-    { month: 'Aug', calls: 33, jobs: 28, revenue: 6500 },
-    { month: 'Sep', calls: 37, jobs: 32, revenue: 7200 },
-    { month: 'Oct', calls: 42, jobs: 34, revenue: 7800 },
-    { month: 'Nov', calls: 45, jobs: 36, revenue: 8200 },
-    { month: 'Dec', calls: 48, jobs: 40, revenue: 9100 },
+    { name: 'Jun', calls: 27, jobs: 23, revenue: 5400 },
+    { name: 'Jul', calls: 29, jobs: 26, revenue: 6100 },
+    { name: 'Aug', calls: 33, jobs: 28, revenue: 6500 },
+    { name: 'Sep', calls: 37, jobs: 32, revenue: 7200 },
+    { name: 'Oct', calls: 42, jobs: 34, revenue: 7800 },
+    { name: 'Nov', calls: 45, jobs: 36, revenue: 8200 },
+    { name: 'Dec', calls: 48, jobs: 40, revenue: 9100 },
   ];
 
   const totalJobs = completedJobs.length + jobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
@@ -251,7 +251,7 @@ const Dashboard = () => {
               <CardDescription>Service breakdown by category</CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center items-center">
-              <DonutChart
+              <EnhancedDonutChart
                 data={jobTypeData}
                 title={`${totalJobs}`}
                 subtitle="Total Jobs"
