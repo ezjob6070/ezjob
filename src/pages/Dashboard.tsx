@@ -530,95 +530,70 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Jobs Status Summary and Calendar View */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-              <Card className="md:col-span-2 bg-white border-0 shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium">Jobs By Status</CardTitle>
-                  <CardDescription>Overview of service requests and job status</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-6">
-                  <div className="flex flex-col md:flex-row items-center">
-                    <div className="flex-1 mb-4 md:mb-0 flex justify-center">
-                      <EnhancedDonutChart 
-                        data={jobStatusData}
-                        title={`${totalTasks}`}
-                        subtitle="Total Jobs"
-                        size={220} 
-                        thickness={30}
-                        gradients={true}
-                        animation={true}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="grid grid-cols-2 gap-3">
-                        {jobStatusData.map((status, index) => (
-                          <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: status.color }}></div>
-                                <span className="font-medium text-gray-700 text-sm">{status.name}</span>
-                              </div>
-                              <span className="text-sm font-bold text-gray-900">{status.value}</span>
+            {/* Enhanced Jobs Status Section - Now Full Width */}
+            <Card className="bg-white border-0 shadow-md mb-6">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-medium">Jobs By Status</CardTitle>
+                <CardDescription>Overview of service requests and job status</CardDescription>
+              </CardHeader>
+              <CardContent className="pb-6">
+                <div className="flex flex-col md:flex-row items-center">
+                  <div className="flex-1 mb-4 md:mb-0 flex justify-center">
+                    <EnhancedDonutChart 
+                      data={jobStatusData}
+                      title={`${totalTasks}`}
+                      subtitle="Total Jobs"
+                      size={300} 
+                      thickness={50}
+                      gradients={true}
+                      animation={true}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="grid grid-cols-2 gap-3">
+                      {jobStatusData.map((status, index) => (
+                        <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: status.color }}></div>
+                              <span className="font-medium text-gray-700 text-sm">{status.name}</span>
                             </div>
-                            <div className="w-full h-2 bg-gray-200 rounded-full mt-1">
-                              <div 
-                                className="h-2 rounded-full" 
-                                style={{ 
-                                  width: `${(status.value / totalTasks) * 100}%`,
-                                  backgroundColor: status.color 
-                                }}
-                              ></div>
-                            </div>
-                            <span className="text-xs text-gray-500 mt-1">
-                              {Math.round((status.value / totalTasks) * 100)}% of total
-                            </span>
+                            <span className="text-sm font-bold text-gray-900">{status.value}</span>
                           </div>
-                        ))}
-                      </div>
-                      {date?.from && (
-                        <div className="text-xs text-center text-gray-500 mt-3">
-                          Period: {getDateRangeText()}
+                          <div className="w-full h-2 bg-gray-200 rounded-full mt-1">
+                            <div 
+                              className="h-2 rounded-full" 
+                              style={{ 
+                                width: `${(status.value / totalTasks) * 100}%`,
+                                backgroundColor: status.color 
+                              }}
+                            ></div>
+                          </div>
+                          <span className="text-xs text-gray-500 mt-1">
+                            {Math.round((status.value / totalTasks) * 100)}% of total
+                          </span>
                         </div>
-                      )}
+                      ))}
                     </div>
+                    {date?.from && (
+                      <div className="text-xs text-center text-gray-500 mt-3">
+                        Period: {getDateRangeText()}
+                      </div>
+                    )}
                   </div>
-                  
-                  <div className="mt-5 text-center">
-                    <Button 
-                      className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                      onClick={() => openDetailDialog('tasks', 'All Jobs', detailedTasksData)}
-                    >
-                      <ClipboardIcon className="h-4 w-4 mr-2" />
-                      View Detailed Job Report
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-white border-0 shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium">Job Type Distribution</CardTitle>
-                  <CardDescription>Service breakdown by category</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center items-center pb-6">
-                  <EnhancedDonutChart
-                    data={jobTypeData}
-                    title={`${totalJobs}`}
-                    subtitle="Total Jobs"
-                    size={220}
-                    thickness={30}
-                    gradients={true}
-                    animation={true}
-                  />
-                  {date?.from && (
-                    <div className="text-xs text-center text-gray-500 mt-2">
-                      Period: {getDateRangeText()}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+                
+                <div className="mt-5 text-center">
+                  <Button 
+                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    onClick={() => openDetailDialog('tasks', 'All Jobs', detailedTasksData)}
+                  >
+                    <ClipboardIcon className="h-4 w-4 mr-2" />
+                    View Detailed Job Report
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
             
             {/* Today's Appointments section */}
             <Card className="bg-white border-0 shadow-md mb-6">
