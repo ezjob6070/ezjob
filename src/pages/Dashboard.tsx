@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { addDays } from "date-fns";
+import { addDays, format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";
 import {
@@ -107,6 +108,17 @@ const Dashboard = () => {
       title,
       data
     });
+  };
+
+  // Format date range for display
+  const getDateRangeText = () => {
+    if (!date?.from) return "All time";
+    
+    if (!date.to) {
+      return format(date.from, "MMM d, yyyy");
+    }
+    
+    return `${format(date.from, "MMM d")} - ${format(date.to, "MMM d, yyyy")}`;
   };
 
   // Sample statistics data
@@ -270,7 +282,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="grid grid-cols-12 gap-2 mt-2">
               {performanceData.map((data) => (
-                <div key={data.month} className="col-span-1">
+                <div key={data.month || data.name} className="col-span-1">
                   <div className="flex flex-col items-center">
                     <div className="relative w-full mb-1 h-32">
                       <div 
@@ -278,7 +290,7 @@ const Dashboard = () => {
                         style={{ height: `${(data.jobs / 50) * 100}%` }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-500">{data.month}</span>
+                    <span className="text-xs text-gray-500">{data.month || data.name}</span>
                   </div>
                 </div>
               ))}
@@ -309,7 +321,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="grid grid-cols-12 gap-2 mt-2">
               {performanceData.map((data) => (
-                <div key={data.month} className="col-span-1">
+                <div key={data.month || data.name} className="col-span-1">
                   <div className="flex flex-col items-center">
                     <div className="relative w-full mb-1 h-32">
                       <div 
@@ -321,7 +333,7 @@ const Dashboard = () => {
                         style={{ height: `${(data.calls / 50) * 100}%`, left: '25%' }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-500">{data.month}</span>
+                    <span className="text-xs text-gray-500">{data.month || data.name}</span>
                   </div>
                 </div>
               ))}
@@ -414,6 +426,11 @@ const Dashboard = () => {
                   <p className="text-blue-600 text-xs mt-2">
                     78% of quarterly target
                   </p>
+                  {date?.from && (
+                    <p className="text-blue-600 text-xs mt-2">
+                      Period: {getDateRangeText()}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
               
@@ -445,6 +462,11 @@ const Dashboard = () => {
                       Operating
                     </div>
                   </div>
+                  {date?.from && (
+                    <p className="text-emerald-600 text-xs mt-2">
+                      Period: {getDateRangeText()}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
               
@@ -476,6 +498,11 @@ const Dashboard = () => {
                       In Progress
                     </div>
                   </div>
+                  {date?.from && (
+                    <p className="text-purple-600 text-xs mt-2">
+                      Period: {getDateRangeText()}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -498,6 +525,9 @@ const Dashboard = () => {
                       </div>
                       <span className="text-2xl font-bold text-blue-900">{dashboardTaskCounts.joby}</span>
                       <span className="text-xs text-blue-600 mt-1">12% of total requests</span>
+                      {date?.from && (
+                        <span className="text-xs text-blue-600 mt-1">Period: {getDateRangeText()}</span>
+                      )}
                     </div>
                     
                     <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 shadow-sm">
@@ -509,6 +539,9 @@ const Dashboard = () => {
                       </div>
                       <span className="text-2xl font-bold text-indigo-900">{dashboardTaskCounts.inProgress}</span>
                       <span className="text-xs text-indigo-600 mt-1">28% of total requests</span>
+                      {date?.from && (
+                        <span className="text-xs text-indigo-600 mt-1">Period: {getDateRangeText()}</span>
+                      )}
                     </div>
                     
                     <div className="flex flex-col p-4 rounded-lg bg-gradient-to-br from-green-50 to-green-100 border border-green-200 shadow-sm">
@@ -520,6 +553,9 @@ const Dashboard = () => {
                       </div>
                       <span className="text-2xl font-bold text-green-900">{dashboardTaskCounts.completed}</span>
                       <span className="text-xs text-green-600 mt-1">48% of total requests</span>
+                      {date?.from && (
+                        <span className="text-xs text-green-600 mt-1">Period: {getDateRangeText()}</span>
+                      )}
                     </div>
                   </div>
                   
@@ -582,6 +618,11 @@ const Dashboard = () => {
                     gradients={true}
                     animation={true}
                   />
+                  {date?.from && (
+                    <div className="text-xs text-center text-gray-500 mt-2">
+                      Period: {getDateRangeText()}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -626,8 +667,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            <DashboardCalendar date={date} setDate={setDate} />
-            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6">
               <PerformanceCard 
                 leadSources={dashboardLeadSources}
@@ -658,6 +697,11 @@ const Dashboard = () => {
   return (
     <div className="space-y-5 py-4">
       <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      {/* Date filter section at the top */}
+      <div className="flex justify-end mb-4">
+        <DashboardCalendar date={date} setDate={setDate} />
+      </div>
       
       {renderContent()}
       
