@@ -31,6 +31,32 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
     }
   };
 
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'high';
+      case 'medium':
+        return 'medium';
+      case 'low':
+        return 'low';
+      default:
+        return 'normal';
+    }
+  };
+
+  const getPriorityBg = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'text-red-700';
+      case 'medium':
+        return 'text-yellow-700';
+      case 'low':
+        return 'text-green-700';
+      default:
+        return 'text-gray-700';
+    }
+  };
+
   return (
     <Card className="bg-white shadow-sm h-full">
       <CardHeader className="pb-2">
@@ -45,8 +71,8 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
               <div className="flex-1">
                 <div className="flex justify-between">
                   <h4 className="font-medium">{appointment.client}</h4>
-                  <span className={`text-xs bg-${appointment.priority === 'high' ? 'red' : appointment.priority === 'medium' ? 'yellow' : 'green'}-100 text-${appointment.priority === 'high' ? 'red' : appointment.priority === 'medium' ? 'yellow' : 'green'}-700 px-1.5 py-0.5 rounded`}>
-                    {appointment.priority}
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${getPriorityBg(appointment.priority)}`}>
+                    {getPriorityText(appointment.priority)}
                   </span>
                 </div>
                 <div className="text-xs text-gray-500">{appointment.time} - {appointment.type}</div>

@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, LoaderCircle, XCircle, RotateCw } from "lucide-react";
 
 interface JobsStatusSectionProps {
   taskCounts: {
@@ -25,50 +26,85 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
       </CardHeader>
       <CardContent>
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <div className="relative flex items-center justify-center">
-            <svg width="200" height="200" viewBox="0 0 200 200">
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" strokeWidth="30" />
+          <div className="relative w-60 h-60">
+            <svg viewBox="0 0 100 100" className="w-full h-full">
+              {/* Background circle */}
+              <circle cx="50" cy="50" r="40" fill="white" stroke="#f0f0f0" strokeWidth="2" />
+              
+              {/* Completed - Green segment */}
               <circle 
-                cx="100" 
-                cy="100" 
-                r="80" 
+                cx="50" 
+                cy="50" 
+                r="40" 
                 fill="none" 
                 stroke="#22c55e" 
-                strokeWidth="30" 
-                strokeDasharray={`${2 * Math.PI * 80 * (taskCounts.completed / totalTasks)} ${2 * Math.PI * 80}`}
-                strokeDashoffset={2 * Math.PI * 80 * 0.25}
+                strokeWidth="20" 
+                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.completed / totalTasks)} ${2 * Math.PI * 40}`} 
+                strokeDashoffset="0" 
+                transform="rotate(-90 50 50)" 
               />
+              
+              {/* In Progress - Blue segment */}
               <circle 
-                cx="100" 
-                cy="100" 
-                r="80" 
+                cx="50" 
+                cy="50" 
+                r="40" 
                 fill="none" 
                 stroke="#3b82f6" 
-                strokeWidth="30" 
-                strokeDasharray={`${2 * Math.PI * 80 * (taskCounts.inProgress / totalTasks)} ${2 * Math.PI * 80}`}
-                strokeDashoffset={2 * Math.PI * 80 * (0.25 - taskCounts.completed / totalTasks)}
+                strokeWidth="20" 
+                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.inProgress / totalTasks)} ${2 * Math.PI * 40}`} 
+                strokeDashoffset={`${-2 * Math.PI * 40 * (taskCounts.completed / totalTasks)}`} 
+                transform="rotate(-90 50 50)" 
               />
+              
+              {/* Cancelled - Red segment */}
               <circle 
-                cx="100" 
-                cy="100" 
-                r="80" 
+                cx="50" 
+                cy="50" 
+                r="40" 
                 fill="none" 
                 stroke="#ef4444" 
-                strokeWidth="30" 
-                strokeDasharray={`${2 * Math.PI * 80 * (taskCounts.canceled / totalTasks)} ${2 * Math.PI * 80}`}
-                strokeDashoffset={2 * Math.PI * 80 * (0.25 - taskCounts.completed / totalTasks - taskCounts.inProgress / totalTasks)}
+                strokeWidth="20" 
+                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.canceled / totalTasks)} ${2 * Math.PI * 40}`} 
+                strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress) / totalTasks)}`} 
+                transform="rotate(-90 50 50)" 
               />
+              
+              {/* Rescheduled - Purple segment */}
+              <circle 
+                cx="50" 
+                cy="50" 
+                r="40" 
+                fill="none" 
+                stroke="#a855f7" 
+                strokeWidth="20" 
+                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.rescheduled / totalTasks)} ${2 * Math.PI * 40}`} 
+                strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress + taskCounts.canceled) / totalTasks)}`} 
+                transform="rotate(-90 50 50)" 
+              />
+              
+              {/* Center text */}
+              <text x="50" y="45" textAnchor="middle" fontSize="22" fontWeight="bold">{totalTasks}</text>
+              <text x="50" y="60" textAnchor="middle" fontSize="8" fill="#666">Total Jobs</text>
+              
+              {/* Completed count */}
+              <text x="72" y="32" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#22c55e">{taskCounts.completed}</text>
+              
+              {/* In Progress count */}
+              <text x="28" y="32" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#3b82f6">{taskCounts.inProgress}</text>
+              
+              {/* Cancelled count */}
+              <text x="28" y="72" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#ef4444">{taskCounts.canceled}</text>
+              
+              {/* Rescheduled count */}
+              <text x="72" y="72" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#a855f7">{taskCounts.rescheduled}</text>
             </svg>
-            <div className="absolute text-center">
-              <div className="text-3xl font-bold">{totalTasks}</div>
-              <div className="text-xs text-muted-foreground">Total Jobs</div>
-            </div>
           </div>
           
           <div className="grid grid-cols-1 gap-2 w-full">
             <div className="flex items-center justify-between p-2 rounded bg-green-50">
               <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                <CheckCircle className="h-4 w-4 text-green-500" />
                 <span>Completed</span>
               </div>
               <div className="flex items-center gap-4">
@@ -82,7 +118,7 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
             
             <div className="flex items-center justify-between p-2 rounded bg-blue-50">
               <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-blue-500"></div>
+                <LoaderCircle className="h-4 w-4 text-blue-500" />
                 <span>In Progress</span>
               </div>
               <div className="flex items-center gap-4">
@@ -96,7 +132,7 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
             
             <div className="flex items-center justify-between p-2 rounded bg-red-50">
               <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                <XCircle className="h-4 w-4 text-red-500" />
                 <span>Cancelled</span>
               </div>
               <div className="flex items-center gap-4">
@@ -110,7 +146,7 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
             
             <div className="flex items-center justify-between p-2 rounded bg-purple-50">
               <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-purple-500"></div>
+                <RotateCw className="h-4 w-4 text-purple-500" />
                 <span>Rescheduled</span>
               </div>
               <div className="flex items-center gap-4">

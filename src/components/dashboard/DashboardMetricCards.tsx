@@ -35,7 +35,7 @@ const DashboardMetricCards: React.FC<DashboardMetricCardsProps> = ({
           </div>
           <div className="text-xl font-bold text-blue-900">${formatCurrency(financialMetrics.totalRevenue)}</div>
           <div className="text-xs text-blue-600 mt-1">
-            ${formatCurrency(financialMetrics.avgJobValue)} avg per job • {dateRange || "All time"}
+            ${formatCurrency(financialMetrics.avgJobValue)} avg per job
           </div>
           <div className="w-full bg-blue-200 h-2 rounded-full mt-2">
             <div className="bg-blue-500 h-2 rounded-full" style={{ width: "78%" }}></div>
