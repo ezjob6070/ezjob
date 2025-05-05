@@ -333,8 +333,6 @@ const Index = () => {
       <DashboardHeader 
         activeTab={activeTab} 
         onTabChange={handleTabChange} 
-        date={date}
-        setDate={setDate}
       />
       
       {renderContent()}
