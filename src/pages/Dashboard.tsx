@@ -156,7 +156,6 @@ const Dashboard = () => {
     { name: 'Completed', value: dashboardTaskCounts.completed, color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a' },
     { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb' },
     { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444', gradientFrom: '#f87171', gradientTo: '#dc2626' },
-    { name: 'Submitted', value: dashboardTaskCounts.submitted, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
     { name: 'Rescheduled', value: dashboardTaskCounts.rescheduled, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
   ];
 
@@ -507,12 +506,12 @@ const Dashboard = () => {
                       Completion Rate
                     </div>
                     <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
-                      <span className="block text-sm font-semibold">{dashboardTaskCounts.submitted}</span>
-                      Scheduled
-                    </div>
-                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
                       <span className="block text-sm font-semibold">{dashboardTaskCounts.inProgress}</span>
                       In Progress
+                    </div>
+                    <div className="p-2 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                      <span className="block text-sm font-semibold">{dashboardTaskCounts.rescheduled}</span>
+                      Rescheduled
                     </div>
                   </div>
                   {date?.from && (
@@ -542,7 +541,6 @@ const Dashboard = () => {
                       gradients={true}
                       animation={true}
                       showLegend={false}
-                      hideTicks={true}
                     />
                   </div>
                   <div className="flex-1">
@@ -555,7 +553,6 @@ const Dashboard = () => {
                             status.name === 'Completed' ? jobsByStatus.completed :
                             status.name === 'In Progress' ? jobsByStatus.inProgress :
                             status.name === 'Cancelled' ? jobsByStatus.canceled :
-                            status.name === 'Submitted' ? jobsByStatus.submitted :
                             jobsByStatus.rescheduled
                           )}
                         >

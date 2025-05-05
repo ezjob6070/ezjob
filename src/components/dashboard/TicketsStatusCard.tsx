@@ -34,10 +34,9 @@ type TicketsStatusCardProps = {
   taskCounts: {
     joby: number;
     inProgress: number;
-    submitted: number;
-    draft: number;
     completed: number;
     canceled: number;
+    rescheduled: number;
   };
   totalTasks: number;
   openDetailDialog: (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => void;
@@ -151,10 +150,9 @@ const TicketsStatusCard = ({
               data={[
                 { name: "New Jobs", value: taskCounts.joby, color: "#3b82f6" },
                 { name: "In Progress", value: taskCounts.inProgress, color: "#8b5cf6" },
-                { name: "On Review", value: taskCounts.submitted, color: "#6b7280" },
-                { name: "Draft", value: taskCounts.draft, color: "#f97316" },
                 { name: "Completed", value: taskCounts.completed, color: "#22c55e" },
-                { name: "Canceled", value: taskCounts.canceled, color: "#ef4444" }
+                { name: "Canceled", value: taskCounts.canceled, color: "#ef4444" },
+                { name: "Rescheduled", value: taskCounts.rescheduled, color: "#ec4899" }
               ]}
               title={`${totalTasks}`}
               subtitle="Total Jobs"
@@ -182,26 +180,6 @@ const TicketsStatusCard = ({
               </div>
             </div>
             
-            <div className="flex items-center p-3 rounded-lg bg-white shadow-sm border border-gray-100 transition-all hover:shadow-md">
-              <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center text-white mr-3">
-                <ClipboardIcon size={18} />
-              </div>
-              <div>
-                <div className="text-xs text-gray-700 font-semibold">On Review</div>
-                <div className="text-xl font-bold text-gray-800">{taskCounts.submitted}</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center p-3 rounded-lg bg-white shadow-sm border border-orange-100 transition-all hover:shadow-md">
-              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white mr-3">
-                <ClipboardIcon size={18} />
-              </div>
-              <div>
-                <div className="text-xs text-orange-700 font-semibold">Draft</div>
-                <div className="text-xl font-bold text-gray-800">{taskCounts.draft}</div>
-              </div>
-            </div>
-            
             <div className="flex items-center p-3 rounded-lg bg-white shadow-sm border border-green-100 transition-all hover:shadow-md">
               <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-white mr-3">
                 <CheckCircleIcon size={18} />
@@ -219,6 +197,16 @@ const TicketsStatusCard = ({
               <div>
                 <div className="text-xs text-red-700 font-semibold">Canceled</div>
                 <div className="text-xl font-bold text-gray-800">{taskCounts.canceled}</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center p-3 rounded-lg bg-white shadow-sm border border-pink-100 transition-all hover:shadow-md col-span-2">
+              <div className="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center text-white mr-3">
+                <ClockIcon size={18} className="rotate-45" />
+              </div>
+              <div>
+                <div className="text-xs text-pink-700 font-semibold">Rescheduled</div>
+                <div className="text-xl font-bold text-gray-800">{taskCounts.rescheduled}</div>
               </div>
             </div>
           </div>

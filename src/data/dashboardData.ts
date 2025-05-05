@@ -5,7 +5,6 @@ import { DateRange } from "react-day-picker";
 export const dashboardTaskCounts = {
   joby: 0,
   inProgress: 24,
-  submitted: 18,
   completed: 42,
   canceled: 8,
   rescheduled: 6
@@ -73,11 +72,6 @@ export const jobsByStatus = {
     { id: "JOB-1002", client: "Martin Residence", address: "456 Pine Ave", taskType: "Plumbing", technician: "Sarah Johnson", date: "2023-05-02", amount: 450 },
     { id: "JOB-1008", client: "Davis Family", address: "753 Walnut Ct", taskType: "Duct Cleaning", technician: "Michael Rodriguez", date: "2023-05-03", amount: 550 }
   ],
-  submitted: [
-    { id: "JOB-1003", client: "Franklin Building", address: "789 Maple Rd", taskType: "Electrical", technician: "Emily Garcia", date: "2023-05-03", amount: 1200 },
-    { id: "JOB-1005", client: "Thompson Office", address: "654 Cedar Ln", taskType: "Commercial HVAC", technician: "David Williams", date: "2023-05-04", amount: 4800 },
-    { id: "JOB-1009", client: "Miller Building", address: "426 Fir Pl", taskType: "Commercial Electric", technician: "Sarah Johnson", date: "2023-05-04", amount: 2750 }
-  ],
   canceled: [
     { id: "JOB-1006", client: "Johnson Residence", address: "987 Birch Blvd", taskType: "Water Heater", technician: "Michael Rodriguez", date: "2023-05-01", amount: 1350, reason: "Client cancelled due to emergency" }
   ],
@@ -91,14 +85,13 @@ export const jobsByStatus = {
 export const detailedTasksData = [
   { id: "JOB-1001", client: "Reynolds Family", address: "123 Oak St", taskType: "AC Repair", status: "completed", date: "2023-05-01", amount: 780 },
   { id: "JOB-1002", client: "Martin Residence", address: "456 Pine Ave", taskType: "Plumbing", status: "in_progress", date: "2023-05-02", amount: 450 },
-  { id: "JOB-1003", client: "Franklin Building", address: "789 Maple Rd", taskType: "Electrical", status: "scheduled", date: "2023-05-03", amount: 1200 },
   { id: "JOB-1004", client: "Garcia Home", address: "321 Elm St", taskType: "HVAC Installation", status: "completed", date: "2023-05-01", amount: 3400 },
-  { id: "JOB-1005", client: "Thompson Office", address: "654 Cedar Ln", taskType: "Commercial HVAC", status: "scheduled", date: "2023-05-04", amount: 4800 },
   { id: "JOB-1006", client: "Johnson Residence", address: "987 Birch Blvd", taskType: "Water Heater", status: "canceled", date: "2023-05-01", amount: 1350 },
   { id: "JOB-1007", client: "Williams Apartment", address: "159 Spruce Dr", taskType: "Appliance Repair", status: "completed", date: "2023-05-02", amount: 245 },
   { id: "JOB-1008", client: "Davis Family", address: "753 Walnut Ct", taskType: "Duct Cleaning", status: "in_progress", date: "2023-05-03", amount: 550 },
-  { id: "JOB-1009", client: "Miller Building", address: "426 Fir Pl", taskType: "Commercial Electric", status: "scheduled", date: "2023-05-04", amount: 2750 },
-  { id: "JOB-1010", client: "Wilson Home", address: "802 Redwood Way", taskType: "Insulation", status: "completed", date: "2023-05-02", amount: 1870 }
+  { id: "JOB-1010", client: "Wilson Home", address: "802 Redwood Way", taskType: "Insulation", status: "completed", date: "2023-05-02", amount: 1870 },
+  { id: "JOB-1011", client: "Parker Home", address: "345 Pine St", taskType: "HVAC Maintenance", status: "rescheduled", date: "2023-05-03", newDate: "2023-05-10", amount: 320 },
+  { id: "JOB-1012", client: "Adams Office", address: "567 Oak Ave", taskType: "Electrical Panel", status: "rescheduled", date: "2023-05-04", newDate: "2023-05-12", amount: 890 }
 ];
 
 // Detailed leads data for dialog
