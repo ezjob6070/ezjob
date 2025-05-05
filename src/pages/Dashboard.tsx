@@ -8,7 +8,6 @@ import TicketsStatusCard from "@/components/dashboard/TicketsStatusCard";
 import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
 import ActivitySection from "@/components/dashboard/ActivitySection";
-import { useGlobalDateRange } from "@/components/GlobalDateRangeFilter";
 import { Button } from "@/components/ui/button";
 import { CalendarRange } from "lucide-react";
 import { format } from "date-fns";
@@ -33,8 +32,7 @@ import {
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 
 const Dashboard = () => {
-  // Use the global date range context
-  const { dateRange, setDateRange } = useGlobalDateRange();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [openDateFilter, setOpenDateFilter] = useState(false);
   
   const formatDateRange = () => {
@@ -133,9 +131,24 @@ const Dashboard = () => {
           />
           
           <PerformanceCard 
-            leadSources={dashboardLeadSources}
-            jobTypePerformance={dashboardJobTypePerformance}
-            financialMetrics={dashboardFinancialMetrics}
+            leadSources={dashboardLeadSources.map(source => ({
+              name: source.name,
+              count: source.value,
+              percentage: source.percentage
+            }))}
+            jobTypePerformance={dashboardJobTypePerformance.map(performance => ({
+              name: performance.name,
+              completed: performance.value,
+              total: performance.revenue / performance.avgValue
+            }))}
+            financialMetrics={{
+              totalRevenue: dashboardFinancialMetrics.totalRevenue,
+              totalJobs: totalTasks,
+              avgJobValue: dashboardFinancialMetrics.avgJobValue,
+              totalLeads: dashboardLeadSources.reduce((sum, source) => sum + source.value, 0),
+              conversionRate: dashboardFinancialMetrics.conversionRate,
+              monthlyGrowth: dashboardFinancialMetrics.monthlyGrowth
+            }}
             formatCurrency={formatCurrency}
             detailedBusinessMetrics={detailedBusinessMetrics}
             dateRange={dateRange}
@@ -144,15 +157,40 @@ const Dashboard = () => {
         
         <div className="lg:col-span-2 space-y-4">
           <TopTechniciansCard 
-            topTechnicians={dashboardTopTechnicians}
+            topTechnicians={dashboardTopTechnicians.map(tech => ({
+              id: `tech-${tech.name.toLowerCase().replace(/\s+/g, '-')}`,
+              name: tech.name,
+              avatar: tech.avatar,
+              initials: tech.name.split(' ').map(n => n[0]).join(''),
+              completedJobs: tech.jobs,
+              revenue: tech.revenue,
+              rating: tech.rating,
+              status: Math.random() > 0.5 ? 'available' : (Math.random() > 0.5 ? 'busy' : 'offline')
+            }))}
             formatCurrency={formatCurrency}
             detailedClientsData={detailedClientsData}
             dateRange={dateRange}
           />
           
           <ActivitySection 
-            activities={dashboardActivities}
-            events={dashboardEvents}
+            activities={dashboardActivities.map(activity => ({
+              id: activity.id,
+              type: activity.type,
+              user: {
+                name: activity.user.name,
+                avatar: undefined,
+                initials: activity.user.initials
+              },
+              description: activity.title,
+              timestamp: activity.time
+            }))}
+            events={dashboardEvents.map(event => ({
+              id: event.id,
+              title: event.title,
+              type: event.type === 'deadline' ? 'meeting' : event.type,
+              time: format(event.datetime, 'h:mm a'),
+              date: format(event.datetime, 'MMM d, yyyy')
+            }))}
             dateRange={dateRange}
           />
         </div>
