@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
@@ -331,7 +330,12 @@ const Index = () => {
 
   return (
     <div className="space-y-3 py-3">
-      <DashboardHeader activeTab={activeTab} onTabChange={handleTabChange} />
+      <DashboardHeader 
+        activeTab={activeTab} 
+        onTabChange={handleTabChange} 
+        date={date}
+        setDate={setDate}
+      />
       
       {renderContent()}
       

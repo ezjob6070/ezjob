@@ -4,13 +4,22 @@ import { Bell, Calendar, BarChart3, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWindowSize } from "@/hooks/use-window-size";
+import { DateRange } from "react-day-picker";
+import EnhancedDateRangeFilter from "./EnhancedDateRangeFilter";
 
 interface DashboardHeaderProps {
   onTabChange?: (tab: string) => void;
   activeTab?: string;
+  date?: DateRange | undefined;
+  setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
 
-const DashboardHeader = ({ onTabChange, activeTab = "dashboard" }: DashboardHeaderProps) => {
+const DashboardHeader = ({ 
+  onTabChange, 
+  activeTab = "dashboard",
+  date,
+  setDate
+}: DashboardHeaderProps) => {
   const [localActiveTab, setLocalActiveTab] = useState(activeTab);
   const { width } = useWindowSize();
   const isMobile = width < 768;
@@ -29,15 +38,27 @@ const DashboardHeader = ({ onTabChange, activeTab = "dashboard" }: DashboardHead
 
   return (
     <div className="bg-white border border-gray-100 shadow-sm rounded-lg -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-5 pt-6 pb-4 md:px-7 md:pt-7 md:pb-2 mb-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-5 gap-4">
-        <div className="flex items-center">
-          <div className="mr-4 bg-white p-3 rounded-xl shadow-md text-indigo-600">
-            <Home className="h-6 w-6" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4">
+        <div>
+          <div className="flex items-center mb-1">
+            <div className="mr-4 bg-white p-3 rounded-xl shadow-md text-indigo-600">
+              <Home className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="text-lg md:text-xl font-bold text-gray-800">Hello, Alex Johnson</h1>
+              <p className="text-indigo-600 text-sm font-medium">Welcome to your Easy Job dashboard</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Hello, Alex Johnson</h1>
-            <p className="text-indigo-600 text-sm md:text-base font-medium">Welcome to your Easy Job dashboard</p>
-          </div>
+          
+          {date && setDate && (
+            <div className="ml-12 -mt-1 mb-2">
+              <EnhancedDateRangeFilter 
+                date={date} 
+                setDate={setDate}
+                compact={true}
+              />
+            </div>
+          )}
         </div>
         <div className="flex items-center">
           <Button

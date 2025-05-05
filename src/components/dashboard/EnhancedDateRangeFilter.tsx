@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -42,11 +41,13 @@ import {
 interface EnhancedDateRangeFilterProps {
   date: DateRange | undefined;
   setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  compact?: boolean;
 }
 
 const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({ 
   date, 
-  setDate 
+  setDate,
+  compact = false
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -55,12 +56,12 @@ const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({
     
     if (date.to) {
       if (date.from.toDateString() === date.to.toDateString()) {
-        return format(date.from, "MMMM d, yyyy");
+        return compact ? format(date.from, "MMM d, yyyy") : format(date.from, "MMMM d, yyyy");
       }
-      return `${format(date.from, "MMM d, yyyy")} - ${format(date.to, "MMM d, yyyy")}`;
+      return `${format(date.from, "MMM d")} - ${format(date.to, "MMM d, yyyy")}`;
     }
     
-    return format(date.from, "MMMM d, yyyy");
+    return compact ? format(date.from, "MMM d, yyyy") : format(date.from, "MMMM d, yyyy");
   };
 
   // Quick date selections
@@ -131,6 +132,126 @@ const EnhancedDateRangeFilter: React.FC<EnhancedDateRangeFilterProps> = ({
 
     setOpen(false);
   };
+
+  if (compact) {
+    return (
+      <div className="flex items-center">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className={cn(
+                "h-8 px-2 text-xs bg-white border-blue-100 text-blue-600 hover:bg-blue-50",
+                date?.from && "bg-blue-50/50"
+              )}
+            >
+              <CalendarRange className="h-3 w-3 mr-1" />
+              <span className="truncate">{formatDateRange()}</span>
+              <ChevronDown className="ml-1 h-3 w-3 opacity-70" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0 shadow-md border border-blue-100" align="start">
+            <Tabs defaultValue="presets" className="w-full">
+              <TabsList className="grid grid-cols-2 p-1 bg-blue-50">
+                <TabsTrigger value="presets" className="text-xs data-[state=active]:bg-white data-[state=active]:text-blue-700">Quick Select</TabsTrigger>
+                <TabsTrigger value="calendar" className="text-xs data-[state=active]:bg-white data-[state=active]:text-blue-700">Calendar</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="presets" className="p-3 space-y-3 bg-white">
+                <div className="grid grid-cols-2 gap-1.5">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 text-xs justify-start hover:bg-blue-50"
+                    onClick={() => selectDatePreset("today")}
+                  >
+                    <CalendarIcon className="mr-1 h-3 w-3 text-blue-600" />
+                    <span>Today</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 text-xs justify-start hover:bg-blue-50"
+                    onClick={() => selectDatePreset("yesterday")}
+                  >
+                    <CalendarIcon className="mr-1 h-3 w-3 text-purple-600" />
+                    <span>Yesterday</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 text-xs justify-start hover:bg-blue-50"
+                    onClick={() => selectDatePreset("this-week")}
+                  >
+                    <CalendarDays className="mr-1 h-3 w-3 text-blue-600" />
+                    <span>This Week</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 text-xs justify-start hover:bg-blue-50"
+                    onClick={() => selectDatePreset("last-week")}
+                  >
+                    <CalendarDays className="mr-1 h-3 w-3 text-purple-600" />
+                    <span>Last Week</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 text-xs justify-start hover:bg-blue-50"
+                    onClick={() => selectDatePreset("this-month")}
+                  >
+                    <CalendarRange className="mr-1 h-3 w-3 text-blue-600" />
+                    <span>This Month</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 text-xs justify-start hover:bg-blue-50"
+                    onClick={() => selectDatePreset("last-month")}
+                  >
+                    <CalendarRange className="mr-1 h-3 w-3 text-purple-600" />
+                    <span>Last Month</span>
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="calendar" className="p-3 bg-white">
+                <CalendarComponent
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate}
+                  numberOfMonths={1}
+                  className="pointer-events-auto"
+                />
+                <div className="mt-2 flex justify-between">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setDate(undefined)}
+                  >
+                    Clear
+                  </Button>
+                  <Button 
+                    variant="default"
+                    size="sm" 
+                    className="h-7 text-xs bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setOpen(false)}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center w-full">
