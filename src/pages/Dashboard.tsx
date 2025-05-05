@@ -30,7 +30,6 @@ import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
 import ActivitySection from "@/components/dashboard/ActivitySection";
 import DashboardDetailDialog from "@/components/DashboardDetailDialog";
-import EnhancedDateRangeFilter from "@/components/dashboard/EnhancedDateRangeFilter";
 import IndustrySelector from "@/components/IndustrySelector";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
@@ -84,11 +83,6 @@ const Dashboard = () => {
     data: []
   });
 
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 7),
-  });
-
   const { jobs, currentIndustry } = useGlobalState();
 
   // Use our predefined fake data
@@ -119,17 +113,6 @@ const Dashboard = () => {
       title,
       data
     });
-  };
-
-  // Format date range for display
-  const getDateRangeText = () => {
-    if (!date?.from) return "All time";
-    
-    if (!date.to) {
-      return format(date.from, "MMM d, yyyy");
-    }
-    
-    return `${format(date.from, "MMM d")} - ${format(date.to, "MMM d, yyyy")}`;
   };
 
   // Sample statistics data
@@ -441,11 +424,6 @@ const Dashboard = () => {
                   <p className="text-blue-600 text-xs mt-2">
                     78% of quarterly target
                   </p>
-                  {date?.from && (
-                    <p className="text-blue-600 text-xs mt-2">
-                      Period: {getDateRangeText()}
-                    </p>
-                  )}
                 </CardContent>
               </Card>
               
@@ -477,11 +455,6 @@ const Dashboard = () => {
                       Operating
                     </div>
                   </div>
-                  {date?.from && (
-                    <p className="text-emerald-600 text-xs mt-2">
-                      Period: {getDateRangeText()}
-                    </p>
-                  )}
                 </CardContent>
               </Card>
               
@@ -513,11 +486,6 @@ const Dashboard = () => {
                       Rescheduled
                     </div>
                   </div>
-                  {date?.from && (
-                    <p className="text-purple-600 text-xs mt-2">
-                      Period: {getDateRangeText()}
-                    </p>
-                  )}
                 </CardContent>
               </Card>
             </div>
@@ -693,193 +661,4 @@ const Dashboard = () => {
                         <span className="text-xs text-gray-500">Target: 70%</span>
                         <span className="text-xs text-gray-500">100%</span>
                       </div>
-                      {callsData.conversionRate >= 65 ? (
-                        <div className="mt-2 p-1.5 rounded bg-green-100 text-green-700 text-xs flex items-center">
-                          <CheckIcon className="h-3 w-3 mr-1" />
-                          On track to meet quarterly targets
-                        </div>
-                      ) : (
-                        <div className="mt-2 p-1.5 rounded bg-amber-100 text-amber-700 text-xs flex items-center">
-                          <AlertCircleIcon className="h-3 w-3 mr-1" />
-                          Below target - action required
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Monthly Trend Chart */}
-                  <div className="flex-1">
-                    <div className="bg-white p-4 rounded-lg border border-gray-200 h-full">
-                      <h3 className="text-sm font-medium text-gray-700 mb-4">Monthly Call Trends</h3>
-                      <div className="h-48">
-                        <div className="flex flex-col space-y-2">
-                          {callsData.monthlyTrend.map((month, i) => (
-                            <div key={i} className="space-y-1">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="w-8 text-gray-500">{month.month}</span>
-                                <div className="flex-1 mx-2">
-                                  <div className="relative h-8">
-                                    {/* Total calls bar */}
-                                    <div 
-                                      className="absolute top-0 h-4 bg-blue-200 rounded-sm"
-                                      style={{ width: `${(month.calls / 150) * 100}%` }}
-                                    ></div>
-                                    {/* Converted calls bar */}
-                                    <div 
-                                      className="absolute top-0 h-4 bg-green-400 rounded-sm"
-                                      style={{ width: `${(month.converted / 150) * 100}%` }}
-                                    ></div>
-                                    
-                                    {/* Value labels */}
-                                    <div className="absolute top-5 left-0 text-xs text-gray-500">
-                                      {Math.round((month.converted / month.calls) * 100)}%
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="text-xs text-right">
-                                  <span className="text-blue-600">{month.calls}</span>
-                                  <span className="text-gray-400 mx-1">/</span>
-                                  <span className="text-green-600">{month.converted}</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex justify-center mt-2 gap-4">
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-blue-200 rounded mr-1"></div>
-                          <span className="text-xs text-gray-600">Total Calls</span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-green-400 rounded mr-1"></div>
-                          <span className="text-xs text-gray-600">Converted</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {date?.from && (
-                  <div className="text-xs text-center text-gray-500 mt-4 p-2 bg-gray-50 rounded-md border border-gray-100">
-                    <CalendarIcon className="h-3 w-3 inline mr-1" />
-                    Period: {getDateRangeText()}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            
-            {/* Today's Appointments section */}
-            <Card className="bg-white border-0 shadow-md mb-6">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-medium">Today's Appointments</CardTitle>
-                    <CardDescription>Scheduled visits and service calls</CardDescription>
-                  </div>
-                  <Button variant="outline" className="h-8 gap-1">
-                    <CalendarIcon className="h-3.5 w-3.5" />
-                    <span className="text-xs">View Calendar</span>
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="pb-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {todaysAppointments.map((apt, index) => (
-                    <div key={index} className="flex p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className={`w-1 self-stretch rounded-full mr-3 ${
-                        apt.priority === 'high' ? 'bg-red-500' : 
-                        apt.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'
-                      }`}></div>
-                      <div className="flex-1">
-                        <div className="flex justify-between">
-                          <h4 className="font-medium text-gray-900">{apt.clientName}</h4>
-                          <span className="text-sm font-medium text-blue-600">{apt.time}</span>
-                        </div>
-                        <div className="flex gap-2 mt-1">
-                          <Badge variant="secondary" className="text-xs h-5 bg-blue-100 text-blue-800">
-                            {apt.jobType}
-                          </Badge>
-                          <span className="text-xs text-gray-500">{apt.address}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6">
-              <PerformanceCard 
-                leadSources={dashboardLeadSources}
-                jobTypePerformance={dashboardJobTypePerformance}
-                financialMetrics={dashboardFinancialMetrics}
-                formatCurrency={formatCurrency}
-                openDetailDialog={openDetailDialog}
-                detailedBusinessMetrics={detailedBusinessMetrics}
-              />
-              
-              <TopTechniciansCard 
-                topTechnicians={dashboardTopTechnicians}
-                formatCurrency={formatCurrency}
-                openDetailDialog={openDetailDialog}
-                detailedClientsData={detailedClientsData}
-              />
-            </div>
-            
-            <ActivitySection 
-              activities={dashboardActivities}
-              events={dashboardEvents}
-            />
-          </>
-        );
-    }
-  };
-
-  return (
-    <div className="space-y-4 py-4">
-      <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      {/* Enhanced Date Range Filter - Styled better with a dedicated card */}
-      <div className="mb-6 max-w-4xl mx-auto">
-        <EnhancedDateRangeFilter date={date} setDate={setDate} />
-      </div>
-      
-      {renderContent()}
-      
-      <DashboardDetailDialog
-        open={activeDialog.open}
-        onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
-        title={activeDialog.title}
-        type={activeDialog.type}
-        data={activeDialog.data}
-      />
-
-      <JobStatusDialog
-        open={statusDialog.open}
-        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
-        title={statusDialog.title}
-        status={statusDialog.status}
-        data={statusDialog.data}
-      />
-    </div>
-  );
-};
-
-export default Dashboard;
-
-const callsData = {
-  total: 248,
-  converted: 168,
-  scheduled: 42,
-  missed: 38,
-  conversionRate: 68,
-  monthlyTrend: [
-    { month: "Jan", calls: 124, converted: 82 },
-    { month: "Feb", calls: 132, converted: 88 },
-    { month: "Mar", calls: 145, converted: 96 },
-    { month: "Apr", calls: 138, converted: 94 },
-    { month: "May", calls: 156, converted: 105 },
-    { month: "Jun", calls: 172, converted: 118 },
-  ]
-};
+                      {callsData.conversionRate >= 65 ?
