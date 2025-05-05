@@ -79,7 +79,7 @@ const Dashboard = () => {
 
   // Calculate the number of rescheduled jobs
   const rescheduledJobs = jobs.filter(job => 
-    job.status === "rescheduled" && 
+    job.status === "scheduled" && job.previousStatus === "scheduled" && 
     (!date?.from || (job.scheduledDate && new Date(job.scheduledDate) >= date.from)) && 
     (!date?.to || (job.scheduledDate && new Date(job.scheduledDate) <= date.to))
   ).length;
