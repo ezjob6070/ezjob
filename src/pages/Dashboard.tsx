@@ -152,14 +152,14 @@ const Dashboard = () => {
     { name: 'Other', value: 12, color: '#f59e0b' },
   ];
 
-  // Create job status data for the circular visualization with enhanced colors
+  // Create job status data for the circular visualization with enhanced colors and gradients
   const jobStatusData = [
-    { name: 'Completed', value: dashboardTaskCounts.completed, color: '#22c55e' },
-    { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6' },
-    { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444' },
-    { name: 'Submitted', value: dashboardTaskCounts.submitted, color: '#f59e0b' },
-    { name: 'Draft', value: dashboardTaskCounts.draft, color: '#8b5cf6' },
-    { name: 'Rescheduled', value: rescheduledJobs, color: '#ec4899' },
+    { name: 'Completed', value: dashboardTaskCounts.completed, color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a' },
+    { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb' },
+    { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444', gradientFrom: '#f87171', gradientTo: '#dc2626' },
+    { name: 'Submitted', value: dashboardTaskCounts.submitted, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
+    { name: 'Draft', value: dashboardTaskCounts.draft, color: '#8b5cf6', gradientFrom: '#a78bfa', gradientTo: '#7c3aed' },
+    { name: 'Rescheduled', value: rescheduledJobs, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
   ];
 
   const COLORS = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'];
@@ -530,8 +530,8 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Enhanced Jobs Status Section - Now Full Width */}
-            <Card className="bg-white border-0 shadow-md mb-6">
+            {/* Enhanced Jobs Status Section - Now Full Width with more vibrant colors */}
+            <Card className="bg-white border-0 shadow-lg mb-6">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-medium">Jobs By Status</CardTitle>
                 <CardDescription>Overview of service requests and job status</CardDescription>
@@ -543,40 +543,61 @@ const Dashboard = () => {
                       data={jobStatusData}
                       title={`${totalTasks}`}
                       subtitle="Total Jobs"
-                      size={300} 
-                      thickness={50}
+                      size={320} 
+                      thickness={60}
                       gradients={true}
                       animation={true}
+                      showLegend={false}
                     />
                   </div>
                   <div className="flex-1">
                     <div className="grid grid-cols-2 gap-3">
                       {jobStatusData.map((status, index) => (
-                        <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex items-center justify-between mb-1">
+                        <div key={index} className="flex flex-col p-3 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center">
-                              <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: status.color }}></div>
-                              <span className="font-medium text-gray-700 text-sm">{status.name}</span>
+                              <div 
+                                className="w-5 h-5 rounded-full mr-2 shadow-sm" 
+                                style={{ 
+                                  background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
+                                }}
+                              ></div>
+                              <span className="font-medium text-gray-700">{status.name}</span>
                             </div>
                             <span className="text-sm font-bold text-gray-900">{status.value}</span>
                           </div>
-                          <div className="w-full h-2 bg-gray-200 rounded-full mt-1">
+                          <div className="w-full h-3 bg-gray-100 rounded-full mt-1 overflow-hidden">
                             <div 
-                              className="h-2 rounded-full" 
+                              className="h-3 rounded-full transition-all duration-1000 ease-out"
                               style={{ 
                                 width: `${(status.value / totalTasks) * 100}%`,
-                                backgroundColor: status.color 
+                                background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
+                                boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
                               }}
                             ></div>
                           </div>
-                          <span className="text-xs text-gray-500 mt-1">
-                            {Math.round((status.value / totalTasks) * 100)}% of total
-                          </span>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-gray-500">
+                              {((status.value / totalTasks) * 100).toFixed(1)}% of total
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className="text-xs"
+                              style={{ 
+                                color: status.color, 
+                                borderColor: status.color,
+                                backgroundColor: `${status.color}10`
+                              }}
+                            >
+                              {status.value} jobs
+                            </Badge>
+                          </div>
                         </div>
                       ))}
                     </div>
                     {date?.from && (
-                      <div className="text-xs text-center text-gray-500 mt-3">
+                      <div className="text-xs text-center text-gray-500 mt-4 p-2 bg-gray-50 rounded-md border border-gray-100">
+                        <CalendarIcon className="h-3 w-3 inline mr-1" />
                         Period: {getDateRangeText()}
                       </div>
                     )}

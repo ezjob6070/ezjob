@@ -7,6 +7,8 @@ type EnhancedDonutChartProps = {
     name: string;
     value: number;
     color: string;
+    gradientFrom?: string;
+    gradientTo?: string;
   }[];
   title: string;
   subtitle?: string;
@@ -128,8 +130,8 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
                   x2="100%" 
                   y2="100%"
                 >
-                  <stop offset="0%" stopColor={segment.color} />
-                  <stop offset="100%" stopColor={getLighterColor(segment.color)} />
+                  <stop offset="0%" stopColor={segment.gradientFrom || segment.color} />
+                  <stop offset="100%" stopColor={segment.gradientTo || getLighterColor(segment.color)} />
                 </linearGradient>
               ))}
             </defs>
@@ -168,20 +170,45 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
                 'Z'
               ].join(' ');
               
+              // Calculate midpoint angle for label positioning
+              const midAngle = segment.startAngle + (segment.endAngle - segment.startAngle) / 2;
+              const labelRadius = radius + 15; // Position labels outside the chart
+              const labelPos = polarToCartesian(centerX, centerY, labelRadius, midAngle);
+              const percentValue = ((segment.value / total) * 100).toFixed(1);
+              
               return (
-                <path
-                  key={index}
-                  d={d}
-                  fill={gradients ? `url(#${segment.gradientId})` : segment.color}
-                  stroke="white"
-                  strokeWidth={1}
-                  style={animation ? {
-                    transform: 'scale(1)',
-                    opacity: 1,
-                    transition: `opacity 0.5s ease-out, transform 0.5s ease-out ${index * 0.1}s`
-                  } : undefined}
-                  className="drop-shadow-sm"
-                />
+                <g key={index}>
+                  <path
+                    d={d}
+                    fill={gradients ? `url(#${segment.gradientId})` : segment.color}
+                    stroke="white"
+                    strokeWidth={2}
+                    style={animation ? {
+                      transform: 'scale(1)',
+                      opacity: 1,
+                      transition: `opacity 0.8s ease-out, transform 0.8s ease-out ${index * 0.1}s`
+                    } : undefined}
+                    className="drop-shadow-md"
+                  />
+                  
+                  {/* Add percentage labels at the outer edge of each segment */}
+                  {segment.value / total > 0.05 && (
+                    <text
+                      x={labelPos.x}
+                      y={labelPos.y}
+                      textAnchor={labelPos.x > centerX ? "start" : "end"}
+                      dominantBaseline="middle"
+                      fill={segment.color}
+                      className="text-xs font-bold"
+                      style={animation ? {
+                        opacity: 1,
+                        transition: `opacity 1s ease-out ${0.5 + index * 0.1}s`
+                      } : undefined}
+                    >
+                      {percentValue}%
+                    </text>
+                  )}
+                </g>
               );
             })
           ) : (
@@ -224,11 +251,13 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
               <div 
                 className="w-3 h-3 rounded-full mr-2" 
                 style={{ 
-                  backgroundColor: item.color,
+                  background: item.gradientFrom && item.gradientTo 
+                    ? `linear-gradient(135deg, ${item.gradientFrom}, ${item.gradientTo})` 
+                    : item.color,
                   boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
                 }}
               ></div>
-              <span className="truncate text-xs">{item.name}: {item.value}%</span>
+              <span className="truncate text-xs">{item.name}: {((item.value / total) * 100).toFixed(1)}%</span>
             </div>
           ))}
         </div>
