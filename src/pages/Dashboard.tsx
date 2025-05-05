@@ -122,7 +122,10 @@ const Dashboard = () => {
               totalLeads: dashboardLeadSources.reduce((sum, source) => sum + source.value, 0),
               conversionRate: dashboardFinancialMetrics.conversionRate,
               monthlyGrowth: dashboardFinancialMetrics.monthlyGrowth,
-              monthlyData: detailedRevenueData.map(item => ({ name: item.month, value: item.revenue }))
+              monthlyData: detailedRevenueData.map(item => ({ 
+                name: item.date.substring(0, 7), // Using date instead of month
+                value: item.amount // Using amount instead of revenue
+              }))
             }}
             formatCurrency={formatCurrency}
             detailedTasksData={detailedTasksData}
@@ -133,10 +136,10 @@ const Dashboard = () => {
           
           <TicketsStatusCard 
             taskCounts={{
-              new: dashboardTaskCounts.new,
+              new: dashboardTaskCounts.joby, // Using joby instead of new
               inProgress: dashboardTaskCounts.inProgress,
               completed: dashboardTaskCounts.completed,
-              cancelled: dashboardTaskCounts.cancelled
+              cancelled: dashboardTaskCounts.canceled // Using canceled instead of cancelled
             }}
             totalTasks={totalTasks}
             detailedTasksData={detailedTasksData}
@@ -197,13 +200,24 @@ const Dashboard = () => {
               description: activity.title,
               timestamp: activity.time
             }))}
-            events={dashboardEvents.map(event => ({
-              id: event.id,
-              title: event.title,
-              type: event.type === 'deadline' ? 'meeting' : (event.type === 'job' || event.type === 'call' ? event.type : 'meeting'),
-              time: format(event.datetime, 'h:mm a'),
-              date: format(event.datetime, 'MMM d, yyyy')
-            }))}
+            events={dashboardEvents.map(event => {
+              // Handle the event type conversion properly
+              let eventType: "meeting" | "job" | "call" = "meeting"; // Default to "meeting"
+              
+              if (event.type === "job") {
+                eventType = "job";
+              } else if (event.type === "call") {
+                eventType = "call";
+              }
+              
+              return {
+                id: event.id,
+                title: event.title,
+                type: eventType,
+                time: format(event.datetime, 'h:mm a'),
+                date: format(event.datetime, 'MMM d, yyyy')
+              };
+            })}
             dateRange={dateRange}
           />
         </div>
