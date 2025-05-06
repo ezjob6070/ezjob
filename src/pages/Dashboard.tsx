@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import DashboardDateFilter from "@/components/dashboard/DashboardDateFilter";
 import MetricsOverview from "@/components/dashboard/MetricsOverview";
 import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
@@ -749,10 +750,13 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-3 py-3">
-      <DashboardHeader 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
-      />
+      <div className="flex items-center justify-between">
+        <DashboardHeader 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+        />
+        <DashboardDateFilter />
+      </div>
       
       {renderContent()}
       

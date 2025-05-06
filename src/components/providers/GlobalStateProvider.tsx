@@ -1,9 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Job } from "@/components/jobs/JobTypes";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";
 import { Technician } from "@/types/technician";
 import { JobSource } from "@/types/jobSource";
+import { DateRange } from "react-day-picker";
 
 interface GlobalStateContextType {
   jobs: Job[];
@@ -21,6 +21,8 @@ interface GlobalStateContextType {
   updateJobSource: (source: JobSource) => void;
   addTechnician: (technician: Technician) => void;
   updateTechnician: (technician: Technician) => void;
+  globalDateRange: DateRange | undefined;
+  setGlobalDateRange: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
 
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
@@ -46,6 +48,11 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [globalDateRange, setGlobalDateRange] = useState<DateRange | undefined>(() => {
+    const savedDateRange = localStorage.getItem('globalDateRange');
+    return savedDateRange ? JSON.parse(savedDateRange) : { from: new Date(), to: new Date() };
+  });
+
   useEffect(() => {
     localStorage.setItem('jobs', JSON.stringify(jobs));
   }, [jobs]);
@@ -61,6 +68,10 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
   useEffect(() => {
     localStorage.setItem('jobSources', JSON.stringify(jobSources));
   }, [jobSources]);
+
+  useEffect(() => {
+    localStorage.setItem('globalDateRange', JSON.stringify(globalDateRange));
+  }, [globalDateRange]);
 
   const addJob = (job: Job) => {
     setJobs(prev => [...prev, job]);
@@ -118,7 +129,9 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
       addJobSource,
       updateJobSource,
       addTechnician,
-      updateTechnician
+      updateTechnician,
+      globalDateRange,
+      setGlobalDateRange
     }}>
       {children}
     </GlobalStateContext.Provider>
