@@ -30,83 +30,107 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
   return (
     <Card className="bg-white shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Jobs By Status</CardTitle>
+        <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
         <p className="text-xs text-muted-foreground">Overview of service requests and job status</p>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col items-center gap-6">
-          {/* Donut Chart */}
-          <div className="relative flex-shrink-0 flex justify-center">
+        <div className="flex flex-row items-start gap-6">
+          {/* Donut Chart - Left side */}
+          <div className="relative w-[250px] flex-shrink-0">
             <EnhancedDonutChart 
               data={chartData}
               title={totalTasks.toString()}
               subtitle="Total Jobs"
-              size={200}
-              thickness={40}
+              size={230}
+              thickness={50}
               showLegend={false}
               animation={true}
             />
           </div>
           
-          {/* Status Items - Now displayed below the chart */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+          {/* Status Items - Right side in 2x2 grid */}
+          <div className="grid grid-cols-2 gap-4 flex-1">
             {/* Completed */}
-            <div className="flex items-center justify-between rounded bg-green-50 p-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-sm">Completed</span>
+            <div className="flex flex-col rounded-lg border border-gray-100 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                <span className="font-medium">Completed</span>
+                <span className="ml-auto">{taskCounts.completed}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{taskCounts.completed}</span>
-                <div className="text-xs bg-green-100 px-2 py-0.5 rounded-full">
+              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+                <div 
+                  className="absolute top-0 left-0 h-2 bg-green-500 rounded-full" 
+                  style={{ width: `${Math.round((taskCounts.completed / totalTasks) * 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs px-2 py-1 rounded-full border border-green-200 bg-green-50 text-green-700">
                   {Math.round((taskCounts.completed / totalTasks) * 100)}%
-                </div>
-                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
+                </span>
+                <Button variant="ghost" size="sm" className="h-7 px-3 text-xs">View</Button>
               </div>
             </div>
             
             {/* In Progress */}
-            <div className="flex items-center justify-between rounded bg-blue-50 p-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                <span className="text-sm">In Progress</span>
+            <div className="flex flex-col rounded-lg border border-gray-100 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                <span className="font-medium">In Progress</span>
+                <span className="ml-auto">{taskCounts.inProgress}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{taskCounts.inProgress}</span>
-                <div className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">
+              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+                <div 
+                  className="absolute top-0 left-0 h-2 bg-blue-500 rounded-full" 
+                  style={{ width: `${Math.round((taskCounts.inProgress / totalTasks) * 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs px-2 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-700">
                   {Math.round((taskCounts.inProgress / totalTasks) * 100)}%
-                </div>
-                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
+                </span>
+                <Button variant="ghost" size="sm" className="h-7 px-3 text-xs">View</Button>
               </div>
             </div>
             
             {/* Cancelled */}
-            <div className="flex items-center justify-between rounded bg-red-50 p-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span className="text-sm">Cancelled</span>
+            <div className="flex flex-col rounded-lg border border-gray-100 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                <span className="font-medium">Cancelled</span>
+                <span className="ml-auto">{taskCounts.canceled}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{taskCounts.canceled}</span>
-                <div className="text-xs bg-red-100 px-2 py-0.5 rounded-full">
+              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+                <div 
+                  className="absolute top-0 left-0 h-2 bg-red-500 rounded-full" 
+                  style={{ width: `${Math.round((taskCounts.canceled / totalTasks) * 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs px-2 py-1 rounded-full border border-red-200 bg-red-50 text-red-700">
                   {Math.round((taskCounts.canceled / totalTasks) * 100)}%
-                </div>
-                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
+                </span>
+                <Button variant="ghost" size="sm" className="h-7 px-3 text-xs">View</Button>
               </div>
             </div>
             
             {/* Rescheduled */}
-            <div className="flex items-center justify-between rounded bg-purple-50 p-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                <span className="text-sm">Rescheduled</span>
+            <div className="flex flex-col rounded-lg border border-gray-100 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-4 h-4 rounded-full bg-purple-500"></div>
+                <span className="font-medium">Rescheduled</span>
+                <span className="ml-auto">{taskCounts.rescheduled}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{taskCounts.rescheduled}</span>
-                <div className="text-xs bg-purple-100 px-2 py-0.5 rounded-full">
+              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+                <div 
+                  className="absolute top-0 left-0 h-2 bg-purple-500 rounded-full" 
+                  style={{ width: `${Math.round((taskCounts.rescheduled / totalTasks) * 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs px-2 py-1 rounded-full border border-purple-200 bg-purple-50 text-purple-700">
                   {Math.round((taskCounts.rescheduled / totalTasks) * 100)}%
-                </div>
-                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
+                </span>
+                <Button variant="ghost" size="sm" className="h-7 px-3 text-xs">View</Button>
               </div>
             </div>
           </div>
