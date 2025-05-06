@@ -3,10 +3,23 @@ import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusIcon, PhoneCallIcon, PhoneIncomingIcon, PhoneOutgoingIcon, PhoneOffIcon, UserPlusIcon } from "lucide-react";
+import { 
+  PlusIcon, 
+  PhoneCallIcon, 
+  PhoneIncomingIcon, 
+  PhoneOutgoingIcon, 
+  PhoneOffIcon, 
+  UserPlusIcon 
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Call type definition
 type Call = {
@@ -14,14 +27,14 @@ type Call = {
   contactName: string;
   contactInitials: string;
   phoneNumber: string;
-  type: "incoming" | "outgoing" | "missed";
-  status: "completed" | "converted" | "cancelled" | "scheduled";
+  type: "incoming" | "outgoing" | "not_answered";
+  status: "completed" | "converted" | "cancelled" | "scheduled" | "not_relevant";
   duration?: number; // in seconds
   date: Date;
   notes?: string;
 };
 
-// Sample calls data
+// Sample calls data - Updated "missed" to "not_answered"
 const sampleCalls: Call[] = [
   {
     id: "1",
@@ -50,7 +63,7 @@ const sampleCalls: Call[] = [
     contactName: "Bob Williams",
     contactInitials: "BW",
     phoneNumber: "(555) 345-6789",
-    type: "missed",
+    type: "not_answered",
     status: "cancelled",
     date: new Date("2023-05-12T09:15:00"),
   },
@@ -71,10 +84,10 @@ const sampleCalls: Call[] = [
     contactInitials: "MB",
     phoneNumber: "(555) 567-8901",
     type: "outgoing",
-    status: "completed",
+    status: "not_relevant",
     duration: 380, // 6min 20sec
     date: new Date("2023-05-11T13:50:00"),
-    notes: "Follow up call regarding service complaint.",
+    notes: "Wrong number, not a potential client.",
   },
 ];
 
@@ -87,12 +100,22 @@ const formatDuration = (seconds?: number): string => {
   return `${minutes}m ${remainingSeconds}s`;
 };
 
+// Call logging form type
+type CallFormValues = {
+  contactName: string;
+  phoneNumber: string;
+  type: "incoming" | "outgoing" | "not_answered";
+  status: "completed" | "converted" | "cancelled" | "scheduled" | "not_relevant";
+  notes: string;
+  duration: string;
+};
+
 const CallCard = ({ call }: { call: Call }) => {
   const getCallTypeIcon = () => {
     switch (call.type) {
       case "incoming": return <PhoneIncomingIcon className="h-4 w-4 text-green-500" />;
       case "outgoing": return <PhoneOutgoingIcon className="h-4 w-4 text-blue-500" />;
-      case "missed": return <PhoneOffIcon className="h-4 w-4 text-red-500" />;
+      case "not_answered": return <PhoneOffIcon className="h-4 w-4 text-red-500" />;
     }
   };
   
@@ -106,6 +129,8 @@ const CallCard = ({ call }: { call: Call }) => {
         return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Cancelled</Badge>;
       case "scheduled": 
         return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Scheduled</Badge>;
+      case "not_relevant":
+        return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Not Relevant</Badge>;
     }
   };
 
@@ -151,6 +176,20 @@ const Calls = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("all");
+  const [calls, setCalls] = useState<Call[]>(sampleCalls);
+  const [isLogCallModalOpen, setIsLogCallModalOpen] = useState(false);
+  
+  // Form for logging a new call
+  const form = useForm<CallFormValues>({
+    defaultValues: {
+      contactName: "",
+      phoneNumber: "",
+      type: "incoming",
+      status: "completed",
+      notes: "",
+      duration: "0",
+    },
+  });
   
   // Set the active tab based on the location state or URL path
   useEffect(() => {
@@ -158,7 +197,7 @@ const Calls = () => {
       setActiveTab(location.state.activeTab);
     } else if (location.pathname.includes("/calls/")) {
       const path = location.pathname.split("/calls/")[1];
-      if (["incoming", "outgoing", "missed", "converted"].includes(path)) {
+      if (["incoming", "outgoing", "not_answered", "converted"].includes(path)) {
         setActiveTab(path);
       }
     }
@@ -168,15 +207,15 @@ const Calls = () => {
   const getFilteredCalls = () => {
     switch (activeTab) {
       case "incoming":
-        return sampleCalls.filter(call => call.type === "incoming");
+        return calls.filter(call => call.type === "incoming");
       case "outgoing":
-        return sampleCalls.filter(call => call.type === "outgoing");
-      case "missed":
-        return sampleCalls.filter(call => call.type === "missed");
+        return calls.filter(call => call.type === "outgoing");
+      case "not_answered":
+        return calls.filter(call => call.type === "not_answered");
       case "converted":
-        return sampleCalls.filter(call => call.status === "converted");
+        return calls.filter(call => call.status === "converted");
       default:
-        return sampleCalls;
+        return calls;
     }
   };
 
@@ -189,6 +228,34 @@ const Calls = () => {
       navigate(`/calls/${tab}`, { replace: true });
     }
   };
+  
+  // Handle call logging
+  const handleLogCall = (data: CallFormValues) => {
+    // Convert duration from minutes to seconds
+    const durationInSeconds = parseInt(data.duration) * 60;
+    
+    // Create a new call object
+    const newCall: Call = {
+      id: (calls.length + 1).toString(),
+      contactName: data.contactName,
+      contactInitials: data.contactName.split(' ').map(n => n[0]).join('').toUpperCase(),
+      phoneNumber: data.phoneNumber,
+      type: data.type,
+      status: data.status,
+      date: new Date(),
+      notes: data.notes,
+      duration: durationInSeconds,
+    };
+    
+    // Add the new call to the calls list
+    setCalls(prevCalls => [newCall, ...prevCalls]);
+    
+    // Close the modal
+    setIsLogCallModalOpen(false);
+    
+    // Reset the form
+    form.reset();
+  };
 
   return (
     <div className="space-y-8 py-8">
@@ -198,11 +265,12 @@ const Calls = () => {
             Call Tracking
           </h1>
           <p className="text-muted-foreground mt-1">
-            Track and manage all your incoming, outgoing, and missed calls
+            Track and manage all your incoming, outgoing, and not answered calls
           </p>
         </div>
         <Button 
           className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
+          onClick={() => setIsLogCallModalOpen(true)}
         >
           <PhoneCallIcon className="mr-2 h-4 w-4" /> Log New Call
         </Button>
@@ -224,9 +292,9 @@ const Calls = () => {
             <PhoneOutgoingIcon className="h-4 w-4 mr-2 text-blue-500" />
             Outgoing
           </TabsTrigger>
-          <TabsTrigger value="missed" className="text-base py-3">
+          <TabsTrigger value="not_answered" className="text-base py-3">
             <PhoneOffIcon className="h-4 w-4 mr-2 text-red-500" />
-            Missed
+            Not Answered
           </TabsTrigger>
           <TabsTrigger value="converted" className="text-base py-3">
             <UserPlusIcon className="h-4 w-4 mr-2 text-amber-500" />
@@ -302,12 +370,12 @@ const Calls = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="missed">
+        <TabsContent value="not_answered">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <PhoneOffIcon className="h-5 w-5 text-red-500" />
-                Missed Calls
+                Not Answered Calls
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -319,7 +387,7 @@ const Calls = () => {
                 {getFilteredCalls().length === 0 && (
                   <div className="flex flex-col items-center justify-center py-8">
                     <PhoneOffIcon className="h-12 w-12 text-gray-300 mb-2" />
-                    <p className="text-muted-foreground">No missed calls found.</p>
+                    <p className="text-muted-foreground">No not answered calls found.</p>
                   </div>
                 )}
               </div>
@@ -352,6 +420,145 @@ const Calls = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Log Call Modal */}
+      <Dialog open={isLogCallModalOpen} onOpenChange={setIsLogCallModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Log New Call</DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={form.handleSubmit(handleLogCall)}>
+            <div className="space-y-4 py-2">
+              <FormField
+                control={form.control}
+                name="contactName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} required />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(555) 123-4567" {...field} required />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Call Type</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select call type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="incoming">Incoming</SelectItem>
+                          <SelectItem value="outgoing">Outgoing</SelectItem>
+                          <SelectItem value="not_answered">Not Answered</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Call Status</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select call status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="converted">Converted</SelectItem>
+                          <SelectItem value="scheduled">Scheduled</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="not_relevant">Not Relevant</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration (minutes)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        step="1" 
+                        {...field} 
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Add any notes about the call here..." 
+                        className="min-h-[100px]" 
+                        {...field} 
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <DialogFooter className="mt-6">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsLogCallModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Save Call</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
