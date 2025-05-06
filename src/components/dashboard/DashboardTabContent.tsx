@@ -47,29 +47,30 @@ const DashboardTabContent: React.FC<DashboardTabContentProps> = ({
           dateRange={dateRangeFormatted}
         />
         
-        {/* Main content grid - reorganized for better layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-          {/* Jobs Status Section - spans 2 columns */}
           <div className="lg:col-span-2">
+            {/* Jobs Status Section */}
             <JobsStatusSection
               taskCounts={taskCounts}
               totalTasks={totalTasks}
               dateRangeText={dateRangeFormatted}
             />
-            
-            {/* Today's Appointments - now below Jobs Status */}
+          </div>
+          
+          <div className="lg:col-span-1">
+            {/* Today's Appointments */}
             <TodaysAppointmentsSection
               appointments={appointments}
               dateRangeText={dateRangeFormatted}
             />
           </div>
-          
-          {/* Call Tracking Section - moved to the right column */}
-          <div className="lg:col-span-1">
-            <CallTrackingSection 
-              dateRangeText={dateRangeFormatted}
-            />
-          </div>
+        </div>
+        
+        <div className="mt-4">
+          {/* Call Tracking Section */}
+          <CallTrackingSection 
+            dateRangeText={dateRangeFormatted}
+          />
         </div>
       </TabsContent>
       
