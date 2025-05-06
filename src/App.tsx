@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,6 +36,7 @@ import TechnicianDetail from "./pages/TechnicianDetail";
 import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
 import Properties from "./pages/Properties";
 import Listings from "./pages/Listings";
+import Projects from "./pages/Projects"; // Add import for Projects page
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
@@ -88,6 +88,7 @@ function App() {
                   <Route path="clients/:id" element={<ClientDetail />} />
                   <Route path="leads" element={<Leads />} />
                   <Route path="leads-clients" element={<LeadsClients />} />
+                  <Route path="projects" element={<Projects />} /> {/* Add Projects route */}
                   
                   {/* Call tracking routes */}
                   <Route path="calls" element={<Calls />} />

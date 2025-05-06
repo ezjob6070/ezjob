@@ -1,279 +1,325 @@
+
+import React from "react";
 import { 
   HomeIcon, 
   UsersIcon, 
-  ClipboardListIcon, 
+  CalendarIcon, 
   SettingsIcon, 
-  UserPlusIcon,
-  FileTextIcon,
-  WalletIcon,
-  BriefcaseIcon,
-  MapIcon,
+  ClipboardIcon, 
+  PhoneIcon, 
   CreditCardIcon,
-  WrenchIcon,
-  UserRoundIcon,
-  CalendarIcon,
-  BuildingIcon,
-  HomeIcon as HouseIcon,
-  HardHatIcon,
-  ConstructionIcon,
-  TruckIcon,
-  LayersIcon,
-  ClipboardCheckIcon,
-  Users,
-  LayoutDashboardIcon,
-  PhoneIcon,
-  MessageSquareIcon,
-  GlobeIcon,
-  DatabaseIcon,
+  BriefcaseIcon,
   UserIcon,
-  PhoneCallIcon,
-  PhoneOutgoingIcon,
-  PhoneIncomingIcon,
-  PhoneOffIcon,
+  BuildingIcon,
+  MapPinIcon,
+  ReceiptIcon,
+  FileTextIcon,
+  TruckIcon,
+  ToolIcon,
+  BarChartIcon,
+  SlidersIcon,
+  FolderIcon,
+  BookIcon,
+  FileIcon,
+  ListIcon,
+  HeadphonesIcon,
+  MessageSquareIcon,
+  MailIcon,
+  BookOpenIcon,
+  PresentationIcon,
 } from "lucide-react";
-import { NavItem, IndustryType } from "./sidebarTypes";
+import { NavItem } from "./sidebarTypes";
 
-// Update industry types to include general
-export const INDUSTRY_TYPES = ['service', 'real_estate', 'construction', 'general'] as const;
+export const INDUSTRY_TYPES = {
+  SERVICE: "service",
+  REAL_ESTATE: "real_estate",
+  CONSTRUCTION: "construction",
+  GENERAL: "general"
+};
 
-// Navigation items organized by category and industry
-export const getCommonNavItems = (): NavItem[] => [
+// Common navigation items for all industries
+const commonNavItems: NavItem[] = [
   {
     label: "Dashboard",
-    icon: <HomeIcon size={20} />,
+    icon: <HomeIcon size={18} />,
     href: "/dashboard",
   },
   {
+    label: "Projects",
+    icon: <FolderIcon size={18} />,
+    href: "/projects",
+  },
+  {
     label: "Leads & Clients",
-    icon: <UsersIcon size={20} />,
-    href: "/leads-clients",
-  },
-  {
-    label: "Calls",
-    icon: <PhoneCallIcon size={20} />,
-    href: "/calls",
-  },
-  {
-    label: "Tasks",
-    icon: <ClipboardListIcon size={20} />,
-    href: "/tasks",
+    icon: <UsersIcon size={18} />,
+    children: [
+      {
+        label: "Combined View",
+        icon: <UsersIcon size={16} />,
+        href: "/leads-clients",
+      },
+      {
+        label: "Leads",
+        icon: <UserIcon size={16} />,
+        href: "/leads",
+      },
+      {
+        label: "Clients",
+        icon: <UsersIcon size={16} />,
+        href: "/clients",
+      },
+    ],
   },
   {
     label: "Schedule",
-    icon: <CalendarIcon size={20} />,
+    icon: <CalendarIcon size={18} />,
     href: "/schedule",
   },
   {
-    label: "Estimates",
-    icon: <FileTextIcon size={20} />,
-    href: "/estimates",
+    label: "Tasks",
+    icon: <ClipboardIcon size={18} />,
+    href: "/tasks",
   },
   {
-    label: "Payments & Invoices",
-    icon: <CreditCardIcon size={20} />,
-    href: "/payments",
-  },
-  {
-    label: "Finance & Reports",
-    icon: <WalletIcon size={20} />,
-    href: "/finance",
+    label: "Calls",
+    icon: <PhoneIcon size={18} />,
+    children: [
+      {
+        label: "All Calls",
+        icon: <PhoneIcon size={16} />,
+        href: "/calls",
+      },
+      {
+        label: "Incoming",
+        icon: <PhoneIcon size={16} />,
+        href: "/calls/incoming",
+      },
+      {
+        label: "Outgoing",
+        icon: <PhoneIcon size={16} />,
+        href: "/calls/outgoing",
+      },
+      {
+        label: "Missed",
+        icon: <PhoneIcon size={16} />,
+        href: "/calls/missed",
+      },
+      {
+        label: "Converted",
+        icon: <PhoneIcon size={16} />,
+        href: "/calls/converted",
+      },
+    ],
   },
   {
     label: "Settings",
-    icon: <SettingsIcon size={20} />,
+    icon: <SettingsIcon size={18} />,
     href: "/settings",
   },
 ];
 
-// Add service specific nav items with direct links
-export const getServiceNavItems = (): NavItem[] => [
+// Service industry specific navigation items
+const serviceNavItems: NavItem[] = [
   {
     label: "Jobs",
-    icon: <BriefcaseIcon size={20} />,
+    icon: <BriefcaseIcon size={18} />,
     href: "/jobs",
-    industries: ['service'],
+    industries: [INDUSTRY_TYPES.SERVICE]
   },
   {
     label: "Technicians",
-    icon: <WrenchIcon size={20} />,
+    icon: <ToolIcon size={18} />,
     href: "/technicians",
-    industries: ['service'],
+    industries: [INDUSTRY_TYPES.SERVICE]
   },
   {
-    label: "Employed",
-    icon: <UserRoundIcon size={20} />,
-    href: "/employed",
-    industries: ['service'],
+    label: "Estimates",
+    icon: <FileTextIcon size={18} />,
+    href: "/estimates",
+    industries: [INDUSTRY_TYPES.SERVICE]
+  },
+  {
+    label: "Payments",
+    icon: <CreditCardIcon size={18} />,
+    href: "/payments",
+    industries: [INDUSTRY_TYPES.SERVICE]
+  },
+  {
+    label: "Finance",
+    icon: <BarChartIcon size={18} />,
+    href: "/finance",
+    industries: [INDUSTRY_TYPES.SERVICE]
   },
   {
     label: "GPS Tracking",
-    icon: <MapIcon size={20} />,
+    icon: <MapPinIcon size={18} />,
     href: "/gps-tracking",
-    industries: ['service'],
+    industries: [INDUSTRY_TYPES.SERVICE]
   },
   {
     label: "Job Sources",
-    icon: <BriefcaseIcon size={20} />,
+    icon: <FileIcon size={18} />,
     href: "/job-sources",
-    industries: ['service'],
+    industries: [INDUSTRY_TYPES.SERVICE]
+  },
+  {
+    label: "Employed",
+    icon: <UsersIcon size={18} />,
+    href: "/employed",
+    industries: [INDUSTRY_TYPES.SERVICE]
   },
 ];
 
-// Add construction specific nav items with direct links
-export const getConstructionNavItems = (): NavItem[] => [
+// Real estate industry specific navigation items
+const realEstateNavItems: NavItem[] = [
   {
-    label: "Projects",
-    icon: <ConstructionIcon size={20} />,
-    href: "/projects",
-    industries: ['construction'],
-  },
-  {
-    label: "Equipment",
-    icon: <TruckIcon size={20} />,
-    href: "/equipment",
-    industries: ['construction'],
-  },
-  {
-    label: "Materials",
-    icon: <LayersIcon size={20} />,
-    href: "/materials",
-    industries: ['construction'],
-  },
-  {
-    label: "Contractors",
-    icon: <Users size={20} />,
-    href: "/contractors",
-    industries: ['construction'],
-  },
-  {
-    label: "Safety Reports",
-    icon: <HardHatIcon size={20} />,
-    href: "/safety-reports",
-    industries: ['construction'],
-  },
-  {
-    label: "Inspections",
-    icon: <ClipboardCheckIcon size={20} />,
-    href: "/inspections",
-    industries: ['construction'],
-  },
-];
-
-export const getRealEstateNavItems = (): NavItem[] => [
-  {
-    label: "Properties",
-    icon: <HouseIcon size={20} />,
-    href: "/properties",
-    industries: ['real_estate'],
+    label: "Dashboard",
+    icon: <HomeIcon size={18} />,
+    href: "/real-estate-dashboard",
+    industries: [INDUSTRY_TYPES.REAL_ESTATE]
   },
   {
     label: "Agents",
-    icon: <UserRoundIcon size={20} />,
+    icon: <UserIcon size={18} />,
     href: "/agents",
-    industries: ['real_estate'],
+    industries: [INDUSTRY_TYPES.REAL_ESTATE]
+  },
+  {
+    label: "Properties",
+    icon: <BuildingIcon size={18} />,
+    href: "/properties",
+    industries: [INDUSTRY_TYPES.REAL_ESTATE]
   },
   {
     label: "Listings",
-    icon: <BuildingIcon size={20} />,
+    icon: <ListIcon size={18} />,
     href: "/listings",
-    industries: ['real_estate'],
+    industries: [INDUSTRY_TYPES.REAL_ESTATE]
   },
 ];
 
-// Add general category specific nav items
-export const getGeneralNavItems = (): NavItem[] => [
+// Construction industry specific navigation items
+const constructionNavItems: NavItem[] = [
   {
-    label: "Contacts",
-    icon: <UsersIcon size={20} />,
-    href: "/contacts",
-    industries: ['general'],
-  },
-  {
-    label: "Employees",
-    icon: <UserRoundIcon size={20} />,
-    href: "/employed",
-    industries: ['general'],
-  },
-  {
-    label: "Communications",
-    icon: <MessageSquareIcon size={20} />,
-    href: "/communications",
-    industries: ['general'],
+    label: "Dashboard",
+    icon: <HomeIcon size={18} />,
+    href: "/construction-dashboard",
+    industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },
   {
     label: "Projects",
-    icon: <ClipboardListIcon size={20} />,
-    href: "/general-projects",
-    industries: ['general'],
+    icon: <FolderIcon size={18} />,
+    href: "/projects",
+    industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },
   {
-    label: "Office Management",
-    icon: <LayoutDashboardIcon size={20} />,
-    href: "/office-management",
-    industries: ['general'],
+    label: "Equipment",
+    icon: <ToolIcon size={18} />,
+    href: "/equipment",
+    industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },
   {
-    label: "Customer Support",
-    icon: <PhoneIcon size={20} />,
-    href: "/customer-support",
-    industries: ['general'],
+    label: "Materials",
+    icon: <TruckIcon size={18} />,
+    href: "/materials",
+    industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },
   {
-    label: "Marketing",
-    icon: <GlobeIcon size={20} />,
-    href: "/marketing",
-    industries: ['general'],
+    label: "Contractors",
+    icon: <UsersIcon size={18} />,
+    href: "/contractors",
+    industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },
   {
-    label: "Knowledge Base",
-    icon: <DatabaseIcon size={20} />,
-    href: "/knowledge-base",
-    industries: ['general'],
+    label: "Safety Reports",
+    icon: <ClipboardIcon size={18} />,
+    href: "/safety-reports",
+    industries: [INDUSTRY_TYPES.CONSTRUCTION]
+  },
+  {
+    label: "Inspections",
+    icon: <FileTextIcon size={18} />,
+    href: "/inspections",
+    industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },
 ];
 
-export const getIndustrySpecificNavItems = (currentIndustry: IndustryType): NavItem[] => {
-  let navItems = [
-    ...getCommonNavItems(),
-  ];
+// General industry specific navigation items
+const generalNavItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    icon: <HomeIcon size={18} />,
+    href: "/general-dashboard",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+  {
+    label: "Communications",
+    icon: <MessageSquareIcon size={18} />,
+    href: "/communications",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+  {
+    label: "Projects",
+    icon: <FolderIcon size={18} />,
+    href: "/projects",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+  {
+    label: "Contacts",
+    icon: <BookIcon size={18} />,
+    href: "/contacts",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+  {
+    label: "Office Management",
+    icon: <BuildingIcon size={18} />,
+    href: "/office-management",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+  {
+    label: "Customer Support",
+    icon: <HeadphonesIcon size={18} />,
+    href: "/customer-support",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+  {
+    label: "Marketing",
+    icon: <PresentationIcon size={18} />,
+    href: "/marketing",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+  {
+    label: "Knowledge Base",
+    icon: <BookOpenIcon size={18} />,
+    href: "/knowledge-base",
+    industries: [INDUSTRY_TYPES.GENERAL]
+  },
+];
+
+export const getIndustrySpecificNavItems = (industry: string): NavItem[] => {
+  // Filter common nav items to avoid duplicates with industry specific items
+  const filteredCommonItems = commonNavItems.filter(item => {
+    // For dashboard, show only the industry specific dashboard
+    if (item.label === "Dashboard" && industry !== "service") {
+      return false;
+    }
+    
+    // For projects, show only the common projects page for service and on others show industry specific
+    if (item.label === "Projects" && industry !== "service") {
+      return false;
+    }
+    
+    return true;
+  });
   
-  // Add service-specific items
-  if (currentIndustry === 'service') {
-    navItems = [...navItems, ...getServiceNavItems()];
+  switch (industry) {
+    case INDUSTRY_TYPES.REAL_ESTATE:
+      return [...filteredCommonItems, ...realEstateNavItems];
+    case INDUSTRY_TYPES.CONSTRUCTION:
+      return [...filteredCommonItems, ...constructionNavItems];
+    case INDUSTRY_TYPES.GENERAL:
+      return [...filteredCommonItems, ...generalNavItems];
+    default:
+      return [...filteredCommonItems, ...serviceNavItems];
   }
-  
-  // Add real estate-specific items
-  if (currentIndustry === 'real_estate') {
-    // Replace the dashboard link for real estate
-    navItems = navItems.map(item => 
-      item.label === "Dashboard" 
-        ? { ...item, href: "/real-estate-dashboard" } 
-        : item
-    );
-    navItems = [...navItems, ...getRealEstateNavItems()];
-  }
-  
-  // Add construction-specific items with customized dashboard
-  if (currentIndustry === 'construction') {
-    // Replace the dashboard link for construction
-    navItems = navItems.map(item => 
-      item.label === "Dashboard" 
-        ? { ...item, href: "/construction-dashboard" } 
-        : item
-    );
-    navItems = [...navItems, ...getConstructionNavItems()];
-  }
-  
-  // Add general-specific items with customized dashboard
-  if (currentIndustry === 'general') {
-    // Replace the dashboard link for general
-    navItems = navItems.map(item => 
-      item.label === "Dashboard" 
-        ? { ...item, href: "/general-dashboard" } 
-        : item
-    );
-    navItems = [...navItems, ...getGeneralNavItems()];
-  }
-  
-  return navItems;
 };
