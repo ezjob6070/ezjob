@@ -34,9 +34,9 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
         <p className="text-xs text-muted-foreground">Overview of service requests and job status</p>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col md:flex-row items-start gap-6">
+        <div className="flex flex-col items-center gap-6">
           {/* Donut Chart */}
-          <div className="relative flex-shrink-0 flex justify-center w-72 md:w-auto">
+          <div className="relative flex-shrink-0 flex justify-center">
             <EnhancedDonutChart 
               data={chartData}
               title={totalTasks.toString()}
@@ -48,8 +48,8 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
             />
           </div>
           
-          {/* Status Items */}
-          <div className="flex flex-col gap-3 w-full">
+          {/* Status Items - Now displayed below the chart */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
             {/* Completed */}
             <div className="flex items-center justify-between rounded bg-green-50 p-3">
               <div className="flex items-center gap-2">
