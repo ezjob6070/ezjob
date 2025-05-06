@@ -41,10 +41,9 @@ const commonNavItems: NavItem[] = [
   {
     label: "Leads & Clients",
     icon: <UsersIcon size={18} />,
-    href: "/leads-clients",
     children: [
       {
-        label: "All Contacts",
+        label: "Combined View",
         icon: <UsersIcon size={16} />,
         href: "/leads-clients",
       },
@@ -73,7 +72,6 @@ const commonNavItems: NavItem[] = [
   {
     label: "Calls",
     icon: <PhoneIcon size={18} />,
-    href: "/calls",
     children: [
       {
         label: "All Calls",
@@ -103,56 +101,44 @@ const commonNavItems: NavItem[] = [
     ],
   },
   {
-    label: "Operations",
+    label: "Jobs",
     icon: <BriefcaseIcon size={18} />,
-    children: [
-      {
-        label: "Jobs",
-        icon: <BriefcaseIcon size={16} />,
-        href: "/jobs",
-      },
-      {
-        label: "Technicians",
-        icon: <WrenchIcon size={16} />,
-        href: "/technicians",
-      },
-      {
-        label: "Job Sources",
-        icon: <FileTextIcon size={16} />,
-        href: "/job-sources",
-      },
-      {
-        label: "Employees",
-        icon: <UsersIcon size={16} />,
-        href: "/employed",
-      },
-    ]
+    href: "/jobs",
   },
   {
-    label: "Finance",
+    label: "Technicians",
+    icon: <WrenchIcon size={18} />,
+    href: "/technicians",
+  },
+  {
+    label: "Estimates",
+    icon: <FileTextIcon size={18} />,
+    href: "/estimates",
+  },
+  {
+    label: "Payments",
+    icon: <CreditCardIcon size={18} />,
+    href: "/payments",
+  },
+  {
+    label: "Finance & Reports",
     icon: <CircleDollarSign size={18} />,
-    children: [
-      {
-        label: "Overview",
-        icon: <CircleDollarSign size={16} />,
-        href: "/finance",
-      },
-      {
-        label: "Estimates",
-        icon: <FileTextIcon size={16} />,
-        href: "/estimates",
-      },
-      {
-        label: "Payments",
-        icon: <CreditCardIcon size={16} />,
-        href: "/payments",
-      },
-    ]
+    href: "/finance",
   },
   {
     label: "GPS Tracking",
     icon: <MapPinIcon size={18} />,
     href: "/gps-tracking",
+  },
+  {
+    label: "Job Sources",
+    icon: <FileTextIcon size={18} />,
+    href: "/job-sources",
+  },
+  {
+    label: "Employed",
+    icon: <UsersIcon size={18} />,
+    href: "/employed",
   },
   {
     label: "Settings",

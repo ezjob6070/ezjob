@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { SidebarProps } from "./sidebarTypes";
 import { getIndustrySpecificNavItems } from "./sidebarConstants";
 import NavItem from "./NavItem";
+import ServiceCategorySelector from "./ServiceCategorySelector";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 const Sidebar = ({ isMobile }: SidebarProps) => {
@@ -17,10 +18,9 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
   const [isHovering, setIsHovering] = useState(false);
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
     "leads-clients": true,
-    "operations": true,
-    "finance": true,
   });
   
+  // No need for industry selector anymore, we're only using service
   const toggleExpand = (key: string) => {
     setExpandedItems(prev => ({
       ...prev,
@@ -50,6 +50,9 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           isHovering ? "w-64" : "w-16"
         )}
       >
+        {/* Add the ServiceCategorySelector here */}
+        {isHovering && <ServiceCategorySelector />}
+
         <div className="mx-2 my-4 border-t border-blue-600/50" />
 
         <div className={cn("py-3", isHovering ? "px-5" : "px-3")}>
