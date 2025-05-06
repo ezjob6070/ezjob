@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useJobsData } from "@/hooks/useJobsData";
 import { useJobSourceData } from "@/hooks/jobs/useJobSourceData";
@@ -242,7 +243,9 @@ const Jobs = () => {
     paymentValue: source.paymentValue || 0, 
     isActive: source.isActive !== false,
     profit: source.profit || 0,
-    createdAt: source.createdAt || new Date()
+    createdAt: source.createdAt || new Date(),
+    totalJobs: source.totalJobs || 0,
+    totalRevenue: source.totalRevenue || 0
   }));
 
   return (
@@ -251,7 +254,7 @@ const Jobs = () => {
         {/* Header Section */}
         <JobsHeader />
 
-        {/* Job Stats Cards - Pass date as a prop if the component expects it */}
+        {/* Job Stats Cards */}
         <JobStats jobs={filteredJobs} />
         
         {/* Jobs Container (Filter and Table) */}

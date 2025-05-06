@@ -1,87 +1,78 @@
 
-import { useState } from "react";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+import { 
+  Form, 
+  FormControl, 
+  FormDescription, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { JobSource } from "@/types/jobSource";
+import { v4 as uuidv4 } from 'uuid';
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  type: z.string().min(1, { message: "Job source type is required." }),
+  name: z.string().min(2, "Name must be at least 2 characters."),
+  type: z.string().min(1, "Source type is required"),
   website: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address." }).optional().or(z.literal("")),
-  logoUrl: z.string().optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
   paymentType: z.enum(["percentage", "fixed"]),
-  paymentValue: z.number().min(0, { message: "Payment value must be a positive number." }),
+  paymentValue: z.coerce.number().min(0, "Must be a positive number"),
   isActive: z.boolean().default(true),
-  notes: z.string().optional(),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface CreateJobSourceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddJobSource: (jobSource: Partial<JobSource>) => void;
+  onAddJobSource: (jobSource: JobSource) => void;
 }
 
-const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobSourceModalProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+const CreateJobSourceModal: React.FC<CreateJobSourceModalProps> = ({
+  open,
+  onOpenChange,
+  onAddJobSource,
+}) => {
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       type: "general",
       website: "",
-      phone: "",
       email: "",
-      logoUrl: "",
       paymentType: "percentage",
-      paymentValue: 0,
+      paymentValue: 10,
       isActive: true,
-      notes: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const newJobSource: Partial<JobSource> = {
-      id: crypto.randomUUID(),
+  const onSubmit = (values: FormValues) => {
+    const newJobSource: JobSource = {
+      id: uuidv4(),
       name: values.name,
       type: values.type,
-      website: values.website || "",
-      phone: values.phone || "",
-      email: values.email || "",
-      logoUrl: values.logoUrl || "",
+      website: values.website || undefined,
+      email: values.email || undefined,
       paymentType: values.paymentType,
       paymentValue: values.paymentValue,
       isActive: values.isActive,
-      notes: values.notes || "",
       totalJobs: 0,
       totalRevenue: 0,
       profit: 0,
@@ -95,13 +86,11 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Add New Job Source</DialogTitle>
-          <DialogDescription>
-            Add details about the new job source. Click save when you're done.
-          </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -109,9 +98,51 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Source Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter job source name" {...field} />
+                    <Input placeholder="Enter source name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source Type</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select source type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="online">Online</SelectItem>
+                      <SelectItem value="referral">Referral</SelectItem>
+                      <SelectItem value="advertisement">Advertisement</SelectItem>
+                      <SelectItem value="partnership">Partnership</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="website"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Website (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter website URL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,25 +151,13 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
             
             <FormField
               control={form.control}
-              name="type"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select job source type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="referral">Referral</SelectItem>
-                      <SelectItem value="website">Website</SelectItem>
-                      <SelectItem value="social_media">Social Media</SelectItem>
-                      <SelectItem value="advertisement">Advertisement</SelectItem>
-                      <SelectItem value="partner">Partner</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Contact Email (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter contact email" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -147,71 +166,14 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="website"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Website</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter website URL" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter phone number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter email address" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="logoUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Logo URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter logo URL" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
                 name="paymentType"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Payment Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select payment type" />
@@ -219,12 +181,9 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="percentage">Percentage</SelectItem>
-                        <SelectItem value="fixed">Fixed</SelectItem>
+                        <SelectItem value="fixed">Fixed Amount</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      How this job source is paid
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -237,15 +196,21 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
                   <FormItem>
                     <FormLabel>Payment Value</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder={form.watch("paymentType") === "percentage" ? "E.g. 25 for 25%" : "E.g. 100 for $100"}
-                        {...field}
-                        onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
-                      />
+                      <div className="relative">
+                        <Input 
+                          type="number" 
+                          {...field}
+                          min={0}
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                          {form.watch("paymentType") === "percentage" ? "%" : "$"}
+                        </div>
+                      </div>
                     </FormControl>
-                    <FormDescription>
-                      {form.watch("paymentType") === "percentage" ? "Percentage value" : "Fixed amount"}
+                    <FormDescription className="text-xs">
+                      {form.watch("paymentType") === "percentage" 
+                        ? "Percentage of job amount paid to source" 
+                        : "Fixed amount paid to source per job"}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -257,11 +222,11 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
               control={form.control}
               name="isActive"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel>Active Status</FormLabel>
+                    <FormLabel className="text-base">Active Status</FormLabel>
                     <FormDescription>
-                      Whether this job source is currently active
+                      Source will be available when creating new jobs
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -274,30 +239,16 @@ const CreateJobSourceModal = ({ open, onOpenChange, onAddJobSource }: CreateJobS
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Add any notes or additional information"
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <div className="flex justify-end gap-2">
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Save Job Source</Button>
-            </DialogFooter>
+              <Button type="submit">Create Job Source</Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

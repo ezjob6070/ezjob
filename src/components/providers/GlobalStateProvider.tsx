@@ -11,7 +11,8 @@ import { sampleTransactions } from '@/data/finances';
 type Job = {
   id: string;
   clientName: string;
-  status: string;
+  status: "scheduled" | "in_progress" | "completed" | "cancelled";
+  date: Date | string;
   scheduledDate?: string | Date;
   amount?: number;
   actualAmount?: number;
@@ -25,7 +26,12 @@ type Technician = {
   name: string;
   email: string;
   phone?: string;
-  status: string;
+  status: "active" | "inactive" | "onLeave";
+  hireDate: string | Date;
+  specialty: string;
+  paymentType: string;
+  paymentRate: number;
+  hourlyRate: number;
   [key: string]: any;
 };
 
@@ -33,10 +39,15 @@ type JobSource = {
   id: string;
   name: string;
   type: string;
-  totalJobs?: number;
-  totalRevenue?: number;
+  paymentType: "percentage" | "fixed";
+  paymentValue: number;
+  isActive: boolean;
+  totalJobs: number;
+  totalRevenue: number;
   expenses?: number;
   companyProfit?: number;
+  profit: number;
+  createdAt: Date;
   [key: string]: any;
 };
 
@@ -68,9 +79,22 @@ const GlobalStateContext = createContext<GlobalStateContextType | undefined>(und
 // Define the provider component
 export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentIndustry, setCurrentIndustry] = useState<IndustryType>('general');
+  
+  // Ensure jobs have all required properties with correct types
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
-  // Initialize with empty array instead of referencing the non-existent finances.jobSources
+  
+  // Ensure technicians have all required properties with correct types
+  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians.map(tech => ({
+    ...tech,
+    status: tech.status as "active" | "inactive" | "onLeave",
+    hireDate: tech.hireDate || new Date().toISOString(),
+    specialty: tech.specialty || '',
+    paymentType: tech.paymentType || 'hourly',
+    paymentRate: tech.paymentRate || 0,
+    hourlyRate: tech.hourlyRate || 0
+  })));
+  
+  // Initialize with jobSources that have all required properties
   const [jobSources, setJobSources] = useState<JobSource[]>([]);
   
   const [dateFilter, setDateFilter] = useState<DateRange | undefined>({
@@ -80,18 +104,22 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Function to add a job
   const addJob = (job: Job) => {
-    const newJob = {
+    const newJob: Job = {
       ...job,
       id: job.id || uuidv4(),
+      status: job.status || "scheduled",
+      date: job.date || job.scheduledDate || new Date().toISOString()
     };
     setJobs(prevJobs => [...prevJobs, newJob]);
   };
 
   // Function to update a job
   const updateJob = (id: string, updatedJob: Partial<Job>) => {
-    setJobs(prevJobs => prevJobs.map(job => 
-      job.id === id ? { ...job, ...updatedJob } : job
-    ));
+    setJobs(prevJobs => 
+      prevJobs.map(job => 
+        job.id === id ? { ...job, ...updatedJob } : job
+      )
+    );
   };
 
   // Function to delete a job
@@ -99,25 +127,29 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setJobs(prevJobs => prevJobs.filter(job => job.id !== id));
   };
 
-  // Function to complete a job
+  // Function to mark a job as completed
   const completeJob = (id: string, actualAmount: number) => {
-    updateJob(id, { 
-      status: 'completed', 
-      completedDate: new Date().toISOString(),
-      actualAmount
-    });
+    setJobs(prevJobs => 
+      prevJobs.map(job => 
+        job.id === id 
+          ? { ...job, status: "completed" as const, actualAmount, completedAt: new Date() }
+          : job
+      )
+    );
   };
 
-  // Function to cancel a job
+  // Function to mark a job as cancelled
   const cancelJob = (id: string, reason?: string) => {
-    updateJob(id, { 
-      status: 'cancelled', 
-      cancelledDate: new Date().toISOString(),
-      cancellationReason: reason || 'No reason provided'
-    });
+    setJobs(prevJobs => 
+      prevJobs.map(job => 
+        job.id === id 
+          ? { ...job, status: "cancelled" as const, cancellationReason: reason || "No reason provided", cancelledAt: new Date() }
+          : job
+      )
+    );
   };
 
-  // Technician functions
+  // Function to add a technician
   const addTechnician = (technician: Technician) => {
     const newTechnician = {
       ...technician,
@@ -126,68 +158,86 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setTechnicians(prevTechnicians => [...prevTechnicians, newTechnician]);
   };
 
+  // Function to update a technician
   const updateTechnician = (id: string, updatedTechnician: Partial<Technician>) => {
-    setTechnicians(prevTechnicians => prevTechnicians.map(tech => 
-      tech.id === id ? { ...tech, ...updatedTechnician } : tech
-    ));
+    setTechnicians(prevTechnicians => 
+      prevTechnicians.map(tech => 
+        tech.id === id ? { ...tech, ...updatedTechnician } : tech
+      )
+    );
   };
 
+  // Function to delete a technician
   const deleteTechnician = (id: string) => {
     setTechnicians(prevTechnicians => prevTechnicians.filter(tech => tech.id !== id));
   };
 
-  // JobSource functions
+  // Function to add a job source
   const addJobSource = (jobSource: JobSource) => {
-    const newJobSource = {
+    const newJobSource: JobSource = {
       ...jobSource,
       id: jobSource.id || uuidv4(),
+      type: jobSource.type || 'general',
+      paymentType: jobSource.paymentType || 'percentage',
+      paymentValue: jobSource.paymentValue || 0,
+      isActive: jobSource.isActive !== false,
+      totalJobs: jobSource.totalJobs || 0,
+      totalRevenue: jobSource.totalRevenue || 0,
+      profit: jobSource.profit || 0,
+      createdAt: jobSource.createdAt || new Date()
     };
-    setJobSources(prevJobSources => [...prevJobSources, newJobSource]);
+    setJobSources(prevSources => [...prevSources, newJobSource]);
   };
 
+  // Function to update a job source
   const updateJobSource = (id: string, updatedJobSource: Partial<JobSource>) => {
-    setJobSources(prevJobSources => prevJobSources.map(source => 
-      source.id === id ? { ...source, ...updatedJobSource } : source
-    ));
+    setJobSources(prevSources => 
+      prevSources.map(source => 
+        source.id === id ? { ...source, ...updatedJobSource } : source
+      )
+    );
   };
 
+  // Function to delete a job source
   const deleteJobSource = (id: string) => {
-    setJobSources(prevJobSources => prevJobSources.filter(source => source.id !== id));
+    setJobSources(prevSources => prevSources.filter(source => source.id !== id));
+  };
+
+  const value = {
+    currentIndustry,
+    setCurrentIndustry,
+    jobs,
+    addJob,
+    updateJob,
+    deleteJob,
+    completeJob,
+    cancelJob,
+    dateFilter,
+    setDateFilter,
+    technicians,
+    addTechnician,
+    updateTechnician,
+    deleteTechnician,
+    jobSources,
+    addJobSource,
+    updateJobSource,
+    deleteJobSource,
   };
 
   return (
-    <GlobalStateContext.Provider 
-      value={{ 
-        currentIndustry, 
-        setCurrentIndustry, 
-        jobs, 
-        addJob, 
-        updateJob, 
-        deleteJob,
-        completeJob,
-        cancelJob,
-        dateFilter,
-        setDateFilter,
-        technicians,
-        addTechnician,
-        updateTechnician,
-        deleteTechnician,
-        jobSources,
-        addJobSource,
-        updateJobSource,
-        deleteJobSource
-      }}
-    >
+    <GlobalStateContext.Provider value={value}>
       {children}
     </GlobalStateContext.Provider>
   );
 };
 
-// Custom hook to use the global state
-export const useGlobalState = () => {
+// Hook to use the global state
+export const useGlobalState = (): GlobalStateContextType => {
   const context = useContext(GlobalStateContext);
+  
   if (context === undefined) {
     throw new Error('useGlobalState must be used within a GlobalStateProvider');
   }
+  
   return context;
 };

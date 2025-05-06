@@ -1,19 +1,24 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowUpIcon, PercentIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowUpRight, BarChart3, ChevronRight } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { format } from "date-fns";
 
 type PerformanceCardProps = {
-  leadSources: { name: string; value: number }[];
-  jobTypePerformance: { name: string; value: number }[];
+  leadSources: Array<{
+    name: string;
+    count: number;
+    percentage: number;
+  }>;
+  jobTypePerformance: Array<{
+    name: string;
+    count: number;
+    revenue: number;
+  }>;
   financialMetrics: {
-    avgJobValue: number;
-    monthlyGrowth: number;
-    conversionRate: number;
+    totalRevenue: number;
+    companysCut: number;
     [key: string]: any;
   };
   formatCurrency: (amount: number) => string;
@@ -21,17 +26,16 @@ type PerformanceCardProps = {
   detailedBusinessMetrics: any[];
 };
 
-const PerformanceCard = ({ 
-  leadSources, 
-  jobTypePerformance, 
-  financialMetrics, 
-  formatCurrency, 
+const PerformanceCard = ({
+  leadSources,
+  jobTypePerformance,
+  financialMetrics,
+  formatCurrency,
   openDetailDialog,
   detailedBusinessMetrics
 }: PerformanceCardProps) => {
   const { dateFilter } = useGlobalState();
-
-  // Format date range for the metrics cards
+  
   const getDateRangeText = () => {
     if (!dateFilter?.from) return "All time";
     
@@ -41,108 +45,90 @@ const PerformanceCard = ({
     
     return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d, yyyy")}`;
   };
-
+  
   return (
-    <Card className="overflow-hidden">
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">Top Performance By Job Source</CardTitle>
-        <div className="text-xs text-muted-foreground">{getDateRangeText()}</div>
-        <div className="flex mt-2 space-x-2">
-          <Badge variant="secondary" className="bg-gray-700 text-white rounded-full">Job Source</Badge>
-          <Badge variant="outline" className="rounded-full">Job Type</Badge>
-        </div>
+        <CardTitle className="text-base font-medium flex items-center justify-between">
+          <div>Performance Metrics</div>
+          <div className="text-xs text-muted-foreground">{getDateRangeText()}</div>
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">Lead Sources</h4>
-            {leadSources.length > 0 ? (
-              <div className="space-y-3">
-                {leadSources.map((source) => (
-                  <div key={source.name} className="flex items-center">
-                    <div className="w-32 mr-2">
-                      <span className="text-sm font-medium">{source.name}</span>
-                    </div>
-                    <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-blue-500 rounded-full" 
-                        style={{ width: `${source.value}%` }}
-                      ></div>
-                    </div>
-                    <span className="ml-2 text-sm font-medium">{source.value}%</span>
-                  </div>
-                ))}
+      <CardContent className="space-y-3">
+        <div>
+          <h4 className="text-sm font-medium mb-1">Lead Sources</h4>
+          <div className="space-y-2">
+            {leadSources.map((source) => (
+              <div key={source.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-primary"></div>
+                  <span className="text-sm">{source.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{source.count}</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({source.percentage}%)
+                  </span>
+                </div>
               </div>
-            ) : (
-              <div className="text-center text-muted-foreground text-sm py-4">
-                No lead source data available
-              </div>
-            )}
-          </div>
-          
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">Job Types</h4>
-            {jobTypePerformance.length > 0 ? (
-              <div className="space-y-3">
-                {jobTypePerformance.map((jobType) => (
-                  <div key={jobType.name} className="flex items-center">
-                    <div className="w-32 mr-2">
-                      <span className="text-sm font-medium">{jobType.name}</span>
-                    </div>
-                    <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-purple-500 rounded-full" 
-                        style={{ width: `${jobType.value}%` }}
-                      ></div>
-                    </div>
-                    <span className="ml-2 text-sm font-medium">{jobType.value}%</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-muted-foreground text-sm py-4">
-                No job type data available
-              </div>
-            )}
+            ))}
           </div>
         </div>
         
-        <div className="mt-6">
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Business Metrics</h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                 onClick={() => openDetailDialog('metrics', 'Business Metrics Details', detailedBusinessMetrics)}>
-              <span className="text-sm text-muted-foreground">Avg. Job Value</span>
-              <span className="text-xl font-bold mt-1">{formatCurrency(financialMetrics.avgJobValue)}</span>
-            </div>
-            <div className="flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                 onClick={() => openDetailDialog('metrics', 'Growth Metrics', detailedBusinessMetrics.filter(m => m.label?.includes('Growth') || false))}>
-              <span className="text-sm text-muted-foreground">Monthly Growth</span>
-              <div className="flex items-center mt-1">
-                <span className="text-xl font-bold">{financialMetrics.monthlyGrowth}%</span>
-                <ArrowUpIcon className="h-4 w-4 text-green-500 ml-1" />
+        <div>
+          <h4 className="text-sm font-medium mb-1">Job Types</h4>
+          <div className="space-y-2">
+            {jobTypePerformance.map((job) => (
+              <div key={job.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                  <span className="text-sm">{job.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{formatCurrency(job.revenue)}</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({job.count} jobs)
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                 onClick={() => openDetailDialog('metrics', 'Conversion Metrics', detailedBusinessMetrics.filter(m => m.label?.includes('Conversion') || m.label?.includes('Rate') || false))}>
-              <span className="text-sm text-muted-foreground">Conversion Rate</span>
-              <div className="flex items-center mt-1">
-                <span className="text-xl font-bold">{financialMetrics.conversionRate}%</span>
-                <PercentIcon className="h-4 w-4 text-blue-500 ml-1" />
+            ))}
+          </div>
+        </div>
+        
+        <div>
+          <h4 className="text-sm font-medium mb-1">Financial KPIs</h4>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-sm">Avg. Job Value</span>
               </div>
+              <span className="text-sm font-medium">{formatCurrency(financialMetrics.avgJobValue)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-violet-500"></div>
+                <span className="text-sm">Conversion Rate</span>
+              </div>
+              <span className="text-sm font-medium">{financialMetrics.conversionRate}%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                <span className="text-sm">Profit Margin</span>
+              </div>
+              <span className="text-sm font-medium">{financialMetrics.profitMargin}%</span>
             </div>
           </div>
         </div>
         
-        <div className="mt-4 text-center">
-          <Button 
-            variant="outline" 
-            className="text-blue-500"
-            onClick={() => openDetailDialog('metrics', 'All Business Metrics', detailedBusinessMetrics)}
-          >
-            View All Metrics
-          </Button>
-        </div>
+        <button
+          onClick={() => openDetailDialog('metrics', 'Business Metrics', detailedBusinessMetrics)}
+          className="flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors group mt-2"
+        >
+          <span>View detailed metrics</span>
+          <ChevronRight className="ml-1 h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+        </button>
       </CardContent>
     </Card>
   );

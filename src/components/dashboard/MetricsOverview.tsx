@@ -83,6 +83,7 @@ const MetricsOverview = ({
         className="bg-gradient-to-br from-purple-500 to-violet-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
+        dateRangeText={getDateRangeText()}
         onClick={() => openDetailDialog('tasks', 'Completed Jobs', detailedTasksData.filter(t => t.status === 'completed'))}
       />
       <DashboardMetricCard
@@ -94,6 +95,7 @@ const MetricsOverview = ({
         className="bg-gradient-to-br from-yellow-400 to-yellow-500 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
+        dateRangeText={getDateRangeText()}
         onClick={() => openDetailDialog('tasks', 'Active Jobs', detailedTasksData.filter(t => t.status === 'in_progress' || t.status === 'scheduled'))}
       />
       <DashboardMetricCard
@@ -105,6 +107,7 @@ const MetricsOverview = ({
         className="bg-gradient-to-br from-blue-500 to-blue-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
+        dateRangeText={getDateRangeText()}
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
       />
       <DashboardMetricCard
@@ -116,6 +119,7 @@ const MetricsOverview = ({
         className="bg-gradient-to-br from-green-500 to-green-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
+        dateRangeText={getDateRangeText()}
         onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
       />
     </div>
