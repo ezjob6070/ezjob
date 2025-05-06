@@ -4,12 +4,16 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import useWindowSize from "@/hooks/use-window-size";
 import { cn } from "@/lib/utils";
+import { useGlobalState } from "./providers/GlobalStateProvider";
 
 const Layout = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const { width } = useWindowSize();
+  
+  // Access GlobalState to verify the provider is available
+  const globalState = useGlobalState();
 
   useEffect(() => {
     const checkScreenSize = () => {

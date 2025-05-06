@@ -76,7 +76,9 @@ function App() {
                 <Route path="/" element={<Welcome />} />
                 
                 {/* Main layout with sidebar for all app pages */}
-                <Route path="/" element={<Layout />}>
+                <Route path="/" element={
+                  <Layout />
+                }>
                   {/* Dashboard routes for different industries */}
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
