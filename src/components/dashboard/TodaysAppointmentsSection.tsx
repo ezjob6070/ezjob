@@ -13,10 +13,12 @@ interface Appointment {
 
 interface TodaysAppointmentsSectionProps {
   appointments: Appointment[];
+  dateRangeText?: string;
 }
 
 const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({ 
-  appointments 
+  appointments,
+  dateRangeText = "Custom Range"
 }) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -61,7 +63,7 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
     <Card className="bg-white shadow-sm h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Today's Appointments</CardTitle>
-        <p className="text-xs text-muted-foreground">Scheduled jobs for today</p>
+        <p className="text-xs text-muted-foreground">Scheduled jobs for today • {dateRangeText}</p>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

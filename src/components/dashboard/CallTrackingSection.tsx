@@ -4,7 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Phone, UserCheck, Calendar, XOctagon } from "lucide-react";
 
-const CallTrackingSection: React.FC = () => {
+interface CallTrackingSectionProps {
+  dateRangeText?: string;
+}
+
+const CallTrackingSection: React.FC<CallTrackingSectionProps> = ({
+  dateRangeText = "Custom Range"
+}) => {
   // Call tracking data
   const totalCalls = 154;
   const convertedCalls = 98;
@@ -13,10 +19,10 @@ const CallTrackingSection: React.FC = () => {
   const conversionRate = 63;
 
   return (
-    <Card className="bg-white shadow-sm">
+    <Card className="bg-white shadow-sm h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Call Tracking & Conversion</CardTitle>
-        <p className="text-xs text-muted-foreground">Overview of incoming calls and customer conversion rate</p>
+        <p className="text-xs text-muted-foreground">Overview of incoming calls and customer conversion rate • {dateRangeText}</p>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-4 gap-3 mb-4">
