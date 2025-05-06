@@ -1,106 +1,95 @@
 
 import React from "react";
-import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Star, Award, TrendingUp } from "lucide-react";
 
-interface TopTechniciansCardProps {
-  topTechnicians: Array<{
-    id: string;
+type TopTechniciansCardProps = {
+  topTechnicians: {
     name: string;
-    avatar?: string;
-    initials: string;
-    completedJobs: number;
+    jobs: number;
     revenue: number;
     rating: number;
-    status: "available" | "busy" | "offline";
-  }>;
-  formatCurrency: (value: number) => string;
-  detailedClientsData?: any[];
-  dateRange?: DateRange | undefined;
-}
+  }[];
+  formatCurrency: (amount: number) => string;
+  openDetailDialog: (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => void;
+  detailedClientsData: any[];
+};
 
 const TopTechniciansCard = ({ 
   topTechnicians, 
-  formatCurrency,
-  detailedClientsData,
-  dateRange
+  formatCurrency, 
+  openDetailDialog,
+  detailedClientsData
 }: TopTechniciansCardProps) => {
-  const formatDateRange = () => {
-    if (!dateRange?.from) return "All Time";
-    
-    if (dateRange.to) {
-      if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
-        return format(dateRange.from, "MMM d, yyyy");
-      }
-      return `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
-    }
-    
-    return format(dateRange.from, "MMM d, yyyy");
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "available":
-        return "bg-green-500";
-      case "busy":
-        return "bg-amber-500";
-      case "offline":
-        return "bg-gray-400";
-      default:
-        return "bg-gray-400";
-    }
+  const getAvatarColorClass = (index: number) => {
+    const colors = [
+      'bg-gradient-to-br from-blue-500 to-blue-600',
+      'bg-gradient-to-br from-purple-500 to-purple-600',
+      'bg-gradient-to-br from-green-500 to-green-600',
+      'bg-gradient-to-br from-amber-500 to-amber-600'
+    ];
+    return colors[index % colors.length];
   };
 
   return (
-    <Card className="bg-white shadow-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center justify-between">
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+        <CardTitle className="text-lg font-medium flex items-center">
+          <Award className="h-5 w-5 mr-2 text-blue-500" />
           Top Technicians
-          {dateRange?.from && (
-            <span className="text-xs font-normal text-muted-foreground">
-              {formatDateRange()}
-            </span>
-          )}
         </CardTitle>
+        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          This Month
+        </Badge>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {topTechnicians.map((technician) => (
-            <div key={technician.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Avatar className="h-10 w-10">
-                    {technician.avatar && (
-                      <AvatarImage src={technician.avatar} alt={technician.name} />
-                    )}
-                    <AvatarFallback>{technician.initials}</AvatarFallback>
-                  </Avatar>
-                  <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${getStatusColor(technician.status)}`} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">{technician.name}</h3>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <span className="text-xs text-muted-foreground">
-                      {technician.completedJobs} jobs
-                    </span>
-                    <span className="text-xs">•</span>
-                    <span className="text-xs text-yellow-600 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
-                      {technician.rating}
-                    </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {topTechnicians.map((technician, index) => (
+            <Card key={technician.name} className="border shadow-sm bg-white hover:shadow-md transition-all cursor-pointer"
+                  onClick={() => openDetailDialog('clients', `${technician.name}'s Performance`, detailedClientsData.filter(c => c.name.includes(technician.name.split(' ')[0])))}>
+              <CardContent className="p-4">
+                <div className="flex items-center mb-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white mr-3 ${getAvatarColorClass(index)}`}>
+                    {technician.name.split(' ').map(n => n[0]).join('')}
+                  </div>
+                  <div>
+                    <div className="font-medium">{technician.name}</div>
+                    <div className="flex items-center text-sm text-amber-500">
+                      <Star className="h-3 w-3 mr-1 fill-amber-500" />
+                      {technician.rating}/5
+                    </div>
                   </div>
                 </div>
-              </div>
-              <Badge variant="outline" className="font-normal text-xs">
-                {formatCurrency(technician.revenue)}
-              </Badge>
-            </div>
+                <div className="grid grid-cols-2 gap-3 text-sm mt-3">
+                  <div className="flex flex-col p-2 bg-gray-50 rounded-md">
+                    <span className="text-xs text-muted-foreground">Jobs</span>
+                    <span className="font-bold">{technician.jobs}</span>
+                  </div>
+                  <div className="flex flex-col p-2 bg-blue-50 rounded-md">
+                    <span className="text-xs text-muted-foreground">Revenue</span>
+                    <span className="font-bold text-blue-700">{formatCurrency(technician.revenue)}</span>
+                  </div>
+                </div>
+                
+                <div className="mt-3 flex items-center text-xs text-green-600">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  <span>12% increase from last month</span>
+                </div>
+              </CardContent>
+            </Card>
           ))}
+        </div>
+        
+        <div className="mt-6 text-center">
+          <Button 
+            variant="outline" 
+            className="border-blue-200 text-blue-700 hover:bg-blue-50"
+            onClick={() => openDetailDialog('clients', 'All Technicians', detailedClientsData)}
+          >
+            View All Technicians
+          </Button>
         </div>
       </CardContent>
     </Card>

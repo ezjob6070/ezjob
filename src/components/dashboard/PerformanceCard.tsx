@@ -1,100 +1,131 @@
 
 import React from "react";
-import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowUpIcon, PercentIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface PerformanceCardProps {
-  leadSources: Array<{
-    name: string;
-    count: number;
-    percentage: number;
-  }>;
-  jobTypePerformance: Array<{
-    name: string;
-    completed: number;
-    total: number;
-  }>;
+type PerformanceCardProps = {
+  leadSources: { name: string; value: number }[];
+  jobTypePerformance: { name: string; value: number }[];
   financialMetrics: {
-    totalRevenue: number;
-    totalJobs: number;
     avgJobValue: number;
-    totalLeads: number;
-    conversionRate: number;
     monthlyGrowth: number;
+    conversionRate: number;
+    [key: string]: any;
   };
-  formatCurrency: (value: number) => string;
-  detailedBusinessMetrics?: any[];
-  dateRange?: DateRange | undefined;
-}
+  formatCurrency: (amount: number) => string;
+  openDetailDialog: (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => void;
+  detailedBusinessMetrics: any[];
+};
 
 const PerformanceCard = ({ 
   leadSources, 
   jobTypePerformance, 
-  financialMetrics,
-  formatCurrency,
-  detailedBusinessMetrics,
-  dateRange
+  financialMetrics, 
+  formatCurrency, 
+  openDetailDialog,
+  detailedBusinessMetrics
 }: PerformanceCardProps) => {
-  const formatDateRange = () => {
-    if (!dateRange?.from) return "All Time";
-    
-    if (dateRange.to) {
-      if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
-        return format(dateRange.from, "MMM d, yyyy");
-      }
-      return `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
-    }
-    
-    return format(dateRange.from, "MMM d, yyyy");
-  };
-
   return (
-    <Card className="bg-white shadow-sm">
+    <Card className="overflow-hidden">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center justify-between">
-          Call Tracking
-          {dateRange?.from && (
-            <span className="text-xs font-normal text-muted-foreground">
-              {formatDateRange()}
-            </span>
-          )}
-        </CardTitle>
+        <CardTitle className="text-lg font-medium">Top Performance By Job Source</CardTitle>
+        <div className="flex mt-2 space-x-2">
+          <Badge variant="secondary" className="bg-gray-700 text-white rounded-full">Job Source</Badge>
+          <Badge variant="outline" className="rounded-full">Job Type</Badge>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <h3 className="text-sm font-medium mb-1">Lead Sources</h3>
-            <div className="space-y-2">
-              {leadSources.map((source) => (
-                <div key={source.name} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium">{source.name}</span>
-                    <span className="text-xs text-muted-foreground">{source.count} calls ({source.percentage}%)</span>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">Lead Sources</h4>
+            {leadSources.length > 0 ? (
+              <div className="space-y-3">
+                {leadSources.map((source) => (
+                  <div key={source.name} className="flex items-center">
+                    <div className="w-32 mr-2">
+                      <span className="text-sm font-medium">{source.name}</span>
+                    </div>
+                    <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-blue-500 rounded-full" 
+                        style={{ width: `${source.value}%` }}
+                      ></div>
+                    </div>
+                    <span className="ml-2 text-sm font-medium">{source.value}%</span>
                   </div>
-                  <Progress value={source.percentage} className="h-1.5" />
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground text-sm py-4">
+                No lead source data available
+              </div>
+            )}
           </div>
           
           <div>
-            <h3 className="text-sm font-medium mb-1">Conversion Rate by Type</h3>
-            <div className="space-y-2">
-              {jobTypePerformance.map((performance) => (
-                <div key={performance.name} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium">{performance.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {performance.completed} of {performance.total} ({Math.round((performance.completed / performance.total) * 100)}%)
-                    </span>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">Job Types</h4>
+            {jobTypePerformance.length > 0 ? (
+              <div className="space-y-3">
+                {jobTypePerformance.map((jobType) => (
+                  <div key={jobType.name} className="flex items-center">
+                    <div className="w-32 mr-2">
+                      <span className="text-sm font-medium">{jobType.name}</span>
+                    </div>
+                    <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-purple-500 rounded-full" 
+                        style={{ width: `${jobType.value}%` }}
+                      ></div>
+                    </div>
+                    <span className="ml-2 text-sm font-medium">{jobType.value}%</span>
                   </div>
-                  <Progress value={(performance.completed / performance.total) * 100} className="h-1.5" />
-                </div>
-              ))}
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground text-sm py-4">
+                No job type data available
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="mt-6">
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">Business Metrics</h4>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                 onClick={() => openDetailDialog('metrics', 'Business Metrics Details', detailedBusinessMetrics)}>
+              <span className="text-sm text-muted-foreground">Avg. Job Value</span>
+              <span className="text-xl font-bold mt-1">{formatCurrency(financialMetrics.avgJobValue)}</span>
+            </div>
+            <div className="flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                 onClick={() => openDetailDialog('metrics', 'Growth Metrics', detailedBusinessMetrics.filter(m => m.label?.includes('Growth') || false))}>
+              <span className="text-sm text-muted-foreground">Monthly Growth</span>
+              <div className="flex items-center mt-1">
+                <span className="text-xl font-bold">{financialMetrics.monthlyGrowth}%</span>
+                <ArrowUpIcon className="h-4 w-4 text-green-500 ml-1" />
+              </div>
+            </div>
+            <div className="flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                 onClick={() => openDetailDialog('metrics', 'Conversion Metrics', detailedBusinessMetrics.filter(m => m.label?.includes('Conversion') || m.label?.includes('Rate') || false))}>
+              <span className="text-sm text-muted-foreground">Conversion Rate</span>
+              <div className="flex items-center mt-1">
+                <span className="text-xl font-bold">{financialMetrics.conversionRate}%</span>
+                <PercentIcon className="h-4 w-4 text-blue-500 ml-1" />
+              </div>
             </div>
           </div>
+        </div>
+        
+        <div className="mt-4 text-center">
+          <Button 
+            variant="outline" 
+            className="text-blue-500"
+            onClick={() => openDetailDialog('metrics', 'All Business Metrics', detailedBusinessMetrics)}
+          >
+            View All Metrics
+          </Button>
         </div>
       </CardContent>
     </Card>
