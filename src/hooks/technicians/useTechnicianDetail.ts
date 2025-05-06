@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -28,10 +29,20 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
     }
     
     if (techData) {
-      setTechnician(techData);
-      setFilteredTechnicians([techData]);
-      setDisplayedTechnicians([techData]);
-      setSelectedTechnicianId(techData.id);
+      // Fix: Ensure all required properties are present before setting state
+      const completeTechData: Technician = {
+        ...techData,
+        hireDate: techData.hireDate || new Date().toISOString(),
+        specialty: techData.specialty || '',
+        paymentType: techData.paymentType || 'hourly',
+        paymentRate: techData.paymentRate || 0,
+        hourlyRate: techData.hourlyRate || 0
+      };
+      
+      setTechnician(completeTechData);
+      setFilteredTechnicians([completeTechData]);
+      setDisplayedTechnicians([completeTechData]);
+      setSelectedTechnicianId(completeTechData.id);
     } else {
       toast({
         title: "Error",

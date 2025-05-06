@@ -13,7 +13,7 @@ export interface Job {
   clientName: string;
   title?: string;
   status: JobStatus;
-  date: Date | string; // Updated to accept string or Date
+  date: Date | string; // Accept either Date or string
   scheduledDate?: Date | string;
   isAllDay?: boolean;
   technicianId?: string;

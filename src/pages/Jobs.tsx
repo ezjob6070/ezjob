@@ -21,7 +21,12 @@ const Jobs = () => {
   
   // Sync with global jobs
   useEffect(() => {
-    setLocalJobs(globalJobs);
+    // Ensure all jobs have the required date field
+    const completeJobs: Job[] = globalJobs.map(job => ({
+      ...job,
+      date: job.date || job.scheduledDate || new Date().toISOString()
+    }));
+    setLocalJobs(completeJobs);
   }, [globalJobs]);
   
   // Control state for filter popovers
@@ -231,7 +236,13 @@ const Jobs = () => {
   // Transform job sources for the JobModals component
   const jobSourcesForModal = globalJobSources.map(source => ({
     id: source.id,
-    name: source.name
+    name: source.name,
+    type: source.type || "general",  // Ensure type property exists
+    paymentType: source.paymentType || "percentage", 
+    paymentValue: source.paymentValue || 0, 
+    isActive: source.isActive !== false,
+    profit: source.profit || 0,
+    createdAt: source.createdAt || new Date()
   }));
 
   return (
@@ -240,8 +251,8 @@ const Jobs = () => {
         {/* Header Section */}
         <JobsHeader />
 
-        {/* Job Stats Cards */}
-        <JobStats jobs={filteredJobs} date={dateRangeValue} />
+        {/* Job Stats Cards - Pass date as a prop if the component expects it */}
+        <JobStats jobs={filteredJobs} />
         
         {/* Jobs Container (Filter and Table) */}
         <JobsContainer 
@@ -260,7 +271,7 @@ const Jobs = () => {
           onEditJobSource={jobSourceData.handleEditJobSource}
           technicianOptions={technicianOptions}
           jobSources={jobSourceNames.map((name, index) => ({ id: `source-${index}`, name }))}
-          allJobSources={globalJobSources}
+          allJobSources={jobSourcesForModal}
         />
       </div>
     </JobsProvider>

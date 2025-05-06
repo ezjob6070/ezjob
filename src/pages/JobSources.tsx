@@ -53,6 +53,19 @@ const JobSources = () => {
     });
   };
 
+  // Ensure jobSources have all required fields for display
+  const completeJobSources: JobSource[] = jobSources.map(source => ({
+    ...source,
+    type: source.type || 'general',
+    paymentType: source.paymentType || 'percentage',
+    paymentValue: source.paymentValue || 0,
+    isActive: source.isActive !== false,
+    totalJobs: source.totalJobs || 0,
+    totalRevenue: source.totalRevenue || 0,
+    profit: source.profit || 0,
+    createdAt: source.createdAt || new Date()
+  }));
+
   return (
     <div className="space-y-8 py-8">
       <div className="flex justify-between items-center">
@@ -72,10 +85,10 @@ const JobSources = () => {
         </Button>
       </div>
 
-      <JobSourceStats jobSources={jobSources as any[]} />
+      <JobSourceStats jobSources={completeJobSources} />
       
       <JobSourcesList 
-        jobSources={jobSources as any[]} 
+        jobSources={completeJobSources} 
         onEditJobSource={handleEditJobSource}
       />
       
