@@ -2,23 +2,17 @@
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { CalendarRange, BarChart3, Activity } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import JobsDateFilter from "@/components/jobs/filters/JobsDateFilter";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 
 // Import dashboard components
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
-import DashboardMetricCards from "@/components/dashboard/DashboardMetricCards";
-import JobsStatusSection from "@/components/dashboard/JobsStatusSection";
-import TodaysAppointmentsSection from "@/components/dashboard/TodaysAppointmentsSection";
-import CallTrackingSection from "@/components/dashboard/CallTrackingSection";
 import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import DashboardDateFilter from "@/components/dashboard/DashboardDateFilter";
+import DashboardTabContent from "@/components/dashboard/DashboardTabContent";
 
 // Import data 
 import { dashboardTaskCounts, dashboardFinancialMetrics } from "@/data/dashboardData";
+import { todaysAppointments } from "@/data/appointmentsData";
 
 const Dashboard = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
@@ -39,37 +33,6 @@ const Dashboard = () => {
   };
 
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
-
-  const todaysAppointments = [
-    {
-      client: "Sarah Johnson",
-      priority: "high" as const,
-      time: "09:30 AM",
-      type: "Installation",
-      address: "123 Main St"
-    },
-    {
-      client: "James Wilson",
-      priority: "medium" as const,
-      time: "11:00 AM", 
-      type: "Repair",
-      address: "456 Oak Ave"
-    },
-    {
-      client: "Emily Davis",
-      priority: "low" as const,
-      time: "01:15 PM",
-      type: "Maintenance",
-      address: "789 Pine Rd"
-    },
-    {
-      client: "Michael Brown",
-      priority: "medium" as const,
-      time: "03:30 PM",
-      type: "Inspection",
-      address: "234 Elm St"
-    }
-  ];
 
   return (
     <div className="space-y-3 py-3">
@@ -92,55 +55,19 @@ const Dashboard = () => {
         </div>
       </div>
       
-      <TabsContent value="dashboard" className="mt-0 p-0">
-        {/* Dashboard Metric Cards */}
-        <DashboardMetricCards 
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <DashboardTabContent
           financialMetrics={{
-            totalRevenue: 148750,
-            monthlyGrowth: 5,
-            avgJobValue: 3542
+            totalRevenue: dashboardFinancialMetrics.totalRevenue,
+            monthlyGrowth: dashboardFinancialMetrics.monthlyGrowth,
+            avgJobValue: dashboardFinancialMetrics.avgJobValue
           }}
           taskCounts={dashboardTaskCounts}
           totalTasks={totalTasks}
-          dateRange={formatDateRange()}
+          dateRangeFormatted={formatDateRange()}
+          appointments={todaysAppointments}
         />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-          <div className="lg:col-span-2">
-            {/* Jobs Status Section */}
-            <JobsStatusSection
-              taskCounts={dashboardTaskCounts}
-              totalTasks={totalTasks}
-            />
-          </div>
-          
-          <div className="lg:col-span-1">
-            {/* Today's Appointments */}
-            <TodaysAppointmentsSection
-              appointments={todaysAppointments}
-            />
-          </div>
-        </div>
-        
-        <div className="mt-4">
-          {/* Call Tracking Section */}
-          <CallTrackingSection />
-        </div>
-      </TabsContent>
-      
-      <TabsContent value="statistics" className="mt-0 p-0">
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Detailed Statistics</h2>
-          <p className="text-gray-500">This section will display detailed statistical information.</p>
-        </div>
-      </TabsContent>
-      
-      <TabsContent value="analytics" className="mt-0 p-0">
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Performance Analytics</h2>
-          <p className="text-gray-500">This section will display detailed analytics information.</p>
-        </div>
-      </TabsContent>
+      </Tabs>
     </div>
   );
 };
