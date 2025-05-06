@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import MetricsOverview from "@/components/dashboard/MetricsOverview";
+import StatisticsSection from "@/components/dashboard/StatisticsSection";
 import TicketsStatusCard from "@/components/dashboard/TicketsStatusCard";
 import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
@@ -82,8 +83,6 @@ const Index = () => {
     { name: 'Other', value: 12 },
   ];
 
-  const COLORS = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'];
-
   // Sample analytics data
   const performanceData = [
     { month: 'Jan', calls: 24, jobs: 18, revenue: 4200 },
@@ -107,76 +106,7 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
-        return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="bg-white">
-                <CardHeader className="py-3 px-4">
-                  <CardTitle className="text-base">Annual Revenue vs Target</CardTitle>
-                </CardHeader>
-                <CardContent className="h-64 p-3">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={revenueData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                      <YAxis tick={{ fontSize: 10 }} />
-                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Line type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={2} activeDot={{ r: 6 }} name="Actual Revenue" />
-                      <Line type="monotone" dataKey="target" stroke="#10b981" strokeWidth={2} strokeDasharray="5 5" name="Target Revenue" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-white">
-                <CardHeader className="py-3 px-4">
-                  <CardTitle className="text-base">Job Type Distribution</CardTitle>
-                </CardHeader>
-                <CardContent className="h-64 p-3 flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={jobTypeData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {jobTypeData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => [`${value} jobs`, 'Count']} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <Card className="bg-white">
-              <CardHeader className="py-3 px-4">
-                <CardTitle className="text-base">Monthly Job Completion Rate</CardTitle>
-              </CardHeader>
-              <CardContent className="h-64 p-3">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={revenueData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Legend wrapperStyle={{ fontSize: '10px' }} />
-                    <Bar dataKey="revenue" name="Completed Jobs" fill="#4f46e5" />
-                    <Bar dataKey="target" name="Total Jobs" fill="#94a3b8" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        );
+        return <StatisticsSection revenueData={revenueData} jobTypeData={jobTypeData} performanceData={performanceData} formatCurrency={formatCurrency} />;
       
       case 'analytics':
         return (
