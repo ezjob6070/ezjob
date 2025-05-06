@@ -38,7 +38,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
   const [service, setService] = useState("");
   const [source, setSource] = useState("");
   const [value, setValue] = useState("0");
-  const [status, setStatus] = useState<Lead["status"]>("new");
+  const [status, setStatus] = useState("new");
   const [notes, setNotes] = useState("");
   const [estimatedClosingDate, setEstimatedClosingDate] = useState<Date | undefined>(undefined);
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
@@ -170,7 +170,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SERVICES.map((option) => (
-                      <SelectItem key={option} value={option || "other"}>
+                      <SelectItem key={option} value={option}>
                         {option}
                       </SelectItem>
                     ))}
@@ -186,7 +186,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SOURCES.map((option) => (
-                      <SelectItem key={option} value={option || "other"}>
+                      <SelectItem key={option} value={option}>
                         {option}
                       </SelectItem>
                     ))}
@@ -196,7 +196,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
               
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select value={status} onValueChange={(val) => setStatus(val as Lead["status"])}>
+                <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
