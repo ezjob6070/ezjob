@@ -17,7 +17,6 @@ type MetricsOverviewProps = {
   detailedTasksData: any[];
   detailedRevenueData: any[];
   detailedBusinessMetrics: any[];
-  dateRange?: DateRange;
 };
 
 const MetricsOverview = ({ 

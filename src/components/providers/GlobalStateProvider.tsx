@@ -4,7 +4,8 @@ import { IndustryType } from '@/components/sidebar/sidebarTypes';
 import { DateRange } from 'react-day-picker';
 import { v4 as uuidv4 } from 'uuid';
 import { technicians as initialTechnicians } from '@/data/technicians';
-import { finances } from '@/data/finances';
+// Import only the specific functions/objects from finances.ts, not the non-existent 'finances' export
+import { sampleTransactions } from '@/data/finances';
 
 // Define the types for our data
 type Job = {
@@ -69,7 +70,8 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [currentIndustry, setCurrentIndustry] = useState<IndustryType>('general');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
-  const [jobSources, setJobSources] = useState<JobSource[]>(finances.jobSources || []);
+  // Initialize with empty array instead of referencing the non-existent finances.jobSources
+  const [jobSources, setJobSources] = useState<JobSource[]>([]);
   
   const [dateFilter, setDateFilter] = useState<DateRange | undefined>({
     from: new Date(),

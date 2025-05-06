@@ -17,8 +17,27 @@ const JobSources = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedJobSource, setSelectedJobSource] = useState<JobSource | null>(null);
 
-  const handleAddJobSource = (newJobSource: JobSource) => {
-    addJobSource(newJobSource);
+  // Function to create a new job source with all required fields
+  const handleAddJobSource = (newJobSource: Partial<JobSource>) => {
+    const completeJobSource: JobSource = {
+      ...newJobSource,
+      id: newJobSource.id || crypto.randomUUID(),
+      type: newJobSource.type || 'general',
+      paymentType: newJobSource.paymentType || 'percentage',
+      paymentValue: newJobSource.paymentValue || 0,
+      isActive: newJobSource.isActive !== false,
+      totalJobs: newJobSource.totalJobs || 0,
+      totalRevenue: newJobSource.totalRevenue || 0,
+      profit: newJobSource.profit || 0,
+      createdAt: newJobSource.createdAt || new Date(),
+      name: newJobSource.name || 'New Job Source'
+    };
+    
+    addJobSource(completeJobSource);
+    toast({
+      title: "Job Source Created",
+      description: "New job source has been added successfully."
+    });
   };
 
   const handleEditJobSource = (jobSource: JobSource) => {
@@ -27,7 +46,11 @@ const JobSources = () => {
   };
 
   const handleUpdateJobSource = (updatedJobSource: JobSource) => {
-    updateJobSource(updatedJobSource);
+    updateJobSource(updatedJobSource.id, updatedJobSource);
+    toast({
+      title: "Job Source Updated",
+      description: "Job source has been updated successfully."
+    });
   };
 
   return (
@@ -49,10 +72,10 @@ const JobSources = () => {
         </Button>
       </div>
 
-      <JobSourceStats jobSources={jobSources} />
+      <JobSourceStats jobSources={jobSources as any[]} />
       
       <JobSourcesList 
-        jobSources={jobSources} 
+        jobSources={jobSources as any[]} 
         onEditJobSource={handleEditJobSource}
       />
       

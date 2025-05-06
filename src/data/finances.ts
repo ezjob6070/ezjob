@@ -1,9 +1,11 @@
-
 import { FinancialTransaction } from "@/types/finance";
 import { calculateTechnicianProfit } from "@/components/dashboard/DashboardUtils";
 
 // Start with empty transactions
 export const sampleTransactions: FinancialTransaction[] = [];
+
+// Create a basic jobSources array to export
+export const jobSources = [];
 
 // Keep the helper functions but remove mock data
 export const filterTransactionsByDateRange = (
@@ -93,4 +95,13 @@ export const getDateRangeForTimeFrame = (timeFrame: "day" | "week" | "month" | "
   }
   
   return { startDate, endDate };
+};
+
+// Export as a named export "finances"
+export const finances = {
+  jobSources: [],
+  sampleTransactions,
+  generateFinancialReport,
+  filterTransactionsByDateRange,
+  getDateRangeForTimeFrame
 };
