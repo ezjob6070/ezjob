@@ -47,28 +47,7 @@ const commonNavItems: NavItem[] = [
   {
     label: "Projects",
     icon: <FolderIcon size={18} />,
-    children: [
-      {
-        label: "Project Overview",
-        icon: <FolderIcon size={16} />,
-        href: "/projects",
-      },
-      {
-        label: "In Progress",
-        icon: <FileIcon size={16} />,
-        href: "/projects/in-progress",
-      },
-      {
-        label: "All Projects",
-        icon: <ListIcon size={16} />,
-        href: "/projects/all",
-      },
-      {
-        label: "Total Projects",
-        icon: <BarChartIcon size={16} />,
-        href: "/projects/total",
-      },
-    ],
+    href: "/projects",
   },
   {
     label: "Leads & Clients",

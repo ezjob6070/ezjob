@@ -37,8 +37,8 @@ import TechnicianDetail from "./pages/TechnicianDetail";
 import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
 import Properties from "./pages/Properties";
 import Listings from "./pages/Listings";
-import ProjectsOverview from "./pages/Projects"; // Renamed import
-import ProjectDetail from "./pages/ProjectDetail"; // New import
+import ProjectsOverview from "./pages/Projects"; // Main projects page
+import ProjectDetail from "./pages/ProjectDetail"; // Project detail page
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
@@ -59,11 +59,6 @@ import Inspections from "./pages/construction/Inspections";
 
 // Import general category pages
 import Contacts from "./pages/general/Contacts";
-
-// Import project pages
-import ProjectsInProgress from "./pages/projects/InProgress";
-import ProjectsAll from "./pages/projects/All";
-import ProjectsTotal from "./pages/projects/Total";
 
 const queryClient = new QueryClient();
 
@@ -96,11 +91,8 @@ function App() {
                   <Route path="leads" element={<Leads />} />
                   <Route path="leads-clients" element={<LeadsClients />} />
                   
-                  {/* Project routes */}
+                  {/* Project routes - simplified to one main Projects page */}
                   <Route path="projects" element={<ProjectsOverview />} />
-                  <Route path="projects/in-progress" element={<ProjectsInProgress />} />
-                  <Route path="projects/all" element={<ProjectsAll />} />
-                  <Route path="projects/total" element={<ProjectsTotal />} />
                   <Route path="project/:id" element={<ProjectDetail />} />
                   
                   {/* Call tracking routes */}
