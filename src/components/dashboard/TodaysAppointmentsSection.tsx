@@ -68,7 +68,7 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
       <CardContent className="flex-1 overflow-auto p-3 pt-0">
         <div className="space-y-2">
           {appointments.map((appointment, index) => (
-            <div key={index} className="flex gap-2 p-2 border border-gray-100 rounded-md">
+            <div key={index} className="flex gap-2 p-2 border border-gray-100 rounded-md hover:bg-gray-50 transition-colors">
               <div className={`mt-1 w-1.5 rounded-full ${getPriorityColor(appointment.priority)} h-12`}></div>
               <div className="flex-1">
                 <div className="flex justify-between">
@@ -89,7 +89,7 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
             </div>
           ))}
           
-          <Button variant="outline" size="sm" className="w-full mt-2">
+          <Button variant="outline" size="sm" className="w-full mt-3">
             View Full Schedule
           </Button>
         </div>

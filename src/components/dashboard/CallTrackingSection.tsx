@@ -19,46 +19,46 @@ const CallTrackingSection: React.FC<CallTrackingSectionProps> = ({
   const conversionRate = 63;
 
   return (
-    <Card className="bg-white shadow-sm h-full mt-0">
+    <Card className="bg-white shadow-sm h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Call Tracking & Conversion</CardTitle>
         <p className="text-xs text-muted-foreground">Overview of incoming calls and customer conversion rate • {dateRangeText}</p>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-4 gap-3 mb-4">
-          <div className="bg-gray-50 p-4 rounded-md">
+          <div className="bg-gray-50 p-3 rounded-md">
             <div className="flex justify-between mb-1">
               <span className="text-sm text-gray-500">Total Calls</span>
               <Phone className="h-4 w-4 text-blue-500" />
             </div>
-            <h3 className="text-2xl font-bold">{totalCalls}</h3>
+            <h3 className="text-xl font-bold">{totalCalls}</h3>
             <p className="text-xs text-gray-500">Last 30 days</p>
           </div>
           
-          <div className="bg-green-50 p-4 rounded-md">
+          <div className="bg-green-50 p-3 rounded-md">
             <div className="flex justify-between mb-1">
               <span className="text-sm text-gray-500">Converted</span>
               <UserCheck className="h-4 w-4 text-green-500" />
             </div>
-            <h3 className="text-2xl font-bold">{convertedCalls}</h3>
+            <h3 className="text-xl font-bold">{convertedCalls}</h3>
             <p className="text-xs text-gray-500">New customers</p>
           </div>
           
-          <div className="bg-yellow-50 p-4 rounded-md">
+          <div className="bg-yellow-50 p-3 rounded-md">
             <div className="flex justify-between mb-1">
               <span className="text-sm text-gray-500">Scheduled</span>
               <Calendar className="h-4 w-4 text-yellow-500" />
             </div>
-            <h3 className="text-2xl font-bold">{scheduledCalls}</h3>
+            <h3 className="text-xl font-bold">{scheduledCalls}</h3>
             <p className="text-xs text-gray-500">Follow-up</p>
           </div>
           
-          <div className="bg-red-50 p-4 rounded-md">
+          <div className="bg-red-50 p-3 rounded-md">
             <div className="flex justify-between mb-1">
               <span className="text-sm text-gray-500">Missed</span>
               <XOctagon className="h-4 w-4 text-red-500" />
             </div>
-            <h3 className="text-2xl font-bold">{missedCalls}</h3>
+            <h3 className="text-xl font-bold">{missedCalls}</h3>
             <p className="text-xs text-gray-500">Opportunities</p>
           </div>
         </div>
