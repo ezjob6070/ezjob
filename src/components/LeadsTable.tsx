@@ -11,9 +11,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Calendar, ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react";
+import { 
+  Calendar, 
+  ChevronDownIcon, 
+  ChevronUpIcon, 
+  SearchIcon,
+  Info,
+  Eye
+} from "lucide-react";
 import { format } from "date-fns";
 import { Lead, LeadStatus } from "@/types/lead";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type LeadsTableProps = {
   leads: Lead[];
@@ -40,6 +59,8 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
     key: keyof Lead;
     direction: "ascending" | "descending";
   } | null>(null);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [viewLeadDialog, setViewLeadDialog] = useState(false);
 
   const handleSort = (key: keyof Lead) => {
     let direction: "ascending" | "descending" = "ascending";
@@ -88,6 +109,28 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  };
+
+  const handleViewLead = (lead: Lead) => {
+    setSelectedLead(lead);
+    setViewLeadDialog(true);
+  };
+
+  const getLeadDescription = (lead: Lead) => {
+    const description = [];
+    if (lead.source) description.push(`Source: ${lead.source}`);
+    if (lead.value) description.push(`Value: ${formatCurrency(lead.value)}`);
+    if (lead.company) description.push(`Company: ${lead.company}`);
+    
+    // Add a snippet of notes if available
+    if (lead.notes) {
+      const notesPreview = lead.notes.length > 60 
+        ? `${lead.notes.substring(0, 60)}...` 
+        : lead.notes;
+      description.push(`Notes: ${notesPreview}`);
+    }
+    
+    return description.join(' • ');
   };
 
   return (
@@ -165,20 +208,32 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
               leads.map((lead) => (
                 <TableRow key={lead.id} className="group hover:bg-muted/50">
                   <TableCell className="font-medium">
-                    <div className="flex items-center">
-                      <Avatar className="h-8 w-8 mr-2">
-                        <AvatarFallback>{lead.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        {lead.name}
-                        <div className="text-sm text-muted-foreground">
-                          {lead.email}
-                        </div>
-                      </div>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center">
+                            <Avatar className="h-8 w-8 mr-2">
+                              <AvatarFallback>{lead.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              {lead.name}
+                              <div className="text-sm text-muted-foreground">
+                                {lead.email}
+                              </div>
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs p-3">
+                          <div className="font-medium">{lead.name}</div>
+                          <p className="text-sm text-muted-foreground">
+                            {getLeadDescription(lead)}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                   <TableCell>{lead.source}</TableCell>
-                  <TableCell>{formatCurrency(lead.value)}</TableCell>
+                  <TableCell>{formatCurrency(lead.value || 0)}</TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -194,13 +249,17 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      View
-                    </Button>
+                    <div className="flex justify-end space-x-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleViewLead(lead)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -208,6 +267,77 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
           </TableBody>
         </Table>
       </div>
+      
+      {/* Lead Detail Dialog */}
+      <Dialog open={viewLeadDialog} onOpenChange={setViewLeadDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-xl">
+              Lead Details
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedLead && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-12 w-12">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {selectedLead.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-semibold">{selectedLead.name}</h3>
+                  <p className="text-muted-foreground">{selectedLead.email}</p>
+                </div>
+                <Badge className={`ml-auto ${statusColors[selectedLead.status]}`}>
+                  {selectedLead.status.charAt(0).toUpperCase() + selectedLead.status.slice(1)}
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Company</h4>
+                  <p>{selectedLead.company || "N/A"}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Phone</h4>
+                  <p>{selectedLead.phone}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Source</h4>
+                  <p>{selectedLead.source || "N/A"}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Value</h4>
+                  <p className="font-semibold">{formatCurrency(selectedLead.value || 0)}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Date Added</h4>
+                  <p>{format(selectedLead.createdAt, "PPP")}</p>
+                </div>
+              </div>
+              
+              {selectedLead.notes && (
+                <div className="pt-2">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Notes</h4>
+                  <div className="bg-muted/50 p-3 rounded-md">
+                    <p className="text-sm">{selectedLead.notes}</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setViewLeadDialog(false)}>
+                  Close
+                </Button>
+                <Button>
+                  Edit Lead
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
