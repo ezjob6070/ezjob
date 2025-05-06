@@ -22,9 +22,15 @@ type LeadsTableProps = {
 const statusColors = {
   new: "bg-gray-100 text-gray-800 hover:bg-gray-200",
   contacted: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-  inprogress: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-  converted: "bg-green-100 text-green-800 hover:bg-green-200",
-  rejected: "bg-red-100 text-red-800 hover:bg-red-200",
+  qualified: "bg-purple-100 text-purple-800 hover:bg-purple-200",
+  proposal: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200",
+  negotiation: "bg-amber-100 text-amber-800 hover:bg-amber-200",
+  won: "bg-green-100 text-green-800 hover:bg-green-200",
+  lost: "bg-red-100 text-red-800 hover:bg-red-200",
+  active: "bg-green-100 text-green-800 hover:bg-green-200",
+  inactive: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+  converted: "bg-blue-100 text-blue-800 hover:bg-blue-200",
+  follow: "bg-amber-100 text-amber-800 hover:bg-amber-200",
 };
 
 const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {

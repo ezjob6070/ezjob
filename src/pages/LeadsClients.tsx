@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
 import LeadsTable from "@/components/LeadsTable";
@@ -191,10 +191,36 @@ const LeadsClients = () => {
     }
   };
 
+  // Get counts of leads by status for the status filter badges
+  const statusCounts = useMemo(() => {
+    const counts = {
+      active: 0,
+      inactive: 0,
+      converted: 0,
+      follow: 0
+    };
+    
+    leads.forEach(lead => {
+      if (lead.status in counts) {
+        counts[lead.status]++;
+      }
+    });
+    
+    return counts;
+  }, [leads]);
+
   // Filter leads based on selected statuses
   const filteredLeads = leadStatusFilter.length > 0
     ? leads.filter(lead => leadStatusFilter.includes(lead.status))
     : leads;
+
+  // Status filter button styles
+  const statusStyles = {
+    active: "bg-green-100 hover:bg-green-200 data-[state=on]:bg-green-200 data-[state=on]:text-green-900 text-green-800",
+    inactive: "bg-gray-100 hover:bg-gray-200 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-900 text-gray-800",
+    converted: "bg-blue-100 hover:bg-blue-200 data-[state=on]:bg-blue-200 data-[state=on]:text-blue-900 text-blue-800",
+    follow: "bg-amber-100 hover:bg-amber-200 data-[state=on]:bg-amber-200 data-[state=on]:text-amber-900 text-amber-800"
+  };
 
   return (
     <div className="space-y-8 py-8">
@@ -228,19 +254,34 @@ const LeadsClients = () => {
         {activeTab === "leads" && (
           <div className="mt-4 mb-4">
             <label className="block text-sm font-medium mb-2">Filter by status:</label>
-            <ToggleGroup type="multiple" className="justify-start flex-wrap" value={leadStatusFilter} onValueChange={setLeadStatusFilter}>
-              <ToggleGroupItem value="active" aria-label="Active" className="flex items-center gap-1">
-                <CheckIcon className="h-4 w-4" /> Active
-              </ToggleGroupItem>
-              <ToggleGroupItem value="inactive" aria-label="Inactive" className="flex items-center gap-1">
-                <XIcon className="h-4 w-4" /> Inactive
-              </ToggleGroupItem>
-              <ToggleGroupItem value="converted" aria-label="Converted" className="flex items-center gap-1">
-                <CheckIcon className="h-4 w-4" /> Converted
-              </ToggleGroupItem>
-              <ToggleGroupItem value="follow" aria-label="Follow" className="flex items-center gap-1">
-                <ArrowRightIcon className="h-4 w-4" /> Follow
-              </ToggleGroupItem>
+            <ToggleGroup type="multiple" className="justify-start flex-wrap gap-3" value={leadStatusFilter} onValueChange={setLeadStatusFilter}>
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="active" aria-label="Active" className={`flex items-center gap-1 ${statusStyles.active}`}>
+                  <CheckIcon className="h-4 w-4" /> Active
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-green-800">{statusCounts.active}</span>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="inactive" aria-label="Inactive" className={`flex items-center gap-1 ${statusStyles.inactive}`}>
+                  <XIcon className="h-4 w-4" /> Inactive
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-gray-800">{statusCounts.inactive}</span>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="converted" aria-label="Converted" className={`flex items-center gap-1 ${statusStyles.converted}`}>
+                  <CheckIcon className="h-4 w-4" /> Converted
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-blue-800">{statusCounts.converted}</span>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="follow" aria-label="Follow" className={`flex items-center gap-1 ${statusStyles.follow}`}>
+                  <ArrowRightIcon className="h-4 w-4" /> Follow
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-amber-800">{statusCounts.follow}</span>
+              </div>
             </ToggleGroup>
           </div>
         )}
