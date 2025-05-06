@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Job } from "@/components/jobs/JobTypes";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";

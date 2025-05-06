@@ -68,9 +68,9 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <GlobalStateProvider>
-      <GlobalDateProvider>
-        <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <GlobalStateProvider>
+        <GlobalDateProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -150,9 +150,9 @@ function App() {
               <QuickActions />
             </BrowserRouter>
           </TooltipProvider>
-        </QueryClientProvider>
-      </GlobalDateProvider>
-    </GlobalStateProvider>
+        </GlobalDateProvider>
+      </GlobalStateProvider>
+    </QueryClientProvider>
   );
 }
 
