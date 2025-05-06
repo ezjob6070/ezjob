@@ -1,246 +1,230 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PlusIcon, CircleIcon } from "lucide-react";
+import { 
+  BarChartIcon, 
+  BriefcaseIcon, 
+  BuildingIcon, 
+  CalendarIcon, 
+  CircleCheckIcon,
+  CircleClockIcon,
+  ClockIcon, 
+  FolderIcon, 
+  TagIcon, 
+  Users2Icon
+} from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { toast } from "sonner";
 
 export default function ProjectsTotal() {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
-
-  const handleCreateProject = () => {
-    toast.info("Create project functionality will be implemented soon");
-  };
-
+  
   // Calculate statistics
-  const totalProjects = projects.length;
-  const completedProjects = projects.filter(p => p.status === "Completed").length;
-  const inProgressProjects = projects.filter(p => p.status === "In Progress").length;
-  const notStartedProjects = projects.filter(p => p.status === "Not Started").length;
+  const totalBudget = projects.reduce((acc, p) => acc + p.budget, 0);
+  const totalSpent = projects.reduce((acc, p) => acc + p.actualSpent, 0);
+  const avgCompletion = Math.round(projects.reduce((acc, p) => acc + p.completion, 0) / projects.length);
   
-  const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
-  const completedBudget = projects
-    .filter(p => p.status === "Completed")
-    .reduce((sum, p) => sum + p.budget, 0);
-  const inProgressBudget = projects
-    .filter(p => p.status === "In Progress")
-    .reduce((sum, p) => sum + p.budget, 0);
+  // Count projects by status
+  const inProgressCount = projects.filter(p => p.status === "In Progress").length;
+  const completedCount = projects.filter(p => p.status === "Completed").length;
+  const notStartedCount = projects.filter(p => p.status === "Not Started").length;
+  const onHoldCount = projects.filter(p => p.status === "On Hold").length;
   
-  const avgCompletion = Math.round(
-    projects.reduce((acc, p) => acc + p.completion, 0) / projects.length
-  );
+  // Count by project type
+  const projectTypes = projects.reduce((acc, project) => {
+    acc[project.type] = (acc[project.type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  // Sort project types by count
+  const sortedProjectTypes = Object.entries(projectTypes)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Total Projects</h1>
-          <p className="text-muted-foreground">Overall statistics for all projects</p>
-        </div>
-        <Button 
-          className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
-          onClick={handleCreateProject}
-        >
-          <PlusIcon className="h-4 w-4 mr-2" />
-          New Project
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Projects Summary</h1>
+        <p className="text-muted-foreground">Overall statistics and metrics for all projects</p>
       </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white shadow-sm">
+        <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+            <CardDescription>Total Projects</CardDescription>
+            <CardTitle className="text-3xl">{projects.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalProjects}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {completedProjects} completed, {inProgressProjects} in progress
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalBudget)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {formatCurrency(completedBudget)} completed, {formatCurrency(inProgressBudget)} in progress
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Average Completion</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgCompletion}%</div>
-            <div className="w-full h-2 bg-gray-100 rounded-full mt-2">
-              <div 
-                className="h-full rounded-full bg-blue-500" 
-                style={{ width: `${avgCompletion}%` }}
-              ></div>
+            <div className="text-sm text-muted-foreground">
+              {inProgressCount} currently in progress
             </div>
           </CardContent>
         </Card>
         
-        <Card className="bg-white shadow-sm">
+        <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Status Breakdown</CardTitle>
+            <CardDescription>Total Budget</CardDescription>
+            <CardTitle className="text-3xl">{formatCurrency(totalBudget)}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2 mb-1">
-              <CircleIcon className="h-3 w-3 fill-green-500 text-green-500" />
-              <span className="text-sm">Completed: {completedProjects}</span>
+            <div className="text-sm text-muted-foreground">
+              {formatCurrency(totalSpent)} spent ({Math.round((totalSpent / totalBudget) * 100)}%)
             </div>
-            <div className="flex items-center gap-2 mb-1">
-              <CircleIcon className="h-3 w-3 fill-blue-500 text-blue-500" />
-              <span className="text-sm">In Progress: {inProgressProjects}</span>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Average Completion</CardDescription>
+            <CardTitle className="text-3xl">{avgCompletion}%</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm text-muted-foreground">
+              {completedCount} projects completed
             </div>
-            <div className="flex items-center gap-2">
-              <CircleIcon className="h-3 w-3 fill-amber-500 text-amber-500" />
-              <span className="text-sm">Not Started: {notStartedProjects}</span>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Project Types</CardDescription>
+            <CardTitle className="text-3xl">{Object.keys(projectTypes).length}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm text-muted-foreground">
+              {Object.keys(projectTypes).length} different categories
             </div>
           </CardContent>
         </Card>
       </div>
-
-      <Card className="bg-white shadow-sm">
-        <CardHeader>
-          <CardTitle>Project Completion Timeline</CardTitle>
-          <CardDescription>Timeline showing completion status of all projects</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="relative">
-            <div className="absolute top-0 bottom-0 left-1/2 -ml-px w-0.5 bg-gray-200"></div>
-            
-            {projects
-              .sort((a, b) => (b.completion - a.completion))
-              .slice(0, 5)
-              .map((project, index) => (
-                <div key={project.id} className="relative mb-8 last:mb-0">
-                  <div className="flex items-center">
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                      project.status === "Completed" 
-                        ? "bg-green-100 text-green-600" 
-                        : project.status === "In Progress"
-                          ? "bg-blue-100 text-blue-600"
-                          : "bg-amber-100 text-amber-600"
-                    } z-10`}>
-                      <CircleIcon className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 ml-4 p-4 bg-gray-50 rounded-md shadow-sm">
-                      <div className="flex justify-between">
-                        <h3 className="font-medium">{project.name}</h3>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          project.status === "Completed" 
-                            ? "bg-green-100 text-green-700" 
-                            : project.status === "In Progress"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-amber-100 text-amber-700"
-                        }`}>
-                          {project.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1">Client: {project.clientName}</p>
-                      <div className="mt-2">
-                        <div className="flex justify-between text-xs text-gray-500 mb-1">
-                          <span>Progress</span>
-                          <span>{project.completion}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full">
-                          <div 
-                            className="h-full rounded-full bg-blue-500" 
-                            style={{ width: `${project.completion}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-white shadow-sm">
+        <Card>
           <CardHeader>
-            <CardTitle>Budget Distribution</CardTitle>
-            <CardDescription>Budget allocation across project types</CardDescription>
+            <CardTitle>Project Status Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {['Website Development', 'Mobile App', 'UI/UX Design', 'Other'].map((type) => {
-                const typeProjects = projects.filter(p => p.type === type);
-                const typeBudget = typeProjects.reduce((sum, p) => sum + p.budget, 0);
-                const percentage = Math.round((typeBudget / totalBudget) * 100) || 0;
-                
-                return (
-                  <div key={type}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">{type}</span>
-                      <span className="text-sm">{formatCurrency(typeBudget)}</span>
-                    </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full">
-                      <div 
-                        className="h-full rounded-full bg-blue-500" 
-                        style={{ width: `${percentage}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between mt-1">
-                      <span className="text-xs text-gray-500">{typeProjects.length} projects</span>
-                      <span className="text-xs text-gray-500">{percentage}%</span>
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                  <span>In Progress</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="font-medium">{inProgressCount}</span>
+                  <span className="text-muted-foreground ml-1">({Math.round((inProgressCount / projects.length) * 100)}%)</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                  <span>Completed</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="font-medium">{completedCount}</span>
+                  <span className="text-muted-foreground ml-1">({Math.round((completedCount / projects.length) * 100)}%)</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-amber-500 mr-2"></div>
+                  <span>Not Started</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="font-medium">{notStartedCount}</span>
+                  <span className="text-muted-foreground ml-1">({Math.round((notStartedCount / projects.length) * 100)}%)</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-gray-400 mr-2"></div>
+                  <span>On Hold</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="font-medium">{onHoldCount}</span>
+                  <span className="text-muted-foreground ml-1">({Math.round((onHoldCount / projects.length) * 100)}%)</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="bg-white shadow-sm">
+        <Card>
           <CardHeader>
-            <CardTitle>Project Managers</CardTitle>
-            <CardDescription>Performance overview of project managers</CardDescription>
+            <CardTitle>Top Project Types</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {['Alex Johnson', 'Sarah Miller', 'David Chen'].map((manager, index) => {
-                const managerProjects = Math.floor(Math.random() * 10) + 5;
-                const completion = Math.floor(Math.random() * 30) + 70;
-                
-                return (
-                  <div key={manager}>
-                    <div className="flex justify-between mb-1">
-                      <div>
-                        <h3 className="text-sm font-medium">{manager}</h3>
-                        <p className="text-xs text-gray-500">{managerProjects} projects</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-medium">{completion}%</span>
-                        <p className="text-xs text-gray-500">avg. completion</p>
-                      </div>
-                    </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full mt-2">
-                      <div 
-                        className={`h-full rounded-full ${
-                          index === 0 ? 'bg-blue-500' : index === 1 ? 'bg-green-500' : 'bg-purple-500'
-                        }`} 
-                        style={{ width: `${completion}%` }}
-                      ></div>
-                    </div>
+            <div className="space-y-4">
+              {sortedProjectTypes.map(([type, count], index) => (
+                <div key={type} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full bg-${
+                      ['blue', 'green', 'amber', 'purple', 'pink'][index % 5]
+                    }-500 mr-2`}></div>
+                    <span>{type}</span>
                   </div>
-                );
-              })}
+                  <div className="flex items-center">
+                    <span className="font-medium">{count}</span>
+                    <span className="text-muted-foreground ml-1">({Math.round((count / projects.length) * 100)}%)</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Overall Project Metrics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 border rounded-md flex items-center gap-3">
+              <div className="bg-blue-100 p-2 rounded-md">
+                <Users2Icon className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Total Workers</div>
+                <div className="text-xl font-bold">{projects.reduce((acc, p) => acc + p.workers, 0)}</div>
+              </div>
+            </div>
+            
+            <div className="p-4 border rounded-md flex items-center gap-3">
+              <div className="bg-green-100 p-2 rounded-md">
+                <BuildingIcon className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Unique Clients</div>
+                <div className="text-xl font-bold">
+                  {new Set(projects.map(p => p.clientName)).size}
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border rounded-md flex items-center gap-3">
+              <div className="bg-amber-100 p-2 rounded-md">
+                <CalendarIcon className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Avg. Duration</div>
+                <div className="text-xl font-bold">
+                  {Math.round(projects.reduce((acc, p) => {
+                    const startDate = new Date(p.startDate);
+                    const endDate = new Date(p.expectedEndDate);
+                    const days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+                    return acc + days;
+                  }, 0) / projects.length)} days
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
