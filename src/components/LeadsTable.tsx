@@ -16,8 +16,8 @@ import {
   ChevronDownIcon, 
   ChevronUpIcon, 
   SearchIcon,
-  Info,
-  Eye
+  Eye,
+  CheckCircle
 } from "lucide-react";
 import { format } from "date-fns";
 import { Lead, LeadStatus } from "@/types/lead";
@@ -33,9 +33,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { 
+  RadioGroup, 
+  RadioGroupItem 
+} from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 type LeadsTableProps = {
   leads: Lead[];
+  onStatusChange?: (id: string, status: LeadStatus) => void;
 };
 
 const statusColors = {
@@ -52,7 +59,21 @@ const statusColors = {
   follow: "bg-amber-100 text-amber-800 hover:bg-amber-200",
 };
 
-const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
+const statusLabels = {
+  new: "New",
+  contacted: "Contacted",
+  qualified: "Qualified",
+  proposal: "Proposal",
+  negotiation: "Negotiation",
+  won: "Won",
+  lost: "Lost",
+  active: "Active",
+  inactive: "Inactive",
+  converted: "Converted",
+  follow: "Follow-up",
+};
+
+const LeadsTable = ({ leads: initialLeads, onStatusChange }: LeadsTableProps) => {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
@@ -61,6 +82,8 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
   } | null>(null);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [viewLeadDialog, setViewLeadDialog] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<LeadStatus | "">("");
+  const { toast } = useToast();
 
   const handleSort = (key: keyof Lead) => {
     let direction: "ascending" | "descending" = "ascending";
@@ -113,6 +136,7 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
 
   const handleViewLead = (lead: Lead) => {
     setSelectedLead(lead);
+    setSelectedStatus(lead.status);
     setViewLeadDialog(true);
   };
 
@@ -131,6 +155,65 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
     }
     
     return description.join(' • ');
+  };
+
+  const handleStatusChange = () => {
+    if (!selectedLead || !selectedStatus || selectedStatus === selectedLead.status) return;
+    
+    // Update local state
+    const updatedLeads = leads.map(lead => 
+      lead.id === selectedLead.id ? { ...lead, status: selectedStatus } : lead
+    );
+    setLeads(updatedLeads);
+    
+    // Call parent callback if provided
+    if (onStatusChange) {
+      onStatusChange(selectedLead.id, selectedStatus);
+    }
+    
+    // Show success message
+    toast({
+      title: "Status updated",
+      description: `Lead status changed to ${statusLabels[selectedStatus]}`,
+    });
+    
+    // Close dialog
+    setViewLeadDialog(false);
+  };
+
+  // Get suggested next status for inactive leads
+  const getQuickActionForStatus = (lead: Lead) => {
+    if (lead.status === "inactive") {
+      return (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="ml-2 bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200 hover:text-amber-900"
+          onClick={(e) => {
+            e.stopPropagation();
+            // Update local state
+            const updatedLeads = leads.map(l => 
+              l.id === lead.id ? { ...l, status: "follow" as LeadStatus } : l
+            );
+            setLeads(updatedLeads);
+            
+            // Call parent callback if provided
+            if (onStatusChange) {
+              onStatusChange(lead.id, "follow");
+            }
+            
+            toast({
+              title: "Status updated",
+              description: "Lead moved to follow-up status",
+            });
+          }}
+        >
+          <CheckCircle className="mr-1 h-3 w-3" /> 
+          Move to Follow-up
+        </Button>
+      );
+    }
+    return null;
   };
 
   return (
@@ -241,12 +324,15 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={statusColors[lead.status]}
-                    >
-                      {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
-                    </Badge>
+                    <div className="flex items-center">
+                      <Badge
+                        variant="outline"
+                        className={statusColors[lead.status]}
+                      >
+                        {statusLabels[lead.status]}
+                      </Badge>
+                      {getQuickActionForStatus(lead)}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
@@ -290,7 +376,7 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
                   <p className="text-muted-foreground">{selectedLead.email}</p>
                 </div>
                 <Badge className={`ml-auto ${statusColors[selectedLead.status]}`}>
-                  {selectedLead.status.charAt(0).toUpperCase() + selectedLead.status.slice(1)}
+                  {statusLabels[selectedLead.status]}
                 </Badge>
               </div>
               
@@ -326,12 +412,43 @@ const LeadsTable = ({ leads: initialLeads }: LeadsTableProps) => {
                 </div>
               )}
               
+              {/* Status Change Section */}
+              <div className="border-t pt-4 mt-4">
+                <h4 className="font-medium mb-3">Update Lead Status</h4>
+                <RadioGroup 
+                  value={selectedStatus} 
+                  onValueChange={(value) => setSelectedStatus(value as LeadStatus)}
+                  className="grid grid-cols-2 sm:grid-cols-3 gap-2"
+                >
+                  {Object.entries(statusLabels).map(([value, label]) => (
+                    <div key={value} className="flex items-center space-x-2">
+                      <RadioGroupItem 
+                        value={value} 
+                        id={`status-${value}`} 
+                        className="border-gray-300"
+                      />
+                      <Label 
+                        htmlFor={`status-${value}`}
+                        className={`text-sm ${
+                          value === selectedLead.status ? 'font-medium' : ''
+                        }`}
+                      >
+                        {label}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+              
               <div className="flex justify-end space-x-2 pt-4">
                 <Button variant="outline" onClick={() => setViewLeadDialog(false)}>
-                  Close
+                  Cancel
                 </Button>
-                <Button>
-                  Edit Lead
+                <Button 
+                  onClick={handleStatusChange}
+                  disabled={!selectedStatus || selectedStatus === selectedLead.status}
+                >
+                  Update Status
                 </Button>
               </div>
             </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
@@ -7,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon, CheckIcon, XIcon, ArrowRightIcon } from "lucide-react";
 import AddClientModal from "@/components/AddClientModal";
 import AddLeadModal from "@/components/leads/AddLeadModal";
-import { Lead } from "@/types/lead"; // Import lead type from the correct location
+import { Lead, LeadStatus } from "@/types/lead"; // Import lead type from the correct location
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useToast } from "@/components/ui/use-toast";
 
 // Import client type from Clients page
 type Client = {
@@ -31,6 +31,7 @@ const LeadsClients = () => {
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [leadStatusFilter, setLeadStatusFilter] = useState<string[]>([]);
+  const { toast } = useToast();
   
   // Sample clients data - we're reusing the data from the Clients page
   const [clients, setClients] = useState<Client[]>([
@@ -179,6 +180,19 @@ const LeadsClients = () => {
     setLeads((prevLeads) => [newLead, ...prevLeads]);
   };
 
+  const handleLeadStatusChange = (id: string, status: LeadStatus) => {
+    setLeads(prevLeads => 
+      prevLeads.map(lead => 
+        lead.id === id ? { ...lead, status } : lead
+      )
+    );
+    
+    toast({
+      title: "Lead status updated",
+      description: `Lead status has been changed to ${status}`,
+    });
+  };
+
   const getAddButtonText = () => {
     return activeTab === "leads" ? "Add Lead" : "Add Client";
   };
@@ -202,7 +216,7 @@ const LeadsClients = () => {
     
     leads.forEach(lead => {
       if (lead.status in counts) {
-        counts[lead.status]++;
+        counts[lead.status as keyof typeof counts]++;
       }
     });
     
@@ -288,7 +302,10 @@ const LeadsClients = () => {
         
         <div className="mt-4">
           <TabsContent value="leads">
-            <LeadsTable leads={filteredLeads} />
+            <LeadsTable 
+              leads={filteredLeads} 
+              onStatusChange={handleLeadStatusChange} 
+            />
           </TabsContent>
           <TabsContent value="clients">
             <ClientsTable clients={clients} />
