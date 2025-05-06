@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -83,7 +84,7 @@ const Dashboard = () => {
     data: []
   });
 
-  const { jobs, currentIndustry } = useGlobalState();
+  const { jobs, currentIndustry, projects } = useGlobalState();
 
   // Use our predefined fake data
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
@@ -659,4 +660,109 @@ const Dashboard = () => {
                       <div className="flex justify-between mt-1">
                         <span className="text-xs text-gray-500">0%</span>
                         <span className="text-xs text-gray-500">Target: 70%</span>
-                        <span className="text-xs text-gray
+                        <span className="text-xs text-gray-500">100%</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Today's Appointments - Third Column */}
+              <div>
+                <Card className="bg-white border-0 shadow-md h-full">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-medium">Today's Appointments</CardTitle>
+                    <CardDescription>Scheduled jobs for today</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <div className="space-y-3">
+                      {todaysAppointments.map((appointment, index) => (
+                        <div 
+                          key={index}
+                          className="p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                        >
+                          <div className="flex justify-between">
+                            <span className="font-medium text-sm">{appointment.clientName}</span>
+                            <span className="text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{appointment.time}</span>
+                          </div>
+                          <div className="flex items-center mt-1.5">
+                            <Badge
+                              className="mr-2"
+                              variant="outline"
+                              style={{
+                                backgroundColor: appointment.priority === 'high' ? '#fef2f2' : 
+                                                appointment.priority === 'medium' ? '#fefce8' : '#f0fdf4',
+                                color: appointment.priority === 'high' ? '#dc2626' : 
+                                      appointment.priority === 'medium' ? '#ca8a04' : '#16a34a',
+                                borderColor: appointment.priority === 'high' ? '#fecaca' : 
+                                            appointment.priority === 'medium' ? '#fef08a' : '#bbf7d0',
+                              }}
+                            >
+                              {appointment.priority}
+                            </Badge>
+                            <span className="text-xs text-gray-500">{appointment.jobType}</span>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1 flex items-center">
+                            <BuildingIcon className="h-3 w-3 mr-1" />
+                            {appointment.address}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-3">
+                      <Button variant="outline" className="w-full">
+                        View All Appointments
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+            
+            {/* Additional dashboard sections would go here */}
+            <TopTechniciansCard
+              topTechnicians={dashboardTopTechnicians}
+              formatCurrency={formatCurrency}
+              openDetailDialog={openDetailDialog}
+              detailedClientsData={detailedClientsData}
+            />
+            
+            <ActivitySection
+              activities={dashboardActivities}
+              events={dashboardEvents}
+            />
+          </>
+        );
+    }
+  };
+
+  return (
+    <div className="space-y-3 py-3">
+      <DashboardHeader 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+      />
+      
+      {renderContent()}
+      
+      <DashboardDetailDialog
+        open={activeDialog.open}
+        onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
+        title={activeDialog.title}
+        type={activeDialog.type}
+        data={activeDialog.data}
+      />
+      
+      <JobStatusDialog
+        open={statusDialog.open}
+        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
+        title={statusDialog.title}
+        status={statusDialog.status}
+        jobs={statusDialog.data}
+      />
+    </div>
+  );
+};
+
+export default Dashboard;
