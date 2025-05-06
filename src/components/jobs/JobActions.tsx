@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { MoreHorizontalIcon } from "lucide-react";
+import { MoreHorizontalIcon, PenLine } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +29,10 @@ const JobActions = ({ job, onCancelJob }: JobActionsProps) => {
         <DropdownMenuSeparator />
         <DropdownMenuItem>View Details</DropdownMenuItem>
         <DropdownMenuItem>Edit Job</DropdownMenuItem>
-        <DropdownMenuItem>Update Status</DropdownMenuItem>
+        <DropdownMenuItem>
+          <PenLine className="h-4 w-4 mr-2" />
+          Update Status
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         {job.status !== "cancelled" && (
           <DropdownMenuItem 
