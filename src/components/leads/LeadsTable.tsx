@@ -12,6 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EyeIcon, PencilIcon, PhoneIcon, MailIcon } from "lucide-react";
 import { Lead, LEAD_STATUS_COLORS } from "@/types/lead";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 interface LeadsTableProps {
   leads: Lead[];
@@ -34,6 +40,13 @@ const LeadsTable = ({ leads, onEditLead, onViewDetails, onStatusChange }: LeadsT
   // Format status for display
   const formatStatus = (status: string) => {
     return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  // Handle status change
+  const handleStatusChange = (leadId: string, newStatus: Lead['status']) => {
+    if (onStatusChange) {
+      onStatusChange(leadId, newStatus);
+    }
   };
 
   return (
@@ -94,6 +107,46 @@ const LeadsTable = ({ leads, onEditLead, onViewDetails, onStatusChange }: LeadsT
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right space-x-1">
+                  {onStatusChange && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          title="Change Status"
+                        >
+                          <Badge className={LEAD_STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-800"}>
+                            {formatStatus(lead.status)}
+                          </Badge>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {/* Make sure every status option has a non-empty value */}
+                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "new")}>
+                          New
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "contacted")}>
+                          Contacted
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "qualified")}>
+                          Qualified
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "proposal")}>
+                          Proposal
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "negotiation")}>
+                          Negotiation
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "won")}>
+                          Won
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "lost")}>
+                          Lost
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"

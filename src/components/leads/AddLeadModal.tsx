@@ -170,7 +170,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SERVICES.map((option) => (
-                      <SelectItem key={option} value={option}>
+                      <SelectItem key={option} value={option || "unknown"}>
                         {option}
                       </SelectItem>
                     ))}
@@ -186,7 +186,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SOURCES.map((option) => (
-                      <SelectItem key={option} value={option}>
+                      <SelectItem key={option} value={option || "unknown"}>
                         {option}
                       </SelectItem>
                     ))}
@@ -202,7 +202,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {initialStatuses.map((status) => (
-                      <SelectItem key={status} value={status}>
+                      <SelectItem key={status} value={status || "new"}>
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </SelectItem>
                     ))}
