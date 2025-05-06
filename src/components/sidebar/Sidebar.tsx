@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { SidebarProps } from "./sidebarTypes";
 import { getIndustrySpecificNavItems } from "./sidebarConstants";
 import NavItem from "./NavItem";
+import ServiceCategorySelector from "./ServiceCategorySelector";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,9 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
               {isHovering && <span>Choose Different Category</span>}
             </Button>
           </div>
+
+          {/* Add the ServiceCategorySelector here */}
+          {isHovering && <ServiceCategorySelector />}
 
           <div className="mx-2 my-4 border-t border-blue-600/50" />
 
