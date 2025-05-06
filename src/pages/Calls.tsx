@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusIcon, PhoneCallIcon, PhoneIncomingIcon, PhoneOutgoingIcon, PhoneOffIcon, UserPlusIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
@@ -148,7 +149,20 @@ const CallCard = ({ call }: { call: Call }) => {
 
 const Calls = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("all");
+  
+  // Set the active tab based on the location state or URL path
+  useEffect(() => {
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+    } else if (location.pathname.includes("/calls/")) {
+      const path = location.pathname.split("/calls/")[1];
+      if (["incoming", "outgoing", "missed", "converted"].includes(path)) {
+        setActiveTab(path);
+      }
+    }
+  }, [location]);
 
   // Filter calls based on active tab
   const getFilteredCalls = () => {
@@ -170,9 +184,9 @@ const Calls = () => {
     setActiveTab(tab);
     // Update the URL without full navigation
     if (tab === "all") {
-      navigate("/calls");
+      navigate("/calls", { replace: true });
     } else {
-      navigate(`/calls/${tab}`);
+      navigate(`/calls/${tab}`, { replace: true });
     }
   };
 
@@ -194,43 +208,150 @@ const Calls = () => {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <PhoneCallIcon className="h-5 w-5 text-blue-500" />
-            Call Log
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs 
-            value={activeTab} 
-            onValueChange={handleTabChange}
-            className="w-full"
-          >
-            <TabsList className="grid grid-cols-5 w-full">
-              <TabsTrigger value="all">All Calls</TabsTrigger>
-              <TabsTrigger value="incoming">Incoming</TabsTrigger>
-              <TabsTrigger value="outgoing">Outgoing</TabsTrigger>
-              <TabsTrigger value="missed">Missed</TabsTrigger>
-              <TabsTrigger value="converted">Converted</TabsTrigger>
-            </TabsList>
-            <div className="mt-4">
+      {/* Make the tabs more prominent since they're the main navigation now */}
+      <Tabs 
+        value={activeTab} 
+        onValueChange={handleTabChange}
+        className="w-full"
+      >
+        <TabsList className="grid grid-cols-5 w-full mb-6 border-b">
+          <TabsTrigger value="all" className="text-base py-3">All Calls</TabsTrigger>
+          <TabsTrigger value="incoming" className="text-base py-3">
+            <PhoneIncomingIcon className="h-4 w-4 mr-2 text-green-500" />
+            Incoming
+          </TabsTrigger>
+          <TabsTrigger value="outgoing" className="text-base py-3">
+            <PhoneOutgoingIcon className="h-4 w-4 mr-2 text-blue-500" />
+            Outgoing
+          </TabsTrigger>
+          <TabsTrigger value="missed" className="text-base py-3">
+            <PhoneOffIcon className="h-4 w-4 mr-2 text-red-500" />
+            Missed
+          </TabsTrigger>
+          <TabsTrigger value="converted" className="text-base py-3">
+            <UserPlusIcon className="h-4 w-4 mr-2 text-amber-500" />
+            Converted
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <PhoneCallIcon className="h-5 w-5 text-blue-500" />
+                All Calls
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
                   <CallCard key={call.id} call={call} />
                 ))}
               </div>
-              
-              {getFilteredCalls().length === 0 && (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <PhoneCallIcon className="h-12 w-12 text-gray-300 mb-2" />
-                  <p className="text-muted-foreground">No calls found for the selected filter.</p>
-                </div>
-              )}
-            </div>
-          </Tabs>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="incoming">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <PhoneIncomingIcon className="h-5 w-5 text-green-500" />
+                Incoming Calls
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {getFilteredCalls().map(call => (
+                  <CallCard key={call.id} call={call} />
+                ))}
+                
+                {getFilteredCalls().length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <PhoneIncomingIcon className="h-12 w-12 text-gray-300 mb-2" />
+                    <p className="text-muted-foreground">No incoming calls found.</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="outgoing">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <PhoneOutgoingIcon className="h-5 w-5 text-blue-500" />
+                Outgoing Calls
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {getFilteredCalls().map(call => (
+                  <CallCard key={call.id} call={call} />
+                ))}
+                
+                {getFilteredCalls().length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <PhoneOutgoingIcon className="h-12 w-12 text-gray-300 mb-2" />
+                    <p className="text-muted-foreground">No outgoing calls found.</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="missed">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <PhoneOffIcon className="h-5 w-5 text-red-500" />
+                Missed Calls
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {getFilteredCalls().map(call => (
+                  <CallCard key={call.id} call={call} />
+                ))}
+                
+                {getFilteredCalls().length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <PhoneOffIcon className="h-12 w-12 text-gray-300 mb-2" />
+                    <p className="text-muted-foreground">No missed calls found.</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="converted">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <UserPlusIcon className="h-5 w-5 text-amber-500" />
+                Converted Calls
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {getFilteredCalls().map(call => (
+                  <CallCard key={call.id} call={call} />
+                ))}
+                
+                {getFilteredCalls().length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <UserPlusIcon className="h-12 w-12 text-gray-300 mb-2" />
+                    <p className="text-muted-foreground">No converted calls found.</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

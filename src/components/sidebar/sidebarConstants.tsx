@@ -51,33 +51,7 @@ export const getCommonNavItems = (): NavItem[] => [
   {
     label: "Calls",
     icon: <PhoneCallIcon size={20} />,
-    children: [
-      {
-        label: "All Calls",
-        icon: <PhoneCallIcon size={20} />,
-        href: "/calls",
-      },
-      {
-        label: "Incoming Calls",
-        icon: <PhoneIncomingIcon size={20} />,
-        href: "/calls/incoming",
-      },
-      {
-        label: "Outgoing Calls",
-        icon: <PhoneOutgoingIcon size={20} />,
-        href: "/calls/outgoing",
-      },
-      {
-        label: "Missed Calls",
-        icon: <PhoneOffIcon size={20} />,
-        href: "/calls/missed",
-      },
-      {
-        label: "Converted Calls",
-        icon: <UserPlusIcon size={20} />,
-        href: "/calls/converted",
-      },
-    ],
+    href: "/calls",
   },
   {
     label: "Tasks",

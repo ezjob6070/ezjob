@@ -158,9 +158,9 @@ const LeadsClients = () => {
     setClients((prevClients) => [newClient, ...prevClients]);
   };
 
-  // Update the handleAddLead function to use the correct Lead type
-  const handleAddLead = (lead: Lead) => {
-    setLeads((prevLeads) => [lead, ...prevLeads]);
+  // Fix the handleAddLead function to match the imported Lead type
+  const handleAddLead = (newLead: Lead) => {
+    setLeads((prevLeads) => [newLead, ...prevLeads]);
   };
 
   const getAddButtonText = () => {
