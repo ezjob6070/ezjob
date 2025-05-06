@@ -1,10 +1,7 @@
 
-import { IncentiveType, INCENTIVE_TYPE } from "./employee";
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "annually";
 
-// Define SalaryBasis as a string enum or union type directly in this file
-export type SalaryBasis = "hourly" | "annual" | "commission" | "weekly" | "monthly" | "yearly";
-
-export type Technician = {
+export interface Technician {
   id: string;
   name: string;
   email: string;
@@ -12,38 +9,22 @@ export type Technician = {
   address?: string;
   position?: string;
   department?: string;
-  hireDate: string; // Keep this as string only, not Date
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
   specialty: string;
-  paymentType: "percentage" | "flat" | "hourly" | "salary"; // Add "salary" as valid option
+  paymentType: "percentage" | "flat" | "hourly" | "salary";
   paymentRate: number;
+  salaryBasis: SalaryBasis;
   hourlyRate: number;
-  salaryBasis?: SalaryBasis;
-  incentiveType?: IncentiveType;
   incentiveAmount?: number;
-  rating?: number;
-  completedJobs?: number;
-  cancelledJobs?: number;
-  totalRevenue?: number;
-  notes?: string;
+  completedJobs: number;
+  cancelledJobs: number;
+  totalRevenue: number;
+  rating: number;
   profileImage?: string;
   imageUrl?: string;
-  certifications?: string[];
-  skills?: string[];
+  initials: string;
+  hireDate: string;
+  notes?: string;
   category?: string;
-  contractType?: string;
-  schedule?: {
-    monday: boolean;
-    tuesday: boolean;
-    wednesday: boolean;
-    thursday: boolean;
-    friday: boolean;
-    saturday: boolean;
-    sunday: boolean;
-  };
-  jobCategories?: string[];
-  performanceRating?: number;
-  initials?: string;
-  yearsExperience?: number;
-};
+}

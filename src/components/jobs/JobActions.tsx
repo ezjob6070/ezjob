@@ -14,9 +14,10 @@ import { Job } from "./JobTypes";
 type JobActionsProps = {
   job: Job;
   onCancelJob: (jobId: string) => void;
+  onUpdateStatus?: (job: Job) => void;
 };
 
-const JobActions = ({ job, onCancelJob }: JobActionsProps) => {
+const JobActions = ({ job, onCancelJob, onUpdateStatus }: JobActionsProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,7 +30,7 @@ const JobActions = ({ job, onCancelJob }: JobActionsProps) => {
         <DropdownMenuSeparator />
         <DropdownMenuItem>View Details</DropdownMenuItem>
         <DropdownMenuItem>Edit Job</DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onUpdateStatus && onUpdateStatus(job)}>
           <PenLine className="h-4 w-4 mr-2" />
           Update Status
         </DropdownMenuItem>

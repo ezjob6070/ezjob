@@ -41,7 +41,14 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         status: techData.status || 'active',
         paymentType: (techData.paymentType as "percentage" | "flat" | "hourly" | "salary") || 'hourly',
         paymentRate: techData.paymentRate || 0,
-        hourlyRate: techData.hourlyRate || 0
+        hourlyRate: techData.hourlyRate || 0,
+        // Ensure salaryBasis is a valid SalaryBasis type
+        salaryBasis: (techData.salaryBasis as SalaryBasis) || 'hourly',
+        completedJobs: techData.completedJobs || 0,
+        cancelledJobs: techData.cancelledJobs || 0,
+        totalRevenue: techData.totalRevenue || 0,
+        rating: techData.rating || 0,
+        initials: techData.initials || techData.name.substring(0, 2).toUpperCase(),
       };
       
       setTechnician(completeTechData);
