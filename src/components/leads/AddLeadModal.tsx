@@ -170,8 +170,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SERVICES.map((option) => (
-                      // Ensure no empty values are passed
-                      <SelectItem key={option} value={option || "unknown"}>
+                      <SelectItem key={option} value={option || "other"}>
                         {option}
                       </SelectItem>
                     ))}
@@ -187,8 +186,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SOURCES.map((option) => (
-                      // Ensure no empty values are passed
-                      <SelectItem key={option} value={option || "unknown"}>
+                      <SelectItem key={option} value={option || "other"}>
                         {option}
                       </SelectItem>
                     ))}
@@ -204,8 +202,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {initialStatuses.map((status) => (
-                      // Ensure no empty values are passed
-                      <SelectItem key={status} value={status || "new"}>
+                      <SelectItem key={status} value={status}>
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </SelectItem>
                     ))}
