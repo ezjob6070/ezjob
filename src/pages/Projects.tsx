@@ -9,21 +9,77 @@ import {
   BriefcaseIcon,
   ListIcon, 
   PlusIcon,
-  SearchIcon
+  SearchIcon,
+  ArrowUpDown,
+  CheckCircle,
+  PauseCircle,
+  Clock
 } from "lucide-react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { initialProjects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { toast } from "sonner";
+import { SortOption } from "@/types/sortOptions";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [view, setView] = useState<'cards' | 'list'>('cards');
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
   const navigate = useNavigate();
   
   const handleCreateProject = () => {
     toast.info("Create project functionality will be implemented soon");
+  };
+
+  const handleChangeStatus = (projectId: number, newStatus: Project['status']) => {
+    setProjects(prevProjects => 
+      prevProjects.map(project => 
+        project.id === projectId ? { ...project, status: newStatus } : project
+      )
+    );
+    toast.success(`Project status changed to ${newStatus}`);
+  };
+
+  const getPlaceholderImage = (projectId: number) => {
+    const imageIds = [
+      "photo-1488590528505-98d2b5aba04b",
+      "photo-1461749280684-dccba630e2f6",
+      "photo-1486312338219-ce68d2c6f44d",
+      "photo-1581091226825-a6a2a5aee158",
+      "photo-1498050108023-c5249f4df085"
+    ];
+    const index = projectId % imageIds.length;
+    return `https://images.unsplash.com/${imageIds[index]}?auto=format&fit=crop&w=300&h=200&q=80`;
+  };
+
+  // Sort function
+  const sortProjects = (projects: Project[], option: SortOption) => {
+    const sortedProjects = [...projects];
+    
+    switch (option) {
+      case "newest":
+        return sortedProjects.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+      case "oldest":
+        return sortedProjects.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+      case "name-asc":
+        return sortedProjects.sort((a, b) => a.name.localeCompare(b.name));
+      case "name-desc":
+        return sortedProjects.sort((a, b) => b.name.localeCompare(a.name));
+      case "budget-high":
+        return sortedProjects.sort((a, b) => b.budget - a.budget);
+      case "budget-low":
+        return sortedProjects.sort((a, b) => a.budget - b.budget);
+      default:
+        return sortedProjects;
+    }
   };
 
   const filteredProjects = projects.filter(project => 
@@ -31,6 +87,8 @@ export default function Projects() {
     project.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.clientName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const sortedProjects = sortProjects(filteredProjects, sortOption);
 
   const goToProjectDetail = (id: number) => {
     navigate(`/project/${id}`);
@@ -128,14 +186,35 @@ export default function Projects() {
         </Card>
       </div>
       
-      <div className="relative mb-4">
-        <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search projects..."
-          className="pl-8"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-grow">
+          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search projects..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+          <div className="w-full md:w-[200px]">
+            <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sort projects" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                <SelectItem value="budget-high">Budget (High-Low)</SelectItem>
+                <SelectItem value="budget-low">Budget (Low-High)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
       
       <Tabs defaultValue="all" className="w-full">
@@ -143,25 +222,25 @@ export default function Projects() {
           <TabsTrigger value="all">
             All
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-gray-200 text-gray-800 rounded-full font-medium">
-              {filteredProjects.length}
+              {sortedProjects.length}
             </span>
           </TabsTrigger>
           <TabsTrigger value="in-progress">
             In Progress
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full font-medium">
-              {filteredProjects.filter(p => p.status === "In Progress").length}
+              {sortedProjects.filter(p => p.status === "In Progress").length}
             </span>
           </TabsTrigger>
           <TabsTrigger value="completed">
             Completed
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-green-100 text-green-800 rounded-full font-medium">
-              {filteredProjects.filter(p => p.status === "Completed").length}
+              {sortedProjects.filter(p => p.status === "Completed").length}
             </span>
           </TabsTrigger>
           <TabsTrigger value="on-hold">
             On Hold
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-amber-100 text-amber-800 rounded-full font-medium">
-              {filteredProjects.filter(p => p.status === "On Hold").length}
+              {sortedProjects.filter(p => p.status === "On Hold").length}
             </span>
           </TabsTrigger>
         </TabsList>
@@ -169,13 +248,17 @@ export default function Projects() {
         <TabsContent value="all">
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filteredProjects.map((project) => (
+              {sortedProjects.map((project) => (
                 <Card 
                   key={project.id} 
                   className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => goToProjectDetail(project.id)}
                 >
-                  <CardHeader>
+                  <div 
+                    className="h-[150px] w-full bg-cover bg-center rounded-t-lg" 
+                    style={{ backgroundImage: `url(${getPlaceholderImage(project.id)})` }}
+                    onClick={() => goToProjectDetail(project.id)}
+                  ></div>
+                  <CardHeader className="pb-2" onClick={() => goToProjectDetail(project.id)}>
                     <div className="flex justify-between">
                       <CardTitle className="text-lg">{project.name}</CardTitle>
                       <span className={`text-xs px-2 py-1 rounded-full ${
@@ -190,7 +273,7 @@ export default function Projects() {
                     </div>
                     <CardDescription>{project.type}</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent onClick={() => goToProjectDetail(project.id)}>
                     <div className="space-y-4">
                       <div>
                         <div className="text-sm font-medium mb-1">Progress</div>
@@ -211,6 +294,32 @@ export default function Projects() {
                       </div>
                     </div>
                   </CardContent>
+                  <div className="px-6 pb-4 flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => handleChangeStatus(project.id, "Completed")}
+                    >
+                      <CheckCircle className="h-3.5 w-3.5 mr-1" /> Complete
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => handleChangeStatus(project.id, "On Hold")}
+                    >
+                      <PauseCircle className="h-3.5 w-3.5 mr-1" /> Hold
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => handleChangeStatus(project.id, "In Progress")}
+                    >
+                      <Clock className="h-3.5 w-3.5 mr-1" /> Progress
+                    </Button>
+                  </div>
                 </Card>
               ))}
             </div>
@@ -221,22 +330,31 @@ export default function Projects() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left p-4">Project Name</th>
+                        <th className="text-left p-4">Project</th>
                         <th className="text-left p-4">Type</th>
                         <th className="text-left p-4">Client</th>
                         <th className="text-left p-4">Status</th>
                         <th className="text-left p-4">Progress</th>
                         <th className="text-right p-4">Budget</th>
+                        <th className="text-center p-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProjects.map((project) => (
+                      {sortedProjects.map((project) => (
                         <tr 
                           key={project.id} 
-                          className="border-b hover:bg-gray-50 cursor-pointer"
-                          onClick={() => goToProjectDetail(project.id)}
+                          className="border-b hover:bg-gray-50"
                         >
-                          <td className="p-4 font-medium">{project.name}</td>
+                          <td className="p-4 font-medium" onClick={() => goToProjectDetail(project.id)} style={{ cursor: 'pointer' }}>
+                            <div className="flex items-center gap-3">
+                              <img 
+                                src={getPlaceholderImage(project.id)} 
+                                alt={project.name} 
+                                className="w-12 h-12 rounded object-cover"
+                              />
+                              <span>{project.name}</span>
+                            </div>
+                          </td>
                           <td className="p-4 text-gray-600">{project.type}</td>
                           <td className="p-4 text-gray-600">{project.clientName}</td>
                           <td className="p-4">
@@ -262,6 +380,37 @@ export default function Projects() {
                             </div>
                           </td>
                           <td className="p-4 text-right">{formatCurrency(project.budget)}</td>
+                          <td className="p-4">
+                            <div className="flex justify-center gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="h-7 px-2"
+                                onClick={() => handleChangeStatus(project.id, "Completed")}
+                                title="Mark as Completed"
+                              >
+                                <CheckCircle className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="h-7 px-2"
+                                onClick={() => handleChangeStatus(project.id, "On Hold")}
+                                title="Put On Hold"
+                              >
+                                <PauseCircle className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="h-7 px-2" 
+                                onClick={() => handleChangeStatus(project.id, "In Progress")}
+                                title="Mark as In Progress"
+                              >
+                                <Clock className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -275,15 +424,19 @@ export default function Projects() {
         <TabsContent value="in-progress">
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filteredProjects
+              {sortedProjects
                 .filter(p => p.status === "In Progress")
                 .map((project) => (
                   <Card 
                     key={project.id} 
                     className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => goToProjectDetail(project.id)}
                   >
-                    <CardHeader>
+                    <div 
+                      className="h-[150px] w-full bg-cover bg-center rounded-t-lg" 
+                      style={{ backgroundImage: `url(${getPlaceholderImage(project.id)})` }}
+                      onClick={() => goToProjectDetail(project.id)}
+                    ></div>
+                    <CardHeader className="pb-2" onClick={() => goToProjectDetail(project.id)}>
                       <div className="flex justify-between">
                         <CardTitle className="text-lg">{project.name}</CardTitle>
                         <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
@@ -292,7 +445,7 @@ export default function Projects() {
                       </div>
                       <CardDescription>{project.type}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent onClick={() => goToProjectDetail(project.id)}>
                       <div className="space-y-4">
                         <div>
                           <div className="text-sm font-medium mb-1">Progress</div>
@@ -313,6 +466,24 @@ export default function Projects() {
                         </div>
                       </div>
                     </CardContent>
+                    <div className="px-6 pb-4 flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleChangeStatus(project.id, "Completed")}
+                      >
+                        <CheckCircle className="h-3.5 w-3.5 mr-1" /> Complete
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleChangeStatus(project.id, "On Hold")}
+                      >
+                        <PauseCircle className="h-3.5 w-3.5 mr-1" /> Hold
+                      </Button>
+                    </div>
                   </Card>
                 ))}
             </div>
@@ -323,24 +494,33 @@ export default function Projects() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left p-4">Project Name</th>
+                        <th className="text-left p-4">Project</th>
                         <th className="text-left p-4">Type</th>
                         <th className="text-left p-4">Client</th>
                         <th className="text-left p-4">Status</th>
                         <th className="text-left p-4">Progress</th>
                         <th className="text-right p-4">Budget</th>
+                        <th className="text-center p-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProjects
+                      {sortedProjects
                         .filter(p => p.status === "In Progress")
                         .map((project) => (
                           <tr 
                             key={project.id} 
-                            className="border-b hover:bg-gray-50 cursor-pointer"
-                            onClick={() => goToProjectDetail(project.id)}
+                            className="border-b hover:bg-gray-50"
                           >
-                            <td className="p-4 font-medium">{project.name}</td>
+                            <td className="p-4 font-medium" onClick={() => goToProjectDetail(project.id)} style={{ cursor: 'pointer' }}>
+                              <div className="flex items-center gap-3">
+                                <img 
+                                  src={getPlaceholderImage(project.id)} 
+                                  alt={project.name} 
+                                  className="w-12 h-12 rounded object-cover"
+                                />
+                                <span>{project.name}</span>
+                              </div>
+                            </td>
                             <td className="p-4 text-gray-600">{project.type}</td>
                             <td className="p-4 text-gray-600">{project.clientName}</td>
                             <td className="p-4">
@@ -360,6 +540,28 @@ export default function Projects() {
                               </div>
                             </td>
                             <td className="p-4 text-right">{formatCurrency(project.budget)}</td>
+                            <td className="p-4">
+                              <div className="flex justify-center gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2"
+                                  onClick={() => handleChangeStatus(project.id, "Completed")}
+                                  title="Mark as Completed"
+                                >
+                                  <CheckCircle className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2"
+                                  onClick={() => handleChangeStatus(project.id, "On Hold")}
+                                  title="Put On Hold"
+                                >
+                                  <PauseCircle className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                     </tbody>
@@ -373,15 +575,19 @@ export default function Projects() {
         <TabsContent value="completed">
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filteredProjects
+              {sortedProjects
                 .filter(p => p.status === "Completed")
                 .map((project) => (
                   <Card 
                     key={project.id} 
                     className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => goToProjectDetail(project.id)}
                   >
-                    <CardHeader>
+                    <div 
+                      className="h-[150px] w-full bg-cover bg-center rounded-t-lg" 
+                      style={{ backgroundImage: `url(${getPlaceholderImage(project.id)})` }}
+                      onClick={() => goToProjectDetail(project.id)}
+                    ></div>
+                    <CardHeader className="pb-2" onClick={() => goToProjectDetail(project.id)}>
                       <div className="flex justify-between">
                         <CardTitle className="text-lg">{project.name}</CardTitle>
                         <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
@@ -390,7 +596,7 @@ export default function Projects() {
                       </div>
                       <CardDescription>{project.type}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent onClick={() => goToProjectDetail(project.id)}>
                       <div className="space-y-4">
                         <div>
                           <div className="text-sm font-medium mb-1">Progress</div>
@@ -411,6 +617,16 @@ export default function Projects() {
                         </div>
                       </div>
                     </CardContent>
+                    <div className="px-6 pb-4 flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleChangeStatus(project.id, "In Progress")}
+                      >
+                        <Clock className="h-3.5 w-3.5 mr-1" /> Reopen
+                      </Button>
+                    </div>
                   </Card>
                 ))}
             </div>
@@ -421,24 +637,33 @@ export default function Projects() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left p-4">Project Name</th>
+                        <th className="text-left p-4">Project</th>
                         <th className="text-left p-4">Type</th>
                         <th className="text-left p-4">Client</th>
                         <th className="text-left p-4">Status</th>
                         <th className="text-left p-4">Progress</th>
                         <th className="text-right p-4">Budget</th>
+                        <th className="text-center p-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProjects
+                      {sortedProjects
                         .filter(p => p.status === "Completed")
                         .map((project) => (
                           <tr 
                             key={project.id} 
-                            className="border-b hover:bg-gray-50 cursor-pointer"
-                            onClick={() => goToProjectDetail(project.id)}
+                            className="border-b hover:bg-gray-50"
                           >
-                            <td className="p-4 font-medium">{project.name}</td>
+                            <td className="p-4 font-medium" onClick={() => goToProjectDetail(project.id)} style={{ cursor: 'pointer' }}>
+                              <div className="flex items-center gap-3">
+                                <img 
+                                  src={getPlaceholderImage(project.id)} 
+                                  alt={project.name} 
+                                  className="w-12 h-12 rounded object-cover"
+                                />
+                                <span>{project.name}</span>
+                              </div>
+                            </td>
                             <td className="p-4 text-gray-600">{project.type}</td>
                             <td className="p-4 text-gray-600">{project.clientName}</td>
                             <td className="p-4">
@@ -458,6 +683,19 @@ export default function Projects() {
                               </div>
                             </td>
                             <td className="p-4 text-right">{formatCurrency(project.budget)}</td>
+                            <td className="p-4">
+                              <div className="flex justify-center gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2" 
+                                  onClick={() => handleChangeStatus(project.id, "In Progress")}
+                                  title="Reopen Project"
+                                >
+                                  <Clock className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                     </tbody>
@@ -471,15 +709,19 @@ export default function Projects() {
         <TabsContent value="on-hold">
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filteredProjects
+              {sortedProjects
                 .filter(p => p.status === "On Hold")
                 .map((project) => (
                   <Card 
                     key={project.id} 
                     className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => goToProjectDetail(project.id)}
                   >
-                    <CardHeader>
+                    <div 
+                      className="h-[150px] w-full bg-cover bg-center rounded-t-lg" 
+                      style={{ backgroundImage: `url(${getPlaceholderImage(project.id)})` }}
+                      onClick={() => goToProjectDetail(project.id)}
+                    ></div>
+                    <CardHeader className="pb-2" onClick={() => goToProjectDetail(project.id)}>
                       <div className="flex justify-between">
                         <CardTitle className="text-lg">{project.name}</CardTitle>
                         <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">
@@ -488,7 +730,7 @@ export default function Projects() {
                       </div>
                       <CardDescription>{project.type}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent onClick={() => goToProjectDetail(project.id)}>
                       <div className="space-y-4">
                         <div>
                           <div className="text-sm font-medium mb-1">Progress</div>
@@ -509,6 +751,16 @@ export default function Projects() {
                         </div>
                       </div>
                     </CardContent>
+                    <div className="px-6 pb-4 flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleChangeStatus(project.id, "In Progress")}
+                      >
+                        <Clock className="h-3.5 w-3.5 mr-1" /> Resume
+                      </Button>
+                    </div>
                   </Card>
                 ))}
             </div>
@@ -519,24 +771,33 @@ export default function Projects() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left p-4">Project Name</th>
+                        <th className="text-left p-4">Project</th>
                         <th className="text-left p-4">Type</th>
                         <th className="text-left p-4">Client</th>
                         <th className="text-left p-4">Status</th>
                         <th className="text-left p-4">Progress</th>
                         <th className="text-right p-4">Budget</th>
+                        <th className="text-center p-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProjects
+                      {sortedProjects
                         .filter(p => p.status === "On Hold")
                         .map((project) => (
                           <tr 
                             key={project.id} 
-                            className="border-b hover:bg-gray-50 cursor-pointer"
-                            onClick={() => goToProjectDetail(project.id)}
+                            className="border-b hover:bg-gray-50"
                           >
-                            <td className="p-4 font-medium">{project.name}</td>
+                            <td className="p-4 font-medium" onClick={() => goToProjectDetail(project.id)} style={{ cursor: 'pointer' }}>
+                              <div className="flex items-center gap-3">
+                                <img 
+                                  src={getPlaceholderImage(project.id)} 
+                                  alt={project.name} 
+                                  className="w-12 h-12 rounded object-cover"
+                                />
+                                <span>{project.name}</span>
+                              </div>
+                            </td>
                             <td className="p-4 text-gray-600">{project.type}</td>
                             <td className="p-4 text-gray-600">{project.clientName}</td>
                             <td className="p-4">
@@ -556,6 +817,19 @@ export default function Projects() {
                               </div>
                             </td>
                             <td className="p-4 text-right">{formatCurrency(project.budget)}</td>
+                            <td className="p-4">
+                              <div className="flex justify-center gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2" 
+                                  onClick={() => handleChangeStatus(project.id, "In Progress")}
+                                  title="Resume Project"
+                                >
+                                  <Clock className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                     </tbody>
