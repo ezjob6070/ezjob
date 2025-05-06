@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -47,12 +48,17 @@ const Technicians = () => {
   // Sync technicians from GlobalState to local state in useTechniciansData
   useEffect(() => {
     if (globalTechnicians && globalTechnicians.length > 0) {
-      // Fix: Ensure all technicians have correct property types
-      const typedTechnicians = globalTechnicians.map(tech => ({
-        ...tech,
-        hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : new Date(tech.hireDate).toISOString(),
-        paymentType: tech.paymentType as "percentage" | "flat" | "hourly" | "salary"
-      }));
+      // Make sure to use only valid string dates, not Date objects
+      const typedTechnicians: Technician[] = globalTechnicians.map(tech => {
+        return {
+          ...tech,
+          // Ensure hireDate is a properly formatted string
+          hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : 
+                    (tech.hireDate ? new Date(tech.hireDate).toISOString().split('T')[0] : '2023-01-01'),
+          // Ensure paymentType is valid
+          paymentType: tech.paymentType as "percentage" | "flat" | "hourly" | "salary"
+        };
+      });
       setTechnicians(typedTechnicians);
     }
   }, [globalTechnicians, setTechnicians]);
@@ -71,9 +77,12 @@ const Technicians = () => {
     const technicianWithId = {
       ...technicianData,
       id: uuidv4(),
+      // Ensure date is a string in YYYY-MM-DD format
       hireDate: typeof technicianData.hireDate === 'string' 
         ? technicianData.hireDate 
-        : new Date(technicianData.hireDate || new Date()).toISOString()
+        : (technicianData.hireDate instanceof Date 
+            ? technicianData.hireDate.toISOString().split('T')[0] 
+            : new Date().toISOString().split('T')[0])
     };
     
     addTechnician(technicianWithId);
@@ -83,8 +92,8 @@ const Technicians = () => {
   const handleUpdateTechnicianForm = (values: TechnicianEditFormValues) => {
     if (!selectedTechnician) return;
     
-    // Fix: Added the second argument as required
     updateTechnician(selectedTechnician.id, {
+      ...selectedTechnician,
       ...values,
       paymentRate: Number(values.paymentRate),
       hourlyRate: Number(values.hourlyRate || selectedTechnician.hourlyRate),
@@ -92,6 +101,8 @@ const Technicians = () => {
       profileImage: values.profileImage || selectedTechnician.profileImage,
       imageUrl: values.profileImage || selectedTechnician.imageUrl,
     });
+    
+    setShowEditModal(false);
   };
 
   const isSalaryDataVisible = !selectedDepartments || selectedDepartments.length === 0 || selectedDepartments.includes("Finance");
@@ -105,10 +116,7 @@ const Technicians = () => {
         exportTechnicians={exportTechnicians}
       />
 
-      <TechnicianStats technicians={globalTechnicians.map(tech => ({
-        ...tech,
-        hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : new Date(tech.hireDate).toISOString(),
-      }))} />
+      <TechnicianStats technicians={globalTechnicians} />
       
       <div className="mb-6">
         <div className="mb-4">

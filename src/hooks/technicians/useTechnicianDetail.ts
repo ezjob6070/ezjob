@@ -29,11 +29,16 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
     }
     
     if (techData) {
-      // Fix: Ensure all required properties are present and have correct types
+      // Ensure we have a valid technician object with all required properties
       const completeTechData: Technician = {
         ...techData,
-        hireDate: typeof techData.hireDate === 'string' ? techData.hireDate : new Date(techData.hireDate).toISOString(),
+        // Ensure hireDate is a valid string
+        hireDate: typeof techData.hireDate === 'string' ? techData.hireDate : 
+                 (techData.hireDate ? new Date(techData.hireDate).toISOString().split('T')[0] : '2023-01-01'),
+        // Make sure all required properties are present
+        email: techData.email || 'no-email@example.com',
         specialty: techData.specialty || '',
+        status: techData.status || 'active',
         paymentType: (techData.paymentType as "percentage" | "flat" | "hourly" | "salary") || 'hourly',
         paymentRate: techData.paymentRate || 0,
         hourlyRate: techData.hourlyRate || 0

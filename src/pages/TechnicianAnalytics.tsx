@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { initialTechnicians } from "@/data/technicians";
 import { Technician } from "@/types/technician";
@@ -18,11 +19,15 @@ const TechnicianAnalytics = () => {
   useEffect(() => {
     // Use global technicians if available, otherwise fall back to initial data
     if (globalTechnicians && globalTechnicians.length > 0) {
-      // Fix: Ensure all technicians have correct property types
-      const typedTechnicians = globalTechnicians.map(tech => ({
-        ...tech,
-        hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : new Date(tech.hireDate).toISOString()
-      }));
+      // Ensure all technicians have valid properties
+      const typedTechnicians: Technician[] = globalTechnicians.map(tech => {
+        return {
+          ...tech,
+          // Ensure hireDate is always a valid string
+          hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : 
+                   (tech.hireDate ? new Date(tech.hireDate).toISOString().split('T')[0] : '2023-01-01')
+        };
+      });
       setTechnicians(typedTechnicians);
     } else {
       setTechnicians(initialTechnicians);

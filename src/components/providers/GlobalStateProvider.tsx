@@ -18,12 +18,45 @@ interface Job {
 interface Technician {
   id: string;
   name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  position?: string;
+  department?: string;
+  hireDate: string; // Keep this as string only, not Date
+  startDate?: string;
+  status: "active" | "inactive" | "onLeave";
+  specialty: string;
+  paymentType: "percentage" | "flat" | "hourly" | "salary"; // Add "salary" as valid option
+  paymentRate: number;
+  hourlyRate: number;
+  salaryBasis?: string;
+  incentiveType?: string;
+  incentiveAmount?: number;
+  rating?: number;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  notes?: string;
+  profileImage?: string;
+  imageUrl?: string;
+  certifications?: string[];
+  skills?: string[];
+  category?: string;
   // Add other technician properties as needed
 }
 
 interface JobSource {
   id: string;
   name: string;
+  type?: string;
+  paymentType?: string;
+  paymentValue?: number;
+  isActive?: boolean;
+  totalJobs?: number;
+  totalRevenue?: number;
+  profit?: number;
+  createdAt?: string;
   // Add other jobSource properties as needed
 }
 
@@ -95,14 +128,56 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
 
   // Mock data for technicians
   const [technicians, setTechnicians] = useState<Technician[]>([
-    { id: "tech-1", name: "Mike Wilson" },
-    { id: "tech-2", name: "Sarah Johnson" }
+    { 
+      id: "tech-1", 
+      name: "Mike Wilson", 
+      email: "mike@example.com", 
+      specialty: "HVAC",
+      hireDate: "2023-01-15",
+      status: "active",
+      paymentType: "percentage",
+      paymentRate: 25,
+      hourlyRate: 20
+    },
+    { 
+      id: "tech-2", 
+      name: "Sarah Johnson", 
+      email: "sarah@example.com", 
+      specialty: "Plumbing",
+      hireDate: "2023-02-20",
+      status: "active",
+      paymentType: "hourly",
+      paymentRate: 30,
+      hourlyRate: 30
+    }
   ]);
 
   // Mock data for job sources
   const [jobSources, setJobSources] = useState<JobSource[]>([
-    { id: "source-1", name: "Website" },
-    { id: "source-2", name: "Referral" }
+    { 
+      id: "source-1", 
+      name: "Website",
+      type: "Online",
+      paymentType: "Fixed",
+      paymentValue: 100,
+      isActive: true,
+      totalJobs: 25,
+      totalRevenue: 5000,
+      profit: 2000,
+      createdAt: "2023-01-01"
+    },
+    { 
+      id: "source-2", 
+      name: "Referral",
+      type: "Personal",
+      paymentType: "Percentage",
+      paymentValue: 10,
+      isActive: true,
+      totalJobs: 15,
+      totalRevenue: 3000,
+      profit: 1500,
+      createdAt: "2023-02-01"
+    }
   ]);
 
   // Job management functions
