@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
@@ -15,6 +14,7 @@ import ActivitySection from "@/components/dashboard/ActivitySection";
 import DashboardDetailDialog from "@/components/DashboardDetailDialog";
 import DashboardCalendar from "@/components/dashboard/DashboardCalendar";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import ProjectsDashboardSection from "@/components/dashboard/ProjectsDashboardSection";
 
 import {
   dashboardTaskCounts,
@@ -224,6 +224,9 @@ const Index = () => {
               detailedBusinessMetrics={detailedBusinessMetrics}
               dateRange={date}
             />
+
+            {/* Add Projects Dashboard Section */}
+            <ProjectsDashboardSection />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <TicketsStatusCard 
