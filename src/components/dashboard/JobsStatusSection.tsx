@@ -34,73 +34,79 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
         <p className="text-xs text-muted-foreground">Overview of service requests and job status</p>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col md:flex-row items-center gap-4">
-          <div className="flex flex-col items-center">
+        <div className="flex flex-col md:flex-row items-start gap-6">
+          {/* Donut Chart */}
+          <div className="relative flex-shrink-0 flex justify-center w-72 md:w-auto">
             <EnhancedDonutChart 
               data={chartData}
               title={totalTasks.toString()}
               subtitle="Total Jobs"
-              size={240}
+              size={200}
               thickness={40}
               showLegend={false}
               animation={true}
             />
           </div>
           
-          <div className="flex flex-col gap-2 w-full">
-            <div className="flex items-center justify-between p-2 rounded bg-green-50">
+          {/* Status Items */}
+          <div className="flex flex-col gap-3 w-full">
+            {/* Completed */}
+            <div className="flex items-center justify-between rounded bg-green-50 p-3">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Completed</span>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span className="text-sm">Completed</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.completed}</span>
                 <div className="text-xs bg-green-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.completed / totalTasks) * 100)}%
                 </div>
-                <Button variant="ghost" size="sm" className="h-6 px-2">View</Button>
+                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
               </div>
             </div>
             
-            <div className="flex items-center justify-between p-2 rounded bg-blue-50">
+            {/* In Progress */}
+            <div className="flex items-center justify-between rounded bg-blue-50 p-3">
               <div className="flex items-center gap-2">
-                <LoaderCircle className="h-4 w-4 text-blue-500" />
-                <span>In Progress</span>
+                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                <span className="text-sm">In Progress</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.inProgress}</span>
                 <div className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.inProgress / totalTasks) * 100)}%
                 </div>
-                <Button variant="ghost" size="sm" className="h-6 px-2">View</Button>
+                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
               </div>
             </div>
             
-            <div className="flex items-center justify-between p-2 rounded bg-red-50">
+            {/* Cancelled */}
+            <div className="flex items-center justify-between rounded bg-red-50 p-3">
               <div className="flex items-center gap-2">
-                <XCircle className="h-4 w-4 text-red-500" />
-                <span>Cancelled</span>
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <span className="text-sm">Cancelled</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.canceled}</span>
                 <div className="text-xs bg-red-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.canceled / totalTasks) * 100)}%
                 </div>
-                <Button variant="ghost" size="sm" className="h-6 px-2">View</Button>
+                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
               </div>
             </div>
             
-            <div className="flex items-center justify-between p-2 rounded bg-purple-50">
+            {/* Rescheduled */}
+            <div className="flex items-center justify-between rounded bg-purple-50 p-3">
               <div className="flex items-center gap-2">
-                <RotateCw className="h-4 w-4 text-purple-500" />
-                <span>Rescheduled</span>
+                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                <span className="text-sm">Rescheduled</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.rescheduled}</span>
                 <div className="text-xs bg-purple-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.rescheduled / totalTasks) * 100)}%
                 </div>
-                <Button variant="ghost" size="sm" className="h-6 px-2">View</Button>
+                <Button variant="ghost" size="sm" className="h-7 px-2">View</Button>
               </div>
             </div>
           </div>
