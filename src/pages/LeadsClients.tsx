@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
@@ -158,7 +159,6 @@ const LeadsClients = () => {
     setClients((prevClients) => [newClient, ...prevClients]);
   };
 
-  // Fix the type definition to match the imported Lead type
   const handleAddLead = (lead: Lead) => {
     setLeads((prevLeads) => [lead, ...prevLeads]);
   };
