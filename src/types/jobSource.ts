@@ -1,21 +1,15 @@
 
-// Update the JobSource type definition to include all required fields
-export type JobSource = {
+export type JobSourcePaymentType = "percentage" | "fixed";
+
+export interface JobSource {
   id: string;
   name: string;
-  type: string; // Required field for GlobalStateProvider
-  website?: string;
-  phone?: string;
-  email?: string;
-  logoUrl?: string;
-  paymentType: "percentage" | "fixed";
+  type?: string;
+  paymentType: JobSourcePaymentType;
   paymentValue: number;
   isActive: boolean;
+  profit: number;
+  createdAt: string | Date;
   totalJobs: number;
   totalRevenue: number;
-  profit: number;
-  expenses?: number;
-  companyProfit?: number;
-  createdAt: Date;
-  notes?: string;
-};
+}

@@ -1,5 +1,6 @@
 
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "annually";
+export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
 
 export interface Technician {
   id: string;
@@ -10,13 +11,14 @@ export interface Technician {
   position?: string;
   department?: string;
   startDate?: string;
-  status: "active" | "inactive" | "onLeave";
+  status: "active" | "inactive" | "onLeave" | "suspended" | "terminated";
   specialty: string;
   paymentType: "percentage" | "flat" | "hourly" | "salary";
   paymentRate: number;
-  salaryBasis: SalaryBasis;
+  salaryBasis?: SalaryBasis;
   hourlyRate: number;
   incentiveAmount?: number;
+  incentiveType?: IncentiveType;
   completedJobs: number;
   cancelledJobs: number;
   totalRevenue: number;
@@ -27,4 +29,10 @@ export interface Technician {
   hireDate: string;
   notes?: string;
   category?: string;
+  // Adding missing properties
+  certifications?: string[];
+  skills?: string[];
+  jobCategories?: string[];
+  contractType?: string;
+  yearsExperience?: number;
 }
