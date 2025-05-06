@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -83,10 +84,7 @@ const Dashboard = () => {
     data: []
   });
 
-  // Get global state and safely handle projects if it doesn't exist
   const { jobs, currentIndustry } = useGlobalState();
-  // Mock projects array if it doesn't exist in global state
-  const projects = useGlobalState().projects || [];
 
   // Use our predefined fake data
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
@@ -470,26 +468,15 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
               
-              {/* Total Overview Card */}
               <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-purple-600 font-medium">Total Overview</p>
-                      <div className="grid grid-cols-3 gap-2 mt-2">
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-purple-800">{totalJobs}</p>
-                          <p className="text-xs text-purple-600">Jobs</p>
-                        </div>
-                        <div className="text-center border-x border-purple-200">
-                          <p className="text-lg font-bold text-purple-800">{projects.length}</p>
-                          <p className="text-xs text-purple-600">Projects</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-purple-800">{callsData.total}</p>
-                          <p className="text-xs text-purple-600">Calls</p>
-                        </div>
-                      </div>
+                      <p className="text-purple-600 font-medium">Total Jobs</p>
+                      <p className="text-2xl font-bold text-purple-800 mt-1">{totalJobs}</p>
+                      <p className="text-purple-600 text-sm mt-1">
+                        {completedJobs} completed, {totalJobs - completedJobs} in progress
+                      </p>
                     </div>
                     <div className="p-2.5 bg-white/60 rounded-full shadow-sm">
                       <ClipboardIcon className="h-5 w-5 text-purple-500" />
@@ -498,11 +485,15 @@ const Dashboard = () => {
                   <div className="mt-3 flex gap-2">
                     <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
                       <span className="block text-sm font-semibold">{Math.round(completedJobs / totalJobs * 100)}%</span>
-                      Completion
+                      Completion Rate
                     </div>
                     <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
-                      <span className="block text-sm font-semibold">{callsData.conversionRate}%</span>
-                      Conversion
+                      <span className="block text-sm font-semibold">{dashboardTaskCounts.inProgress}</span>
+                      In Progress
+                    </div>
+                    <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                      <span className="block text-sm font-semibold">{dashboardTaskCounts.rescheduled}</span>
+                      Rescheduled
                     </div>
                   </div>
                 </CardContent>
@@ -664,13 +655,24 @@ const Dashboard = () => {
                         <span className="text-xs text-gray-500">Target: 70%</span>
                         <span className="text-xs text-gray-500">100%</span>
                       </div>
+                      {callsData.conversionRate >= 65 ? (
+                        <div className="mt-2 text-green-600 text-xs flex items-center">
+                          <CheckIcon className="h-3 w-3 mr-1" />
+                          <span>On track to hit quarterly target!</span>
+                        </div>
+                      ) : (
+                        <div className="mt-2 text-amber-600 text-xs flex items-center">
+                          <AlertCircleIcon className="h-3 w-3 mr-1" />
+                          <span>Needs improvement - {70 - callsData.conversionRate}% below target</span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               </div>
-              
-              {/* Today's Appointments - Third Column */}
-              <div>
+
+              {/* Right Side Content - Today's Appointments */}
+              <div className="md:col-span-1">
                 <Card className="bg-white border-0 shadow-md h-full">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-medium">Today's Appointments</CardTitle>
@@ -681,30 +683,22 @@ const Dashboard = () => {
                       {todaysAppointments.map((appointment, index) => (
                         <div 
                           key={index}
-                          className="p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                          className="p-3 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors"
                         >
                           <div className="flex justify-between">
-                            <span className="font-medium text-sm">{appointment.clientName}</span>
-                            <span className="text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">{appointment.time}</span>
-                          </div>
-                          <div className="flex items-center mt-1.5">
-                            <Badge
-                              className="mr-2"
-                              variant="outline"
-                              style={{
-                                backgroundColor: appointment.priority === 'high' ? '#fef2f2' : 
-                                                appointment.priority === 'medium' ? '#fefce8' : '#f0fdf4',
-                                color: appointment.priority === 'high' ? '#dc2626' : 
-                                      appointment.priority === 'medium' ? '#ca8a04' : '#16a34a',
-                                borderColor: appointment.priority === 'high' ? '#fecaca' : 
-                                            appointment.priority === 'medium' ? '#fef08a' : '#bbf7d0',
-                              }}
+                            <div className="font-medium text-sm">{appointment.clientName}</div>
+                            <Badge 
+                              className={`text-xs ${
+                                appointment.priority === 'high' ? 'bg-red-100 text-red-800 hover:bg-red-200' : 
+                                appointment.priority === 'medium' ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 
+                                'bg-green-100 text-green-800 hover:bg-green-200'
+                              }`}
                             >
                               {appointment.priority}
                             </Badge>
-                            <span className="text-xs text-gray-500">{appointment.jobType}</span>
                           </div>
-                          <div className="text-xs text-gray-500 mt-1 flex items-center">
+                          <div className="text-xs text-gray-500 mt-1">{appointment.time} - {appointment.jobType}</div>
+                          <div className="text-xs text-gray-500 mt-0.5 flex items-center">
                             <BuildingIcon className="h-3 w-3 mr-1" />
                             {appointment.address}
                           </div>
@@ -712,9 +706,14 @@ const Dashboard = () => {
                       ))}
                     </div>
                     
-                    <div className="mt-3">
-                      <Button variant="outline" className="w-full">
-                        View All Appointments
+                    <div className="flex justify-center mt-4">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-xs border-blue-200 text-blue-600 hover:bg-blue-50"
+                      >
+                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
+                        View Full Schedule
                       </Button>
                     </div>
                   </CardContent>
@@ -722,17 +721,20 @@ const Dashboard = () => {
               </div>
             </div>
             
-            {/* Additional dashboard sections would go here */}
-            <TopTechniciansCard
-              topTechnicians={dashboardTopTechnicians}
-              formatCurrency={formatCurrency}
-              openDetailDialog={openDetailDialog}
-              detailedClientsData={detailedClientsData}
+            <JobStatusDialog 
+              open={statusDialog.open}
+              onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
+              status={statusDialog.status}
+              title={statusDialog.title}
+              data={statusDialog.data}
             />
             
-            <ActivitySection
-              activities={dashboardActivities}
-              events={dashboardEvents}
+            <DashboardDetailDialog
+              open={activeDialog.open}
+              onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
+              title={activeDialog.title}
+              type={activeDialog.type}
+              data={activeDialog.data}
             />
           </>
         );
@@ -747,23 +749,6 @@ const Dashboard = () => {
       />
       
       {renderContent()}
-      
-      <DashboardDetailDialog
-        open={activeDialog.open}
-        onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
-        title={activeDialog.title}
-        type={activeDialog.type}
-        data={activeDialog.data}
-      />
-      
-      {/* Fix props for JobStatusDialog to match its expected interface */}
-      <JobStatusDialog
-        open={statusDialog.open}
-        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
-        title={statusDialog.title}
-        status={statusDialog.status}
-        data={statusDialog.data}
-      />
     </div>
   );
 };
