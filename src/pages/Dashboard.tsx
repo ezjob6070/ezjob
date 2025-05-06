@@ -14,6 +14,8 @@ import DashboardMetricCards from "@/components/dashboard/DashboardMetricCards";
 import JobsStatusSection from "@/components/dashboard/JobsStatusSection";
 import TodaysAppointmentsSection from "@/components/dashboard/TodaysAppointmentsSection";
 import CallTrackingSection from "@/components/dashboard/CallTrackingSection";
+import DashboardTabs from "@/components/dashboard/DashboardTabs";
+import DashboardDateFilter from "@/components/dashboard/DashboardDateFilter";
 
 // Import data 
 import { dashboardTaskCounts, dashboardFinancialMetrics } from "@/data/dashboardData";
@@ -78,34 +80,15 @@ const Dashboard = () => {
         />
         
         <div className="flex items-center gap-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mr-2">
-            <TabsList>
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="statistics" className="flex items-center gap-1">
-                <BarChart3 className="h-3.5 w-3.5" />
-                Statistics
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center gap-1">
-                <Activity className="h-3.5 w-3.5" />
-                Analytics
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <DashboardTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-          <Popover open={openDateFilter} onOpenChange={setOpenDateFilter}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="h-8 px-3 text-sm flex items-center gap-1 bg-white border-blue-100 shadow-sm"
-              >
-                <CalendarRange className="h-3.5 w-3.5 text-blue-500" />
-                <span className="font-medium text-xs">{formatDateRange()}</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <JobsDateFilter date={dateRange} setDate={setDateRange} />
-            </PopoverContent>
-          </Popover>
+          <DashboardDateFilter 
+            openDateFilter={openDateFilter} 
+            setOpenDateFilter={setOpenDateFilter}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            formatDateRange={formatDateRange}
+          />
         </div>
       </div>
       
