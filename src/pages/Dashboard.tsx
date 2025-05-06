@@ -42,13 +42,13 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-3 py-3">
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4">
         <DashboardGreeting 
           name="Alex Johnson" 
           subtitle="Welcome to your Easy Job dashboard" 
         />
         
-        <div className="flex items-center gap-2">
+        <div className="mt-4 flex items-center gap-2">
           <DashboardTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
           <DashboardDateFilter 
