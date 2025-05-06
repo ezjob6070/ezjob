@@ -66,7 +66,7 @@ const DashboardTabContent: React.FC<DashboardTabContentProps> = ({
           </div>
         </div>
         
-        <div className="mt-4">
+        <div className="mt-0">
           {/* Call Tracking Section */}
           <CallTrackingSection 
             dateRangeText={dateRangeFormatted}
