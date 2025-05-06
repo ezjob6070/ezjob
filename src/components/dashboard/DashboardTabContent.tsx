@@ -53,6 +53,7 @@ const DashboardTabContent: React.FC<DashboardTabContentProps> = ({
             <JobsStatusSection
               taskCounts={taskCounts}
               totalTasks={totalTasks}
+              dateRangeText={dateRangeFormatted}
             />
           </div>
           
@@ -60,13 +61,16 @@ const DashboardTabContent: React.FC<DashboardTabContentProps> = ({
             {/* Today's Appointments */}
             <TodaysAppointmentsSection
               appointments={appointments}
+              dateRangeText={dateRangeFormatted}
             />
           </div>
         </div>
         
         <div className="mt-4">
           {/* Call Tracking Section */}
-          <CallTrackingSection />
+          <CallTrackingSection 
+            dateRangeText={dateRangeFormatted}
+          />
         </div>
       </TabsContent>
       

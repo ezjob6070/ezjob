@@ -14,11 +14,13 @@ interface JobsStatusSectionProps {
     rescheduled: number;
   };
   totalTasks: number;
+  dateRangeText?: string;
 }
 
 const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({ 
   taskCounts, 
-  totalTasks 
+  totalTasks,
+  dateRangeText = "Custom Range" 
 }) => {
   // State for the dialog
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -64,10 +66,10 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
   };
 
   return (
-    <Card className="bg-white shadow-sm">
+    <Card className="bg-white shadow-sm mb-4">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
-        <p className="text-xs text-muted-foreground">Overview of service requests and job status</p>
+        <p className="text-xs text-muted-foreground">Overview of service requests and job status • {dateRangeText}</p>
       </CardHeader>
       <CardContent>
         <div className="flex flex-row items-start gap-6">

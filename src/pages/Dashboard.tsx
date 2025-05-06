@@ -15,12 +15,18 @@ import { dashboardTaskCounts, dashboardFinancialMetrics } from "@/data/dashboard
 import { todaysAppointments } from "@/data/appointmentsData";
 
 const Dashboard = () => {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  // Set default date range to current day
+  const today = new Date();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: today,
+    to: today
+  });
+  
   const [openDateFilter, setOpenDateFilter] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   
   const formatDateRange = () => {
-    if (!dateRange?.from) return "All Time";
+    if (!dateRange?.from) return "Custom Range";
     
     if (dateRange.to) {
       if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
