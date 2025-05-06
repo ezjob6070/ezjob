@@ -9,7 +9,7 @@ export interface JobSource {
   paymentValue: number;
   isActive: boolean;
   profit: number;
-  createdAt: string | Date;
+  createdAt: string | Date; // Allow both string and Date to accommodate different usages
   totalJobs: number;
   totalRevenue: number;
 }

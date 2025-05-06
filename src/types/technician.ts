@@ -29,7 +29,7 @@ export interface Technician {
   hireDate: string;
   notes?: string;
   category?: string;
-  // Adding missing properties
+  // Previously missing properties now included
   certifications?: string[];
   skills?: string[];
   jobCategories?: string[];
