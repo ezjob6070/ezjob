@@ -15,7 +15,7 @@ import {
   ReceiptIcon,
   FileTextIcon,
   TruckIcon,
-  ToolIcon,
+  WrenchIcon, // Changed from ToolIcon to WrenchIcon which exists in lucide-react
   BarChartIcon,
   SlidersIcon,
   FolderIcon,
@@ -128,7 +128,7 @@ const serviceNavItems: NavItem[] = [
   },
   {
     label: "Technicians",
-    icon: <ToolIcon size={18} />,
+    icon: <WrenchIcon size={18} />, // Updated from ToolIcon
     href: "/technicians",
     industries: [INDUSTRY_TYPES.SERVICE]
   },
@@ -209,12 +209,12 @@ const constructionNavItems: NavItem[] = [
   {
     label: "Projects",
     icon: <FolderIcon size={18} />,
-    href: "/projects",
+    href: "/construction-projects", // Updated to match the new route
     industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },
   {
     label: "Equipment",
-    icon: <ToolIcon size={18} />,
+    icon: <WrenchIcon size={18} />, // Updated from ToolIcon
     href: "/equipment",
     industries: [INDUSTRY_TYPES.CONSTRUCTION]
   },

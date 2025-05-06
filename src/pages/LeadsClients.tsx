@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import AddClientModal from "@/components/AddClientModal";
 import AddLeadModal from "@/components/leads/AddLeadModal";
-import { Lead } from "@/types/lead";
+import { Lead } from "@/types/lead"; // Import lead type from the correct location
 
 // Import client type from Clients page
 type Client = {
@@ -159,13 +159,21 @@ const LeadsClients = () => {
     setClients((prevClients) => [newClient, ...prevClients]);
   };
 
-  const handleAddLead = (lead: Lead) => {
-    // Make sure to create a new Lead object that matches the imported Lead type
+  const handleAddLead = (lead: any) => {
+    // Ensure the lead conforms to the Lead type from types/lead.ts
     const newLead: Lead = {
-      ...lead,
-      createdAt: new Date(), // Ensure createdAt is added
-      status: lead.status || "new" // Ensure status has a default value
+      id: lead.id || String(Date.now()),
+      name: lead.name,
+      company: lead.company,
+      email: lead.email,
+      phone: lead.phone,
+      status: lead.status || "new",
+      source: lead.source,
+      value: lead.value,
+      createdAt: new Date(), // Ensure createdAt is always set
+      notes: lead.notes
     };
+    
     setLeads((prevLeads) => [newLead, ...prevLeads]);
   };
 

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,7 +37,7 @@ import TechnicianDetail from "./pages/TechnicianDetail";
 import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
 import Properties from "./pages/Properties";
 import Listings from "./pages/Listings";
-import Projects from "./pages/Projects"; // Add import for Projects page
+import Projects from "./pages/Projects"; // General projects page
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
@@ -48,7 +49,7 @@ import MissedCalls from "./pages/calls/MissedCalls";
 import ConvertedCalls from "./pages/calls/ConvertedCalls";
 
 // Import construction pages
-import Projects from "./pages/construction/Projects";
+import ConstructionProjects from "./pages/construction/Projects"; // Renamed to avoid conflict
 import Equipment from "./pages/construction/Equipment";
 import Materials from "./pages/construction/Materials";
 import Contractors from "./pages/construction/Contractors";
@@ -88,7 +89,7 @@ function App() {
                   <Route path="clients/:id" element={<ClientDetail />} />
                   <Route path="leads" element={<Leads />} />
                   <Route path="leads-clients" element={<LeadsClients />} />
-                  <Route path="projects" element={<Projects />} /> {/* Add Projects route */}
+                  <Route path="projects" element={<Projects />} />
                   
                   {/* Call tracking routes */}
                   <Route path="calls" element={<Calls />} />
@@ -117,7 +118,7 @@ function App() {
                   <Route path="settings" element={<Settings />} />
                   
                   {/* Construction Routes */}
-                  <Route path="projects" element={<Projects />} />
+                  <Route path="construction-projects" element={<ConstructionProjects />} /> {/* Updated route */}
                   <Route path="equipment" element={<Equipment />} />
                   <Route path="materials" element={<Materials />} />
                   <Route path="contractors" element={<Contractors />} />
@@ -127,7 +128,7 @@ function App() {
                   {/* General Category Routes */}
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="communications" element={<Navigate to="/contacts" replace />} />
-                  <Route path="general-projects" element={<Navigate to="/contacts" replace />} />
+                  <Route path="general-projects" element={<Navigate to="/projects" replace />} />
                   <Route path="office-management" element={<Navigate to="/contacts" replace />} />
                   <Route path="customer-support" element={<Navigate to="/contacts" replace />} />
                   <Route path="marketing" element={<Navigate to="/contacts" replace />} />
