@@ -26,7 +26,11 @@ import {
   MessageSquareIcon,
   GlobeIcon,
   DatabaseIcon,
-  UserIcon
+  UserIcon,
+  PhoneCallIcon,  // Added phone-call icon
+  PhoneOutgoingIcon, // Added phone outgoing icon
+  PhoneIncomingIcon, // Added phone incoming icon
+  PhoneXIcon, // Added phone-x icon
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
@@ -43,16 +47,36 @@ export const getCommonNavItems = (): NavItem[] => [
   {
     label: "Leads & Clients",
     icon: <UsersIcon size={20} />,
+    href: "/leads-clients",
+  },
+  {
+    label: "Calls",
+    icon: <PhoneCallIcon size={20} />,
     children: [
       {
-        label: "Leads",
-        icon: <UserPlusIcon size={20} />,
-        href: "/leads",
+        label: "All Calls",
+        icon: <PhoneCallIcon size={20} />,
+        href: "/calls",
       },
       {
-        label: "Clients",
-        icon: <UsersIcon size={20} />,
-        href: "/clients",
+        label: "Incoming Calls",
+        icon: <PhoneIncomingIcon size={20} />,
+        href: "/calls/incoming",
+      },
+      {
+        label: "Outgoing Calls",
+        icon: <PhoneOutgoingIcon size={20} />,
+        href: "/calls/outgoing",
+      },
+      {
+        label: "Missed Calls",
+        icon: <PhoneXIcon size={20} />,
+        href: "/calls/missed",
+      },
+      {
+        label: "Converted Calls",
+        icon: <UserPlusIcon size={20} />,
+        href: "/calls/converted",
       },
     ],
   },

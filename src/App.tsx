@@ -13,6 +13,7 @@ import GeneralDashboard from "./pages/GeneralDashboard";
 import RealEstateAgents from "./pages/RealEstateAgents";
 import Clients from "./pages/Clients";
 import Leads from "./pages/Leads";
+import LeadsClients from "./pages/LeadsClients";
 import ClientDetail from "./pages/ClientDetail";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
@@ -38,6 +39,13 @@ import Properties from "./pages/Properties";
 import Listings from "./pages/Listings";
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
+
+// Import call pages
+import Calls from "./pages/Calls";
+import IncomingCalls from "./pages/calls/IncomingCalls";
+import OutgoingCalls from "./pages/calls/OutgoingCalls";
+import MissedCalls from "./pages/calls/MissedCalls";
+import ConvertedCalls from "./pages/calls/ConvertedCalls";
 
 // Import construction pages
 import Projects from "./pages/construction/Projects";
@@ -79,6 +87,15 @@ function App() {
                   <Route path="clients" element={<Clients />} />
                   <Route path="clients/:id" element={<ClientDetail />} />
                   <Route path="leads" element={<Leads />} />
+                  <Route path="leads-clients" element={<LeadsClients />} />
+                  
+                  {/* Call tracking routes */}
+                  <Route path="calls" element={<Calls />} />
+                  <Route path="calls/incoming" element={<IncomingCalls />} />
+                  <Route path="calls/outgoing" element={<OutgoingCalls />} />
+                  <Route path="calls/missed" element={<MissedCalls />} />
+                  <Route path="calls/converted" element={<ConvertedCalls />} />
+                  
                   <Route path="tasks" element={<Tasks />} />
                   <Route path="tasks/:id" element={<TaskDetail />} />
                   <Route path="jobs" element={<Jobs />} />
