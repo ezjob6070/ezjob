@@ -26,79 +26,93 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
       </CardHeader>
       <CardContent>
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <div className="relative w-60 h-60">
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              {/* Background circle */}
-              <circle cx="50" cy="50" r="40" fill="white" stroke="#f0f0f0" strokeWidth="2" />
-              
-              {/* Completed - Green segment */}
-              <circle 
-                cx="50" 
-                cy="50" 
-                r="40" 
-                fill="none" 
-                stroke="#22c55e" 
-                strokeWidth="20" 
-                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.completed / totalTasks)} ${2 * Math.PI * 40}`} 
-                strokeDashoffset="0" 
-                transform="rotate(-90 50 50)" 
-              />
-              
-              {/* In Progress - Blue segment */}
-              <circle 
-                cx="50" 
-                cy="50" 
-                r="40" 
-                fill="none" 
-                stroke="#3b82f6" 
-                strokeWidth="20" 
-                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.inProgress / totalTasks)} ${2 * Math.PI * 40}`} 
-                strokeDashoffset={`${-2 * Math.PI * 40 * (taskCounts.completed / totalTasks)}`} 
-                transform="rotate(-90 50 50)" 
-              />
-              
-              {/* Cancelled - Red segment */}
-              <circle 
-                cx="50" 
-                cy="50" 
-                r="40" 
-                fill="none" 
-                stroke="#ef4444" 
-                strokeWidth="20" 
-                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.canceled / totalTasks)} ${2 * Math.PI * 40}`} 
-                strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress) / totalTasks)}`} 
-                transform="rotate(-90 50 50)" 
-              />
-              
-              {/* Rescheduled - Purple segment */}
-              <circle 
-                cx="50" 
-                cy="50" 
-                r="40" 
-                fill="none" 
-                stroke="#a855f7" 
-                strokeWidth="20" 
-                strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.rescheduled / totalTasks)} ${2 * Math.PI * 40}`} 
-                strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress + taskCounts.canceled) / totalTasks)}`} 
-                transform="rotate(-90 50 50)" 
-              />
-              
-              {/* Center text */}
-              <text x="50" y="45" textAnchor="middle" fontSize="22" fontWeight="bold">{totalTasks}</text>
-              <text x="50" y="60" textAnchor="middle" fontSize="8" fill="#666">Total Jobs</text>
-              
-              {/* Completed count */}
-              <text x="72" y="32" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#22c55e">{taskCounts.completed}</text>
-              
-              {/* In Progress count */}
-              <text x="28" y="32" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#3b82f6">{taskCounts.inProgress}</text>
-              
-              {/* Cancelled count */}
-              <text x="28" y="72" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#ef4444">{taskCounts.canceled}</text>
-              
-              {/* Rescheduled count */}
-              <text x="72" y="72" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#a855f7">{taskCounts.rescheduled}</text>
-            </svg>
+          <div className="flex flex-col items-center">
+            <div className="relative w-60 h-60">
+              <svg viewBox="0 0 100 100" className="w-full h-full">
+                {/* Background circle */}
+                <circle cx="50" cy="50" r="40" fill="white" stroke="#f0f0f0" strokeWidth="2" />
+                
+                {/* Completed - Green segment */}
+                <circle 
+                  cx="50" 
+                  cy="50" 
+                  r="40" 
+                  fill="none" 
+                  stroke="#22c55e" 
+                  strokeWidth="20" 
+                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.completed / totalTasks)} ${2 * Math.PI * 40}`} 
+                  strokeDashoffset="0" 
+                  transform="rotate(-90 50 50)" 
+                />
+                
+                {/* In Progress - Blue segment */}
+                <circle 
+                  cx="50" 
+                  cy="50" 
+                  r="40" 
+                  fill="none" 
+                  stroke="#3b82f6" 
+                  strokeWidth="20" 
+                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.inProgress / totalTasks)} ${2 * Math.PI * 40}`} 
+                  strokeDashoffset={`${-2 * Math.PI * 40 * (taskCounts.completed / totalTasks)}`} 
+                  transform="rotate(-90 50 50)" 
+                />
+                
+                {/* Cancelled - Red segment */}
+                <circle 
+                  cx="50" 
+                  cy="50" 
+                  r="40" 
+                  fill="none" 
+                  stroke="#ef4444" 
+                  strokeWidth="20" 
+                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.canceled / totalTasks)} ${2 * Math.PI * 40}`} 
+                  strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress) / totalTasks)}`} 
+                  transform="rotate(-90 50 50)" 
+                />
+                
+                {/* Rescheduled - Purple segment */}
+                <circle 
+                  cx="50" 
+                  cy="50" 
+                  r="40" 
+                  fill="none" 
+                  stroke="#a855f7" 
+                  strokeWidth="20" 
+                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.rescheduled / totalTasks)} ${2 * Math.PI * 40}`} 
+                  strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress + taskCounts.canceled) / totalTasks)}`} 
+                  transform="rotate(-90 50 50)" 
+                />
+                
+                {/* Center text */}
+                <text x="50" y="45" textAnchor="middle" fontSize="22" fontWeight="bold">{totalTasks}</text>
+                <text x="50" y="60" textAnchor="middle" fontSize="8" fill="#666">Total Jobs</text>
+              </svg>
+            </div>
+            
+            {/* Status counts below the chart */}
+            <div className="grid grid-cols-4 gap-4 mt-4 w-full">
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full bg-green-500 mb-1"></div>
+                <span className="text-sm font-semibold">{taskCounts.completed}</span>
+                <span className="text-xs text-gray-500">Completed</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full bg-blue-500 mb-1"></div>
+                <span className="text-sm font-semibold">{taskCounts.inProgress}</span>
+                <span className="text-xs text-gray-500">In Progress</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full bg-red-500 mb-1"></div>
+                <span className="text-sm font-semibold">{taskCounts.canceled}</span>
+                <span className="text-xs text-gray-500">Canceled</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full bg-purple-500 mb-1"></div>
+                <span className="text-sm font-semibold">{taskCounts.rescheduled}</span>
+                <span className="text-xs text-gray-500">Rescheduled</span>
+              </div>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 gap-2 w-full">
