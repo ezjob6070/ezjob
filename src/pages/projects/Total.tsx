@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,7 @@ export default function ProjectsTotal() {
   const totalProjects = projects.length;
   const completedProjects = projects.filter(p => p.status === "Completed").length;
   const inProgressProjects = projects.filter(p => p.status === "In Progress").length;
-  const plannedProjects = projects.filter(p => p.status === "Planned").length;
+  const notStartedProjects = projects.filter(p => p.status === "Not Started").length;
   
   const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
   const completedBudget = projects
@@ -104,7 +103,7 @@ export default function ProjectsTotal() {
             </div>
             <div className="flex items-center gap-2">
               <CircleIcon className="h-3 w-3 fill-amber-500 text-amber-500" />
-              <span className="text-sm">Planned: {plannedProjects}</span>
+              <span className="text-sm">Not Started: {notStartedProjects}</span>
             </div>
           </CardContent>
         </Card>
