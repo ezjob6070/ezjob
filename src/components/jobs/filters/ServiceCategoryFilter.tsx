@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, CalendarRange } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/command";
 import { JOB_CATEGORIES } from "../constants";
 import { Badge } from "@/components/ui/badge";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { format } from "date-fns";
 
 interface ServiceCategoryFilterProps {
   selectedCategories: string[];
@@ -32,6 +34,17 @@ export function ServiceCategoryFilter({
   clearCategories
 }: ServiceCategoryFilterProps) {
   const [open, setOpen] = useState(false);
+  const { dateFilter } = useGlobalState();
+  
+  const getDateRangeText = () => {
+    if (!dateFilter?.from) return "All time";
+    
+    if (!dateFilter.to || dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
+      return format(dateFilter.from, "MMM d, yyyy");
+    }
+    
+    return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d, yyyy")}`;
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,6 +69,10 @@ export function ServiceCategoryFilter({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[240px] p-0" align="start">
+        <div className="p-2 border-b flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">{getDateRangeText()}</span>
+          <CalendarRange className="h-3 w-3 text-muted-foreground" />
+        </div>
         <Command>
           <CommandInput placeholder="Search categories..." />
           <CommandList>
