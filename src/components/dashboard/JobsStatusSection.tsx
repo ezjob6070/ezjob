@@ -67,112 +67,112 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
 
   return (
     <Card className="bg-white shadow-sm h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
+      <CardHeader className="pb-2 pt-3">
+        <CardTitle className="text-base">Jobs By Status</CardTitle>
         <p className="text-xs text-muted-foreground">Overview of service requests and job status • {dateRangeText}</p>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-row items-start gap-6">
+      <CardContent className="p-3 pt-0">
+        <div className="flex flex-row items-start gap-4">
           {/* Donut Chart - Left side */}
-          <div className="relative w-[220px] flex-shrink-0">
+          <div className="relative w-[180px] flex-shrink-0">
             <EnhancedDonutChart 
               data={chartData}
               title={totalTasks.toString()}
               subtitle="Total Jobs"
-              size={200}
-              thickness={45}
+              size={180}
+              thickness={40}
               showLegend={false}
               animation={true}
             />
           </div>
           
           {/* Status Items - Right side in 2x2 grid */}
-          <div className="grid grid-cols-2 gap-3 flex-1">
+          <div className="grid grid-cols-2 gap-2 flex-1">
             {/* Completed */}
-            <div className="flex flex-col rounded-lg border border-gray-100 p-3 cursor-pointer hover:border-green-300 transition-colors" 
+            <div className="flex flex-col rounded-lg border border-gray-100 p-2 cursor-pointer hover:border-green-300 transition-colors" 
                  onClick={() => handleViewStatus("Completed", taskCounts.completed)}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="font-medium">Completed</span>
-                <span className="ml-auto">{taskCounts.completed}</span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                <span className="font-medium text-sm">Completed</span>
+                <span className="ml-auto text-sm">{taskCounts.completed}</span>
               </div>
-              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+              <div className="relative h-1.5 bg-gray-100 rounded-full mb-1.5">
                 <div 
-                  className="absolute top-0 left-0 h-2 bg-green-500 rounded-full" 
+                  className="absolute top-0 left-0 h-1.5 bg-green-500 rounded-full" 
                   style={{ width: `${Math.round((taskCounts.completed / totalTasks) * 100)}%` }}
                 ></div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs px-2 py-1 rounded-full border border-green-200 bg-green-50 text-green-700">
+                <span className="text-xs px-1.5 py-0.5 rounded-full border border-green-200 bg-green-50 text-green-700">
                   {Math.round((taskCounts.completed / totalTasks) * 100)}%
                 </span>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">View</Button>
+                <Button variant="ghost" size="sm" className="h-5 px-2 text-xs">View</Button>
               </div>
             </div>
             
             {/* In Progress */}
-            <div className="flex flex-col rounded-lg border border-gray-100 p-3 cursor-pointer hover:border-blue-300 transition-colors" 
+            <div className="flex flex-col rounded-lg border border-gray-100 p-2 cursor-pointer hover:border-blue-300 transition-colors" 
                  onClick={() => handleViewStatus("In Progress", taskCounts.inProgress)}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                <span className="font-medium">In Progress</span>
-                <span className="ml-auto">{taskCounts.inProgress}</span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                <span className="font-medium text-sm">In Progress</span>
+                <span className="ml-auto text-sm">{taskCounts.inProgress}</span>
               </div>
-              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+              <div className="relative h-1.5 bg-gray-100 rounded-full mb-1.5">
                 <div 
-                  className="absolute top-0 left-0 h-2 bg-blue-500 rounded-full" 
+                  className="absolute top-0 left-0 h-1.5 bg-blue-500 rounded-full" 
                   style={{ width: `${Math.round((taskCounts.inProgress / totalTasks) * 100)}%` }}
                 ></div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs px-2 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-700">
+                <span className="text-xs px-1.5 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700">
                   {Math.round((taskCounts.inProgress / totalTasks) * 100)}%
                 </span>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">View</Button>
+                <Button variant="ghost" size="sm" className="h-5 px-2 text-xs">View</Button>
               </div>
             </div>
             
             {/* Cancelled */}
-            <div className="flex flex-col rounded-lg border border-gray-100 p-3 cursor-pointer hover:border-red-300 transition-colors" 
+            <div className="flex flex-col rounded-lg border border-gray-100 p-2 cursor-pointer hover:border-red-300 transition-colors" 
                  onClick={() => handleViewStatus("Canceled", taskCounts.canceled)}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span className="font-medium">Cancelled</span>
-                <span className="ml-auto">{taskCounts.canceled}</span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                <span className="font-medium text-sm">Cancelled</span>
+                <span className="ml-auto text-sm">{taskCounts.canceled}</span>
               </div>
-              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+              <div className="relative h-1.5 bg-gray-100 rounded-full mb-1.5">
                 <div 
-                  className="absolute top-0 left-0 h-2 bg-red-500 rounded-full" 
+                  className="absolute top-0 left-0 h-1.5 bg-red-500 rounded-full" 
                   style={{ width: `${Math.round((taskCounts.canceled / totalTasks) * 100)}%` }}
                 ></div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs px-2 py-1 rounded-full border border-red-200 bg-red-50 text-red-700">
+                <span className="text-xs px-1.5 py-0.5 rounded-full border border-red-200 bg-red-50 text-red-700">
                   {Math.round((taskCounts.canceled / totalTasks) * 100)}%
                 </span>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">View</Button>
+                <Button variant="ghost" size="sm" className="h-5 px-2 text-xs">View</Button>
               </div>
             </div>
             
             {/* Rescheduled */}
-            <div className="flex flex-col rounded-lg border border-gray-100 p-3 cursor-pointer hover:border-purple-300 transition-colors" 
+            <div className="flex flex-col rounded-lg border border-gray-100 p-2 cursor-pointer hover:border-purple-300 transition-colors" 
                  onClick={() => handleViewStatus("Rescheduled", taskCounts.rescheduled)}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                <span className="font-medium">Rescheduled</span>
-                <span className="ml-auto">{taskCounts.rescheduled}</span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                <span className="font-medium text-sm">Rescheduled</span>
+                <span className="ml-auto text-sm">{taskCounts.rescheduled}</span>
               </div>
-              <div className="relative h-2 bg-gray-100 rounded-full mb-2">
+              <div className="relative h-1.5 bg-gray-100 rounded-full mb-1.5">
                 <div 
-                  className="absolute top-0 left-0 h-2 bg-purple-500 rounded-full" 
+                  className="absolute top-0 left-0 h-1.5 bg-purple-500 rounded-full" 
                   style={{ width: `${Math.round((taskCounts.rescheduled / totalTasks) * 100)}%` }}
                 ></div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs px-2 py-1 rounded-full border border-purple-200 bg-purple-50 text-purple-700">
+                <span className="text-xs px-1.5 py-0.5 rounded-full border border-purple-200 bg-purple-50 text-purple-700">
                   {Math.round((taskCounts.rescheduled / totalTasks) * 100)}%
                 </span>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">View</Button>
+                <Button variant="ghost" size="sm" className="h-5 px-2 text-xs">View</Button>
               </div>
             </div>
           </div>

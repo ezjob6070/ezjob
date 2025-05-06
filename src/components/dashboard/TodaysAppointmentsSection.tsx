@@ -61,24 +61,24 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
 
   return (
     <Card className="bg-white shadow-sm h-full flex flex-col">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 pt-3">
         <CardTitle className="text-base">Today's Appointments</CardTitle>
         <p className="text-xs text-muted-foreground">Scheduled jobs for today • {dateRangeText}</p>
       </CardHeader>
       <CardContent className="flex-1 overflow-auto p-3 pt-0">
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {appointments.map((appointment, index) => (
             <div key={index} className="flex gap-2 p-2 border border-gray-100 rounded-md hover:bg-gray-50 transition-colors">
-              <div className={`mt-1 w-1.5 rounded-full ${getPriorityColor(appointment.priority)} h-12`}></div>
+              <div className={`mt-1 w-1.5 rounded-full ${getPriorityColor(appointment.priority)} h-10`}></div>
               <div className="flex-1">
                 <div className="flex justify-between">
-                  <h4 className="font-medium">{appointment.client}</h4>
+                  <h4 className="font-medium text-sm">{appointment.client}</h4>
                   <span className={`text-xs px-1.5 py-0.5 rounded ${getPriorityBg(appointment.priority)}`}>
                     {getPriorityText(appointment.priority)}
                   </span>
                 </div>
                 <div className="text-xs text-gray-500">{appointment.time} - {appointment.type}</div>
-                <div className="flex items-center gap-1 mt-1 text-xs text-gray-600">
+                <div className="flex items-center gap-1 mt-0.5 text-xs text-gray-600">
                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -89,7 +89,7 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
             </div>
           ))}
           
-          <Button variant="outline" size="sm" className="w-full mt-3">
+          <Button variant="outline" size="sm" className="w-full mt-2 text-xs py-1">
             View Full Schedule
           </Button>
         </div>

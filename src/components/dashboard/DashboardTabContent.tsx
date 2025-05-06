@@ -47,8 +47,8 @@ const DashboardTabContent: React.FC<DashboardTabContentProps> = ({
           dateRange={dateRangeFormatted}
         />
         
-        {/* Two column layout - Jobs Status with Appointments */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+        {/* Two column layout - improved spacing and balance */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3">
           {/* Jobs Status Section - 2/3 width */}
           <div className="lg:col-span-2">
             <JobsStatusSection
@@ -58,20 +58,19 @@ const DashboardTabContent: React.FC<DashboardTabContentProps> = ({
             />
           </div>
           
-          {/* Today's Appointments - 1/3 width */}
-          <div className="lg:col-span-1">
+          {/* Right column with stacked sections */}
+          <div className="lg:col-span-1 flex flex-col gap-3">
+            {/* Today's Appointments - 1/3 width */}
             <TodaysAppointmentsSection
               appointments={appointments}
               dateRangeText={dateRangeFormatted}
             />
+            
+            {/* Call Tracking Section - moved to right column */}
+            <CallTrackingSection 
+              dateRangeText={dateRangeFormatted}
+            />
           </div>
-        </div>
-        
-        {/* Call Tracking Section - full width */}
-        <div className="mt-4">
-          <CallTrackingSection 
-            dateRangeText={dateRangeFormatted}
-          />
         </div>
       </TabsContent>
       
