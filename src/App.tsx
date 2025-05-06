@@ -37,7 +37,7 @@ import TechnicianDetail from "./pages/TechnicianDetail";
 import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
 import Properties from "./pages/Properties";
 import Listings from "./pages/Listings";
-import Projects from "./pages/Projects"; // General projects page
+import ProjectsOverview from "./pages/Projects"; // Renamed import
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
@@ -49,7 +49,7 @@ import MissedCalls from "./pages/calls/MissedCalls";
 import ConvertedCalls from "./pages/calls/ConvertedCalls";
 
 // Import construction pages
-import ConstructionProjects from "./pages/construction/Projects"; // Renamed to avoid conflict
+import ConstructionProjects from "./pages/construction/Projects"; // Renamed import
 import Equipment from "./pages/construction/Equipment";
 import Materials from "./pages/construction/Materials";
 import Contractors from "./pages/construction/Contractors";
@@ -58,6 +58,11 @@ import Inspections from "./pages/construction/Inspections";
 
 // Import general category pages
 import Contacts from "./pages/general/Contacts";
+
+// Import project pages
+import ProjectsInProgress from "./pages/projects/InProgress";
+import ProjectsAll from "./pages/projects/All";
+import ProjectsTotal from "./pages/projects/Total";
 
 const queryClient = new QueryClient();
 
@@ -89,7 +94,12 @@ function App() {
                   <Route path="clients/:id" element={<ClientDetail />} />
                   <Route path="leads" element={<Leads />} />
                   <Route path="leads-clients" element={<LeadsClients />} />
-                  <Route path="projects" element={<Projects />} />
+                  
+                  {/* Project routes */}
+                  <Route path="projects" element={<ProjectsOverview />} />
+                  <Route path="projects/in-progress" element={<ProjectsInProgress />} />
+                  <Route path="projects/all" element={<ProjectsAll />} />
+                  <Route path="projects/total" element={<ProjectsTotal />} />
                   
                   {/* Call tracking routes */}
                   <Route path="calls" element={<Calls />} />
@@ -118,7 +128,7 @@ function App() {
                   <Route path="settings" element={<Settings />} />
                   
                   {/* Construction Routes */}
-                  <Route path="construction-projects" element={<ConstructionProjects />} /> {/* Updated route */}
+                  <Route path="construction-projects" element={<ConstructionProjects />} />
                   <Route path="equipment" element={<Equipment />} />
                   <Route path="materials" element={<Materials />} />
                   <Route path="contractors" element={<Contractors />} />

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { 
   HomeIcon, 
@@ -27,6 +26,7 @@ import {
   MailIcon,
   BookOpenIcon,
   PresentationIcon,
+  CircleDollarSign,
 } from "lucide-react";
 import { NavItem } from "./sidebarTypes";
 
@@ -47,7 +47,28 @@ const commonNavItems: NavItem[] = [
   {
     label: "Projects",
     icon: <FolderIcon size={18} />,
-    href: "/projects",
+    children: [
+      {
+        label: "Project Overview",
+        icon: <FolderIcon size={16} />,
+        href: "/projects",
+      },
+      {
+        label: "In Progress",
+        icon: <FileIcon size={16} />,
+        href: "/projects/in-progress",
+      },
+      {
+        label: "All Projects",
+        icon: <ListIcon size={16} />,
+        href: "/projects/all",
+      },
+      {
+        label: "Total Projects",
+        icon: <BarChartIcon size={16} />,
+        href: "/projects/total",
+      },
+    ],
   },
   {
     label: "Leads & Clients",
@@ -145,8 +166,8 @@ const serviceNavItems: NavItem[] = [
     industries: [INDUSTRY_TYPES.SERVICE]
   },
   {
-    label: "Finance",
-    icon: <BarChartIcon size={18} />,
+    label: "Finance & Reports",
+    icon: <CircleDollarSign size={18} />,
     href: "/finance",
     industries: [INDUSTRY_TYPES.SERVICE]
   },
