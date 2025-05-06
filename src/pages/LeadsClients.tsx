@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
@@ -159,8 +158,9 @@ const LeadsClients = () => {
     setClients((prevClients) => [newClient, ...prevClients]);
   };
 
-  const handleAddLead = (newLead: Lead) => {
-    setLeads((prevLeads) => [newLead, ...prevLeads]);
+  // Update the handleAddLead function to use the correct Lead type
+  const handleAddLead = (lead: Lead) => {
+    setLeads((prevLeads) => [lead, ...prevLeads]);
   };
 
   const getAddButtonText = () => {

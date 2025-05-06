@@ -1,4 +1,3 @@
-
 import { 
   HomeIcon, 
   UsersIcon, 
@@ -27,10 +26,10 @@ import {
   GlobeIcon,
   DatabaseIcon,
   UserIcon,
-  PhoneCallIcon,  // Added phone-call icon
-  PhoneOutgoingIcon, // Added phone outgoing icon
-  PhoneIncomingIcon, // Added phone incoming icon
-  PhoneXIcon, // Added phone-x icon
+  PhoneCallIcon,
+  PhoneOutgoingIcon,
+  PhoneIncomingIcon,
+  PhoneOffIcon,
 } from "lucide-react";
 import { NavItem, IndustryType } from "./sidebarTypes";
 
@@ -70,7 +69,7 @@ export const getCommonNavItems = (): NavItem[] => [
       },
       {
         label: "Missed Calls",
-        icon: <PhoneXIcon size={20} />,
+        icon: <PhoneOffIcon size={20} />,
         href: "/calls/missed",
       },
       {

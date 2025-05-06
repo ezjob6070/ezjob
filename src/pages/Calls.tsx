@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusIcon, PhoneCallIcon, PhoneIncomingIcon, PhoneOutgoingIcon, PhoneXIcon, UserPlusIcon } from "lucide-react";
+import { PlusIcon, PhoneCallIcon, PhoneIncomingIcon, PhoneOutgoingIcon, PhoneOffIcon, UserPlusIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -92,7 +91,7 @@ const CallCard = ({ call }: { call: Call }) => {
     switch (call.type) {
       case "incoming": return <PhoneIncomingIcon className="h-4 w-4 text-green-500" />;
       case "outgoing": return <PhoneOutgoingIcon className="h-4 w-4 text-blue-500" />;
-      case "missed": return <PhoneXIcon className="h-4 w-4 text-red-500" />;
+      case "missed": return <PhoneOffIcon className="h-4 w-4 text-red-500" />;
     }
   };
   
