@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,8 +90,8 @@ const IndexPage = () => {
   ];
 
   const events = [
-    { id: "event-1", type: "meeting" as const, title: "Team Meeting", datetime: new Date("2024-07-15T10:00:00"), location: "Conference Room" },
-    { id: "event-2", type: "meeting" as const, title: "Project Deadline", datetime: new Date("2024-07-20T17:00:00") }
+    { id: "event-1", type: "meeting", title: "Team Meeting", datetime: new Date("2024-07-15T10:00:00"), location: "Conference Room" },
+    { id: "event-2", type: "deadline", title: "Project Deadline", datetime: new Date("2024-07-20T17:00:00") }
   ];
 
   const totalTasks = Object.values(taskCounts).reduce((sum, count) => sum + count, 0);
@@ -257,7 +256,7 @@ const IndexPage = () => {
             events={events.map(event => ({
               id: event.id,
               title: event.title,
-              type: "meeting",
+              type: event.type === 'deadline' ? 'meeting' : event.type,
               time: format(event.datetime, 'h:mm a'),
               date: format(event.datetime, 'MMM d, yyyy')
             }))}
