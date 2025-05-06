@@ -1,3 +1,4 @@
+
 import React from "react";
 import { 
   HomeIcon, 
@@ -14,7 +15,7 @@ import {
   ReceiptIcon,
   FileTextIcon,
   TruckIcon,
-  WrenchIcon, // Changed from ToolIcon to WrenchIcon which exists in lucide-react
+  WrenchIcon,
   BarChartIcon,
   SlidersIcon,
   FolderIcon,
@@ -27,6 +28,10 @@ import {
   BookOpenIcon,
   PresentationIcon,
   CircleDollarSign,
+  PhoneIncomingIcon,
+  PhoneOutgoingIcon,
+  PhoneOffIcon,
+  UserPlusIcon
 } from "lucide-react";
 import { NavItem } from "./sidebarTypes";
 
@@ -91,22 +96,22 @@ const commonNavItems: NavItem[] = [
       },
       {
         label: "Incoming",
-        icon: <PhoneIcon size={16} />,
+        icon: <PhoneIncomingIcon size={16} className="text-green-500" />,
         href: "/calls/incoming",
       },
       {
         label: "Outgoing",
-        icon: <PhoneIcon size={16} />,
+        icon: <PhoneOutgoingIcon size={16} className="text-blue-500" />,
         href: "/calls/outgoing",
       },
       {
-        label: "Missed",
-        icon: <PhoneIcon size={16} />,
-        href: "/calls/missed",
+        label: "Not Answered",
+        icon: <PhoneOffIcon size={16} className="text-red-500" />,
+        href: "/calls/not_answered",
       },
       {
         label: "Converted",
-        icon: <PhoneIcon size={16} />,
+        icon: <UserPlusIcon size={16} className="text-amber-500" />,
         href: "/calls/converted",
       },
     ],

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -107,6 +106,7 @@ const jobSources = [
   "Other"
 ];
 
+// Format call duration
 const formatDuration = (seconds?: number): string => {
   if (!seconds) return "--";
   
@@ -249,11 +249,7 @@ const Calls = () => {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     // Update the URL without full navigation
-    if (tab === "all") {
-      navigate("/calls", { replace: true });
-    } else {
-      navigate(`/calls/${tab}`, { replace: true });
-    }
+    navigate(`/calls${tab === "all" ? "" : `/${tab}`}`, { replace: true });
   };
   
   // Handle call logging
