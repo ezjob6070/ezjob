@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpIcon, PercentIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { format } from "date-fns";
 
 type PerformanceCardProps = {
   leadSources: { name: string; value: number }[];
@@ -27,10 +29,24 @@ const PerformanceCard = ({
   openDetailDialog,
   detailedBusinessMetrics
 }: PerformanceCardProps) => {
+  const { dateFilter } = useGlobalState();
+
+  // Format date range for the metrics cards
+  const getDateRangeText = () => {
+    if (!dateFilter?.from) return "All time";
+    
+    if (!dateFilter.to || dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
+      return format(dateFilter.from, "MMM d, yyyy");
+    }
+    
+    return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d, yyyy")}`;
+  };
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-medium">Top Performance By Job Source</CardTitle>
+        <div className="text-xs text-muted-foreground">{getDateRangeText()}</div>
         <div className="flex mt-2 space-x-2">
           <Badge variant="secondary" className="bg-gray-700 text-white rounded-full">Job Source</Badge>
           <Badge variant="outline" className="rounded-full">Job Type</Badge>

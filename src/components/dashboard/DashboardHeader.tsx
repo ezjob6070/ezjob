@@ -65,25 +65,6 @@ const DashboardHeader = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-9 gap-1.5 border-blue-100 bg-blue-50/80 hover:bg-blue-100 text-blue-700",
-                  dateFilter && "bg-blue-100"
-                )}
-              >
-                <CalendarRange className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium">{formatDateRange()}</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <DashboardDateFilter />
-            </PopoverContent>
-          </Popover>
-          
           <Button
             variant="ghost"
             size="icon"
@@ -95,38 +76,59 @@ const DashboardHeader = ({
         </div>
       </div>
       
-      <Tabs value={localActiveTab} onValueChange={handleTabChange} className="w-full">
-        <div className="border-b border-gray-100">
-          <TabsList className="bg-transparent p-0 w-full md:w-auto justify-start">
-            <TabsTrigger 
-              value="dashboard" 
-              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 px-4 py-2"
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+        <Tabs value={localActiveTab} onValueChange={handleTabChange} className="w-full">
+          <div className="border-b border-gray-100">
+            <TabsList className="bg-transparent p-0 w-full md:w-auto justify-start">
+              <TabsTrigger 
+                value="dashboard" 
+                className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 px-4 py-2"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger 
+                value="statistics" 
+                className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 px-4 py-2"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Statistics
+              </TabsTrigger>
+              <TabsTrigger 
+                value="analytics" 
+                className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 px-4 py-2"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Analytics
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </Tabs>
+        
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn(
+                "h-9 gap-1.5 border-blue-100 bg-blue-50/80 hover:bg-blue-100 text-blue-700",
+                dateFilter && "bg-blue-100"
+              )}
             >
-              <Home className="h-4 w-4 mr-2" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger 
-              value="statistics" 
-              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 px-4 py-2"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Statistics
-            </TabsTrigger>
-            <TabsTrigger 
-              value="analytics" 
-              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 px-4 py-2"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-        </div>
-      </Tabs>
+              <CalendarRange className="h-3.5 w-3.5" />
+              <span className="text-xs font-medium">{formatDateRange()}</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <DashboardDateFilter />
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 };
 
-// New component for the date filter functionality
+// Date filter functionality
 const DashboardDateFilter = () => {
   const { dateFilter, setDateFilter } = useGlobalState();
   const [date, setDate] = useState<DateRange | undefined>(dateFilter);

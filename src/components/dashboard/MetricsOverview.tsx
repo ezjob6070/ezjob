@@ -3,7 +3,7 @@ import React from "react";
 import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon } from "lucide-react";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
+import { format, isWithinInterval } from "date-fns";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 type MetricsOverviewProps = {
@@ -27,26 +27,59 @@ const MetricsOverview = ({
   detailedTasksData,
   detailedRevenueData,
   detailedBusinessMetrics,
-  dateRange
 }: MetricsOverviewProps) => {
-  const { jobs } = useGlobalState();
+  const { jobs, dateFilter } = useGlobalState();
   
-  // Calculate total metrics from all jobs data regardless of date
-  const allJobs = jobs;
-  const completedJobs = allJobs.filter(job => job.status === "completed").length;
-  const activeJobs = allJobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
+  // Filter jobs based on the date filter
+  const filteredJobs = dateFilter?.from 
+    ? jobs.filter(job => {
+        // If the job has a scheduled date, check if it's within the filter range
+        if (job.scheduledDate) {
+          const jobDate = new Date(job.scheduledDate);
+          return dateFilter.to 
+            ? isWithinInterval(jobDate, { start: dateFilter.from, end: dateFilter.to }) 
+            : jobDate >= dateFilter.from;
+        }
+        return false;
+      })
+    : jobs;
   
-  // Calculate lifetime values
+  // Calculate metrics based on filtered jobs
+  const completedJobs = filteredJobs.filter(job => job.status === "completed").length;
+  const activeJobs = filteredJobs.filter(job => job.status === "in_progress" || job.status === "scheduled").length;
+  
+  // Calculate revenue and profit based on filtered jobs
+  const periodRevenue = filteredJobs.reduce((sum, job) => {
+    if (job.status === "completed") {
+      return sum + (job.actualAmount || job.amount || 0);
+    }
+    return sum;
+  }, 0);
+  
+  const periodProfit = periodRevenue * 0.6; // Assuming 60% profit margin
+
+  // Calculate lifetime values from all jobs
   const lifetimeRevenue = financialMetrics.totalRevenue;
   const lifetimeProfit = financialMetrics.companysCut;
+
+  // Format date range for the metrics cards
+  const getDateRangeText = () => {
+    if (!dateFilter?.from) return "All time";
+    
+    if (!dateFilter.to || dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
+      return format(dateFilter.from, "MMM d, yyyy");
+    }
+    
+    return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d, yyyy")}`;
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
       <DashboardMetricCard
-        title="Total Completed Jobs"
+        title="Completed Jobs"
         value={completedJobs.toString()}
         icon={<PhoneCallIcon size={20} className="text-white" />}
-        description="All time completed jobs"
+        description={`For ${getDateRangeText()}`}
         trend={{ value: "↑", isPositive: true }}
         className="bg-gradient-to-br from-purple-500 to-violet-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
@@ -57,7 +90,7 @@ const MetricsOverview = ({
         title="Active Jobs"
         value={activeJobs.toString()}
         icon={<BriefcaseIcon size={20} className="text-white" />}
-        description="Currently in progress"
+        description={`For ${getDateRangeText()}`}
         trend={{ value: "↑", isPositive: true }}
         className="bg-gradient-to-br from-yellow-400 to-yellow-500 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
@@ -65,10 +98,10 @@ const MetricsOverview = ({
         onClick={() => openDetailDialog('tasks', 'Active Jobs', detailedTasksData.filter(t => t.status === 'in_progress' || t.status === 'scheduled'))}
       />
       <DashboardMetricCard
-        title="Lifetime Revenue"
-        value={formatCurrency(lifetimeRevenue)}
+        title="Period Revenue"
+        value={formatCurrency(periodRevenue)}
         icon={<CalculatorIcon size={20} className="text-white" />}
-        description="Total revenue earned"
+        description={`For ${getDateRangeText()}`}
         trend={{ value: "↑", isPositive: true }}
         className="bg-gradient-to-br from-blue-500 to-blue-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
@@ -76,10 +109,10 @@ const MetricsOverview = ({
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
       />
       <DashboardMetricCard
-        title="Lifetime Net Profit"
-        value={formatCurrency(lifetimeProfit)}
+        title="Period Profit"
+        value={formatCurrency(periodProfit)}
         icon={<DollarSignIcon size={20} className="text-white" />}
-        description="Total profit earned"
+        description={`For ${getDateRangeText()}`}
         trend={{ value: "↑", isPositive: true }}
         className="bg-gradient-to-br from-green-500 to-green-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"

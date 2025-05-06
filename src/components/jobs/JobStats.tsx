@@ -3,22 +3,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BarChartIcon, BriefcaseIcon, UsersIcon, DollarSign, XCircle } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Job } from "./JobTypes";
-import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
+import { format, isWithinInterval } from "date-fns";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 type JobStatsProps = {
   jobs: Job[];
-  date?: DateRange | undefined;
 };
 
-const JobStats = ({ jobs, date }: JobStatsProps) => {
+const JobStats = ({ jobs }: JobStatsProps) => {
+  // Use the global date filter
+  const { dateFilter } = useGlobalState();
+  
   // Filter jobs based on date range if provided
-  const filteredJobs = date?.from 
-    ? jobs.filter(job => 
-        job.scheduledDate && 
-        new Date(job.scheduledDate) >= date.from! && 
-        (!date.to || new Date(job.scheduledDate) <= date.to!)
-      )
+  const filteredJobs = dateFilter?.from 
+    ? jobs.filter(job => {
+        if (job.scheduledDate) {
+          const jobDate = new Date(job.scheduledDate);
+          return dateFilter.to 
+            ? isWithinInterval(jobDate, { start: dateFilter.from, end: dateFilter.to }) 
+            : jobDate >= dateFilter.from;
+        }
+        return false;
+      })
     : jobs;
     
   // Stats
@@ -42,19 +48,19 @@ const JobStats = ({ jobs, date }: JobStatsProps) => {
 
   // Format date range for display
   const getDateRangeText = () => {
-    if (!date?.from) return null;
+    if (!dateFilter?.from) return null;
     
-    if (!date.to) {
+    if (!dateFilter.to || dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
       return (
         <div className="text-xs text-muted-foreground mt-1">
-          {format(date.from, "MMM d, yyyy")}
+          {format(dateFilter.from, "MMM d, yyyy")}
         </div>
       );
     }
     
     return (
       <div className="text-xs text-muted-foreground mt-1">
-        {format(date.from, "MMM d")} - {format(date.to, "MMM d, yyyy")}
+        {format(dateFilter.from, "MMM d")} - {format(dateFilter.to, "MMM d, yyyy")}
       </div>
     );
   };
