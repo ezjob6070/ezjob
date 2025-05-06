@@ -38,6 +38,7 @@ import FinanceTechnicians from "./pages/finance/FinanceTechnicians";
 import Properties from "./pages/Properties";
 import Listings from "./pages/Listings";
 import ProjectsOverview from "./pages/Projects"; // Renamed import
+import ProjectDetail from "./pages/ProjectDetail"; // New import
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 
@@ -100,6 +101,7 @@ function App() {
                   <Route path="projects/in-progress" element={<ProjectsInProgress />} />
                   <Route path="projects/all" element={<ProjectsAll />} />
                   <Route path="projects/total" element={<ProjectsTotal />} />
+                  <Route path="project/:id" element={<ProjectDetail />} />
                   
                   {/* Call tracking routes */}
                   <Route path="calls" element={<Calls />} />
