@@ -38,7 +38,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
   const [service, setService] = useState("");
   const [source, setSource] = useState("");
   const [value, setValue] = useState("0");
-  const [status, setStatus] = useState("new");
+  const [status, setStatus] = useState<Lead["status"]>("new");
   const [notes, setNotes] = useState("");
   const [estimatedClosingDate, setEstimatedClosingDate] = useState<Date | undefined>(undefined);
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
@@ -170,6 +170,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SERVICES.map((option) => (
+                      // Ensure no empty values are passed
                       <SelectItem key={option} value={option || "unknown"}>
                         {option}
                       </SelectItem>
@@ -186,6 +187,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_SOURCES.map((option) => (
+                      // Ensure no empty values are passed
                       <SelectItem key={option} value={option || "unknown"}>
                         {option}
                       </SelectItem>
@@ -196,12 +198,13 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
               
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select value={status} onValueChange={setStatus}>
+                <Select value={status} onValueChange={(val) => setStatus(val as Lead["status"])}>
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
                     {initialStatuses.map((status) => (
+                      // Ensure no empty values are passed
                       <SelectItem key={status} value={status || "new"}>
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </SelectItem>
