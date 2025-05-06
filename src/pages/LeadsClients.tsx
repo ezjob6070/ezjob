@@ -163,7 +163,8 @@ const LeadsClients = () => {
     // Make sure to create a new Lead object that matches the imported Lead type
     const newLead: Lead = {
       ...lead,
-      createdAt: new Date(),
+      createdAt: new Date(), // Ensure createdAt is added
+      status: lead.status || "new" // Ensure status has a default value
     };
     setLeads((prevLeads) => [newLead, ...prevLeads]);
   };
