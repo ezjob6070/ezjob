@@ -37,23 +37,7 @@ const commonNavItems: NavItem[] = [
   {
     label: "Leads & Clients",
     icon: <UsersIcon size={18} />,
-    children: [
-      {
-        label: "Combined View",
-        icon: <UsersIcon size={16} />,
-        href: "/leads-clients",
-      },
-      {
-        label: "Leads",
-        icon: <UserIcon size={16} />,
-        href: "/leads",
-      },
-      {
-        label: "Clients",
-        icon: <UsersIcon size={16} />,
-        href: "/clients",
-      },
-    ],
+    href: "/leads-clients",
   },
   {
     label: "Schedule",
