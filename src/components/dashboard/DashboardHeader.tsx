@@ -1,9 +1,15 @@
 
 import React, { useState, useEffect } from "react";
-import { Bell, Calendar, BarChart3, Home } from "lucide-react";
+import { Bell, Calendar, BarChart3, Home, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWindowSize } from "@/hooks/use-window-size";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
 interface DashboardHeaderProps {
   onTabChange?: (tab: string) => void;
@@ -17,6 +23,7 @@ const DashboardHeader = ({
   const [localActiveTab, setLocalActiveTab] = useState(activeTab);
   const { width } = useWindowSize();
   const isMobile = width < 768;
+  const { dateFilter, setDateFilter } = useGlobalState();
   
   // Update local state when parent state changes
   useEffect(() => {
@@ -28,6 +35,19 @@ const DashboardHeader = ({
     if (onTabChange) {
       onTabChange(value);
     }
+  };
+
+  const formatDateRange = () => {
+    if (!dateFilter?.from) return "Today";
+    
+    if (dateFilter.to) {
+      if (dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
+        return format(dateFilter.from, "MMM d");
+      }
+      return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d")}`;
+    }
+    
+    return format(dateFilter.from, "MMM d");
   };
 
   return (
@@ -44,7 +64,26 @@ const DashboardHeader = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-9 gap-1.5 border-blue-100 bg-blue-50/80 hover:bg-blue-100 text-blue-700",
+                  dateFilter && "bg-blue-100"
+                )}
+              >
+                <CalendarRange className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">{formatDateRange()}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <DashboardDateFilter />
+            </PopoverContent>
+          </Popover>
+          
           <Button
             variant="ghost"
             size="icon"
@@ -83,6 +122,128 @@ const DashboardHeader = ({
           </TabsList>
         </div>
       </Tabs>
+    </div>
+  );
+};
+
+// New component for the date filter functionality
+const DashboardDateFilter = () => {
+  const { dateFilter, setDateFilter } = useGlobalState();
+  const [date, setDate] = useState<DateRange | undefined>(dateFilter);
+
+  // Apply the date filter when it changes
+  useEffect(() => {
+    if (date) {
+      setDateFilter(date);
+    }
+  }, [date, setDateFilter]);
+
+  // Quick date selection options
+  const selectToday = () => {
+    const today = new Date();
+    setDate({ from: today, to: today });
+  };
+  
+  const selectYesterday = () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    setDate({ from: yesterday, to: yesterday });
+  };
+  
+  const selectThisWeek = () => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+    startOfWeek.setDate(diff);
+    
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    
+    setDate({ from: startOfWeek, to: endOfWeek });
+  };
+  
+  const selectLastWeek = () => {
+    const today = new Date();
+    const startOfLastWeek = new Date(today);
+    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7 - startOfLastWeek.getDay() + 1);
+    
+    const endOfLastWeek = new Date(startOfLastWeek);
+    endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
+    
+    setDate({ from: startOfLastWeek, to: endOfLastWeek });
+  };
+  
+  const selectThisMonth = () => {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    setDate({ from: startOfMonth, to: endOfMonth });
+  };
+  
+  return (
+    <div className="p-3">
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={selectToday}
+          className="text-xs h-8"
+        >
+          Today
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={selectYesterday}
+          className="text-xs h-8"
+        >
+          Yesterday
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={selectThisWeek}
+          className="text-xs h-8"
+        >
+          This Week
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={selectLastWeek}
+          className="text-xs h-8"
+        >
+          Last Week
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={selectThisMonth}
+          className="text-xs h-8"
+        >
+          This Month
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          className="text-xs h-8"
+          onClick={() => setDate(undefined)}
+        >
+          Reset
+        </Button>
+      </div>
+      
+      <CalendarComponent
+        initialFocus
+        mode="range"
+        defaultMonth={dateFilter?.from}
+        selected={date}
+        onSelect={setDate}
+        numberOfMonths={1}
+        className="pointer-events-auto rounded border"
+      />
     </div>
   );
 };
