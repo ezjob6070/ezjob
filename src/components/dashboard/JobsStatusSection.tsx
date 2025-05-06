@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, LoaderCircle, XCircle, RotateCw } from "lucide-react";
+import EnhancedDonutChart from "@/components/EnhancedDonutChart";
 
 interface JobsStatusSectionProps {
   taskCounts: {
@@ -18,6 +19,14 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
   taskCounts, 
   totalTasks 
 }) => {
+  // Convert task counts to format needed for donut chart
+  const chartData = [
+    { name: "Completed", value: taskCounts.completed, color: "#22c55e", gradientFrom: "#22c55e", gradientTo: "#4ade80" },
+    { name: "In Progress", value: taskCounts.inProgress, color: "#3b82f6", gradientFrom: "#3b82f6", gradientTo: "#60a5fa" },
+    { name: "Canceled", value: taskCounts.canceled, color: "#ef4444", gradientFrom: "#ef4444", gradientTo: "#f87171" },
+    { name: "Rescheduled", value: taskCounts.rescheduled, color: "#a855f7", gradientFrom: "#a855f7", gradientTo: "#c084fc" }
+  ];
+
   return (
     <Card className="bg-white shadow-sm">
       <CardHeader className="pb-2">
@@ -27,68 +36,15 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
       <CardContent>
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="flex flex-col items-center">
-            <div className="relative w-60 h-60">
-              <svg viewBox="0 0 100 100" className="w-full h-full">
-                {/* Background circle */}
-                <circle cx="50" cy="50" r="40" fill="white" stroke="#f0f0f0" strokeWidth="2" />
-                
-                {/* Completed - Green segment */}
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="40" 
-                  fill="none" 
-                  stroke="#22c55e" 
-                  strokeWidth="20" 
-                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.completed / totalTasks)} ${2 * Math.PI * 40}`} 
-                  strokeDashoffset="0" 
-                  transform="rotate(-90 50 50)" 
-                />
-                
-                {/* In Progress - Blue segment */}
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="40" 
-                  fill="none" 
-                  stroke="#3b82f6" 
-                  strokeWidth="20" 
-                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.inProgress / totalTasks)} ${2 * Math.PI * 40}`} 
-                  strokeDashoffset={`${-2 * Math.PI * 40 * (taskCounts.completed / totalTasks)}`} 
-                  transform="rotate(-90 50 50)" 
-                />
-                
-                {/* Cancelled - Red segment */}
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="40" 
-                  fill="none" 
-                  stroke="#ef4444" 
-                  strokeWidth="20" 
-                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.canceled / totalTasks)} ${2 * Math.PI * 40}`} 
-                  strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress) / totalTasks)}`} 
-                  transform="rotate(-90 50 50)" 
-                />
-                
-                {/* Rescheduled - Purple segment */}
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="40" 
-                  fill="none" 
-                  stroke="#a855f7" 
-                  strokeWidth="20" 
-                  strokeDasharray={`${2 * Math.PI * 40 * (taskCounts.rescheduled / totalTasks)} ${2 * Math.PI * 40}`} 
-                  strokeDashoffset={`${-2 * Math.PI * 40 * ((taskCounts.completed + taskCounts.inProgress + taskCounts.canceled) / totalTasks)}`} 
-                  transform="rotate(-90 50 50)" 
-                />
-                
-                {/* Center text */}
-                <text x="50" y="45" textAnchor="middle" fontSize="22" fontWeight="bold">{totalTasks}</text>
-                <text x="50" y="60" textAnchor="middle" fontSize="8" fill="#666">Total Jobs</text>
-              </svg>
-            </div>
+            <EnhancedDonutChart 
+              data={chartData}
+              title={totalTasks.toString()}
+              subtitle="Total Jobs"
+              size={240}
+              thickness={40}
+              showLegend={false}
+              animation={true}
+            />
             
             {/* Status counts below the chart */}
             <div className="grid grid-cols-4 gap-4 mt-4 w-full">
