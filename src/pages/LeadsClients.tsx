@@ -4,10 +4,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
 import LeadsTable from "@/components/LeadsTable";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, CheckIcon, XIcon, ArrowRightIcon } from "lucide-react";
 import AddClientModal from "@/components/AddClientModal";
 import AddLeadModal from "@/components/leads/AddLeadModal";
 import { Lead } from "@/types/lead"; // Import lead type from the correct location
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 // Import client type from Clients page
 type Client = {
@@ -29,6 +30,7 @@ const LeadsClients = () => {
   const [activeTab, setActiveTab] = useState("leads");
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [leadStatusFilter, setLeadStatusFilter] = useState<string[]>([]);
   
   // Sample clients data - we're reusing the data from the Clients page
   const [clients, setClients] = useState<Client[]>([
@@ -189,6 +191,11 @@ const LeadsClients = () => {
     }
   };
 
+  // Filter leads based on selected statuses
+  const filteredLeads = leadStatusFilter.length > 0
+    ? leads.filter(lead => leadStatusFilter.includes(lead.status))
+    : leads;
+
   return (
     <div className="space-y-8 py-8">
       <div className="flex justify-between items-center">
@@ -217,9 +224,30 @@ const LeadsClients = () => {
           <TabsTrigger value="leads">Leads</TabsTrigger>
           <TabsTrigger value="clients">Clients</TabsTrigger>
         </TabsList>
+        
+        {activeTab === "leads" && (
+          <div className="mt-4 mb-4">
+            <label className="block text-sm font-medium mb-2">Filter by status:</label>
+            <ToggleGroup type="multiple" className="justify-start flex-wrap" value={leadStatusFilter} onValueChange={setLeadStatusFilter}>
+              <ToggleGroupItem value="active" aria-label="Active" className="flex items-center gap-1">
+                <CheckIcon className="h-4 w-4" /> Active
+              </ToggleGroupItem>
+              <ToggleGroupItem value="inactive" aria-label="Inactive" className="flex items-center gap-1">
+                <XIcon className="h-4 w-4" /> Inactive
+              </ToggleGroupItem>
+              <ToggleGroupItem value="converted" aria-label="Converted" className="flex items-center gap-1">
+                <CheckIcon className="h-4 w-4" /> Converted
+              </ToggleGroupItem>
+              <ToggleGroupItem value="follow" aria-label="Follow" className="flex items-center gap-1">
+                <ArrowRightIcon className="h-4 w-4" /> Follow
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        )}
+        
         <div className="mt-4">
           <TabsContent value="leads">
-            <LeadsTable leads={leads} />
+            <LeadsTable leads={filteredLeads} />
           </TabsContent>
           <TabsContent value="clients">
             <ClientsTable clients={clients} />
