@@ -12,13 +12,13 @@ export type Technician = {
   address?: string;
   position?: string;
   department?: string;
-  hireDate: string;
+  hireDate: string; // Keep this as string only, not Date
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
   specialty: string;
-  paymentType: "percentage" | "flat" | "hourly";
+  paymentType: "percentage" | "flat" | "hourly" | "salary"; // Add "salary" as valid option
   paymentRate: number;
-  hourlyRate: number; // Required field, always a number
+  hourlyRate: number;
   salaryBasis?: SalaryBasis;
   incentiveType?: IncentiveType;
   incentiveAmount?: number;

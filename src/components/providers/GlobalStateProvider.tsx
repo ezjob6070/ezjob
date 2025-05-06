@@ -1,9 +1,9 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { IndustryType } from '@/components/sidebar/sidebarTypes';
 import { DateRange } from 'react-day-picker';
 import { v4 as uuidv4 } from 'uuid';
-import { technicians as initialTechnicians } from '@/data/technicians';
+import { technicians as initialTechnicianData } from '@/data/technicians';
+import { Technician } from '@/types/technician';
 // Import only the specific functions/objects from finances.ts, not the non-existent 'finances' export
 import { sampleTransactions } from '@/data/finances';
 
@@ -18,20 +18,6 @@ type Job = {
   actualAmount?: number;
   technicianId?: string;
   jobSourceId?: string;
-  [key: string]: any;
-};
-
-type Technician = {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  status: "active" | "inactive" | "onLeave";
-  hireDate: string | Date;
-  specialty: string;
-  paymentType: string;
-  paymentRate: number;
-  hourlyRate: number;
   [key: string]: any;
 };
 
@@ -84,15 +70,24 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [jobs, setJobs] = useState<Job[]>([]);
   
   // Ensure technicians have all required properties with correct types
-  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians.map(tech => ({
-    ...tech,
-    status: tech.status as "active" | "inactive" | "onLeave",
-    hireDate: tech.hireDate || new Date().toISOString(),
-    specialty: tech.specialty || '',
-    paymentType: tech.paymentType || 'hourly',
-    paymentRate: tech.paymentRate || 0,
-    hourlyRate: tech.hourlyRate || 0
-  })));
+  const [technicians, setTechnicians] = useState<Technician[]>(
+    initialTechnicianData.map(tech => {
+      // Convert any Date objects to strings to ensure consistent typing
+      const hireDate = typeof tech.hireDate === 'string' 
+        ? tech.hireDate 
+        : new Date(tech.hireDate || new Date()).toISOString();
+        
+      return {
+        ...tech,
+        status: tech.status as "active" | "inactive" | "onLeave",
+        hireDate: hireDate,
+        specialty: tech.specialty || '',
+        paymentType: (tech.paymentType as "percentage" | "flat" | "hourly" | "salary") || 'hourly',
+        paymentRate: tech.paymentRate || 0,
+        hourlyRate: tech.hourlyRate || 0
+      };
+    })
+  );
   
   // Initialize with jobSources that have all required properties
   const [jobSources, setJobSources] = useState<JobSource[]>([]);
@@ -151,9 +146,14 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Function to add a technician
   const addTechnician = (technician: Technician) => {
-    const newTechnician = {
+    // Ensure correct types
+    const newTechnician: Technician = {
       ...technician,
       id: technician.id || uuidv4(),
+      hireDate: typeof technician.hireDate === 'string' 
+        ? technician.hireDate 
+        : new Date(technician.hireDate || new Date()).toISOString(),
+      paymentType: technician.paymentType as "percentage" | "flat" | "hourly" | "salary"
     };
     setTechnicians(prevTechnicians => [...prevTechnicians, newTechnician]);
   };
@@ -161,9 +161,19 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Function to update a technician
   const updateTechnician = (id: string, updatedTechnician: Partial<Technician>) => {
     setTechnicians(prevTechnicians => 
-      prevTechnicians.map(tech => 
-        tech.id === id ? { ...tech, ...updatedTechnician } : tech
-      )
+      prevTechnicians.map(tech => {
+        if (tech.id === id) {
+          const updatedTech = { ...tech, ...updatedTechnician };
+          
+          // Ensure hireDate is a string
+          if (updatedTech.hireDate && typeof updatedTech.hireDate !== 'string') {
+            updatedTech.hireDate = new Date(updatedTech.hireDate).toISOString();
+          }
+          
+          return updatedTech;
+        }
+        return tech;
+      })
     );
   };
 

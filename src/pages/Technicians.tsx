@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -47,7 +46,15 @@ const Technicians = () => {
   
   // Sync technicians from GlobalState to local state in useTechniciansData
   useEffect(() => {
-    setTechnicians(globalTechnicians);
+    if (globalTechnicians && globalTechnicians.length > 0) {
+      // Fix: Ensure all technicians have correct property types
+      const typedTechnicians = globalTechnicians.map(tech => ({
+        ...tech,
+        hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : new Date(tech.hireDate).toISOString(),
+        paymentType: tech.paymentType as "percentage" | "flat" | "hourly" | "salary"
+      }));
+      setTechnicians(typedTechnicians);
+    }
   }, [globalTechnicians, setTechnicians]);
 
   const handleEditTechnician = (technician: Technician) => {
@@ -60,10 +67,13 @@ const Technicians = () => {
   };
 
   const handleAddNewTechnician = (technicianData: any) => {
-    // Ensure the technician has a unique ID
+    // Ensure the technician has a unique ID and correct types
     const technicianWithId = {
       ...technicianData,
-      id: uuidv4()
+      id: uuidv4(),
+      hireDate: typeof technicianData.hireDate === 'string' 
+        ? technicianData.hireDate 
+        : new Date(technicianData.hireDate || new Date()).toISOString()
     };
     
     addTechnician(technicianWithId);
@@ -73,23 +83,15 @@ const Technicians = () => {
   const handleUpdateTechnicianForm = (values: TechnicianEditFormValues) => {
     if (!selectedTechnician) return;
     
-    const updatedTechnician: Technician = {
-      ...selectedTechnician,
+    // Fix: Added the second argument as required
+    updateTechnician(selectedTechnician.id, {
       ...values,
-      id: selectedTechnician.id,
       paymentRate: Number(values.paymentRate),
       hourlyRate: Number(values.hourlyRate || selectedTechnician.hourlyRate),
       incentiveAmount: values.incentiveAmount ? Number(values.incentiveAmount) : selectedTechnician.incentiveAmount,
-      initials: selectedTechnician.initials,
-      completedJobs: selectedTechnician.completedJobs,
-      cancelledJobs: selectedTechnician.cancelledJobs,
-      totalRevenue: selectedTechnician.totalRevenue,
-      rating: selectedTechnician.rating,
       profileImage: values.profileImage || selectedTechnician.profileImage,
       imageUrl: values.profileImage || selectedTechnician.imageUrl,
-    };
-    
-    updateTechnician(updatedTechnician);
+    });
   };
 
   const isSalaryDataVisible = !selectedDepartments || selectedDepartments.length === 0 || selectedDepartments.includes("Finance");
@@ -103,7 +105,10 @@ const Technicians = () => {
         exportTechnicians={exportTechnicians}
       />
 
-      <TechnicianStats technicians={globalTechnicians} />
+      <TechnicianStats technicians={globalTechnicians.map(tech => ({
+        ...tech,
+        hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : new Date(tech.hireDate).toISOString(),
+      }))} />
       
       <div className="mb-6">
         <div className="mb-4">

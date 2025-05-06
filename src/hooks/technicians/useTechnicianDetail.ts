@@ -29,12 +29,12 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
     }
     
     if (techData) {
-      // Fix: Ensure all required properties are present before setting state
+      // Fix: Ensure all required properties are present and have correct types
       const completeTechData: Technician = {
         ...techData,
-        hireDate: techData.hireDate || new Date().toISOString(),
+        hireDate: typeof techData.hireDate === 'string' ? techData.hireDate : new Date(techData.hireDate).toISOString(),
         specialty: techData.specialty || '',
-        paymentType: techData.paymentType || 'hourly',
+        paymentType: (techData.paymentType as "percentage" | "flat" | "hourly" | "salary") || 'hourly',
         paymentRate: techData.paymentRate || 0,
         hourlyRate: techData.hourlyRate || 0
       };

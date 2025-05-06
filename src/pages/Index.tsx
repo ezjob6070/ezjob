@@ -51,7 +51,15 @@ const Index = () => {
     to: addDays(new Date(), 7),
   });
 
-  const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
+  // Fix: Ensure taskCounts has the correct properties
+  const taskCounts = {
+    completed: dashboardTaskCounts.completed,
+    inProgress: dashboardTaskCounts.inProgress,
+    scheduled: dashboardTaskCounts.scheduled || dashboardTaskCounts.rescheduled || 0, // Fix property name
+    cancelled: dashboardTaskCounts.cancelled || dashboardTaskCounts.canceled || 0 // Fix property name
+  };
+  
+  const totalTasks = Object.values(taskCounts).reduce((sum, count) => sum + count, 0);
 
   const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
     setActiveDialog({
@@ -225,20 +233,28 @@ const Index = () => {
               detailedBusinessMetrics={detailedBusinessMetrics}
             />
 
-            {/* Add Projects Dashboard Section */}
             <ProjectsDashboardSection />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <TicketsStatusCard 
-                taskCounts={dashboardTaskCounts}
+                taskCounts={taskCounts}
                 totalTasks={totalTasks}
                 openDetailDialog={openDetailDialog}
                 detailedTasksData={detailedTasksData}
               />
               
               <PerformanceCard 
-                leadSources={dashboardLeadSources}
-                jobTypePerformance={dashboardJobTypePerformance}
+                leadSources={dashboardLeadSources.map(source => ({
+                  name: source.name,
+                  count: source.value || 0, // Map value to count
+                  percentage: source.percentage
+                }))}
+                jobTypePerformance={dashboardJobTypePerformance.map(item => ({
+                  name: item.name,
+                  count: item.value || 0, // Map value to count
+                  revenue: item.revenue,
+                  avgValue: item.avgValue || 0
+                }))}
                 financialMetrics={dashboardFinancialMetrics}
                 formatCurrency={formatCurrency}
                 openDetailDialog={openDetailDialog}
