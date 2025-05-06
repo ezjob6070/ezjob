@@ -17,7 +17,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Search, FileText, FileCheck, Clock } from "lucide-react";
 
 interface ReportsSectionProps {
@@ -56,6 +56,14 @@ const ReportsSection = ({ reports, employees }: ReportsSectionProps) => {
       default:
         return null;
     }
+  };
+
+  // Format date safely - check if it's valid before formatting
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return "Invalid date";
+
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return isValid(dateObj) ? format(dateObj, "MMM d, yyyy") : "Invalid date";
   };
 
   return (
@@ -142,7 +150,7 @@ const ReportsSection = ({ reports, employees }: ReportsSectionProps) => {
                     <div className="font-medium">{report.title}</div>
                   </TableCell>
                   <TableCell>{getEmployeeName(report.employeeId)}</TableCell>
-                  <TableCell>{format(report.dateSubmitted, "MMM d, yyyy")}</TableCell>
+                  <TableCell>{formatDate(report.dateSubmitted)}</TableCell>
                   <TableCell>
                     <Badge 
                       variant={

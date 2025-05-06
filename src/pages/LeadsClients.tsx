@@ -160,7 +160,12 @@ const LeadsClients = () => {
   };
 
   const handleAddLead = (lead: Lead) => {
-    setLeads((prevLeads) => [lead, ...prevLeads]);
+    // Make sure to create a new Lead object that matches the imported Lead type
+    const newLead: Lead = {
+      ...lead,
+      createdAt: new Date(),
+    };
+    setLeads((prevLeads) => [newLead, ...prevLeads]);
   };
 
   const getAddButtonText = () => {
