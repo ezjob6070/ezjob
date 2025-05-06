@@ -59,10 +59,12 @@ import Inspections from "./pages/construction/Inspections";
 
 // Import general category pages
 import Contacts from "./pages/general/Contacts";
-
-const queryClient = new QueryClient();
+import React from 'react'; // Add explicit React import
 
 function App() {
+  // Create queryClient inside the component function
+  const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalStateProvider>
