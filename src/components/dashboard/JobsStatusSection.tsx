@@ -45,39 +45,15 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
               showLegend={false}
               animation={true}
             />
-            
-            {/* Status counts below the chart */}
-            <div className="grid grid-cols-4 gap-4 mt-4 w-full">
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-green-500 mb-1"></div>
-                <span className="text-sm font-semibold">{taskCounts.completed}</span>
-                <span className="text-xs text-gray-500">Completed</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-blue-500 mb-1"></div>
-                <span className="text-sm font-semibold">{taskCounts.inProgress}</span>
-                <span className="text-xs text-gray-500">In Progress</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-red-500 mb-1"></div>
-                <span className="text-sm font-semibold">{taskCounts.canceled}</span>
-                <span className="text-xs text-gray-500">Canceled</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-purple-500 mb-1"></div>
-                <span className="text-sm font-semibold">{taskCounts.rescheduled}</span>
-                <span className="text-xs text-gray-500">Rescheduled</span>
-              </div>
-            </div>
           </div>
           
-          <div className="grid grid-cols-1 gap-2 w-full">
+          <div className="flex flex-col gap-2 w-full">
             <div className="flex items-center justify-between p-2 rounded bg-green-50">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />
                 <span>Completed</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.completed}</span>
                 <div className="text-xs bg-green-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.completed / totalTasks) * 100)}%
@@ -91,7 +67,7 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
                 <LoaderCircle className="h-4 w-4 text-blue-500" />
                 <span>In Progress</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.inProgress}</span>
                 <div className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.inProgress / totalTasks) * 100)}%
@@ -105,7 +81,7 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
                 <XCircle className="h-4 w-4 text-red-500" />
                 <span>Cancelled</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.canceled}</span>
                 <div className="text-xs bg-red-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.canceled / totalTasks) * 100)}%
@@ -119,7 +95,7 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
                 <RotateCw className="h-4 w-4 text-purple-500" />
                 <span>Rescheduled</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <span className="font-medium">{taskCounts.rescheduled}</span>
                 <div className="text-xs bg-purple-100 px-2 py-0.5 rounded-full">
                   {Math.round((taskCounts.rescheduled / totalTasks) * 100)}%
