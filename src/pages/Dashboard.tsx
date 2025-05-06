@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -468,32 +467,39 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md">
+              {/* Updated Overview Card with Yellow Theme */}
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 shadow-md">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-purple-600 font-medium">Total Jobs</p>
-                      <p className="text-2xl font-bold text-purple-800 mt-1">{totalJobs}</p>
-                      <p className="text-purple-600 text-sm mt-1">
-                        {completedJobs} completed, {totalJobs - completedJobs} in progress
-                      </p>
+                      <p className="text-amber-600 font-medium">Total Overview</p>
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-amber-800">{totalJobs}</p>
+                          <p className="text-xs text-amber-600">Jobs</p>
+                        </div>
+                        <div className="text-center border-x border-amber-200">
+                          <p className="text-lg font-bold text-amber-800">{jobs.length}</p>
+                          <p className="text-xs text-amber-600">Projects</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-amber-800">{callsData.total}</p>
+                          <p className="text-xs text-amber-600">Calls</p>
+                        </div>
+                      </div>
                     </div>
                     <div className="p-2.5 bg-white/60 rounded-full shadow-sm">
-                      <ClipboardIcon className="h-5 w-5 text-purple-500" />
+                      <ClipboardIcon className="h-5 w-5 text-amber-500" />
                     </div>
                   </div>
                   <div className="mt-3 flex gap-2">
-                    <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
+                    <div className="p-1.5 bg-amber-200/50 rounded flex-1 text-center text-xs font-medium text-amber-700">
                       <span className="block text-sm font-semibold">{Math.round(completedJobs / totalJobs * 100)}%</span>
-                      Completion Rate
+                      Completion
                     </div>
-                    <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
-                      <span className="block text-sm font-semibold">{dashboardTaskCounts.inProgress}</span>
-                      In Progress
-                    </div>
-                    <div className="p-1.5 bg-purple-200/50 rounded flex-1 text-center text-xs font-medium text-purple-700">
-                      <span className="block text-sm font-semibold">{dashboardTaskCounts.rescheduled}</span>
-                      Rescheduled
+                    <div className="p-1.5 bg-amber-200/50 rounded flex-1 text-center text-xs font-medium text-amber-700">
+                      <span className="block text-sm font-semibold">{callsData.conversionRate}%</span>
+                      Conversion
                     </div>
                   </div>
                 </CardContent>
@@ -749,6 +755,22 @@ const Dashboard = () => {
       />
       
       {renderContent()}
+      
+      <JobStatusDialog
+        open={statusDialog.open}
+        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
+        status={statusDialog.status}
+        title={statusDialog.title}
+        data={statusDialog.data}
+      />
+      
+      <DashboardDetailDialog
+        open={activeDialog.open}
+        onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
+        title={activeDialog.title}
+        type={activeDialog.type}
+        data={activeDialog.data}
+      />
     </div>
   );
 };
