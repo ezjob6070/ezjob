@@ -65,8 +65,8 @@ const TodaysAppointmentsSection: React.FC<TodaysAppointmentsSectionProps> = ({
         <CardTitle className="text-base">Today's Appointments</CardTitle>
         <p className="text-xs text-muted-foreground">Scheduled jobs for today • {dateRangeText}</p>
       </CardHeader>
-      <CardContent className="flex-1 overflow-auto">
-        <div className="space-y-3">
+      <CardContent className="flex-1 overflow-auto p-3 pt-0">
+        <div className="space-y-2">
           {appointments.map((appointment, index) => (
             <div key={index} className="flex gap-2 p-2 border border-gray-100 rounded-md">
               <div className={`mt-1 w-1.5 rounded-full ${getPriorityColor(appointment.priority)} h-12`}></div>

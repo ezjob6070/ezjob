@@ -41,14 +41,14 @@ const Dashboard = () => {
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
 
   return (
-    <div className="space-y-3 py-3">
+    <div className="space-y-0 py-3">
       <div className="mb-4">
         <DashboardGreeting 
           name="Alex Johnson" 
           subtitle="Welcome to your Easy Job dashboard" 
         />
         
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-2">
           <DashboardTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
           <DashboardDateFilter 

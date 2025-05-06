@@ -19,7 +19,7 @@ const CallTrackingSection: React.FC<CallTrackingSectionProps> = ({
   const conversionRate = 63;
 
   return (
-    <Card className="bg-white shadow-sm h-full">
+    <Card className="bg-white shadow-sm h-full mt-0">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Call Tracking & Conversion</CardTitle>
         <p className="text-xs text-muted-foreground">Overview of incoming calls and customer conversion rate • {dateRangeText}</p>

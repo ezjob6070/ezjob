@@ -66,7 +66,7 @@ const JobsStatusSection: React.FC<JobsStatusSectionProps> = ({
   };
 
   return (
-    <Card className="bg-white shadow-sm mb-4">
+    <Card className="bg-white shadow-sm h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
         <p className="text-xs text-muted-foreground">Overview of service requests and job status • {dateRangeText}</p>
