@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import AddClientModal from "@/components/AddClientModal";
 import AddLeadModal from "@/components/leads/AddLeadModal";
-import { Lead } from "@/types/lead"; // Import lead type from the correct location
+import { Lead } from "@/types/lead";
+import { useServiceCategory } from "@/hooks/useServiceCategory";
 
 // Import client type from Clients page
 type Client = {
@@ -29,6 +30,7 @@ const LeadsClients = () => {
   const [activeTab, setActiveTab] = useState("leads");
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const { serviceCategory, isFiltered } = useServiceCategory();
   
   // Sample clients data - we're reusing the data from the Clients page
   const [clients, setClients] = useState<Client[]>([
@@ -198,6 +200,7 @@ const LeadsClients = () => {
           </h1>
           <p className="text-muted-foreground mt-1">
             Manage all your leads and client relationships in one place
+            {isFiltered && <span className="ml-1 font-medium text-blue-600">• Filtered by {serviceCategory}</span>}
           </p>
         </div>
         <Button 
