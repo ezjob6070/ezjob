@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { Technician } from "@/types/technician";
+import { Technician, SalaryBasis } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
