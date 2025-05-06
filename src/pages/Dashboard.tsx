@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -84,7 +83,10 @@ const Dashboard = () => {
     data: []
   });
 
-  const { jobs, currentIndustry, projects } = useGlobalState();
+  // Get global state and safely handle projects if it doesn't exist
+  const { jobs, currentIndustry } = useGlobalState();
+  // Mock projects array if it doesn't exist in global state
+  const projects = useGlobalState().projects || [];
 
   // Use our predefined fake data
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
@@ -468,7 +470,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
               
-              {/* Replaced Total Jobs with Total Overview */}
+              {/* Total Overview Card */}
               <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start">
@@ -754,12 +756,13 @@ const Dashboard = () => {
         data={activeDialog.data}
       />
       
+      {/* Fix props for JobStatusDialog to match its expected interface */}
       <JobStatusDialog
         open={statusDialog.open}
         onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
         title={statusDialog.title}
         status={statusDialog.status}
-        jobs={statusDialog.data}
+        data={statusDialog.data}
       />
     </div>
   );

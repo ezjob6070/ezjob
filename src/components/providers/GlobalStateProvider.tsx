@@ -5,6 +5,18 @@ import { IndustryType } from "@/components/sidebar/sidebarTypes";
 import { Technician } from "@/types/technician";
 import { JobSource } from "@/types/jobSource";
 
+// Define an interface for projects
+interface Project {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  completion: number;
+  budget: number;
+  startDate: string;
+  endDate?: string;
+}
+
 interface GlobalStateContextType {
   jobs: Job[];
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>;
@@ -14,6 +26,8 @@ interface GlobalStateContextType {
   setTechnicians: React.Dispatch<React.SetStateAction<Technician[]>>;
   jobSources: JobSource[];
   setJobSources: React.Dispatch<React.SetStateAction<JobSource[]>>;
+  projects: Project[]; // Add projects property
+  setProjects: React.Dispatch<React.SetStateAction<Project[]>>; // Add projects setter
   addJob: (job: Job) => void;
   completeJob: (jobId: string, actualAmount?: number) => void;
   cancelJob: (jobId: string, reason?: string) => void;
@@ -46,6 +60,42 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Add projects state
+  const [projects, setProjects] = useState<Project[]>(() => {
+    const saved = localStorage.getItem('projects');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: "1",
+        name: "Office Building Renovation",
+        type: "Commercial",
+        status: "In Progress",
+        completion: 65,
+        budget: 120000,
+        startDate: "2025-04-15",
+        endDate: "2025-06-30"
+      },
+      {
+        id: "2",
+        name: "Central Park Landscaping",
+        type: "Municipal",
+        status: "In Progress",
+        completion: 42,
+        budget: 85000,
+        startDate: "2025-04-20"
+      },
+      {
+        id: "3",
+        name: "Wilson Residence Remodel",
+        type: "Residential",
+        status: "Completed",
+        completion: 100,
+        budget: 45000,
+        startDate: "2025-03-01",
+        endDate: "2025-04-15"
+      }
+    ];
+  });
+
   useEffect(() => {
     localStorage.setItem('jobs', JSON.stringify(jobs));
   }, [jobs]);
@@ -61,6 +111,11 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
   useEffect(() => {
     localStorage.setItem('jobSources', JSON.stringify(jobSources));
   }, [jobSources]);
+
+  // Add projects effect for localStorage persistence
+  useEffect(() => {
+    localStorage.setItem('projects', JSON.stringify(projects));
+  }, [projects]);
 
   const addJob = (job: Job) => {
     setJobs(prev => [...prev, job]);
@@ -112,6 +167,8 @@ export const GlobalStateProvider = ({ children }: { children: React.ReactNode })
       setTechnicians,
       jobSources,
       setJobSources,
+      projects, // Add projects to the context
+      setProjects, // Add setProjects to the context
       addJob,
       completeJob,
       cancelJob,
