@@ -1,8 +1,10 @@
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { format } from "date-fns";
 
 type StatisticsSectionProps = {
   revenueData: any[];
@@ -19,6 +21,20 @@ const StatisticsSection = ({
 }: StatisticsSectionProps) => {
   // Colors for charts
   const COLORS = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899'];
+  
+  // Get the global date filter
+  const { dateFilter } = useGlobalState();
+  
+  // Format date range for display
+  const getDateRangeText = () => {
+    if (!dateFilter?.from) return "All time";
+    
+    if (!dateFilter.to || dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
+      return format(dateFilter.from, "MMM d, yyyy");
+    }
+    
+    return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d, yyyy")}`;
+  };
   
   // Enhanced job status data for donut chart
   const jobStatusData = [
@@ -50,7 +66,10 @@ const StatisticsSection = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-white shadow-sm">
           <CardHeader className="py-4 px-6">
-            <CardTitle className="text-base font-medium">Job Status Distribution</CardTitle>
+            <CardTitle className="text-base font-medium flex items-center justify-between">
+              <div>Job Status Distribution</div>
+              <div className="text-xs text-muted-foreground">{getDateRangeText()}</div>
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 px-6 pb-6 h-[350px]">
             <EnhancedDonutChart 
@@ -67,7 +86,10 @@ const StatisticsSection = ({
         
         <Card className="bg-white shadow-sm">
           <CardHeader className="py-4 px-6">
-            <CardTitle className="text-base font-medium">Jobs by Area</CardTitle>
+            <CardTitle className="text-base font-medium flex items-center justify-between">
+              <div>Jobs by Area</div>
+              <div className="text-xs text-muted-foreground">{getDateRangeText()}</div>
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 px-6 pb-6 h-[350px]">
             <EnhancedDonutChart
@@ -86,7 +108,10 @@ const StatisticsSection = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-white shadow-sm">
           <CardHeader className="py-4 px-6">
-            <CardTitle className="text-base font-medium">Revenue Trends</CardTitle>
+            <CardTitle className="text-base font-medium flex items-center justify-between">
+              <div>Revenue Trends</div>
+              <div className="text-xs text-muted-foreground">{getDateRangeText()}</div>
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 px-6 pb-6 h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -124,7 +149,10 @@ const StatisticsSection = ({
         
         <Card className="bg-white shadow-sm">
           <CardHeader className="py-4 px-6">
-            <CardTitle className="text-base font-medium">Technician Performance</CardTitle>
+            <CardTitle className="text-base font-medium flex items-center justify-between">
+              <div>Technician Performance</div>
+              <div className="text-xs text-muted-foreground">{getDateRangeText()}</div>
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 px-6 pb-6 h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
