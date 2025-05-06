@@ -122,7 +122,6 @@ const LeadsTable = ({ leads, onEditLead, onViewDetails, onStatusChange }: LeadsT
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {/* Make sure every status option has a non-empty value */}
                         <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "new")}>
                           New
                         </DropdownMenuItem>

@@ -201,9 +201,9 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    {initialStatuses.map((status) => (
-                      <SelectItem key={status} value={status || "new"}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                    {initialStatuses.map((statusValue) => (
+                      <SelectItem key={statusValue} value={statusValue}>
+                        {statusValue.charAt(0).toUpperCase() + statusValue.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectContent>
