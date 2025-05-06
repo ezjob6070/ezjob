@@ -32,6 +32,7 @@ type Call = {
   duration?: number; // in seconds
   date: Date;
   notes?: string;
+  jobSource?: string; // Added job source field
 };
 
 // Sample calls data - Updated "missed" to "not_answered"
@@ -46,6 +47,7 @@ const sampleCalls: Call[] = [
     duration: 320, // 5min 20sec
     date: new Date("2023-05-12T14:30:00"),
     notes: "Discussed service options and pricing.",
+    jobSource: "Google Ads",
   },
   {
     id: "2",
@@ -57,6 +59,7 @@ const sampleCalls: Call[] = [
     duration: 480, // 8min
     date: new Date("2023-05-12T11:45:00"),
     notes: "Successfully scheduled appointment for next week.",
+    jobSource: "Referral",
   },
   {
     id: "3",
@@ -77,6 +80,7 @@ const sampleCalls: Call[] = [
     duration: 240, // 4min
     date: new Date("2023-05-12T16:20:00"),
     notes: "Set up appointment for estimate.",
+    jobSource: "Website",
   },
   {
     id: "5",
@@ -89,6 +93,18 @@ const sampleCalls: Call[] = [
     date: new Date("2023-05-11T13:50:00"),
     notes: "Wrong number, not a potential client.",
   },
+];
+
+// Sample job sources
+const jobSources = [
+  "Website",
+  "Google Ads",
+  "Facebook Ads",
+  "Referral",
+  "Direct Call",
+  "Email Campaign",
+  "Trade Show",
+  "Other"
 ];
 
 const formatDuration = (seconds?: number): string => {
@@ -108,6 +124,7 @@ type CallFormValues = {
   status: "completed" | "converted" | "cancelled" | "scheduled" | "not_relevant";
   notes: string;
   duration: string;
+  jobSource?: string; // Added job source field
 };
 
 const CallCard = ({ call }: { call: Call }) => {
@@ -160,9 +177,18 @@ const CallCard = ({ call }: { call: Call }) => {
               <div className="text-xs text-muted-foreground">Duration: {formatDuration(call.duration)}</div>
             </div>
             
-            {call.notes && (
-              <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-2 rounded-md">
-                {call.notes}
+            {(call.notes || call.jobSource) && (
+              <div className="mt-2 text-xs">
+                {call.jobSource && (
+                  <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded-sm mb-1 inline-block">
+                    Source: {call.jobSource}
+                  </div>
+                )}
+                {call.notes && (
+                  <div className="text-gray-600 bg-gray-50 p-2 rounded-md">
+                    {call.notes}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -188,6 +214,7 @@ const Calls = () => {
       status: "completed",
       notes: "",
       duration: "0",
+      jobSource: "",
     },
   });
   
@@ -246,6 +273,11 @@ const Calls = () => {
       notes: data.notes,
       duration: durationInSeconds,
     };
+    
+    // Add job source if selected
+    if (data.jobSource) {
+      newCall.jobSource = data.jobSource;
+    }
     
     // Add the new call to the calls list
     setCalls(prevCalls => [newCall, ...prevCalls]);
@@ -509,6 +541,35 @@ const Calls = () => {
                   )}
                 />
               </div>
+              
+              {/* Job Source field (optional) */}
+              <FormField
+                control={form.control}
+                name="jobSource"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Job Source (Optional)</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      value={field.value || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a job source" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {jobSources.map(source => (
+                          <SelectItem key={source} value={source}>{source}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Where did this call originate from?
+                    </p>
+                  </FormItem>
+                )}
+              />
               
               <FormField
                 control={form.control}
