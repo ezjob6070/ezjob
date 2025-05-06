@@ -49,11 +49,6 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         totalRevenue: techData.totalRevenue || 0,
         rating: techData.rating || 0,
         initials: techData.initials || techData.name.substring(0, 2).toUpperCase(),
-        // Add missing optional properties with default values
-        certifications: techData.certifications || [],
-        skills: techData.skills || [],
-        jobCategories: techData.jobCategories || [],
-        incentiveType: techData.incentiveType || 'none',
       };
       
       setTechnician(completeTechData);

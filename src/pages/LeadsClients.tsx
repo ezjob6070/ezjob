@@ -1,28 +1,14 @@
-
 import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
-import LeadsTable from "@/components/leads/LeadsTable";
+import LeadsTable from "@/components/LeadsTable";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  PlusIcon, 
-  CheckIcon, 
-  XIcon, 
-  ArrowRightIcon, 
-  SearchIcon, 
-  Filter, 
-  Calendar as CalendarIcon 
-} from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { PlusIcon, CheckIcon, XIcon, ArrowRightIcon } from "lucide-react";
 import AddClientModal from "@/components/AddClientModal";
 import AddLeadModal from "@/components/leads/AddLeadModal";
-import { Lead, LeadStatus, LEAD_STATUS_COLORS } from "@/types/lead";
+import { Lead, LeadStatus } from "@/types/lead"; // Import lead type from the correct location
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useToast } from "@/components/ui/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Import client type from Clients page
 type Client = {
@@ -45,15 +31,6 @@ const LeadsClients = () => {
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [leadStatusFilter, setLeadStatusFilter] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [leadSourceFilter, setLeadSourceFilter] = useState<string>("");
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
-    from: undefined,
-    to: undefined,
-  });
   const { toast } = useToast();
   
   // Sample clients data - we're reusing the data from the Clients page
@@ -153,7 +130,7 @@ const LeadsClients = () => {
       email: "david.b@example.com",
       phone: "(555) 555-6666",
       status: "qualified",
-      source: "Google Ads",
+      source: "Google Ad",
       value: 3000,
       createdAt: new Date("2023-05-05"),
     },
@@ -167,7 +144,6 @@ const LeadsClients = () => {
       source: "Trade Show",
       value: 5000,
       createdAt: new Date("2023-05-07"),
-      service: "Remodeling",
     },
     {
       id: "5",
@@ -179,42 +155,6 @@ const LeadsClients = () => {
       source: "LinkedIn",
       value: 7500,
       createdAt: new Date("2023-05-10"),
-      service: "Electrical",
-    },
-    {
-      id: "6",
-      name: "Jennifer Lee",
-      company: "Lee Consulting",
-      email: "jennifer.l@example.com",
-      phone: "(555) 111-3333",
-      status: "active",
-      source: "Email Campaign",
-      value: 9000,
-      createdAt: new Date("2023-05-12"),
-      service: "HVAC",
-    },
-    {
-      id: "7",
-      name: "Thomas Baker",
-      email: "thomas.b@example.com",
-      phone: "(555) 222-4444",
-      status: "follow",
-      source: "Partner",
-      value: 3500,
-      createdAt: new Date("2023-05-15"),
-      service: "Plumbing",
-    },
-    {
-      id: "8",
-      name: "Lisa Campbell",
-      company: "Campbell Properties",
-      email: "lisa.c@example.com",
-      phone: "(555) 333-5555",
-      status: "converted",
-      source: "Website",
-      value: 12000,
-      createdAt: new Date("2023-05-18"),
-      service: "General Contracting",
     },
   ]);
 
@@ -230,23 +170,14 @@ const LeadsClients = () => {
       company: lead.company,
       email: lead.email,
       phone: lead.phone,
-      address: lead.address,
-      service: lead.service,
       status: lead.status || "new",
       source: lead.source,
       value: lead.value,
-      createdAt: new Date(),
-      notes: lead.notes,
-      estimatedClosingDate: lead.estimatedClosingDate,
-      priority: lead.priority,
+      createdAt: new Date(), // Ensure createdAt is always set
+      notes: lead.notes
     };
     
     setLeads((prevLeads) => [newLead, ...prevLeads]);
-    
-    toast({
-      title: "Lead added",
-      description: "New lead has been added successfully",
-    });
   };
 
   const handleLeadStatusChange = (id: string, status: LeadStatus) => {
@@ -262,113 +193,48 @@ const LeadsClients = () => {
     });
   };
 
-  const handleEditLead = (lead: Lead) => {
-    // This would typically open an edit modal
-    toast({
-      title: "Edit Lead",
-      description: `Editing lead: ${lead.name}`,
-    });
+  const getAddButtonText = () => {
+    return activeTab === "leads" ? "Add Lead" : "Add Client";
   };
 
-  const handleViewLeadDetails = (lead: Lead) => {
-    // This would typically open a detailed view
-    toast({
-      title: "View Lead Details",
-      description: `Viewing details for ${lead.name}`,
-    });
+  const handleAddButtonClick = () => {
+    if (activeTab === "leads") {
+      setShowAddLeadModal(true);
+    } else {
+      setShowAddClientModal(true);
+    }
   };
 
   // Get counts of leads by status for the status filter badges
   const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = {
+    const counts = {
       active: 0,
       inactive: 0,
       converted: 0,
-      follow: 0,
-      new: 0,
-      contacted: 0,
-      qualified: 0,
-      proposal: 0,
-      negotiation: 0,
-      won: 0,
-      lost: 0
+      follow: 0
     };
     
     leads.forEach(lead => {
       if (lead.status in counts) {
-        counts[lead.status]++;
+        counts[lead.status as keyof typeof counts]++;
       }
     });
     
     return counts;
   }, [leads]);
 
-  // Filter leads based on selected statuses, search term, and source
-  const filteredLeads = useMemo(() => {
-    return leads.filter(lead => {
-      // Status filter
-      if (leadStatusFilter.length > 0 && !leadStatusFilter.includes(lead.status)) {
-        return false;
-      }
-      
-      // Search term filter
-      if (searchTerm && 
-          !lead.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
-          !lead.email.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          !(lead.company && lead.company.toLowerCase().includes(searchTerm.toLowerCase()))) {
-        return false;
-      }
-      
-      // Source filter
-      if (leadSourceFilter && lead.source !== leadSourceFilter) {
-        return false;
-      }
-      
-      // Date range filter
-      if (dateRange.from && dateRange.to) {
-        const leadDate = new Date(lead.createdAt);
-        if (leadDate < dateRange.from || leadDate > dateRange.to) {
-          return false;
-        }
-      }
-      
-      return true;
-    });
-  }, [leads, leadStatusFilter, searchTerm, leadSourceFilter, dateRange]);
-  
-  // Get unique sources for filter
-  const leadSources = useMemo(() => {
-    const sources = new Set<string>();
-    leads.forEach(lead => {
-      if (lead.source) {
-        sources.add(lead.source);
-      }
-    });
-    return Array.from(sources);
-  }, [leads]);
+  // Filter leads based on selected statuses
+  const filteredLeads = leadStatusFilter.length > 0
+    ? leads.filter(lead => leadStatusFilter.includes(lead.status))
+    : leads;
 
-  const clearFilters = () => {
-    setLeadStatusFilter([]);
-    setSearchTerm("");
-    setLeadSourceFilter("");
-    setDateRange({
-      from: undefined,
-      to: undefined
-    });
+  // Status filter button styles
+  const statusStyles = {
+    active: "bg-green-100 hover:bg-green-200 data-[state=on]:bg-green-200 data-[state=on]:text-green-900 text-green-800",
+    inactive: "bg-gray-100 hover:bg-gray-200 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-900 text-gray-800",
+    converted: "bg-blue-100 hover:bg-blue-200 data-[state=on]:bg-blue-200 data-[state=on]:text-blue-900 text-blue-800",
+    follow: "bg-amber-100 hover:bg-amber-200 data-[state=on]:bg-amber-200 data-[state=on]:text-amber-900 text-amber-800"
   };
-
-  // Format date range for display
-  const formatDateRange = () => {
-    if (dateRange.from && dateRange.to) {
-      if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
-        return format(dateRange.from, "MMM d, yyyy");
-      }
-      return `${format(dateRange.from, "MMM d, yyyy")} - ${format(dateRange.to, "MMM d, yyyy")}`;
-    }
-    return "All dates";
-  };
-
-  const hasFilters = leadStatusFilter.length > 0 || searchTerm || leadSourceFilter || dateRange.from;
 
   return (
     <div className="space-y-8 py-8">
@@ -382,11 +248,10 @@ const LeadsClients = () => {
           </p>
         </div>
         <Button 
-          onClick={activeTab === "leads" ? () => setShowAddLeadModal(true) : () => setShowAddClientModal(true)}
+          onClick={handleAddButtonClick}
           className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
         >
-          <PlusIcon className="mr-2 h-4 w-4" /> 
-          {activeTab === "leads" ? "Add Lead" : "Add Client"}
+          <PlusIcon className="mr-2 h-4 w-4" /> {getAddButtonText()}
         </Button>
       </div>
 
@@ -401,92 +266,37 @@ const LeadsClients = () => {
         </TabsList>
         
         {activeTab === "leads" && (
-          <div className="mt-6">
-            <div className="flex flex-col space-y-4">
-              <div className="flex flex-wrap gap-4 items-center">
-                <div className="relative flex-grow max-w-md">
-                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Search leads..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
-                
-                <Select value={leadSourceFilter} onValueChange={setLeadSourceFilter}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by source" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All sources</SelectItem>
-                    {leadSources.map(source => (
-                      <SelectItem key={source} value={source}>
-                        {source}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="flex items-center gap-2 w-[180px]">
-                      <CalendarIcon className="h-4 w-4" />
-                      {formatDateRange()}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      selected={dateRange as any}
-                      onSelect={setDateRange as any}
-                      numberOfMonths={2}
-                      className="p-3"
-                    />
-                  </PopoverContent>
-                </Popover>
-                
-                {hasFilters && (
-                  <Button 
-                    variant="ghost" 
-                    onClick={clearFilters}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Clear filters
-                  </Button>
-                )}
+          <div className="mt-4 mb-4">
+            <label className="block text-sm font-medium mb-2">Filter by status:</label>
+            <ToggleGroup type="multiple" className="justify-start flex-wrap gap-3" value={leadStatusFilter} onValueChange={setLeadStatusFilter}>
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="active" aria-label="Active" className={`flex items-center gap-1 ${statusStyles.active}`}>
+                  <CheckIcon className="h-4 w-4" /> Active
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-green-800">{statusCounts.active}</span>
               </div>
               
-              <div className="overflow-x-auto">
-                <ToggleGroup type="multiple" className="justify-start flex-wrap gap-2" value={leadStatusFilter} onValueChange={setLeadStatusFilter}>
-                  {Object.entries(statusCounts).map(([status, count]) => (
-                    count > 0 ? (
-                      <div key={status} className="flex flex-col items-center">
-                        <ToggleGroupItem 
-                          value={status} 
-                          aria-label={status} 
-                          className={`flex items-center gap-1 ${LEAD_STATUS_COLORS[status as LeadStatus]}`}
-                        >
-                          {status === "active" && <CheckIcon className="h-4 w-4" />}
-                          {status === "inactive" && <XIcon className="h-4 w-4" />}
-                          {status === "follow" && <ArrowRightIcon className="h-4 w-4" />}
-                          {status === "converted" && <CheckIcon className="h-4 w-4" />}
-                          {status.charAt(0).toUpperCase() + status.slice(1)}
-                        </ToggleGroupItem>
-                        <span className="text-xs mt-1 font-medium">{count}</span>
-                      </div>
-                    ) : null
-                  ))}
-                </ToggleGroup>
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="inactive" aria-label="Inactive" className={`flex items-center gap-1 ${statusStyles.inactive}`}>
+                  <XIcon className="h-4 w-4" /> Inactive
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-gray-800">{statusCounts.inactive}</span>
               </div>
-            </div>
-            
-            {hasFilters && (
-              <div className="mt-4 text-sm text-muted-foreground">
-                Showing {filteredLeads.length} of {leads.length} leads
+              
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="converted" aria-label="Converted" className={`flex items-center gap-1 ${statusStyles.converted}`}>
+                  <CheckIcon className="h-4 w-4" /> Converted
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-blue-800">{statusCounts.converted}</span>
               </div>
-            )}
+              
+              <div className="flex flex-col items-center">
+                <ToggleGroupItem value="follow" aria-label="Follow" className={`flex items-center gap-1 ${statusStyles.follow}`}>
+                  <ArrowRightIcon className="h-4 w-4" /> Follow
+                </ToggleGroupItem>
+                <span className="text-xs mt-1 font-medium text-amber-800">{statusCounts.follow}</span>
+              </div>
+            </ToggleGroup>
           </div>
         )}
         
@@ -494,9 +304,7 @@ const LeadsClients = () => {
           <TabsContent value="leads">
             <LeadsTable 
               leads={filteredLeads} 
-              onEditLead={handleEditLead}
-              onViewDetails={handleViewLeadDetails}
-              onStatusChange={handleLeadStatusChange}
+              onStatusChange={handleLeadStatusChange} 
             />
           </TabsContent>
           <TabsContent value="clients">

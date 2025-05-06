@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { IncentiveType, SalaryBasis } from "@/types/technician";
+import { IncentiveType } from "@/types/employee";
+import { SalaryBasis } from "@/types/technician";
 
 interface TechnicianPaymentFieldsProps {
   control: Control<any>;
@@ -29,15 +30,15 @@ const TechnicianPaymentFields: React.FC<TechnicianPaymentFieldsProps> = ({
     { value: "percentage", label: "Percentage" },
     { value: "flat", label: "Flat Rate" },
     { value: "hourly", label: "Hourly" },
-    { value: "salary", label: "Salary" },
   ];
 
   const SALARY_BASIS_SELECT_OPTIONS = [
     { value: "hourly", label: "Hourly" },
+    { value: "annual", label: "Annual" },
+    { value: "commission", label: "Commission" },
     { value: "weekly", label: "Weekly" },
-    { value: "bi-weekly", label: "Bi-Weekly" },
     { value: "monthly", label: "Monthly" },
-    { value: "annually", label: "Annually" },
+    { value: "yearly", label: "Yearly" },
   ];
 
   const INCENTIVE_TYPE_SELECT_OPTIONS = [

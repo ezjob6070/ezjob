@@ -1,6 +1,6 @@
 
 import * as z from "zod";
-import { SalaryBasis, IncentiveType } from "@/types/technician";
+import { SalaryBasis } from "@/types/technician";
 
 export const technicianEditSchema = z.object({
   name: z.string().min(2, {
@@ -14,7 +14,7 @@ export const technicianEditSchema = z.object({
   specialty: z.string().min(2, {
     message: "Specialty must be at least 2 characters.",
   }),
-  status: z.enum(["active", "inactive", "onLeave", "suspended", "terminated"]),
+  status: z.enum(["active", "inactive", "onLeave"]),
   paymentType: z.enum(["percentage", "flat", "hourly", "salary"]),
   paymentRate: z.string().refine((value) => {
     try {
@@ -31,7 +31,7 @@ export const technicianEditSchema = z.object({
   notes: z.string().optional(),
   department: z.string().optional(),
   position: z.string().optional(),
-  salaryBasis: z.enum(["hourly", "weekly", "bi-weekly", "monthly", "annually"] as const).optional(),
+  salaryBasis: z.enum(["hourly", "annual", "commission", "weekly", "monthly", "yearly"] as const).optional(),
   hourlyRate: z.string().optional(),
   incentiveType: z.enum(["hourly", "weekly", "monthly", "bonus", "commission", "none"] as const).optional(),
   incentiveAmount: z.string().optional(),

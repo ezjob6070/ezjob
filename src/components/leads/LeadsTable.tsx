@@ -10,42 +10,39 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { EyeIcon, PencilIcon, PhoneIcon, MailIcon } from "lucide-react";
-import { Lead, LEAD_STATUS_COLORS } from "@/types/lead";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+import { EyeIcon, PencilIcon } from "lucide-react";
+
+type Lead = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  service: string;
+  source: string;
+  value: number;
+  dateAdded: Date;
+  status: "active" | "converted" | "inactive";
+  notes?: string;
+};
 
 interface LeadsTableProps {
   leads: Lead[];
   onEditLead: (lead: Lead) => void;
   onViewDetails: (lead: Lead) => void;
-  onStatusChange?: (id: string, status: Lead['status']) => void;
 }
 
-const LeadsTable = ({ leads, onEditLead, onViewDetails, onStatusChange }: LeadsTableProps) => {
-  // Format currency with $ symbol and 2 decimal places
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  // Format status for display
-  const formatStatus = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  // Handle status change
-  const handleStatusChange = (leadId: string, newStatus: Lead['status']) => {
-    if (onStatusChange) {
-      onStatusChange(leadId, newStatus);
+const LeadsTable = ({ leads, onEditLead, onViewDetails }: LeadsTableProps) => {
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case "active":
+        return "secondary";
+      case "converted":
+        return "outline";
+      case "inactive":
+        return "destructive";
+      default:
+        return "secondary";
     }
   };
 
@@ -55,7 +52,6 @@ const LeadsTable = ({ leads, onEditLead, onViewDetails, onStatusChange }: LeadsT
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Company</TableHead>
             <TableHead>Service</TableHead>
             <TableHead>Source</TableHead>
             <TableHead>Date Added</TableHead>
@@ -67,90 +63,29 @@ const LeadsTable = ({ leads, onEditLead, onViewDetails, onStatusChange }: LeadsT
         <TableBody>
           {leads.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 No leads found.
               </TableCell>
             </TableRow>
           ) : (
             leads.map((lead) => (
-              <TableRow key={lead.id} className="hover:bg-muted/50">
-                <TableCell className="font-medium">
-                  <div className="flex flex-col">
-                    <span>{lead.name}</span>
-                    <div className="flex gap-2 text-xs text-muted-foreground mt-1">
-                      {lead.phone && (
-                        <span className="flex items-center gap-1">
-                          <PhoneIcon className="h-3 w-3" /> 
-                          {lead.phone}
-                        </span>
-                      )}
-                      {lead.email && (
-                        <span className="flex items-center gap-1">
-                          <MailIcon className="h-3 w-3" /> 
-                          {lead.email}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>{lead.company || "—"}</TableCell>
-                <TableCell>{lead.service || "—"}</TableCell>
+              <TableRow key={lead.id}>
+                <TableCell className="font-medium">{lead.name}</TableCell>
+                <TableCell>{lead.service}</TableCell>
                 <TableCell>{lead.source}</TableCell>
+                <TableCell>{format(lead.dateAdded, "MMM d, yyyy")}</TableCell>
+                <TableCell>${lead.value}</TableCell>
                 <TableCell>
-                  {lead.createdAt ? format(lead.createdAt, "MMM d, yyyy") : 
-                   lead.dateAdded ? format(lead.dateAdded, "MMM d, yyyy") : "—"}
-                </TableCell>
-                <TableCell>{formatCurrency(lead.value)}</TableCell>
-                <TableCell>
-                  <Badge className={LEAD_STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-800"}>
-                    {formatStatus(lead.status)}
+                  <Badge variant={getBadgeVariant(lead.status)}>
+                    {lead.status === 'active' ? 'Active' : 
+                     lead.status === 'converted' ? 'Converted' : 'Inactive'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right space-x-1">
-                  {onStatusChange && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                          title="Change Status"
-                        >
-                          <Badge className={LEAD_STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-800"}>
-                            {formatStatus(lead.status)}
-                          </Badge>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "new")}>
-                          New
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "contacted")}>
-                          Contacted
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "qualified")}>
-                          Qualified
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "proposal")}>
-                          Proposal
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "negotiation")}>
-                          Negotiation
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "won")}>
-                          Won
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(lead.id, "lost")}>
-                          Lost
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onViewDetails(lead)}
-                    title="View Details"
                   >
                     <EyeIcon className="h-4 w-4" />
                   </Button>
@@ -158,7 +93,6 @@ const LeadsTable = ({ leads, onEditLead, onViewDetails, onStatusChange }: LeadsT
                     variant="ghost"
                     size="icon"
                     onClick={() => onEditLead(lead)}
-                    title="Edit Lead"
                   >
                     <PencilIcon className="h-4 w-4" />
                   </Button>

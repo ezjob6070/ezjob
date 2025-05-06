@@ -14,12 +14,20 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Lead, LEAD_SERVICES, LEAD_SOURCES } from "@/types/lead";
+
+type Lead = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  service: string;
+  source: string;
+  value: number;
+  dateAdded: Date;
+  status: "active" | "converted" | "inactive";
+  notes?: string;
+};
 
 interface AddLeadModalProps {
   open: boolean;
@@ -27,21 +35,18 @@ interface AddLeadModalProps {
   onAddLead: (lead: Lead) => void;
 }
 
-const initialStatuses = ["new", "contacted", "qualified", "proposal", "active"];
+const services = ["Plumbing", "HVAC", "Electrical", "General Contracting", "Remodeling", "Other"];
+const sources = ["Website", "Referral", "Google Ads", "Facebook", "Direct Mail", "Other"];
 
 const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
   const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [service, setService] = useState("");
-  const [source, setSource] = useState("");
+  const [service, setService] = useState(services[0]);
+  const [source, setSource] = useState(sources[0]);
   const [value, setValue] = useState("0");
-  const [status, setStatus] = useState("new");
   const [notes, setNotes] = useState("");
-  const [estimatedClosingDate, setEstimatedClosingDate] = useState<Date | undefined>(undefined);
-  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,18 +54,15 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
     const newLead: Lead = {
       id: uuidv4(),
       name,
-      company,
       email,
       phone,
       address,
       service,
       source,
       value: parseFloat(value) || 0,
-      createdAt: new Date(),
-      status: status as Lead['status'],
-      notes: notes.trim() || undefined,
-      estimatedClosingDate,
-      priority
+      dateAdded: new Date(),
+      status: "active",
+      notes: notes.trim() || undefined
     };
     
     onAddLead(newLead);
@@ -70,22 +72,18 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
 
   const resetForm = () => {
     setName("");
-    setCompany("");
     setEmail("");
     setPhone("");
     setAddress("");
-    setService("");
-    setSource("");
+    setService(services[0]);
+    setSource(sources[0]);
     setValue("0");
-    setStatus("new");
     setNotes("");
-    setEstimatedClosingDate(undefined);
-    setPriority("medium");
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Add New Lead</DialogTitle>
@@ -94,7 +92,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input 
                   id="name" 
                   value={name} 
@@ -104,16 +102,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
-                <Input 
-                  id="company" 
-                  value={company} 
-                  onChange={(e) => setCompany(e.target.value)} 
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input 
                   id="email" 
                   type="email" 
@@ -124,7 +113,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone *</Label>
+                <Label htmlFor="phone">Phone</Label>
                 <Input 
                   id="phone" 
                   value={phone} 
@@ -146,31 +135,14 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="priority">Priority</Label>
-                <Select 
-                  value={priority} 
-                  onValueChange={(value) => setPriority(value as "low" | "medium" | "high")}
-                >
-                  <SelectTrigger id="priority">
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
                 <Label htmlFor="service">Service</Label>
                 <Select value={service} onValueChange={setService}>
                   <SelectTrigger id="service">
                     <SelectValue placeholder="Select service" />
                   </SelectTrigger>
                   <SelectContent>
-                    {LEAD_SERVICES.map((option) => (
-                      <SelectItem key={option} value={option || "unknown"}>
+                    {services.map((option) => (
+                      <SelectItem key={option} value={option}>
                         {option}
                       </SelectItem>
                     ))}
@@ -185,55 +157,13 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                     <SelectValue placeholder="Select source" />
                   </SelectTrigger>
                   <SelectContent>
-                    {LEAD_SOURCES.map((option) => (
-                      <SelectItem key={option} value={option || "unknown"}>
+                    {sources.map((option) => (
+                      <SelectItem key={option} value={option}>
                         {option}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger id="status">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {initialStatuses.map((statusValue) => (
-                      <SelectItem key={statusValue} value={statusValue}>
-                        {statusValue.charAt(0).toUpperCase() + statusValue.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Estimated Closing Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !estimatedClosingDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {estimatedClosingDate ? format(estimatedClosingDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={estimatedClosingDate}
-                      onSelect={setEstimatedClosingDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
               </div>
             </div>
             
@@ -243,6 +173,7 @@ const AddLeadModal = ({ open, onOpenChange, onAddLead }: AddLeadModalProps) => {
                 id="address" 
                 value={address} 
                 onChange={(e) => setAddress(e.target.value)} 
+                required
               />
             </div>
             
