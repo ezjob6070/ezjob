@@ -1,4 +1,3 @@
-
 export type TimeFrame = "day" | "week" | "month" | "year" | "custom";
 
 export type FinancialTransaction = {
@@ -47,5 +46,26 @@ export type ProfitBreakdownItem = {
   color: string;
 };
 
-// Adding entityType for finance-related components
+export type OfficeExpense = {
+  id: string;
+  date: string;
+  category: string;
+  description: string;
+  amount: number;
+  paymentMethod?: string;
+  vendor?: string;
+  recurring?: boolean;
+  receipt?: string;
+  status?: "paid" | "pending" | "overdue";
+};
+
 export type FinanceEntityType = "technician" | "jobSource" | "client" | "agent" | "property";
+
+export type ExpenseCategory = {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  color: string;
+  budget?: number;
+  currentSpend?: number;
+};
