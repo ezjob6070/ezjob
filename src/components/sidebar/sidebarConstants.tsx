@@ -15,10 +15,6 @@ import {
   FileTextIcon,
   CircleDollarSign,
   FolderIcon,
-  PhoneIncomingIcon,
-  PhoneOutgoingIcon,
-  PhoneOffIcon,
-  UserPlusIcon
 } from "lucide-react";
 import { NavItem } from "./sidebarTypes";
 
@@ -72,33 +68,7 @@ const commonNavItems: NavItem[] = [
   {
     label: "Calls",
     icon: <PhoneIcon size={18} />,
-    children: [
-      {
-        label: "All Calls",
-        icon: <PhoneIcon size={16} />,
-        href: "/calls",
-      },
-      {
-        label: "Incoming",
-        icon: <PhoneIncomingIcon size={16} className="text-green-500" />,
-        href: "/calls/incoming",
-      },
-      {
-        label: "Outgoing",
-        icon: <PhoneOutgoingIcon size={16} className="text-blue-500" />,
-        href: "/calls/outgoing",
-      },
-      {
-        label: "Not Answered",
-        icon: <PhoneOffIcon size={16} className="text-red-500" />,
-        href: "/calls/not_answered",
-      },
-      {
-        label: "Converted",
-        icon: <UserPlusIcon size={16} className="text-amber-500" />,
-        href: "/calls/converted",
-      },
-    ],
+    href: "/calls",
   },
   {
     label: "Jobs",
