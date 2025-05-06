@@ -39,7 +39,7 @@ const OfficeExpensesOverview = ({
         value={`$${totalExpenses.toLocaleString()}`}
         description={filterDescription}
         icon={<DollarSign className="h-4 w-4" />}
-        trend={{ value: dateRangeText, isPositive: false, showArrow: false }}
+        trend={{ value: dateRangeText, isPositive: false }}
       />
       
       <DashboardMetricCard

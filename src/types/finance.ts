@@ -1,3 +1,4 @@
+
 export type TimeFrame = "day" | "week" | "month" | "year" | "custom";
 
 export type FinancialTransaction = {

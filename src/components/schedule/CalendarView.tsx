@@ -1,11 +1,12 @@
 
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format, isSameDay } from "date-fns";
+import { format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, addDays, startOfMonth, endOfMonth } from "date-fns";
 import { Job } from "@/components/jobs/JobTypes";
 import { Task } from "@/components/calendar/types";
 import { cn } from "@/lib/utils";
 import UpcomingEvents from "@/components/UpcomingEvents";
+import { CalendarViewMode } from "./CalendarViewOptions";
 
 interface CalendarViewProps {
   jobs: Job[];
@@ -14,6 +15,7 @@ interface CalendarViewProps {
   jobsForSelectedDate: Job[];
   tasksForSelectedDate: Task[];
   updateSelectedDateItems: (date: Date) => void;
+  viewMode: CalendarViewMode;
 }
 
 // Define the event types more specifically
@@ -53,6 +55,7 @@ const CalendarView = ({
   jobsForSelectedDate,
   tasksForSelectedDate,
   updateSelectedDateItems,
+  viewMode,
 }: CalendarViewProps) => {
   // Process jobs and tasks to create upcoming events with validated dates
   const jobEvents = jobs
@@ -118,6 +121,84 @@ const CalendarView = ({
       updateSelectedDateItems(date);
     }
   };
+
+  // Get events for the current view based on viewMode
+  const getViewTitle = () => {
+    switch (viewMode) {
+      case 'day':
+        return format(selectedDate, "EEEE, MMMM d, yyyy");
+      case 'week': {
+        const weekStart = startOfWeek(selectedDate);
+        const weekEnd = endOfWeek(selectedDate);
+        return `${format(weekStart, "MMM d")} - ${format(weekEnd, "MMM d, yyyy")}`;
+      }
+      case 'month':
+        return format(selectedDate, "MMMM yyyy");
+      case 'home':
+        return "Schedule Overview";
+      default:
+        return format(selectedDate, "MMMM d, yyyy");
+    }
+  };
+
+  const getEventsForCurrentView = () => {
+    switch (viewMode) {
+      case 'day':
+        return { jobs: jobsForSelectedDate, tasks: tasksForSelectedDate };
+      case 'week': {
+        const weekStart = startOfWeek(selectedDate);
+        const weekEnd = endOfWeek(selectedDate);
+        const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+        
+        const weekJobs = jobs.filter(job => {
+          const jobDate = ensureValidDate(job.date);
+          return jobDate && weekDays.some(day => isSameDay(jobDate, day));
+        });
+        
+        const weekTasks = tasks.filter(task => 
+          weekDays.some(day => isSameDay(task.dueDate, day))
+        );
+        
+        return { jobs: weekJobs, tasks: weekTasks };
+      }
+      case 'month': {
+        const monthStart = startOfMonth(selectedDate);
+        const monthEnd = endOfMonth(selectedDate);
+        const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+        
+        const monthJobs = jobs.filter(job => {
+          const jobDate = ensureValidDate(job.date);
+          return jobDate && monthDays.some(day => isSameDay(jobDate, day));
+        });
+        
+        const monthTasks = tasks.filter(task => 
+          monthDays.some(day => isSameDay(task.dueDate, day))
+        );
+        
+        return { jobs: monthJobs, tasks: monthTasks };
+      }
+      case 'home':
+        // Return upcoming events for the next 7 days
+        const today = new Date();
+        const nextWeek = addDays(today, 7);
+        const weekDays = eachDayOfInterval({ start: today, end: nextWeek });
+        
+        const upcomingJobs = jobs.filter(job => {
+          const jobDate = ensureValidDate(job.date);
+          return jobDate && weekDays.some(day => isSameDay(jobDate, day));
+        });
+        
+        const upcomingTasks = tasks.filter(task => 
+          weekDays.some(day => isSameDay(task.dueDate, day))
+        );
+        
+        return { jobs: upcomingJobs, tasks: upcomingTasks };
+      default:
+        return { jobs: jobsForSelectedDate, tasks: tasksForSelectedDate };
+    }
+  };
+
+  const currentViewEvents = getEventsForCurrentView();
 
   return (
     <div className="space-y-6">
@@ -220,18 +301,18 @@ const CalendarView = ({
         <Card className="md:col-span-1">
           <CardHeader>
             <CardTitle className="text-xl">
-              {format(selectedDate, "EEEE, MMMM d, yyyy")}
+              {getViewTitle()}
             </CardTitle>
           </CardHeader>
           <CardContent className="max-h-[500px] overflow-y-auto">
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-3">Jobs ({jobsForSelectedDate.length})</h3>
-                {jobsForSelectedDate.length === 0 ? (
-                  <p className="text-muted-foreground">No jobs scheduled for this day</p>
+                <h3 className="text-lg font-semibold mb-3">Jobs ({currentViewEvents.jobs.length})</h3>
+                {currentViewEvents.jobs.length === 0 ? (
+                  <p className="text-muted-foreground">No jobs scheduled for this {viewMode}</p>
                 ) : (
                   <div className="space-y-3">
-                    {jobsForSelectedDate.map(job => (
+                    {currentViewEvents.jobs.map(job => (
                       <Card key={job.id} className="p-3 shadow-sm">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
@@ -241,6 +322,11 @@ const CalendarView = ({
                           <div className="text-right text-sm">
                             <p>${job.amount}</p>
                             <p className="text-muted-foreground capitalize">{job.status.replace('_', ' ')}</p>
+                            {viewMode !== 'day' && job.date && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {format(job.date instanceof Date ? job.date : new Date(job.date), "MMM d")}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </Card>
@@ -250,12 +336,12 @@ const CalendarView = ({
               </div>
               
               <div>
-                <h3 className="text-lg font-semibold mb-3">Tasks ({tasksForSelectedDate.length})</h3>
-                {tasksForSelectedDate.length === 0 ? (
-                  <p className="text-muted-foreground">No tasks due for this day</p>
+                <h3 className="text-lg font-semibold mb-3">Tasks ({currentViewEvents.tasks.length})</h3>
+                {currentViewEvents.tasks.length === 0 ? (
+                  <p className="text-muted-foreground">No tasks due for this {viewMode}</p>
                 ) : (
                   <div className="space-y-3">
-                    {tasksForSelectedDate.map(task => (
+                    {currentViewEvents.tasks.map(task => (
                       <Card key={task.id} className="p-3 shadow-sm">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
@@ -265,6 +351,11 @@ const CalendarView = ({
                           <div className="text-right text-sm">
                             <p className="capitalize">{task.status}</p>
                             <p className="text-muted-foreground capitalize">{task.priority} priority</p>
+                            {viewMode !== 'day' && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {format(task.dueDate, "MMM d")}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </Card>
@@ -277,7 +368,7 @@ const CalendarView = ({
         </Card>
       </div>
       
-      <UpcomingEvents events={upcomingEvents} />
+      {viewMode === 'home' && <UpcomingEvents events={upcomingEvents} />}
     </div>
   );
 };

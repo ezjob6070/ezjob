@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon } from "lucide-react";
 import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -21,6 +22,7 @@ const Schedule = () => {
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState("calendar");
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
 
   // Sync with global jobs
   useEffect(() => {
@@ -56,6 +58,14 @@ const Schedule = () => {
     updateSelectedDateItems(nextDay);
   };
 
+  const handleViewChange = (newView: CalendarViewMode) => {
+    setViewMode(newView);
+    // If switching to calendar view from another tab
+    if (activeTab !== "calendar") {
+      setActiveTab("calendar");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -75,6 +85,11 @@ const Schedule = () => {
           Show Calendar
         </Button>
       </div>
+
+      <CalendarViewOptions 
+        currentView={viewMode} 
+        onViewChange={handleViewChange} 
+      />
 
       <Tabs 
         defaultValue="calendar" 
@@ -104,6 +119,7 @@ const Schedule = () => {
             jobsForSelectedDate={jobsForSelectedDate}
             tasksForSelectedDate={tasksForSelectedDate}
             updateSelectedDateItems={updateSelectedDateItems}
+            viewMode={viewMode}
           />
         </TabsContent>
         
