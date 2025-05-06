@@ -15,7 +15,7 @@ export const technicianEditSchema = z.object({
     message: "Specialty must be at least 2 characters.",
   }),
   status: z.enum(["active", "inactive", "onLeave"]),
-  paymentType: z.enum(["percentage", "flat", "hourly"]),
+  paymentType: z.enum(["percentage", "flat", "hourly", "salary"]),
   paymentRate: z.string().refine((value) => {
     try {
       const num = parseFloat(value);

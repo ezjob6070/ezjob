@@ -51,12 +51,12 @@ const Index = () => {
     to: addDays(new Date(), 7),
   });
 
-  // Fix: Ensure taskCounts has the correct properties
+  // Fix: Map dashboard task counts to expected property names
   const taskCounts = {
     completed: dashboardTaskCounts.completed,
     inProgress: dashboardTaskCounts.inProgress,
-    scheduled: dashboardTaskCounts.scheduled || dashboardTaskCounts.rescheduled || 0, // Fix property name
-    cancelled: dashboardTaskCounts.cancelled || dashboardTaskCounts.canceled || 0 // Fix property name
+    scheduled: dashboardTaskCounts.rescheduled, // Changed from scheduled to rescheduled
+    cancelled: dashboardTaskCounts.canceled // Changed from cancelled to canceled
   };
   
   const totalTasks = Object.values(taskCounts).reduce((sum, count) => sum + count, 0);
@@ -246,12 +246,12 @@ const Index = () => {
               <PerformanceCard 
                 leadSources={dashboardLeadSources.map(source => ({
                   name: source.name,
-                  count: source.value || 0, // Map value to count
+                  count: source.value, // Map value to count
                   percentage: source.percentage
                 }))}
                 jobTypePerformance={dashboardJobTypePerformance.map(item => ({
                   name: item.name,
-                  count: item.value || 0, // Map value to count
+                  count: item.value, // Map value to count
                   revenue: item.revenue,
                   avgValue: item.avgValue || 0
                 }))}
