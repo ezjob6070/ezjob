@@ -14,4 +14,7 @@ export interface Task {
   technician?: string;
   color?: string;
   type?: string;
+  followUpDate?: Date;
+  hasFollowUp?: boolean;
+  parentTaskId?: string;
 }

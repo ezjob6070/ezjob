@@ -1,4 +1,3 @@
-
 import { Task } from "../types";
 import { addDays, addHours, format, startOfDay, subDays } from "date-fns";
 
@@ -21,7 +20,8 @@ export const mockTasks: Task[] = [
     color: "#3b82f6", // blue
     type: "installation",
     priority: "medium",
-    dueDate: addHours(todayStart, 12)
+    dueDate: addHours(todayStart, 12),
+    hasFollowUp: false
   },
   {
     id: "task-2",
@@ -33,11 +33,13 @@ export const mockTasks: Task[] = [
     location: "North Innovation District",
     client: { name: "TechFuture Investments" },
     technician: "Sarah Johnson",
-    status: "scheduled",
+    status: "in progress",
     color: "#10b981", // green
     type: "inspection",
     priority: "high",
-    dueDate: addHours(todayStart, 16)
+    dueDate: addHours(todayStart, 16),
+    hasFollowUp: true,
+    followUpDate: addDays(todayStart, 7)
   },
   {
     id: "task-3",
@@ -49,11 +51,30 @@ export const mockTasks: Task[] = [
     location: "Harbor District",
     client: { name: "Global Hospitality Group" },
     technician: "Michael Rodriguez",
-    status: "scheduled",
+    status: "overdue",
     color: "#f59e0b", // amber
     type: "repair",
     priority: "urgent",
-    dueDate: addDays(addHours(todayStart, 13), 1)
+    dueDate: addDays(addHours(todayStart, 13), 1),
+    hasFollowUp: false
+  },
+  {
+    id: "task-3-followup",
+    title: "Follow-up: Plumbing Repair Verification",
+    start: addDays(addHours(todayStart, 10), 2).toISOString(),
+    end: addDays(addHours(todayStart, 12), 2).toISOString(),
+    allDay: false,
+    description: "Verify repair fixed the leak in hotel basement",
+    location: "Harbor District",
+    client: { name: "Global Hospitality Group" },
+    technician: "Michael Rodriguez",
+    status: "scheduled",
+    color: "#4f46e5", // indigo
+    type: "follow-up",
+    priority: "high",
+    dueDate: addDays(addHours(todayStart, 12), 2),
+    hasFollowUp: false,
+    parentTaskId: "task-3"
   },
   {
     id: "task-4",
@@ -327,5 +348,109 @@ export const mockTasks: Task[] = [
     type: "maintenance",
     priority: "medium",
     dueDate: addDays(addHours(todayStart, 18), 9)
+  },
+  {
+    id: "task-21",
+    title: "Client Follow-up Call",
+    start: addHours(todayStart, 13).toISOString(),
+    end: addHours(todayStart, 14).toISOString(),
+    allDay: false,
+    description: "Call client to discuss recent installation and address any concerns",
+    location: "Office",
+    client: { name: "Northern Medical Center" },
+    technician: "David Garcia",
+    status: "scheduled",
+    color: "#8b5cf6", // purple
+    type: "follow-up",
+    priority: "medium",
+    dueDate: addHours(todayStart, 14),
+    hasFollowUp: false
+  },
+  {
+    id: "task-22",
+    title: "Equipment Calibration",
+    start: addHours(todayStart, 15).toISOString(),
+    end: addHours(todayStart, 17).toISOString(),
+    allDay: false,
+    description: "Calibrate sensitive medical equipment for the new wing",
+    location: "Eastside Hospital",
+    client: { name: "Eastside Healthcare Systems" },
+    technician: "Jennifer Lopez",
+    status: "scheduled",
+    color: "#059669", // emerald
+    type: "maintenance",
+    priority: "high",
+    dueDate: addHours(todayStart, 17),
+    hasFollowUp: false
+  },
+  {
+    id: "task-23",
+    title: "Monthly System Audit",
+    start: addDays(todayStart, 1).toISOString(),
+    end: addDays(addHours(todayStart, 4), 1).toISOString(),
+    allDay: false,
+    description: "Perform comprehensive security system audit for corporate headquarters",
+    location: "Financial District",
+    client: { name: "Global Investments Corp" },
+    technician: "Michael Rodriguez",
+    status: "scheduled",
+    color: "#0ea5e9", // sky blue
+    type: "audit",
+    priority: "medium",
+    dueDate: addDays(addHours(todayStart, 4), 1),
+    hasFollowUp: false
+  },
+  {
+    id: "task-24",
+    title: "Follow-up Training Session",
+    start: addDays(addHours(todayStart, 10), 2).toISOString(),
+    end: addDays(addHours(todayStart, 14), 2).toISOString(),
+    allDay: false,
+    description: "Conduct training session for staff on new security protocols",
+    location: "West Tower, Training Room B",
+    client: { name: "Secure Financial Partners" },
+    technician: "Sarah Johnson",
+    status: "scheduled",
+    color: "#4f46e5", // indigo
+    type: "training",
+    priority: "low",
+    dueDate: addDays(addHours(todayStart, 14), 2),
+    hasFollowUp: true,
+    followUpDate: addDays(todayStart, 9)
+  },
+  {
+    id: "task-24-followup",
+    title: "Training Effectiveness Assessment",
+    start: addDays(addHours(todayStart, 10), 9).toISOString(),
+    end: addDays(addHours(todayStart, 12), 9).toISOString(),
+    allDay: false,
+    description: "Assess effectiveness of the security protocol training",
+    location: "West Tower",
+    client: { name: "Secure Financial Partners" },
+    technician: "Sarah Johnson",
+    status: "scheduled",
+    color: "#4f46e5", // indigo
+    type: "follow-up",
+    priority: "low",
+    dueDate: addDays(addHours(todayStart, 12), 9),
+    hasFollowUp: false,
+    parentTaskId: "task-24"
+  },
+  {
+    id: "task-25",
+    title: "Emergency Generator Testing",
+    start: addDays(addHours(todayStart, 8), 3).toISOString(),
+    end: addDays(addHours(todayStart, 11), 3).toISOString(),
+    allDay: false,
+    description: "Test emergency generator systems at data center",
+    location: "North Data Center",
+    client: { name: "CloudTech Solutions" },
+    technician: "Robert Taylor",
+    status: "scheduled",
+    color: "#dc2626", // red
+    type: "testing",
+    priority: "high",
+    dueDate: addDays(addHours(todayStart, 11), 3),
+    hasFollowUp: false
   }
 ];
