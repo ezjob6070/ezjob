@@ -122,13 +122,38 @@ const Technicians = () => {
   const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
 
   return (
-    <div className="space-y-8 py-8">
+    <div className="space-y-6 py-8">
       <TechnicianTabs currentTab="list" />
       
       <TechniciansPageHeader 
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}
       />
+      
+      {/* Role Filter Buttons - Moved to top of page */}
+      <div className="grid grid-cols-3 gap-4 mb-6 mt-4">
+        <Button
+          variant={roleFilter === "all" ? "default" : "outline"}
+          onClick={() => setRoleFilter("all")}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "all" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+        >
+          All Staff ({globalTechnicians.length})
+        </Button>
+        <Button
+          variant={roleFilter === "technician" ? "default" : "outline"}
+          onClick={() => setRoleFilter("technician")}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "technician" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+        >
+          Technicians ({technicianCount})
+        </Button>
+        <Button
+          variant={roleFilter === "salesman" ? "default" : "outline"}
+          onClick={() => setRoleFilter("salesman")}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "salesman" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+        >
+          Salesmen ({salesmanCount})
+        </Button>
+      </div>
 
       <TechnicianStats technicians={globalTechnicians} />
       
@@ -138,32 +163,6 @@ const Technicians = () => {
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
           />
-        </div>
-        
-        <div className="mb-8">
-          <div className="grid grid-cols-3 gap-4">
-            <Button
-              variant={roleFilter === "all" ? "default" : "outline"}
-              onClick={() => setRoleFilter("all")}
-              className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "all" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
-            >
-              All Staff ({globalTechnicians.length})
-            </Button>
-            <Button
-              variant={roleFilter === "technician" ? "default" : "outline"}
-              onClick={() => setRoleFilter("technician")}
-              className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "technician" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
-            >
-              Technicians ({technicianCount})
-            </Button>
-            <Button
-              variant={roleFilter === "salesman" ? "default" : "outline"}
-              onClick={() => setRoleFilter("salesman")}
-              className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "salesman" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
-            >
-              Salesmen ({salesmanCount})
-            </Button>
-          </div>
         </div>
         
         <TechnicianFilters 
