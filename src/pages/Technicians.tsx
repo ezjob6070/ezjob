@@ -123,7 +123,17 @@ const Technicians = () => {
 
   return (
     <div className="space-y-6 py-8">
-      {/* Role Filter Buttons - At the top of page */}
+      {/* Page Header - Now at the very top */}
+      <div className="mb-2">
+        <h1 className="text-2xl font-bold leading-tight tracking-tighter">
+          Team Members
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Manage your technicians, salesmen and their payment structures
+        </p>
+      </div>
+      
+      {/* Role Filter Buttons - Under the header */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
@@ -155,6 +165,7 @@ const Technicians = () => {
         </Button>
       </div>
       
+      {/* Action buttons */}
       <TechniciansPageHeader 
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}
@@ -200,6 +211,7 @@ const Technicians = () => {
         onToggleSelect={toggleTechnician}
         onEditTechnician={handleEditTechnician}
         showSalaryData={isSalaryDataVisible}
+        displayMode="card"
       />
       
       <AddTechnicianModal 

@@ -16,12 +16,105 @@ export function useTechniciansData() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [departments, setDepartments] = useState<string[]>([]);
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  
+  // Extract unique categories and departments
+  const categories = useMemo(() => {
+    return Array.from(new Set(
+      technicians.map(tech => tech.category || "Uncategorized")
+    ));
+  }, [technicians]);
+  
+  const departments = useMemo(() => {
+    return Array.from(new Set(
+      technicians.map(tech => tech.department || "General")
+    ));
+  }, [technicians]);
 
-  // Update handleSearchChange to accept a string directly
+  // Filtered technicians based on all criteria
+  const filteredTechnicians = useMemo(() => {
+    return technicians
+      .filter(tech => {
+        const matchesSearch = searchQuery === "" || 
+          tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
+        
+        const matchesCategory = selectedCategories.length === 0 || 
+          selectedCategories.includes(tech.category || "Uncategorized");
+        
+        const matchesStatus = statusFilter === "all" || 
+          tech.status === statusFilter;
+        
+        const matchesDepartment = selectedDepartments.length === 0 ||
+          selectedDepartments.includes(tech.department || "General");
+        
+        const matchesDateRange = !dateRange?.from ||
+          (tech.hireDate && new Date(tech.hireDate) >= dateRange.from &&
+          (!dateRange.to || new Date(tech.hireDate) <= dateRange.to));
+          
+        const matchesRole = roleFilter === "all" ||
+          (tech.role || "technician") === roleFilter;
+        
+        return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange && matchesRole;
+      })
+      .sort((a, b) => {
+        switch (sortOption) {
+          case "newest":
+            return new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime();
+          case "oldest":
+            return new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime();
+          case "name-asc":
+            return a.name.localeCompare(b.name);
+          case "name-desc":
+            return b.name.localeCompare(a.name);
+          case "revenue-high":
+            return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+          case "revenue-low":
+            return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+          default:
+            return 0;
+        }
+      });
+  }, [technicians, searchQuery, selectedCategories, statusFilter, selectedDepartments, dateRange, roleFilter, sortOption]);
+
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
+  };
+
+  const toggleTechnician = (technicianId: string) => {
+    setSelectedTechnicians(prev => {
+      if (prev.includes(technicianId)) {
+        return prev.filter(id => id !== technicianId);
+      } else {
+        return [...prev, technicianId];
+      }
+    });
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(category)) {
+        return prev.filter(c => c !== category);
+      } else {
+        return [...prev, category];
+      }
+    });
+  };
+  
+  const toggleDepartment = (department: string) => {
+    setSelectedDepartments(prev => {
+      if (prev.includes(department)) {
+        return prev.filter(d => d !== department);
+      } else {
+        return [...prev, department];
+      }
+    });
+  };
+
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
   };
 
   const addCategory = (category: string) => {
@@ -30,137 +123,31 @@ export function useTechniciansData() {
       description: `New category "${category}" has been added.`,
     });
   };
-
-  const toggleTechnician = (technicianId: string) => {
-    setSelectedTechnicians((prevSelected) =>
-      prevSelected.includes(technicianId)
-        ? prevSelected.filter((id) => id !== technicianId)
-        : [...prevSelected, technicianId]
-    );
-  };
-
-  const toggleCategory = (category: string) => {
-    setSelectedCategories((prevSelected) =>
-      prevSelected.includes(category)
-        ? prevSelected.filter((c) => c !== category)
-        : [...prevSelected, category]
-    );
-  };
-
-  const toggleDepartment = (department: string) => {
-    setSelectedDepartments((prevSelected) =>
-      prevSelected.includes(department)
-        ? prevSelected.filter((d) => d !== department)
-        : [...prevSelected, department]
-    );
-  };
-
-  const handleSortChange = (option: SortOption) => {
-    setSortOption(option);
-  };
-
+  
   const exportTechnicians = () => {
-    const csvRows = [];
-    const headers = Object.keys(technicians[0]);
-    csvRows.push(headers.join(','));
-
-    for (const technician of technicians) {
-      const values = headers.map(header => technician[header]);
-      csvRows.push(values.join(','));
-    }
-
-    const csvData = csvRows.join('\n');
-    const blob = new Blob([csvData], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'technicians.csv');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const dataToExport = filteredTechnicians;
+    const json = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const href = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = 'staff-export.json';
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+    
+    toast({
+      title: "Export Successful",
+      description: `Exported ${dataToExport.length} staff records to JSON.`,
+    });
   };
 
   return {
     technicians,
-    filteredTechnicians: useMemo(() => {
-      let filtered = [...technicians];
-
-      if (searchQuery) {
-        const searchTerm = searchQuery.toLowerCase();
-        filtered = filtered.filter((technician) =>
-          technician.name.toLowerCase().includes(searchTerm) ||
-          technician.email?.toLowerCase().includes(searchTerm) ||
-          technician.phone.toLowerCase().includes(searchTerm) ||
-          technician.specialty.toLowerCase().includes(searchTerm)
-        );
-      }
-
-      if (selectedCategories.length > 0) {
-        filtered = filtered.filter((technician) =>
-          selectedCategories.includes(technician.specialty)
-        );
-      }
-
-      if (selectedDepartments.length > 0) {
-        filtered = filtered.filter((technician) =>
-          selectedDepartments.includes(technician.department || "")
-        );
-      }
-
-      if (statusFilter !== "all") {
-        filtered = filtered.filter((technician) => technician.status === statusFilter);
-      }
-
-      if (dateRange?.from && dateRange?.to) {
-        filtered = filtered.filter((technician) => {
-          const hireDate = new Date(technician.hireDate);
-          return hireDate >= dateRange.from! && hireDate <= dateRange.to!;
-        });
-      }
-
-      switch (sortOption) {
-        case "name":
-        case "name-asc":
-          filtered.sort((a, b) => a.name.localeCompare(b.name));
-          break;
-        case "name-desc":
-          filtered.sort((a, b) => b.name.localeCompare(a.name));
-          break;
-        case "rating":
-          filtered.sort((a, b) => b.rating - a.rating);
-          break;
-        case "completedJobs":
-        case "jobs-high":
-          filtered.sort((a, b) => b.completedJobs - a.completedJobs);
-          break;
-        case "jobs-low":
-          filtered.sort((a, b) => a.completedJobs - b.completedJobs);
-          break;
-        case "revenue":
-        case "revenue-high":
-          filtered.sort((a, b) => b.totalRevenue - a.totalRevenue);
-          break;
-        case "revenue-low":
-          filtered.sort((a, b) => a.totalRevenue - b.totalRevenue);
-          break;
-        case "profit-high":
-          filtered.sort((a, b) => (b.totalRevenue * 0.4) - (a.totalRevenue * 0.4));
-          break;
-        case "profit-low":
-          filtered.sort((a, b) => (a.totalRevenue * 0.4) - (b.totalRevenue * 0.4));
-          break;
-        case "newest":
-          filtered.sort((a, b) => new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime());
-          break;
-        case "oldest":
-          filtered.sort((a, b) => new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime());
-          break;
-        default:
-          break;
-      }
-
-      return filtered;
-    }, [technicians, searchQuery, selectedCategories, selectedDepartments, statusFilter, sortOption, dateRange]),
+    filteredTechnicians,
     searchQuery,
     selectedTechnicians,
     selectedCategories,
@@ -168,8 +155,10 @@ export function useTechniciansData() {
     statusFilter,
     sortOption,
     dateRange,
+    roleFilter,
     categories,
     departments,
+    setTechnicians,
     handleSearchChange,
     toggleTechnician,
     toggleCategory,
@@ -177,9 +166,8 @@ export function useTechniciansData() {
     handleSortChange,
     setStatusFilter,
     setDateRange,
+    setRoleFilter,
     addCategory,
-    setTechnicians,
-    setDepartments,
     exportTechnicians
   };
 }
