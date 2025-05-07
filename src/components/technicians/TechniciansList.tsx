@@ -36,12 +36,8 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
   const contractorCount = technicians.filter(t => t.role === "contractor").length;
 
   // Handle clicking on a technician card
-  const handleCardClick = (technician: Technician) => {
-    if (onEditTechnician) {
-      onEditTechnician(technician);
-    } else {
-      navigate(`/technicians/${technician.id}`);
-    }
+  const handleCardClick = (technicianId: string) => {
+    navigate(`/technicians/${technicianId}`);
   };
 
   // Role legend for quick visual reference
@@ -88,7 +84,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
                 technician={technician}
                 selected={selectedTechnicians?.includes(technician.id) || false}
                 onSelect={onToggleSelect || (() => {})}
-                onClick={() => handleCardClick(technician)}
+                onClick={handleCardClick}
               />
             ))}
             {technicians.length === 0 && (
