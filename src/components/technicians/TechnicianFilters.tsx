@@ -1,270 +1,244 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
+import React, { useState } from "react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { DateRange } from "react-day-picker";
+import { UserPlus, Filter, ChevronDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Technician, StaffRole } from "@/types/technician";
-import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { SortOption } from "@/types/sortOptions";
-import RoleFilter from "./filters/RoleFilter";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DateRange } from "react-day-picker";
+import DateRangeSelector from "@/components/finance/DateRangeSelector";
+
+import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
+import { Technician } from "@/types/technician";
+import TechnicianSelectDropdown from "./filters/TechnicianSelectDropdown";
+import DateSortFilter from "./filters/DateSortFilter";
+
+// Define extended sort options
+type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
 
 interface TechnicianFiltersProps {
   categories: string[];
   selectedCategories: string[];
   toggleCategory: (category: string) => void;
-  addCategory?: (category: string) => void;
+  addCategory: (category: string) => void;
   status: string;
-  onStatusChange: (value: string) => void;
-  technicians: Technician[];
-  selectedTechnicians: string[];
-  onTechnicianToggle: (techId: string) => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  sortOption: SortOption;
-  onSortChange: (option: SortOption) => void;
+  onStatusChange: (status: string) => void;
+  technicians?: Technician[];
+  selectedTechnicians?: string[];
+  onTechnicianToggle?: (technicianId: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  sortOption?: SortOption;
+  onSortChange?: (option: SortOption) => void;
   date?: DateRange | undefined;
   setDate?: (date: DateRange | undefined) => void;
   departments?: string[];
   selectedDepartments?: string[];
   toggleDepartment?: (department: string) => void;
-  selectedRole?: StaffRole | "all";
-  onRoleChange?: (role: StaffRole | "all") => void;
 }
 
-const TechnicianFilters = ({
+const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   categories,
   selectedCategories,
   toggleCategory,
   addCategory,
   status,
   onStatusChange,
-  technicians,
-  selectedTechnicians,
+  technicians = [],
+  selectedTechnicians = [],
   onTechnicianToggle,
-  searchQuery,
-  onSearchChange,
-  sortOption,
+  sortOption = "newest",
   onSortChange,
   date,
   setDate,
   departments = [],
   selectedDepartments = [],
-  toggleDepartment = () => {},
-  selectedRole = "all",
-  onRoleChange = () => {},
-}: TechnicianFiltersProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showAllCategories, setShowAllCategories] = useState(false);
-  const [showAllDepartments, setShowAllDepartments] = useState(false);
-  const [showAllTechnicians, setShowAllTechnicians] = useState(false);
+  toggleDepartment
+}) => {
+  const [technicianDropdownOpen, setTechnicianDropdownOpen] = React.useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
-  const visibleCategories = showAllCategories ? categories : categories.slice(0, 5);
-  const visibleDepartments = showAllDepartments ? departments : departments.slice(0, 5);
-  const visibleTechnicians = showAllTechnicians ? technicians : technicians.slice(0, 5);
-
+  // Create safe copies of arrays to prevent "undefined is not iterable" errors
+  const safeDepartments = departments || [];
+  const safeSelectedDepartments = selectedDepartments || [];
+  
   return (
-    <Card>
-      <CardHeader className="px-4 py-3">
-        <CardTitle className="text-base font-medium">Filters</CardTitle>
-      </CardHeader>
-      <CardContent className="px-4 py-3 grid gap-6">
-        {/* Role Filter */}
-        <RoleFilter 
-          selectedRole={selectedRole} 
-          onRoleChange={onRoleChange} 
+    <div className="space-y-4 w-full">
+      {/* Top row with main filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <CategoryFilter 
+          categories={categories}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          addCategory={addCategory}
         />
-
-        {/* Status Filter */}
-        <div className="flex flex-col space-y-2">
-          <div className="text-sm font-medium">Status</div>
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant={status === "all" ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/90"
-              onClick={() => onStatusChange("all")}
-            >
-              All
-            </Badge>
-            <Badge
-              variant={status === "active" ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/90"
-              onClick={() => onStatusChange("active")}
-            >
-              Active
-            </Badge>
-            <Badge
-              variant={status === "inactive" ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/90"
-              onClick={() => onStatusChange("inactive")}
-            >
-              Inactive
-            </Badge>
-            <Badge
-              variant={status === "onLeave" ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/90"
-              onClick={() => onStatusChange("onLeave")}
-            >
-              On Leave
-            </Badge>
+        
+        <Select value={status} onValueChange={onStatusChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="onLeave">On Leave</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        {/* Date filter - simplified */}
+        {setDate && date && (
+          <div className="w-[220px]">
+            <DateRangeSelector date={date} setDate={setDate} />
           </div>
-        </div>
+        )}
 
-        {/* Category Filter */}
-        <div className="flex flex-col space-y-2">
-          <div className="text-sm font-medium">Categories</div>
-          <div className="flex flex-wrap gap-2">
-            {visibleCategories.map((category) => (
-              <Badge
-                key={category}
-                variant={selectedCategories.includes(category) ? "default" : "outline"}
-                className="cursor-pointer hover:bg-primary/90"
-                onClick={() => toggleCategory(category)}
-              >
-                {category}
-              </Badge>
-            ))}
-            {categories.length > 5 && (
-              <Button
-                variant="link"
-                className="p-0 text-sm"
-                onClick={() => setShowAllCategories(!showAllCategories)}
-              >
-                {showAllCategories ? "Show Less" : "Show All"}
+        {/* Department filter if available */}
+        {safeDepartments.length > 0 && toggleDepartment && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <UserPlus className="h-4 w-4" />
+                Departments
+                {safeSelectedDepartments.length > 0 && (
+                  <Badge variant="secondary" className="ml-1">{safeSelectedDepartments.length}</Badge>
+                )}
               </Button>
-            )}
-            {addCategory && (
-              <Button
-                variant="link"
-                className="p-0 text-sm"
-                onClick={() => {
-                  const newCategory = prompt("Enter new category name:");
-                  if (newCategory) {
-                    addCategory(newCategory);
-                  }
-                }}
-              >
-                Add Category
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Department Filter */}
-        {departments.length > 0 && (
-          <div className="flex flex-col space-y-2">
-            <div className="text-sm font-medium">Departments</div>
-            <div className="flex flex-wrap gap-2">
-              {visibleDepartments.map((department) => (
-                <Badge
-                  key={department}
-                  variant={selectedDepartments.includes(department) ? "default" : "outline"}
-                  className="cursor-pointer hover:bg-primary/90"
-                  onClick={() => toggleDepartment(department)}
-                >
-                  {department}
-                </Badge>
-              ))}
-              {departments.length > 5 && (
-                <Button
-                  variant="link"
-                  className="p-0 text-sm"
-                  onClick={() => setShowAllDepartments(!showAllDepartments)}
-                >
-                  {showAllDepartments ? "Show Less" : "Show All"}
-                </Button>
-              )}
+            </PopoverTrigger>
+            <PopoverContent className="w-72" align="start" side="bottom" avoidCollisions={false}>
+              <div className="space-y-2">
+                <div className="font-medium">Filter by Department</div>
+                <Separator />
+                <div className="h-48 overflow-y-auto space-y-1">
+                  {safeDepartments.map((department) => (
+                    <div key={department} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`department-${department}`} 
+                        checked={safeSelectedDepartments.includes(department)}
+                        onCheckedChange={() => toggleDepartment(department)}
+                      />
+                      <Label htmlFor={`department-${department}`} className="cursor-pointer">{department}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+        
+        {/* Enhanced date/name/revenue sort filter */}
+        {onSortChange && (
+          <DateSortFilter
+            sortOption={sortOption}
+            onSortChange={onSortChange}
+          />
+        )}
+        
+        {/* Simplified Technician dropdown that only shows the list */}
+        {technicians.length > 0 && onTechnicianToggle && (
+          <TechnicianSelectDropdown
+            technicians={technicians}
+            selectedTechnicians={selectedTechnicians}
+            onTechnicianToggle={onTechnicianToggle}
+            dropdownOpen={technicianDropdownOpen}
+            setDropdownOpen={setTechnicianDropdownOpen}
+          />
+        )}
+        
+        {/* Advanced filters toggle */}
+        <Popover open={showAdvancedFilters} onOpenChange={setShowAdvancedFilters}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="ml-auto gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Advanced Filters
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="end" side="bottom" avoidCollisions={false}>
+            <div className="space-y-4">
+              <div className="font-medium">Advanced Filters</div>
+              <Separator />
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Experience Level</h3>
+                  <RadioGroup defaultValue="all">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="all" id="exp-all" />
+                      <Label htmlFor="exp-all">All Levels</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="junior" id="exp-junior" />
+                      <Label htmlFor="exp-junior">Junior (0-2 years)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="mid" id="exp-mid" />
+                      <Label htmlFor="exp-mid">Mid-Level (2-5 years)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="senior" id="exp-senior" />
+                      <Label htmlFor="exp-senior">Senior (5+ years)</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Payment Type</h3>
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="payment-percentage" />
+                      <Label htmlFor="payment-percentage">Percentage</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="payment-flat" />
+                      <Label htmlFor="payment-flat">Flat Rate</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="payment-hourly" />
+                      <Label htmlFor="payment-hourly">Hourly</Label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Rating</h3>
+                  <RadioGroup defaultValue="all">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="all" id="rating-all" />
+                      <Label htmlFor="rating-all">All Ratings</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="5" id="rating-5" />
+                      <Label htmlFor="rating-5">5 Stars</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="4+" id="rating-4" />
+                      <Label htmlFor="rating-4">4+ Stars</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="3+" id="rating-3" />
+                      <Label htmlFor="rating-3">3+ Stars</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Date Range Picker */}
-        {setDate && (
-          <div className="flex flex-col space-y-2">
-            <div className="text-sm font-medium">Date Range</div>
-            <Popover open={isOpen} onOpenChange={setIsOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[300px] justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date?.from ? (
-                    date.to ? (
-                      `${date.from?.toLocaleDateString()} - ${date.to?.toLocaleDateString()}`
-                    ) : (
-                      date.from?.toLocaleDateString()
-                    )
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="range"
-                  defaultMonth={date?.from}
-                  selected={date}
-                  onSelect={setDate}
-                  numberOfMonths={2}
-                  pagedNavigation
-                  className="border-0 rounded-md"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        )}
-
-        {/* Sort Options */}
-        <div className="flex flex-col space-y-2">
-          <div className="text-sm font-medium">Sort By</div>
-          <div className="grid grid-cols-1 gap-2">
-            <Button
-              variant={sortOption === "newest" ? "default" : "outline"}
-              onClick={() => onSortChange("newest")}
-            >
-              Newest
-            </Button>
-            <Button
-              variant={sortOption === "oldest" ? "default" : "outline"}
-              onClick={() => onSortChange("oldest")}
-            >
-              Oldest
-            </Button>
-            <Button
-              variant={sortOption === "name-asc" ? "default" : "outline"}
-              onClick={() => onSortChange("name-asc")}
-            >
-              Name (A-Z)
-            </Button>
-            <Button
-              variant={sortOption === "name-desc" ? "default" : "outline"}
-              onClick={() => onSortChange("name-desc")}
-            >
-              Name (Z-A)
-            </Button>
-            <Button
-              variant={sortOption === "revenue-high" ? "default" : "outline"}
-              onClick={() => onSortChange("revenue-high")}
-            >
-              Revenue (High to Low)
-            </Button>
-            <Button
-              variant={sortOption === "revenue-low" ? "default" : "outline"}
-              onClick={() => onSortChange("revenue-low")}
-            >
-              Revenue (Low to High)
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
   );
 };
 

@@ -1,8 +1,6 @@
 
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "annually" | "commission" | "yearly";
 
-export type StaffRole = "technician" | "salesman";
-
 export interface Technician {
   id: string;
   name: string;
@@ -35,5 +33,4 @@ export interface Technician {
   skills?: string[];
   jobCategories?: string[];
   yearsExperience?: number;
-  role?: StaffRole;
 }

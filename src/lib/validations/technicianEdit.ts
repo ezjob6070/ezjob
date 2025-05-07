@@ -36,7 +36,6 @@ export const technicianEditSchema = z.object({
   incentiveAmount: z.string().optional(),
   profileImage: z.string().nullable().optional(),
   contractType: z.string().optional(),
-  role: z.enum(["technician", "salesman"]).default("technician"),
 });
 
 export type TechnicianEditFormValues = z.infer<typeof technicianEditSchema>;

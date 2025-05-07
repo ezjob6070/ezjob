@@ -32,5 +32,4 @@ export const technicianSchema = z.object({
   incentiveType: z.enum(["bonus", "commission", "none", "hourly", "weekly", "monthly"]).optional(),
   incentiveAmount: z.string().optional(),
   profileImage: z.string().optional(),
-  role: z.enum(["technician", "salesman"]).default("technician"),
 });

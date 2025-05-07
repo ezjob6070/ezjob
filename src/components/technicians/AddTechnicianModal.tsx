@@ -35,7 +35,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { TechnicianDateField } from "./form/TechnicianDateField";
 import { TechnicianImageUpload } from "./TechnicianImageUpload";
-import { TechnicianRoleField } from "./form/TechnicianRoleField";
 
 export interface AddTechnicianModalProps {
   open: boolean;
@@ -63,7 +62,6 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       paymentRate: "50",
       hireDate: "",
       notes: "",
-      role: "technician",
     },
   });
   
@@ -98,8 +96,6 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       // Default salary-related fields
       salaryBasis: values.salaryBasis || "hourly",
       hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : 0,
-      // Include the staff role
-      role: values.role,
     };
     
     onAddTechnician(newTechnician);
@@ -107,15 +103,12 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
     form.reset();
     onOpenChange(false);
   }
-
-  // Get title based on selected role
-  const modalTitle = form.watch("role") === "salesman" ? "Add New Salesman" : "Add New Technician";
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{modalTitle}</DialogTitle>
+          <DialogTitle>Add New Technician</DialogTitle>
         </DialogHeader>
         
         <Form {...form}>
@@ -129,15 +122,12 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Role selection field */}
-              <TechnicianRoleField control={form.control} />
-              
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{form.watch("role") === "salesman" ? "Salesman Name *" : "Technician Name *"}</FormLabel>
+                    <FormLabel>Technician Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter name" {...field} />
                     </FormControl>
@@ -319,7 +309,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Additional notes about the ${form.watch("role") === "salesman" ? "salesman" : "technician"}`}
+                      placeholder="Additional notes about the technician"
                       className="min-h-[100px]"
                       {...field}
                     />
@@ -333,9 +323,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit">
-                {form.watch("role") === "salesman" ? "Add Salesman" : "Add Technician"}
-              </Button>
+              <Button type="submit">Add Technician</Button>
             </DialogFooter>
           </form>
         </Form>

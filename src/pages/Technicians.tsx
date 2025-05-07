@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Technician, StaffRole } from "@/types/technician";
+import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
@@ -14,13 +14,11 @@ import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
-  const [selectedRole, setSelectedRole] = useState<StaffRole | "all">("all");
   
   const { technicians: globalTechnicians, addTechnician, updateTechnician } = useGlobalState();
   
@@ -65,11 +63,6 @@ const Technicians = () => {
     }
   }, [globalTechnicians, setTechnicians]);
 
-  // Apply role filter to filteredTechnicians
-  const roleFilteredTechnicians = selectedRole === "all" 
-    ? filteredTechnicians
-    : filteredTechnicians.filter(tech => tech.role === selectedRole);
-
   const handleEditTechnician = (technician: Technician) => {
     setSelectedTechnician(technician);
     setShowEditModal(true);
@@ -112,42 +105,18 @@ const Technicians = () => {
     setShowEditModal(false);
   };
 
-  const handleRoleChange = (role: StaffRole | "all") => {
-    setSelectedRole(role);
-  };
-
   const isSalaryDataVisible = !selectedDepartments || selectedDepartments.length === 0 || selectedDepartments.includes("Finance");
-
-  // Get the appropriate title based on selected role
-  const getPageTitle = () => {
-    switch(selectedRole) {
-      case "technician": return "Technicians";
-      case "salesman": return "Salesmen";
-      default: return "Staff Management";
-    }
-  };
 
   return (
     <div className="space-y-8 py-8">
       <TechnicianTabs currentTab="list" />
       
-      <div className="mb-6">
-        <Tabs defaultValue="all" onValueChange={(value) => setSelectedRole(value as StaffRole | "all")}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="all">All Staff</TabsTrigger>
-            <TabsTrigger value="technician">Technicians</TabsTrigger>
-            <TabsTrigger value="salesman">Salesmen</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      
       <TechniciansPageHeader 
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}
-        title={getPageTitle()}
       />
 
-      <TechnicianStats technicians={roleFilteredTechnicians} />
+      <TechnicianStats technicians={globalTechnicians} />
       
       <div className="mb-6">
         <div className="mb-4">
@@ -176,13 +145,11 @@ const Technicians = () => {
           departments={departments}
           selectedDepartments={selectedDepartments}
           toggleDepartment={toggleDepartment}
-          selectedRole={selectedRole}
-          onRoleChange={handleRoleChange}
         />
       </div>
       
       <TechniciansList 
-        technicians={roleFilteredTechnicians}
+        technicians={filteredTechnicians}
         selectedTechnicians={selectedTechnicians}
         onToggleSelect={toggleTechnician}
         onEditTechnician={handleEditTechnician}
