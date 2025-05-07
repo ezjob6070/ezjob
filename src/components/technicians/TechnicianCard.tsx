@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Technician } from "@/types/technician";
-import { Wrench, Briefcase, UserCheck } from "lucide-react";
+import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
 
 interface TechnicianCardProps {
   technician: Technician;
@@ -58,6 +58,17 @@ export default function TechnicianCard({
           gradientFrom: "from-purple-50",
           gradientTo: "to-purple-100",
           iconBg: "bg-purple-500"
+        };
+      case "contractor":
+        return {
+          color: "#F97316", // Bright Orange
+          bgColor: "#FFEDD5",
+          icon: <Hammer className="h-4 w-4 text-[#F97316]" />,
+          label: "Contractor",
+          borderHover: "hover:border-[#F97316]",
+          gradientFrom: "from-orange-50",
+          gradientTo: "to-orange-100",
+          iconBg: "bg-orange-500"
         };
       default:
         return {

@@ -1,5 +1,5 @@
 
-export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "annually" | "commission" | "yearly";
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly";
 
 export interface Technician {
   id: string;
@@ -11,27 +11,53 @@ export interface Technician {
   department?: string;
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
+  hireDate: string;
   specialty: string;
   paymentType: "percentage" | "flat" | "hourly" | "salary";
   paymentRate: number;
-  salaryBasis: SalaryBasis;
   hourlyRate: number;
-  incentiveAmount?: number;
-  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
+  salaryBasis: SalaryBasis;
   completedJobs: number;
   cancelledJobs: number;
   totalRevenue: number;
   rating: number;
+  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
+  incentiveAmount?: number;
+  notes?: string;
   profileImage?: string;
   imageUrl?: string;
-  initials: string;
-  hireDate: string;
-  notes?: string;
-  category?: string;
-  contractType?: string;
   certifications?: string[];
   skills?: string[];
-  jobCategories?: string[];
   yearsExperience?: number;
-  role?: "technician" | "salesman" | "employed";
+  documents?: Document[];
+  category?: string;
+  role?: "technician" | "salesman" | "employed" | "contractor";
+  initials: string;
+}
+
+export interface Document {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  uploadDate: string;
+  size?: number;
+}
+
+export interface TechnicianFilters {
+  search: string;
+  paymentTypes: string[];
+  status: string[];
+  categories: string[];
+  dateRange?: {
+    from: Date;
+    to: Date;
+  };
+}
+
+export interface FinancialSummary {
+  totalRevenue: number;
+  totalJobs: number;
+  averageJobValue: number;
+  paymentsDue: number;
 }

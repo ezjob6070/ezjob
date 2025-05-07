@@ -4,11 +4,11 @@ import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/for
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Control } from "react-hook-form";
 import { Label } from "@/components/ui/label";
-import { Wrench, Briefcase, UserCheck } from "lucide-react";
+import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
 
 interface TechnicianRoleFieldProps {
   control: Control<any>;
-  defaultValue?: "technician" | "salesman" | "employed";
+  defaultValue?: "technician" | "salesman" | "employed" | "contractor";
 }
 
 export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({
@@ -27,7 +27,7 @@ export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({
             <RadioGroup
               onValueChange={field.onChange}
               defaultValue={field.value}
-              className="grid grid-cols-3 gap-4"
+              className="grid grid-cols-4 gap-4"
             >
               <div>
                 <RadioGroupItem
@@ -71,6 +71,21 @@ export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({
                 >
                   <UserCheck className="mb-2 h-5 w-5 text-purple-600" />
                   Employed
+                </Label>
+              </div>
+              
+              <div>
+                <RadioGroupItem
+                  value="contractor"
+                  id="contractor"
+                  className="peer sr-only"
+                />
+                <Label
+                  htmlFor="contractor"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-500 peer-data-[state=checked]:bg-orange-50 [&:has([data-state=checked])]:border-primary"
+                >
+                  <Hammer className="mb-2 h-5 w-5 text-orange-600" />
+                  Contractor
                 </Label>
               </div>
             </RadioGroup>

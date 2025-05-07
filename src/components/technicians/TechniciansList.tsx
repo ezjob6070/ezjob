@@ -6,7 +6,7 @@ import TechniciansCardView from "@/components/technicians/list/TechniciansCardVi
 import ViewToggleButtons from "@/components/technicians/list/ViewToggleButtons";
 import { Card, CardContent } from "@/components/ui/card";
 import TechnicianCard from "@/components/technicians/TechnicianCard";
-import { Wrench, Briefcase, UserCheck } from "lucide-react";
+import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
 
 interface TechniciansListProps {
   technicians: Technician[];
@@ -31,6 +31,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
   const technicianCount = technicians.filter(t => (t.role || "technician") === "technician").length;
   const salesmanCount = technicians.filter(t => t.role === "salesman").length;
   const employedCount = technicians.filter(t => t.role === "employed").length;
+  const contractorCount = technicians.filter(t => t.role === "contractor").length;
 
   // Role legend for quick visual reference
   const renderRoleLegend = () => (
@@ -47,6 +48,10 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
         <UserCheck className="h-3 w-3 mr-1" />
         Employed ({employedCount}) 
       </div>
+      <div className="flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-medium">
+        <Hammer className="h-3 w-3 mr-1" />
+        Contractor ({contractorCount}) 
+      </div>
     </div>
   );
 
@@ -55,7 +60,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
       <CardContent className="p-0">
         <div className="p-4 border-b flex flex-col">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-medium">Technicians</h3>
+            <h3 className="text-lg font-medium">Technicians & Contractors</h3>
             <ViewToggleButtons 
               displayMode={displayMode}
               onDisplayModeChange={setDisplayMode}
@@ -77,7 +82,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
             ))}
             {technicians.length === 0 && (
               <div className="col-span-4 text-center py-8 text-muted-foreground">
-                No technicians found matching your filters.
+                No team members found matching your filters.
               </div>
             )}
           </div>

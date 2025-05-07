@@ -119,6 +119,7 @@ const Technicians = () => {
   const technicianCount = globalTechnicians.filter(tech => (tech.role || "technician") === "technician").length;
   const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
   const employedCount = globalTechnicians.filter(tech => tech.role === "employed").length;
+  const contractorCount = globalTechnicians.filter(tech => tech.role === "contractor").length;
   const totalCount = globalTechnicians.length;
 
   return (
@@ -129,12 +130,12 @@ const Technicians = () => {
           Team Members
         </h1>
         <p className="text-muted-foreground mt-1">
-          Manage your technicians, salesmen and their payment structures
+          Manage your technicians, salesmen, contractors and their payment structures
         </p>
       </div>
       
       {/* Role Filter Buttons - Under the header */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
@@ -145,23 +146,30 @@ const Technicians = () => {
         <Button
           variant={roleFilter === "technician" ? "default" : "outline"}
           onClick={() => setRoleFilter("technician")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "technician" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "technician" ? "bg-[#E0F2FE] border-2 border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#E0F2FE]/90" : ""}`}
         >
           Technicians ({technicianCount})
         </Button>
         <Button
           variant={roleFilter === "salesman" ? "default" : "outline"}
           onClick={() => setRoleFilter("salesman")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "salesman" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "salesman" ? "bg-[#ECFDF5] border-2 border-[#10B981] text-[#10B981] hover:bg-[#ECFDF5]/90" : ""}`}
         >
           Salesmen ({salesmanCount})
         </Button>
         <Button
           variant={roleFilter === "employed" ? "default" : "outline"}
           onClick={() => setRoleFilter("employed")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "employed" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "employed" ? "bg-[#F3E8FF] border-2 border-[#8B5CF6] text-[#8B5CF6] hover:bg-[#F3E8FF]/90" : ""}`}
         >
           Employed ({employedCount})
+        </Button>
+        <Button
+          variant={roleFilter === "contractor" ? "default" : "outline"}
+          onClick={() => setRoleFilter("contractor")}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "contractor" ? "bg-[#FFEDD5] border-2 border-[#F97316] text-[#F97316] hover:bg-[#FFEDD5]/90" : ""}`}
+        >
+          Contractors ({contractorCount})
         </Button>
       </div>
       
