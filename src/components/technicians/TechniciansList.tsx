@@ -60,6 +60,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
             onEditTechnician={onEditTechnician}
             selectedTechnicians={selectedTechnicians}
             onToggleSelect={onToggleSelect}
+            showSalaryData={showSalaryData}
           />
         )}
       </CardContent>

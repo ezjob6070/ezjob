@@ -48,6 +48,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         cancelledJobs: techData.cancelledJobs || 0,
         totalRevenue: techData.totalRevenue || 0,
         rating: techData.rating || 0,
+        // Use existing initials or generate from name
         initials: techData.initials || techData.name.substring(0, 2).toUpperCase(),
         // Handle image properties
         profileImage: techData.profileImage || techData.imageUrl,

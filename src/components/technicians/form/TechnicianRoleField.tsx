@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface TechnicianRoleFieldProps {
   control: Control<any>;
-  defaultValue?: "technician" | "salesman";
+  defaultValue?: "technician" | "salesman" | "employed";
 }
 
 export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({
@@ -32,6 +32,7 @@ export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({
             <SelectContent>
               <SelectItem value="technician">Technician</SelectItem>
               <SelectItem value="salesman">Salesman</SelectItem>
+              <SelectItem value="employed">Employed</SelectItem>
             </SelectContent>
           </Select>
           <FormMessage />

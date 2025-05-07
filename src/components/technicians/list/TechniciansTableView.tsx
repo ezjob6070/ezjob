@@ -1,147 +1,116 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { 
-  Table, TableBody, TableCell, TableHead, 
-  TableHeader, TableRow 
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { 
-  Star, Edit, Calendar, Mail, Phone, 
-  CheckCircle, XCircle 
-} from "lucide-react";
 import { Technician } from "@/types/technician";
-import { getBadgeVariantFromStatus } from "./technicianListUtils";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { format } from "date-fns";
 
-interface TechniciansTableViewProps {
+export interface TechniciansTableViewProps {
   technicians: Technician[];
   onEditTechnician?: (technician: Technician) => void;
+  selectedTechnicians?: string[];
+  onToggleSelect?: (technicianId: string) => void;
+  showSalaryData?: boolean;
 }
 
-const TechniciansTableView: React.FC<TechniciansTableViewProps> = ({ 
+const TechniciansTableView: React.FC<TechniciansTableViewProps> = ({
   technicians,
-  onEditTechnician
+  onEditTechnician,
+  selectedTechnicians = [],
+  onToggleSelect,
+  showSalaryData = false
 }) => {
-  const navigate = useNavigate();
+  const handleRowClick = (technician: Technician) => {
+    if (onEditTechnician) {
+      onEditTechnician(technician);
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "active":
+        return "success";
+      case "inactive":
+        return "destructive";
+      case "onLeave":
+        return "warning";
+      default:
+        return "secondary";
+    }
+  };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="rounded-md overflow-hidden">
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-muted/50">
           <TableRow>
-            <TableHead className="w-[250px]">Technician</TableHead>
+            {onToggleSelect && <TableHead className="w-12"></TableHead>}
+            <TableHead className="w-1/4">Technician</TableHead>
             <TableHead>Contact</TableHead>
-            <TableHead>Department</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Jobs</TableHead>
-            <TableHead>Revenue</TableHead>
-            <TableHead>Contract</TableHead>
+            <TableHead>Specialty</TableHead>
+            <TableHead>Hire Date</TableHead>
+            {showSalaryData && <TableHead>Payment</TableHead>}
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {technicians.map((technician) => (
-            <TableRow
-              key={technician.id}
-              className="cursor-pointer hover:bg-slate-50"
-              onClick={() => navigate(`/technicians/${technician.id}`)}
+            <TableRow 
+              key={technician.id} 
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => handleRowClick(technician)}
             >
+              {onToggleSelect && (
+                <TableCell className="p-2" onClick={e => e.stopPropagation()}>
+                  <Checkbox 
+                    checked={selectedTechnicians.includes(technician.id)}
+                    onCheckedChange={() => onToggleSelect(technician.id)}
+                  />
+                </TableCell>
+              )}
               <TableCell className="font-medium">
-                <div className="flex items-center">
-                  <Avatar className="h-10 w-10 mr-3">
-                    <AvatarImage src={technician.imageUrl || ""} alt={technician.name} />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {technician.imageUrl ? "" : technician.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-semibold">{technician.name}</div>
-                    <div className="text-xs text-muted-foreground">{technician.specialty}</div>
-                    <div className="flex items-center mt-1">
-                      <Star className="w-3 h-3 text-yellow-400 mr-1 fill-yellow-400" />
-                      <span className="text-xs">{technician.rating || "N/A"}</span>
-                    </div>
-                  </div>
-                </div>
+                {technician.name}
+                {technician.role && (
+                  <Badge variant="outline" className="ml-2 capitalize">
+                    {technician.role}
+                  </Badge>
+                )}
               </TableCell>
-              
+              <TableCell>{technician.email}</TableCell>
               <TableCell>
-                <div className="space-y-1">
-                  <div className="text-xs flex items-center">
-                    <Mail className="h-3 w-3 mr-1 text-muted-foreground" /> 
-                    <span className="truncate max-w-[150px]">{technician.email}</span>
-                  </div>
-                  {technician.phone && (
-                    <div className="text-xs flex items-center">
-                      <Phone className="h-3 w-3 mr-1 text-muted-foreground" /> 
-                      <span>{technician.phone}</span>
-                    </div>
-                  )}
-                </div>
-              </TableCell>
-              
-              <TableCell>
-                <div>
-                  <div className="text-sm">{technician.department || "General"}</div>
-                  {technician.position && (
-                    <div className="text-xs text-muted-foreground">{technician.position}</div>
-                  )}
-                </div>
-              </TableCell>
-              
-              <TableCell>
-                <Badge
-                  variant={getBadgeVariantFromStatus(technician.status)}
-                  className="capitalize"
-                >
+                <Badge variant={getStatusBadgeVariant(technician.status)} className="capitalize">
                   {technician.status}
                 </Badge>
               </TableCell>
-              
+              <TableCell>{technician.specialty}</TableCell>
               <TableCell>
-                <div className="space-y-1">
-                  <div className="text-xs flex items-center">
-                    <CheckCircle className="h-3 w-3 mr-1 text-green-500" /> 
-                    <span>{technician.completedJobs || 0} completed</span>
-                  </div>
-                  <div className="text-xs flex items-center">
-                    <XCircle className="h-3 w-3 mr-1 text-red-500" /> 
-                    <span>{technician.cancelledJobs || 0} cancelled</span>
-                  </div>
-                </div>
+                {technician.hireDate ? format(new Date(technician.hireDate), 'MMM d, yyyy') : 'Not set'}
               </TableCell>
-              
-              <TableCell>{formatCurrency(technician.totalRevenue || 0)}</TableCell>
-              
-              <TableCell>
-                <div>
-                  <div className="text-sm">{technician.contractType || "Standard"}</div>
-                  <div className="text-xs text-muted-foreground flex items-center">
-                    <Calendar className="h-3 w-3 mr-1" /> 
-                    {technician.hireDate ? new Date(technician.hireDate).toLocaleDateString() : "N/A"}
-                  </div>
-                </div>
-              </TableCell>
-              
+              {showSalaryData && (
+                <TableCell>
+                  {technician.paymentType === 'hourly' ? 
+                    `$${technician.hourlyRate}/hr` : 
+                    technician.paymentType === 'percentage' ? 
+                      `${technician.paymentRate}% commission` : 
+                      `$${technician.paymentRate} flat`}
+                </TableCell>
+              )}
               <TableCell className="text-right">
-                <div className="flex justify-end items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onEditTechnician) onEditTechnician(technician);
-                    }}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                <div className="flex justify-end space-x-2">
+                  {/* Actions could go here */}
                 </div>
               </TableCell>
             </TableRow>
           ))}
+          {technicians.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={onToggleSelect ? 8 : 7} className="h-24 text-center">
+                No technicians found matching your filters.
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>
