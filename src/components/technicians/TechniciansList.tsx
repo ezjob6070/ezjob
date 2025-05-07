@@ -6,7 +6,8 @@ import TechniciansCardView from "@/components/technicians/list/TechniciansCardVi
 import ViewToggleButtons from "@/components/technicians/list/ViewToggleButtons";
 import { Card, CardContent } from "@/components/ui/card";
 import TechnicianCard from "@/components/technicians/TechnicianCard";
-import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
+import { Wrench, Briefcase, UserCheck, Hammer, UserRound } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TechniciansListProps {
   technicians: Technician[];
@@ -26,12 +27,14 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
   showSalaryData = false
 }) => {
   const [displayMode, setDisplayMode] = useState<"card" | "table">(initialDisplayMode);
+  const navigate = useNavigate();
 
   // Calculate how many of each role we have
   const technicianCount = technicians.filter(t => (t.role || "technician") === "technician").length;
   const salesmanCount = technicians.filter(t => t.role === "salesman").length;
   const employedCount = technicians.filter(t => t.role === "employed").length;
   const contractorCount = technicians.filter(t => t.role === "contractor").length;
+  const femaleCount = technicians.filter(t => t.role === "female").length;
 
   // Role legend for quick visual reference
   const renderRoleLegend = () => (
@@ -52,8 +55,21 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
         <Hammer className="h-3 w-3 mr-1" />
         Contractor ({contractorCount}) 
       </div>
+      <div className="flex items-center px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-xs font-medium">
+        <UserRound className="h-3 w-3 mr-1" />
+        Female ({femaleCount}) 
+      </div>
     </div>
   );
+
+  // Handle clicking on a technician card
+  const handleCardClick = (technician: Technician) => {
+    if (onEditTechnician) {
+      onEditTechnician(technician);
+    } else {
+      navigate(`/technicians/${technician.id}`);
+    }
+  };
 
   return (
     <Card className="shadow-sm">
@@ -75,9 +91,9 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
               <TechnicianCard
                 key={technician.id}
                 technician={technician}
-                selected={selectedTechnicians.includes(technician.id)}
+                selected={selectedTechnicians?.includes(technician.id) || false}
                 onSelect={onToggleSelect || (() => {})}
-                onClick={id => onEditTechnician && onEditTechnician(technician)}
+                onClick={() => handleCardClick(technician)}
               />
             ))}
             {technicians.length === 0 && (

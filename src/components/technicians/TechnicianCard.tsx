@@ -3,7 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Technician } from "@/types/technician";
-import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
+import { Wrench, Briefcase, UserCheck, Hammer, UserRound } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TechnicianCardProps {
   technician: Technician;
@@ -18,6 +19,8 @@ export default function TechnicianCard({
   onSelect,
   onClick
 }: TechnicianCardProps) {
+  const navigate = useNavigate();
+  
   const revenue = technician.totalRevenue?.toLocaleString(undefined, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
@@ -70,6 +73,17 @@ export default function TechnicianCard({
           gradientTo: "to-orange-100",
           iconBg: "bg-orange-500"
         };
+      case "female":
+        return {
+          color: "#EC4899", // Pink
+          bgColor: "#FCE7F3",
+          icon: <UserRound className="h-4 w-4 text-[#EC4899]" />,
+          label: "Female",
+          borderHover: "hover:border-[#EC4899]",
+          gradientFrom: "from-pink-50",
+          gradientTo: "to-pink-100",
+          iconBg: "bg-pink-500"
+        };
       default:
         return {
           color: "#6E59A5", // Tertiary Purple
@@ -86,9 +100,18 @@ export default function TechnicianCard({
   
   const roleStyle = getRoleStyles();
   
+  const handleCardClick = () => {
+    // Navigate to technician detail if onClick is not provided
+    if (typeof onClick === 'function') {
+      onClick(technician.id);
+    } else {
+      navigate(`/technicians/${technician.id}`);
+    }
+  };
+  
   return (
     <div
-      onClick={() => onClick(technician.id)}
+      onClick={handleCardClick}
       className={cn(
         "group relative flex flex-col rounded-lg border p-4 hover:cursor-pointer hover:border-2 bg-gradient-to-br",
         roleStyle.gradientFrom, roleStyle.gradientTo,
@@ -99,6 +122,7 @@ export default function TechnicianCard({
       <Checkbox
         checked={selected}
         onCheckedChange={() => onSelect(technician.id)}
+        onClick={(e) => e.stopPropagation()}
         className="absolute right-2 top-2 rounded-full border-2 ring-offset-background focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
       />
       <div className="flex items-center">

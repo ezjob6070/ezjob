@@ -14,6 +14,7 @@ import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
+import { Wrench, Briefcase, UserCheck, Hammer, UserRound } from "lucide-react";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -120,6 +121,7 @@ const Technicians = () => {
   const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
   const employedCount = globalTechnicians.filter(tech => tech.role === "employed").length;
   const contractorCount = globalTechnicians.filter(tech => tech.role === "contractor").length;
+  const femaleCount = globalTechnicians.filter(tech => tech.role === "female").length;
   const totalCount = globalTechnicians.length;
 
   return (
@@ -135,41 +137,72 @@ const Technicians = () => {
       </div>
       
       {/* Role Filter Buttons - Under the header */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-6 gap-3 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "all" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+          className={`h-24 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center ${roleFilter === "all" ? "bg-[#F1F0FB] border-2 border-[#6E59A5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
         >
-          All Staff ({totalCount})
+          <div className="rounded-full bg-[#6E59A5]/20 p-2 mb-1">
+            <UserCheck className="h-6 w-6 text-[#6E59A5]" />
+          </div>
+          <div>All Staff</div>
+          <div className="text-sm mt-1 font-bold">{totalCount}</div>
         </Button>
         <Button
           variant={roleFilter === "technician" ? "default" : "outline"}
           onClick={() => setRoleFilter("technician")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "technician" ? "bg-[#E0F2FE] border-2 border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#E0F2FE]/90" : ""}`}
+          className={`h-24 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center ${roleFilter === "technician" ? "bg-[#E0F2FE] border-2 border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#E0F2FE]/90" : ""}`}
         >
-          Technicians ({technicianCount})
+          <div className="rounded-full bg-[#0EA5E9]/20 p-2 mb-1">
+            <Wrench className="h-6 w-6 text-[#0EA5E9]" />
+          </div>
+          <div>Technicians</div>
+          <div className="text-sm mt-1 font-bold">{technicianCount}</div>
         </Button>
         <Button
           variant={roleFilter === "salesman" ? "default" : "outline"}
           onClick={() => setRoleFilter("salesman")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "salesman" ? "bg-[#ECFDF5] border-2 border-[#10B981] text-[#10B981] hover:bg-[#ECFDF5]/90" : ""}`}
+          className={`h-24 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center ${roleFilter === "salesman" ? "bg-[#ECFDF5] border-2 border-[#10B981] text-[#10B981] hover:bg-[#ECFDF5]/90" : ""}`}
         >
-          Salesmen ({salesmanCount})
+          <div className="rounded-full bg-[#10B981]/20 p-2 mb-1">
+            <Briefcase className="h-6 w-6 text-[#10B981]" />
+          </div>
+          <div>Salesmen</div>
+          <div className="text-sm mt-1 font-bold">{salesmanCount}</div>
         </Button>
         <Button
           variant={roleFilter === "employed" ? "default" : "outline"}
           onClick={() => setRoleFilter("employed")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "employed" ? "bg-[#F3E8FF] border-2 border-[#8B5CF6] text-[#8B5CF6] hover:bg-[#F3E8FF]/90" : ""}`}
+          className={`h-24 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center ${roleFilter === "employed" ? "bg-[#F3E8FF] border-2 border-[#8B5CF6] text-[#8B5CF6] hover:bg-[#F3E8FF]/90" : ""}`}
         >
-          Employed ({employedCount})
+          <div className="rounded-full bg-[#8B5CF6]/20 p-2 mb-1">
+            <UserCheck className="h-6 w-6 text-[#8B5CF6]" />
+          </div>
+          <div>Employed</div>
+          <div className="text-sm mt-1 font-bold">{employedCount}</div>
         </Button>
         <Button
           variant={roleFilter === "contractor" ? "default" : "outline"}
           onClick={() => setRoleFilter("contractor")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "contractor" ? "bg-[#FFEDD5] border-2 border-[#F97316] text-[#F97316] hover:bg-[#FFEDD5]/90" : ""}`}
+          className={`h-24 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center ${roleFilter === "contractor" ? "bg-[#FFEDD5] border-2 border-[#F97316] text-[#F97316] hover:bg-[#FFEDD5]/90" : ""}`}
         >
-          Contractors ({contractorCount})
+          <div className="rounded-full bg-[#F97316]/20 p-2 mb-1">
+            <Hammer className="h-6 w-6 text-[#F97316]" />
+          </div>
+          <div>Contractors</div>
+          <div className="text-sm mt-1 font-bold">{contractorCount}</div>
+        </Button>
+        <Button
+          variant={roleFilter === "female" ? "default" : "outline"}
+          onClick={() => setRoleFilter("female")}
+          className={`h-24 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center ${roleFilter === "female" ? "bg-[#FCE7F3] border-2 border-[#EC4899] text-[#EC4899] hover:bg-[#FCE7F3]/90" : ""}`}
+        >
+          <div className="rounded-full bg-[#EC4899]/20 p-2 mb-1">
+            <UserRound className="h-6 w-6 text-[#EC4899]" />
+          </div>
+          <div>Female</div>
+          <div className="text-sm mt-1 font-bold">{femaleCount}</div>
         </Button>
       </div>
       
