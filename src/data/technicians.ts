@@ -17,6 +17,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "percentage",
       paymentRate: 30,
       hourlyRate: 25,
+      salaryBasis: "hourly",
       completedJobs: 78,
       cancelledJobs: 3,
       totalRevenue: 128500,
@@ -27,7 +28,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["NATE Certification", "EPA 608 Certification"],
       skills: ["Commercial HVAC", "Refrigeration", "System Design"],
       imageUrl: "/avatars/tech-1.jpg",
-      yearsExperience: 8
+      yearsExperience: 8,
+      initials: "JS"
     },
     {
       id: "tech-2",
@@ -40,6 +42,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "hourly",
       paymentRate: 32,
       hourlyRate: 28,
+      salaryBasis: "hourly",
       completedJobs: 82,
       cancelledJobs: 2,
       totalRevenue: 156700,
@@ -50,7 +53,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["Master Electrician License", "OSHA Safety Certification"],
       skills: ["Commercial Wiring", "Lighting Systems", "PLC Programming"],
       imageUrl: "/avatars/tech-2.jpg",
-      yearsExperience: 10
+      yearsExperience: 10,
+      initials: "SJ"
     },
     {
       id: "tech-3",
@@ -63,6 +67,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "flat",
       paymentRate: 200,
       hourlyRate: 22,
+      salaryBasis: "weekly",
       completedJobs: 64,
       cancelledJobs: 5,
       totalRevenue: 94800,
@@ -73,7 +78,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["Journeyman Plumber License", "Backflow Prevention Certification"],
       skills: ["Commercial Plumbing", "Water Heater Installation", "Leak Detection"],
       imageUrl: "/avatars/tech-3.jpg",
-      yearsExperience: 5
+      yearsExperience: 5,
+      initials: "MR"
     },
     {
       id: "tech-4",
@@ -86,6 +92,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "percentage",
       paymentRate: 28,
       hourlyRate: 27,
+      salaryBasis: "bi-weekly",
       completedJobs: 48,
       cancelledJobs: 1,
       totalRevenue: 86200,
@@ -96,7 +103,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["Master Carpenter Certification", "Cabinet Installation Specialist"],
       skills: ["Finish Carpentry", "Cabinet Installation", "Custom Woodworking"],
       imageUrl: "/avatars/tech-4.jpg",
-      yearsExperience: 7
+      yearsExperience: 7,
+      initials: "JL"
     },
     {
       id: "tech-5",
@@ -109,6 +117,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "hourly",
       paymentRate: 30,
       hourlyRate: 30,
+      salaryBasis: "hourly",
       completedJobs: 56,
       cancelledJobs: 2,
       totalRevenue: 105400,
@@ -119,7 +128,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["Journeyman Mason", "Historic Restoration Specialist"],
       skills: ["Brick and Stone", "Concrete Work", "Historic Restoration"],
       imageUrl: "/avatars/tech-5.jpg",
-      yearsExperience: 12
+      yearsExperience: 12,
+      initials: "DW"
     },
     {
       id: "tech-6",
@@ -132,6 +142,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "flat",
       paymentRate: 250,
       hourlyRate: 35,
+      salaryBasis: "monthly",
       completedJobs: 42,
       cancelledJobs: 0,
       totalRevenue: 142500,
@@ -142,7 +153,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["CDL Class A", "OSHA Heavy Equipment Certification"],
       skills: ["Excavator Operation", "Bulldozer", "Crane Operation"],
       imageUrl: "/avatars/tech-6.jpg",
-      yearsExperience: 15
+      yearsExperience: 15,
+      initials: "RG"
     },
     {
       id: "tech-7",
@@ -155,6 +167,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "percentage",
       paymentRate: 25,
       hourlyRate: 26,
+      salaryBasis: "bi-weekly",
       completedJobs: 38,
       cancelledJobs: 1,
       totalRevenue: 78600,
@@ -165,7 +178,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["Lead-Safe Certification", "Decorative Finishing Specialist"],
       skills: ["Drywall", "Painting", "Decorative Finishes"],
       imageUrl: "/avatars/tech-7.jpg",
-      yearsExperience: 6
+      yearsExperience: 6,
+      initials: "EC"
     },
     {
       id: "tech-8",
@@ -178,6 +192,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "hourly",
       paymentRate: 28,
       hourlyRate: 28,
+      salaryBasis: "hourly",
       completedJobs: 52,
       cancelledJobs: 3,
       totalRevenue: 92800,
@@ -188,7 +203,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["Master Roofer Certification", "Fall Protection Safety Training"],
       skills: ["Shingle Roofing", "Metal Roofing", "Commercial Flat Roofs"],
       imageUrl: "/avatars/tech-8.jpg",
-      yearsExperience: 9
+      yearsExperience: 9,
+      initials: "WT"
     },
     {
       id: "tech-9",
@@ -201,6 +217,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "percentage",
       paymentRate: 26,
       hourlyRate: 24,
+      salaryBasis: "weekly",
       completedJobs: 92,
       cancelledJobs: 4,
       totalRevenue: 110500,
@@ -211,7 +228,8 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["HVAC Excellence Certification", "Indoor Air Quality Certification"],
       skills: ["Preventive Maintenance", "System Diagnostics", "Filter Systems"],
       imageUrl: "/avatars/tech-9.jpg",
-      yearsExperience: 7
+      yearsExperience: 7,
+      initials: "OM"
     },
     {
       id: "tech-10",
@@ -224,6 +242,7 @@ const createSampleTechnicians = (): Technician[] => {
       paymentType: "flat",
       paymentRate: 180,
       hourlyRate: 25,
+      salaryBasis: "bi-weekly",
       completedJobs: 34,
       cancelledJobs: 2,
       totalRevenue: 68200,
@@ -234,15 +253,12 @@ const createSampleTechnicians = (): Technician[] => {
       certifications: ["CFI Certification", "Luxury Vinyl Installation Specialist"],
       skills: ["Hardwood Installation", "Tile Work", "Vinyl and Laminate"],
       imageUrl: "/avatars/tech-10.jpg",
-      yearsExperience: 8
+      yearsExperience: 8,
+      initials: "JW"
     }
   ];
 
-  // Add initials to all technicians
-  return sampleData.map(tech => ({
-    ...tech,
-    initials: getInitials(tech.name)
-  }));
+  return sampleData;
 };
 
 export const technicians = [...createSampleTechnicians(), ...additionalTechnicians];

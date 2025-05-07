@@ -5,9 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { technicianSchema } from "@/lib/validations/technician";
-import { Technician } from "@/types/technician";
+import { Technician, SalaryBasis } from "@/types/technician";
 import { getInitials } from "@/lib/utils";
-import { SalaryBasis, IncentiveType } from "@/types/employee";
 
 import {
   Dialog,
@@ -34,9 +33,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { DatePicker } from "@/components/ui/date-picker";
-import { format } from "date-fns";
 import { TechnicianDateField } from "./form/TechnicianDateField";
+import { TechnicianImageUpload } from "./TechnicianImageUpload";
 
 export interface AddTechnicianModalProps {
   open: boolean;
@@ -49,7 +47,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
   onOpenChange, 
   onAddTechnician 
 }) => {
-  const [date, setDate] = useState<Date>();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   
   const form = useForm<z.infer<typeof technicianSchema>>({
     resolver: zodResolver(technicianSchema),
@@ -67,7 +65,13 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
     },
   });
   
+  function handleProfileImageChange(image: string | null) {
+    setProfileImage(image);
+  }
+  
   function onSubmit(values: z.infer<typeof technicianSchema>) {
+    const initials = getInitials(values.name);
+    
     const newTechnician: Technician = {
       id: uuidv4(),
       name: values.name,
@@ -76,22 +80,26 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       address: values.address,
       specialty: values.specialty,
       status: values.status as "active" | "inactive" | "onLeave",
-      paymentType: values.paymentType as "percentage" | "flat" | "hourly",
-      paymentRate: Number(values.paymentRate), // Convert string to number
+      paymentType: values.paymentType as "percentage" | "flat" | "hourly" | "salary",
+      paymentRate: Number(values.paymentRate),
       hireDate: values.hireDate,
       notes: values.notes,
-      initials: getInitials(values.name),
+      initials,
       // Default values for new technicians
       completedJobs: 0,
       cancelledJobs: 0,
       totalRevenue: 0,
       rating: 5.0,
-      // Default salary-related fields if they're used elsewhere
-      salaryBasis: values.paymentType === "hourly" ? "hourly" as SalaryBasis : undefined,
+      // Include profile image if selected
+      profileImage: profileImage || undefined,
+      imageUrl: profileImage || undefined,
+      // Default salary-related fields
+      salaryBasis: values.salaryBasis || "hourly",
       hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : 0,
     };
     
     onAddTechnician(newTechnician);
+    setProfileImage(null);
     form.reset();
     onOpenChange(false);
   }
@@ -105,6 +113,14 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+            <div className="flex justify-center mb-6">
+              <TechnicianImageUpload
+                initials={getInitials(form.watch("name") || "TN")}
+                onImageChange={handleProfileImageChange}
+                size="lg"
+              />
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -227,6 +243,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                         <SelectItem value="percentage">Percentage</SelectItem>
                         <SelectItem value="flat">Flat Rate</SelectItem>
                         <SelectItem value="hourly">Hourly</SelectItem>
+                        <SelectItem value="salary">Salary</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -249,6 +266,35 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                     <FormControl>
                       <Input type="number" placeholder="Enter rate" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="salaryBasis"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Salary Basis</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select salary basis" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="hourly">Hourly</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="annually">Annually</SelectItem>
+                        <SelectItem value="commission">Commission</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

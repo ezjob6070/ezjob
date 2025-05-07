@@ -49,6 +49,11 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         totalRevenue: techData.totalRevenue || 0,
         rating: techData.rating || 0,
         initials: techData.initials || techData.name.substring(0, 2).toUpperCase(),
+        // Handle image properties
+        profileImage: techData.profileImage || techData.imageUrl,
+        imageUrl: techData.imageUrl || techData.profileImage,
+        // Ensure incentiveType is a valid enum value if provided
+        incentiveType: techData.incentiveType as "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly" | undefined,
       };
       
       setTechnician(completeTechData);
@@ -75,11 +80,6 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
       paymentRate: Number(values.paymentRate),
       hourlyRate: Number(values.hourlyRate || technician.hourlyRate),
       incentiveAmount: values.incentiveAmount ? Number(values.incentiveAmount) : technician.incentiveAmount,
-      initials: technician.initials,
-      completedJobs: technician.completedJobs,
-      cancelledJobs: technician.cancelledJobs,
-      totalRevenue: technician.totalRevenue,
-      rating: technician.rating,
       profileImage: values.profileImage || technician.profileImage,
       imageUrl: values.profileImage || technician.imageUrl,
       notes: values.notes || technician.notes,

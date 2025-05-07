@@ -1,6 +1,5 @@
 
 import * as z from "zod";
-import { SalaryBasis } from "@/types/technician";
 
 export const technicianEditSchema = z.object({
   name: z.string().min(2, {

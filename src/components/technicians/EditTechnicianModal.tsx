@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   AlertDialog,
@@ -16,11 +17,10 @@ import { useForm } from "react-hook-form";
 import { Technician } from "@/types/technician";
 import { technicianEditSchema, TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { TechnicianBasicInfoFields } from "@/components/technicians/TechnicianBasicInfoFields";
-import { TechnicianDateField } from "@/components/technicians/TechnicianDateField";
+import { TechnicianDateField } from "@/components/technicians/form/TechnicianDateField";
 import TechnicianPaymentFields from "@/components/technicians/form/TechnicianPaymentFields";
 import { TechnicianStatusFields } from "@/components/technicians/form/TechnicianStatusFields";
 import { TechnicianImageUpload } from "@/components/technicians/TechnicianImageUpload";
-import { IncentiveType } from "@/types/employee";
 
 export interface EditTechnicianModalProps {
   technician: Technician | null;
@@ -106,7 +106,7 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
               <TechnicianPaymentFields 
                 control={form.control} 
                 defaultSalaryBasis={technician.salaryBasis}
-                defaultIncentiveType={technician.incentiveType}
+                defaultIncentiveType={technician.incentiveType as any}
               />
               
               <TechnicianDateField
