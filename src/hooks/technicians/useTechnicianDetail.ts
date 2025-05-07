@@ -57,6 +57,10 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         incentiveType: techData.incentiveType as "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly" | undefined,
         // Role is optional but should be valid if provided
         role: techData.role as "technician" | "salesman" | "employed" | "contractor" | undefined,
+        // Add sensitive information if it exists
+        ssn: techData.ssn,
+        driverLicense: techData.driverLicense,
+        idNumber: techData.idNumber,
       };
       
       setTechnician(completeTechData);
@@ -86,6 +90,14 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
       profileImage: values.profileImage || technician.profileImage,
       imageUrl: values.profileImage || technician.imageUrl,
       notes: values.notes || technician.notes,
+      // Update sensitive information
+      ssn: values.ssn || technician.ssn,
+      driverLicense: values.driverLicenseNumber ? {
+        number: values.driverLicenseNumber,
+        state: values.driverLicenseState || "",
+        expirationDate: values.driverLicenseExpiration || ""
+      } : technician.driverLicense,
+      idNumber: values.idNumber || technician.idNumber,
     };
     
     setTechnician(updatedTechnician);

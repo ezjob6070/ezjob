@@ -11,7 +11,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Technician } from "@/types/technician";
@@ -22,6 +23,8 @@ import TechnicianPaymentFields from "@/components/technicians/form/TechnicianPay
 import { TechnicianStatusFields } from "@/components/technicians/form/TechnicianStatusFields";
 import { TechnicianImageUpload } from "@/components/technicians/TechnicianImageUpload";
 import { TechnicianRoleField } from "./form/TechnicianRoleField";
+import { Separator } from "@/components/ui/separator";
+import { Shield } from "lucide-react";
 
 export interface EditTechnicianModalProps {
   technician: Technician | null;
@@ -52,11 +55,17 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
       notes: technician?.notes || "",
       department: technician?.department || "",
       position: technician?.position || "",
-      salaryBasis: technician?.salaryBasis,
+      salaryBasis: technician?.salaryBasis || "hourly",
       hourlyRate: String(technician?.hourlyRate || ""),
       incentiveType: technician?.incentiveType,
       incentiveAmount: String(technician?.incentiveAmount || ""),
       role: technician?.role || "technician",
+      // New sensitive fields
+      ssn: technician?.ssn || "",
+      driverLicenseNumber: technician?.driverLicense?.number || "",
+      driverLicenseState: technician?.driverLicense?.state || "",
+      driverLicenseExpiration: technician?.driverLicense?.expirationDate || "",
+      idNumber: technician?.idNumber || "",
     },
   });
 
@@ -66,11 +75,18 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
   );
 
   function onSubmitForm(values: TechnicianEditFormValues) {
-    // Include the profile image in the update
-    onUpdateTechnician({
+    // Format driver's license data for the update
+    const formattedValues = {
       ...values,
       profileImage: profileImage,
-    });
+      driverLicense: values.driverLicenseNumber ? {
+        number: values.driverLicenseNumber,
+        state: values.driverLicenseState,
+        expirationDate: values.driverLicenseExpiration,
+      } : undefined
+    };
+    
+    onUpdateTechnician(formattedValues);
     onOpenChange(false);
   }
 
@@ -114,7 +130,7 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
               
               <TechnicianPaymentFields 
                 control={form.control} 
-                defaultSalaryBasis={technician.salaryBasis}
+                defaultSalaryBasis={technician.salaryBasis || "hourly"}
                 defaultIncentiveType={technician.incentiveType as any}
               />
               
@@ -129,6 +145,97 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
                 name="hireDate"
                 label="Hire Date"
               />
+              
+              {/* Sensitive Information Section */}
+              <div className="pt-4">
+                <div className="flex items-center mb-4">
+                  <Shield className="h-5 w-5 mr-2 text-amber-500" />
+                  <h3 className="text-base font-semibold">Sensitive Information</h3>
+                </div>
+                <div className="bg-amber-50 p-4 rounded-lg space-y-4">
+                  {/* SSN */}
+                  <FormField
+                    control={form.control}
+                    name="ssn"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Social Security Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="XXX-XX-XXXX" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {/* Driver's License */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">Driver's License</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <FormField
+                        control={form.control}
+                        name="driverLicenseNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>License Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="License number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="driverLicenseState"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <FormControl>
+                              <Input placeholder="State" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="driverLicenseExpiration"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Expiration Date</FormLabel>
+                            <FormControl>
+                              <Input placeholder="MM/DD/YYYY" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* ID Number */}
+                  <FormField
+                    control={form.control}
+                    name="idNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ID Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ID number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <p className="text-xs text-amber-700">
+                    This information is sensitive and should be handled with care.
+                  </p>
+                </div>
+              </div>
             </div>
             
             <AlertDialogFooter>

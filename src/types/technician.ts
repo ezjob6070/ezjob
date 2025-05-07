@@ -34,6 +34,14 @@ export interface Technician {
   role?: "technician" | "salesman" | "employed" | "contractor";
   initials: string;
   jobCategories?: string[];
+  // New fields for sensitive information
+  ssn?: string;
+  driverLicense?: {
+    number: string;
+    state: string;
+    expirationDate: string;
+  };
+  idNumber?: string;
 }
 
 export interface Document {
