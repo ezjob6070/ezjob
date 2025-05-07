@@ -55,6 +55,8 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         imageUrl: techData.imageUrl || techData.profileImage,
         // Ensure incentiveType is a valid enum value if provided
         incentiveType: techData.incentiveType as "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly" | undefined,
+        // Role is optional but should be valid if provided
+        role: techData.role as "technician" | "salesman" | "employed" | "contractor" | undefined,
       };
       
       setTechnician(completeTechData);
@@ -74,7 +76,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
   const handleUpdateTechnician = (values: TechnicianEditFormValues) => {
     if (!technician) return;
     
-    const updatedTechnician: Technician = {
+    const updatedTechnician = {
       ...technician,
       ...values,
       id: technician.id,
