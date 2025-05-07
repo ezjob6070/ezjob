@@ -5,6 +5,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
+import { Wrench, Briefcase, UserCheck } from "lucide-react";
 
 export interface TechniciansTableViewProps {
   technicians: Technician[];
@@ -40,6 +41,32 @@ const TechniciansTableView: React.FC<TechniciansTableViewProps> = ({
     }
   };
 
+  const getRoleIcon = (role?: string) => {
+    switch (role) {
+      case "technician":
+        return <Wrench className="h-4 w-4 mr-1 text-blue-500" />;
+      case "salesman":
+        return <Briefcase className="h-4 w-4 mr-1 text-green-500" />;
+      case "employed":
+        return <UserCheck className="h-4 w-4 mr-1 text-purple-500" />;
+      default:
+        return <Wrench className="h-4 w-4 mr-1 text-blue-500" />;
+    }
+  };
+
+  const getRoleBadgeColor = (role?: string) => {
+    switch (role) {
+      case "technician":
+        return "bg-blue-100 text-blue-700 border-blue-300";
+      case "salesman":
+        return "bg-green-100 text-green-700 border-green-300";
+      case "employed":
+        return "bg-purple-100 text-purple-700 border-purple-300";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-300";
+    }
+  };
+
   return (
     <div className="rounded-md overflow-hidden">
       <Table>
@@ -71,16 +98,19 @@ const TechniciansTableView: React.FC<TechniciansTableViewProps> = ({
                 </TableCell>
               )}
               <TableCell className="font-medium">
-                {technician.name}
-                {technician.role && (
-                  <Badge variant="outline" className="ml-2 capitalize">
-                    {technician.role}
-                  </Badge>
-                )}
+                <div className="flex items-center">
+                  {technician.name}
+                  {technician.role && (
+                    <span className={`ml-2 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getRoleBadgeColor(technician.role)}`}>
+                      {getRoleIcon(technician.role)}
+                      {technician.role.charAt(0).toUpperCase() + technician.role.slice(1)}
+                    </span>
+                  )}
+                </div>
               </TableCell>
               <TableCell>{technician.email}</TableCell>
               <TableCell>
-                <Badge variant={getStatusBadgeVariant(technician.status)} className="capitalize">
+                <Badge variant={getStatusBadgeVariant(technician.status) as any} className="capitalize">
                   {technician.status}
                 </Badge>
               </TableCell>

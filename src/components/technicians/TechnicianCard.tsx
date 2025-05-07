@@ -3,8 +3,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Technician } from "@/types/technician";
-import { format } from "date-fns";
-import { useMemo } from "react";
 import { Wrench, Briefcase, UserCheck } from "lucide-react";
 
 interface TechnicianCardProps {
@@ -20,14 +18,10 @@ export default function TechnicianCard({
   onSelect,
   onClick
 }: TechnicianCardProps) {
-  const revenue = useMemo(() => {
-    if (!technician.totalRevenue) return "0";
-
-    return technician.totalRevenue.toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-  }, [technician.totalRevenue]);
+  const revenue = technician.totalRevenue?.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }) || "0";
   
   // Enhanced role-specific styling with proper icons
   const getRoleStyles = () => {
@@ -38,7 +32,10 @@ export default function TechnicianCard({
           bgColor: "#E0F2FE",
           icon: <Wrench className="h-4 w-4 text-[#0EA5E9]" />,
           label: "Technician",
-          borderHover: "hover:border-[#0EA5E9]"
+          borderHover: "hover:border-[#0EA5E9]",
+          gradientFrom: "from-blue-50",
+          gradientTo: "to-blue-100",
+          iconBg: "bg-blue-500"
         };
       case "salesman":
         return {
@@ -46,7 +43,10 @@ export default function TechnicianCard({
           bgColor: "#ECFDF5",
           icon: <Briefcase className="h-4 w-4 text-[#10B981]" />,
           label: "Salesman",
-          borderHover: "hover:border-[#10B981]"
+          borderHover: "hover:border-[#10B981]",
+          gradientFrom: "from-green-50",
+          gradientTo: "to-green-100",
+          iconBg: "bg-green-500"
         };
       case "employed":
         return {
@@ -54,7 +54,10 @@ export default function TechnicianCard({
           bgColor: "#F3E8FF",
           icon: <UserCheck className="h-4 w-4 text-[#8B5CF6]" />,
           label: "Employed",
-          borderHover: "hover:border-[#8B5CF6]"
+          borderHover: "hover:border-[#8B5CF6]",
+          gradientFrom: "from-purple-50",
+          gradientTo: "to-purple-100",
+          iconBg: "bg-purple-500"
         };
       default:
         return {
@@ -62,7 +65,10 @@ export default function TechnicianCard({
           bgColor: "#F1F0FB",
           icon: <UserCheck className="h-4 w-4 text-[#6E59A5]" />,
           label: "Staff",
-          borderHover: "hover:border-[#6E59A5]"
+          borderHover: "hover:border-[#6E59A5]",
+          gradientFrom: "from-gray-50",
+          gradientTo: "to-gray-100",
+          iconBg: "bg-gray-500"
         };
     }
   };
@@ -73,7 +79,8 @@ export default function TechnicianCard({
     <div
       onClick={() => onClick(technician.id)}
       className={cn(
-        "group relative flex flex-col rounded-lg border p-4 hover:cursor-pointer hover:border-2",
+        "group relative flex flex-col rounded-lg border p-4 hover:cursor-pointer hover:border-2 bg-gradient-to-br",
+        roleStyle.gradientFrom, roleStyle.gradientTo,
         selected ? `border-2 border-[${roleStyle.color}]` : `border-border ${roleStyle.borderHover}`,
         "transition-all hover:shadow-md"
       )}
@@ -89,8 +96,7 @@ export default function TechnicianCard({
             <AvatarImage src={technician.imageUrl} alt={technician.name} />
           ) : (
             <AvatarFallback 
-              style={{ backgroundColor: roleStyle.bgColor, color: roleStyle.color }}
-              className="font-medium"
+              className={`font-medium text-white ${roleStyle.iconBg}`}
             >
               {technician.initials}
             </AvatarFallback>
@@ -110,21 +116,21 @@ export default function TechnicianCard({
       </div>
 
       <div className="grid grid-cols-3 text-center gap-2 mt-4">
-        <div className="p-1 rounded-md" style={{ backgroundColor: `${roleStyle.bgColor}40` }}>
+        <div className="p-1 rounded-md bg-white bg-opacity-60 shadow-sm">
           <div className="text-sm font-medium">{technician.completedJobs}</div>
           <div className="text-xs text-muted-foreground">Completed</div>
         </div>
-        <div className="p-1 rounded-md" style={{ backgroundColor: `${roleStyle.bgColor}40` }}>
+        <div className="p-1 rounded-md bg-white bg-opacity-60 shadow-sm">
           <div className="text-sm font-medium">{technician.cancelledJobs}</div>
           <div className="text-xs text-muted-foreground">Cancelled</div>
         </div>
-        <div className="p-1 rounded-md" style={{ backgroundColor: `${roleStyle.bgColor}40` }}>
+        <div className="p-1 rounded-md bg-white bg-opacity-60 shadow-sm">
           <div className="text-sm font-medium" style={{ color: roleStyle.color }}>${revenue}</div>
           <div className="text-xs text-muted-foreground">Revenue</div>
         </div>
       </div>
       
-      <div className="mt-3 pt-3 border-t text-xs text-muted-foreground">
+      <div className="mt-3 pt-3 border-t border-opacity-30 text-xs text-muted-foreground" style={{ borderColor: roleStyle.color }}>
         <div className="flex justify-between items-center">
           <div>Status: <span className="capitalize">{technician.status}</span></div>
           <div>Rating: <span style={{ color: roleStyle.color }}>{technician.rating}/5</span></div>
