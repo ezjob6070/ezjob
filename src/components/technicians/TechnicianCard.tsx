@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Technician } from "@/types/technician";
 import { format } from "date-fns";
 import { useMemo } from "react";
-import { Briefcase, User, Users } from "lucide-react";
+import { Briefcase, UserCheck, User } from "lucide-react";
 
 interface TechnicianCardProps {
   technician: Technician;
@@ -29,36 +29,40 @@ export default function TechnicianCard({
     });
   }, [technician.totalRevenue]);
   
-  // Determine role-specific styling
+  // Enhanced role-specific styling
   const getRoleStyles = () => {
     switch(technician.role) {
       case "technician":
         return {
           color: "#0EA5E9", // Ocean Blue
           bgColor: "#E0F2FE",
-          icon: <User className="h-4 w-4 text-[#0EA5E9]" />,
-          label: "Technician"
+          icon: <Briefcase className="h-4 w-4 text-[#0EA5E9]" />,
+          label: "Technician",
+          borderHover: "hover:border-[#0EA5E9]"
         };
       case "salesman":
         return {
           color: "#F97316", // Bright Orange
           bgColor: "#FEF0E6",
-          icon: <Briefcase className="h-4 w-4 text-[#F97316]" />,
-          label: "Salesman"
+          icon: <User className="h-4 w-4 text-[#F97316]" />,
+          label: "Salesman",
+          borderHover: "hover:border-[#F97316]"
         };
       case "employed":
         return {
           color: "#8B5CF6", // Vivid Purple
           bgColor: "#F3E8FF",
-          icon: <Users className="h-4 w-4 text-[#8B5CF6]" />,
-          label: "Employed"
+          icon: <UserCheck className="h-4 w-4 text-[#8B5CF6]" />,
+          label: "Employed",
+          borderHover: "hover:border-[#8B5CF6]"
         };
       default:
         return {
           color: "#6E59A5", // Tertiary Purple
           bgColor: "#F1F0FB",
           icon: <User className="h-4 w-4 text-[#6E59A5]" />,
-          label: "Staff"
+          label: "Staff",
+          borderHover: "hover:border-[#6E59A5]"
         };
     }
   };
@@ -70,7 +74,7 @@ export default function TechnicianCard({
       onClick={() => onClick(technician.id)}
       className={cn(
         "group relative flex flex-col rounded-lg border p-4 hover:cursor-pointer hover:border-2",
-        selected ? `border-2 border-[${roleStyle.color}]` : "border-border hover:border-[#9b87f5]",
+        selected ? `border-2 border-[${roleStyle.color}]` : `border-border ${roleStyle.borderHover}`,
         "transition-all hover:shadow-md"
       )}
     >
@@ -106,16 +110,16 @@ export default function TechnicianCard({
       </div>
 
       <div className="grid grid-cols-3 text-center gap-2 mt-4">
-        <div>
+        <div className="p-1 rounded-md" style={{ backgroundColor: `${roleStyle.bgColor}40` }}>
           <div className="text-sm font-medium">{technician.completedJobs}</div>
           <div className="text-xs text-muted-foreground">Completed</div>
         </div>
-        <div>
+        <div className="p-1 rounded-md" style={{ backgroundColor: `${roleStyle.bgColor}40` }}>
           <div className="text-sm font-medium">{technician.cancelledJobs}</div>
           <div className="text-xs text-muted-foreground">Cancelled</div>
         </div>
-        <div>
-          <div className="text-sm font-medium">${revenue}</div>
+        <div className="p-1 rounded-md" style={{ backgroundColor: `${roleStyle.bgColor}40` }}>
+          <div className="text-sm font-medium" style={{ color: roleStyle.color }}>${revenue}</div>
           <div className="text-xs text-muted-foreground">Revenue</div>
         </div>
       </div>
@@ -123,7 +127,7 @@ export default function TechnicianCard({
       <div className="mt-3 pt-3 border-t text-xs text-muted-foreground">
         <div className="flex justify-between items-center">
           <div>Status: <span className="capitalize">{technician.status}</span></div>
-          <div>Rating: {technician.rating}/5</div>
+          <div>Rating: <span style={{ color: roleStyle.color }}>{technician.rating}/5</span></div>
         </div>
       </div>
     </div>
