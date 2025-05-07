@@ -26,7 +26,7 @@ export default function TechnicianCard({
     maximumFractionDigits: 0,
   }) || "0";
   
-  // Enhanced role-specific styling with proper icons - without circular backgrounds
+  // Role-specific styling with proper colors
   const getRoleStyles = () => {
     switch(technician.role) {
       case "technician":
@@ -120,7 +120,8 @@ export default function TechnicianCard({
             <AvatarImage src={technician.imageUrl} alt={technician.name} />
           ) : (
             <AvatarFallback 
-              className={`font-medium text-white ${roleStyle.iconBg}`}
+              className="font-medium text-white"
+              style={{ backgroundColor: roleStyle.color }}
             >
               {technician.initials}
             </AvatarFallback>
