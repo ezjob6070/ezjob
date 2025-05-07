@@ -24,10 +24,10 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
     <div className="flex justify-between items-center">
       <div>
         <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-          Technicians
+          Staff Management
         </h1>
         <p className="text-muted-foreground mt-1">
-          Manage your technicians and their payment structures
+          Manage your technicians, salesmen and their payment structures
         </p>
       </div>
       <div className="flex space-x-2">
@@ -39,11 +39,11 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Technician Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Staff Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={exportTechnicians}>
               <Download className="h-4 w-4 mr-2" />
-              Export Technicians
+              Export Staff
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Filter className="h-4 w-4 mr-2" />
@@ -56,7 +56,7 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
           onClick={onAddTechnician}
           className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900"
         >
-          <PlusIcon className="mr-2 h-4 w-4" /> Add Technician
+          <PlusIcon className="mr-2 h-4 w-4" /> Add Staff
         </Button>
       </div>
     </div>

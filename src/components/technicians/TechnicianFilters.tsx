@@ -45,6 +45,8 @@ interface TechnicianFiltersProps {
   departments?: string[];
   selectedDepartments?: string[];
   toggleDepartment?: (department: string) => void;
+  roleFilter?: string;
+  onRoleChange?: (role: string) => void;
 }
 
 const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
@@ -63,7 +65,9 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   setDate,
   departments = [],
   selectedDepartments = [],
-  toggleDepartment
+  toggleDepartment,
+  roleFilter = "all",
+  onRoleChange
 }) => {
   const [technicianDropdownOpen, setTechnicianDropdownOpen] = React.useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -82,6 +86,20 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           toggleCategory={toggleCategory}
           addCategory={addCategory}
         />
+        
+        {/* Role filter */}
+        {onRoleChange && (
+          <Select value={roleFilter} onValueChange={onRoleChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="technician">Technicians</SelectItem>
+              <SelectItem value="salesman">Salesmen</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
         
         <Select value={status} onValueChange={onStatusChange}>
           <SelectTrigger className="w-[180px]">

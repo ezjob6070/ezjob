@@ -33,4 +33,5 @@ export interface Technician {
   skills?: string[];
   jobCategories?: string[];
   yearsExperience?: number;
+  role?: "technician" | "salesman";
 }

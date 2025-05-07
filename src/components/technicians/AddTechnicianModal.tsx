@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { TechnicianDateField } from "./form/TechnicianDateField";
 import { TechnicianImageUpload } from "./TechnicianImageUpload";
+import { TechnicianRoleField } from "./form/TechnicianRoleField";
 
 export interface AddTechnicianModalProps {
   open: boolean;
@@ -62,6 +62,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       paymentRate: "50",
       hireDate: "",
       notes: "",
+      role: "technician",
     },
   });
   
@@ -96,6 +97,8 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       // Default salary-related fields
       salaryBasis: values.salaryBasis || "hourly",
       hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : 0,
+      // Add the role field
+      role: values.role,
     };
     
     onAddTechnician(newTechnician);
@@ -108,7 +111,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Technician</DialogTitle>
+          <DialogTitle>Add New Staff</DialogTitle>
         </DialogHeader>
         
         <Form {...form}>
@@ -127,7 +130,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Technician Name *</FormLabel>
+                    <FormLabel>Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter name" {...field} />
                     </FormControl>
@@ -135,6 +138,8 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                   </FormItem>
                 )}
               />
+              
+              <TechnicianRoleField control={form.control} />
               
               <FormField
                 control={form.control}
@@ -323,7 +328,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit">Add Technician</Button>
+              <Button type="submit">Add Staff</Button>
             </DialogFooter>
           </form>
         </Form>

@@ -17,6 +17,7 @@ export const useTechniciansData = () => {
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [roleFilter, setRoleFilter] = useState("all");
   
   const categories = Array.from(new Set(
     technicians.map(tech => tech.category || "Uncategorized")
@@ -46,8 +47,11 @@ export const useTechniciansData = () => {
       const matchesDateRange = !dateRange?.from ||
         (tech.hireDate && new Date(tech.hireDate) >= dateRange.from &&
          (!dateRange.to || new Date(tech.hireDate) <= dateRange.to));
+        
+      const matchesRole = roleFilter === "all" ||
+        (tech.role || "technician") === roleFilter;
       
-      return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange;
+      return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange && matchesRole;
     })
     .sort((a, b) => {
       switch (sortOption) {
@@ -72,7 +76,7 @@ export const useTechniciansData = () => {
     setTechnicians((prevTechnicians) => [newTechnician, ...prevTechnicians]);
     toast({
       title: "Success",
-      description: "New technician added successfully",
+      description: "New staff added successfully",
     });
   };
 
@@ -85,7 +89,7 @@ export const useTechniciansData = () => {
     
     toast({
       title: "Success",
-      description: "Technician updated successfully",
+      description: "Staff updated successfully",
     });
   };
 
@@ -142,7 +146,7 @@ export const useTechniciansData = () => {
     
     const link = document.createElement('a');
     link.href = href;
-    link.download = 'technicians-export.json';
+    link.download = 'staff-export.json';
     document.body.appendChild(link);
     link.click();
     
@@ -151,7 +155,7 @@ export const useTechniciansData = () => {
     
     toast({
       title: "Export Successful",
-      description: `Exported ${dataToExport.length} technicians to JSON.`,
+      description: `Exported ${dataToExport.length} staff records to JSON.`,
     });
   };
 
@@ -167,6 +171,7 @@ export const useTechniciansData = () => {
     dateRange,
     categories,
     departments,
+    roleFilter,
     handleAddTechnician,
     handleUpdateTechnician,
     handleSearchChange,
@@ -176,8 +181,10 @@ export const useTechniciansData = () => {
     handleSortChange,
     setStatusFilter,
     setDateRange,
+    setRoleFilter,
     addCategory,
-    exportTechnicians
+    exportTechnicians,
+    setTechnicians
   };
 };
 

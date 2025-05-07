@@ -29,6 +29,7 @@ const Technicians = () => {
     selectedCategories,
     selectedDepartments = [], 
     statusFilter,
+    roleFilter = "all",
     sortOption,
     dateRange,
     categories,
@@ -39,6 +40,7 @@ const Technicians = () => {
     toggleDepartment,
     handleSortChange,
     setStatusFilter,
+    setRoleFilter,
     setDateRange,
     addCategory,
     exportTechnicians,
@@ -56,7 +58,9 @@ const Technicians = () => {
           hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : 
                     (tech.hireDate ? new Date(tech.hireDate).toISOString().split('T')[0] : '2023-01-01'),
           // Ensure paymentType is valid
-          paymentType: tech.paymentType as "percentage" | "flat" | "hourly" | "salary"
+          paymentType: tech.paymentType as "percentage" | "flat" | "hourly" | "salary",
+          // Default role if not set
+          role: tech.role || "technician"
         };
       });
       setTechnicians(typedTechnicians);
@@ -107,6 +111,10 @@ const Technicians = () => {
 
   const isSalaryDataVisible = !selectedDepartments || selectedDepartments.length === 0 || selectedDepartments.includes("Finance");
 
+  // Get staff counts by role
+  const technicianCount = globalTechnicians.filter(tech => (tech.role || "technician") === "technician").length;
+  const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
+
   return (
     <div className="space-y-8 py-8">
       <TechnicianTabs currentTab="list" />
@@ -124,6 +132,32 @@ const Technicians = () => {
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
           />
+        </div>
+        
+        <div className="mb-4">
+          <div className="flex space-x-2 mb-4">
+            <Button
+              variant={roleFilter === "all" ? "default" : "outline"}
+              onClick={() => setRoleFilter("all")}
+              className="min-w-[100px]"
+            >
+              All Staff ({globalTechnicians.length})
+            </Button>
+            <Button
+              variant={roleFilter === "technician" ? "default" : "outline"}
+              onClick={() => setRoleFilter("technician")}
+              className="min-w-[100px]"
+            >
+              Technicians ({technicianCount})
+            </Button>
+            <Button
+              variant={roleFilter === "salesman" ? "default" : "outline"}
+              onClick={() => setRoleFilter("salesman")}
+              className="min-w-[100px]"
+            >
+              Salesmen ({salesmanCount})
+            </Button>
+          </div>
         </div>
         
         <TechnicianFilters 
@@ -145,6 +179,8 @@ const Technicians = () => {
           departments={departments}
           selectedDepartments={selectedDepartments}
           toggleDepartment={toggleDepartment}
+          roleFilter={roleFilter}
+          onRoleChange={setRoleFilter}
         />
       </div>
       
