@@ -2,11 +2,11 @@
 export interface Task {
   id: string;
   title: string;
-  dueDate?: Date;
+  dueDate: Date;
   start?: string;
   end?: string;
   allDay?: boolean;
-  priority?: "high" | "medium" | "low";
+  priority?: "high" | "medium" | "low" | "urgent";
   status: string;
   client: { name: string };
   location?: string;
