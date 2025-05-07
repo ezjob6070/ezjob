@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Technician } from "@/types/technician";
 import { format } from "date-fns";
 import { useMemo } from "react";
-import { Briefcase, UserCheck, User } from "lucide-react";
+import { Wrench, Briefcase, UserCheck } from "lucide-react";
 
 interface TechnicianCardProps {
   technician: Technician;
@@ -29,24 +29,24 @@ export default function TechnicianCard({
     });
   }, [technician.totalRevenue]);
   
-  // Enhanced role-specific styling
+  // Enhanced role-specific styling with proper icons
   const getRoleStyles = () => {
     switch(technician.role) {
       case "technician":
         return {
           color: "#0EA5E9", // Ocean Blue
           bgColor: "#E0F2FE",
-          icon: <Briefcase className="h-4 w-4 text-[#0EA5E9]" />,
+          icon: <Wrench className="h-4 w-4 text-[#0EA5E9]" />,
           label: "Technician",
           borderHover: "hover:border-[#0EA5E9]"
         };
       case "salesman":
         return {
-          color: "#F97316", // Bright Orange
-          bgColor: "#FEF0E6",
-          icon: <User className="h-4 w-4 text-[#F97316]" />,
+          color: "#10B981", // Emerald Green
+          bgColor: "#ECFDF5",
+          icon: <Briefcase className="h-4 w-4 text-[#10B981]" />,
           label: "Salesman",
-          borderHover: "hover:border-[#F97316]"
+          borderHover: "hover:border-[#10B981]"
         };
       case "employed":
         return {
@@ -60,7 +60,7 @@ export default function TechnicianCard({
         return {
           color: "#6E59A5", // Tertiary Purple
           bgColor: "#F1F0FB",
-          icon: <User className="h-4 w-4 text-[#6E59A5]" />,
+          icon: <UserCheck className="h-4 w-4 text-[#6E59A5]" />,
           label: "Staff",
           borderHover: "hover:border-[#6E59A5]"
         };
@@ -102,9 +102,9 @@ export default function TechnicianCard({
             {technician.specialty}
           </div>
           <div className="flex items-center mt-1 px-2 py-0.5 rounded-full text-xs" 
-               style={{ backgroundColor: roleStyle.bgColor }}>
+               style={{ backgroundColor: roleStyle.bgColor, color: roleStyle.color }}>
             {roleStyle.icon}
-            <span className="ml-1" style={{ color: roleStyle.color }}>{roleStyle.label}</span>
+            <span className="ml-1 font-medium">{roleStyle.label}</span>
           </div>
         </div>
       </div>
