@@ -33,6 +33,7 @@ export interface Technician {
   category?: string;
   role?: "technician" | "salesman" | "employed" | "contractor";
   initials: string;
+  jobCategories?: string[];
 }
 
 export interface Document {

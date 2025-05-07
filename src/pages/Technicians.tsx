@@ -14,7 +14,7 @@ import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
-import { Wrench, Briefcase, UserCheck, Hammer, UserRound } from "lucide-react";
+import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -121,7 +121,6 @@ const Technicians = () => {
   const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
   const employedCount = globalTechnicians.filter(tech => tech.role === "employed").length;
   const contractorCount = globalTechnicians.filter(tech => tech.role === "contractor").length;
-  const femaleCount = globalTechnicians.filter(tech => tech.role === "female").length;
   const totalCount = globalTechnicians.length;
 
   return (
@@ -137,7 +136,7 @@ const Technicians = () => {
       </div>
       
       {/* Role Filter Buttons - Under the header */}
-      <div className="grid grid-cols-6 gap-3 mb-6">
+      <div className="grid grid-cols-5 gap-3 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
@@ -192,17 +191,6 @@ const Technicians = () => {
           </div>
           <div>Contractors</div>
           <div className="text-sm mt-1 font-bold">{contractorCount}</div>
-        </Button>
-        <Button
-          variant={roleFilter === "female" ? "default" : "outline"}
-          onClick={() => setRoleFilter("female")}
-          className={`h-24 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center ${roleFilter === "female" ? "bg-[#FCE7F3] border-2 border-[#EC4899] text-[#EC4899] hover:bg-[#FCE7F3]/90" : ""}`}
-        >
-          <div className="rounded-full bg-[#EC4899]/20 p-2 mb-1">
-            <UserRound className="h-6 w-6 text-[#EC4899]" />
-          </div>
-          <div>Female</div>
-          <div className="text-sm mt-1 font-bold">{femaleCount}</div>
         </Button>
       </div>
       
