@@ -46,7 +46,7 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
         
         <Button 
           onClick={onAddTechnician}
-          className="bg-[#FEF7CD] hover:bg-[#F3EDBD] text-[#8B7E2F]"
+          className="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900"
         >
           <PlusIcon className="mr-2 h-4 w-4" /> Add Staff
         </Button>
