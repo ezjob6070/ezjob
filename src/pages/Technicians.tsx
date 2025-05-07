@@ -10,7 +10,6 @@ import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
 import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
-import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
@@ -123,14 +122,12 @@ const Technicians = () => {
 
   return (
     <div className="space-y-6 py-8">
-      <TechnicianTabs currentTab="list" />
-      
       <TechniciansPageHeader 
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}
       />
       
-      {/* Role Filter Buttons - Moved to top of page */}
+      {/* Role Filter Buttons - At the top of page */}
       <div className="grid grid-cols-3 gap-4 mb-6 mt-4">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
