@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -6,6 +5,7 @@ import { Technician, SalaryBasis } from "@/types/technician";
 import { initialTechnicians } from "@/data/technicians";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { getInitials } from "@/lib/utils";
 
 export const useTechnicianDetail = (technicianId: string | undefined) => {
   const navigate = useNavigate();
@@ -49,14 +49,14 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         totalRevenue: techData.totalRevenue || 0,
         rating: techData.rating || 0,
         // Use existing initials or generate from name
-        initials: techData.initials || techData.name.substring(0, 2).toUpperCase(),
+        initials: techData.initials || getInitials(techData.name),
         // Handle image properties
         profileImage: techData.profileImage || techData.imageUrl,
         imageUrl: techData.imageUrl || techData.profileImage,
         // Ensure incentiveType is a valid enum value if provided
         incentiveType: techData.incentiveType as "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly" | undefined,
         // Role is optional but should be valid if provided
-        role: techData.role as "technician" | "salesman" | "employed" | "contractor" | undefined,
+        role: techData.role as "technician" | "salesman" | "employed" | "contractor" | "female" | undefined,
       };
       
       setTechnician(completeTechData);
@@ -130,11 +130,44 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
     localDateRange,
     setLocalDateRange,
     selectedTechnicianId,
-    handleUpdateTechnician,
-    toggleTechnician,
-    clearFilters,
-    applyFilters,
-    onTechnicianSelect
+    handleUpdateTechnician: (values: TechnicianEditFormValues) => {
+      if (!technician) return;
+      
+      const updatedTechnician = {
+        ...technician,
+        ...values,
+        id: technician.id,
+        paymentRate: Number(values.paymentRate),
+        hourlyRate: Number(values.hourlyRate || technician.hourlyRate),
+        incentiveAmount: values.incentiveAmount ? Number(values.incentiveAmount) : technician.incentiveAmount,
+        profileImage: values.profileImage || technician.profileImage,
+        imageUrl: values.profileImage || technician.imageUrl,
+        notes: values.notes || technician.notes,
+      };
+      
+      setTechnician(updatedTechnician);
+      setFilteredTechnicians([updatedTechnician]);
+      setDisplayedTechnicians([updatedTechnician]);
+      
+      toast({
+        title: "Success",
+        description: "Technician updated successfully",
+      });
+    },
+    toggleTechnician: (techName: string) => {
+      setSelectedTechnicianNames(prev => 
+        prev.includes(techName) ? prev.filter(name => name !== techName) : [...prev, techName]
+      );
+    },
+    clearFilters: () => {
+      setSelectedTechnicianNames([]);
+    },
+    applyFilters: () => {
+      console.log("Applying filters");
+    },
+    onTechnicianSelect: (tech: Technician) => {
+      setSelectedTechnicianId(tech.id);
+    }
   };
 };
 

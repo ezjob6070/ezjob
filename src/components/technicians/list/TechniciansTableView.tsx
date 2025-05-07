@@ -12,7 +12,7 @@ import { Technician } from "@/types/technician";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
-import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
+import { Wrench, Briefcase, UserCheck, Hammer, UserRound } from "lucide-react";
 
 interface TechniciansTableViewProps {
   technicians: Technician[];
@@ -60,6 +60,13 @@ const TechniciansTableView: React.FC<TechniciansTableViewProps> = ({
           bgColor: "#FFEDD5",
           icon: <Hammer className="h-4 w-4 text-[#F97316] mr-1" />,
           label: "Contractor"
+        };
+      case "female":
+        return {
+          color: "#D946EF", // Magenta Pink
+          bgColor: "#FFDEE2", // Soft Pink
+          icon: <UserRound className="h-4 w-4 text-[#D946EF] mr-1" />,
+          label: "Female"
         };
       default:
         return {
