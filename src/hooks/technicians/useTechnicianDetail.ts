@@ -29,6 +29,9 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
     }
     
     if (techData) {
+      // Generate initials from name if not present
+      const nameInitials = techData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+      
       // Ensure we have a valid technician object with all required properties
       const completeTechData: Technician = {
         ...techData,
@@ -49,7 +52,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         totalRevenue: techData.totalRevenue || 0,
         rating: techData.rating || 0,
         // Use existing initials or generate from name
-        initials: techData.initials || techData.name.substring(0, 2).toUpperCase(),
+        initials: techData.initials || nameInitials,
         // Handle image properties
         profileImage: techData.profileImage || techData.imageUrl,
         imageUrl: techData.imageUrl || techData.profileImage,
