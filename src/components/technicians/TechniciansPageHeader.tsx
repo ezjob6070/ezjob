@@ -21,15 +21,7 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
   exportTechnicians
 }) => {
   return (
-    <div className="flex justify-between items-center">
-      <div>
-        <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-          Team Members
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your technicians, salesmen and their payment structures
-        </p>
-      </div>
+    <div className="flex justify-end items-center">
       <div className="flex space-x-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

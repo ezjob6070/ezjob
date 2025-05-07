@@ -194,7 +194,7 @@ const Technicians = () => {
         </Button>
       </div>
       
-      {/* Action buttons */}
+      {/* Action buttons - Removed duplicate Team Members header */}
       <TechniciansPageHeader 
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}
