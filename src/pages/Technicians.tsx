@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -124,7 +123,7 @@ const Technicians = () => {
 
   // Role colors for consistent styling
   const roleColors = {
-    all: "#6E59A5",
+    all: "#8B7E2F", // Changed to dark yellow to match the All Staff card
     technician: "#0EA5E9",
     salesman: "#10B981",
     employed: "#8B5CF6",
@@ -142,19 +141,19 @@ const Technicians = () => {
         </p>
       </div>
       
-      {/* Role Filter Buttons - Enhanced with color-matched text */}
+      {/* Role Filter Buttons - All Staff card now with light yellow background */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
           className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
             ${roleFilter === "all" 
-              ? "bg-[#6E59A5] text-white hover:bg-[#5D4A94]" 
-              : "hover:bg-[#F1F0FB] hover:text-[#6E59A5] border-[#6E59A5]/30"}`}
+              ? "bg-[#FEF7CD] text-[#8B7E2F] hover:bg-[#FEF7CD]/90" 
+              : "hover:bg-[#FEF7CD] hover:text-[#8B7E2F] border-[#8B7E2F]/30"}`}
         >
-          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "all" ? "text-white" : "text-[#6E59A5]"}`} />
+          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`} />
           <div className="text-base font-medium">All Staff</div>
-          <div className={`text-3xl font-bold mt-2 ${roleFilter === "all" ? "text-white" : "text-[#6E59A5]"}`}>{totalCount}</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`}>{totalCount}</div>
         </Button>
         
         <Button

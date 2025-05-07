@@ -1,5 +1,5 @@
 
-export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "commission" | "annually" | "yearly";
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
 
 export interface Technician {
   id: string;

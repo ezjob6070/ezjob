@@ -75,14 +75,14 @@ export default function TechnicianCard({
         };
       default:
         return {
-          color: "#6E59A5", // Tertiary Purple
-          bgColor: "#F1F0FB",
-          icon: <UserCheck className="h-4 w-4 text-[#6E59A5]" />,
+          color: "#8B7E2F", // Dark Yellow for "All Staff"
+          bgColor: "#FEF7CD", // Light Yellow
+          icon: <UserCheck className="h-4 w-4 text-[#8B7E2F]" />,
           label: "Staff",
-          borderHover: "hover:border-[#6E59A5]",
-          gradientFrom: "from-gray-50",
-          gradientTo: "to-gray-100",
-          iconBg: "bg-gray-500"
+          borderHover: "hover:border-[#8B7E2F]",
+          gradientFrom: "from-yellow-50",
+          gradientTo: "to-yellow-100",
+          iconBg: "bg-yellow-500"
         };
     }
   };
