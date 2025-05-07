@@ -61,7 +61,9 @@ const Technicians = () => {
           // Ensure paymentType is valid
           paymentType: tech.paymentType as "percentage" | "flat" | "hourly" | "salary",
           // Default role if not set
-          role: tech.role || "technician"
+          role: tech.role || "technician",
+          // Default initials if not set
+          initials: tech.initials || tech.name.split(' ').map(n => n[0]).join('')
         };
       });
       setTechnicians(typedTechnicians);
@@ -87,7 +89,10 @@ const Technicians = () => {
         ? technicianData.hireDate 
         : (technicianData.hireDate instanceof Date 
             ? technicianData.hireDate.toISOString().split('T')[0] 
-            : new Date().toISOString().split('T')[0])
+            : new Date().toISOString().split('T')[0]),
+      // Default initials if not set
+      initials: technicianData.initials || 
+        (technicianData.name ? technicianData.name.split(' ').map(n => n[0]).join('') : 'XX')
     };
     
     addTechnician(technicianWithId);
@@ -135,26 +140,26 @@ const Technicians = () => {
           />
         </div>
         
-        <div className="mb-4">
-          <div className="flex space-x-2 mb-4">
+        <div className="mb-8">
+          <div className="grid grid-cols-3 gap-4">
             <Button
               variant={roleFilter === "all" ? "default" : "outline"}
               onClick={() => setRoleFilter("all")}
-              className="min-w-[100px]"
+              className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "all" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
             >
               All Staff ({globalTechnicians.length})
             </Button>
             <Button
               variant={roleFilter === "technician" ? "default" : "outline"}
               onClick={() => setRoleFilter("technician")}
-              className="min-w-[100px]"
+              className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "technician" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
             >
               Technicians ({technicianCount})
             </Button>
             <Button
               variant={roleFilter === "salesman" ? "default" : "outline"}
               onClick={() => setRoleFilter("salesman")}
-              className="min-w-[100px]"
+              className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "salesman" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
             >
               Salesmen ({salesmanCount})
             </Button>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Technician } from "@/types/technician";
@@ -171,8 +172,25 @@ export const useTechniciansData = () => {
     categories,
     departments,
     roleFilter,
-    handleAddTechnician,
-    handleUpdateTechnician,
+    handleAddTechnician: (newTechnician: Technician) => {
+      setTechnicians((prevTechnicians) => [newTechnician, ...prevTechnicians]);
+      toast({
+        title: "Success",
+        description: "New staff added successfully",
+      });
+    },
+    handleUpdateTechnician: (updatedTechnician: Technician) => {
+      setTechnicians((prevTechnicians) => 
+        prevTechnicians.map((tech) => 
+          tech.id === updatedTechnician.id ? updatedTechnician : tech
+        )
+      );
+      
+      toast({
+        title: "Success",
+        description: "Staff updated successfully",
+      });
+    },
     handleSearchChange,
     toggleTechnician,
     toggleCategory,
