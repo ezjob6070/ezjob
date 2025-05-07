@@ -5,7 +5,6 @@ import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
-import TechnicianStats from "@/components/technicians/TechnicianStats";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
 import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
@@ -148,66 +147,66 @@ const Technicians = () => {
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
-          className={`h-40 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
             ${roleFilter === "all" 
               ? "bg-[#6E59A5] text-white hover:bg-[#5D4A94]" 
               : "hover:bg-[#F1F0FB] hover:text-[#6E59A5] border-[#6E59A5]/30"}`}
         >
-          <UserCheck className={`h-16 w-16 mb-3 ${roleFilter !== "all" ? "text-[#6E59A5]" : ""}`} />
+          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "all" ? "text-white" : "text-[#6E59A5]"}`} />
           <div className="text-base font-medium">All Staff</div>
-          <div className={`text-2xl font-bold mt-2 ${roleFilter !== "all" ? "text-[#6E59A5]" : ""}`}>{totalCount}</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "all" ? "text-white" : "text-[#6E59A5]"}`}>{totalCount}</div>
         </Button>
         
         <Button
           variant={roleFilter === "technician" ? "default" : "outline"}
           onClick={() => setRoleFilter("technician")}
-          className={`h-40 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
             ${roleFilter === "technician" 
               ? "bg-[#0EA5E9] text-white hover:bg-[#0D96D6]" 
               : "hover:bg-[#E0F2FE] hover:text-[#0EA5E9] border-[#0EA5E9]/30"}`}
         >
-          <Wrench className={`h-16 w-16 mb-3 ${roleFilter !== "technician" ? "text-[#0EA5E9]" : ""}`} />
+          <Wrench className={`h-20 w-20 mb-3 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`} />
           <div className="text-base font-medium">Technicians</div>
-          <div className={`text-2xl font-bold mt-2 ${roleFilter !== "technician" ? "text-[#0EA5E9]" : ""}`}>{technicianCount}</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`}>{technicianCount}</div>
         </Button>
         
         <Button
           variant={roleFilter === "salesman" ? "default" : "outline"}
           onClick={() => setRoleFilter("salesman")}
-          className={`h-40 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
             ${roleFilter === "salesman" 
               ? "bg-[#10B981] text-white hover:bg-[#0EA874]" 
               : "hover:bg-[#ECFDF5] hover:text-[#10B981] border-[#10B981]/30"}`}
         >
-          <Briefcase className={`h-16 w-16 mb-3 ${roleFilter !== "salesman" ? "text-[#10B981]" : ""}`} />
+          <Briefcase className={`h-20 w-20 mb-3 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
           <div className="text-base font-medium">Salesmen</div>
-          <div className={`text-2xl font-bold mt-2 ${roleFilter !== "salesman" ? "text-[#10B981]" : ""}`}>{salesmanCount}</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`}>{salesmanCount}</div>
         </Button>
         
         <Button
           variant={roleFilter === "employed" ? "default" : "outline"}
           onClick={() => setRoleFilter("employed")}
-          className={`h-40 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
             ${roleFilter === "employed" 
               ? "bg-[#8B5CF6] text-white hover:bg-[#7C4EE7]" 
               : "hover:bg-[#F3E8FF] hover:text-[#8B5CF6] border-[#8B5CF6]/30"}`}
         >
-          <UserCheck className={`h-16 w-16 mb-3 ${roleFilter !== "employed" ? "text-[#8B5CF6]" : ""}`} />
+          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`} />
           <div className="text-base font-medium">Employed</div>
-          <div className={`text-2xl font-bold mt-2 ${roleFilter !== "employed" ? "text-[#8B5CF6]" : ""}`}>{employedCount}</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`}>{employedCount}</div>
         </Button>
         
         <Button
           variant={roleFilter === "contractor" ? "default" : "outline"}
           onClick={() => setRoleFilter("contractor")}
-          className={`h-40 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
             ${roleFilter === "contractor" 
               ? "bg-[#F97316] text-white hover:bg-[#E76A14]" 
               : "hover:bg-[#FFEDD5] hover:text-[#F97316] border-[#F97316]/30"}`}
         >
-          <Hammer className={`h-16 w-16 mb-3 ${roleFilter !== "contractor" ? "text-[#F97316]" : ""}`} />
+          <Hammer className={`h-20 w-20 mb-3 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`} />
           <div className="text-base font-medium">Contractors</div>
-          <div className={`text-2xl font-bold mt-2 ${roleFilter !== "contractor" ? "text-[#F97316]" : ""}`}>{contractorCount}</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`}>{contractorCount}</div>
         </Button>
       </div>
       
@@ -216,8 +215,6 @@ const Technicians = () => {
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}
       />
-
-      <TechnicianStats technicians={globalTechnicians} />
       
       <div className="mb-6">
         <div className="mb-4">
