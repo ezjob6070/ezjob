@@ -172,6 +172,7 @@ export const useTechniciansData = () => {
     categories,
     departments,
     roleFilter,
+    setRoleFilter,
     handleAddTechnician: (newTechnician: Technician) => {
       setTechnicians((prevTechnicians) => [newTechnician, ...prevTechnicians]);
       toast({
@@ -191,16 +192,67 @@ export const useTechniciansData = () => {
         description: "Staff updated successfully",
       });
     },
-    handleSearchChange,
-    toggleTechnician,
-    toggleCategory,
-    toggleDepartment,
-    handleSortChange,
+    handleSearchChange: (query: string) => {
+      setSearchQuery(query);
+    },
+    toggleTechnician: (technicianId: string) => {
+      setSelectedTechnicians(prev => {
+        if (prev.includes(technicianId)) {
+          return prev.filter(id => id !== technicianId);
+        } else {
+          return [...prev, technicianId];
+        }
+      });
+    },
+    toggleCategory: (category: string) => {
+      setSelectedCategories(prev => {
+        if (prev.includes(category)) {
+          return prev.filter(c => c !== category);
+        } else {
+          return [...prev, category];
+        }
+      });
+    },
+    toggleDepartment: (department: string) => {
+      setSelectedDepartments(prev => {
+        if (prev.includes(department)) {
+          return prev.filter(d => d !== department);
+        } else {
+          return [...prev, department];
+        }
+      });
+    },
+    handleSortChange: (option: SortOption) => {
+      setSortOption(option);
+    },
     setStatusFilter,
     setDateRange,
-    setRoleFilter,
-    addCategory,
-    exportTechnicians,
+    addCategory: (category: string) => {
+      toast({
+        title: "Category Added",
+        description: `New category "${category}" has been added.`,
+      });
+    },
+    exportTechnicians: () => {
+      const dataToExport = filteredTechnicians;
+      const json = JSON.stringify(dataToExport, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const href = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = href;
+      link.download = 'staff-export.json';
+      document.body.appendChild(link);
+      link.click();
+      
+      document.body.removeChild(link);
+      URL.revokeObjectURL(href);
+      
+      toast({
+        title: "Export Successful",
+        description: `Exported ${dataToExport.length} staff records to JSON.`,
+      });
+    },
     setTechnicians
   };
 };

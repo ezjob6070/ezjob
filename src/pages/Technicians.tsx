@@ -19,6 +19,7 @@ const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
+  const [roleFilter, setRoleFilter] = useState("all");
   
   const { technicians: globalTechnicians, addTechnician, updateTechnician } = useGlobalState();
   
@@ -29,7 +30,6 @@ const Technicians = () => {
     selectedCategories,
     selectedDepartments = [], 
     statusFilter,
-    roleFilter = "all",
     sortOption,
     dateRange,
     categories,
@@ -40,7 +40,6 @@ const Technicians = () => {
     toggleDepartment,
     handleSortChange,
     setStatusFilter,
-    setRoleFilter,
     setDateRange,
     addCategory,
     exportTechnicians,
@@ -119,22 +118,19 @@ const Technicians = () => {
   // Get staff counts by role
   const technicianCount = globalTechnicians.filter(tech => (tech.role || "technician") === "technician").length;
   const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
+  const employedCount = globalTechnicians.filter(tech => tech.role === "employed").length;
+  const totalCount = globalTechnicians.length;
 
   return (
     <div className="space-y-6 py-8">
-      <TechniciansPageHeader 
-        onAddTechnician={() => setShowAddModal(true)}
-        exportTechnicians={exportTechnicians}
-      />
-      
       {/* Role Filter Buttons - At the top of page */}
-      <div className="grid grid-cols-3 gap-4 mb-6 mt-4">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
           className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "all" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
         >
-          All Staff ({globalTechnicians.length})
+          All Staff ({totalCount})
         </Button>
         <Button
           variant={roleFilter === "technician" ? "default" : "outline"}
@@ -150,7 +146,19 @@ const Technicians = () => {
         >
           Salesmen ({salesmanCount})
         </Button>
+        <Button
+          variant={roleFilter === "employed" ? "default" : "outline"}
+          onClick={() => setRoleFilter("employed")}
+          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "employed" ? "bg-[#F1F0FB] border-2 border-[#9b87f5] text-[#6E59A5] hover:bg-[#F1F0FB]/90" : ""}`}
+        >
+          Employed ({employedCount})
+        </Button>
       </div>
+      
+      <TechniciansPageHeader 
+        onAddTechnician={() => setShowAddModal(true)}
+        exportTechnicians={exportTechnicians}
+      />
 
       <TechnicianStats technicians={globalTechnicians} />
       
