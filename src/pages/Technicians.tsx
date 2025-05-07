@@ -14,6 +14,7 @@ import TechnicianTabs from "@/components/technicians/TechnicianTabs";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
+import { Button } from "@/components/ui/button";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
