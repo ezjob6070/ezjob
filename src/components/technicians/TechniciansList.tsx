@@ -19,7 +19,7 @@ interface TechniciansListProps {
 
 const TechniciansList: React.FC<TechniciansListProps> = ({ 
   technicians, 
-  displayMode: initialDisplayMode = "card", // Changed default to card
+  displayMode: initialDisplayMode = "card",
   selectedTechnicians = [],
   onToggleSelect,
   onEditTechnician,
@@ -28,7 +28,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
   const [displayMode, setDisplayMode] = useState<"card" | "table">(initialDisplayMode);
 
   // Calculate how many of each role we have
-  const technicianCount = technicians.filter(t => t.role === "technician").length;
+  const technicianCount = technicians.filter(t => (t.role || "technician") === "technician").length;
   const salesmanCount = technicians.filter(t => t.role === "salesman").length;
   const employedCount = technicians.filter(t => t.role === "employed").length;
 
