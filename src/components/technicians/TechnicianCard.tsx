@@ -26,7 +26,7 @@ export default function TechnicianCard({
     maximumFractionDigits: 0,
   }) || "0";
   
-  // Enhanced role-specific styling with proper icons
+  // Enhanced role-specific styling with proper icons - without circular backgrounds
   const getRoleStyles = () => {
     switch(technician.role) {
       case "technician":
