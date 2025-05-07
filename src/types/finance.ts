@@ -31,6 +31,7 @@ export type FinancialReport = {
 export type JobSource = {
   id: string;
   name: string;
+  type: string;
   website?: string;
   logoUrl?: string;
   category?: string;
@@ -38,7 +39,11 @@ export type JobSource = {
   totalRevenue?: number;
   expenses?: number;
   companyProfit?: number;
-  createdAt?: Date;
+  paymentType: "percentage" | "fixed";
+  paymentValue: number;
+  isActive: boolean;
+  profit: number;
+  createdAt: Date;
 };
 
 export type ProfitBreakdownItem = {

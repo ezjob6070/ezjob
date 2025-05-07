@@ -1,5 +1,5 @@
 
-export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "annually";
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "annually" | "commission" | "yearly";
 
 export interface Technician {
   id: string;
@@ -17,6 +17,7 @@ export interface Technician {
   salaryBasis: SalaryBasis;
   hourlyRate: number;
   incentiveAmount?: number;
+  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
   completedJobs: number;
   cancelledJobs: number;
   totalRevenue: number;
@@ -27,4 +28,9 @@ export interface Technician {
   hireDate: string;
   notes?: string;
   category?: string;
+  contractType?: string;
+  certifications?: string[];
+  skills?: string[];
+  jobCategories?: string[];
+  yearsExperience?: number;
 }

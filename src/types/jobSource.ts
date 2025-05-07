@@ -1,9 +1,8 @@
 
-// Update the JobSource type definition to include all required fields
 export type JobSource = {
   id: string;
   name: string;
-  type: string; // Required field for GlobalStateProvider
+  type: string;
   website?: string;
   phone?: string;
   email?: string;

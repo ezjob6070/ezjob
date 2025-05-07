@@ -31,11 +31,12 @@ export const technicianEditSchema = z.object({
   notes: z.string().optional(),
   department: z.string().optional(),
   position: z.string().optional(),
-  salaryBasis: z.enum(["hourly", "annual", "commission", "weekly", "monthly", "yearly"] as const).optional(),
+  salaryBasis: z.enum(["hourly", "weekly", "bi-weekly", "monthly", "annually", "commission", "yearly"] as const).optional(),
   hourlyRate: z.string().optional(),
   incentiveType: z.enum(["hourly", "weekly", "monthly", "bonus", "commission", "none"] as const).optional(),
   incentiveAmount: z.string().optional(),
   profileImage: z.string().nullable().optional(),
+  contractType: z.string().optional(),
 });
 
 export type TechnicianEditFormValues = z.infer<typeof technicianEditSchema>;

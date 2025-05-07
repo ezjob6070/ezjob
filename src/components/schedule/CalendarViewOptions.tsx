@@ -1,5 +1,5 @@
 
-import { Calendar, CalendarDays, CalendarWeek, Home, LayoutGrid } from "lucide-react";
+import { Calendar, CalendarDays, LayoutGrid, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -20,7 +20,7 @@ const CalendarViewOptions = ({ currentView, onViewChange }: CalendarViewOptionsP
             <span className="hidden sm:inline">Day</span>
           </ToggleGroupItem>
           <ToggleGroupItem value="week" aria-label="Weekly View" className="gap-1">
-            <CalendarWeek className="h-4 w-4" />
+            <Calendar className="h-4 w-4" />
             <span className="hidden sm:inline">Week</span>
           </ToggleGroupItem>
           <ToggleGroupItem value="month" aria-label="Monthly View" className="gap-1">
