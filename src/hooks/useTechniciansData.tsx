@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Technician } from "@/types/technician";
+import { Technician, StaffRole } from "@/types/technician";
 import { DateRange } from "react-day-picker";
 import { initialTechnicians } from "@/data/technicians";
 
@@ -17,6 +17,7 @@ export const useTechniciansData = () => {
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [roleFilter, setRoleFilter] = useState<StaffRole | "all">("all");
   
   const categories = Array.from(new Set(
     technicians.map(tech => tech.category || "Uncategorized")
@@ -47,7 +48,12 @@ export const useTechniciansData = () => {
         (tech.hireDate && new Date(tech.hireDate) >= dateRange.from &&
          (!dateRange.to || new Date(tech.hireDate) <= dateRange.to));
       
-      return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange;
+      const matchesRole = roleFilter === "all" ||
+        tech.role === roleFilter ||
+        (roleFilter === "technician" && !tech.role) || // Assume technician if role not specified
+        (!tech.role && roleFilter === "technician"); // Legacy data support
+      
+      return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange && matchesRole;
     })
     .sort((a, b) => {
       switch (sortOption) {
@@ -72,7 +78,7 @@ export const useTechniciansData = () => {
     setTechnicians((prevTechnicians) => [newTechnician, ...prevTechnicians]);
     toast({
       title: "Success",
-      description: "New technician added successfully",
+      description: `New ${newTechnician.role === "salesman" ? "salesman" : "technician"} added successfully`,
     });
   };
 
@@ -85,7 +91,7 @@ export const useTechniciansData = () => {
     
     toast({
       title: "Success",
-      description: "Technician updated successfully",
+      description: `${updatedTechnician.role === "salesman" ? "Salesman" : "Technician"} updated successfully`,
     });
   };
 
@@ -127,6 +133,10 @@ export const useTechniciansData = () => {
     setSortOption(option);
   };
 
+  const handleRoleChange = (role: StaffRole | "all") => {
+    setRoleFilter(role);
+  };
+
   const addCategory = (category: string) => {
     toast({
       title: "Category Added",
@@ -142,7 +152,7 @@ export const useTechniciansData = () => {
     
     const link = document.createElement('a');
     link.href = href;
-    link.download = 'technicians-export.json';
+    link.download = 'staff-export.json';
     document.body.appendChild(link);
     link.click();
     
@@ -151,7 +161,7 @@ export const useTechniciansData = () => {
     
     toast({
       title: "Export Successful",
-      description: `Exported ${dataToExport.length} technicians to JSON.`,
+      description: `Exported ${dataToExport.length} staff members to JSON.`,
     });
   };
 
@@ -165,6 +175,7 @@ export const useTechniciansData = () => {
     statusFilter,
     sortOption,
     dateRange,
+    roleFilter,
     categories,
     departments,
     handleAddTechnician,
@@ -174,10 +185,12 @@ export const useTechniciansData = () => {
     toggleCategory,
     toggleDepartment,
     handleSortChange,
+    handleRoleChange,
     setStatusFilter,
     setDateRange,
     addCategory,
-    exportTechnicians
+    exportTechnicians,
+    setTechnicians
   };
 };
 

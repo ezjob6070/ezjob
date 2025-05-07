@@ -21,6 +21,7 @@ import { TechnicianDateField } from "@/components/technicians/form/TechnicianDat
 import TechnicianPaymentFields from "@/components/technicians/form/TechnicianPaymentFields";
 import { TechnicianStatusFields } from "@/components/technicians/form/TechnicianStatusFields";
 import { TechnicianImageUpload } from "@/components/technicians/TechnicianImageUpload";
+import { TechnicianRoleField } from "@/components/technicians/form/TechnicianRoleField";
 
 export interface EditTechnicianModalProps {
   technician: Technician | null;
@@ -55,6 +56,7 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
       hourlyRate: String(technician?.hourlyRate || ""),
       incentiveType: technician?.incentiveType,
       incentiveAmount: String(technician?.incentiveAmount || ""),
+      role: technician?.role || "technician",
     },
   });
 
@@ -74,13 +76,16 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
 
   if (!technician) return null;
 
+  // Determine title based on role
+  const modalTitle = form.watch("role") === "salesman" ? "Edit Salesman" : "Edit Technician";
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-h-[90vh] overflow-y-auto">
         <AlertDialogHeader>
-          <AlertDialogTitle>Edit Technician</AlertDialogTitle>
+          <AlertDialogTitle>{modalTitle}</AlertDialogTitle>
           <AlertDialogDescription>
-            Make changes to the technician's profile here. Click save when
+            Make changes to the {form.watch("role") === "salesman" ? "salesman" : "technician"}'s profile here. Click save when
             you're done.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -99,6 +104,9 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
             </div>
 
             <div className="space-y-4">
+              {/* Add Role Field */}
+              <TechnicianRoleField control={form.control} />
+              
               <TechnicianBasicInfoFields control={form.control} />
               
               <TechnicianStatusFields control={form.control} />
@@ -113,14 +121,14 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
                 control={form.control}
                 name="startDate"
                 label="Start Date"
-                description="When did the technician start working?"
+                description="When did the staff member start working?"
               />
               
               <TechnicianDateField
                 control={form.control}
                 name="hireDate"
                 label="Hire Date"
-                description="When was the technician officially hired?"
+                description="When was the staff member officially hired?"
               />
             </div>
             
