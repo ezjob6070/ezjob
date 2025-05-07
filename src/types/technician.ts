@@ -1,5 +1,11 @@
 
-export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "monthly" | "commission" | "annually" | "yearly";
+export type TechnicianStatus = "active" | "inactive" | "onLeave";
+
+export type PaymentType = "percentage" | "flat" | "hourly" | "salary";
+
+export type SalaryBasis = "weekly" | "biweekly" | "monthly" | "yearly";
+
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
 
 export interface Technician {
   id: string;
@@ -10,55 +16,24 @@ export interface Technician {
   position?: string;
   department?: string;
   startDate?: string;
-  status: "active" | "inactive" | "onLeave";
+  status: TechnicianStatus;
   hireDate: string;
   specialty: string;
-  paymentType: "percentage" | "flat" | "hourly" | "salary";
-  paymentRate: number;
-  hourlyRate: number;
-  salaryBasis: SalaryBasis;
+  rating: number;
+  bio?: string;
+  skills?: string[];
   completedJobs: number;
   cancelledJobs: number;
-  totalRevenue: number;
-  rating: number;
-  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
-  incentiveAmount?: number;
-  notes?: string;
-  profileImage?: string;
+  totalRevenue?: number;
   imageUrl?: string;
-  certifications?: string[];
-  skills?: string[];
-  yearsExperience?: number;
-  documents?: Document[];
+  paymentType: PaymentType;
+  paymentRate: number;
+  salaryBasis?: SalaryBasis;
+  hourlyRate?: number;
+  incentiveAmount?: number;
   category?: string;
-  role?: "technician" | "salesman" | "employed" | "contractor";
+  role: TechnicianRole;
   initials: string;
-  jobCategories?: string[];
-}
-
-export interface Document {
-  id: string;
-  title: string;
-  type: string;
-  url: string;
-  uploadDate: string;
-  size?: number;
-}
-
-export interface TechnicianFilters {
-  search: string;
-  paymentTypes: string[];
-  status: string[];
-  categories: string[];
-  dateRange?: {
-    from: Date;
-    to: Date;
-  };
-}
-
-export interface FinancialSummary {
-  totalRevenue: number;
-  totalJobs: number;
-  averageJobValue: number;
-  paymentsDue: number;
+  profileImage?: string;
+  isActive?: boolean;
 }
