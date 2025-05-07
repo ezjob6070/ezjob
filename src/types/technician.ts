@@ -31,7 +31,7 @@ export interface Technician {
   yearsExperience?: number;
   documents?: Document[];
   category?: string;
-  role?: "technician" | "salesman" | "employed" | "contractor" | "female";
+  role?: "technician" | "salesman" | "employed" | "contractor";
   initials: string;
 }
 

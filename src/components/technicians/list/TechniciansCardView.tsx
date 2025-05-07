@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { 
   Star, Edit, Mail, Phone, MapPin, 
-  CheckCircle, XCircle, Wrench, Briefcase, UserCheck, Hammer, UserRound
+  CheckCircle, XCircle, Wrench, Briefcase, UserCheck, Hammer 
 } from "lucide-react";
 import { Technician } from "@/types/technician";
 import { getBadgeVariantFromStatus, formatHourlyRate } from "./technicianListUtils";
@@ -53,13 +53,6 @@ const TechniciansCardView: React.FC<TechniciansCardViewProps> = ({
           bgColor: "#FFEDD5",
           icon: <Hammer className="h-4 w-4 mr-1" />,
           label: "Contractor"
-        };
-      case "female":
-        return {
-          color: "#D946EF", // Magenta Pink
-          bgColor: "#FFDEE2", // Soft Pink
-          icon: <UserRound className="h-4 w-4 mr-1" />,
-          label: "Female"
         };
       default:
         return {

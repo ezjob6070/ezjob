@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -119,7 +120,6 @@ const Technicians = () => {
   const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
   const employedCount = globalTechnicians.filter(tech => tech.role === "employed").length;
   const contractorCount = globalTechnicians.filter(tech => tech.role === "contractor").length;
-  const femaleCount = globalTechnicians.filter(tech => tech.role === "female").length;
   const totalCount = globalTechnicians.length;
 
   return (
@@ -135,7 +135,7 @@ const Technicians = () => {
       </div>
       
       {/* Role Filter Buttons - Under the header */}
-      <div className="grid grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
@@ -170,13 +170,6 @@ const Technicians = () => {
           className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "contractor" ? "bg-[#FFEDD5] border-2 border-[#F97316] text-[#F97316] hover:bg-[#FFEDD5]/90" : ""}`}
         >
           Contractors ({contractorCount})
-        </Button>
-        <Button
-          variant={roleFilter === "female" ? "default" : "outline"}
-          onClick={() => setRoleFilter("female")}
-          className={`h-16 text-lg font-medium shadow-md hover:shadow-lg transition-all ${roleFilter === "female" ? "bg-[#FFDEE2] border-2 border-[#D946EF] text-[#D946EF] hover:bg-[#FFDEE2]/90" : ""}`}
-        >
-          Female ({femaleCount})
         </Button>
       </div>
       
