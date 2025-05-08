@@ -7,7 +7,6 @@ import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
-import TechnicianSearchBar from "@/components/technicians/TechnicianSearchBar";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
@@ -22,18 +21,20 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [roleFilter, setRoleFilter] = useState("all");
+  const [searchQuery, setLocalSearchQuery] = useState("");
   
   const { technicians: globalTechnicians, addTechnician, updateTechnician } = useGlobalState();
   
   const {
     filteredTechnicians,
-    searchQuery,
+    searchQuery: hookSearchQuery,
     selectedTechnicians,
     selectedCategories,
     selectedDepartments = [], 
@@ -42,7 +43,6 @@ const Technicians = () => {
     dateRange,
     categories,
     departments = [], 
-    handleSearchChange,
     toggleTechnician,
     toggleCategory,
     toggleDepartment,
@@ -52,8 +52,14 @@ const Technicians = () => {
     addCategory,
     exportTechnicians,
     setTechnicians,
-    setRoleFilter
+    handleSearchChange: setSearchQueryInHook
   } = useTechniciansData();
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocalSearchQuery(value);
+    setSearchQueryInHook(value);
+  };
   
   // Sync technicians from GlobalState to local state in useTechniciansData
   useEffect(() => {
@@ -200,10 +206,14 @@ const Technicians = () => {
       
       <div className="mb-6">
         <div className="mb-4">
-          <TechnicianSearchBar
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-          />
+          <div className="relative">
+            <Input
+              placeholder="Search team members..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-full"
+            />
+          </div>
         </div>
         
         <TechnicianFilters 
