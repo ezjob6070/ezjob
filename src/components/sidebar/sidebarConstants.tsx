@@ -60,7 +60,7 @@ const commonNavItems: NavItem[] = [
     href: "/jobs",
   },
   {
-    label: "Technicians",
+    label: "Team Management",
     icon: <WrenchIcon size={18} />,
     href: "/technicians",
   },
