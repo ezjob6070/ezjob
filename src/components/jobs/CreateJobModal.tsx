@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -486,8 +485,9 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 )}
               />
 
-              {/* Job Definition, Source, and Contractor fields in a single row */}
+              {/* Job Definition (Technician), Job Contractor, and Job Source fields in a single row - rearranged order */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Technician field - placed first */}
                 <FormField
                   control={form.control}
                   name="technicianId"
@@ -516,6 +516,13 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                             {filteredTechnicians.map((tech) => (
                               <SelectItem key={tech.id} value={tech.id}>
                                 {tech.name}
+                                {tech.paymentType && tech.paymentRate && (
+                                  <span className="ml-2 text-xs text-gray-500">
+                                    ({tech.paymentType === 'percentage' ? 
+                                      `${tech.paymentRate}%` : 
+                                      `$${tech.paymentRate}`})
+                                  </span>
+                                )}
                               </SelectItem>
                             ))}
                             {filteredTechnicians.length === 0 && (
@@ -526,62 +533,19 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           </div>
                         </SelectContent>
                       </Select>
+                      {selectedTechnician && formatPaymentInfo(selectedTechnician, 'technician')}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {jobSources.length > 0 && (
-                  <FormField
-                    control={form.control}
-                    name="jobSourceId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Job Source</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value || ""}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a job source" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <div className="px-3 pb-2">
-                              <Input
-                                placeholder="Search job sources..."
-                                value={jobSourceSearch}
-                                onChange={(e) => setJobSourceSearch(e.target.value)}
-                                className="mb-2"
-                              />
-                            </div>
-                            <div className="max-h-[200px] overflow-y-auto">
-                              {filteredJobSources.map((source) => (
-                                <SelectItem key={source.id} value={source.id}>
-                                  {source.name}
-                                </SelectItem>
-                              ))}
-                              {filteredJobSources.length === 0 && (
-                                <div className="px-3 py-2 text-sm text-muted-foreground">
-                                  No job sources found
-                                </div>
-                              )}
-                            </div>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-
+                {/* Job Contractor field - moved to second position */}
                 <FormField
                   control={form.control}
                   name="contractorId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Contractor</FormLabel>
+                      <FormLabel>Job Contractor (Optional)</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         value={field.value || ""}
@@ -604,6 +568,13 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                             {filteredContractors.map((contractor) => (
                               <SelectItem key={contractor.id} value={contractor.id}>
                                 {contractor.name}
+                                {contractor.paymentType && contractor.paymentRate && (
+                                  <span className="ml-2 text-xs text-gray-500">
+                                    ({contractor.paymentType === 'percentage' ? 
+                                      `${contractor.paymentRate}%` : 
+                                      `$${contractor.paymentRate}`})
+                                  </span>
+                                )}
                               </SelectItem>
                             ))}
                             {filteredContractors.length === 0 && (
@@ -614,10 +585,65 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           </div>
                         </SelectContent>
                       </Select>
+                      {selectedContractor && formatPaymentInfo(selectedContractor, 'contractor')}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Job Source field - moved to third position */}
+                {jobSources.length > 0 && (
+                  <FormField
+                    control={form.control}
+                    name="jobSourceId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Source (Optional)</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a job source" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <div className="px-3 pb-2">
+                              <Input
+                                placeholder="Search job sources..."
+                                value={jobSourceSearch}
+                                onChange={(e) => setJobSourceSearch(e.target.value)}
+                                className="mb-2"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              {filteredJobSources.map((source) => (
+                                <SelectItem key={source.id} value={source.id}>
+                                  {source.name}
+                                  {source.paymentType && source.paymentValue && (
+                                    <span className="ml-2 text-xs text-gray-500">
+                                      ({source.paymentType === 'percentage' ? 
+                                        `${source.paymentValue}%` : 
+                                        `$${source.paymentValue}`})
+                                    </span>
+                                  )}
+                                </SelectItem>
+                              ))}
+                              {filteredJobSources.length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No job sources found
+                                </div>
+                              )}
+                            </div>
+                          </SelectContent>
+                        </Select>
+                        {selectedJobSource && formatPaymentInfo(selectedJobSource, 'jobSource')}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
 
               {/* Payment badges row */}
