@@ -66,7 +66,7 @@ interface JobsContextType {
   // Job operations
   handleAddJob: (job: Job) => void;
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
-  handleCompleteJob: (jobId: string, actualAmount: number) => void;
+  handleCompleteJob: (jobId: string, actualAmount?: number) => void;
   handleRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
   handleSendToEstimate: (job: Job) => void;
   
@@ -77,13 +77,13 @@ interface JobsContextType {
   closeStatusModal: () => void;
   
   // Job source operations
-  toggleJobSourceSidebar: () => void;
+  toggleJobSourceSidebar?: () => void;
 }
 
 // Create the context with a default undefined value
 const JobsContext = createContext<JobsContextType | undefined>(undefined);
 
-// Context provider component
+// Context provider component with default values for required properties
 export const JobsProvider = ({ children, value }: { children: ReactNode, value: JobsContextType }) => {
   return <JobsContext.Provider value={value}>{children}</JobsContext.Provider>;
 };

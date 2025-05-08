@@ -65,23 +65,18 @@ const JobsContainer = ({
       
       {/* Jobs Tabs and Table */}
       <JobsFilterPopovers 
-        categories={[]}
-        selectedCategories={[]}
-        toggleCategory={() => {}}
-        selectAllCategories={() => {}}
-        deselectAllCategories={() => {}}
         serviceTypes={["All Services", "Installation", "Repair", "Maintenance"]}
-        selectedServiceTypes={selectedServiceTypes}
+        selectedServiceTypes={selectedServiceTypes || []}
         toggleServiceType={toggleServiceType}
         selectAllServiceTypes={selectAllServiceTypes}
         deselectAllServiceTypes={deselectAllServiceTypes}
-        jobSources={jobSourceNames}
-        selectedSources={selectedJobSources}
+        jobSources={jobSourceNames || []}
+        selectedSources={selectedJobSources || []}
         toggleSource={toggleJobSource}
         selectAllSources={selectAllJobSources}
         deselectAllSources={deselectAllJobSources}
-        contractorNames={contractorNames}
-        selectedContractors={selectedContractors}
+        contractorNames={contractorNames || []}
+        selectedContractors={selectedContractors || []}
         toggleContractor={toggleContractor}
         selectAllContractors={selectAllContractors}
         deselectAllContractors={deselectAllContractors}

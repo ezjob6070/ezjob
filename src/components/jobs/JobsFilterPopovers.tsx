@@ -10,50 +10,50 @@ import { format } from "date-fns";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 interface JobsFilterPopoversProps {
-  categories: string[];
-  selectedCategories: string[];
-  toggleCategory: (category: string) => void;
-  selectAllCategories: () => void;
-  deselectAllCategories: () => void;
-  serviceTypes: string[];
-  selectedServiceTypes: string[];
-  toggleServiceType: (serviceType: string) => void;
-  selectAllServiceTypes: () => void;
-  deselectAllServiceTypes: () => void;
-  jobSources: string[];
-  selectedSources: string[];
-  toggleSource: (source: string) => void;
-  selectAllSources: () => void;
-  deselectAllSources: () => void;
-  date: DateRange | undefined;
-  setDate: (date: DateRange | undefined) => void;
+  categories?: string[];
+  selectedCategories?: string[];
+  toggleCategory?: (category: string) => void;
+  selectAllCategories?: () => void;
+  deselectAllCategories?: () => void;
+  serviceTypes?: string[];
+  selectedServiceTypes?: string[];
+  toggleServiceType?: (serviceType: string) => void;
+  selectAllServiceTypes?: () => void;
+  deselectAllServiceTypes?: () => void;
+  jobSources?: string[];
+  selectedSources?: string[];
+  toggleSource?: (source: string) => void;
+  selectAllSources?: () => void;
+  deselectAllSources?: () => void;
+  date?: DateRange | undefined;
+  setDate?: (date: DateRange | undefined) => void;
   // New contractor filters
-  contractorNames: string[];
-  selectedContractors: string[];
-  toggleContractor: (contractor: string) => void;
-  selectAllContractors: () => void;
-  deselectAllContractors: () => void;
+  contractorNames?: string[];
+  selectedContractors?: string[];
+  toggleContractor?: (contractor: string) => void;
+  selectAllContractors?: () => void;
+  deselectAllContractors?: () => void;
 }
 
 const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
-  serviceTypes,
-  selectedServiceTypes,
-  toggleServiceType,
-  selectAllServiceTypes,
-  deselectAllServiceTypes,
-  jobSources,
-  selectedSources,
-  toggleSource,
-  selectAllSources,
-  deselectAllSources,
+  serviceTypes = [],
+  selectedServiceTypes = [],
+  toggleServiceType = () => {},
+  selectAllServiceTypes = () => {},
+  deselectAllServiceTypes = () => {},
+  jobSources = [],
+  selectedSources = [],
+  toggleSource = () => {},
+  selectAllSources = () => {},
+  deselectAllSources = () => {},
   date,
-  setDate,
-  // New contractor props
-  contractorNames,
-  selectedContractors,
-  toggleContractor,
-  selectAllContractors,
-  deselectAllContractors
+  setDate = () => {},
+  // New contractor props with defaults
+  contractorNames = [],
+  selectedContractors = [],
+  toggleContractor = () => {},
+  selectAllContractors = () => {},
+  deselectAllContractors = () => {}
 }) => {
   const [openServiceType, setOpenServiceType] = useState(false);
   const [openJobSource, setOpenJobSource] = useState(false);
@@ -187,7 +187,7 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
+          <PopoverContent className="w-auto p-0" align="end" side="bottom" sideOffset={5}>
             <Calendar
               mode="range"
               defaultMonth={date?.from}
