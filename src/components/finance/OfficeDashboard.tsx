@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,31 +37,31 @@ const OfficeDashboard = ({ date, setDate }: OfficeDashboardProps) => {
 
   // Initialize expenses data
   const [expenses, setExpenses] = useState<OfficeExpense[]>([
-    { id: "1", date: "2023-10-01", category: "rent", description: "Office Rent - October", amount: 2850, vendor: "Metro Property Management", paymentMethod: "bank", status: "paid" },
-    { id: "2", date: "2023-10-05", category: "equipment", description: "New Printer", amount: 549.99, vendor: "Office Supplies Co.", paymentMethod: "credit", status: "paid" },
-    { id: "3", date: "2023-10-08", category: "secretary", description: "Secretary Salary", amount: 1800, vendor: "Payroll", paymentMethod: "bank", status: "paid" },
-    { id: "4", date: "2023-10-10", category: "utilities", description: "Electricity Bill", amount: 320.5, vendor: "City Power Co.", paymentMethod: "credit", status: "paid" },
-    { id: "5", date: "2023-10-15", category: "inventory", description: "Office Supplies", amount: 420.5, vendor: "Staples", paymentMethod: "credit", status: "paid" },
-    { id: "6", date: "2023-10-20", category: "insurance", description: "Business Insurance", amount: 750, vendor: "SafeGuard Insurance", paymentMethod: "bank", status: "paid" },
-    { id: "7", date: "2023-10-25", category: "warehouse", description: "Warehouse Rent", amount: 1200, vendor: "Industrial Space Inc.", paymentMethod: "bank", status: "pending" },
-    { id: "8", date: "2023-10-28", category: "staff", description: "Staff Training", amount: 850, vendor: "Professional Training Ltd.", paymentMethod: "credit", status: "paid" },
-    { id: "9", date: "2023-11-01", category: "rent", description: "Office Rent - November", amount: 2850, vendor: "Metro Property Management", paymentMethod: "bank", status: "pending" },
-    { id: "10", date: "2023-11-05", category: "equipment", description: "Computer Repairs", amount: 320, vendor: "Tech Support Inc.", paymentMethod: "credit", status: "paid" },
-    { id: "11", date: "2023-11-08", category: "secretary", description: "Secretary Salary", amount: 1800, vendor: "Payroll", paymentMethod: "bank", status: "paid" },
-    { id: "12", date: "2023-11-12", category: "utilities", description: "Water Bill", amount: 180, vendor: "City Utilities", paymentMethod: "bank", status: "paid" },
-    { id: "13", date: "2023-11-15", category: "inventory", description: "Cleaning Supplies", amount: 210, vendor: "Janitorial Depot", paymentMethod: "credit", status: "paid" },
-    { id: "14", date: "2023-11-18", category: "other", description: "Client Lunch Meeting", amount: 135, vendor: "Downtown Cafe", paymentMethod: "credit", status: "paid" },
-    { id: "15", date: "2023-11-20", category: "insurance", description: "Liability Insurance", amount: 450, vendor: "SafeGuard Insurance", paymentMethod: "bank", status: "paid" },
-    { id: "16", date: "2023-11-25", category: "warehouse", description: "Warehouse Rent", amount: 1200, vendor: "Industrial Space Inc.", paymentMethod: "bank", status: "pending" },
-    { id: "17", date: "2023-11-28", category: "staff", description: "Holiday Bonuses", amount: 1500, vendor: "Payroll", paymentMethod: "bank", status: "paid" },
-    { id: "18", date: "2023-12-01", category: "rent", description: "Office Rent - December", amount: 2850, vendor: "Metro Property Management", paymentMethod: "bank", status: "pending" },
-    { id: "19", date: "2023-12-05", category: "equipment", description: "New Office Chairs", amount: 780, vendor: "Modern Office Furniture", paymentMethod: "credit", status: "paid" },
-    { id: "20", date: "2023-12-08", category: "secretary", description: "Secretary Salary", amount: 1800, vendor: "Payroll", paymentMethod: "bank", status: "paid" }
+    { id: "1", date: new Date("2023-10-01"), category: "rent", description: "Office Rent - October", amount: 2850, vendor: "Metro Property Management", paymentMethod: "bank", status: "paid" },
+    { id: "2", date: new Date("2023-10-05"), category: "equipment", description: "New Printer", amount: 549.99, vendor: "Office Supplies Co.", paymentMethod: "credit", status: "paid" },
+    { id: "3", date: new Date("2023-10-08"), category: "secretary", description: "Secretary Salary", amount: 1800, vendor: "Payroll", paymentMethod: "bank", status: "paid" },
+    { id: "4", date: new Date("2023-10-10"), category: "utilities", description: "Electricity Bill", amount: 320.5, vendor: "City Power Co.", paymentMethod: "credit", status: "paid" },
+    { id: "5", date: new Date("2023-10-15"), category: "inventory", description: "Office Supplies", amount: 420.5, vendor: "Staples", paymentMethod: "credit", status: "paid" },
+    { id: "6", date: new Date("2023-10-20"), category: "insurance", description: "Business Insurance", amount: 750, vendor: "SafeGuard Insurance", paymentMethod: "bank", status: "paid" },
+    { id: "7", date: new Date("2023-10-25"), category: "warehouse", description: "Warehouse Rent", amount: 1200, vendor: "Industrial Space Inc.", paymentMethod: "bank", status: "pending" },
+    { id: "8", date: new Date("2023-10-28"), category: "staff", description: "Staff Training", amount: 850, vendor: "Professional Training Ltd.", paymentMethod: "credit", status: "paid" },
+    { id: "9", date: new Date("2023-11-01"), category: "rent", description: "Office Rent - November", amount: 2850, vendor: "Metro Property Management", paymentMethod: "bank", status: "pending" },
+    { id: "10", date: new Date("2023-11-05"), category: "equipment", description: "Computer Repairs", amount: 320, vendor: "Tech Support Inc.", paymentMethod: "credit", status: "paid" },
+    { id: "11", date: new Date("2023-11-08"), category: "secretary", description: "Secretary Salary", amount: 1800, vendor: "Payroll", paymentMethod: "bank", status: "paid" },
+    { id: "12", date: new Date("2023-11-12"), category: "utilities", description: "Water Bill", amount: 180, vendor: "City Utilities", paymentMethod: "bank", status: "paid" },
+    { id: "13", date: new Date("2023-11-15"), category: "inventory", description: "Cleaning Supplies", amount: 210, vendor: "Janitorial Depot", paymentMethod: "credit", status: "paid" },
+    { id: "14", date: new Date("2023-11-18"), category: "other", description: "Client Lunch Meeting", amount: 135, vendor: "Downtown Cafe", paymentMethod: "credit", status: "paid" },
+    { id: "15", date: new Date("2023-11-20"), category: "insurance", description: "Liability Insurance", amount: 450, vendor: "SafeGuard Insurance", paymentMethod: "bank", status: "paid" },
+    { id: "16", date: new Date("2023-11-25"), category: "warehouse", description: "Warehouse Rent", amount: 1200, vendor: "Industrial Space Inc.", paymentMethod: "bank", status: "pending" },
+    { id: "17", date: new Date("2023-11-28"), category: "staff", description: "Holiday Bonuses", amount: 1500, vendor: "Payroll", paymentMethod: "bank", status: "paid" },
+    { id: "18", date: new Date("2023-12-01"), category: "rent", description: "Office Rent - December", amount: 2850, vendor: "Metro Property Management", paymentMethod: "bank", status: "pending" },
+    { id: "19", date: new Date("2023-12-05"), category: "equipment", description: "New Office Chairs", amount: 780, vendor: "Modern Office Furniture", paymentMethod: "credit", status: "paid" },
+    { id: "20", date: new Date("2023-12-08"), category: "secretary", description: "Secretary Salary", amount: 1800, vendor: "Payroll", paymentMethod: "bank", status: "paid" }
   ]);
 
   // Filter expenses based on selected date range and category
   const filteredExpenses = expenses.filter(expense => {
-    const expenseDate = new Date(expense.date);
+    const expenseDate = expense.date instanceof Date ? expense.date : new Date(expense.date);
     const matchesDateRange = !date?.from || !date?.to || 
       (expenseDate >= date.from && expenseDate <= date.to);
     
@@ -78,8 +77,11 @@ const OfficeDashboard = ({ date, setDate }: OfficeDashboardProps) => {
     ? filteredExpenses.reduce((max, exp) => exp.amount > max.amount ? exp : max, filteredExpenses[0])
     : null;
   const mostRecentExpense = filteredExpenses.length > 0 
-    ? filteredExpenses.reduce((latest, exp) => 
-        new Date(exp.date) > new Date(latest.date) ? exp : latest, filteredExpenses[0])
+    ? filteredExpenses.reduce((latest, exp) => {
+        const expDate = exp.date instanceof Date ? exp.date : new Date(exp.date);
+        const latestDate = latest.date instanceof Date ? latest.date : new Date(latest.date);
+        return expDate > latestDate ? exp : latest;
+      }, filteredExpenses[0])
     : null;
 
   function calculateMonthlyAverage() {
@@ -89,7 +91,8 @@ const OfficeDashboard = ({ date, setDate }: OfficeDashboardProps) => {
     const expensesByMonth: {[key: string]: number} = {};
     
     filteredExpenses.forEach(expense => {
-      const month = new Date(expense.date).toISOString().substring(0, 7); // YYYY-MM format
+      const expenseDate = expense.date instanceof Date ? expense.date : new Date(expense.date);
+      const month = expenseDate.toISOString().substring(0, 7); // YYYY-MM format
       if (!expensesByMonth[month]) {
         expensesByMonth[month] = 0;
       }

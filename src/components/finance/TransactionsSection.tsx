@@ -1,135 +1,150 @@
 
-import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ChevronRight, Search } from "lucide-react";
+import { useState } from "react";
+import { 
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "@/components/ui/card";
+import { DateRange } from "react-day-picker";
 import { FinancialTransaction } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { format } from "date-fns";
-import { Input } from "@/components/ui/input";
+import { 
+  ArrowDownLeftIcon,
+  ArrowUpRightIcon,
+  RotateCcwIcon,
+  CalendarIcon,
+  ClockIcon, 
+  CircleAlertIcon,
+  CheckCircle2Icon
+} from "lucide-react";
 
 interface TransactionsSectionProps {
-  filteredTransactions: FinancialTransaction[];
+  transactions: FinancialTransaction[];
+  dateRange?: DateRange;
 }
 
-const TransactionsSection: React.FC<TransactionsSectionProps> = ({ filteredTransactions }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+const TransactionsSection: React.FC<TransactionsSectionProps> = ({ 
+  transactions,
+  dateRange
+}) => {
+  const [activeTab, setActiveTab] = useState<"all" | "payments" | "expenses" | "refunds">("all");
   
-  // Apply search filter
-  const searchFilteredTransactions = filteredTransactions.filter(transaction => {
-    const term = searchTerm.toLowerCase();
-    return (
-      transaction.clientName.toLowerCase().includes(term) ||
-      transaction.jobTitle.toLowerCase().includes(term) ||
-      transaction.id.toLowerCase().includes(term) ||
-      (transaction.notes && transaction.notes.toLowerCase().includes(term)) ||
-      (transaction.technicianName && transaction.technicianName.toLowerCase().includes(term)) ||
-      transaction.category.toLowerCase().includes(term) ||
-      transaction.status.toLowerCase().includes(term)
-    );
+  const filteredTransactions = transactions.filter(transaction => {
+    if (activeTab === "payments") return transaction.category === "payment";
+    if (activeTab === "expenses") return transaction.category === "expense";
+    if (activeTab === "refunds") return transaction.category === "refund";
+    return true;
   });
-
+  
+  // Most recent transactions
+  const recentTransactions = [...filteredTransactions]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+  
+  // Calculate summary stats
+  const totalPayments = transactions
+    .filter(t => t.category === "payment")
+    .reduce((sum, t) => sum + t.amount, 0);
+    
+  const totalExpenses = transactions
+    .filter(t => t.category === "expense")
+    .reduce((sum, t) => sum + t.amount, 0);
+    
+  const totalRefunds = transactions
+    .filter(t => t.category === "refund")
+    .reduce((sum, t) => sum + t.amount, 0);
+    
+  const netAmount = totalPayments - totalExpenses - totalRefunds;
+  
+  // Category icon mapping
+  const getCategoryIcon = (transaction: FinancialTransaction) => {
+    if (transaction.category === "payment") return <ArrowUpRightIcon className="h-4 w-4 text-green-500" />;
+    if (transaction.category === "expense") return <ArrowDownLeftIcon className="h-4 w-4 text-red-500" />;
+    return <RotateCcwIcon className="h-4 w-4 text-amber-500" />;
+  };
+  
+  // Status icon mapping
+  const getStatusIcon = (transaction: FinancialTransaction) => {
+    if (transaction.status === "completed") return <CheckCircle2Icon className="h-4 w-4 text-green-500" />;
+    if (transaction.status === "pending") return <ClockIcon className="h-4 w-4 text-amber-500" />;
+    if (transaction.status === "cancelled") return <CircleAlertIcon className="h-4 w-4 text-red-500" />;
+    return <ClockIcon className="h-4 w-4 text-gray-500" />;
+  };
+  
   return (
-    <Card className="shadow-sm border-gray-100">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-xl">Recent Transactions</CardTitle>
-        <CardDescription>Most recent financial activities</CardDescription>
-        
-        <div className="mt-2 relative">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by client, transaction ID, category..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
+    <Card className="w-full h-full">
+      <CardHeader>
+        <CardTitle>Recent Transactions</CardTitle>
+        <CardDescription>
+          {dateRange?.from && dateRange?.to 
+            ? `Showing transactions from ${dateRange.from.toLocaleDateString()} to ${dateRange.to.toLocaleDateString()}`
+            : 'Showing all transactions'}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="pt-2">
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader className="bg-gray-50">
-              <TableRow>
-                <TableHead className="py-3">Date</TableHead>
-                <TableHead>Transaction</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {searchFilteredTransactions.length > 0 ? (
-                searchFilteredTransactions.map((transaction) => (
-                  <TableRow key={transaction.id} className="hover:bg-gray-50">
-                    <TableCell className="text-sm">
-                      {transaction.date ? 
-                        format(new Date(transaction.date), "MMM d, yyyy") : 
-                        "N/A"
-                      }
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">{transaction.jobTitle}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {transaction.notes || "No details provided"}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {transaction.category}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={
-                          transaction.status === "completed"
-                            ? "bg-green-500"
-                            : transaction.status === "pending"
-                            ? "bg-yellow-500"
-                            : transaction.status === "failed"
-                            ? "bg-red-500"
-                            : "bg-gray-500"
-                        }
-                      >
-                        {transaction.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <span
-                        className={
-                          transaction.amount >= 0
-                            ? "text-emerald-600 font-semibold"
-                            : "text-red-600 font-semibold"
-                        }
-                      >
-                        {transaction.amount >= 0 ? "+" : "-"}
-                        {formatCurrency(Math.abs(transaction.amount))}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    {searchTerm ? "No matching transactions found." : "No transactions found."}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        
-        {filteredTransactions.length > 0 && (
-          <div className="flex justify-end mt-3">
-            <Button variant="ghost" size="sm" className="text-xs text-blue-600 hover:text-blue-700">
-              View All Transactions
-              <ChevronRight className="ml-1 h-3 w-3" />
-            </Button>
+      <CardContent>
+        <div className="space-y-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <div className="text-sm text-slate-600 mb-1">Total Payments</div>
+              <div className="text-xl font-bold text-green-600">{formatCurrency(totalPayments)}</div>
+            </div>
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <div className="text-sm text-slate-600 mb-1">Total Expenses</div>
+              <div className="text-xl font-bold text-red-600">{formatCurrency(totalExpenses)}</div>
+            </div>
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <div className="text-sm text-slate-600 mb-1">Total Refunds</div>
+              <div className="text-xl font-bold text-amber-600">{formatCurrency(totalRefunds)}</div>
+            </div>
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <div className="text-sm text-slate-600 mb-1">Net Amount</div>
+              <div className="text-xl font-bold text-blue-600">{formatCurrency(netAmount)}</div>
+            </div>
           </div>
-        )}
+          
+          <div className="space-y-2">
+            <h4 className="font-medium text-sm text-slate-600">Recent transactions</h4>
+            {recentTransactions.length > 0 ? (
+              <div className="space-y-3">
+                {recentTransactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between border-b pb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100">
+                        {getCategoryIcon(transaction)}
+                      </div>
+                      <div>
+                        <div className="font-medium">{transaction.description}</div>
+                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                          <CalendarIcon className="h-3 w-3" /> 
+                          {new Date(transaction.date).toLocaleDateString()}
+                          <span className="mx-1">•</span>
+                          {getStatusIcon(transaction)} {transaction.status}
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`font-medium ${
+                      transaction.category === "payment" 
+                        ? "text-green-600" 
+                        : transaction.category === "expense" 
+                        ? "text-red-600" 
+                        : "text-amber-600"
+                    }`}>
+                      {transaction.category === "payment" && "+"}
+                      {transaction.category === "expense" && "-"}
+                      {formatCurrency(transaction.amount)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-4 text-center text-muted-foreground">
+                No recent transactions found
+              </div>
+            )}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

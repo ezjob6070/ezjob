@@ -30,6 +30,9 @@ export interface FinancialReport {
   transactions: FinancialTransaction[];
 }
 
+// Export the JobSource type
+export type { JobSource } from './jobSource';
+
 export interface JobSourceFinance extends JobSource {
   // Extending the JobSource type to ensure compatibility
   type: string;
@@ -50,19 +53,25 @@ export interface ExpenseCategory {
   id: string;
   name: string;
   color: string;
-  amount: number;
-  percentage: number;
+  amount?: number;
+  percentage?: number;
+  icon?: React.ReactNode;
+  budget?: number;
+  currentSpend?: number;
 }
 
 export interface OfficeExpense {
   id: string;
-  name: string;
+  name?: string;
   amount: number;
-  date: Date;
+  date: Date | string;
   category: string;
   description?: string;
-  recurring: boolean;
+  recurring?: boolean;
   paidBy?: string;
+  vendor?: string;
+  paymentMethod?: string;
+  status?: string;
 }
 
 export type FinanceEntityType = "technician" | "jobSource" | "contractor" | "employee" | "salesman";

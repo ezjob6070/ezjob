@@ -41,8 +41,8 @@ const FinancialTransactionsTable = ({
   const filteredTransactions = transactions.filter(transaction => {
     const searchTermLower = searchTerm.toLowerCase();
     return (
-      transaction.clientName.toLowerCase().includes(searchTermLower) ||
-      transaction.jobTitle.toLowerCase().includes(searchTermLower) ||
+      transaction.clientName?.toLowerCase().includes(searchTermLower) ||
+      transaction.jobTitle?.toLowerCase().includes(searchTermLower) ||
       (transaction.technicianName && transaction.technicianName.toLowerCase().includes(searchTermLower)) ||
       transaction.category.toLowerCase().includes(searchTermLower) ||
       transaction.status.toLowerCase().includes(searchTermLower)
@@ -58,9 +58,9 @@ const FinancialTransactionsTable = ({
       case "amount":
         return factor * (a.amount - b.amount);
       case "clientName":
-        return factor * a.clientName.localeCompare(b.clientName);
+        return factor * (a.clientName || "").localeCompare(b.clientName || "");
       case "jobTitle":
-        return factor * a.jobTitle.localeCompare(b.jobTitle);
+        return factor * (a.jobTitle || "").localeCompare(b.jobTitle || "");
       case "category":
         return factor * a.category.localeCompare(b.category);
       case "status":
@@ -96,7 +96,7 @@ const FinancialTransactionsTable = ({
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-amber-100 text-amber-800";
-      case "failed":
+      case "cancelled":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
