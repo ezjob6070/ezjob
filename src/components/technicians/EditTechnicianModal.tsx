@@ -23,6 +23,7 @@ import TechnicianPaymentFields from "@/components/technicians/form/TechnicianPay
 import { TechnicianStatusFields } from "@/components/technicians/form/TechnicianStatusFields";
 import { TechnicianImageUpload } from "@/components/technicians/TechnicianImageUpload";
 import { TechnicianRoleField } from "./form/TechnicianRoleField";
+import { TechnicianSubRoleField } from "./form/TechnicianSubRoleField";
 import { Separator } from "@/components/ui/separator";
 import { Shield, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

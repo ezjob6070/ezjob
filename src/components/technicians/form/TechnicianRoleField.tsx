@@ -3,10 +3,11 @@ import React from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from "react-hook-form";
+import { TechnicianRole } from "@/types/technician";
 
 interface TechnicianRoleFieldProps {
   control: Control<any>;
-  defaultValue?: "technician" | "salesman" | "employed" | "contractor";
+  defaultValue?: TechnicianRole;
 }
 
 export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({

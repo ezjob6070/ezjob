@@ -37,6 +37,7 @@ export const technicianEditSchema = z.object({
   profileImage: z.string().nullable().optional(),
   contractType: z.string().optional(),
   role: z.enum(["technician", "salesman", "employed", "contractor"]).default("technician"),
+  subRole: z.string().optional(),
   // Sensitive fields
   ssn: z.string().optional(),
   driverLicenseNumber: z.string().optional(),

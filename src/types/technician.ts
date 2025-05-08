@@ -1,6 +1,22 @@
 
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
 
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
+
+export interface TechnicianSubRoles {
+  technician: string[];
+  salesman: string[];
+  employed: string[];
+  contractor: string[];
+}
+
+export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
+  technician: ["HVAC", "Plumbing", "Electrical", "General", "Carpentry"],
+  salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Support"],
+  employed: ["Secretary", "Management", "HR", "Finance", "Administration", "Operations"],
+  contractor: ["Independent", "Agency", "Specialized", "Consultant"]
+};
+
 export interface Technician {
   id: string;
   name: string;
@@ -31,7 +47,8 @@ export interface Technician {
   yearsExperience?: number;
   documents?: Document[];
   category?: string;
-  role?: "technician" | "salesman" | "employed" | "contractor";
+  role?: TechnicianRole;
+  subRole?: string;
   initials: string;
   jobCategories?: string[];
   // Sensitive information fields
@@ -42,7 +59,7 @@ export interface Technician {
     expirationDate: string;
   };
   idNumber?: string;
-  workContract?: string; // New field for work contract
+  workContract?: string;
 }
 
 export interface Document {

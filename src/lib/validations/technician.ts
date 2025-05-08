@@ -33,7 +33,8 @@ export const technicianSchema = z.object({
   incentiveAmount: z.string().optional(),
   profileImage: z.string().optional(),
   role: z.enum(["technician", "salesman", "employed", "contractor"]).default("technician"),
-  // New optional sensitive fields
+  subRole: z.string().optional(),
+  // Sensitive fields
   ssn: z.string().optional(),
   driverLicenseNumber: z.string().optional(),
   driverLicenseState: z.string().optional(),

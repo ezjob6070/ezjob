@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TechnicianDateField } from "./form/TechnicianDateField";
 import { TechnicianImageUpload } from "./TechnicianImageUpload";
 import { TechnicianRoleField } from "./form/TechnicianRoleField";
+import { TechnicianSubRoleField } from "./form/TechnicianSubRoleField";
 import { Shield, FileText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -68,6 +68,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       hireDate: "",
       notes: "",
       role: "technician",
+      subRole: "",
       ssn: "",
       driverLicenseNumber: "",
       driverLicenseState: "",
@@ -110,6 +111,8 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : 0,
       // Add the role field
       role: values.role,
+      // Add the sub-role if provided
+      subRole: values.subRole || undefined,
       // Add sensitive fields if provided
       ssn: values.ssn || undefined,
       idNumber: values.idNumber || undefined,
@@ -171,6 +174,11 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                   
                   <TechnicianRoleField control={form.control} />
                   
+                  <TechnicianSubRoleField 
+                    control={form.control}
+                    setValue={form.setValue}
+                  />
+                  
                   <FormField
                     control={form.control}
                     name="email"
@@ -212,7 +220,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                       </FormItem>
                     )}
                   />
-
+                  
                   <TechnicianDateField
                     control={form.control}
                     name="hireDate"
@@ -305,7 +313,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="salaryBasis"
