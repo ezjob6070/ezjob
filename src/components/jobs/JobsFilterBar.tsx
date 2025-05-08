@@ -1,8 +1,7 @@
-
 import React, { useState } from "react";
 import { useJobsContext } from "./context/JobsContext";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronDown, Users, DollarSign, CreditCard } from "lucide-react";
+import { Check, ChevronDown, Users, DollarSign, CreditCard, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
   Popover, 
@@ -17,9 +16,17 @@ import {
   CommandItem, 
   CommandList 
 } from "@/components/ui/command";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 import AmountFilter from "./AmountFilter";
 import PaymentMethodFilter from "./PaymentMethodFilter";
 import JobSortFilter from "./filters/JobSortFilter";
+import CustomFilterDialogContent from "./filters/CustomFilterDialogContent";
 
 const JobsFilterBar = () => {
   const { 
@@ -334,6 +341,22 @@ const JobsFilterBar = () => {
             <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
           </PopoverContent>
         </Popover>
+        
+        {/* Custom Filter - Moved to the end */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              Custom Filter
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl w-[90vw]">
+            <DialogHeader>
+              <DialogTitle>Create Custom Filter</DialogTitle>
+            </DialogHeader>
+            <CustomFilterDialogContent />
+          </DialogContent>
+        </Dialog>
         
         {hasActiveFilters && (
           <Button 

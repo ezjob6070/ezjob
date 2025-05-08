@@ -1,11 +1,8 @@
 
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUp, ArrowDown, Filter } from "lucide-react";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import CustomFilterDialogContent from "./CustomFilterDialogContent";
 
 type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
 
@@ -19,66 +16,49 @@ const JobSortFilter: React.FC<JobSortFilterProps> = ({
   setSortBy
 }) => {
   return (
-    <div className="flex items-center gap-2">
-      <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Sort by" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="newest">
-            <div className="flex items-center gap-2">
-              <ArrowDown className="h-4 w-4" />
-              <span>Newest First</span>
-            </div>
-          </SelectItem>
-          <SelectItem value="oldest">
-            <div className="flex items-center gap-2">
-              <ArrowUp className="h-4 w-4" />
-              <span>Oldest First</span>
-            </div>
-          </SelectItem>
-          <SelectItem value="name-asc">
-            <div className="flex items-center gap-2">
-              <ArrowUp className="h-4 w-4" />
-              <span>Name (A-Z)</span>
-            </div>
-          </SelectItem>
-          <SelectItem value="name-desc">
-            <div className="flex items-center gap-2">
-              <ArrowDown className="h-4 w-4" />
-              <span>Name (Z-A)</span>
-            </div>
-          </SelectItem>
-          <SelectItem value="revenue-high">
-            <div className="flex items-center gap-2">
-              <ArrowDown className="h-4 w-4" />
-              <span>Revenue (High-Low)</span>
-            </div>
-          </SelectItem>
-          <SelectItem value="revenue-low">
-            <div className="flex items-center gap-2">
-              <ArrowUp className="h-4 w-4" />
-              <span>Revenue (Low-High)</span>
-            </div>
-          </SelectItem>
-        </SelectContent>
-      </Select>
-      
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
-            Custom Filter
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Create Custom Filter</DialogTitle>
-          </DialogHeader>
-          <CustomFilterDialogContent />
-        </DialogContent>
-      </Dialog>
-    </div>
+    <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Sort by" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="newest">
+          <div className="flex items-center gap-2">
+            <ArrowDown className="h-4 w-4" />
+            <span>Newest First</span>
+          </div>
+        </SelectItem>
+        <SelectItem value="oldest">
+          <div className="flex items-center gap-2">
+            <ArrowUp className="h-4 w-4" />
+            <span>Oldest First</span>
+          </div>
+        </SelectItem>
+        <SelectItem value="name-asc">
+          <div className="flex items-center gap-2">
+            <ArrowUp className="h-4 w-4" />
+            <span>Name (A-Z)</span>
+          </div>
+        </SelectItem>
+        <SelectItem value="name-desc">
+          <div className="flex items-center gap-2">
+            <ArrowDown className="h-4 w-4" />
+            <span>Name (Z-A)</span>
+          </div>
+        </SelectItem>
+        <SelectItem value="revenue-high">
+          <div className="flex items-center gap-2">
+            <ArrowDown className="h-4 w-4" />
+            <span>Revenue (High-Low)</span>
+          </div>
+        </SelectItem>
+        <SelectItem value="revenue-low">
+          <div className="flex items-center gap-2">
+            <ArrowUp className="h-4 w-4" />
+            <span>Revenue (Low-High)</span>
+          </div>
+        </SelectItem>
+      </SelectContent>
+    </Select>
   );
 };
 
