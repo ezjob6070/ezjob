@@ -13,15 +13,23 @@ import { Job } from "./JobTypes";
 import { Badge } from "@/components/ui/badge";
 import { AlarmClock, Clock, ExternalLink, MoreHorizontal } from "lucide-react";
 import JobActions from "./JobActions";
+import { useToast } from "@/components/ui/use-toast";
 
 interface JobsTableProps {
   jobs: Job[];
   searchTerm: string;
   onOpenStatusModal: (job: Job) => void;
+  onSendToEstimate?: (job: Job) => void;
 }
 
-const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
+const JobsTable = ({ 
+  jobs, 
+  searchTerm, 
+  onOpenStatusModal,
+  onSendToEstimate
+}: JobsTableProps) => {
   const [jobsData, setJobsData] = useState(jobs);
+  const { toast } = useToast();
 
   useEffect(() => {
     setJobsData(jobs);
@@ -35,6 +43,17 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
     job.jobSourceName?.toLowerCase().includes(searchTerm.toLowerCase() || '') ||
     job.category?.toLowerCase().includes(searchTerm.toLowerCase() || '')
   );
+
+  const handleSendToEstimate = (job: Job) => {
+    if (onSendToEstimate) {
+      onSendToEstimate(job);
+    } else {
+      toast({
+        title: "Converting job to estimate",
+        description: `Job for ${job.clientName} is being converted to an estimate.`
+      });
+    }
+  };
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -179,7 +198,8 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
                 <JobActions 
                   job={job} 
                   onCancelJob={() => {}} 
-                  onUpdateStatus={onOpenStatusModal} 
+                  onUpdateStatus={onOpenStatusModal}
+                  onSendToEstimate={handleSendToEstimate}
                 />
               </TableCell>
             </TableRow>
