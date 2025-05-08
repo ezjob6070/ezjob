@@ -26,9 +26,23 @@ export interface Job {
   notes?: string;
   paymentMethod?: string;
   estimateId?: string;
+  // Additional fields needed by components
+  clientEmail?: string;
+  clientPhone?: string;
+  contractorId?: string;
+  contractorName?: string;
+  signature?: string;
+  hasImages?: boolean;
+  imageCount?: number;
+  parts?: any[];
+  source?: string;
 }
 
 export interface AmountRange {
   min: number;
   max: number;
 }
+
+export type PaymentMethod = "cash" | "credit" | "check" | "bank" | "online" | "invoice" | "other";
+
+export type JobTab = "all" | "scheduled" | "in-progress" | "completed" | "cancelled";

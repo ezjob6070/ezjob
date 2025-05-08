@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRange } from "react-day-picker";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { FinanceEntityType } from "@/types/finance";
 
 interface AgentsFinanceSectionProps {
   activeAgents: any[];

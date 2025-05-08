@@ -6,6 +6,9 @@ import FinancePageHeader from "@/components/finance/FinancePageHeader";
 import OverviewDashboard from "@/components/finance/OverviewDashboard";
 import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
 import TechniciansDashboard from "@/components/finance/TechniciansDashboard";
+import ContractorsDashboard from "@/components/finance/ContractorsDashboard";
+import EmployeesDashboard from "@/components/finance/EmployeesDashboard";
+import SalesmenDashboard from "@/components/finance/SalesmenDashboard";
 import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
 import OfficeDashboard from "@/components/finance/OfficeDashboard";
 import SalariesDashboard from "@/components/finance/SalariesDashboard";
@@ -14,8 +17,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSection";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const Finance = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<FinanceTabId>("overview");
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()),
@@ -23,6 +29,13 @@ const Finance = () => {
   });
   
   const { technicians, jobs, jobSources } = useGlobalState();
+  
+  // Check if we have state passed from another component
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab as FinanceTabId);
+    }
+  }, [location.state]);
   
   const {
     showFilters,
@@ -75,7 +88,7 @@ const Finance = () => {
             onValueChange={handleTabChange}
             className="w-full"
           >
-            <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center justify-between p-4 border-b overflow-x-auto">
               <TabsList className="bg-white/50">
                 {financeTabOptions.map(tab => (
                   <TabsTrigger 
@@ -124,6 +137,27 @@ const Finance = () => {
                 <div className="mt-8 w-full">
                   <TechnicianInvoiceSection activeTechnicians={activeTechnicians.length > 0 ? activeTechnicians : technicians} />
                 </div>
+              </TabsContent>
+              
+              <TabsContent value="contractors" className="mt-0">
+                <ContractorsDashboard 
+                  dateRange={date}
+                  setDateRange={setDate}
+                />
+              </TabsContent>
+              
+              <TabsContent value="employees" className="mt-0">
+                <EmployeesDashboard 
+                  dateRange={date}
+                  setDateRange={setDate}
+                />
+              </TabsContent>
+              
+              <TabsContent value="salesmen" className="mt-0">
+                <SalesmenDashboard 
+                  dateRange={date}
+                  setDateRange={setDate}
+                />
               </TabsContent>
 
               <TabsContent value="transactions" className="mt-0">

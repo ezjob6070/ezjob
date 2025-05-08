@@ -1,9 +1,8 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRange } from "react-day-picker";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { FinanceEntityType } from "@/types/finance";
 
 interface PropertiesFinanceSectionProps {
   properties: any[];
@@ -16,23 +15,23 @@ const PropertiesFinanceSection: React.FC<PropertiesFinanceSectionProps> = ({
   dateRange,
   setDateRange
 }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  
   // Mock data for demonstration
   const propertyMetrics = [
     {
-      address: "123 Main St",
-      listPrice: 750000,
+      name: "123 Main St",
+      revenue: 250000,
+      expenses: 50000,
+      profit: 200000,
       status: "Listed",
-      daysOnMarket: 15,
-      viewings: 8
+      daysOnMarket: 45
     },
     {
-      address: "456 Oak Ave",
-      listPrice: 525000,
+      name: "456 Oak Ave",
+      revenue: 180000,
+      expenses: 30000,
+      profit: 150000,
       status: "Under Contract",
-      daysOnMarket: 32,
-      viewings: 12
+      daysOnMarket: 30
     }
   ];
 
@@ -44,18 +43,16 @@ const PropertiesFinanceSection: React.FC<PropertiesFinanceSectionProps> = ({
       <CardContent>
         <div className="space-y-4">
           {propertyMetrics.map((property) => (
-            <div key={property.address} className="p-4 border rounded-lg">
+            <div key={property.name} className="p-4 border rounded-lg">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold">{property.address}</h3>
-                <span className={`font-medium ${
-                  property.status === "Listed" ? "text-blue-600" : "text-green-600"
-                }`}>{property.status}</span>
+                <h3 className="font-semibold">{property.name}</h3>
+                <span className="text-green-600 font-medium">{formatCurrency(property.profit)}</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                <div>List Price: {formatCurrency(property.listPrice)}</div>
-                <div>Days on Market: {property.daysOnMarket}</div>
-                <div>Total Viewings: {property.viewings}</div>
-                <div>Potential Commission: {formatCurrency(property.listPrice * 0.03)}</div>
+                <div>Revenue: {formatCurrency(property.revenue)}</div>
+                <div>Expenses: {formatCurrency(property.expenses)}</div>
+                <div>Status: {property.status}</div>
+                <div>Days on market: {property.daysOnMarket}</div>
               </div>
             </div>
           ))}

@@ -13,6 +13,10 @@ export interface FinancialTransaction {
   technicianName?: string;
   technicianRate?: number;
   technicianRateIsPercentage?: boolean;
+  notes?: string;
+  jobTitle?: string;
+  jobSourceId?: string;
+  jobSourceName?: string;
 }
 
 export interface FinancialReport {
@@ -38,3 +42,27 @@ export interface FinancePage {
     to: Date;
   };
 }
+
+// Add types for other finance features
+export type TimeFrame = "day" | "week" | "month" | "year" | "custom";
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  color: string;
+  amount: number;
+  percentage: number;
+}
+
+export interface OfficeExpense {
+  id: string;
+  name: string;
+  amount: number;
+  date: Date;
+  category: string;
+  description?: string;
+  recurring: boolean;
+  paidBy?: string;
+}
+
+export type FinanceEntityType = "technician" | "jobSource" | "contractor" | "employee" | "salesman";
