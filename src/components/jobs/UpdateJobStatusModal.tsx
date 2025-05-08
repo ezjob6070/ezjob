@@ -50,7 +50,8 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   useEffect(() => {
     // Set initial status based on current job status
     if (job) {
-      setStatus(job.status === "in_progress" ? "completed" : job.status);
+      setStatus(job.status === "in_progress" ? "completed" : 
+               job.status === "rescheduled" ? "reschedule" : job.status);
       setActualAmount(job.amount || 0);
       setParts(job.parts ? job.parts.join(", ") : "");
       setCancellationReason(job.cancellationReason || "");

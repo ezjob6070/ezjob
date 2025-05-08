@@ -37,6 +37,12 @@ export interface Job {
   source?: string;
   contractorName?: string;
   contractorId?: string;
+  // Add missing properties that are being used in various components
+  parts?: string[];
+  signature?: string;
+  hasImages?: boolean;
+  imageCount?: number;
+  clientId?: string;
 }
 
 export interface JobTab {

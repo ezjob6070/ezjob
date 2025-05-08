@@ -1,7 +1,6 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Job } from '@/components/jobs/JobTypes';
-import { addDays, subDays } from 'date-fns';
+import { addDays, subDays, format } from 'date-fns';
 
 // Generate additional job data for demo purposes
 export const additionalJobs: Job[] = (() => {
@@ -19,15 +18,15 @@ export const additionalJobs: Job[] = (() => {
       description: "Installation of 24-panel solar array with battery backup system",
       scheduledDate: addDays(today, 15),
       date: addDays(today, 15), // Add the required date field
-      assignedTechId: "tech-11",
-      assignedTechName: "Thomas Cooper",
-      jobSource: "Website Inquiry",
+      technicianId: "tech-11",
+      technicianName: "Thomas Cooper",
+      jobSourceId: "source-1",
+      source: "Website Inquiry",
       status: "scheduled",
       priority: "medium",
       amount: 28500,
       notes: "Customer is interested in tax credit information. Home has metal roof requiring special mounting hardware.",
-      attachments: [],
-      createdAt: subDays(today, 5),
+      createdAt: format(subDays(today, 5), "yyyy-MM-dd"),
       category: "Renewable Energy",
       serviceType: "Installation"
     },
@@ -42,16 +41,16 @@ export const additionalJobs: Job[] = (() => {
       description: "Complete smart home setup including lighting, security, climate control and entertainment systems",
       scheduledDate: addDays(today, 8),
       date: addDays(today, 8), // Add the required date field
-      assignedTechId: "tech-12",
-      assignedTechName: "Rebecca Wong",
-      jobSource: "Trade Show",
+      technicianId: "tech-12",
+      technicianName: "Rebecca Wong",
+      jobSourceId: "source-2",
+      source: "Trade Show",
       status: "scheduled",
       priority: "high",
       amount: 12800,
       estimateId: "est-007",
       notes: "Client has existing Nest thermostats that need to be integrated. Wants voice control throughout house.",
-      attachments: [],
-      createdAt: subDays(today, 11),
+      createdAt: format(subDays(today, 11), "yyyy-MM-dd"),
       category: "Smart Home",
       serviceType: "Installation"
     },
@@ -66,15 +65,15 @@ export const additionalJobs: Job[] = (() => {
       description: "Redesign of main entrance landscaping with water-efficient features",
       scheduledDate: addDays(today, 20),
       date: addDays(today, 20), // Add the required date field
-      assignedTechId: "tech-13",
-      assignedTechName: "Marcus Johnson",
-      jobSource: "Referral",
+      technicianId: "tech-13",
+      technicianName: "Marcus Johnson",
+      jobSourceId: "source-3",
+      source: "Referral",
       status: "scheduled",
       priority: "medium",
       amount: 18200,
       notes: "Client wants drought-resistant plants and modern hardscaping. Site visit already completed.",
-      attachments: [],
-      createdAt: subDays(today, 15),
+      createdAt: format(subDays(today, 15), "yyyy-MM-dd"),
       category: "Landscape",
       serviceType: "Design"
     },
@@ -89,15 +88,15 @@ export const additionalJobs: Job[] = (() => {
       description: "Interior design consultation for 5,000 sq ft office space renovation",
       scheduledDate: addDays(today, 4),
       date: addDays(today, 4), // Add the required date field
-      assignedTechId: "tech-14",
-      assignedTechName: "Sophia Martinez",
-      jobSource: "Website",
+      technicianId: "tech-14",
+      technicianName: "Sophia Martinez",
+      jobSourceId: "source-4",
+      source: "Website",
       status: "scheduled",
       priority: "low",
       amount: 3500,
       notes: "Initial consultation only. Client may proceed with full design services afterward.",
-      attachments: [],
-      createdAt: subDays(today, 6),
+      createdAt: format(subDays(today, 6), "yyyy-MM-dd"),
       category: "Interior Design",
       serviceType: "Consultation"
     },
@@ -112,16 +111,16 @@ export const additionalJobs: Job[] = (() => {
       description: "Installation of comprehensive security system for high-end auto dealership",
       scheduledDate: addDays(today, 12),
       date: addDays(today, 12), // Add the required date field
-      assignedTechId: "tech-15",
-      assignedTechName: "Derek Foster",
-      jobSource: "Direct Call",
+      technicianId: "tech-15",
+      technicianName: "Derek Foster",
+      jobSourceId: "source-5",
+      source: "Direct Call",
       status: "scheduled",
       priority: "urgent",
       amount: 32500,
       estimateId: "est-008",
       notes: "24/7 monitoring required. System must include perimeter sensors, motion detection, and HD cameras.",
-      attachments: [],
-      createdAt: subDays(today, 8),
+      createdAt: format(subDays(today, 8), "yyyy-MM-dd"),
       category: "Security",
       serviceType: "Installation"
     },
@@ -136,16 +135,16 @@ export const additionalJobs: Job[] = (() => {
       description: "Complete kitchen renovation with new appliances, cabinets, countertops, and flooring",
       scheduledDate: addDays(today, 25),
       date: addDays(today, 25), // Add the required date field
-      assignedTechId: "tech-4",
-      assignedTechName: "Jennifer Lopez",
-      jobSource: "Referral",
+      technicianId: "tech-4",
+      technicianName: "Jennifer Lopez",
+      jobSourceId: "source-6",
+      source: "Referral",
       status: "scheduled",
       priority: "medium",
       amount: 42800,
       estimateId: "est-009",
       notes: "Homeowners will be on vacation during first week of work. Key will be with neighbor.",
-      attachments: [],
-      createdAt: subDays(today, 21),
+      createdAt: format(subDays(today, 21), "yyyy-MM-dd"),
       category: "Remodeling",
       serviceType: "Renovation"
     },
@@ -160,15 +159,15 @@ export const additionalJobs: Job[] = (() => {
       description: "Emergency repair of leaking water main in building basement",
       scheduledDate: today,
       date: today, // Add the required date field
-      assignedTechId: "tech-3",
-      assignedTechName: "Michael Rodriguez",
-      jobSource: "Emergency Call",
+      technicianId: "tech-3",
+      technicianName: "Michael Rodriguez",
+      jobSourceId: "source-7",
+      source: "Emergency Call",
       status: "scheduled",
       priority: "urgent",
       amount: 3800,
       notes: "Water currently shut off to building. Requires immediate attention.",
-      attachments: [],
-      createdAt: today,
+      createdAt: format(today, "yyyy-MM-dd"),
       category: "Plumbing",
       serviceType: "Repair"
     }

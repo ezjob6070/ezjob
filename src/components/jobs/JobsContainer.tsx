@@ -46,7 +46,11 @@ const JobsContainer = ({
     selectedContractors,
     toggleContractor,
     selectAllContractors,
-    deselectAllContractors
+    deselectAllContractors,
+    selectedTechnicians,
+    toggleTechnician,
+    selectAllTechnicians,
+    deselectAllTechnicians
   } = useJobsContext();
 
   // Create a wrapper function to properly handle Date objects for handleRescheduleJob
