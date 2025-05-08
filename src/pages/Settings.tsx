@@ -19,7 +19,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { CompanyProfile, User, UserPermission, UserRole, PermissionModule, PermissionAction } from "@/types/finance";
+import { 
+  CompanyProfile, User, UserPermission, UserRole, PermissionModule, 
+  PermissionAction, VisibilityLevel, DataAccessLevel, FeatureAccess 
+} from "@/types/finance";
 import { 
   Table, 
   TableBody, 
@@ -31,9 +34,10 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, Filter, Key, Lock, MoreHorizontal, Plus, Search, ShieldCheck, User as UserIcon, UserCog, UserPlus, Users } from "lucide-react";
+import { Check, Filter, Key, Lock, MoreHorizontal, Plus, Search, Shield, ShieldCheck, User as UserIcon, UserCog, UserPlus, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const companyProfileSchema = z.object({
   companyName: z
@@ -103,6 +107,23 @@ const permissionActions: { id: PermissionAction; name: string; description: stri
   { id: "viewSensitive", name: "View Sensitive", description: "Can view sensitive/confidential information" },
 ];
 
+// Visibility levels for UI
+const visibilityLevels: { id: VisibilityLevel; name: string; description: string }[] = [
+  { id: "none", name: "None", description: "No visibility" },
+  { id: "limited", name: "Limited", description: "Limited visibility to essential information only" },
+  { id: "standard", name: "Standard", description: "Standard visibility to most information" },
+  { id: "full", name: "Full", description: "Full visibility to all information including sensitive data" }
+];
+
+// Data access levels for UI
+const dataAccessLevels: { id: DataAccessLevel; name: string; description: string }[] = [
+  { id: "none", name: "None", description: "No data access" },
+  { id: "personal", name: "Personal", description: "Access to own data only" },
+  { id: "team", name: "Team", description: "Access to team data" },
+  { id: "department", name: "Department", description: "Access to department data" },
+  { id: "all", name: "All", description: "Access to all data" }
+];
+
 // Generate all available permissions based on modules and actions
 const generateAvailablePermissions = (): UserPermission[] => {
   const permissions: UserPermission[] = [];
@@ -115,18 +136,47 @@ const generateAvailablePermissions = (): UserPermission[] => {
         return;
       }
       
+      // Set default visibility and data access levels
+      let defaultVisibility: VisibilityLevel = "standard";
+      let defaultDataAccess: DataAccessLevel = "team";
+      
+      // Adjust defaults based on action type
+      if (action.id === "viewSensitive") {
+        defaultVisibility = "full";
+        defaultDataAccess = "all";
+      } else if (action.id === "manage") {
+        defaultVisibility = "full";
+        defaultDataAccess = "all";
+      } else if (module.id === "settings") {
+        defaultDataAccess = "all";
+      }
+      
       permissions.push({
         id: `${module.id}-${action.id}`,
         name: `${action.name} ${module.name}`,
         description: `Can ${action.name.toLowerCase()} ${module.name.toLowerCase()}`,
         module: module.id,
-        action: action.id
+        action: action.id,
+        visibilityLevel: defaultVisibility,
+        dataAccessLevel: defaultDataAccess
       });
     });
   });
   
   return permissions;
 };
+
+// Feature access definitions
+const featureAccessOptions: FeatureAccess[] = [
+  { id: "finance-dashboard", name: "Finance Dashboard", enabled: true, description: "Access to finance dashboard" },
+  { id: "job-management", name: "Job Management", enabled: true, description: "Access to job management features" },
+  { id: "client-database", name: "Client Database", enabled: true, description: "Access to client database" },
+  { id: "technician-tracking", name: "Technician Tracking", enabled: true, description: "Access to technician tracking" },
+  { id: "sensitive-payment-info", name: "Payment Information", enabled: false, description: "Access to sensitive payment information" },
+  { id: "financial-reports", name: "Financial Reports", enabled: false, description: "Access to financial reports" },
+  { id: "system-settings", name: "System Settings", enabled: false, description: "Access to system settings" },
+  { id: "user-management", name: "User Management", enabled: false, description: "Ability to manage users" },
+];
 
 // Sample users for demonstration
 const initialUsers: User[] = [
@@ -189,6 +239,9 @@ const Settings = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPermissionModule, setSelectedPermissionModule] = useState<PermissionModule | "all">("all");
   const [showPermissionDetails, setShowPermissionDetails] = useState(false);
+  const [editingPermission, setEditingPermission] = useState<UserPermission | null>(null);
+  const [showFeatureAccessDialog, setShowFeatureAccessDialog] = useState(false);
+  const [userFeatures, setUserFeatures] = useState<Record<string, FeatureAccess[]>>({});
   
   const availablePermissions = generateAvailablePermissions();
 
@@ -273,6 +326,17 @@ const Settings = () => {
       createdAt: new Date(),
     };
     
+    // Initialize feature access for the new user
+    setUserFeatures({
+      ...userFeatures,
+      [newUser.id]: featureAccessOptions.map(feature => ({
+        ...feature,
+        enabled: data.role === "admin" ? true : 
+                (feature.id.includes("sensitive") || feature.id.includes("settings") || 
+                 feature.id.includes("user-management")) ? false : true
+      }))
+    });
+    
     setUsers([...users, newUser]);
     setShowAddUserDialog(false);
     toast.success("User added", {
@@ -285,6 +349,25 @@ const Settings = () => {
     setSelectedUser(user);
     setShowEditPermissionsDialog(true);
     setSelectedPermissionModule("all");
+    setEditingPermission(null);
+  }
+  
+  function handleEditFeatureAccess(user: User) {
+    setSelectedUser(user);
+    setShowFeatureAccessDialog(true);
+    
+    // Initialize feature access if not already set
+    if (!userFeatures[user.id]) {
+      setUserFeatures({
+        ...userFeatures,
+        [user.id]: featureAccessOptions.map(feature => ({
+          ...feature,
+          enabled: user.role === "admin" ? true : 
+                  (feature.id.includes("sensitive") || feature.id.includes("settings") || 
+                   feature.id.includes("user-management")) ? false : true
+        }))
+      });
+    }
   }
   
   function handleUpdatePermissions(userId: string, permissionId: string, isChecked: boolean) {
@@ -309,6 +392,51 @@ const Settings = () => {
         return user;
       })
     );
+  }
+  
+  function handleUpdatePermissionVisibility(userId: string, permissionId: string, visibility: VisibilityLevel) {
+    setUsers(prevUsers => 
+      prevUsers.map(user => {
+        if (user.id === userId) {
+          return {
+            ...user,
+            permissions: user.permissions.map(p => 
+              p.id === permissionId ? { ...p, visibilityLevel: visibility } : p
+            )
+          };
+        }
+        return user;
+      })
+    );
+  }
+  
+  function handleUpdatePermissionDataAccess(userId: string, permissionId: string, dataAccess: DataAccessLevel) {
+    setUsers(prevUsers => 
+      prevUsers.map(user => {
+        if (user.id === userId) {
+          return {
+            ...user,
+            permissions: user.permissions.map(p => 
+              p.id === permissionId ? { ...p, dataAccessLevel: dataAccess } : p
+            )
+          };
+        }
+        return user;
+      })
+    );
+  }
+  
+  function handleUpdateFeatureAccess(userId: string, featureId: string, enabled: boolean) {
+    setUserFeatures(prev => ({
+      ...prev,
+      [userId]: prev[userId]?.map(feature => 
+        feature.id === featureId ? { ...feature, enabled } : feature
+      ) || []
+    }));
+  }
+
+  function handleEditPermissionDetails(permission: UserPermission) {
+    setEditingPermission(permission);
   }
 
   function handleUpdateUserRole(userId: string, role: UserRole) {
@@ -404,6 +532,7 @@ const Settings = () => {
           <TabsTrigger value="account">Account</TabsTrigger>
         </TabsList>
 
+        {/* Company Profile Tab Content */}
         <TabsContent value="profile">
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
@@ -551,6 +680,7 @@ const Settings = () => {
           </div>
         </TabsContent>
 
+        {/* Notifications Tab Content */}
         <TabsContent value="notifications">
           <Form {...notificationsForm}>
             <form
@@ -674,6 +804,7 @@ const Settings = () => {
           </Form>
         </TabsContent>
 
+        {/* Users Tab Content */}
         <TabsContent value="users">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -825,7 +956,7 @@ const Settings = () => {
                             ));
                           })()}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-xs text-muted-foreground mt-3">
                           You can customize these permissions after creating the user.
                         </p>
                       </div>
@@ -889,6 +1020,10 @@ const Settings = () => {
                             <ShieldCheck className="mr-2 h-4 w-4" />
                             Manage Permissions
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditFeatureAccess(user)}>
+                            <Shield className="mr-2 h-4 w-4" />
+                            Feature Access
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleUpdateUserRole(user.id, "admin")}
                             disabled={user.role === "admin"}
@@ -942,6 +1077,7 @@ const Settings = () => {
               </TableBody>
             </Table>
             
+            {/* Advanced Permission Editor Dialog */}
             <Dialog open={showEditPermissionsDialog} onOpenChange={setShowEditPermissionsDialog}>
               <DialogContent className="max-w-4xl">
                 <DialogHeader>
@@ -1009,72 +1145,190 @@ const Settings = () => {
                     </div>
                   </div>
                   
-                  {selectedUser && (
+                  {selectedUser && !editingPermission && (
                     <div className="h-[400px] overflow-y-auto border rounded-md p-4">
                       <div className="space-y-6">
                         {/* Permissions list */}
                         <div className="grid grid-cols-1 gap-3">
-                          {filteredPermissions.map((permission) => (
-                            <div 
-                              key={permission.id} 
-                              className="flex items-center justify-between p-3 border rounded hover:bg-muted/30"
-                            >
-                              <div className="flex items-start">
-                                <div className="flex items-center h-5 mt-0.5">
-                                  <Checkbox
-                                    id={`permission-${permission.id}`}
-                                    checked={selectedUser.permissions.some(p => p.id === permission.id)}
-                                    onCheckedChange={(checked) => 
-                                      handleUpdatePermissions(selectedUser.id, permission.id, checked === true)
-                                    }
-                                  />
-                                </div>
-                                <div className="ml-3">
-                                  <div className="flex items-center gap-2">
-                                    <label
-                                      htmlFor={`permission-${permission.id}`}
-                                      className="text-sm font-medium"
-                                    >
-                                      {permission.name}
-                                    </label>
+                          {filteredPermissions.map((permission) => {
+                            const userHasPermission = selectedUser.permissions.some(p => p.id === permission.id);
+                            const userPermission = selectedUser.permissions.find(p => p.id === permission.id);
+                            
+                            return (
+                              <div 
+                                key={permission.id} 
+                                className="flex items-center justify-between p-3 border rounded hover:bg-muted/30"
+                              >
+                                <div className="flex items-start">
+                                  <div className="flex items-center h-5 mt-0.5">
+                                    <Checkbox
+                                      id={`permission-${permission.id}`}
+                                      checked={userHasPermission}
+                                      onCheckedChange={(checked) => 
+                                        handleUpdatePermissions(selectedUser.id, permission.id, checked === true)
+                                      }
+                                    />
+                                  </div>
+                                  <div className="ml-3">
+                                    <div className="flex items-center gap-2">
+                                      <label
+                                        htmlFor={`permission-${permission.id}`}
+                                        className="text-sm font-medium"
+                                      >
+                                        {permission.name}
+                                      </label>
+                                      
+                                      {/* Special permission indicators */}
+                                      {permission.action === "viewSensitive" && (
+                                        <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
+                                          Sensitive
+                                        </Badge>
+                                      )}
+                                      
+                                      {userHasPermission && userPermission?.visibilityLevel && (
+                                        <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                                          {visibilityLevels.find(v => v.id === userPermission.visibilityLevel)?.name || "Standard"} Visibility
+                                        </Badge>
+                                      )}
+                                      
+                                      {userHasPermission && userPermission?.dataAccessLevel && (
+                                        <Badge variant="outline" className="bg-green-50 text-green-800 border-green-200">
+                                          {dataAccessLevels.find(d => d.id === userPermission.dataAccessLevel)?.name || "Team"} Access
+                                        </Badge>
+                                      )}
+                                    </div>
                                     
-                                    {/* Special permission indicators */}
-                                    {permission.action === "viewSensitive" && (
-                                      <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
-                                        Sensitive
-                                      </Badge>
-                                    )}
-                                    {permission.action === "manage" && (
-                                      <Badge variant="outline" className="bg-purple-50 text-purple-800 border-purple-200">
-                                        Admin
-                                      </Badge>
-                                    )}
-                                    {permission.module === "settings" && (
-                                      <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
-                                        System
-                                      </Badge>
+                                    {showPermissionDetails && (
+                                      <div className="text-xs text-muted-foreground mt-1">
+                                        <div className="flex items-start gap-x-2 mt-1">
+                                          <div className="flex items-center">
+                                            <Key className="h-3 w-3 mr-1" />
+                                            <span className="font-medium">{permission.action}</span>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <Filter className="h-3 w-3 mr-1" />
+                                            <span className="font-medium">{permission.module}</span>
+                                          </div>
+                                        </div>
+                                        <p className="mt-1">{permission.description}</p>
+                                      </div>
                                     )}
                                   </div>
-                                  
-                                  {showPermissionDetails && (
-                                    <div className="text-xs text-muted-foreground mt-1">
-                                      <div className="flex items-start gap-x-2 mt-1">
-                                        <div className="flex items-center">
-                                          <Key className="h-3 w-3 mr-1" />
-                                          <span className="font-medium">{permission.action}</span>
-                                        </div>
-                                        <div className="flex items-center">
-                                          <Filter className="h-3 w-3 mr-1" />
-                                          <span className="font-medium">{permission.module}</span>
-                                        </div>
-                                      </div>
-                                      <p className="mt-1">{permission.description}</p>
-                                    </div>
-                                  )}
                                 </div>
+                                
+                                {userHasPermission && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => handleEditPermissionDetails(userPermission || permission)}
+                                  >
+                                    Customize
+                                  </Button>
+                                )}
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Permission detail editing */}
+                  {selectedUser && editingPermission && (
+                    <div className="border rounded-md p-6 space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h3 className="text-lg font-medium">{editingPermission.name}</h3>
+                          <p className="text-sm text-muted-foreground">{editingPermission.description}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant="outline">
+                              Module: {editingPermission.module}
+                            </Badge>
+                            <Badge variant="outline">
+                              Action: {editingPermission.action}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingPermission(null)}
+                        >
+                          Back to List
+                        </Button>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <h4 className="text-sm font-medium mb-3">Visibility Level</h4>
+                          <p className="text-xs text-muted-foreground mb-2">
+                            Control how much information the user can see within this permission
+                          </p>
+                          
+                          <RadioGroup 
+                            value={editingPermission.visibilityLevel || "standard"}
+                            onValueChange={(value) => 
+                              handleUpdatePermissionVisibility(
+                                selectedUser.id, 
+                                editingPermission.id, 
+                                value as VisibilityLevel
+                              )
+                            }
+                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2"
+                          >
+                            {visibilityLevels.map((level) => (
+                              <div key={level.id} className="flex items-center space-x-2">
+                                <RadioGroupItem value={level.id} id={`visibility-${level.id}`} />
+                                <label htmlFor={`visibility-${level.id}`} className="text-sm font-medium cursor-pointer">
+                                  {level.name}
+                                </label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                          
+                          <div className="mt-2 text-xs">
+                            {visibilityLevels.find(v => v.id === (editingPermission.visibilityLevel || "standard"))?.description}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="text-sm font-medium mb-3">Data Access Level</h4>
+                          <p className="text-xs text-muted-foreground mb-2">
+                            Control which records the user can access with this permission
+                          </p>
+                          
+                          <RadioGroup 
+                            value={editingPermission.dataAccessLevel || "team"}
+                            onValueChange={(value) => 
+                              handleUpdatePermissionDataAccess(
+                                selectedUser.id, 
+                                editingPermission.id, 
+                                value as DataAccessLevel
+                              )
+                            }
+                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2"
+                          >
+                            {dataAccessLevels.map((level) => (
+                              <div key={level.id} className="flex items-center space-x-2">
+                                <RadioGroupItem value={level.id} id={`access-${level.id}`} />
+                                <label htmlFor={`access-${level.id}`} className="text-sm font-medium cursor-pointer">
+                                  {level.name}
+                                </label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                          
+                          <div className="mt-2 text-xs">
+                            {dataAccessLevels.find(d => d.id === (editingPermission.dataAccessLevel || "team"))?.description}
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-end">
+                          <Button onClick={() => setEditingPermission(null)}>
+                            Done
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -1098,9 +1352,82 @@ const Settings = () => {
                 </div>
               </DialogContent>
             </Dialog>
+            
+            {/* Feature Access Dialog */}
+            <Dialog open={showFeatureAccessDialog} onOpenChange={setShowFeatureAccessDialog}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      Feature Access Control
+                    </div>
+                  </DialogTitle>
+                  <DialogDescription>
+                    {selectedUser && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="font-medium">{selectedUser.name}</span>
+                        <Badge variant="outline" className={roleDisplay[selectedUser.role].color}>
+                          {roleDisplay[selectedUser.role].label}
+                        </Badge>
+                      </div>
+                    )}
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="h-[400px] overflow-y-auto space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Enable or disable access to specific features for this user.
+                  </p>
+                  
+                  {selectedUser && (
+                    <div className="space-y-3">
+                      {(userFeatures[selectedUser.id] || featureAccessOptions).map((feature) => (
+                        <div key={feature.id} className="flex items-center justify-between p-3 border rounded hover:bg-muted/30">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">{feature.name}</span>
+                              {feature.id.includes("sensitive") && (
+                                <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
+                                  Sensitive
+                                </Badge>
+                              )}
+                              {feature.id.includes("settings") && (
+                                <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                                  System
+                                </Badge>
+                              )}
+                              {feature.id.includes("management") && (
+                                <Badge variant="outline" className="bg-purple-50 text-purple-800 border-purple-200">
+                                  Admin
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground">{feature.description}</p>
+                          </div>
+                          <Switch 
+                            checked={feature.enabled} 
+                            onCheckedChange={(checked) => 
+                              handleUpdateFeatureAccess(selectedUser.id, feature.id, checked)
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <DialogFooter>
+                  <Button onClick={() => setShowFeatureAccessDialog(false)}>
+                    Done
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </TabsContent>
 
+        {/* Appearance Tab Content */}
         <TabsContent value="appearance">
           <div className="space-y-4">
             <div className="text-center py-8">
@@ -1111,6 +1438,7 @@ const Settings = () => {
           </div>
         </TabsContent>
 
+        {/* Account Tab Content */}
         <TabsContent value="account">
           <div className="space-y-6">
             <div className="rounded-lg border p-4">

@@ -23,4 +23,9 @@ export interface JobSource {
   paymentType?: string;
   paymentValue?: number;
   logoUrl?: string;
+  // Added to fix build errors
+  role?: string;
+  subRole?: string;
+  technicianId?: string;
+  date?: string;
 }

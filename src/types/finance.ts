@@ -98,10 +98,25 @@ export interface UserPermission {
   description: string;
   module: PermissionModule;
   action: PermissionAction;
+  // Add visibility control and data access level
+  visibilityLevel?: VisibilityLevel;
+  dataAccessLevel?: DataAccessLevel;
 }
 
 export type PermissionModule = "jobs" | "technicians" | "clients" | "finance" | "settings" | "reports" | "team" | "payments" | "estimates" | "invoices";
 export type PermissionAction = "view" | "create" | "edit" | "delete" | "approve" | "manage" | "export" | "import" | "viewSensitive";
+
+// New types for enhanced granular permissions
+export type VisibilityLevel = "none" | "limited" | "standard" | "full";
+export type DataAccessLevel = "none" | "personal" | "team" | "department" | "all";
+
+// Feature access control
+export interface FeatureAccess {
+  id: string;
+  name: string;
+  enabled: boolean;
+  description?: string;
+}
 
 // Company profile settings
 export interface CompanyProfile {
@@ -115,3 +130,4 @@ export interface CompanyProfile {
   taxId?: string;
   description?: string;
 }
+
