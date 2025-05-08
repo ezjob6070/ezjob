@@ -77,7 +77,7 @@ export interface OfficeExpense {
 
 export type FinanceEntityType = "technician" | "jobSource" | "contractor" | "employee" | "salesman";
 
-// User management types
+// User management types with enhanced permissions
 export interface User {
   id: string;
   name: string;
@@ -96,6 +96,9 @@ export interface UserPermission {
   id: string;
   name: string;
   description: string;
-  module: "jobs" | "technicians" | "clients" | "finance" | "settings" | "reports";
-  action: "view" | "create" | "edit" | "delete" | "approve";
+  module: PermissionModule;
+  action: PermissionAction;
 }
+
+export type PermissionModule = "jobs" | "technicians" | "clients" | "finance" | "settings" | "reports" | "team" | "payments" | "estimates" | "invoices";
+export type PermissionAction = "view" | "create" | "edit" | "delete" | "approve" | "manage" | "export" | "import" | "viewSensitive";

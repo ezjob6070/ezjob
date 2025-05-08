@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -19,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User, UserPermission, UserRole } from "@/types/finance";
+import { User, UserPermission, UserRole, PermissionModule, PermissionAction } from "@/types/finance";
 import { 
   Table, 
   TableBody, 
@@ -28,9 +29,10 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, MoreHorizontal, Plus, Search, UserCog, UserPlus, Users } from "lucide-react";
+import { Check, Filter, Key, Lock, MoreHorizontal, Plus, Search, ShieldCheck, User as UserIcon, UserCog, UserPlus, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -72,18 +74,57 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
 type UserFormValues = z.infer<typeof userFormSchema>;
 
-// Sample permissions for dropdown selection
-const availablePermissions: UserPermission[] = [
-  { id: "1", name: "View Jobs", description: "Can view all jobs", module: "jobs", action: "view" },
-  { id: "2", name: "Create Jobs", description: "Can create new jobs", module: "jobs", action: "create" },
-  { id: "3", name: "Edit Jobs", description: "Can edit job details", module: "jobs", action: "edit" },
-  { id: "4", name: "View Technicians", description: "Can view all technicians", module: "technicians", action: "view" },
-  { id: "5", name: "Edit Technicians", description: "Can edit technician details", module: "technicians", action: "edit" },
-  { id: "6", name: "View Finance", description: "Can view financial data", module: "finance", action: "view" },
-  { id: "7", name: "Edit Finance", description: "Can edit financial data", module: "finance", action: "edit" },
-  { id: "8", name: "View Reports", description: "Can view reports", module: "reports", action: "view" },
-  { id: "9", name: "User Management", description: "Can manage users", module: "settings", action: "edit" },
+// Define available permission modules and actions for the UI
+const permissionModules: { id: PermissionModule; name: string; description: string; }[] = [
+  { id: "jobs", name: "Jobs", description: "Access to jobs and related features" },
+  { id: "technicians", name: "Technicians", description: "Access to technician information" },
+  { id: "clients", name: "Clients", description: "Access to client information" },
+  { id: "finance", name: "Finance", description: "Access to financial information" },
+  { id: "settings", name: "Settings", description: "Access to system settings" },
+  { id: "reports", name: "Reports", description: "Access to analytics and reports" },
+  { id: "team", name: "Team Management", description: "Access to manage team members" },
+  { id: "payments", name: "Payments", description: "Access to payment processing" },
+  { id: "estimates", name: "Estimates", description: "Access to create and manage estimates" },
+  { id: "invoices", name: "Invoices", description: "Access to create and manage invoices" },
 ];
+
+// Permission actions with descriptions
+const permissionActions: { id: PermissionAction; name: string; description: string; }[] = [
+  { id: "view", name: "View", description: "Can view information" },
+  { id: "create", name: "Create", description: "Can create new items" },
+  { id: "edit", name: "Edit", description: "Can modify existing items" },
+  { id: "delete", name: "Delete", description: "Can delete items" },
+  { id: "approve", name: "Approve", description: "Can approve items requiring authorization" },
+  { id: "manage", name: "Manage", description: "Full management capability" },
+  { id: "export", name: "Export", description: "Can export data" },
+  { id: "import", name: "Import", description: "Can import data" },
+  { id: "viewSensitive", name: "View Sensitive", description: "Can view sensitive/confidential information" },
+];
+
+// Generate all available permissions based on modules and actions
+const generateAvailablePermissions = (): UserPermission[] => {
+  const permissions: UserPermission[] = [];
+  
+  permissionModules.forEach(module => {
+    permissionActions.forEach(action => {
+      // Skip combinations that don't make sense
+      if ((module.id === "settings" && action.id !== "view" && action.id !== "manage") ||
+          (action.id === "viewSensitive" && !["finance", "clients", "team", "payments"].includes(module.id))) {
+        return;
+      }
+      
+      permissions.push({
+        id: `${module.id}-${action.id}`,
+        name: `${action.name} ${module.name}`,
+        description: `Can ${action.name.toLowerCase()} ${module.name.toLowerCase()}`,
+        module: module.id,
+        action: action.id
+      });
+    });
+  });
+  
+  return permissions;
+};
 
 // Sample users for demonstration
 const initialUsers: User[] = [
@@ -93,7 +134,7 @@ const initialUsers: User[] = [
     email: "alex.johnson@example.com",
     role: "admin",
     status: "active",
-    permissions: availablePermissions,
+    permissions: generateAvailablePermissions(),
     createdAt: new Date(2023, 5, 15),
     lastLogin: new Date(),
   },
@@ -103,7 +144,7 @@ const initialUsers: User[] = [
     email: "sarah.williams@example.com",
     role: "manager",
     status: "active",
-    permissions: availablePermissions.filter(p => p.action === "view" || p.module === "jobs"),
+    permissions: generateAvailablePermissions().filter(p => p.action === "view" || p.module === "jobs"),
     createdAt: new Date(2023, 8, 10),
     lastLogin: new Date(2023, 11, 20),
   },
@@ -113,7 +154,7 @@ const initialUsers: User[] = [
     email: "michael.brown@example.com",
     role: "staff",
     status: "inactive",
-    permissions: availablePermissions.filter(p => p.action === "view"),
+    permissions: generateAvailablePermissions().filter(p => p.action === "view"),
     createdAt: new Date(2023, 10, 5),
     lastLogin: new Date(2023, 10, 15),
   },
@@ -123,7 +164,7 @@ const initialUsers: User[] = [
     email: "jessica.davis@example.com",
     role: "viewer",
     status: "pending",
-    permissions: availablePermissions.filter(p => p.action === "view" && p.module !== "settings"),
+    permissions: generateAvailablePermissions().filter(p => p.action === "view" && p.module !== "settings"),
     createdAt: new Date(2024, 1, 20),
     lastLogin: null,
   },
@@ -144,6 +185,10 @@ const Settings = () => {
   const [showEditPermissionsDialog, setShowEditPermissionsDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPermissionModule, setSelectedPermissionModule] = useState<PermissionModule | "all">("all");
+  const [showPermissionDetails, setShowPermissionDetails] = useState(false);
+  
+  const availablePermissions = generateAvailablePermissions();
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -190,18 +235,36 @@ const Settings = () => {
   }
   
   function onAddUserSubmit(data: UserFormValues) {
+    // Assign default permissions based on role
+    let defaultPermissions: UserPermission[] = [];
+    
+    switch(data.role) {
+      case "admin":
+        defaultPermissions = availablePermissions;
+        break;
+      case "manager":
+        defaultPermissions = availablePermissions.filter(p => 
+          p.module !== "settings" || p.action !== "manage");
+        break;
+      case "staff":
+        defaultPermissions = availablePermissions.filter(p => 
+          p.action === "view" || 
+          (p.module === "jobs" && ["create", "edit"].includes(p.action)));
+        break;
+      case "viewer":
+        defaultPermissions = availablePermissions.filter(p => 
+          p.action === "view" && 
+          !["settings", "finance"].includes(p.module));
+        break;
+    }
+
     const newUser: User = {
       id: `${users.length + 1}`,
       name: data.name,
       email: data.email,
       role: data.role,
       status: data.status,
-      permissions: availablePermissions.filter(p => {
-        if (data.role === "admin") return true;
-        if (data.role === "manager") return p.module !== "settings" || p.action !== "edit";
-        if (data.role === "staff") return p.action === "view" || (p.module === "jobs" && p.action !== "delete");
-        return p.action === "view";
-      }),
+      permissions: defaultPermissions,
       createdAt: new Date(),
     };
     
@@ -216,6 +279,7 @@ const Settings = () => {
   function handleEditPermissions(user: User) {
     setSelectedUser(user);
     setShowEditPermissionsDialog(true);
+    setSelectedPermissionModule("all");
   }
   
   function handleUpdatePermissions(userId: string, permissionId: string, isChecked: boolean) {
@@ -241,6 +305,50 @@ const Settings = () => {
       })
     );
   }
+
+  function handleUpdateUserRole(userId: string, role: UserRole) {
+    setUsers(prevUsers => 
+      prevUsers.map(user => {
+        if (user.id === userId) {
+          // Update permissions based on new role
+          let newPermissions: UserPermission[];
+          
+          switch(role) {
+            case "admin":
+              newPermissions = availablePermissions;
+              break;
+            case "manager":
+              newPermissions = availablePermissions.filter(p => 
+                p.module !== "settings" || p.action !== "manage");
+              break;
+            case "staff":
+              newPermissions = availablePermissions.filter(p => 
+                p.action === "view" || 
+                (p.module === "jobs" && ["create", "edit"].includes(p.action)));
+              break;
+            case "viewer":
+              newPermissions = availablePermissions.filter(p => 
+                p.action === "view" && 
+                !["settings", "finance"].includes(p.module));
+              break;
+            default:
+              newPermissions = user.permissions;
+          }
+          
+          return {
+            ...user,
+            role,
+            permissions: newPermissions
+          };
+        }
+        return user;
+      })
+    );
+    
+    toast.success("User role updated", {
+      description: `User role has been updated to ${role}.`,
+    });
+  }
   
   function handleDeleteUser(userId: string) {
     setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
@@ -265,6 +373,11 @@ const Settings = () => {
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Filter permissions by selected module
+  const filteredPermissions = selectedPermissionModule === "all" 
+    ? availablePermissions 
+    : availablePermissions.filter(p => p.module === selectedPermissionModule);
 
   return (
     <div className="space-y-8 py-8">
@@ -515,7 +628,7 @@ const Settings = () => {
 
         <TabsContent value="users">
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center space-x-2 w-full max-w-sm">
                 <Search className="h-4 w-4 text-muted-foreground" />
                 <Input 
@@ -533,7 +646,7 @@ const Settings = () => {
                     Add User
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-2xl">
                   <DialogHeader>
                     <DialogTitle>Add New User</DialogTitle>
                     <DialogDescription>
@@ -623,6 +736,52 @@ const Settings = () => {
                         />
                       </div>
                       
+                      <div className="p-4 border rounded-md mt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-medium">Role Permission Preview</h3>
+                          <Badge variant="outline" className={
+                            roleDisplay[userForm.watch("role") as UserRole]?.color || "bg-gray-100"
+                          }>
+                            {roleDisplay[userForm.watch("role") as UserRole]?.label || "Custom"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          These permissions will be assigned to the user based on their role:
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          {(() => {
+                            // Get permissions based on selected role
+                            const role = userForm.watch("role") as UserRole;
+                            let rolePermissions: string[] = [];
+                            
+                            switch(role) {
+                              case "admin":
+                                rolePermissions = ["Full system access", "Can manage all settings", "Can manage all users"];
+                                break;
+                              case "manager":
+                                rolePermissions = ["Can manage most features", "Limited settings access", "Can view financial data"];
+                                break;
+                              case "staff":
+                                rolePermissions = ["Basic access to jobs", "Can create and edit jobs", "Limited financial visibility"];
+                                break;
+                              case "viewer":
+                                rolePermissions = ["View-only access", "No edit capabilities", "No access to settings"];
+                                break;
+                            }
+                            
+                            return rolePermissions.map((perm, i) => (
+                              <div key={i} className="flex items-center">
+                                <Check className="h-3 w-3 text-green-500 mr-2" />
+                                <span className="text-xs">{perm}</span>
+                              </div>
+                            ));
+                          })()}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          You can customize these permissions after creating the user.
+                        </p>
+                      </div>
+                      
                       <DialogFooter>
                         <Button type="submit">Add User</Button>
                       </DialogFooter>
@@ -679,14 +838,39 @@ const Settings = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleEditPermissions(user)}>
-                            <UserCog className="mr-2 h-4 w-4" />
+                            <ShieldCheck className="mr-2 h-4 w-4" />
                             Manage Permissions
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleUpdateUserStatus(user.id, "active")}>
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateUserRole(user.id, "admin")}
+                            disabled={user.role === "admin"}
+                          >
+                            <UserCog className="mr-2 h-4 w-4" />
+                            Set as Admin
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateUserRole(user.id, "manager")}
+                            disabled={user.role === "manager"}
+                          >
+                            Set as Manager
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateUserRole(user.id, "staff")}
+                            disabled={user.role === "staff"}
+                          >
+                            Set as Staff
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateUserStatus(user.id, "active")}
+                            disabled={user.status === "active"}
+                          >
                             <Check className="mr-2 h-4 w-4" />
                             Set as Active
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleUpdateUserStatus(user.id, "inactive")}>
+                          <DropdownMenuItem 
+                            onClick={() => handleUpdateUserStatus(user.id, "inactive")}
+                            disabled={user.status === "inactive"}
+                          >
                             Set as Inactive
                           </DropdownMenuItem>
                           <DropdownMenuItem 
@@ -711,68 +895,159 @@ const Settings = () => {
             </Table>
             
             <Dialog open={showEditPermissionsDialog} onOpenChange={setShowEditPermissionsDialog}>
-              <DialogContent className="max-w-3xl">
+              <DialogContent className="max-w-4xl">
                 <DialogHeader>
                   <DialogTitle>
-                    <div className="flex items-center gap-3">
-                      <Users className="h-5 w-5" />
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="h-5 w-5" />
                       Manage User Permissions
                     </div>
                   </DialogTitle>
                   <DialogDescription>
                     {selectedUser && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback>{selectedUser.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{selectedUser.name}</span>
-                        <Badge variant="outline" className={roleDisplay[selectedUser.role].color}>
-                          {roleDisplay[selectedUser.role].label}
-                        </Badge>
+                      <div className="flex flex-col md:flex-row md:items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-6 w-6">
+                            <AvatarFallback>{selectedUser.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{selectedUser.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={roleDisplay[selectedUser.role].color}>
+                            {roleDisplay[selectedUser.role].label}
+                          </Badge>
+                          <Badge variant={selectedUser.status === "active" ? "success" : selectedUser.status === "pending" ? "warning" : "destructive"}>
+                            {selectedUser.status.charAt(0).toUpperCase() + selectedUser.status.slice(1)}
+                          </Badge>
+                        </div>
                       </div>
                     )}
                   </DialogDescription>
                 </DialogHeader>
                 
-                {selectedUser && (
-                  <div className="h-[400px] overflow-y-auto">
-                    <div className="space-y-4">
-                      {["jobs", "technicians", "clients", "finance", "reports", "settings"].map((module) => (
-                        <div key={module} className="border rounded-lg p-4">
-                          <h3 className="font-medium mb-2 capitalize">{module} Permissions</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {availablePermissions
-                              .filter(p => p.module === module)
-                              .map((permission) => (
-                                <div className="flex items-center space-x-2" key={permission.id}>
-                                  <Switch
+                <div className="flex flex-col space-y-4">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={selectedPermissionModule === "all" ? "bg-primary text-primary-foreground" : ""}
+                        onClick={() => setSelectedPermissionModule("all")}
+                      >
+                        All
+                      </Button>
+                      
+                      {permissionModules.map(module => (
+                        <Button
+                          key={module.id}
+                          variant="outline"
+                          size="sm"
+                          className={selectedPermissionModule === module.id ? "bg-primary text-primary-foreground" : ""}
+                          onClick={() => setSelectedPermissionModule(module.id)}
+                        >
+                          {module.name}
+                        </Button>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-2 md:mt-0">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setShowPermissionDetails(!showPermissionDetails)}
+                      >
+                        {showPermissionDetails ? "Hide Details" : "Show Details"}
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {selectedUser && (
+                    <div className="h-[400px] overflow-y-auto border rounded-md p-4">
+                      <div className="space-y-6">
+                        {/* Permissions list */}
+                        <div className="grid grid-cols-1 gap-3">
+                          {filteredPermissions.map((permission) => (
+                            <div 
+                              key={permission.id} 
+                              className="flex items-center justify-between p-3 border rounded hover:bg-muted/30"
+                            >
+                              <div className="flex items-start">
+                                <div className="flex items-center h-5 mt-0.5">
+                                  <Checkbox
                                     id={`permission-${permission.id}`}
                                     checked={selectedUser.permissions.some(p => p.id === permission.id)}
                                     onCheckedChange={(checked) => 
-                                      handleUpdatePermissions(selectedUser.id, permission.id, checked)
+                                      handleUpdatePermissions(selectedUser.id, permission.id, checked === true)
                                     }
                                   />
-                                  <label
-                                    htmlFor={`permission-${permission.id}`}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                  >
-                                    {permission.name}
-                                    <p className="text-xs text-muted-foreground mt-1">{permission.description}</p>
-                                  </label>
                                 </div>
-                              ))}
-                          </div>
+                                <div className="ml-3">
+                                  <div className="flex items-center gap-2">
+                                    <label
+                                      htmlFor={`permission-${permission.id}`}
+                                      className="text-sm font-medium"
+                                    >
+                                      {permission.name}
+                                    </label>
+                                    
+                                    {/* Special permission indicators */}
+                                    {permission.action === "viewSensitive" && (
+                                      <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
+                                        Sensitive
+                                      </Badge>
+                                    )}
+                                    {permission.action === "manage" && (
+                                      <Badge variant="outline" className="bg-purple-50 text-purple-800 border-purple-200">
+                                        Admin
+                                      </Badge>
+                                    )}
+                                    {permission.module === "settings" && (
+                                      <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                                        System
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  
+                                  {showPermissionDetails && (
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                      <div className="flex items-start gap-x-2 mt-1">
+                                        <div className="flex items-center">
+                                          <Key className="h-3 w-3 mr-1" />
+                                          <span className="font-medium">{permission.action}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                          <Filter className="h-3 w-3 mr-1" />
+                                          <span className="font-medium">{permission.module}</span>
+                                        </div>
+                                      </div>
+                                      <p className="mt-1">{permission.description}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center">
+                    <div>
+                      {selectedUser && (
+                        <p className="text-sm text-muted-foreground">
+                          {selectedUser.permissions.length} permissions granted
+                        </p>
+                      )}
+                    </div>
+                    
+                    <DialogFooter className="sm:justify-end">
+                      <Button onClick={() => setShowEditPermissionsDialog(false)}>
+                        Done
+                      </Button>
+                    </DialogFooter>
                   </div>
-                )}
-                
-                <DialogFooter>
-                  <Button onClick={() => setShowEditPermissionsDialog(false)}>
-                    Done
-                  </Button>
-                </DialogFooter>
+                </div>
               </DialogContent>
             </Dialog>
           </div>
