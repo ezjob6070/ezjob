@@ -66,6 +66,24 @@ const JobTabs: React.FC<JobTabsProps> = ({
     return jobs.filter(job => job.status === activeTab);
   };
   
+  // Function to get badge color based on status
+  const getBadgeColor = (status: string) => {
+    switch (status) {
+      case "all":
+        return "bg-gray-200 text-gray-800";
+      case "scheduled":
+        return "bg-blue-100 text-blue-800";
+      case "in_progress":
+        return "bg-orange-100 text-orange-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-200 text-gray-800";
+    }
+  };
+  
   const filteredJobs = getFilteredJobs();
   
   return (
@@ -76,7 +94,7 @@ const JobTabs: React.FC<JobTabsProps> = ({
           {jobTabs.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className="flex gap-2">
               <span>{tab.label}</span>
-              <span className="rounded-full bg-muted px-1.5 py-0.5 text-xs">
+              <span className={`rounded-full px-1.5 py-0.5 text-xs ${getBadgeColor(tab.status)}`}>
                 {tab.count}
               </span>
             </TabsTrigger>
