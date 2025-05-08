@@ -31,7 +31,22 @@ const JobsContainer = ({
     setContractorPopoverOpen,
     setSourcePopoverOpen,
     setAmountPopoverOpen,
-    setPaymentPopoverOpen
+    setPaymentPopoverOpen,
+    // Additional properties needed for JobsFilterPopovers
+    date,
+    setDate,
+    selectedServiceTypes,
+    toggleServiceType,
+    selectAllServiceTypes,
+    deselectAllServiceTypes,
+    selectedJobSources,
+    toggleJobSource,
+    selectAllJobSources,
+    deselectAllJobSources,
+    selectedContractors,
+    toggleContractor,
+    selectAllContractors,
+    deselectAllContractors
   } = useJobsContext();
 
   // Create a wrapper function to properly handle Date objects for handleRescheduleJob
@@ -52,22 +67,22 @@ const JobsContainer = ({
         selectAllCategories={() => {}}
         deselectAllCategories={() => {}}
         serviceTypes={["All Services", "Installation", "Repair", "Maintenance"]}
-        selectedServiceTypes={["All Services"]}
-        toggleServiceType={() => {}}
-        selectAllServiceTypes={() => {}}
-        deselectAllServiceTypes={() => {}}
+        selectedServiceTypes={selectedServiceTypes}
+        toggleServiceType={toggleServiceType}
+        selectAllServiceTypes={selectAllServiceTypes}
+        deselectAllServiceTypes={deselectAllServiceTypes}
         jobSources={jobSourceNames}
-        selectedSources={[]}
-        toggleSource={() => {}}
-        selectAllSources={() => {}}
-        deselectAllSources={() => {}}
+        selectedSources={selectedJobSources}
+        toggleSource={toggleJobSource}
+        selectAllSources={selectAllJobSources}
+        deselectAllSources={deselectAllJobSources}
         contractorNames={contractorNames}
-        selectedContractors={[]}
-        toggleContractor={() => {}}
-        selectAllContractors={() => {}}
-        deselectAllContractors={() => {}}
-        date={undefined}
-        setDate={() => {}}
+        selectedContractors={selectedContractors}
+        toggleContractor={toggleContractor}
+        selectAllContractors={selectAllContractors}
+        deselectAllContractors={deselectAllContractors}
+        date={date}
+        setDate={setDate}
       />
       
       <JobTabs 

@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, CaretSortIcon, CheckCircledIcon, FunnelIcon } from "@radix-ui/react-icons";
+import { Calendar as CalendarIcon, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -67,7 +68,7 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
           <PopoverTrigger asChild>
             <Button variant="outline" role="combobox" aria-expanded={openServiceType} className="w-[200px] justify-between">
               {selectedServiceTypes.length > 0 ? selectedServiceTypes.join(", ") : "Select service type"}
-              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
@@ -83,7 +84,8 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
                         setOpenServiceType(false);
                       }}
                     >
-                      <CheckCircledIcon className={cn("mr-2 h-4 w-4")} />
+                      <Check className={cn("mr-2 h-4 w-4", 
+                        selectedServiceTypes.includes(serviceType) ? "opacity-100" : "opacity-0")} />
                       {serviceType}
                     </CommandItem>
                   ))}
@@ -100,7 +102,7 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
           <PopoverTrigger asChild>
             <Button variant="outline" role="combobox" aria-expanded={openJobSource} className="w-[200px] justify-between">
               {selectedSources.length > 0 ? selectedSources.join(", ") : "Select job source"}
-              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
@@ -116,7 +118,8 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
                         setOpenJobSource(false);
                       }}
                     >
-                      <CheckCircledIcon className={cn("mr-2 h-4 w-4")} />
+                      <Check className={cn("mr-2 h-4 w-4", 
+                        selectedSources.includes(source) ? "opacity-100" : "opacity-0")} />
                       {source}
                     </CommandItem>
                   ))}
@@ -133,7 +136,7 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
           <PopoverTrigger asChild>
             <Button variant="outline" role="combobox" aria-expanded={openContractor} className="w-[200px] justify-between">
               {selectedContractors.length > 0 ? selectedContractors.join(", ") : "Select contractor"}
-              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
@@ -149,7 +152,8 @@ const JobsFilterPopovers: React.FC<JobsFilterPopoversProps> = ({
                         setOpenContractor(false);
                       }}
                     >
-                      <CheckCircledIcon className={cn("mr-2 h-4 w-4")} />
+                      <Check className={cn("mr-2 h-4 w-4", 
+                        selectedContractors.includes(contractor) ? "opacity-100" : "opacity-0")} />
                       {contractor}
                     </CommandItem>
                   ))}

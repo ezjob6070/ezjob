@@ -1,7 +1,13 @@
 
 import { createContext, useContext, ReactNode } from "react";
-import { Job, AmountRange, PaymentMethod } from "@/components/jobs/JobTypes";
+import { Job, JobPriority, PaymentMethod } from "@/components/jobs/JobTypes";
 import { DateRange } from "react-day-picker";
+
+// Define AmountRange type that was previously imported
+interface AmountRange {
+  min?: number;
+  max?: number;
+}
 
 // Define the context type
 interface JobsContextType {
@@ -53,6 +59,8 @@ interface JobsContextType {
   deselectAllContractors: () => void;
   selectAllJobSources: () => void;
   deselectAllJobSources: () => void;
+  selectAllServiceTypes: () => void;
+  deselectAllServiceTypes: () => void;
   clearFilters: () => void;
   
   // Job operations

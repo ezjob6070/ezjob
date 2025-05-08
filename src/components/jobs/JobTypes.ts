@@ -74,3 +74,8 @@ export interface JobFilters {
   dateFilter: "today" | "tomorrow" | "yesterday" | "thisWeek" | "nextWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
   customDateRange: DateRange;
 }
+
+export interface AmountRange {
+  min?: number;
+  max?: number;
+}
