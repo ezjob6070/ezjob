@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,6 +36,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { TechnicianDateField } from "./form/TechnicianDateField";
 import { TechnicianImageUpload } from "./TechnicianImageUpload";
 import { TechnicianRoleField } from "./form/TechnicianRoleField";
+import { Shield, FileText } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface AddTechnicianModalProps {
   open: boolean;
@@ -48,6 +52,7 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
   onAddTechnician 
 }) => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("basic");
   
   const form = useForm<z.infer<typeof technicianSchema>>({
     resolver: zodResolver(technicianSchema),
@@ -63,6 +68,12 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       hireDate: "",
       notes: "",
       role: "technician",
+      ssn: "",
+      driverLicenseNumber: "",
+      driverLicenseState: "",
+      driverLicenseExpiration: "",
+      idNumber: "",
+      workContract: "",
     },
   });
   
@@ -99,11 +110,23 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
       hourlyRate: values.paymentType === "hourly" ? Number(values.paymentRate) : 0,
       // Add the role field
       role: values.role,
+      // Add sensitive fields if provided
+      ssn: values.ssn || undefined,
+      idNumber: values.idNumber || undefined,
+      // Add driver's license if provided
+      driverLicense: values.driverLicenseNumber ? {
+        number: values.driverLicenseNumber,
+        state: values.driverLicenseState || "",
+        expirationDate: values.driverLicenseExpiration || "",
+      } : undefined,
+      // Add work contract field
+      workContract: values.workContract || undefined,
     };
     
     onAddTechnician(newTechnician);
     setProfileImage(null);
     form.reset();
+    setActiveTab("basic");
     onOpenChange(false);
   }
   
@@ -124,205 +147,321 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="basic">Basic Information</TabsTrigger>
+                <TabsTrigger value="sensitive">Sensitive Information</TabsTrigger>
+              </TabsList>
               
-              <TechnicianRoleField control={form.control} />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="email@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Phone number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="specialty"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Specialty *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="E.g., Plumbing, Electrical, etc." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <TabsContent value="basic" className="space-y-4 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <TechnicianRoleField control={form.control} />
+                  
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="email@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Phone number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="specialty"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Specialty *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="E.g., Plumbing, Electrical, etc." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <TechnicianDateField
-                control={form.control}
-                name="hireDate"
-                label="Hire Date *"
-              />
-              
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter address" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                        <SelectItem value="onLeave">On Leave</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="paymentType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Payment Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select payment type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="percentage">Percentage</SelectItem>
-                        <SelectItem value="flat">Flat Rate</SelectItem>
-                        <SelectItem value="hourly">Hourly</SelectItem>
-                        <SelectItem value="salary">Salary</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="paymentRate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {form.watch("paymentType") === "percentage"
-                        ? "Percentage Rate (%)"
-                        : form.watch("paymentType") === "flat"
-                        ? "Flat Rate ($)"
-                        : "Hourly Rate ($/hour)"}
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Enter rate" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <TechnicianDateField
+                    control={form.control}
+                    name="hireDate"
+                    label="Hire Date *"
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                            <SelectItem value="onLeave">On Leave</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="paymentType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Payment Type</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select payment type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="percentage">Percentage</SelectItem>
+                            <SelectItem value="flat">Flat Rate</SelectItem>
+                            <SelectItem value="hourly">Hourly</SelectItem>
+                            <SelectItem value="salary">Salary</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="paymentRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {form.watch("paymentType") === "percentage"
+                            ? "Percentage Rate (%)"
+                            : form.watch("paymentType") === "flat"
+                            ? "Flat Rate ($)"
+                            : "Hourly Rate ($/hour)"}
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="Enter rate" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="salaryBasis"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Salary Basis</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                  <FormField
+                    control={form.control}
+                    name="salaryBasis"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Salary Basis</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select salary basis" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="hourly">Hourly</SelectItem>
+                            <SelectItem value="weekly">Weekly</SelectItem>
+                            <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="annually">Annually</SelectItem>
+                            <SelectItem value="commission">Commission</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select salary basis" />
-                        </SelectTrigger>
+                        <Textarea
+                          placeholder="Additional notes about the technician"
+                          className="min-h-[100px]"
+                          {...field}
+                        />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="hourly">Hourly</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="annually">Annually</SelectItem>
-                        <SelectItem value="commission">Commission</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Additional notes about the technician"
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+              
+              <TabsContent value="sensitive" className="space-y-6 py-4">
+                <div className="bg-amber-50 p-4 rounded-lg space-y-6">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-amber-500" />
+                    <h3 className="font-medium text-amber-700">Sensitive Information (Optional)</h3>
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="ssn"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Social Security Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="XXX-XX-XXXX" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="idNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ID Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ID number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Driver's License Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="driverLicenseNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>License Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="License number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="driverLicenseState"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <FormControl>
+                              <Input placeholder="State" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="driverLicenseExpiration"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Expiration</FormLabel>
+                            <FormControl>
+                              <Input placeholder="MM/DD/YYYY" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 pt-2">
+                    <FileText className="h-5 w-5 text-amber-500" />
+                    <h3 className="font-medium text-amber-700">Work Contract</h3>
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="workContract"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contract Reference</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Contract ID or reference" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <p className="text-xs text-amber-700 mt-2">
+                    This information is sensitive and should be handled with care.
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

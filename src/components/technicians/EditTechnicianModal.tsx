@@ -24,7 +24,8 @@ import { TechnicianStatusFields } from "@/components/technicians/form/Technician
 import { TechnicianImageUpload } from "@/components/technicians/TechnicianImageUpload";
 import { TechnicianRoleField } from "./form/TechnicianRoleField";
 import { Separator } from "@/components/ui/separator";
-import { Shield } from "lucide-react";
+import { Shield, FileText } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface EditTechnicianModalProps {
   technician: Technician | null;
@@ -39,6 +40,8 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
   onOpenChange,
   onUpdateTechnician,
 }) => {
+  const [activeTab, setActiveTab] = React.useState("basic");
+  
   const form = useForm<TechnicianEditFormValues>({
     resolver: zodResolver(technicianEditSchema),
     defaultValues: {
@@ -60,12 +63,13 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
       incentiveType: technician?.incentiveType,
       incentiveAmount: String(technician?.incentiveAmount || ""),
       role: technician?.role || "technician",
-      // New sensitive fields
+      // Sensitive fields
       ssn: technician?.ssn || "",
       driverLicenseNumber: technician?.driverLicense?.number || "",
       driverLicenseState: technician?.driverLicense?.state || "",
       driverLicenseExpiration: technician?.driverLicense?.expirationDate || "",
       idNumber: technician?.idNumber || "",
+      workContract: technician?.workContract || "",
     },
   });
 
@@ -116,43 +120,53 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
               />
             </div>
 
-            <div className="space-y-4">
-              <TechnicianBasicInfoFields control={form.control} />
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="basic">Basic Information</TabsTrigger>
+                <TabsTrigger value="sensitive">Sensitive Information</TabsTrigger>
+              </TabsList>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TechnicianRoleField 
-                  control={form.control} 
-                  defaultValue={technician.role || "technician"} 
-                />
-              </div>
-              
-              <TechnicianStatusFields control={form.control} />
-              
-              <TechnicianPaymentFields 
-                control={form.control} 
-                defaultSalaryBasis={technician.salaryBasis || "hourly"}
-                defaultIncentiveType={technician.incentiveType as any}
-              />
-              
-              <TechnicianDateField
-                control={form.control}
-                name="startDate"
-                label="Start Date"
-              />
-              
-              <TechnicianDateField
-                control={form.control}
-                name="hireDate"
-                label="Hire Date"
-              />
-              
-              {/* Sensitive Information Section */}
-              <div className="pt-4">
-                <div className="flex items-center mb-4">
-                  <Shield className="h-5 w-5 mr-2 text-amber-500" />
-                  <h3 className="text-base font-semibold">Sensitive Information</h3>
+              <TabsContent value="basic" className="space-y-4 pt-4">
+                <div className="space-y-4">
+                  <TechnicianBasicInfoFields control={form.control} />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <TechnicianRoleField 
+                      control={form.control} 
+                      defaultValue={technician.role || "technician"} 
+                    />
+                  </div>
+                  
+                  <TechnicianStatusFields control={form.control} />
+                  
+                  <TechnicianPaymentFields 
+                    control={form.control} 
+                    defaultSalaryBasis={technician.salaryBasis || "hourly"}
+                    defaultIncentiveType={technician.incentiveType as any}
+                  />
+                  
+                  <TechnicianDateField
+                    control={form.control}
+                    name="startDate"
+                    label="Start Date"
+                  />
+                  
+                  <TechnicianDateField
+                    control={form.control}
+                    name="hireDate"
+                    label="Hire Date"
+                  />
                 </div>
+              </TabsContent>
+              
+              <TabsContent value="sensitive" className="space-y-4 pt-4">
+                {/* Sensitive Information Section */}
                 <div className="bg-amber-50 p-4 rounded-lg space-y-4">
+                  <div className="flex items-center mb-4">
+                    <Shield className="h-5 w-5 mr-2 text-amber-500" />
+                    <h3 className="text-base font-semibold">Sensitive Information</h3>
+                  </div>
+                  
                   {/* SSN */}
                   <FormField
                     control={form.control}
@@ -231,12 +245,34 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
                     )}
                   />
                   
+                  {/* Work Contract */}
+                  <div className="pt-4">
+                    <div className="flex items-center mb-2">
+                      <FileText className="h-5 w-5 mr-2 text-amber-500" />
+                      <h4 className="text-base font-semibold">Work Contract</h4>
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="workContract"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contract Reference</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Contract ID or reference" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
                   <p className="text-xs text-amber-700">
                     This information is sensitive and should be handled with care.
                   </p>
                 </div>
-              </div>
-            </div>
+              </TabsContent>
+            </Tabs>
             
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => onOpenChange(false)}>Cancel</AlertDialogCancel>

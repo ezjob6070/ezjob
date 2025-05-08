@@ -43,6 +43,7 @@ export const technicianEditSchema = z.object({
   driverLicenseState: z.string().optional(),
   driverLicenseExpiration: z.string().optional(),
   idNumber: z.string().optional(),
+  workContract: z.string().optional(), // New field for work contract
 });
 
 export type TechnicianEditFormValues = z.infer<typeof technicianEditSchema>;

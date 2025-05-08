@@ -42,6 +42,7 @@ export interface Technician {
     expirationDate: string;
   };
   idNumber?: string;
+  workContract?: string; // New field for work contract
 }
 
 export interface Document {
