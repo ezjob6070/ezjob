@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -172,12 +173,14 @@ const AddTechnicianModal: React.FC<AddTechnicianModalProps> = ({
                     )}
                   />
                   
-                  <TechnicianRoleField control={form.control} />
-                  
-                  <TechnicianSubRoleField 
-                    control={form.control}
-                    setValue={form.setValue}
-                  />
+                  {/* Role and SubRole fields side by side */}
+                  <div className="md:col-span-2 flex flex-col sm:flex-row gap-4">
+                    <TechnicianRoleField control={form.control} />
+                    <TechnicianSubRoleField 
+                      control={form.control}
+                      setValue={form.setValue}
+                    />
+                  </div>
                   
                   <FormField
                     control={form.control}

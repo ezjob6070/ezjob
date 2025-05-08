@@ -38,7 +38,7 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
       name="subRole"
       defaultValue={defaultValue || ""}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="flex-1">
           <FormLabel>Industry/Department</FormLabel>
           <FormControl>
             <Select
@@ -46,7 +46,7 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
               value={field.value}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select industry/department" />
+                <SelectValue placeholder="Select industry/department (optional)" />
               </SelectTrigger>
               <SelectContent>
                 {subRoles.map((subRole) => (

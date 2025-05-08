@@ -20,7 +20,7 @@ export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({
       name="role"
       defaultValue={defaultValue}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="flex-1">
           <FormLabel>Role</FormLabel>
           <FormControl>
             <Select

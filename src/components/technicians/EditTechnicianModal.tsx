@@ -64,6 +64,7 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
       incentiveType: technician?.incentiveType,
       incentiveAmount: String(technician?.incentiveAmount || ""),
       role: technician?.role || "technician",
+      subRole: technician?.subRole || "",
       // Sensitive fields
       ssn: technician?.ssn || "",
       driverLicenseNumber: technician?.driverLicense?.number || "",
@@ -131,10 +132,16 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
                 <div className="space-y-4">
                   <TechnicianBasicInfoFields control={form.control} />
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Role and SubRole fields side by side */}
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <TechnicianRoleField 
                       control={form.control} 
                       defaultValue={technician.role || "technician"} 
+                    />
+                    <TechnicianSubRoleField 
+                      control={form.control}
+                      setValue={form.setValue}
+                      defaultValue={technician.subRole}
                     />
                   </div>
                   
