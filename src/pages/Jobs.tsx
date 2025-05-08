@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useJobsData } from "@/hooks/useJobsData";
 import { useJobSourceData } from "@/hooks/jobs/useJobSourceData";
@@ -12,8 +11,10 @@ import JobsHeader from "@/components/jobs/JobsHeader";
 import JobsContainer from "@/components/jobs/JobsContainer";
 import { JobsProvider } from "@/components/jobs/context/JobsContext";
 import { DateRange } from "react-day-picker";
+import { useNavigate } from "react-router-dom";
 
 const Jobs = () => {
+  const navigate = useNavigate();
   const { jobs: globalJobs, technicians: globalTechnicians, jobSources: globalJobSources, addJob, completeJob, cancelJob } = useGlobalState();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
@@ -80,7 +81,8 @@ const Jobs = () => {
     handleRescheduleJob,
     openStatusModal,
     closeStatusModal,
-    handleUpdateJobStatus
+    handleUpdateJobStatus,
+    sendJobToEstimate
   } = useJobsData(localJobs, jobSourceNames);
 
   // Set up technician data
@@ -233,6 +235,7 @@ const Jobs = () => {
     handleCancelJob,
     handleCompleteJob,
     handleRescheduleJob: handleLocalRescheduleJob,
+    handleSendToEstimate,
     
     // Job status modal
     selectedJob,
@@ -271,6 +274,7 @@ const Jobs = () => {
         <JobsContainer 
           technicianNames={technicianNames}
           jobSourceNames={jobSourceNames}
+          onSendToEstimate={handleSendToEstimate}
         />
 
         {/* Modals */}

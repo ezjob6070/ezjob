@@ -1,21 +1,19 @@
-
-import { createContext, useContext, ReactNode } from "react";
-import { Job, AmountRange, PaymentMethod } from "@/components/jobs/JobTypes";
+import { createContext, useContext } from "react";
+import { Job, AmountRange } from "../JobTypes";
 import { DateRange } from "react-day-picker";
 
-// Define the context type
 interface JobsContextType {
-  // Modals state
+  // Modals
   isCreateModalOpen: boolean;
   setIsCreateModalOpen: (open: boolean) => void;
   
-  // Filter popovers state
+  // Filter popovers
   datePopoverOpen: boolean;
   setDatePopoverOpen: (open: boolean) => void;
   techPopoverOpen: boolean;
   setTechPopoverOpen: (open: boolean) => void;
-  contractorPopoverOpen: boolean; // Added contractor popover state
-  setContractorPopoverOpen: (open: boolean) => void; // Added setter
+  contractorPopoverOpen: boolean;
+  setContractorPopoverOpen: (open: boolean) => void;
   sourcePopoverOpen: boolean;
   setSourcePopoverOpen: (open: boolean) => void;
   amountPopoverOpen: boolean;
@@ -23,30 +21,30 @@ interface JobsContextType {
   paymentPopoverOpen: boolean;
   setPaymentPopoverOpen: (open: boolean) => void;
   
-  // Jobs data 
+  // Jobs
   jobs: Job[];
   filteredJobs: Job[];
+  
+  // Search and filters
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  
-  // Filters
   selectedTechnicians: string[];
   selectedCategories: string[];
   selectedJobSources: string[];
   selectedServiceTypes: string[];
-  date: DateRange | undefined;  // Updated to DateRange | undefined to be compatible
+  date?: DateRange;
   amountRange: AmountRange | null;
-  paymentMethod: PaymentMethod | null;
+  paymentMethod: string | null;
   hasActiveFilters: boolean;
   
   // Filter operations
   toggleTechnician: (techName: string) => void;
   toggleCategory: (category: string) => void;
-  toggleJobSource: (sourceName: string) => void;
-  toggleServiceType: (serviceType: string) => void;
-  setDate: (date: DateRange | undefined) => void; // Updated to use DateRange
+  toggleJobSource: (source: string) => void;
+  toggleServiceType: (type: string) => void;
+  setDate: (dateRange?: DateRange) => void;
   setAmountRange: (range: AmountRange | null) => void;
-  setPaymentMethod: (method: PaymentMethod | null) => void;
+  setPaymentMethod: (method: string | null) => void;
   selectAllTechnicians: () => void;
   deselectAllTechnicians: () => void;
   selectAllJobSources: () => void;
@@ -55,9 +53,10 @@ interface JobsContextType {
   
   // Job operations
   handleAddJob: (job: Job) => void;
-  handleCancelJob: (jobId: string, cancellationReason?: string) => void;
+  handleCancelJob: (jobId: string, reason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount: number) => void;
   handleRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
+  handleSendToEstimate?: (job: Job) => void;
   
   // Job status modal
   selectedJob: Job | null;
@@ -65,22 +64,23 @@ interface JobsContextType {
   openStatusModal: (job: Job) => void;
   closeStatusModal: () => void;
   
-  // Job source operations
+  // Other operations
   toggleJobSourceSidebar: () => void;
 }
 
-// Create the context with a default undefined value
-const JobsContext = createContext<JobsContextType | undefined>(undefined);
+const JobsContext = createContext<JobsContextType | null>(null);
 
-// Context provider component
-export const JobsProvider = ({ children, value }: { children: ReactNode, value: JobsContextType }) => {
-  return <JobsContext.Provider value={value}>{children}</JobsContext.Provider>;
+export const JobsProvider = ({ children, value }: { children: React.ReactNode, value: JobsContextType }) => {
+  return (
+    <JobsContext.Provider value={value}>
+      {children}
+    </JobsContext.Provider>
+  );
 };
 
-// Custom hook to use the context
-export const useJobsContext = () => {
+export const useJobsContext = (): JobsContextType => {
   const context = useContext(JobsContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useJobsContext must be used within a JobsProvider");
   }
   return context;
