@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -977,4 +978,29 @@ const calculateRemainingAmount = (
     if (technician.paymentType === 'percentage') {
       remaining -= amount * (technician.paymentRate / 100);
     } else {
-      remaining
+      remaining -= Math.min(technician.paymentRate, amount); // Can't deduct more than total
+    }
+  }
+  
+  // Subtract contractor payment
+  if (contractor && contractor.paymentType && contractor.paymentRate) {
+    if (contractor.paymentType === 'percentage') {
+      remaining -= amount * (contractor.paymentRate / 100);
+    } else {
+      remaining -= Math.min(contractor.paymentRate, amount); // Can't deduct more than total
+    }
+  }
+  
+  // Subtract job source payment
+  if (jobSource && jobSource.paymentType && jobSource.paymentValue) {
+    if (jobSource.paymentType === 'percentage') {
+      remaining -= amount * (jobSource.paymentValue / 100);
+    } else {
+      remaining -= Math.min(jobSource.paymentValue, amount); // Can't deduct more than total
+    }
+  }
+  
+  return Math.max(0, remaining); // Ensure it's never negative
+};
+
+export default CreateJobModal;
