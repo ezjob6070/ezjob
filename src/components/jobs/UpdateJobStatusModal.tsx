@@ -38,7 +38,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled" | "estimate">("completed");
   const [actualAmount, setActualAmount] = useState<number>(job?.amount || 0);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>(
-    job?.scheduledDate ? new Date(job.scheduledDate) : new Date()
+    job?.scheduledDate ? new Date(job.scheduledDate as string) : new Date()
   );
   const [timeSelection, setTimeSelection] = useState<"preset" | "custom" | "allDay">("preset");
   const [presetTime, setPresetTime] = useState<string>("");
@@ -54,7 +54,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
       setActualAmount(job.amount || 0);
       setParts(job.parts ? job.parts.join(", ") : "");
       setCancellationReason(job.cancellationReason || "");
-      setRescheduleDate(job.scheduledDate ? new Date(job.scheduledDate) : new Date());
+      setRescheduleDate(job.scheduledDate ? new Date(job.scheduledDate as string) : new Date());
     }
   }, [job]);
   
@@ -102,7 +102,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
       
       onReschedule(job.id, scheduledDate, isAllDay);
     } else if (status === "estimate" && onSendToEstimate) {
-      // Handle the new "estimate" status option
+      // Handle sending job to estimate
       onSendToEstimate(job);
     }
     

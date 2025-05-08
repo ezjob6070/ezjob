@@ -13,7 +13,7 @@ interface JobTabsProps {
   onCancelJob: (jobId: string, cancellationReason?: string) => void;
   onCompleteJob: (jobId: string, actualAmount: number) => void;
   onRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
-  onSendToEstimate: (job: Job) => void; // Add this prop
+  onSendToEstimate: (job: Job) => void;
   onSearchChange: (value: string) => void;
   selectedJob: Job | null;
   isStatusModalOpen: boolean;
@@ -32,7 +32,7 @@ const JobTabs: React.FC<JobTabsProps> = ({
   onCancelJob,
   onCompleteJob,
   onRescheduleJob,
-  onSendToEstimate, // Add this prop
+  onSendToEstimate,
   onSearchChange,
   selectedJob,
   isStatusModalOpen,
@@ -97,7 +97,6 @@ const JobTabs: React.FC<JobTabsProps> = ({
         <TabsContent value={activeTab} className="mt-6">
           <JobsTable
             jobs={filteredJobs}
-            onCancelJob={onCancelJob}
             onUpdateStatus={openStatusModal}
             onSendToEstimate={onSendToEstimate}
           />

@@ -23,7 +23,7 @@ const StatusSelection: React.FC<StatusSelectionProps> = ({
     options.push({ value: "completed", label: "Completed" });
     options.push({ value: "cancelled", label: "Cancelled" });
     options.push({ value: "reschedule", label: "Reschedule" });
-    options.push({ value: "estimate", label: "Convert to Estimate" });
+    options.push({ value: "estimate", label: "Send to Estimate" });
     
     // Only add in_progress if not already in that status
     if (job.status !== "in_progress") {
