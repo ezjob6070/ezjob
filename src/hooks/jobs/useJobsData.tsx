@@ -48,7 +48,7 @@ export interface UseJobsDataResult {
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount?: number) => void;
-  // New properties for sorting
+  // Properties for sorting
   sortBy: string;
   setSortBy: (option: string) => void;
   // Properties for contractors
@@ -269,6 +269,26 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
         const dateA = new Date(a.date || a.scheduledDate || '').getTime();
         const dateB = new Date(b.date || b.scheduledDate || '').getTime();
         return dateA - dateB; // oldest first
+      });
+    } else if (sortBy === "name-asc") {
+      filtered = [...filtered].sort((a, b) => {
+        return (a.clientName || "").localeCompare(b.clientName || "");
+      });
+    } else if (sortBy === "name-desc") {
+      filtered = [...filtered].sort((a, b) => {
+        return (b.clientName || "").localeCompare(a.clientName || "");
+      });
+    } else if (sortBy === "revenue-high") {
+      filtered = [...filtered].sort((a, b) => {
+        const amountA = a.amount || 0;
+        const amountB = b.amount || 0;
+        return amountB - amountA; // high to low
+      });
+    } else if (sortBy === "revenue-low") {
+      filtered = [...filtered].sort((a, b) => {
+        const amountA = a.amount || 0;
+        const amountB = b.amount || 0;
+        return amountA - amountB; // low to high
       });
     }
     

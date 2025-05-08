@@ -78,6 +78,10 @@ interface JobsContextType {
   
   // Job source operations
   toggleJobSourceSidebar?: () => void;
+  
+  // Sort operations
+  sortBy: string;
+  setSortBy: (option: string) => void;
 }
 
 // Create the context with a default undefined value

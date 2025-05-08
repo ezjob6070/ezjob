@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/command";
 import AmountFilter from "./AmountFilter";
 import PaymentMethodFilter from "./PaymentMethodFilter";
+import JobSortFilter from "./filters/JobSortFilter";
 
 const JobsFilterBar = () => {
   const { 
@@ -52,7 +53,10 @@ const JobsFilterBar = () => {
     paymentPopoverOpen,
     setPaymentPopoverOpen,
     paymentMethod,
-    setPaymentMethod
+    setPaymentMethod,
+    // Sort
+    sortBy,
+    setSortBy
   } = useJobsContext();
   
   const [openTechnicians, setOpenTechnicians] = useState(false);
@@ -84,6 +88,11 @@ const JobsFilterBar = () => {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 bg-gray-50 p-3 rounded-md border border-gray-100">
       <div className="flex flex-wrap items-center gap-2">
+        {/* Sort Filter */}
+        <div className="mr-1">
+          <JobSortFilter sortBy={sortBy} setSortBy={setSortBy} />
+        </div>
+        
         {/* Technician Filter */}
         <Popover open={openTechnicians} onOpenChange={setOpenTechnicians}>
           <PopoverTrigger asChild>
@@ -325,8 +334,6 @@ const JobsFilterBar = () => {
             <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
           </PopoverContent>
         </Popover>
-        
-        {/* Removed Date Sort Filter */}
         
         {hasActiveFilters && (
           <Button 
