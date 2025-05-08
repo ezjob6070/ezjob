@@ -31,6 +31,10 @@ const JobActions = ({
   const handleSendToEstimate = useCallback(() => {
     if (onSendToEstimate) {
       onSendToEstimate(job);
+      toast({
+        title: "Job sent to estimate",
+        description: `Job for ${job.clientName} has been sent to estimates.`,
+      });
     } else {
       // Fallback if the handler isn't provided
       toast({
