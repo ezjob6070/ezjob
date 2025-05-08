@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User, UserPermission, UserRole, PermissionModule, PermissionAction } from "@/types/finance";
+import { CompanyProfile, User, UserPermission, UserRole, PermissionModule, PermissionAction } from "@/types/finance";
 import { 
   Table, 
   TableBody, 
@@ -36,22 +35,25 @@ import { Check, Filter, Key, Lock, MoreHorizontal, Plus, Search, ShieldCheck, Us
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const profileFormSchema = z.object({
-  name: z
+const companyProfileSchema = z.object({
+  companyName: z
     .string()
     .min(2, {
-      message: "Name must be at least 2 characters.",
+      message: "Company name must be at least 2 characters.",
     })
-    .max(30, {
-      message: "Name must not be longer than 30 characters.",
+    .max(50, {
+      message: "Company name must not be longer than 50 characters.",
     }),
   email: z
     .string()
     .min(1, { message: "Email is required." })
     .email("This is not a valid email."),
-  bio: z.string().max(160).optional(),
   phone: z.string().optional(),
-  jobTitle: z.string().max(50).optional(),
+  website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  address: z.string().max(200).optional(),
+  industry: z.string().max(50).optional(),
+  taxId: z.string().max(30).optional(),
+  description: z.string().max(500).optional(),
 });
 
 const notificationsFormSchema = z.object({
@@ -70,7 +72,7 @@ const userFormSchema = z.object({
   status: z.enum(["active", "inactive", "pending"]),
 });
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type CompanyProfileValues = z.infer<typeof companyProfileSchema>;
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
 type UserFormValues = z.infer<typeof userFormSchema>;
 
@@ -190,14 +192,17 @@ const Settings = () => {
   
   const availablePermissions = generateAvailablePermissions();
 
-  const profileForm = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+  const companyProfileForm = useForm<CompanyProfileValues>({
+    resolver: zodResolver(companyProfileSchema),
     defaultValues: {
-      name: "Alex Johnson",
-      email: "alex.johnson@example.com",
-      bio: "Sales manager with 5+ years of experience in client relationship management.",
+      companyName: "TechService Solutions",
+      email: "info@techservicesolutions.com",
       phone: "(555) 123-4567",
-      jobTitle: "Sales Manager",
+      website: "https://techservicesolutions.com",
+      address: "123 Business Ave, Suite 100, Tech City, TC 12345",
+      industry: "Field Service Management",
+      taxId: "12-3456789",
+      description: "Premier provider of field service management solutions with over 10 years of experience serving residential and commercial clients.",
     },
   });
 
@@ -222,9 +227,9 @@ const Settings = () => {
     },
   });
 
-  function onProfileSubmit(data: ProfileFormValues) {
-    toast.success("Profile updated", {
-      description: "Your profile information has been updated successfully.",
+  function onCompanyProfileSubmit(data: CompanyProfileValues) {
+    toast.success("Company profile updated", {
+      description: "Your company information has been updated successfully.",
     });
   }
 
@@ -386,13 +391,13 @@ const Settings = () => {
           Settings
         </h1>
         <p className="text-muted-foreground mt-1">
-          Manage your account settings and preferences
+          Manage your company settings, users and preferences
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="profile">Company Profile</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
@@ -403,12 +408,12 @@ const Settings = () => {
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>AJ</AvatarFallback>
+                <AvatarImage src="/placeholder.svg" alt="Company logo" />
+                <AvatarFallback>TS</AvatarFallback>
               </Avatar>
               <div className="space-y-2">
                 <Button size="sm" variant="outline">
-                  Change Avatar
+                  Change Company Logo
                 </Button>
                 <Button size="sm" variant="ghost" className="text-muted-foreground">
                   Remove
@@ -418,18 +423,18 @@ const Settings = () => {
 
             <Separator />
 
-            <Form {...profileForm}>
+            <Form {...companyProfileForm}>
               <form
-                onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+                onSubmit={companyProfileForm.handleSubmit(onCompanyProfileSubmit)}
                 className="space-y-6"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
-                    control={profileForm.control}
-                    name="name"
+                    control={companyProfileForm.control}
+                    name="companyName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>Company Name</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -438,7 +443,7 @@ const Settings = () => {
                     )}
                   />
                   <FormField
-                    control={profileForm.control}
+                    control={companyProfileForm.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
@@ -451,7 +456,7 @@ const Settings = () => {
                     )}
                   />
                   <FormField
-                    control={profileForm.control}
+                    control={companyProfileForm.control}
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
@@ -464,11 +469,37 @@ const Settings = () => {
                     )}
                   />
                   <FormField
-                    control={profileForm.control}
-                    name="jobTitle"
+                    control={companyProfileForm.control}
+                    name="website"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Job Title</FormLabel>
+                        <FormLabel>Website</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={companyProfileForm.control}
+                    name="industry"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Industry</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={companyProfileForm.control}
+                    name="taxId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tax ID / Business Number</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -478,26 +509,43 @@ const Settings = () => {
                   />
                 </div>
                 <FormField
-                  control={profileForm.control}
-                  name="bio"
+                  control={companyProfileForm.control}
+                  name="address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bio</FormLabel>
+                      <FormLabel>Business Address</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder="Tell us a little about yourself"
+                          placeholder="Enter your company's address"
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={companyProfileForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Brief description about your company"
                           className="resize-none"
                         />
                       </FormControl>
                       <FormDescription>
-                        Brief description for your profile. URLs are hyperlinked.
+                        This description may appear on invoices, estimates, and client communications.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit">Update profile</Button>
+                <Button type="submit">Update Company Profile</Button>
               </form>
             </Form>
           </div>

@@ -102,3 +102,16 @@ export interface UserPermission {
 
 export type PermissionModule = "jobs" | "technicians" | "clients" | "finance" | "settings" | "reports" | "team" | "payments" | "estimates" | "invoices";
 export type PermissionAction = "view" | "create" | "edit" | "delete" | "approve" | "manage" | "export" | "import" | "viewSensitive";
+
+// Company profile settings
+export interface CompanyProfile {
+  companyName: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  logo?: string;
+  industry?: string;
+  taxId?: string;
+  description?: string;
+}

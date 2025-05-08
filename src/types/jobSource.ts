@@ -17,4 +17,10 @@ export interface JobSource {
   expenses?: number;
   companyProfit?: number;
   category?: string;
+  // Additional properties needed by existing components
+  profit?: number;
+  phone?: string;
+  paymentType?: string;
+  paymentValue?: number;
+  logoUrl?: string;
 }
