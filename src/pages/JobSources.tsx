@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -56,7 +55,7 @@ const JobSources = () => {
       ...updatedJobSource,
       createdAt: typeof updatedJobSource.createdAt === 'string' 
         ? updatedJobSource.createdAt 
-        : (updatedJobSource.createdAt instanceof Date ? updatedJobSource.createdAt.toISOString() : new Date().toISOString())
+        : new Date().toISOString()
     };
     
     updateJobSource(formattedJobSource.id, formattedJobSource);
@@ -78,7 +77,7 @@ const JobSources = () => {
     profit: source.profit || 0,
     createdAt: typeof source.createdAt === 'string' 
       ? source.createdAt 
-      : (source.createdAt instanceof Date ? source.createdAt.toISOString() : new Date().toISOString()),
+      : new Date().toISOString(),
     website: source.website || '',
     phone: source.phone || '',
     email: source.email || '',

@@ -3,6 +3,8 @@ export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "mont
 
 export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
 
+export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
+
 export interface TechnicianSubRoles {
   technician: string[];
   salesman: string[];
@@ -37,7 +39,7 @@ export interface Technician {
   cancelledJobs: number;
   totalRevenue: number;
   rating: number;
-  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
+  incentiveType?: IncentiveType;
   incentiveAmount?: number;
   notes?: string;
   profileImage?: string;

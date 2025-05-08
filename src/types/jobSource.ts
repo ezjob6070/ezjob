@@ -12,7 +12,6 @@ export interface JobSource {
   totalRevenue: number;
   profit: number;
   createdAt: string;
-  // Adding missing properties that are used in components
   website?: string;
   phone?: string;
   email?: string;

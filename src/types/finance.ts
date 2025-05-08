@@ -1,24 +1,22 @@
 
-export type TimeFrame = "day" | "week" | "month" | "year" | "custom";
+import { JobSource } from "./jobSource";
 
-export type FinancialTransaction = {
+export interface FinancialTransaction {
   id: string;
   date: Date;
   amount: number;
-  clientName: string;
-  jobTitle: string;
+  category: "payment" | "expense" | "refund";
+  description: string;
+  status: "pending" | "completed" | "cancelled";
+  clientName?: string;
+  jobId?: string;
   technicianName?: string;
   technicianRate?: number;
   technicianRateIsPercentage?: boolean;
-  jobSourceId?: string;
-  jobSourceName?: string;
-  category: "payment" | "expense" | "refund";
-  status: "pending" | "completed" | "failed";
-  notes?: string;
-};
+}
 
-export type FinancialReport = {
-  timeFrame: TimeFrame;
+export interface FinancialReport {
+  timeFrame: "day" | "week" | "month" | "year" | "custom";
   startDate: Date;
   endDate: Date;
   totalRevenue: number;
@@ -26,52 +24,17 @@ export type FinancialReport = {
   companyProfit: number;
   technicianPayments: number;
   transactions: FinancialTransaction[];
-};
+}
 
-export type JobSource = {
-  id: string;
-  name: string;
+export interface JobSourceFinance extends JobSource {
+  // Extending the JobSource type to ensure compatibility
   type: string;
-  website?: string;
-  logoUrl?: string;
-  category?: string;
-  totalJobs?: number;
-  totalRevenue?: number;
-  expenses?: number;
-  companyProfit?: number;
-  paymentType: "percentage" | "fixed";
-  paymentValue: number;
-  isActive: boolean;
-  profit: number;
-  createdAt: Date;
-};
+}
 
-export type ProfitBreakdownItem = {
-  name: string;
-  value: number;
-  color: string;
-};
-
-export type OfficeExpense = {
-  id: string;
-  date: string;
-  category: string;
-  description: string;
-  amount: number;
-  paymentMethod?: string;
-  vendor?: string;
-  recurring?: boolean;
-  receipt?: string;
-  status?: "paid" | "pending" | "overdue";
-};
-
-export type FinanceEntityType = "technician" | "jobSource" | "client" | "agent" | "property";
-
-export type ExpenseCategory = {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  color: string;
-  budget?: number;
-  currentSpend?: number;
-};
+export interface FinancePage {
+  activeTab: string;
+  dateRange: {
+    from: Date;
+    to: Date;
+  };
+}

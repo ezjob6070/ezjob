@@ -13,6 +13,7 @@ import { JobsProvider } from "@/components/jobs/context/JobsContext";
 import { DateRange } from "react-day-picker";
 import { useNavigate } from "react-router-dom";
 import { JobSource } from "@/types/jobSource";
+import { Technician } from "@/types/technician";
 
 const Jobs = () => {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ const Jobs = () => {
   };
 
   const handleCancelJob = (jobId: string, reason?: string) => {
-    cancelJob(jobId, reason);
+    cancelJob(jobId);
     
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
@@ -125,13 +126,13 @@ const Jobs = () => {
     );
   };
 
-  const handleCompleteJob = (jobId: string, actualAmount: number) => {
+  const handleCompleteJob = (jobId: string) => {
     completeJob(jobId);
     
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
-          ? { ...job, status: "completed" as const, actualAmount }
+          ? { ...job, status: "completed" as const }
           : job
       )
     );
@@ -273,9 +274,14 @@ const Jobs = () => {
     paymentValue: source.paymentValue || 0, 
     isActive: source.isActive !== false,
     profit: source.profit || 0,
-    createdAt: source.createdAt || new Date(),
+    createdAt: typeof source.createdAt === 'string' ? source.createdAt : new Date().toISOString(),
     totalJobs: source.totalJobs || 0,
-    totalRevenue: source.totalRevenue || 0
+    totalRevenue: source.totalRevenue || 0,
+    website: source.website || '',
+    phone: source.phone || '',
+    email: source.email || '',
+    logoUrl: source.logoUrl || '',
+    notes: source.notes || ''
   }));
 
   return (

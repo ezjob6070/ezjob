@@ -1,62 +1,34 @@
 
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled";
 
-export type PaymentMethod = "credit_card" | "cash" | "check" | "zelle" | "venmo" | "paypal";
+export interface Job {
+  id: string;
+  title?: string;
+  clientName: string;
+  date: string | Date;
+  scheduledDate?: string;
+  status: JobStatus;
+  amount: number;
+  actualAmount?: number;
+  isAllDay?: boolean;
+  cancellationReason?: string;
+  technicianId?: string;
+  technicianName?: string;
+  jobSourceId?: string;
+  jobSourceName?: string;
+  description?: string;
+  category?: string;
+  serviceType?: string;
+  address?: string;
+  phoneNumber?: string;
+  email?: string;
+  priority?: "low" | "medium" | "high";
+  notes?: string;
+  paymentMethod?: string;
+  estimateId?: string;
+}
 
 export interface AmountRange {
   min: number;
   max: number;
-}
-
-export interface Job {
-  id: string;
-  clientName: string;
-  title?: string;
-  status: JobStatus;
-  date: Date | string; // Accept either Date or string
-  scheduledDate?: Date | string;
-  isAllDay?: boolean;
-  technicianId?: string;
-  technicianName?: string;
-  address?: string;
-  amount?: number;
-  actualAmount?: number;
-  paymentMethod?: PaymentMethod;
-  description?: string;
-  notes?: string;
-  cancellationReason?: string;
-  source?: string;
-  // Additional properties
-  clientId?: string;
-  clientEmail?: string;
-  clientPhone?: string;
-  jobSourceId?: string;
-  jobSourceName?: string;
-  jobSource?: string;
-  // New contractor fields
-  contractorId?: string;
-  contractorName?: string;
-  parts?: string[];
-  createdAt?: Date;
-  assignedTechId?: string;
-  assignedTechName?: string;
-  priority?: string;
-  estimateId?: string;
-  attachments?: any[];
-  jobNumber?: string;
-  // New fields for signature and images
-  signature?: string;
-  hasImages?: boolean;
-  imageCount?: number;
-  images?: string[];
-  // Add service category
-  category?: string;
-  serviceType?: string;
-}
-
-export interface JobTab {
-  id: string;
-  label: string;
-  status: JobStatus | "all";
-  count: number;
 }
