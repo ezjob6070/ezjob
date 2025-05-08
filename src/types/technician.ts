@@ -51,7 +51,7 @@ export interface Technician {
   category?: string;
   role?: TechnicianRole;
   subRole?: string;
-  initials: string;
+  initials?: string;
   jobCategories?: string[];
   // Sensitive information fields
   ssn?: string;
