@@ -1,142 +1,166 @@
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Technician } from "@/types/technician";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { Technician } from "@/types/technician";
+import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TechnicianCardProps {
   technician: Technician;
-  selected?: boolean;
-  onToggleSelect?: (id: string) => void;
-  showSalaryData?: boolean;
-  onEdit?: (technician: Technician) => void;
+  selected: boolean;
+  onSelect: (id: string) => void;
+  onClick: (id: string) => void;
 }
 
-const TechnicianCard: React.FC<TechnicianCardProps> = ({
+export default function TechnicianCard({
   technician,
-  selected = false,
-  onToggleSelect,
-  showSalaryData = true,
-  onEdit,
-}) => {
+  selected,
+  onSelect,
+  onClick
+}: TechnicianCardProps) {
   const navigate = useNavigate();
   
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking the checkbox or edit button
-    if ((e.target as HTMLElement).closest('[data-no-navigate=true]')) return;
-    navigate(`/technicians/${technician.id}`);
-  };
+  const revenue = technician.totalRevenue?.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }) || "0";
   
-  const getRoleColor = (role?: string) => {
-    switch (role) {
-      case "technician": return "bg-blue-100 text-blue-800";
-      case "salesman": return "bg-emerald-100 text-emerald-800";
-      case "employed": return "bg-purple-100 text-purple-800";
-      case "contractor": return "bg-amber-100 text-amber-800";
-      default: return "bg-gray-100 text-gray-800";
+  // Role-specific styling with proper colors
+  const getRoleStyles = () => {
+    switch(technician.role) {
+      case "technician":
+        return {
+          color: "#0EA5E9", // Ocean Blue
+          bgColor: "#E0F2FE",
+          icon: <Wrench className="h-4 w-4 text-[#0EA5E9]" />,
+          label: "Technician",
+          borderHover: "hover:border-[#0EA5E9]",
+          gradientFrom: "from-blue-50",
+          gradientTo: "to-blue-100",
+          iconBg: "bg-blue-500"
+        };
+      case "salesman":
+        return {
+          color: "#10B981", // Emerald Green
+          bgColor: "#ECFDF5",
+          icon: <Briefcase className="h-4 w-4 text-[#10B981]" />,
+          label: "Salesman",
+          borderHover: "hover:border-[#10B981]",
+          gradientFrom: "from-green-50",
+          gradientTo: "to-green-100",
+          iconBg: "bg-green-500"
+        };
+      case "employed":
+        return {
+          color: "#8B5CF6", // Vivid Purple
+          bgColor: "#F3E8FF",
+          icon: <UserCheck className="h-4 w-4 text-[#8B5CF6]" />,
+          label: "Employed",
+          borderHover: "hover:border-[#8B5CF6]",
+          gradientFrom: "from-purple-50",
+          gradientTo: "to-purple-100",
+          iconBg: "bg-purple-500"
+        };
+      case "contractor":
+        return {
+          color: "#F97316", // Bright Orange
+          bgColor: "#FFEDD5",
+          icon: <Hammer className="h-4 w-4 text-[#F97316]" />,
+          label: "Contractor",
+          borderHover: "hover:border-[#F97316]",
+          gradientFrom: "from-orange-50",
+          gradientTo: "to-orange-100",
+          iconBg: "bg-orange-500"
+        };
+      default:
+        return {
+          color: "#8B7E2F", // Dark Yellow for "All Staff"
+          bgColor: "#FEF7CD", // Light Yellow
+          icon: <UserCheck className="h-4 w-4 text-[#8B7E2F]" />,
+          label: "Staff",
+          borderHover: "hover:border-[#8B7E2F]",
+          gradientFrom: "from-yellow-50",
+          gradientTo: "to-yellow-100",
+          iconBg: "bg-yellow-500"
+        };
     }
   };
   
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "bg-green-100 text-green-800";
-      case "inactive": return "bg-red-100 text-red-800";
-      case "onLeave": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
+  const roleStyle = getRoleStyles();
+  
+  const handleCardClick = () => {
+    // Navigate to technician detail if onClick is not provided
+    if (typeof onClick === 'function') {
+      onClick(technician.id);
+    } else {
+      navigate(`/technicians/${technician.id}`);
     }
   };
   
   return (
-    <Card className="cursor-pointer group hover:border-primary/50 transition-colors" onClick={handleCardClick}>
-      <CardContent className="p-0">
-        <div className="relative p-4">
-          {/* Edit Button - Top Right Corner */}
-          {onEdit && (
-            <div 
-              className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-              data-no-navigate="true"
+    <div
+      onClick={handleCardClick}
+      className={cn(
+        "group relative flex flex-col rounded-lg border p-4 hover:cursor-pointer hover:border-2 bg-gradient-to-br",
+        roleStyle.gradientFrom, roleStyle.gradientTo,
+        selected ? `border-2 border-[${roleStyle.color}]` : `border-border ${roleStyle.borderHover}`,
+        "transition-all hover:shadow-md"
+      )}
+    >
+      <Checkbox
+        checked={selected}
+        onCheckedChange={() => onSelect(technician.id)}
+        onClick={(e) => e.stopPropagation()}
+        className="absolute right-2 top-2 rounded-full border-2 ring-offset-background focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+      />
+      <div className="flex items-center">
+        <Avatar className="h-12 w-12 border-2" style={{ borderColor: roleStyle.color }}>
+          {technician.imageUrl ? (
+            <AvatarImage src={technician.imageUrl} alt={technician.name} />
+          ) : (
+            <AvatarFallback 
+              className="font-medium text-white"
+              style={{ backgroundColor: roleStyle.color }}
             >
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                className="h-8 px-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(technician);
-                }}
-              >
-                <Edit className="h-4 w-4 mr-1" /> Edit
-              </Button>
-            </div>
+              {technician.initials}
+            </AvatarFallback>
           )}
-          
-          {/* Selection Checkbox - Top Left Corner */}
-          {onToggleSelect && (
-            <div 
-              className="absolute top-2 left-2 z-10"
-              data-no-navigate="true"
-            >
-              <Checkbox
-                checked={selected}
-                onCheckedChange={() => onToggleSelect(technician.id)}
-                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                aria-label={`Select ${technician.name}`}
-              />
-            </div>
-          )}
-          
-          <div className="flex flex-col items-center text-center pt-4">
-            <Avatar className="h-16 w-16 mb-2">
-              {technician.profileImage || technician.imageUrl ? (
-                <AvatarImage src={technician.profileImage || technician.imageUrl} alt={technician.name} />
-              ) : (
-                <AvatarFallback className="text-lg bg-primary/10 text-primary">
-                  {technician.initials || technician.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            
-            <h3 className="font-medium text-lg mt-1">{technician.name}</h3>
-            
-            <div className="flex gap-2 justify-center mt-1 mb-2 flex-wrap">
-              <Badge variant="outline" className={`${getRoleColor(technician.role)}`}>
-                {technician.role || 'Technician'}
-              </Badge>
-              
-              <Badge variant="outline" className={`${getStatusColor(technician.status)}`}>
-                {technician.status}
-              </Badge>
-            </div>
-            
-            <p className="text-sm text-muted-foreground">{technician.specialty}</p>
-            
-            {showSalaryData && (
-              <div className="grid grid-cols-2 gap-3 mt-3 w-full">
-                <div className="border rounded p-2 text-center">
-                  <div className="text-xs text-muted-foreground">Payment</div>
-                  <div className="font-medium text-sm">
-                    {formatCurrency(technician.paymentRate)}
-                    {technician.paymentType === "percentage" && "%"}
-                  </div>
-                </div>
-                
-                <div className="border rounded p-2 text-center">
-                  <div className="text-xs text-muted-foreground">Revenue</div>
-                  <div className="font-medium text-sm">{formatCurrency(technician.totalRevenue)}</div>
-                </div>
-              </div>
-            )}
+        </Avatar>
+        <div className="ml-4 flex flex-col">
+          <div className="text-sm font-medium">{technician.name}</div>
+          <div className="text-xs text-muted-foreground">
+            {technician.specialty}
+          </div>
+          <div className="flex items-center mt-1 px-2 py-0.5 rounded-full text-xs" 
+               style={{ backgroundColor: roleStyle.bgColor, color: roleStyle.color }}>
+            {roleStyle.icon}
+            <span className="ml-1 font-medium">{roleStyle.label}</span>
           </div>
         </div>
-      </CardContent>
-    </Card>
-  );
-};
+      </div>
 
-export default TechnicianCard;
+      <div className="grid grid-cols-3 text-center gap-2 mt-4">
+        <div className="p-1 rounded-md bg-white bg-opacity-60 shadow-sm">
+          <div className="text-sm font-medium">{technician.completedJobs}</div>
+          <div className="text-xs text-muted-foreground">Completed</div>
+        </div>
+        <div className="p-1 rounded-md bg-white bg-opacity-60 shadow-sm">
+          <div className="text-sm font-medium">{technician.cancelledJobs}</div>
+          <div className="text-xs text-muted-foreground">Cancelled</div>
+        </div>
+        <div className="p-1 rounded-md bg-white bg-opacity-60 shadow-sm">
+          <div className="text-sm font-medium" style={{ color: roleStyle.color }}>${revenue}</div>
+          <div className="text-xs text-muted-foreground">Revenue</div>
+        </div>
+      </div>
+      
+      <div className="mt-3 pt-3 border-t border-opacity-30 text-xs text-muted-foreground" style={{ borderColor: roleStyle.color }}>
+        <div className="flex justify-between items-center">
+          <div>Status: <span className="capitalize">{technician.status}</span></div>
+          <div>Rating: <span style={{ color: roleStyle.color }}>{technician.rating}/5</span></div>
+        </div>
+      </div>
+    </div>
+  );
+}

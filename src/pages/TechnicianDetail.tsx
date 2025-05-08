@@ -68,10 +68,7 @@ const TechnicianDetail = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <TechnicianOverviewTab 
-            technician={technicianWithDefaults} 
-            onEditClick={() => setShowEditModal(true)}
-          />
+          <TechnicianOverviewTab technician={technicianWithDefaults} />
         </TabsContent>
 
         <TabsContent value="financial" className="space-y-6">

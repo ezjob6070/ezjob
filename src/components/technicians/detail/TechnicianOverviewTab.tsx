@@ -1,22 +1,17 @@
 
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Users, Phone, AtSign, MapPin, Calendar, Edit } from "lucide-react";
+import { Users, Phone, AtSign, MapPin, Calendar } from "lucide-react";
 import { Technician } from "@/types/technician";
 import TechnicianDetailCard from "@/components/technicians/charts/TechnicianDetailCard";
 import JobsRevenueComparison from "@/components/technicians/JobsRevenueComparison";
 import TechnicianInvoiceGenerator from "@/components/technicians/invoices/TechnicianInvoiceGenerator";
-import { Button } from "@/components/ui/button";
 
 interface TechnicianOverviewTabProps {
   technician: Technician;
-  onEditClick?: () => void;
 }
 
-const TechnicianOverviewTab: React.FC<TechnicianOverviewTabProps> = ({ 
-  technician,
-  onEditClick 
-}) => {
+const TechnicianOverviewTab: React.FC<TechnicianOverviewTabProps> = ({ technician }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -36,18 +31,8 @@ const TechnicianOverviewTab: React.FC<TechnicianOverviewTabProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <Card className="md:col-span-1">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <CardTitle>Technician Details</CardTitle>
-          {onEditClick && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={onEditClick}
-              className="ml-auto"
-            >
-              <Edit className="h-4 w-4 mr-1" /> Edit
-            </Button>
-          )}
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2">

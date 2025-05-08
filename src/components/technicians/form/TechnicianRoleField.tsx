@@ -18,10 +18,9 @@ import {
 
 interface TechnicianRoleFieldProps {
   control: Control<any>;
-  defaultValue?: string;
 }
 
-export function TechnicianRoleField({ control, defaultValue = "technician" }: TechnicianRoleFieldProps) {
+export function TechnicianRoleField({ control }: TechnicianRoleFieldProps) {
   return (
     <FormField
       control={control}
@@ -29,7 +28,7 @@ export function TechnicianRoleField({ control, defaultValue = "technician" }: Te
       render={({ field }) => (
         <FormItem>
           <FormLabel>Role</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value || defaultValue}>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder="Select role" />
