@@ -14,6 +14,8 @@ interface JobsContextType {
   setDatePopoverOpen: (open: boolean) => void;
   techPopoverOpen: boolean;
   setTechPopoverOpen: (open: boolean) => void;
+  contractorPopoverOpen: boolean; // Added contractor popover state
+  setContractorPopoverOpen: (open: boolean) => void; // Added setter
   sourcePopoverOpen: boolean;
   setSourcePopoverOpen: (open: boolean) => void;
   amountPopoverOpen: boolean;

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -45,6 +46,7 @@ interface CreateJobModalProps {
   onAddJob: (job: Job) => void;
   technicians: { id: string; name: string }[];
   jobSources?: { id: string; name: string }[];
+  contractors?: { id: string; name: string }[];
 }
 
 const timeOptions = [
@@ -60,6 +62,7 @@ const formSchema = z.object({
   clientEmail: z.string().email("Invalid email").optional().or(z.literal("")),
   clientAddress: z.string().min(5, "Address must be at least 5 characters"),
   technicianId: z.string().min(1, "Please select a technician"),
+  contractorId: z.string().optional(),
   jobSourceId: z.string().optional(),
   date: z.date({
     required_error: "Please select a date",
@@ -83,6 +86,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   onAddJob,
   technicians,
   jobSources = [],
+  contractors = [],
 }) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -93,6 +97,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       clientEmail: "",
       clientAddress: "",
       technicianId: "",
+      contractorId: "",
       jobSourceId: "",
       timeSelection: "preset",
       presetTime: "",
@@ -111,6 +116,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   const [signaturePad, setSignaturePad] = useState(false);
   const [technicianSearch, setTechnicianSearch] = useState("");
   const [jobSourceSearch, setJobSourceSearch] = useState("");
+  const [contractorSearch, setContractorSearch] = useState("");
 
   const filteredTechnicians = technicians.filter(tech =>
     tech.name.toLowerCase().includes(technicianSearch.toLowerCase())
@@ -120,6 +126,10 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     source.name.toLowerCase().includes(jobSourceSearch.toLowerCase())
   );
 
+  const filteredContractors = contractors.filter(contractor =>
+    contractor.name.toLowerCase().includes(contractorSearch.toLowerCase())
+  );
+
   const timeSelection = form.watch("timeSelection");
   const hasSignature = form.watch("hasSignature");
   const clientEmail = form.watch("clientEmail");
@@ -127,6 +137,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
 
   const onSubmit = (values: FormValues) => {
     const technician = technicians.find(tech => tech.id === values.technicianId);
+    const contractor = values.contractorId ? contractors.find(c => c.id === values.contractorId) : undefined;
     
     let scheduledDate = new Date(values.date);
     const isAllDay = values.timeSelection === "allDay";
@@ -198,6 +209,13 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
       const source = jobSources.find(src => src.id === values.jobSourceId);
       if (source) {
         newJob.jobSourceName = source.name;
+      }
+    }
+
+    if (values.contractorId) {
+      newJob.contractorId = values.contractorId;
+      if (contractor) {
+        newJob.contractorName = contractor.name;
       }
     }
 
@@ -401,51 +419,94 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
 
-                {jobSources.length > 0 && (
-                  <FormField
-                    control={form.control}
-                    name="jobSourceId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Job Source (Optional)</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a job source" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <div className="px-3 pb-2">
-                              <Input
-                                placeholder="Search job sources..."
-                                value={jobSourceSearch}
-                                onChange={(e) => setJobSourceSearch(e.target.value)}
-                                className="mb-2"
-                              />
-                            </div>
-                            <div className="max-h-[200px] overflow-y-auto">
-                              {filteredJobSources.map((source) => (
-                                <SelectItem key={source.id} value={source.id}>
-                                  {source.name}
-                                </SelectItem>
-                              ))}
-                              {filteredJobSources.length === 0 && (
-                                <div className="px-3 py-2 text-sm text-muted-foreground">
-                                  No job sources found
-                                </div>
-                              )}
-                            </div>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                <FormField
+                  control={form.control}
+                  name="contractorId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Contractor (Optional)</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value || ""}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a contractor" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <div className="px-3 pb-2">
+                            <Input
+                              placeholder="Search contractors..."
+                              value={contractorSearch}
+                              onChange={(e) => setContractorSearch(e.target.value)}
+                              className="mb-2"
+                            />
+                          </div>
+                          <div className="max-h-[200px] overflow-y-auto">
+                            {filteredContractors.map((contractor) => (
+                              <SelectItem key={contractor.id} value={contractor.id}>
+                                {contractor.name}
+                              </SelectItem>
+                            ))}
+                            {filteredContractors.length === 0 && (
+                              <div className="px-3 py-2 text-sm text-muted-foreground">
+                                No contractors found
+                              </div>
+                            )}
+                          </div>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
+
+              {jobSources.length > 0 && (
+                <FormField
+                  control={form.control}
+                  name="jobSourceId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Source (Optional)</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value || ""}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a job source" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <div className="px-3 pb-2">
+                            <Input
+                              placeholder="Search job sources..."
+                              value={jobSourceSearch}
+                              onChange={(e) => setJobSourceSearch(e.target.value)}
+                              className="mb-2"
+                            />
+                          </div>
+                          <div className="max-h-[200px] overflow-y-auto">
+                            {filteredJobSources.map((source) => (
+                              <SelectItem key={source.id} value={source.id}>
+                                {source.name}
+                              </SelectItem>
+                            ))}
+                            {filteredJobSources.length === 0 && (
+                              <div className="px-3 py-2 text-sm text-muted-foreground">
+                                No job sources found
+                              </div>
+                            )}
+                          </div>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <FormField

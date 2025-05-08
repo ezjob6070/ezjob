@@ -14,6 +14,7 @@ interface JobModalsProps {
   onAddJobSource: () => void;
   onEditJobSource: (jobSource: JobSource) => void;
   technicianOptions: { id: string; name: string }[];
+  contractors?: { id: string; name: string }[];
   jobSources: { id: string; name: string }[];
   allJobSources: JobSource[];
 }
@@ -27,6 +28,7 @@ const JobModals: React.FC<JobModalsProps> = ({
   onAddJobSource,
   onEditJobSource,
   technicianOptions,
+  contractors = [],
   jobSources,
   allJobSources
 }) => {
@@ -37,6 +39,7 @@ const JobModals: React.FC<JobModalsProps> = ({
         onOpenChange={setIsCreateModalOpen}
         onAddJob={onAddJob}
         technicians={technicianOptions}
+        contractors={contractors}
         jobSources={jobSources}
       />
 

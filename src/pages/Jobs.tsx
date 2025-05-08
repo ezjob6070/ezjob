@@ -33,6 +33,7 @@ const Jobs = () => {
   // Control state for filter popovers
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
   const [techPopoverOpen, setTechPopoverOpen] = useState(false);
+  const [contractorPopoverOpen, setContractorPopoverOpen] = useState(false);
   const [sourcePopoverOpen, setSourcePopoverOpen] = useState(false);
   const [amountPopoverOpen, setAmountPopoverOpen] = useState(false);
   const [paymentPopoverOpen, setPaymentPopoverOpen] = useState(false);
@@ -42,6 +43,10 @@ const Jobs = () => {
   
   // Map job source names from global state
   const jobSourceNames = globalJobSources.map(source => source.name);
+  
+  // Extract contractors from technicians for now (in a real app, you'd have a dedicated contractors list)
+  // Here, we're treating all technicians with role "contractor" as contractors
+  const contractorTechnicians = globalTechnicians.filter(tech => tech.role === "contractor");
   
   // Get jobs data and filter functionality
   const {
@@ -81,6 +86,10 @@ const Jobs = () => {
   // Set up technician data
   const technicianNames = globalTechnicians.map(tech => tech.name);
   const technicianOptions = globalTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
+  
+  // Set up contractor data
+  const contractorNames = contractorTechnicians.map(tech => tech.name);
+  const contractorOptions = contractorTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
 
   // Handler functions
   const addCategory = (category: string) => {
@@ -184,6 +193,7 @@ const Jobs = () => {
     // Filter popovers state
     datePopoverOpen, setDatePopoverOpen,
     techPopoverOpen, setTechPopoverOpen,
+    contractorPopoverOpen, setContractorPopoverOpen,
     sourcePopoverOpen, setSourcePopoverOpen,
     amountPopoverOpen, setAmountPopoverOpen,
     paymentPopoverOpen, setPaymentPopoverOpen,
@@ -273,6 +283,7 @@ const Jobs = () => {
           onAddJobSource={jobSourceData.handleAddJobSource}
           onEditJobSource={jobSourceData.handleEditJobSource}
           technicianOptions={technicianOptions}
+          contractors={contractorOptions}
           jobSources={jobSourceNames.map((name, index) => ({ id: `source-${index}`, name }))}
           allJobSources={jobSourcesForModal}
         />

@@ -33,6 +33,9 @@ export interface Job {
   jobSourceId?: string;
   jobSourceName?: string;
   jobSource?: string;
+  // New contractor fields
+  contractorId?: string;
+  contractorName?: string;
   parts?: string[];
   createdAt?: Date;
   assignedTechId?: string;
