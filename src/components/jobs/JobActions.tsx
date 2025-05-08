@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { FileText, MoreHorizontalIcon, PenLine, Send } from "lucide-react";
+import { MoreHorizontalIcon, PenLine } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,36 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Job } from "./JobTypes";
-import { useToast } from "@/components/ui/use-toast";
-import { useCallback } from "react";
 
 type JobActionsProps = {
   job: Job;
   onCancelJob: (jobId: string) => void;
   onUpdateStatus?: (job: Job) => void;
-  onSendToEstimate?: (job: Job) => void;
 };
 
-const JobActions = ({ 
-  job, 
-  onCancelJob, 
-  onUpdateStatus,
-  onSendToEstimate
-}: JobActionsProps) => {
-  const { toast } = useToast();
-
-  const handleSendToEstimate = useCallback(() => {
-    if (onSendToEstimate) {
-      onSendToEstimate(job);
-    } else {
-      // Fallback if the handler isn't provided
-      toast({
-        title: "Feature in development",
-        description: "Send to Estimate functionality is being implemented.",
-      });
-    }
-  }, [job, onSendToEstimate, toast]);
-
+const JobActions = ({ job, onCancelJob, onUpdateStatus }: JobActionsProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,10 +33,6 @@ const JobActions = ({
         <DropdownMenuItem onClick={() => onUpdateStatus && onUpdateStatus(job)}>
           <PenLine className="h-4 w-4 mr-2" />
           Update Status
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSendToEstimate}>
-          <FileText className="h-4 w-4 mr-2" />
-          Send to Estimate
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {job.status !== "cancelled" && (
