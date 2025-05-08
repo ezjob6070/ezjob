@@ -24,6 +24,7 @@ interface JobTabsProps {
   setSourcePopoverOpen: (open: boolean) => void;
   setAmountPopoverOpen: (open: boolean) => void;
   setPaymentPopoverOpen: (open: boolean) => void;
+  setContractorPopoverOpen: (open: boolean) => void;
 }
 
 const JobTabs: React.FC<JobTabsProps> = ({
@@ -42,7 +43,8 @@ const JobTabs: React.FC<JobTabsProps> = ({
   setTechPopoverOpen,
   setSourcePopoverOpen,
   setAmountPopoverOpen,
-  setPaymentPopoverOpen
+  setPaymentPopoverOpen,
+  setContractorPopoverOpen
 }) => {
   const [activeTab, setActiveTab] = useState("all");
   
@@ -68,19 +70,7 @@ const JobTabs: React.FC<JobTabsProps> = ({
   
   return (
     <div className="space-y-4">
-      {/* Search input */}
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Search jobs..."
-          className="pl-8"
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-      </div>
-
-      {/* Tabs */}
+      {/* Tabs - placed at the top */}
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5">
           {jobTabs.map((tab) => (
@@ -93,8 +83,20 @@ const JobTabs: React.FC<JobTabsProps> = ({
           ))}
         </TabsList>
         
+        {/* Search input - moved below tabs */}
+        <div className="relative mt-4">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search jobs..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </div>
+        
         {/* Tab content */}
-        <TabsContent value={activeTab} className="mt-6">
+        <TabsContent value={activeTab} className="mt-4">
           <JobsTable
             jobs={filteredJobs}
             onUpdateStatus={openStatusModal}
