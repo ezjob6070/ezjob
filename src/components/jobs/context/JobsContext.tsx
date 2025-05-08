@@ -59,8 +59,8 @@ interface JobsContextType {
   deselectAllContractors: () => void;
   selectAllJobSources: () => void;
   deselectAllJobSources: () => void;
-  selectAllServiceTypes: () => void;
-  deselectAllServiceTypes: () => void;
+  selectAllServiceTypes?: () => void;
+  deselectAllServiceTypes?: () => void;
   clearFilters: () => void;
   
   // Job operations

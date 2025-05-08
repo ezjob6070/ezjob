@@ -1,3 +1,4 @@
+
 // This is a minimal fix to address the TypeScript errors in Jobs.tsx
 // Only adding the missing properties to the existing hook
 
@@ -15,6 +16,8 @@ export interface UseJobsDataResult {
   filteredJobs: Job[];
   selectedServiceTypes: string[];
   toggleServiceType: (serviceType: string) => void;
+  selectAllServiceTypes: () => void;
+  deselectAllServiceTypes: () => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   selectedTechnicians: string[];
@@ -43,6 +46,8 @@ export interface UseJobsDataResult {
   openStatusModal: (job: Job) => void;
   closeStatusModal: () => void;
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
+  handleCancelJob: (jobId: string, cancellationReason?: string) => void;
+  handleCompleteJob: (jobId: string, actualAmount?: number) => void;
 }
 
 export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[] = []): UseJobsDataResult => {
@@ -75,6 +80,11 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     }
   }, [initialJobsData]);
 
+  // Effect to filter jobs when filters change
+  useEffect(() => {
+    applyFilters();
+  }, [searchTerm, selectedTechnicians, selectedCategories, selectedJobSources, selectedServiceTypes, date, amountRange, paymentMethod]);
+
   const toggleServiceType = (serviceType: string) => {
     setSelectedServiceTypes(prev => {
       if (prev.includes(serviceType)) {
@@ -85,12 +95,21 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     });
   };
 
-  const toggleTechnician = (technicianId: string) => {
+  const selectAllServiceTypes = () => {
+    const allServiceTypes = SERVICE_TYPES || [];
+    setSelectedServiceTypes(allServiceTypes);
+  };
+
+  const deselectAllServiceTypes = () => {
+    setSelectedServiceTypes([]);
+  };
+
+  const toggleTechnician = (technicianName: string) => {
     setSelectedTechnicians(prev => {
-      if (prev.includes(technicianId)) {
-        return prev.filter(id => id !== technicianId);
+      if (prev.includes(technicianName)) {
+        return prev.filter(name => name !== technicianName);
       } else {
-        return [...prev, technicianId];
+        return [...prev, technicianName];
       }
     });
   };
@@ -116,8 +135,11 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   };
 
   const selectAllTechnicians = () => {
-    const allTechIds = [...new Set(jobs.map(job => job.technicianId))].filter(Boolean) as string[];
-    setSelectedTechnicians(allTechIds);
+    // Get all unique technician names from jobs
+    const techNames = jobs
+      .map(job => job.technicianName)
+      .filter(Boolean) as string[];
+    setSelectedTechnicians([...new Set(techNames)]);
   };
 
   const deselectAllTechnicians = () => {
@@ -125,7 +147,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   };
 
   const selectAllJobSources = () => {
-    const allSources = [...new Set(jobs.map(job => job.jobSourceId))].filter(Boolean) as string[];
+    const allSources = [...new Set(jobs.map(job => job.jobSourceName))].filter(Boolean) as string[];
     setSelectedJobSources(allSources);
   };
 
@@ -137,6 +159,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setSelectedTechnicians([]);
     setSelectedCategories([]);
     setSelectedJobSources([]);
+    setSelectedServiceTypes([]);
     setDate(undefined);
     setAmountRange(null);
     setPaymentMethod(null);
@@ -151,14 +174,15 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     
     if (searchTerm) {
       filtered = filtered.filter(job => 
-        (job.clientName || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (job.address || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (job.description || '')?.toLowerCase().includes(searchTerm.toLowerCase())
+        (job.clientName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.address || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.technicianName || '').toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     
     if (selectedTechnicians.length) {
-      filtered = filtered.filter(job => job.technicianId && selectedTechnicians.includes(job.technicianId));
+      filtered = filtered.filter(job => job.technicianName && selectedTechnicians.includes(job.technicianName));
     }
     
     if (selectedCategories.length) {
@@ -166,7 +190,11 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     }
     
     if (selectedJobSources.length) {
-      filtered = filtered.filter(job => job.jobSourceId && selectedJobSources.includes(job.jobSourceId));
+      filtered = filtered.filter(job => job.jobSourceName && selectedJobSources.includes(job.jobSourceName));
+    }
+    
+    if (selectedServiceTypes.length) {
+      filtered = filtered.filter(job => job.serviceType && selectedServiceTypes.includes(job.serviceType));
     }
     
     if (date?.from) {
@@ -182,7 +210,8 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     if (amountRange) {
       filtered = filtered.filter(job => {
         const amount = job.amount || 0;
-        return amount >= amountRange.min && amount <= amountRange.max;
+        return (amountRange.min === undefined || amount >= amountRange.min) && 
+               (amountRange.max === undefined || amount <= amountRange.max);
       });
     }
     
@@ -195,6 +224,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     if (selectedTechnicians.length) filterCount++;
     if (selectedCategories.length) filterCount++;
     if (selectedJobSources.length) filterCount++;
+    if (selectedServiceTypes.length) filterCount++;
     if (date?.from) filterCount++;
     if (amountRange) filterCount++;
     if (paymentMethod) filterCount++;
@@ -236,12 +266,42 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     closeStatusModal();
   };
 
+  const handleCancelJob = (jobId: string, cancellationReason?: string) => {
+    const updatedJobs = jobs.map(job => 
+      job.id === jobId 
+        ? { ...job, status: "cancelled", cancellationReason: cancellationReason || "No reason provided" } 
+        : job
+    ) as Job[];
+    
+    setJobs(updatedJobs);
+    applyFilters();
+    closeStatusModal();
+  };
+
+  const handleCompleteJob = (jobId: string, actualAmount?: number) => {
+    const updatedJobs = jobs.map(job => 
+      job.id === jobId 
+        ? { 
+            ...job, 
+            status: "completed", 
+            actualAmount: actualAmount !== undefined ? actualAmount : job.amount
+          } 
+        : job
+    ) as Job[];
+    
+    setJobs(updatedJobs);
+    applyFilters();
+    closeStatusModal();
+  };
+
   return {
     jobs,
     loading,
     error,
     selectedServiceTypes,
     toggleServiceType,
+    selectAllServiceTypes,
+    deselectAllServiceTypes,
     filteredJobs,
     searchTerm,
     setSearchTerm,
@@ -270,7 +330,9 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     handleRescheduleJob,
     openStatusModal,
     closeStatusModal,
-    handleUpdateJobStatus
+    handleUpdateJobStatus,
+    handleCancelJob,
+    handleCompleteJob
   };
 };
 
