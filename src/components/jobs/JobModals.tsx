@@ -13,8 +13,8 @@ interface JobModalsProps {
   onAddJob: (job: Job) => void;
   onAddJobSource: () => void;
   onEditJobSource: (jobSource: JobSource) => void;
-  technicianOptions: { id: string; name: string }[];
-  contractors?: { id: string; name: string }[];
+  technicianOptions: { id: string; name: string; paymentType?: string; paymentRate?: number }[];
+  contractors?: { id: string; name: string; paymentType?: string; paymentRate?: number }[];
   jobSources: { id: string; name: string }[];
   allJobSources: JobSource[];
 }
@@ -40,7 +40,12 @@ const JobModals: React.FC<JobModalsProps> = ({
         onAddJob={onAddJob}
         technicians={technicianOptions}
         contractors={contractors}
-        jobSources={jobSources}
+        jobSources={jobSources.map(source => ({
+          id: source.id,
+          name: source.name,
+          paymentType: allJobSources.find(js => js.id === source.id)?.paymentType || 'percentage',
+          paymentValue: allJobSources.find(js => js.id === source.id)?.paymentValue || 0
+        }))}
       />
 
       <JobSourceSidebar 
@@ -55,3 +60,4 @@ const JobModals: React.FC<JobModalsProps> = ({
 };
 
 export default JobModals;
+

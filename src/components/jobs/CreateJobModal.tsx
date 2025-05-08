@@ -1,8 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
-import { CalendarIcon, Clock, ImageIcon, FileSignature, Send } from "lucide-react";
+import { CalendarIcon, Clock, ImageIcon, FileSignature, Send, Percent, DollarSign } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -39,14 +39,16 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { JobSource } from "@/types/jobSource";
 
 interface CreateJobModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddJob: (job: Job) => void;
-  technicians: { id: string; name: string }[];
-  jobSources?: { id: string; name: string }[];
-  contractors?: { id: string; name: string }[];
+  technicians: { id: string; name: string; paymentType?: string; paymentRate?: number }[];
+  jobSources?: { id: string; name: string; paymentType?: string; paymentValue?: number }[];
+  contractors?: { id: string; name: string; paymentType?: string; paymentRate?: number }[];
 }
 
 const timeOptions = [
@@ -111,6 +113,49 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     },
   });
 
+  // Form field watches
+  const technicianId = form.watch("technicianId");
+  const contractorId = form.watch("contractorId");
+  const jobSourceId = form.watch("jobSourceId");
+  const timeSelection = form.watch("timeSelection");
+  const hasSignature = form.watch("hasSignature");
+  const clientEmail = form.watch("clientEmail");
+  const sendNotification = form.watch("sendNotification");
+  const amount = form.watch("amount");
+
+  // Selected entities
+  const [selectedTechnician, setSelectedTechnician] = useState<any>(null);
+  const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  const [selectedJobSource, setSelectedJobSource] = useState<any>(null);
+
+  // Update selected entities when IDs change
+  useEffect(() => {
+    if (technicianId) {
+      const tech = technicians.find(t => t.id === technicianId);
+      setSelectedTechnician(tech || null);
+    } else {
+      setSelectedTechnician(null);
+    }
+  }, [technicianId, technicians]);
+
+  useEffect(() => {
+    if (contractorId) {
+      const contractor = contractors.find(c => c.id === contractorId);
+      setSelectedContractor(contractor || null);
+    } else {
+      setSelectedContractor(null);
+    }
+  }, [contractorId, contractors]);
+
+  useEffect(() => {
+    if (jobSourceId) {
+      const source = jobSources.find(s => s.id === jobSourceId);
+      setSelectedJobSource(source || null);
+    } else {
+      setSelectedJobSource(null);
+    }
+  }, [jobSourceId, jobSources]);
+
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [signaturePad, setSignaturePad] = useState(false);
@@ -130,10 +175,32 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     contractor.name.toLowerCase().includes(contractorSearch.toLowerCase())
   );
 
-  const timeSelection = form.watch("timeSelection");
-  const hasSignature = form.watch("hasSignature");
-  const clientEmail = form.watch("clientEmail");
-  const sendNotification = form.watch("sendNotification");
+  // Function to format payment information
+  const formatPaymentInfo = (entity: any, type: 'technician' | 'contractor' | 'jobSource') => {
+    if (!entity) return null;
+
+    let paymentType, paymentValue;
+    
+    if (type === 'technician' || type === 'contractor') {
+      paymentType = entity.paymentType;
+      paymentValue = entity.paymentRate;
+    } else if (type === 'jobSource') {
+      paymentType = entity.paymentType;
+      paymentValue = entity.paymentValue;
+    }
+
+    if (!paymentType || paymentValue === undefined) return null;
+
+    const icon = paymentType === 'percentage' ? <Percent className="h-3 w-3" /> : <DollarSign className="h-3 w-3" />;
+    const value = paymentType === 'percentage' ? `${paymentValue}%` : `$${paymentValue}`;
+
+    return (
+      <Badge variant="outline" className="text-xs ml-2 bg-slate-50">
+        {icon}
+        <span className="ml-1">{value}</span>
+      </Badge>
+    );
+  };
 
   const onSubmit = (values: FormValues) => {
     const technician = technicians.find(tech => tech.id === values.technicianId);
@@ -382,38 +449,41 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Technician *</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a technician" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <div className="px-3 pb-2">
-                            <Input
-                              placeholder="Search technicians..."
-                              value={technicianSearch}
-                              onChange={(e) => setTechnicianSearch(e.target.value)}
-                              className="mb-2"
-                            />
-                          </div>
-                          <div className="max-h-[200px] overflow-y-auto">
-                            {filteredTechnicians.map((tech) => (
-                              <SelectItem key={tech.id} value={tech.id}>
-                                {tech.name}
-                              </SelectItem>
-                            ))}
-                            {filteredTechnicians.length === 0 && (
-                              <div className="px-3 py-2 text-sm text-muted-foreground">
-                                No technicians found
-                              </div>
-                            )}
-                          </div>
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-1">
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a technician" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <div className="px-3 pb-2">
+                              <Input
+                                placeholder="Search technicians..."
+                                value={technicianSearch}
+                                onChange={(e) => setTechnicianSearch(e.target.value)}
+                                className="mb-2"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              {filteredTechnicians.map((tech) => (
+                                <SelectItem key={tech.id} value={tech.id}>
+                                  {tech.name}
+                                </SelectItem>
+                              ))}
+                              {filteredTechnicians.length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No technicians found
+                                </div>
+                              )}
+                            </div>
+                          </SelectContent>
+                        </Select>
+                        {selectedTechnician && formatPaymentInfo(selectedTechnician, 'technician')}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -425,38 +495,41 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Job Contractor (Optional)</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value || ""}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a contractor" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <div className="px-3 pb-2">
-                            <Input
-                              placeholder="Search contractors..."
-                              value={contractorSearch}
-                              onChange={(e) => setContractorSearch(e.target.value)}
-                              className="mb-2"
-                            />
-                          </div>
-                          <div className="max-h-[200px] overflow-y-auto">
-                            {filteredContractors.map((contractor) => (
-                              <SelectItem key={contractor.id} value={contractor.id}>
-                                {contractor.name}
-                              </SelectItem>
-                            ))}
-                            {filteredContractors.length === 0 && (
-                              <div className="px-3 py-2 text-sm text-muted-foreground">
-                                No contractors found
-                              </div>
-                            )}
-                          </div>
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-1">
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a contractor" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <div className="px-3 pb-2">
+                              <Input
+                                placeholder="Search contractors..."
+                                value={contractorSearch}
+                                onChange={(e) => setContractorSearch(e.target.value)}
+                                className="mb-2"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              {filteredContractors.map((contractor) => (
+                                <SelectItem key={contractor.id} value={contractor.id}>
+                                  {contractor.name}
+                                </SelectItem>
+                              ))}
+                              {filteredContractors.length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No contractors found
+                                </div>
+                              )}
+                            </div>
+                          </SelectContent>
+                        </Select>
+                        {selectedContractor && formatPaymentInfo(selectedContractor, 'contractor')}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -470,42 +543,96 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Job Source (Optional)</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value || ""}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a job source" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <div className="px-3 pb-2">
-                            <Input
-                              placeholder="Search job sources..."
-                              value={jobSourceSearch}
-                              onChange={(e) => setJobSourceSearch(e.target.value)}
-                              className="mb-2"
-                            />
-                          </div>
-                          <div className="max-h-[200px] overflow-y-auto">
-                            {filteredJobSources.map((source) => (
-                              <SelectItem key={source.id} value={source.id}>
-                                {source.name}
-                              </SelectItem>
-                            ))}
-                            {filteredJobSources.length === 0 && (
-                              <div className="px-3 py-2 text-sm text-muted-foreground">
-                                No job sources found
-                              </div>
-                            )}
-                          </div>
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-1">
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a job source" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <div className="px-3 pb-2">
+                              <Input
+                                placeholder="Search job sources..."
+                                value={jobSourceSearch}
+                                onChange={(e) => setJobSourceSearch(e.target.value)}
+                                className="mb-2"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              {filteredJobSources.map((source) => (
+                                <SelectItem key={source.id} value={source.id}>
+                                  {source.name}
+                                </SelectItem>
+                              ))}
+                              {filteredJobSources.length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No job sources found
+                                </div>
+                              )}
+                            </div>
+                          </SelectContent>
+                        </Select>
+                        {selectedJobSource && formatPaymentInfo(selectedJobSource, 'jobSource')}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              )}
+
+              {/* Amount display section when amount is entered */}
+              {amount && amount > 0 && (selectedTechnician || selectedContractor || selectedJobSource) && (
+                <div className="border rounded-md p-3 bg-slate-50">
+                  <h4 className="text-sm font-medium mb-2">Payment Breakdown</h4>
+                  <div className="space-y-1 text-xs">
+                    {selectedTechnician && selectedTechnician.paymentType && (
+                      <div className="flex justify-between">
+                        <span>Technician ({selectedTechnician.name}):</span>
+                        <span className="font-medium">
+                          {selectedTechnician.paymentType === 'percentage' 
+                            ? `$${(amount * selectedTechnician.paymentRate / 100).toFixed(2)} (${selectedTechnician.paymentRate}%)`
+                            : `$${selectedTechnician.paymentRate}`
+                          }
+                        </span>
+                      </div>
+                    )}
+                    
+                    {selectedContractor && selectedContractor.paymentType && (
+                      <div className="flex justify-between">
+                        <span>Contractor ({selectedContractor.name}):</span>
+                        <span className="font-medium">
+                          {selectedContractor.paymentType === 'percentage' 
+                            ? `$${(amount * selectedContractor.paymentRate / 100).toFixed(2)} (${selectedContractor.paymentRate}%)`
+                            : `$${selectedContractor.paymentRate}`
+                          }
+                        </span>
+                      </div>
+                    )}
+                    
+                    {selectedJobSource && selectedJobSource.paymentType && (
+                      <div className="flex justify-between">
+                        <span>Job Source ({selectedJobSource.name}):</span>
+                        <span className="font-medium">
+                          {selectedJobSource.paymentType === 'percentage' 
+                            ? `$${(amount * selectedJobSource.paymentValue / 100).toFixed(2)} (${selectedJobSource.paymentValue}%)`
+                            : `$${selectedJobSource.paymentValue}`
+                          }
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="border-t pt-1 mt-1 flex justify-between font-medium">
+                      <span>Remaining (Company):</span>
+                      <span>
+                        ${calculateRemainingAmount(amount, selectedTechnician, selectedContractor, selectedJobSource).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -837,4 +964,44 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
   );
 };
 
+// Helper function to calculate the remaining amount after deducting all payments
+const calculateRemainingAmount = (
+  amount: number,
+  technician: any,
+  contractor: any,
+  jobSource: any
+) => {
+  let remaining = amount;
+  
+  // Subtract technician payment
+  if (technician && technician.paymentType && technician.paymentRate) {
+    if (technician.paymentType === 'percentage') {
+      remaining -= amount * (technician.paymentRate / 100);
+    } else {
+      remaining -= Math.min(technician.paymentRate, amount); // Can't deduct more than total
+    }
+  }
+  
+  // Subtract contractor payment
+  if (contractor && contractor.paymentType && contractor.paymentRate) {
+    if (contractor.paymentType === 'percentage') {
+      remaining -= amount * (contractor.paymentRate / 100);
+    } else {
+      remaining -= Math.min(contractor.paymentRate, amount); // Can't deduct more than total
+    }
+  }
+  
+  // Subtract job source payment
+  if (jobSource && jobSource.paymentType && jobSource.paymentValue) {
+    if (jobSource.paymentType === 'percentage') {
+      remaining -= amount * (jobSource.paymentValue / 100);
+    } else {
+      remaining -= Math.min(jobSource.paymentValue, amount); // Can't deduct more than total
+    }
+  }
+  
+  return Math.max(0, remaining); // Ensure it's never negative
+};
+
 export default CreateJobModal;
+
