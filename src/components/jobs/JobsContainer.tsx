@@ -1,4 +1,3 @@
-
 import React from "react";
 import JobsTable from "./JobsTable";
 import JobFilterBar from "./JobFilterBar";

@@ -199,7 +199,7 @@ const JobsTable = ({
                   job={job} 
                   onCancelJob={() => {}} 
                   onUpdateStatus={onOpenStatusModal}
-                  onSendToEstimate={onSendToEstimate}
+                  onSendToEstimate={handleSendToEstimate}
                 />
               </TableCell>
             </TableRow>
