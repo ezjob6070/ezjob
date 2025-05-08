@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useJobsContext } from "./context/JobsContext";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronDown, Calendar, Users, ArrowUpDown, DollarSign, CreditCard } from "lucide-react";
+import { Check, ChevronDown, Users, DollarSign, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
   Popover, 
@@ -17,13 +17,6 @@ import {
   CommandItem, 
   CommandList 
 } from "@/components/ui/command";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import AmountFilter from "./AmountFilter";
 import PaymentMethodFilter from "./PaymentMethodFilter";
 
@@ -37,8 +30,6 @@ const JobsFilterBar = () => {
     toggleTechnician,
     selectAllTechnicians,
     deselectAllTechnicians,
-    sortBy,
-    setSortBy,
     // Job source related
     sourcePopoverOpen,
     setSourcePopoverOpen,
@@ -335,19 +326,7 @@ const JobsFilterBar = () => {
           </PopoverContent>
         </Popover>
         
-        {/* Date Sort Filter */}
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="h-9" aria-label="Sort by date">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <SelectValue placeholder="Sort by date" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest first</SelectItem>
-            <SelectItem value="oldest">Oldest first</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Removed Date Sort Filter */}
         
         {hasActiveFilters && (
           <Button 
