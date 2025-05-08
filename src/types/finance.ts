@@ -76,3 +76,26 @@ export interface OfficeExpense {
 }
 
 export type FinanceEntityType = "technician" | "jobSource" | "contractor" | "employee" | "salesman";
+
+// User management types
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  lastLogin?: Date;
+  status: "active" | "inactive" | "pending";
+  permissions: UserPermission[];
+  createdAt: Date;
+}
+
+export type UserRole = "admin" | "manager" | "staff" | "viewer";
+
+export interface UserPermission {
+  id: string;
+  name: string;
+  description: string;
+  module: "jobs" | "technicians" | "clients" | "finance" | "settings" | "reports";
+  action: "view" | "create" | "edit" | "delete" | "approve";
+}
