@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -7,21 +6,13 @@ import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
-import TechnicianSearchBar from "@/components/technicians/TechnicianSearchBar";
+import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
 import TechnicianFilters from "@/components/technicians/TechnicianFilters";
 import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -51,8 +42,7 @@ const Technicians = () => {
     setDateRange,
     addCategory,
     exportTechnicians,
-    setTechnicians,
-    setRoleFilter
+    setTechnicians
   } = useTechniciansData();
   
   // Sync technicians from GlobalState to local state in useTechniciansData
@@ -131,6 +121,15 @@ const Technicians = () => {
   const contractorCount = globalTechnicians.filter(tech => tech.role === "contractor").length;
   const totalCount = globalTechnicians.length;
 
+  // Role colors for consistent styling
+  const roleColors = {
+    all: "#8B7E2F", // Changed to dark yellow to match the All Staff card
+    technician: "#0EA5E9",
+    salesman: "#10B981",
+    employed: "#8B5CF6",
+    contractor: "#F97316"
+  };
+
   return (
     <div className="space-y-6 py-8">
       <div className="mb-2">
@@ -142,55 +141,73 @@ const Technicians = () => {
         </p>
       </div>
       
-      {/* Role Filter using dropdown */}
-      <Card className="p-4">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-          <div className="w-full md:w-64">
-            <Label htmlFor="role-filter" className="mb-2 block text-sm font-medium">Filter by role</Label>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger id="role-filter" className="w-full">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  All Staff ({totalCount})
-                </SelectItem>
-                <SelectItem value="technician">
-                  Technicians ({technicianCount})
-                </SelectItem>
-                <SelectItem value="salesman">
-                  Salesmen ({salesmanCount})
-                </SelectItem>
-                <SelectItem value="employed">
-                  Employed ({employedCount})
-                </SelectItem>
-                <SelectItem value="contractor">
-                  Contractors ({contractorCount})
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-            <div className="bg-gray-50 p-2 rounded border">
-              <div className="text-gray-500">All Staff</div>
-              <div className="font-semibold text-lg">{totalCount}</div>
-            </div>
-            <div className="bg-blue-50 p-2 rounded border border-blue-100">
-              <div className="text-blue-700">Technicians</div>
-              <div className="font-semibold text-lg text-blue-700">{technicianCount}</div>
-            </div>
-            <div className="bg-green-50 p-2 rounded border border-green-100">
-              <div className="text-green-700">Salesmen</div>
-              <div className="font-semibold text-lg text-green-700">{salesmanCount}</div>
-            </div>
-            <div className="bg-purple-50 p-2 rounded border border-purple-100">
-              <div className="text-purple-700">Employed</div>
-              <div className="font-semibold text-lg text-purple-700">{employedCount}</div>
-            </div>
-          </div>
-        </div>
-      </Card>
+      {/* Role Filter Buttons - All Staff card now with light yellow background */}
+      <div className="grid grid-cols-5 gap-4 mb-6">
+        <Button
+          variant={roleFilter === "all" ? "default" : "outline"}
+          onClick={() => setRoleFilter("all")}
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+            ${roleFilter === "all" 
+              ? "bg-[#FEF7CD] text-[#8B7E2F] hover:bg-[#FEF7CD]/90" 
+              : "hover:bg-[#FEF7CD] hover:text-[#8B7E2F] border-[#8B7E2F]/30"}`}
+        >
+          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`} />
+          <div className="text-base font-medium">All Staff</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`}>{totalCount}</div>
+        </Button>
+        
+        <Button
+          variant={roleFilter === "technician" ? "default" : "outline"}
+          onClick={() => setRoleFilter("technician")}
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+            ${roleFilter === "technician" 
+              ? "bg-[#0EA5E9] text-white hover:bg-[#0D96D6]" 
+              : "hover:bg-[#E0F2FE] hover:text-[#0EA5E9] border-[#0EA5E9]/30"}`}
+        >
+          <Wrench className={`h-20 w-20 mb-3 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`} />
+          <div className="text-base font-medium">Technicians</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`}>{technicianCount}</div>
+        </Button>
+        
+        <Button
+          variant={roleFilter === "salesman" ? "default" : "outline"}
+          onClick={() => setRoleFilter("salesman")}
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+            ${roleFilter === "salesman" 
+              ? "bg-[#10B981] text-white hover:bg-[#0EA874]" 
+              : "hover:bg-[#ECFDF5] hover:text-[#10B981] border-[#10B981]/30"}`}
+        >
+          <Briefcase className={`h-20 w-20 mb-3 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
+          <div className="text-base font-medium">Salesmen</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`}>{salesmanCount}</div>
+        </Button>
+        
+        <Button
+          variant={roleFilter === "employed" ? "default" : "outline"}
+          onClick={() => setRoleFilter("employed")}
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+            ${roleFilter === "employed" 
+              ? "bg-[#8B5CF6] text-white hover:bg-[#7C4EE7]" 
+              : "hover:bg-[#F3E8FF] hover:text-[#8B5CF6] border-[#8B5CF6]/30"}`}
+        >
+          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`} />
+          <div className="text-base font-medium">Employed</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`}>{employedCount}</div>
+        </Button>
+        
+        <Button
+          variant={roleFilter === "contractor" ? "default" : "outline"}
+          onClick={() => setRoleFilter("contractor")}
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+            ${roleFilter === "contractor" 
+              ? "bg-[#F97316] text-white hover:bg-[#E76A14]" 
+              : "hover:bg-[#FFEDD5] hover:text-[#F97316] border-[#F97316]/30"}`}
+        >
+          <Hammer className={`h-20 w-20 mb-3 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`} />
+          <div className="text-base font-medium">Contractors</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`}>{contractorCount}</div>
+        </Button>
+      </div>
       
       {/* Action buttons */}
       <TechniciansPageHeader 

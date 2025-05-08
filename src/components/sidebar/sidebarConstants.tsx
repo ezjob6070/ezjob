@@ -15,7 +15,6 @@ import {
   FileTextIcon,
   CircleDollarSign,
   FolderIcon,
-  Users,
 } from "lucide-react";
 import { NavItem } from "./sidebarTypes";
 
@@ -61,8 +60,8 @@ const commonNavItems: NavItem[] = [
     href: "/jobs",
   },
   {
-    label: "Team Management",
-    icon: <Users size={18} />,
+    label: "Technicians",
+    icon: <WrenchIcon size={18} />,
     href: "/technicians",
   },
   {
@@ -106,4 +105,3 @@ const commonNavItems: NavItem[] = [
 export const getIndustrySpecificNavItems = (): NavItem[] => {
   return commonNavItems;
 };
-
