@@ -45,6 +45,10 @@ interface JobsContextType {
   paymentMethod: PaymentMethod | null;
   hasActiveFilters: boolean;
   
+  // Sort options
+  sortBy: string;
+  setSortBy: (option: string) => void;
+  
   // Filter operations
   toggleTechnician: (techName: string) => void;
   toggleContractor: (contractorName: string) => void;

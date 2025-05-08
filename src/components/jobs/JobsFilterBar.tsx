@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useJobsContext } from "./context/JobsContext";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronDown, Users } from "lucide-react";
+import { Check, ChevronDown, Calendar, Users, ArrowUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
   Popover, 
@@ -17,6 +17,13 @@ import {
   CommandItem, 
   CommandList 
 } from "@/components/ui/command";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const JobsFilterBar = () => {
   const { 
@@ -27,7 +34,9 @@ const JobsFilterBar = () => {
     selectedTechnicians,
     toggleTechnician,
     selectAllTechnicians,
-    deselectAllTechnicians
+    deselectAllTechnicians,
+    sortBy,
+    setSortBy
   } = useJobsContext();
   
   const [openTechnicians, setOpenTechnicians] = useState(false);
@@ -41,12 +50,8 @@ const JobsFilterBar = () => {
   }, [jobs]);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <p className="text-sm text-muted-foreground">
-        Showing {filteredJobs.length} of {jobs.length} jobs
-      </p>
-      
-      <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-2 bg-gray-50 p-3 rounded-md border border-gray-100">
+      <div className="flex flex-wrap items-center gap-2">
         {/* Technician Filter */}
         <Popover open={openTechnicians} onOpenChange={setOpenTechnicians}>
           <PopoverTrigger asChild>
@@ -55,6 +60,7 @@ const JobsFilterBar = () => {
               role="combobox" 
               aria-expanded={openTechnicians}
               className="flex gap-1"
+              size="sm"
             >
               <Users className="h-4 w-4" />
               {selectedTechnicians.length > 0 ? (
@@ -67,7 +73,7 @@ const JobsFilterBar = () => {
               <ChevronDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[220px] p-0" align="end">
+          <PopoverContent className="w-[220px] p-0" align="start">
             <Command>
               <CommandInput placeholder="Search technicians..." />
               <CommandList>
@@ -111,6 +117,20 @@ const JobsFilterBar = () => {
           </PopoverContent>
         </Popover>
         
+        {/* Date Sort Filter */}
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-[140px] h-9" size="sm">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <SelectValue placeholder="Sort by date" />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Newest first</SelectItem>
+            <SelectItem value="oldest">Oldest first</SelectItem>
+          </SelectContent>
+        </Select>
+        
         {hasActiveFilters && (
           <Button 
             onClick={clearFilters} 
@@ -122,6 +142,10 @@ const JobsFilterBar = () => {
           </Button>
         )}
       </div>
+      
+      <p className="text-sm text-muted-foreground">
+        Showing {filteredJobs.length} of {jobs.length} jobs
+      </p>
     </div>
   );
 };

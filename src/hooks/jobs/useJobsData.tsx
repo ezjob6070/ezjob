@@ -48,6 +48,14 @@ export interface UseJobsDataResult {
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount?: number) => void;
+  // New properties for sorting
+  sortBy: string;
+  setSortBy: (option: string) => void;
+  // Properties for contractors
+  selectedContractors: string[];
+  toggleContractor: (contractorName: string) => void;
+  selectAllContractors: () => void;
+  deselectAllContractors: () => void;
 }
 
 export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[] = []): UseJobsDataResult => {
@@ -60,6 +68,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
+  const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
@@ -67,6 +76,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [appliedFilters, setAppliedFilters] = useState<number>(0);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState<boolean>(false);
+  const [sortBy, setSortBy] = useState<string>("newest");
 
   useEffect(() => {
     try {
@@ -83,7 +93,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   // Effect to filter jobs when filters change
   useEffect(() => {
     applyFilters();
-  }, [searchTerm, selectedTechnicians, selectedCategories, selectedJobSources, selectedServiceTypes, date, amountRange, paymentMethod]);
+  }, [searchTerm, selectedTechnicians, selectedCategories, selectedJobSources, selectedServiceTypes, selectedContractors, date, amountRange, paymentMethod, sortBy]);
 
   const toggleServiceType = (serviceType: string) => {
     setSelectedServiceTypes(prev => {
@@ -110,6 +120,16 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
         return prev.filter(name => name !== technicianName);
       } else {
         return [...prev, technicianName];
+      }
+    });
+  };
+
+  const toggleContractor = (contractorName: string) => {
+    setSelectedContractors(prev => {
+      if (prev.includes(contractorName)) {
+        return prev.filter(name => name !== contractorName);
+      } else {
+        return [...prev, contractorName];
       }
     });
   };
@@ -146,6 +166,18 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setSelectedTechnicians([]);
   };
 
+  const selectAllContractors = () => {
+    // Get all unique contractor names from jobs
+    const contractorNames = jobs
+      .map(job => job.contractorName)
+      .filter(Boolean) as string[];
+    setSelectedContractors([...new Set(contractorNames)]);
+  };
+
+  const deselectAllContractors = () => {
+    setSelectedContractors([]);
+  };
+
   const selectAllJobSources = () => {
     const allSources = [...new Set(jobs.map(job => job.jobSourceName))].filter(Boolean) as string[];
     setSelectedJobSources(allSources);
@@ -160,6 +192,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setSelectedCategories([]);
     setSelectedJobSources([]);
     setSelectedServiceTypes([]);
+    setSelectedContractors([]);
     setDate(undefined);
     setAmountRange(null);
     setPaymentMethod(null);
@@ -167,6 +200,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setAppliedFilters(0);
     setHasActiveFilters(false);
     setFilteredJobs(jobs);
+    setSortBy("newest"); // Reset sort to newest first
   };
 
   const applyFilters = () => {
@@ -183,6 +217,10 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     
     if (selectedTechnicians.length) {
       filtered = filtered.filter(job => job.technicianName && selectedTechnicians.includes(job.technicianName));
+    }
+    
+    if (selectedContractors.length) {
+      filtered = filtered.filter(job => job.contractorName && selectedContractors.includes(job.contractorName));
     }
     
     if (selectedCategories.length) {
@@ -219,9 +257,25 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
       filtered = filtered.filter(job => job.paymentMethod === paymentMethod);
     }
     
+    // Apply sorting after filtering
+    if (sortBy === "newest") {
+      filtered = [...filtered].sort((a, b) => {
+        const dateA = new Date(a.date || a.scheduledDate || '').getTime();
+        const dateB = new Date(b.date || b.scheduledDate || '').getTime();
+        return dateB - dateA; // newest first
+      });
+    } else if (sortBy === "oldest") {
+      filtered = [...filtered].sort((a, b) => {
+        const dateA = new Date(a.date || a.scheduledDate || '').getTime();
+        const dateB = new Date(b.date || b.scheduledDate || '').getTime();
+        return dateA - dateB; // oldest first
+      });
+    }
+    
     // Count applied filters for display
     let filterCount = 0;
     if (selectedTechnicians.length) filterCount++;
+    if (selectedContractors.length) filterCount++;
     if (selectedCategories.length) filterCount++;
     if (selectedJobSources.length) filterCount++;
     if (selectedServiceTypes.length) filterCount++;
@@ -229,6 +283,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     if (amountRange) filterCount++;
     if (paymentMethod) filterCount++;
     if (searchTerm) filterCount++;
+    if (sortBy !== "newest") filterCount++;
     
     setAppliedFilters(filterCount);
     setHasActiveFilters(filterCount > 0);
@@ -308,6 +363,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     selectedTechnicians,
     selectedCategories,
     selectedJobSources,
+    selectedContractors,
     date,
     amountRange,
     paymentMethod,
@@ -318,11 +374,14 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     toggleTechnician,
     toggleCategory,
     toggleJobSource,
+    toggleContractor,
     setDate,
     setAmountRange,
     setPaymentMethod,
     selectAllTechnicians,
     deselectAllTechnicians,
+    selectAllContractors,
+    deselectAllContractors,
     selectAllJobSources,
     deselectAllJobSources,
     clearFilters,
@@ -332,7 +391,9 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     closeStatusModal,
     handleUpdateJobStatus,
     handleCancelJob,
-    handleCompleteJob
+    handleCompleteJob,
+    sortBy,
+    setSortBy
   };
 };
 

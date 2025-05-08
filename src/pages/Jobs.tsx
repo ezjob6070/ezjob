@@ -86,7 +86,9 @@ const Jobs = () => {
     handleRescheduleJob,
     openStatusModal,
     closeStatusModal,
-    handleUpdateJobStatus
+    handleUpdateJobStatus,
+    sortBy,
+    setSortBy
   } = useJobsData(localJobs, jobSourceNames);
 
   // Set up technician data
@@ -234,6 +236,10 @@ const Jobs = () => {
     amountRange: amountRange as AmountRange | null,
     paymentMethod,
     hasActiveFilters,
+    
+    // Sort options
+    sortBy,
+    setSortBy,
     
     // Filter operations
     toggleTechnician,
