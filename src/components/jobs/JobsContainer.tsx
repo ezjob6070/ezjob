@@ -26,17 +26,11 @@ const JobsContainer = ({
     isStatusModalOpen,
     openStatusModal,
     closeStatusModal,
-    datePopoverOpen,
     setDatePopoverOpen,
-    techPopoverOpen,
     setTechPopoverOpen,
-    contractorPopoverOpen,
     setContractorPopoverOpen,
-    sourcePopoverOpen,
     setSourcePopoverOpen,
-    amountPopoverOpen,
     setAmountPopoverOpen,
-    paymentPopoverOpen,
     setPaymentPopoverOpen,
     // Additional properties needed for JobsFilterPopovers
     date,
@@ -104,10 +98,10 @@ const JobsContainer = ({
         closeStatusModal={closeStatusModal}
         setDatePopoverOpen={setDatePopoverOpen}
         setTechPopoverOpen={setTechPopoverOpen}
+        setContractorPopoverOpen={setContractorPopoverOpen}
         setSourcePopoverOpen={setSourcePopoverOpen}
         setAmountPopoverOpen={setAmountPopoverOpen}
         setPaymentPopoverOpen={setPaymentPopoverOpen}
-        setContractorPopoverOpen={setContractorPopoverOpen}
       />
     </div>
   );

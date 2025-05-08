@@ -4,7 +4,7 @@ export interface JobSource {
   name: string;
   description?: string;
   type: string;
-  active: boolean; 
+  active: boolean; // This is required
   createdAt: string;
   phoneNumber?: string;
   email?: string;
@@ -29,6 +29,6 @@ export interface JobSource {
   technicianId?: string;
   date?: string | Date;
   // For other components
-  isActive?: boolean;  // Alias for active for backward compatibility
+  isActive?: boolean;
   contractorName?: string;
 }

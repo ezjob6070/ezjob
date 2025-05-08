@@ -1,69 +1,87 @@
 
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "estimate" | "pending";
+import { DateRange } from "react-day-picker";
+
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
 export type JobPriority = "low" | "medium" | "high" | "urgent";
-export type PaymentMethod = "cash" | "credit_card" | "check" | "online" | "invoice" | null;
+export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile";
 
 export interface Job {
   id: string;
+  title?: string;
   jobNumber?: string;
   clientName: string;
-  clientId?: string;
-  technicianName?: string;
+  amount: number;
+  status: JobStatus;
+  actualAmount?: number;
   technicianId?: string;
-  contractorId?: string;
-  contractorName?: string;
+  technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  date?: Date | string;
+  date: Date | string;
   scheduledDate?: Date | string;
-  isAllDay?: boolean;
-  address?: string;
-  status: JobStatus;
+  createdAt?: string;
   priority?: JobPriority;
-  description?: string;
-  notes?: string;
-  category?: string;
-  serviceType?: string;
-  amount?: number;
-  actualAmount?: number;
-  paymentMethod?: PaymentMethod;
-  paymentStatus?: "paid" | "unpaid" | "partial";
-  createdAt: string;
-  updatedAt?: string;
-  completedAt?: string;
-  cancelledAt?: string;
-  cancellationReason?: string;
-  title?: string;
-  clientEmail?: string;
+  details?: string;
+  address?: string;
   clientPhone?: string;
-  duration?: number;
+  clientEmail?: string;
+  notes?: string;
+  description?: string;
+  serviceType?: string;
+  category?: string;
   estimateId?: string;
+  isAllDay?: boolean;
+  paymentStatus?: "paid" | "unpaid" | "partial";
+  paymentMethod?: PaymentMethod;
+  cancellationReason?: string;
+  source?: string;
+  contractorName?: string;
+  contractorId?: string;
+  // Add missing properties that are being used in various components
+  parts?: string[];
   signature?: string;
-  parts?: any[];
   hasImages?: boolean;
   imageCount?: number;
+  clientId?: string;
+}
+
+export interface JobTab {
+  id: string;
+  label: string;
+  status: string;
+  count: number;
+}
+
+export interface ServiceTypeFilter {
+  name: string;
+  amount: number;
+  percentage: number;
+}
+
+export interface CreateJobFormData {
+  title: string;
+  clientName: string;
+  technicianId: string;
+  amount: number;
+  date: Date;
+  time?: Date;
+  isAllDay: boolean;
+  priority: JobPriority;
+  description?: string;
+  category?: string;
+  serviceType?: string;
+  jobSourceId?: string;
+  contractorId?: string;
+}
+
+export interface JobFilters {
+  searchTerm: string;
+  technicianFilter: string;
+  dateFilter: "today" | "tomorrow" | "yesterday" | "thisWeek" | "nextWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
+  customDateRange: DateRange;
 }
 
 export interface AmountRange {
-  min: number;
-  max: number;
-}
-
-export interface TechnicianFilter {
-  name: string;
-  selected: boolean;
-  category?: string;
-  role?: string;
-}
-
-export interface FilterGroup {
-  name: string;
-  filters: TechnicianFilter[];
-}
-
-export interface CompactFilterProps {
-  label: string;
-  count: number;
-  onClear: () => void;
-  children?: React.ReactNode;
+  min?: number;
+  max?: number;
 }

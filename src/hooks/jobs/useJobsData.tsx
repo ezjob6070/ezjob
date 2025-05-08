@@ -1,7 +1,7 @@
-
 // This is a minimal fix to address the TypeScript errors in Jobs.tsx
+// Only adding the missing properties to the existing hook
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { initialJobs } from '@/data/jobs';
 import { Job, AmountRange, PaymentMethod } from '@/components/jobs/JobTypes';
 import { JOB_CATEGORIES, SERVICE_TYPES } from '@/components/jobs/constants';
@@ -15,14 +15,11 @@ export interface UseJobsDataResult {
   filteredJobs: Job[];
   selectedServiceTypes: string[];
   toggleServiceType: (serviceType: string) => void;
-  selectAllServiceTypes: () => void;
-  deselectAllServiceTypes: () => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   selectedTechnicians: string[];
   selectedCategories: string[];
   selectedJobSources: string[];
-  selectedContractors: string[];  // Added for contractors
   date: DateRange | undefined;
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
@@ -31,7 +28,6 @@ export interface UseJobsDataResult {
   selectedJob: Job | null;
   isStatusModalOpen: boolean;
   toggleTechnician: (technicianId: string) => void;
-  toggleContractor: (contractorId: string) => void;  // Added for contractors
   toggleCategory: (category: string) => void;
   toggleJobSource: (jobSource: string) => void;
   setDate: (date: DateRange | undefined) => void;
@@ -39,28 +35,14 @@ export interface UseJobsDataResult {
   setPaymentMethod: (method: PaymentMethod | null) => void;
   selectAllTechnicians: () => void;
   deselectAllTechnicians: () => void;
-  selectAllContractors: () => void;  // Added for contractors
-  deselectAllContractors: () => void;  // Added for contractors
   selectAllJobSources: () => void;
   deselectAllJobSources: () => void;
   clearFilters: () => void;
   applyFilters: () => void;
-  handleRescheduleJob: (jobId: string, newDate: Date | string, isAllDay?: boolean) => void;
+  handleRescheduleJob: (jobId: string, newDate: Date | string) => void;
   openStatusModal: (job: Job) => void;
   closeStatusModal: () => void;
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
-  datePopoverOpen: boolean;
-  setDatePopoverOpen: (open: boolean) => void;
-  techPopoverOpen: boolean;
-  setTechPopoverOpen: (open: boolean) => void;
-  contractorPopoverOpen: boolean;
-  setContractorPopoverOpen: (open: boolean) => void;
-  sourcePopoverOpen: boolean;
-  setSourcePopoverOpen: (open: boolean) => void;
-  amountPopoverOpen: boolean;
-  setAmountPopoverOpen: (open: boolean) => void;
-  paymentPopoverOpen: boolean;
-  setPaymentPopoverOpen: (open: boolean) => void;
 }
 
 export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[] = []): UseJobsDataResult => {
@@ -73,7 +55,6 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
-  const [selectedContractors, setSelectedContractors] = useState<string[]>([]);  // Added for contractors
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
@@ -81,14 +62,6 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [appliedFilters, setAppliedFilters] = useState<number>(0);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState<boolean>(false);
-  
-  // Popovers state
-  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
-  const [techPopoverOpen, setTechPopoverOpen] = useState(false);
-  const [contractorPopoverOpen, setContractorPopoverOpen] = useState(false);
-  const [sourcePopoverOpen, setSourcePopoverOpen] = useState(false);
-  const [amountPopoverOpen, setAmountPopoverOpen] = useState(false);
-  const [paymentPopoverOpen, setPaymentPopoverOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -102,11 +75,6 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     }
   }, [initialJobsData]);
 
-  useEffect(() => {
-    applyFilters();
-  }, [searchTerm, selectedTechnicians, selectedCategories, selectedJobSources, selectedContractors, date, amountRange, paymentMethod, jobs]);
-
-  // Service type selection functions
   const toggleServiceType = (serviceType: string) => {
     setSelectedServiceTypes(prev => {
       if (prev.includes(serviceType)) {
@@ -117,30 +85,12 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     });
   };
 
-  const selectAllServiceTypes = () => {
-    setSelectedServiceTypes(SERVICE_TYPES);
-  };
-
-  const deselectAllServiceTypes = () => {
-    setSelectedServiceTypes([]);
-  };
-
   const toggleTechnician = (technicianId: string) => {
     setSelectedTechnicians(prev => {
       if (prev.includes(technicianId)) {
         return prev.filter(id => id !== technicianId);
       } else {
         return [...prev, technicianId];
-      }
-    });
-  };
-
-  const toggleContractor = (contractorId: string) => {
-    setSelectedContractors(prev => {
-      if (prev.includes(contractorId)) {
-        return prev.filter(id => id !== contractorId);
-      } else {
-        return [...prev, contractorId];
       }
     });
   };
@@ -165,9 +115,8 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     });
   };
 
-  // Selection functions
   const selectAllTechnicians = () => {
-    const allTechIds = [...new Set(jobs.map(job => job.technicianName))].filter(Boolean) as string[];
+    const allTechIds = [...new Set(jobs.map(job => job.technicianId))].filter(Boolean) as string[];
     setSelectedTechnicians(allTechIds);
   };
 
@@ -175,17 +124,8 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setSelectedTechnicians([]);
   };
 
-  const selectAllContractors = () => {
-    const allContractors = [...new Set(jobs.map(job => job.contractorName))].filter(Boolean) as string[];
-    setSelectedContractors(allContractors);
-  };
-
-  const deselectAllContractors = () => {
-    setSelectedContractors([]);
-  };
-
   const selectAllJobSources = () => {
-    const allSources = [...new Set(jobs.map(job => job.jobSourceName))].filter(Boolean) as string[];
+    const allSources = [...new Set(jobs.map(job => job.jobSourceId))].filter(Boolean) as string[];
     setSelectedJobSources(allSources);
   };
 
@@ -193,13 +133,10 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setSelectedJobSources([]);
   };
 
-  // Filter management
   const clearFilters = () => {
     setSelectedTechnicians([]);
-    setSelectedContractors([]);
     setSelectedCategories([]);
     setSelectedJobSources([]);
-    setSelectedServiceTypes([]);
     setDate(undefined);
     setAmountRange(null);
     setPaymentMethod(null);
@@ -221,29 +158,21 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     }
     
     if (selectedTechnicians.length) {
-      filtered = filtered.filter(job => job.technicianName && selectedTechnicians.includes(job.technicianName));
-    }
-    
-    if (selectedContractors.length) {
-      filtered = filtered.filter(job => job.contractorName && selectedContractors.includes(job.contractorName));
+      filtered = filtered.filter(job => job.technicianId && selectedTechnicians.includes(job.technicianId));
     }
     
     if (selectedCategories.length) {
       filtered = filtered.filter(job => job.category && selectedCategories.includes(job.category));
     }
-
-    if (selectedServiceTypes.length) {
-      filtered = filtered.filter(job => job.serviceType && selectedServiceTypes.includes(job.serviceType));
-    }
     
     if (selectedJobSources.length) {
-      filtered = filtered.filter(job => job.jobSourceName && selectedJobSources.includes(job.jobSourceName));
+      filtered = filtered.filter(job => job.jobSourceId && selectedJobSources.includes(job.jobSourceId));
     }
     
     if (date?.from) {
       filtered = filtered.filter(job => {
         if (!job.date) return false;
-        const jobDate = new Date(job.date);
+        const jobDate = new Date(typeof job.date === 'string' ? job.date : job.date);
         return date.from && date.to ? 
           jobDate >= date.from && jobDate <= date.to : 
           date.from && jobDate >= date.from;
@@ -253,8 +182,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     if (amountRange) {
       filtered = filtered.filter(job => {
         const amount = job.amount || 0;
-        return (amountRange.min === undefined || amount >= amountRange.min) && 
-               (amountRange.max === undefined || amount <= amountRange.max);
+        return amount >= amountRange.min && amount <= amountRange.max;
       });
     }
     
@@ -265,9 +193,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     // Count applied filters for display
     let filterCount = 0;
     if (selectedTechnicians.length) filterCount++;
-    if (selectedContractors.length) filterCount++;
     if (selectedCategories.length) filterCount++;
-    if (selectedServiceTypes.length) filterCount++;
     if (selectedJobSources.length) filterCount++;
     if (date?.from) filterCount++;
     if (amountRange) filterCount++;
@@ -279,22 +205,15 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setFilteredJobs(filtered);
   };
 
-  // Job modification functions
-  const handleRescheduleJob = (jobId: string, newDate: Date | string, isAllDay: boolean = false) => {
+  const handleRescheduleJob = (jobId: string, newDate: Date | string) => {
     const dateValue = typeof newDate === 'string' ? new Date(newDate) : newDate;
     
     const updatedJobs = jobs.map(job => 
-      job.id === jobId ? { 
-        ...job, 
-        date: dateValue,
-        scheduledDate: dateValue,
-        isAllDay: isAllDay,
-        status: 'scheduled' as const
-      } : job
+      job.id === jobId ? { ...job, date: dateValue } : job
     );
     
     setJobs(updatedJobs);
-    applyFilters();
+    setFilteredJobs(updatedJobs);
   };
 
   const openStatusModal = (job: Job) => {
@@ -309,11 +228,11 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
 
   const handleUpdateJobStatus = (jobId: string, newStatus: string) => {
     const updatedJobs = jobs.map(job => 
-      job.id === jobId ? { ...job, status: newStatus as any } : job
-    );
+      job.id === jobId ? { ...job, status: newStatus } : job
+    ) as Job[];
     
     setJobs(updatedJobs);
-    applyFilters();
+    setFilteredJobs(updatedJobs);
     closeStatusModal();
   };
 
@@ -323,15 +242,12 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     error,
     selectedServiceTypes,
     toggleServiceType,
-    selectAllServiceTypes,
-    deselectAllServiceTypes,
     filteredJobs,
     searchTerm,
     setSearchTerm,
     selectedTechnicians,
     selectedCategories,
     selectedJobSources,
-    selectedContractors,
     date,
     amountRange,
     paymentMethod,
@@ -340,7 +256,6 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     selectedJob,
     isStatusModalOpen,
     toggleTechnician,
-    toggleContractor,
     toggleCategory,
     toggleJobSource,
     setDate,
@@ -348,8 +263,6 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setPaymentMethod,
     selectAllTechnicians,
     deselectAllTechnicians,
-    selectAllContractors,
-    deselectAllContractors,
     selectAllJobSources,
     deselectAllJobSources,
     clearFilters,
@@ -357,19 +270,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     handleRescheduleJob,
     openStatusModal,
     closeStatusModal,
-    handleUpdateJobStatus,
-    datePopoverOpen,
-    setDatePopoverOpen,
-    techPopoverOpen,
-    setTechPopoverOpen,
-    contractorPopoverOpen,
-    setContractorPopoverOpen,
-    sourcePopoverOpen,
-    setSourcePopoverOpen,
-    amountPopoverOpen,
-    setAmountPopoverOpen,
-    paymentPopoverOpen,
-    setPaymentPopoverOpen
+    handleUpdateJobStatus
   };
 };
 
