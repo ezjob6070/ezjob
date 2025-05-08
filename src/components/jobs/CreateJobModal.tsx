@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -175,8 +174,8 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
     contractor.name.toLowerCase().includes(contractorSearch.toLowerCase())
   );
 
-  // Function to format payment information
-  const formatPaymentInfo = (entity: any, type: 'technician' | 'contractor' | 'jobSource') => {
+  // Function to format payment information text
+  const getPaymentInfoText = (entity: any, type: 'technician' | 'contractor' | 'jobSource') => {
     if (!entity) return null;
 
     let paymentType, paymentValue;
@@ -191,15 +190,20 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
 
     if (!paymentType || paymentValue === undefined) return null;
 
-    const icon = paymentType === 'percentage' ? <Percent className="h-3 w-3" /> : <DollarSign className="h-3 w-3" />;
-    const value = paymentType === 'percentage' ? `${paymentValue}%` : `$${paymentValue}`;
-
-    return (
-      <Badge variant="outline" className="text-xs bg-slate-50">
-        {icon}
-        <span className="ml-1">{value}</span>
-      </Badge>
-    );
+    // For displaying in the small text below selection
+    if (amount && amount > 0) {
+      const calculatedAmount = paymentType === 'percentage' 
+        ? (amount * paymentValue / 100).toFixed(2) 
+        : paymentValue.toFixed(2);
+        
+      return paymentType === 'percentage' 
+        ? `Payment: $${calculatedAmount} (${paymentValue}% of $${amount})` 
+        : `Payment: $${calculatedAmount} (fixed)`;
+    } else {
+      return paymentType === 'percentage' 
+        ? `Payment: ${paymentValue}% of job value` 
+        : `Payment: $${paymentValue} (fixed)`;
+    }
   };
 
   // Display payment badges in a row
@@ -487,7 +491,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
               />
 
               {/* Job Definition, Source, and Contractor fields in a single row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <FormField
                   control={form.control}
                   name="technicianId"
@@ -526,62 +530,22 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           </div>
                         </SelectContent>
                       </Select>
+                      {selectedTechnician && selectedTechnician.paymentType && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {getPaymentInfoText(selectedTechnician, 'technician')}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                {jobSources.length > 0 && (
-                  <FormField
-                    control={form.control}
-                    name="jobSourceId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Job Source</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value || ""}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a job source" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <div className="px-3 pb-2">
-                              <Input
-                                placeholder="Search job sources..."
-                                value={jobSourceSearch}
-                                onChange={(e) => setJobSourceSearch(e.target.value)}
-                                className="mb-2"
-                              />
-                            </div>
-                            <div className="max-h-[200px] overflow-y-auto">
-                              {filteredJobSources.map((source) => (
-                                <SelectItem key={source.id} value={source.id}>
-                                  {source.name}
-                                </SelectItem>
-                              ))}
-                              {filteredJobSources.length === 0 && (
-                                <div className="px-3 py-2 text-sm text-muted-foreground">
-                                  No job sources found
-                                </div>
-                              )}
-                            </div>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
 
                 <FormField
                   control={form.control}
                   name="contractorId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Contractor</FormLabel>
+                      <FormLabel>Contractor (Optional)</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         value={field.value || ""}
@@ -614,10 +578,65 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                           </div>
                         </SelectContent>
                       </Select>
+                      {selectedContractor && selectedContractor.paymentType && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {getPaymentInfoText(selectedContractor, 'contractor')}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {jobSources.length > 0 && (
+                  <FormField
+                    control={form.control}
+                    name="jobSourceId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Source (Optional)</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a job source" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <div className="px-3 pb-2">
+                              <Input
+                                placeholder="Search job sources..."
+                                value={jobSourceSearch}
+                                onChange={(e) => setJobSourceSearch(e.target.value)}
+                                className="mb-2"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              {filteredJobSources.map((source) => (
+                                <SelectItem key={source.id} value={source.id}>
+                                  {source.name}
+                                </SelectItem>
+                              ))}
+                              {filteredJobSources.length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No job sources found
+                                </div>
+                              )}
+                            </div>
+                          </SelectContent>
+                        </Select>
+                        {selectedJobSource && selectedJobSource.paymentType && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {getPaymentInfoText(selectedJobSource, 'jobSource')}
+                          </p>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
 
               {/* Payment badges row */}
@@ -927,119 +946,4 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                         className="gap-2"
                       >
                         <FileSignature size={16} />
-                        {signatureData ? "Clear Signature" : "Sign Now"}
-                      </Button>
-                    )}
-                  </div>
-                  
-                  {hasSignature && signaturePad && (
-                    <div className="mt-2 border rounded p-4 flex items-center justify-center bg-gray-50 h-[150px]">
-                      {signatureData ? (
-                        <div className="text-center">
-                          <p className="text-sm text-green-600 font-medium">Signature captured!</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Client signature has been saved
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          Signature pad would appear here (placeholder)
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mb-2">
-                  <FormField
-                    control={form.control}
-                    name="sendNotification"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <Checkbox 
-                            disabled={!clientEmail} 
-                            checked={field.value && !!clientEmail} 
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div>
-                          <FormLabel className={cn("cursor-pointer", !clientEmail && "opacity-50")}>
-                            Send Job Details to Client
-                          </FormLabel>
-                          {!clientEmail && (
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Client email required for notifications
-                            </p>
-                          )}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  {sendNotification && clientEmail && (
-                    <div className="flex items-center gap-2 ml-6 mt-2">
-                      <Send size={14} className="text-blue-500" />
-                      <p className="text-xs text-muted-foreground">
-                        Job details will be sent to {clientEmail}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-            </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Create Job</Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-// Helper function to calculate the remaining amount after deducting all payments
-const calculateRemainingAmount = (
-  amount: number,
-  technician: any,
-  contractor: any,
-  jobSource: any
-) => {
-  let remaining = amount;
-  
-  // Subtract technician payment
-  if (technician && technician.paymentType && technician.paymentRate) {
-    if (technician.paymentType === 'percentage') {
-      remaining -= amount * (technician.paymentRate / 100);
-    } else {
-      remaining -= Math.min(technician.paymentRate, amount); // Can't deduct more than total
-    }
-  }
-  
-  // Subtract contractor payment
-  if (contractor && contractor.paymentType && contractor.paymentRate) {
-    if (contractor.paymentType === 'percentage') {
-      remaining -= amount * (contractor.paymentRate / 100);
-    } else {
-      remaining -= Math.min(contractor.paymentRate, amount); // Can't deduct more than total
-    }
-  }
-  
-  // Subtract job source payment
-  if (jobSource && jobSource.paymentType && jobSource.paymentValue) {
-    if (jobSource.paymentType === 'percentage') {
-      remaining -= amount * (jobSource.paymentValue / 100);
-    } else {
-      remaining -= Math.min(jobSource.paymentValue, amount); // Can't deduct more than total
-    }
-  }
-  
-  return Math.max(0, remaining); // Ensure it's never negative
-};
-
-export default CreateJobModal;
+                        {signatureData ?
