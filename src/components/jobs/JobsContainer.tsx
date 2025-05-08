@@ -26,11 +26,17 @@ const JobsContainer = ({
     isStatusModalOpen,
     openStatusModal,
     closeStatusModal,
+    datePopoverOpen,
     setDatePopoverOpen,
+    techPopoverOpen,
     setTechPopoverOpen,
+    contractorPopoverOpen,
     setContractorPopoverOpen,
+    sourcePopoverOpen,
     setSourcePopoverOpen,
+    amountPopoverOpen,
     setAmountPopoverOpen,
+    paymentPopoverOpen,
     setPaymentPopoverOpen,
     // Additional properties needed for JobsFilterPopovers
     date,
@@ -64,26 +70,6 @@ const JobsContainer = ({
       <JobsFilterBar />
       
       {/* Jobs Tabs and Table */}
-      <JobsFilterPopovers 
-        serviceTypes={["All Services", "Installation", "Repair", "Maintenance"]}
-        selectedServiceTypes={selectedServiceTypes || []}
-        toggleServiceType={toggleServiceType}
-        selectAllServiceTypes={selectAllServiceTypes}
-        deselectAllServiceTypes={deselectAllServiceTypes}
-        jobSources={jobSourceNames || []}
-        selectedSources={selectedJobSources || []}
-        toggleSource={toggleJobSource}
-        selectAllSources={selectAllJobSources}
-        deselectAllSources={deselectAllJobSources}
-        contractorNames={contractorNames || []}
-        selectedContractors={selectedContractors || []}
-        toggleContractor={toggleContractor}
-        selectAllContractors={selectAllContractors}
-        deselectAllContractors={deselectAllContractors}
-        date={date}
-        setDate={setDate}
-      />
-      
       <JobTabs 
         jobs={filteredJobs} 
         searchTerm={searchTerm}

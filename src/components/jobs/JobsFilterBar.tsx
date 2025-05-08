@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useJobsContext } from "./context/JobsContext";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronDown, Calendar, Users, ArrowUpDown } from "lucide-react";
+import { Check, ChevronDown, Calendar, Users, ArrowUpDown, DollarSign, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
   Popover, 
@@ -24,6 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import AmountFilter from "./AmountFilter";
+import PaymentMethodFilter from "./PaymentMethodFilter";
 
 const JobsFilterBar = () => {
   const { 
@@ -36,7 +38,30 @@ const JobsFilterBar = () => {
     selectAllTechnicians,
     deselectAllTechnicians,
     sortBy,
-    setSortBy
+    setSortBy,
+    // Job source related
+    sourcePopoverOpen,
+    setSourcePopoverOpen,
+    selectedJobSources,
+    toggleJobSource,
+    selectAllJobSources,
+    deselectAllJobSources,
+    // Contractor related
+    contractorPopoverOpen,
+    setContractorPopoverOpen,
+    selectedContractors,
+    toggleContractor,
+    selectAllContractors,
+    deselectAllContractors,
+    // Amount and Payment method
+    amountPopoverOpen,
+    setAmountPopoverOpen,
+    amountRange,
+    setAmountRange,
+    paymentPopoverOpen,
+    setPaymentPopoverOpen,
+    paymentMethod,
+    setPaymentMethod
   } = useJobsContext();
   
   const [openTechnicians, setOpenTechnicians] = useState(false);
@@ -47,6 +72,22 @@ const JobsFilterBar = () => {
       .map(job => job.technicianName)
       .filter(Boolean) as string[];
     return [...new Set(techNames)].sort();
+  }, [jobs]);
+
+  // Get unique job sources from jobs
+  const availableJobSources = React.useMemo(() => {
+    const sources = jobs
+      .map(job => job.jobSourceName)
+      .filter(Boolean) as string[];
+    return [...new Set(sources)].sort();
+  }, [jobs]);
+
+  // Get unique contractors from jobs
+  const availableContractors = React.useMemo(() => {
+    const contractors = jobs
+      .map(job => job.contractorName)
+      .filter(Boolean) as string[];
+    return [...new Set(contractors)].sort();
   }, [jobs]);
 
   return (
@@ -117,9 +158,186 @@ const JobsFilterBar = () => {
           </PopoverContent>
         </Popover>
         
+        {/* Contractor Filter */}
+        <Popover open={contractorPopoverOpen} onOpenChange={setContractorPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              role="combobox" 
+              aria-expanded={contractorPopoverOpen}
+              className="flex gap-1"
+              size="sm"
+            >
+              <Users className="h-4 w-4" />
+              {selectedContractors.length > 0 ? (
+                <span>
+                  {selectedContractors.length} contractor{selectedContractors.length > 1 ? 's' : ''}
+                </span>
+              ) : (
+                <span>Contractors</span>
+              )}
+              <ChevronDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[220px] p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Search contractors..." />
+              <CommandList>
+                <CommandEmpty>No contractor found.</CommandEmpty>
+                <CommandGroup>
+                  {availableContractors.map((contractor) => (
+                    <CommandItem
+                      key={contractor}
+                      onSelect={() => toggleContractor(contractor)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedContractors.includes(contractor) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {contractor}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <div className="border-t p-2 flex justify-between">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => selectAllContractors()}
+                    className="text-xs"
+                  >
+                    Select all
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => deselectAllContractors()}
+                    className="text-xs"
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        
+        {/* Job Source Filter */}
+        <Popover open={sourcePopoverOpen} onOpenChange={setSourcePopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              role="combobox" 
+              aria-expanded={sourcePopoverOpen}
+              className="flex gap-1"
+              size="sm"
+            >
+              {selectedJobSources.length > 0 ? (
+                <span>
+                  {selectedJobSources.length} source{selectedJobSources.length > 1 ? 's' : ''}
+                </span>
+              ) : (
+                <span>Job Sources</span>
+              )}
+              <ChevronDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[220px] p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Search job sources..." />
+              <CommandList>
+                <CommandEmpty>No job source found.</CommandEmpty>
+                <CommandGroup>
+                  {availableJobSources.map((source) => (
+                    <CommandItem
+                      key={source}
+                      onSelect={() => toggleJobSource(source)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedJobSources.includes(source) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {source}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <div className="border-t p-2 flex justify-between">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => selectAllJobSources()}
+                    className="text-xs"
+                  >
+                    Select all
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => deselectAllJobSources()}
+                    className="text-xs"
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        
+        {/* Amount Filter */}
+        <Popover open={amountPopoverOpen} onOpenChange={setAmountPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              role="combobox" 
+              aria-expanded={amountPopoverOpen}
+              className="flex gap-1"
+              size="sm"
+            >
+              <DollarSign className="h-4 w-4" />
+              <span>
+                {amountRange ? (
+                  `$${amountRange.min || 0} - $${amountRange.max || '∞'}`
+                ) : (
+                  "Amount"
+                )}
+              </span>
+              <ChevronDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[220px] p-4" align="start">
+            <AmountFilter value={amountRange} onChange={setAmountRange} />
+          </PopoverContent>
+        </Popover>
+        
+        {/* Payment Method Filter */}
+        <Popover open={paymentPopoverOpen} onOpenChange={setPaymentPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              role="combobox" 
+              aria-expanded={paymentPopoverOpen}
+              className="flex gap-1"
+              size="sm"
+            >
+              <CreditCard className="h-4 w-4" />
+              <span>
+                {paymentMethod ? paymentMethod.replace('_', ' ') : "Payment"}
+              </span>
+              <ChevronDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[220px] p-4" align="start">
+            <PaymentMethodFilter value={paymentMethod} onChange={setPaymentMethod} />
+          </PopoverContent>
+        </Popover>
+        
         {/* Date Sort Filter */}
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[140px] h-9" size="sm">
+          <SelectTrigger className="h-9" aria-label="Sort by date">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               <SelectValue placeholder="Sort by date" />
