@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,8 +29,13 @@ const JobSources = () => {
       totalJobs: newJobSource.totalJobs || 0,
       totalRevenue: newJobSource.totalRevenue || 0,
       profit: newJobSource.profit || 0,
-      createdAt: newJobSource.createdAt || new Date().toISOString(), // Convert Date to string
-      name: newJobSource.name || 'New Job Source'
+      createdAt: newJobSource.createdAt || new Date().toISOString(), // Ensure it's a string
+      name: newJobSource.name || 'New Job Source',
+      website: newJobSource.website || '',
+      phone: newJobSource.phone || '',
+      email: newJobSource.email || '',
+      logoUrl: newJobSource.logoUrl || '',
+      notes: newJobSource.notes || ''
     };
     
     addJobSource(completeJobSource);
@@ -50,7 +56,7 @@ const JobSources = () => {
       ...updatedJobSource,
       createdAt: typeof updatedJobSource.createdAt === 'string' 
         ? updatedJobSource.createdAt 
-        : updatedJobSource.createdAt.toISOString()
+        : (updatedJobSource.createdAt instanceof Date ? updatedJobSource.createdAt.toISOString() : new Date().toISOString())
     };
     
     updateJobSource(formattedJobSource.id, formattedJobSource);
@@ -70,7 +76,14 @@ const JobSources = () => {
     totalJobs: source.totalJobs || 0,
     totalRevenue: source.totalRevenue || 0,
     profit: source.profit || 0,
-    createdAt: typeof source.createdAt === 'string' ? source.createdAt : (source.createdAt || new Date()).toISOString()
+    createdAt: typeof source.createdAt === 'string' 
+      ? source.createdAt 
+      : (source.createdAt instanceof Date ? source.createdAt.toISOString() : new Date().toISOString()),
+    website: source.website || '',
+    phone: source.phone || '',
+    email: source.email || '',
+    logoUrl: source.logoUrl || '',
+    notes: source.notes || ''
   }));
 
   return (

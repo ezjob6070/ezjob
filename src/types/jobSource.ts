@@ -11,5 +11,11 @@ export interface JobSource {
   totalJobs: number;
   totalRevenue: number;
   profit: number;
-  createdAt: string | Date;
+  createdAt: string;
+  // Adding missing properties that are used in components
+  website?: string;
+  phone?: string;
+  email?: string;
+  logoUrl?: string;
+  notes?: string;
 }
