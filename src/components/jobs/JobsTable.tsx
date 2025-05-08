@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -16,24 +17,25 @@ import JobActions from "./JobActions";
 
 interface JobsTableProps {
   jobs: Job[];
-  searchTerm: string;
-  onOpenStatusModal: (job: Job) => void;
+  onUpdateStatus: (job: Job) => void;
+  onSendToEstimate?: (job: Job) => void;
+  searchTerm?: string; // Make this optional
 }
 
-const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
+const JobsTable = ({ jobs, onUpdateStatus, onSendToEstimate, searchTerm = '' }: JobsTableProps) => {
   const [jobsData, setJobsData] = useState(jobs);
 
   useEffect(() => {
     setJobsData(jobs);
   }, [jobs]);
 
-  // Filter jobs based on search term
+  // Filter jobs based on search term - Adding null checks to prevent toLowerCase() on undefined
   const filteredJobs = jobsData.filter(job =>
-    job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    job.technicianName?.toLowerCase().includes(searchTerm.toLowerCase() || '') ||
-    job.jobSourceName?.toLowerCase().includes(searchTerm.toLowerCase() || '') ||
-    job.category?.toLowerCase().includes(searchTerm.toLowerCase() || '')
+    (job.clientName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    ((job.title || '')?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    ((job.technicianName || '')?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    ((job.jobSourceName || '')?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    ((job.category || '')?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadgeColor = (status: string) => {
@@ -137,7 +139,7 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
           {filteredJobs.map((job) => (
             <TableRow key={job.id}>
               <TableCell className="font-medium">
-                {job.clientName}
+                {job.clientName || "No client name"}
               </TableCell>
               <TableCell>
                 {job.title || "No title specified"}
@@ -179,7 +181,8 @@ const JobsTable = ({ jobs, searchTerm, onOpenStatusModal }: JobsTableProps) => {
                 <JobActions 
                   job={job} 
                   onCancelJob={() => {}} 
-                  onUpdateStatus={onOpenStatusModal} 
+                  onUpdateStatus={onUpdateStatus}
+                  onSendToEstimate={onSendToEstimate}
                 />
               </TableCell>
             </TableRow>

@@ -99,6 +99,7 @@ const JobTabs: React.FC<JobTabsProps> = ({
             jobs={filteredJobs}
             onUpdateStatus={openStatusModal}
             onSendToEstimate={onSendToEstimate}
+            searchTerm={searchTerm}
           />
         </TabsContent>
       </Tabs>
