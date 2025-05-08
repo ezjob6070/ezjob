@@ -48,9 +48,9 @@ const Jobs = () => {
   // Map job source names from global state
   const jobSourceNames = globalJobSources.map(source => source.name);
   
-  // Extract contractors from technicians for now (in a real app, you'd have a dedicated contractors list)
-  // Here, we're treating all technicians with role "contractor" as contractors
+  // Extract contractors from technicians
   const contractorTechnicians = globalTechnicians.filter(tech => tech.role === "contractor");
+  const contractorNames = contractorTechnicians.map(tech => tech.name);
   
   // Get jobs data and filter functionality
   const {
@@ -58,7 +58,7 @@ const Jobs = () => {
     searchTerm,
     setSearchTerm,
     selectedTechnicians,
-    selectedCategories,
+    selectedContractors,
     selectedJobSources,
     selectedServiceTypes,
     date,
@@ -69,7 +69,7 @@ const Jobs = () => {
     selectedJob,
     isStatusModalOpen,
     toggleTechnician,
-    toggleCategory,
+    toggleContractor,
     toggleJobSource,
     toggleServiceType,
     setDate,
@@ -77,6 +77,8 @@ const Jobs = () => {
     setPaymentMethod,
     selectAllTechnicians,
     deselectAllTechnicians,
+    selectAllContractors,
+    deselectAllContractors,
     selectAllJobSources,
     deselectAllJobSources,
     clearFilters,
@@ -92,7 +94,6 @@ const Jobs = () => {
   const technicianOptions = globalTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
   
   // Set up contractor data
-  const contractorNames = contractorTechnicians.map(tech => tech.name);
   const contractorOptions = contractorTechnicians.map(tech => ({ id: tech.id, name: tech.name }));
 
   // Handler functions
@@ -226,7 +227,7 @@ const Jobs = () => {
     
     // Filters
     selectedTechnicians,
-    selectedCategories,
+    selectedContractors,
     selectedJobSources,
     selectedServiceTypes,
     date: dateRangeValue, // Use the properly typed date value
@@ -236,7 +237,7 @@ const Jobs = () => {
     
     // Filter operations
     toggleTechnician,
-    toggleCategory,
+    toggleContractor,
     toggleJobSource,
     toggleServiceType,
     setDate: handleSetDate, // Use the wrapper function
@@ -244,6 +245,8 @@ const Jobs = () => {
     setPaymentMethod,
     selectAllTechnicians,
     deselectAllTechnicians,
+    selectAllContractors,
+    deselectAllContractors,
     selectAllJobSources,
     deselectAllJobSources,
     clearFilters,
@@ -297,6 +300,7 @@ const Jobs = () => {
         <JobsContainer 
           technicianNames={technicianNames}
           jobSourceNames={jobSourceNames}
+          contractorNames={contractorNames}
         />
 
         {/* Modals */}

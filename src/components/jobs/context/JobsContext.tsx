@@ -14,8 +14,8 @@ interface JobsContextType {
   setDatePopoverOpen: (open: boolean) => void;
   techPopoverOpen: boolean;
   setTechPopoverOpen: (open: boolean) => void;
-  contractorPopoverOpen: boolean; // Added contractor popover state
-  setContractorPopoverOpen: (open: boolean) => void; // Added setter
+  contractorPopoverOpen: boolean;
+  setContractorPopoverOpen: (open: boolean) => void;
   sourcePopoverOpen: boolean;
   setSourcePopoverOpen: (open: boolean) => void;
   amountPopoverOpen: boolean;
@@ -31,24 +31,26 @@ interface JobsContextType {
   
   // Filters
   selectedTechnicians: string[];
-  selectedCategories: string[];
+  selectedContractors: string[];
   selectedJobSources: string[];
   selectedServiceTypes: string[];
-  date: DateRange | undefined;  // Updated to DateRange | undefined to be compatible
+  date: DateRange | undefined;
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
   hasActiveFilters: boolean;
   
   // Filter operations
   toggleTechnician: (techName: string) => void;
-  toggleCategory: (category: string) => void;
+  toggleContractor: (contractorName: string) => void;
   toggleJobSource: (sourceName: string) => void;
   toggleServiceType: (serviceType: string) => void;
-  setDate: (date: DateRange | undefined) => void; // Updated to use DateRange
+  setDate: (date: DateRange | undefined) => void;
   setAmountRange: (range: AmountRange | null) => void;
   setPaymentMethod: (method: PaymentMethod | null) => void;
   selectAllTechnicians: () => void;
   deselectAllTechnicians: () => void;
+  selectAllContractors: () => void;
+  deselectAllContractors: () => void;
   selectAllJobSources: () => void;
   deselectAllJobSources: () => void;
   clearFilters: () => void;
@@ -58,7 +60,7 @@ interface JobsContextType {
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount: number) => void;
   handleRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
-  handleSendToEstimate: (job: Job) => void; // Add new function for sending to estimate
+  handleSendToEstimate: (job: Job) => void;
   
   // Job status modal
   selectedJob: Job | null;

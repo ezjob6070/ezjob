@@ -4,11 +4,10 @@ import { Job, PaymentMethod } from "@/components/jobs/JobTypes";
 import { AmountRange } from "@/components/jobs/AmountFilter";
 import { DateRange } from "react-day-picker";
 import { isWithinInterval, isSameDay, startOfDay } from "date-fns";
-import { JobFiltersState } from "./jobHookTypes";
 
-export const useJobFilters = (initialJobSources: string[] = []) => {
+export const useJobFilters = (initialJobSources: string[] = [], initialContractors: string[] = []) => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
   const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
   const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
   
@@ -31,19 +30,11 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     );
   };
 
-  const toggleCategory = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-
-  const toggleServiceType = (serviceType: string) => {
-    setSelectedServiceTypes(prev => 
-      prev.includes(serviceType) 
-        ? prev.filter(s => s !== serviceType)
-        : [...prev, serviceType]
+  const toggleContractor = (contractorName: string) => {
+    setSelectedContractors(prev => 
+      prev.includes(contractorName) 
+        ? prev.filter(c => c !== contractorName)
+        : [...prev, contractorName]
     );
   };
 
@@ -52,6 +43,14 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
       prev.includes(sourceName) 
         ? prev.filter(s => s !== sourceName)
         : [...prev, sourceName]
+    );
+  };
+
+  const toggleServiceType = (serviceType: string) => {
+    setSelectedServiceTypes(prev => 
+      prev.includes(serviceType) 
+        ? prev.filter(s => s !== serviceType)
+        : [...prev, serviceType]
     );
   };
 
@@ -64,6 +63,14 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     setSelectedTechnicians([]);
   };
 
+  const selectAllContractors = () => {
+    setSelectedContractors(initialContractors);
+  };
+
+  const deselectAllContractors = () => {
+    setSelectedContractors([]);
+  };
+
   const selectAllJobSources = () => {
     setSelectedJobSources(initialJobSources);
   };
@@ -74,7 +81,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
 
   const clearFilters = () => {
     setSelectedTechnicians([]);
-    setSelectedCategories([]);
+    setSelectedContractors([]);
     setSelectedJobSources([]);
     setSelectedServiceTypes([]);
     // Reset date to today
@@ -94,7 +101,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
 
   const hasActiveFilters = 
     (appliedFilters && selectedTechnicians.length > 0) || 
-    selectedCategories.length > 0 || 
+    selectedContractors.length > 0 || 
     selectedJobSources.length > 0 ||
     selectedServiceTypes.length > 0 ||
     !!amountRange || 
@@ -117,19 +124,21 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
       );
     }
 
-    if (selectedCategories.length > 0) {
+    // Filter by contractor
+    if (selectedContractors.length > 0) {
       result = result.filter(job => 
-        job.category && selectedCategories.includes(job.category)
+        job.contractorName && selectedContractors.includes(job.contractorName)
       );
     }
 
+    // Filter by service type
     if (selectedServiceTypes.length > 0) {
       result = result.filter(job => 
         job.serviceType && selectedServiceTypes.includes(job.serviceType)
       );
     }
 
-    // Filter by job source if any are selected
+    // Filter by job source
     if (selectedJobSources.length > 0) {
       result = result.filter(job => 
         job.source && selectedJobSources.includes(job.source)
@@ -178,7 +187,7 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
   return {
     // Filter state
     selectedTechnicians,
-    selectedCategories,
+    selectedContractors,
     selectedJobSources,
     selectedServiceTypes,
     date,
@@ -194,11 +203,13 @@ export const useJobFilters = (initialJobSources: string[] = []) => {
     
     // Filter actions
     toggleTechnician,
-    toggleCategory,
+    toggleContractor,
     toggleJobSource,
     toggleServiceType,
     selectAllTechnicians,
     deselectAllTechnicians,
+    selectAllContractors,
+    deselectAllContractors,
     selectAllJobSources,
     deselectAllJobSources,
     clearFilters,

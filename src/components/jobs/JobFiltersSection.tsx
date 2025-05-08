@@ -4,26 +4,22 @@ import { DateRange } from "react-day-picker";
 import { AmountRange } from "./AmountFilter";
 import { PaymentMethod } from "./JobTypes";
 import TechnicianFilter from "./filters/TechnicianFilter";
-import CategoryFilter from "./filters/CategoryFilter";
 import JobSourceFilter from "./JobSourceFilter";
 import FilterHeader from "./filters/FilterHeader";
 import FilterActions from "./filters/FilterActions";
+import JobContractorFilter from "./filters/JobContractorFilter";
 
 interface JobFiltersSectionProps {
   technicianNames: string[];
   selectedTechnicians: string[];
-  selectedCategories: string[];
   date?: DateRange | undefined;
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
-  categories: string[];
   appliedFilters: boolean;
   toggleTechnician: (techName: string) => void;
-  toggleCategory: (category: string) => void;
   setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   setAmountRange: React.Dispatch<React.SetStateAction<AmountRange | null>>;
   setPaymentMethod: React.Dispatch<React.SetStateAction<PaymentMethod | null>>;
-  addCategory: (category: string) => void;
   selectAllTechnicians: () => void;
   deselectAllTechnicians: () => void;
   clearFilters: () => void;
@@ -33,16 +29,18 @@ interface JobFiltersSectionProps {
   toggleJobSource: (sourceName: string) => void;
   selectAllJobSources: () => void;
   deselectAllJobSources: () => void;
+  // New contractor filter props
+  contractorNames: string[];
+  selectedContractors: string[];
+  toggleContractor: (contractorName: string) => void;
+  selectAllContractors: () => void;
+  deselectAllContractors: () => void;
 }
 
 const JobFiltersSection: React.FC<JobFiltersSectionProps> = ({
   technicianNames,
   selectedTechnicians,
-  selectedCategories,
-  categories,
   toggleTechnician,
-  toggleCategory,
-  addCategory,
   selectAllTechnicians,
   deselectAllTechnicians,
   clearFilters,
@@ -52,7 +50,12 @@ const JobFiltersSection: React.FC<JobFiltersSectionProps> = ({
   toggleJobSource,
   selectAllJobSources,
   deselectAllJobSources,
-  appliedFilters
+  // New contractor props
+  contractorNames,
+  selectedContractors,
+  toggleContractor,
+  selectAllContractors,
+  deselectAllContractors
 }) => {
   
   return (
@@ -69,11 +72,12 @@ const JobFiltersSection: React.FC<JobFiltersSectionProps> = ({
             onDeselectAll={deselectAllTechnicians}
           />
           
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategories}
-            toggleCategory={toggleCategory}
-            addCategory={addCategory}
+          <JobContractorFilter
+            contractors={contractorNames}
+            selectedContractors={selectedContractors}
+            toggleContractor={toggleContractor}
+            selectAllContractors={selectAllContractors}
+            deselectAllContractors={deselectAllContractors}
           />
           
           <JobSourceFilter

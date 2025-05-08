@@ -10,20 +10,14 @@ import JobFilterInfoBar from "./JobFilterInfoBar";
 interface JobFiltersWrapperProps {
   technicianNames: string[];
   selectedTechnicians: string[];
-  selectedCategories: string[];
   date: DateRange | undefined;
   amountRange: AmountRange | null;
   paymentMethod: PaymentMethod | null;
-  categories: string[];
   appliedFilters: boolean;
   toggleTechnician: (techName: string) => void;
-  toggleCategory: (category: string) => void;
   setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   setAmountRange: React.Dispatch<React.SetStateAction<AmountRange | null>>;
   setPaymentMethod: React.Dispatch<React.SetStateAction<PaymentMethod | null>>;
-  addCategory: (category: string) => void;
-  selectAllTechnicians: () => void;
-  deselectAllTechnicians: () => void;
   clearFilters: () => void;
   applyFilters: () => void;
   jobSourceNames: string[];
@@ -34,25 +28,25 @@ interface JobFiltersWrapperProps {
   hasActiveFilters: boolean;
   filteredJobsCount: number;
   totalJobsCount: number;
+  // New contractor filter props
+  contractorNames: string[];
+  selectedContractors: string[];
+  toggleContractor: (contractorName: string) => void;
+  selectAllContractors: () => void;
+  deselectAllContractors: () => void;
 }
 
 const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
   technicianNames,
   selectedTechnicians,
-  selectedCategories,
   date,
   amountRange,
   paymentMethod,
-  categories,
   appliedFilters,
   toggleTechnician,
-  toggleCategory,
   setDate,
   setAmountRange,
   setPaymentMethod,
-  addCategory,
-  selectAllTechnicians,
-  deselectAllTechnicians,
   clearFilters,
   applyFilters,
   jobSourceNames,
@@ -62,7 +56,13 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
   deselectAllJobSources,
   hasActiveFilters,
   filteredJobsCount,
-  totalJobsCount
+  totalJobsCount,
+  // New contractor props
+  contractorNames,
+  selectedContractors,
+  toggleContractor,
+  selectAllContractors,
+  deselectAllContractors
 }) => {
   return (
     <>
@@ -80,20 +80,14 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
       <JobFiltersSection 
         technicianNames={technicianNames}
         selectedTechnicians={selectedTechnicians}
-        selectedCategories={selectedCategories}
         date={date}
         amountRange={amountRange}
         paymentMethod={paymentMethod}
-        categories={categories}
         appliedFilters={appliedFilters}
         toggleTechnician={toggleTechnician}
-        toggleCategory={toggleCategory}
         setDate={setDate}
         setAmountRange={setAmountRange}
         setPaymentMethod={setPaymentMethod}
-        addCategory={addCategory}
-        selectAllTechnicians={selectAllTechnicians}
-        deselectAllTechnicians={deselectAllTechnicians}
         clearFilters={clearFilters}
         applyFilters={applyFilters}
         jobSourceNames={jobSourceNames}
@@ -101,6 +95,11 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
         toggleJobSource={toggleJobSource}
         selectAllJobSources={selectAllJobSources}
         deselectAllJobSources={deselectAllJobSources}
+        contractorNames={contractorNames}
+        selectedContractors={selectedContractors}
+        toggleContractor={toggleContractor}
+        selectAllContractors={selectAllContractors}
+        deselectAllContractors={deselectAllContractors}
       />
     </>
   );

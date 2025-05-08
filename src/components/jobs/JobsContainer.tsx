@@ -5,9 +5,14 @@ import JobsFilterPopovers from "./JobsFilterPopovers";
 import JobTabs from "./JobTabs";
 import { useJobsContext } from "./context/JobsContext";
 
-const JobsContainer = ({ technicianNames, jobSourceNames }: { 
+const JobsContainer = ({ 
+  technicianNames, 
+  jobSourceNames,
+  contractorNames
+}: { 
   technicianNames: string[];
   jobSourceNames: string[];
+  contractorNames: string[];
 }) => {
   const {
     filteredJobs,
@@ -23,6 +28,7 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
     closeStatusModal,
     setDatePopoverOpen,
     setTechPopoverOpen,
+    setContractorPopoverOpen,
     setSourcePopoverOpen,
     setAmountPopoverOpen,
     setPaymentPopoverOpen
@@ -40,8 +46,8 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
       
       {/* Jobs Tabs and Table */}
       <JobsFilterPopovers 
-        categories={["All Categories", "Plumbing", "Electrical", "HVAC", "Cleaning"]}
-        selectedCategories={["All Categories"]}
+        categories={[]}
+        selectedCategories={[]}
         toggleCategory={() => {}}
         selectAllCategories={() => {}}
         deselectAllCategories={() => {}}
@@ -55,6 +61,11 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
         toggleSource={() => {}}
         selectAllSources={() => {}}
         deselectAllSources={() => {}}
+        contractorNames={contractorNames}
+        selectedContractors={[]}
+        toggleContractor={() => {}}
+        selectAllContractors={() => {}}
+        deselectAllContractors={() => {}}
         date={undefined}
         setDate={() => {}}
       />
@@ -73,6 +84,7 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
         closeStatusModal={closeStatusModal}
         setDatePopoverOpen={setDatePopoverOpen}
         setTechPopoverOpen={setTechPopoverOpen}
+        setContractorPopoverOpen={setContractorPopoverOpen}
         setSourcePopoverOpen={setSourcePopoverOpen}
         setAmountPopoverOpen={setAmountPopoverOpen}
         setPaymentPopoverOpen={setPaymentPopoverOpen}
