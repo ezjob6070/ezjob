@@ -485,14 +485,14 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 )}
               />
 
-              {/* Job Definition (Technician), Job Contractor, and Job Source fields in a single row - rearranged order */}
+              {/* Job Definition (Technician), Job Contractor, and Job Source fields in a single row - fixed alignment */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Technician field - placed first */}
                 <FormField
                   control={form.control}
                   name="technicianId"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex-1">
                       <FormLabel>Technician *</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
@@ -544,7 +544,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   control={form.control}
                   name="contractorId"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex-1">
                       <FormLabel>Job Contractor (Optional)</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
@@ -597,7 +597,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                     control={form.control}
                     name="jobSourceId"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>Job Source (Optional)</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
