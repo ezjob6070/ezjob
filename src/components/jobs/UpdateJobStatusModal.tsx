@@ -23,6 +23,7 @@ interface UpdateJobStatusModalProps {
   onCancel: (jobId: string, cancellationReason?: string) => void;
   onComplete: (jobId: string, actualAmount: number) => void;
   onReschedule?: (jobId: string, newDate: Date, isAllDay: boolean) => void;
+  onSendToEstimate?: (job: Job) => void;
 }
 
 const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
@@ -32,8 +33,9 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   onCancel,
   onComplete,
   onReschedule,
+  onSendToEstimate,
 }) => {
-  const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled">("completed");
+  const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled" | "estimate">("completed");
   const [actualAmount, setActualAmount] = useState<number>(job?.amount || 0);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>(
     job?.scheduledDate ? new Date(job.scheduledDate) : new Date()
@@ -99,9 +101,13 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
       }
       
       onReschedule(job.id, scheduledDate, isAllDay);
+    } else if (status === "estimate" && onSendToEstimate) {
+      // Handle the new "estimate" status option
+      onSendToEstimate(job);
     }
     
-    // No need to manually close the modal here - the parent component will handle it
+    // Close the modal after action is taken
+    onOpenChange(false);
   };
 
   return (
@@ -111,7 +117,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
           <DialogHeader>
             <DialogTitle>Update Job Status</DialogTitle>
             <DialogDescription>
-              Mark this job as completed, cancelled, or reschedule it.
+              Mark this job as completed, cancelled, reschedule it, or convert to estimate.
             </DialogDescription>
           </DialogHeader>
           
@@ -120,7 +126,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
 
             <StatusSelection 
               status={status} 
-              onStatusChange={(value) => setStatus(value as "completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled")}
+              onStatusChange={(value) => setStatus(value as "completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled" | "estimate")}
               job={job}
             />
 
