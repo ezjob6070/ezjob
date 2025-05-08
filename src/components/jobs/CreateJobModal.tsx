@@ -486,7 +486,8 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Job Definition, Source, and Contractor fields in a single row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <FormField
                   control={form.control}
                   name="technicianId"
@@ -530,12 +531,57 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
 
+                {jobSources.length > 0 && (
+                  <FormField
+                    control={form.control}
+                    name="jobSourceId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Source</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a job source" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <div className="px-3 pb-2">
+                              <Input
+                                placeholder="Search job sources..."
+                                value={jobSourceSearch}
+                                onChange={(e) => setJobSourceSearch(e.target.value)}
+                                className="mb-2"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              {filteredJobSources.map((source) => (
+                                <SelectItem key={source.id} value={source.id}>
+                                  {source.name}
+                                </SelectItem>
+                              ))}
+                              {filteredJobSources.length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No job sources found
+                                </div>
+                              )}
+                            </div>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
                 <FormField
                   control={form.control}
                   name="contractorId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Contractor (Optional)</FormLabel>
+                      <FormLabel>Job Contractor</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         value={field.value || ""}
@@ -573,51 +619,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({
                   )}
                 />
               </div>
-
-              {jobSources.length > 0 && (
-                <FormField
-                  control={form.control}
-                  name="jobSourceId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Source (Optional)</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value || ""}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a job source" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <div className="px-3 pb-2">
-                            <Input
-                              placeholder="Search job sources..."
-                              value={jobSourceSearch}
-                              onChange={(e) => setJobSourceSearch(e.target.value)}
-                              className="mb-2"
-                            />
-                          </div>
-                          <div className="max-h-[200px] overflow-y-auto">
-                            {filteredJobSources.map((source) => (
-                              <SelectItem key={source.id} value={source.id}>
-                                {source.name}
-                              </SelectItem>
-                            ))}
-                            {filteredJobSources.length === 0 && (
-                              <div className="px-3 py-2 text-sm text-muted-foreground">
-                                No job sources found
-                              </div>
-                            )}
-                          </div>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
 
               {/* Payment badges row */}
               {(selectedTechnician || selectedContractor || selectedJobSource) && renderPaymentBadges()}
