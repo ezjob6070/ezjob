@@ -16,6 +16,7 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
     handleCancelJob,
     handleCompleteJob,
     handleRescheduleJob,
+    handleSendToEstimate,
     selectedJob,
     isStatusModalOpen,
     openStatusModal,
@@ -64,6 +65,7 @@ const JobsContainer = ({ technicianNames, jobSourceNames }: {
         onCancelJob={handleCancelJob}
         onCompleteJob={handleCompleteJob}
         onRescheduleJob={handleRescheduleJobWrapper}
+        onSendToEstimate={handleSendToEstimate}
         onSearchChange={setSearchTerm}
         selectedJob={selectedJob}
         isStatusModalOpen={isStatusModalOpen}

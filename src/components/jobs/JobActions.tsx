@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { MoreHorizontalIcon, PenLine } from "lucide-react";
+import { MoreHorizontalIcon, PenLine, ClipboardList } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +15,10 @@ type JobActionsProps = {
   job: Job;
   onCancelJob: (jobId: string) => void;
   onUpdateStatus?: (job: Job) => void;
+  onSendToEstimate?: (job: Job) => void;
 };
 
-const JobActions = ({ job, onCancelJob, onUpdateStatus }: JobActionsProps) => {
+const JobActions = ({ job, onCancelJob, onUpdateStatus, onSendToEstimate }: JobActionsProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,6 +34,10 @@ const JobActions = ({ job, onCancelJob, onUpdateStatus }: JobActionsProps) => {
         <DropdownMenuItem onClick={() => onUpdateStatus && onUpdateStatus(job)}>
           <PenLine className="h-4 w-4 mr-2" />
           Update Status
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onSendToEstimate && onSendToEstimate(job)}>
+          <ClipboardList className="h-4 w-4 mr-2" />
+          Send to Estimate
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {job.status !== "cancelled" && (

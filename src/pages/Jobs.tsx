@@ -12,8 +12,10 @@ import JobsHeader from "@/components/jobs/JobsHeader";
 import JobsContainer from "@/components/jobs/JobsContainer";
 import { JobsProvider } from "@/components/jobs/context/JobsContext";
 import { DateRange } from "react-day-picker";
+import { useNavigate } from "react-router-dom";
 
 const Jobs = () => {
+  const navigate = useNavigate();
   const { jobs: globalJobs, technicians: globalTechnicians, jobSources: globalJobSources, addJob, completeJob, cancelJob } = useGlobalState();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
@@ -154,6 +156,22 @@ const Jobs = () => {
       )
     );
   };
+
+  // Handle sending job to estimate
+  const handleSendToEstimate = (job: Job) => {
+    // In a real app, you would convert the job to an estimate and save it
+    console.log("Job sent to estimate:", job);
+    
+    toast({
+      title: "Job Converted to Estimate",
+      description: `Job for ${job.clientName} has been sent to estimates.`,
+    });
+    
+    // Navigate to estimates page
+    setTimeout(() => {
+      navigate("/estimates");
+    }, 1500);
+  };
   
   // Create DateRange object from string date if needed
   const getDateRangeFromString = (dateStr: string | null): DateRange | undefined => {
@@ -233,6 +251,7 @@ const Jobs = () => {
     handleCancelJob,
     handleCompleteJob,
     handleRescheduleJob: handleLocalRescheduleJob,
+    handleSendToEstimate,
     
     // Job status modal
     selectedJob,

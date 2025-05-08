@@ -58,6 +58,7 @@ interface JobsContextType {
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount: number) => void;
   handleRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
+  handleSendToEstimate: (job: Job) => void; // Add new function for sending to estimate
   
   // Job status modal
   selectedJob: Job | null;
