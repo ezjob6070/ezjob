@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -23,13 +22,13 @@ const JobSources = () => {
       ...newJobSource,
       id: newJobSource.id || crypto.randomUUID(),
       type: newJobSource.type || 'general',
-      paymentType: newJobSource.paymentType || 'percentage',
+      paymentType: (newJobSource.paymentType as "fixed" | "percentage") || 'percentage',
       paymentValue: newJobSource.paymentValue || 0,
       isActive: newJobSource.isActive !== false,
       totalJobs: newJobSource.totalJobs || 0,
       totalRevenue: newJobSource.totalRevenue || 0,
       profit: newJobSource.profit || 0,
-      createdAt: newJobSource.createdAt || new Date(),
+      createdAt: newJobSource.createdAt || new Date().toISOString(), // Convert Date to string
       name: newJobSource.name || 'New Job Source'
     };
     
@@ -46,7 +45,15 @@ const JobSources = () => {
   };
 
   const handleUpdateJobSource = (updatedJobSource: JobSource) => {
-    updateJobSource(updatedJobSource.id, updatedJobSource);
+    // Ensure createdAt is a string
+    const formattedJobSource: JobSource = {
+      ...updatedJobSource,
+      createdAt: typeof updatedJobSource.createdAt === 'string' 
+        ? updatedJobSource.createdAt 
+        : updatedJobSource.createdAt.toISOString()
+    };
+    
+    updateJobSource(formattedJobSource.id, formattedJobSource);
     toast({
       title: "Job Source Updated",
       description: "Job source has been updated successfully."
@@ -57,13 +64,13 @@ const JobSources = () => {
   const completeJobSources: JobSource[] = jobSources.map(source => ({
     ...source,
     type: source.type || 'general',
-    paymentType: source.paymentType || 'percentage',
+    paymentType: (source.paymentType as "fixed" | "percentage") || 'percentage',
     paymentValue: source.paymentValue || 0,
     isActive: source.isActive !== false,
     totalJobs: source.totalJobs || 0,
     totalRevenue: source.totalRevenue || 0,
     profit: source.profit || 0,
-    createdAt: source.createdAt || new Date()
+    createdAt: typeof source.createdAt === 'string' ? source.createdAt : (source.createdAt || new Date()).toISOString()
   }));
 
   return (

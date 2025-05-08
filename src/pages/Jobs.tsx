@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useJobsData } from "@/hooks/useJobsData";
 import { useJobSourceData } from "@/hooks/jobs/useJobSourceData";
@@ -13,6 +12,7 @@ import JobsContainer from "@/components/jobs/JobsContainer";
 import { JobsProvider } from "@/components/jobs/context/JobsContext";
 import { DateRange } from "react-day-picker";
 import { useNavigate } from "react-router-dom";
+import { JobSource } from "@/types/jobSource";
 
 const Jobs = () => {
   const navigate = useNavigate();
@@ -27,7 +27,8 @@ const Jobs = () => {
     // Ensure all jobs have the required date field
     const completeJobs: Job[] = globalJobs.map(job => ({
       ...job,
-      date: job.date || job.scheduledDate || new Date().toISOString()
+      date: job.date || job.scheduledDate || new Date().toISOString(),
+      status: job.status === "canceled" ? "cancelled" as const : job.status as any // Fix "canceled" -> "cancelled"
     }));
     setLocalJobs(completeJobs);
   }, [globalJobs]);
@@ -125,7 +126,7 @@ const Jobs = () => {
   };
 
   const handleCompleteJob = (jobId: string, actualAmount: number) => {
-    completeJob(jobId, actualAmount);
+    completeJob(jobId);
     
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
@@ -264,11 +265,11 @@ const Jobs = () => {
   };
 
   // Transform job sources for the JobModals component
-  const jobSourcesForModal = globalJobSources.map(source => ({
+  const jobSourcesForModal: JobSource[] = globalJobSources.map(source => ({
     id: source.id,
     name: source.name,
-    type: source.type || "general",  // Ensure type property exists
-    paymentType: source.paymentType || "percentage", 
+    type: source.type || "general",
+    paymentType: (source.paymentType as "fixed" | "percentage") || "percentage",
     paymentValue: source.paymentValue || 0, 
     isActive: source.isActive !== false,
     profit: source.profit || 0,

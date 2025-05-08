@@ -48,19 +48,32 @@ const Technicians = () => {
   // Sync technicians from GlobalState to local state in useTechniciansData
   useEffect(() => {
     if (globalTechnicians && globalTechnicians.length > 0) {
-      // Make sure to use only valid string dates, not Date objects
+      // Make sure all required properties are present and have correct types
       const typedTechnicians: Technician[] = globalTechnicians.map(tech => {
+        // Generate initials from name if not present
+        const nameInitials = tech.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        
         return {
           ...tech,
           // Ensure hireDate is a properly formatted string
           hireDate: typeof tech.hireDate === 'string' ? tech.hireDate : 
-                   (tech.hireDate ? new Date(tech.hireDate).toISOString().split('T')[0] : '2023-01-01'),
+                  (tech.hireDate ? new Date(tech.hireDate).toISOString().split('T')[0] : '2023-01-01'),
           // Ensure paymentType is valid
           paymentType: tech.paymentType as "percentage" | "flat" | "hourly" | "salary",
           // Default role if not set
           role: tech.role || "technician",
+          // Ensure salaryBasis is a valid SalaryBasis type
+          salaryBasis: tech.salaryBasis as "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly",
           // Default initials if not set
-          initials: tech.initials || tech.name.split(' ').map(n => n[0]).join('')
+          initials: tech.initials || nameInitials,
+          // Ensure other required fields have values
+          specialty: tech.specialty || '',
+          completedJobs: tech.completedJobs || 0,
+          cancelledJobs: tech.cancelledJobs || 0,
+          totalRevenue: tech.totalRevenue || 0,
+          rating: tech.rating || 0,
+          hourlyRate: tech.hourlyRate || 0,
+          paymentRate: tech.paymentRate || 0
         };
       });
       setTechnicians(typedTechnicians);
