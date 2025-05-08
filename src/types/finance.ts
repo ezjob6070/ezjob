@@ -72,6 +72,7 @@ export interface OfficeExpense {
   vendor?: string;
   paymentMethod?: string;
   status?: string;
+  receipt?: string;
 }
 
 export type FinanceEntityType = "technician" | "jobSource" | "contractor" | "employee" | "salesman";

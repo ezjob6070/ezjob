@@ -1,20 +1,20 @@
 
-export type JobSourcePaymentType = "fixed" | "percentage";
-
 export interface JobSource {
   id: string;
   name: string;
+  description?: string;
   type: string;
-  paymentType: JobSourcePaymentType;
-  paymentValue: number;
-  isActive: boolean;
-  totalJobs: number;
-  totalRevenue: number;
-  profit: number;
+  active: boolean;
   createdAt: string;
-  website?: string;
-  phone?: string;
+  phoneNumber?: string;
   email?: string;
-  logoUrl?: string;
+  contactName?: string;
+  address?: string;
+  website?: string;
   notes?: string;
+  totalJobs?: number;
+  totalRevenue?: number;
+  expenses?: number;
+  companyProfit?: number;
+  category?: string;
 }

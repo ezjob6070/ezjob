@@ -86,7 +86,7 @@ const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
             </Card>
           </div>
           
-          <TransactionsSection filteredTransactions={filteredTransactions} />
+          <TransactionsSection transactions={filteredTransactions} dateRange={dateRange} />
         </CardContent>
       </Card>
     </div>

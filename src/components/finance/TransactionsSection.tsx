@@ -26,12 +26,15 @@ interface TransactionsSectionProps {
 }
 
 const TransactionsSection: React.FC<TransactionsSectionProps> = ({ 
-  transactions,
+  transactions = [],
   dateRange
 }) => {
   const [activeTab, setActiveTab] = useState<"all" | "payments" | "expenses" | "refunds">("all");
   
-  const filteredTransactions = transactions.filter(transaction => {
+  // Ensure transactions is an array before filtering
+  const transactionsArray = Array.isArray(transactions) ? transactions : [];
+  
+  const filteredTransactions = transactionsArray.filter(transaction => {
     if (activeTab === "payments") return transaction.category === "payment";
     if (activeTab === "expenses") return transaction.category === "expense";
     if (activeTab === "refunds") return transaction.category === "refund";
@@ -44,15 +47,15 @@ const TransactionsSection: React.FC<TransactionsSectionProps> = ({
     .slice(0, 5);
   
   // Calculate summary stats
-  const totalPayments = transactions
+  const totalPayments = transactionsArray
     .filter(t => t.category === "payment")
     .reduce((sum, t) => sum + t.amount, 0);
     
-  const totalExpenses = transactions
+  const totalExpenses = transactionsArray
     .filter(t => t.category === "expense")
     .reduce((sum, t) => sum + t.amount, 0);
     
-  const totalRefunds = transactions
+  const totalRefunds = transactionsArray
     .filter(t => t.category === "refund")
     .reduce((sum, t) => sum + t.amount, 0);
     

@@ -134,7 +134,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         
         <ReportGenerator dateRange={date} />
         
-        <TransactionsSection filteredTransactions={filteredTransactions.slice(0, 5)} />
+        <TransactionsSection transactions={filteredTransactions.slice(0, 5)} dateRange={date} />
       </div>
     );
   }
@@ -293,7 +293,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             </TableHeader>
             <TableBody>
               {jobSources
-                .sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0))
+                .sort((a, b) => ((b.totalRevenue || 0) - (a.totalRevenue || 0)))
                 .slice(0, 5)
                 .map((source) => (
                   <TableRow key={source.id}>
@@ -315,7 +315,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </CardContent>
       </Card>
       
-      <TransactionsSection filteredTransactions={filteredTransactions.slice(0, 5)} />
+      <TransactionsSection transactions={filteredTransactions.slice(0, 5)} dateRange={date} />
     </div>
   );
 };

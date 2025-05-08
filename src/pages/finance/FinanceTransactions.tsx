@@ -112,7 +112,8 @@ const FinanceTransactions = () => {
 
       {/* Transactions Section */}
       <TransactionsSection 
-        filteredTransactions={filteredTransactions} 
+        transactions={filteredTransactions} 
+        dateRange={date}
       />
     </div>
   );
