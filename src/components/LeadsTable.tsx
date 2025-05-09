@@ -25,7 +25,16 @@ import {
   DollarSign,
   Tag,
   ChevronRight,
-  MoreHorizontal
+  MoreHorizontal,
+  CircleAlert,
+  Check,
+  FileText,
+  Handshake,
+  Trophy,
+  CircleX,
+  Briefcase,
+  Clock,
+  Filter
 } from "lucide-react";
 import { format } from "date-fns";
 import { Lead, LeadStatus } from "@/types/lead";
@@ -599,7 +608,7 @@ const statusOptions = [
   {
     value: "new",
     label: "New",
-    icon: <AlertCircle className="h-4 w-4" />,
+    icon: <CircleAlert className="h-4 w-4" />,
     color: "bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200"
   },
   {
@@ -635,7 +644,7 @@ const statusOptions = [
   {
     value: "lost",
     label: "Lost",
-    icon: <XCircle className="h-4 w-4" />,
+    icon: <CircleX className="h-4 w-4" />,
     color: "bg-red-100 text-red-800 hover:bg-red-200 border-red-200"
   },
   {
@@ -659,7 +668,7 @@ const statusOptions = [
   {
     value: "follow",
     label: "Follow-up",
-    icon: <ArrowRightCircle className="h-4 w-4" />,
+    icon: <Filter className="h-4 w-4" />,
     color: "bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-200"
   }
 ];

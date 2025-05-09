@@ -2,7 +2,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { LeadStatus } from "@/types/lead";
-import { Check, Clock, Phone, AlertCircle, FileText, Handshake, Trophy, XCircle, Briefcase, ArrowRightCircle } from "lucide-react";
+import { CircleAlert, Phone, Check, FileText, Handshake, Trophy, CircleX, Briefcase, Clock, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
@@ -24,7 +24,7 @@ const statusOptions: StatusOption[] = [
   {
     value: "new",
     label: "New",
-    icon: <AlertCircle className="h-4 w-4" />,
+    icon: <CircleAlert className="h-4 w-4" />,
     color: "bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200",
     description: "Recently added leads that need initial contact"
   },
@@ -66,7 +66,7 @@ const statusOptions: StatusOption[] = [
   {
     value: "lost",
     label: "Lost",
-    icon: <XCircle className="h-4 w-4" />,
+    icon: <CircleX className="h-4 w-4" />,
     color: "bg-red-100 text-red-800 hover:bg-red-200 border-red-200",
     description: "Opportunity closed without success"
   },
@@ -94,7 +94,7 @@ const statusOptions: StatusOption[] = [
   {
     value: "follow",
     label: "Follow-up",
-    icon: <ArrowRightCircle className="h-4 w-4" />,
+    icon: <Filter className="h-4 w-4" />,
     color: "bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-200",
     description: "Scheduled for future follow-up"
   }
