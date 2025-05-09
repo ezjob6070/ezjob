@@ -3,12 +3,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
 import LeadsTable from "@/components/LeadsTable";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, CheckIcon, XIcon, ArrowRightIcon } from "lucide-react";
+import { PlusIcon, FilterIcon, SlidersHorizontal } from "lucide-react";
 import AddClientModal from "@/components/AddClientModal";
-import AddLeadModal from "@/components/leads/AddLeadModal";
-import { Lead, LeadStatus } from "@/types/lead"; // Import lead type from the correct location
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import AddLeadModal from "@/components/AddLeadModal";
+import { Lead, LeadStatus } from "@/types/lead"; 
 import { useToast } from "@/components/ui/use-toast";
+import LeadStatusFilter from "@/components/leads/LeadStatusFilter";
+import LeadValueStats from "@/components/leads/LeadValueStats";
+import { 
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { initialLeads } from "@/data/leads";
 
 // Import client type from Clients page
 type Client = {
@@ -30,10 +42,10 @@ const LeadsClients = () => {
   const [activeTab, setActiveTab] = useState("leads");
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
-  const [leadStatusFilter, setLeadStatusFilter] = useState<string[]>([]);
+  const [leadStatusFilter, setLeadStatusFilter] = useState<LeadStatus[]>([]);
   const { toast } = useToast();
   
-  // Sample clients data - we're reusing the data from the Clients page
+  // Sample clients data - reusing from the Clients page
   const [clients, setClients] = useState<Client[]>([
     {
       id: "1",
@@ -102,68 +114,18 @@ const LeadsClients = () => {
     },
   ]);
 
-  // Sample leads data
-  const [leads, setLeads] = useState<Lead[]>([
-    {
-      id: "1",
-      name: "Michael Johnson",
-      email: "michael.j@example.com",
-      phone: "(555) 111-2222",
-      status: "new",
-      source: "Website",
-      value: 1200,
-      createdAt: new Date("2023-05-01"),
-    },
-    {
-      id: "2",
-      name: "Sarah Williams",
-      email: "sarah.w@example.com",
-      phone: "(555) 333-4444",
-      status: "contacted",
-      source: "Referral",
-      value: 2500,
-      createdAt: new Date("2023-05-03"),
-    },
-    {
-      id: "3",
-      name: "David Brown",
-      email: "david.b@example.com",
-      phone: "(555) 555-6666",
-      status: "qualified",
-      source: "Google Ad",
-      value: 3000,
-      createdAt: new Date("2023-05-05"),
-    },
-    {
-      id: "4",
-      name: "Emily Davis",
-      company: "Davis Designs",
-      email: "emily.d@example.com",
-      phone: "(555) 777-8888",
-      status: "proposal",
-      source: "Trade Show",
-      value: 5000,
-      createdAt: new Date("2023-05-07"),
-    },
-    {
-      id: "5",
-      name: "Robert Wilson",
-      company: "Wilson Tech",
-      email: "robert.w@example.com",
-      phone: "(555) 999-0000",
-      status: "negotiation",
-      source: "LinkedIn",
-      value: 7500,
-      createdAt: new Date("2023-05-10"),
-    },
-  ]);
+  // Using the leads data from data/leads.ts
+  const [leads, setLeads] = useState<Lead[]>(initialLeads.map(lead => ({
+    ...lead,
+    createdAt: new Date(lead.dateAdded),
+    status: lead.status as LeadStatus
+  })));
 
   const handleAddClient = (newClient: Client) => {
     setClients((prevClients) => [newClient, ...prevClients]);
   };
 
   const handleAddLead = (lead: any) => {
-    // Ensure the lead conforms to the Lead type from types/lead.ts
     const newLead: Lead = {
       id: lead.id || String(Date.now()),
       name: lead.name,
@@ -173,11 +135,16 @@ const LeadsClients = () => {
       status: lead.status || "new",
       source: lead.source,
       value: lead.value,
-      createdAt: new Date(), // Ensure createdAt is always set
+      createdAt: new Date(),
       notes: lead.notes
     };
     
     setLeads((prevLeads) => [newLead, ...prevLeads]);
+    
+    toast({
+      title: "New lead added",
+      description: `${lead.name} has been added as a new lead`,
+    });
   };
 
   const handleLeadStatusChange = (id: string, status: LeadStatus) => {
@@ -205,21 +172,23 @@ const LeadsClients = () => {
     }
   };
 
-  // Get counts of leads by status for the status filter badges
-  const statusCounts = useMemo(() => {
-    const counts = {
-      active: 0,
-      inactive: 0,
-      converted: 0,
-      follow: 0
-    };
-    
-    leads.forEach(lead => {
-      if (lead.status in counts) {
-        counts[lead.status as keyof typeof counts]++;
+  // Handle filter toggle
+  const handleStatusToggle = (status: LeadStatus) => {
+    setLeadStatusFilter(prev => {
+      if (prev.includes(status)) {
+        return prev.filter(s => s !== status);
+      } else {
+        return [...prev, status];
       }
     });
-    
+  };
+
+  // Get counts of leads by status for the status filter badges
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    leads.forEach(lead => {
+      counts[lead.status] = (counts[lead.status] || 0) + 1;
+    });
     return counts;
   }, [leads]);
 
@@ -227,14 +196,6 @@ const LeadsClients = () => {
   const filteredLeads = leadStatusFilter.length > 0
     ? leads.filter(lead => leadStatusFilter.includes(lead.status))
     : leads;
-
-  // Status filter button styles
-  const statusStyles = {
-    active: "bg-green-100 hover:bg-green-200 data-[state=on]:bg-green-200 data-[state=on]:text-green-900 text-green-800",
-    inactive: "bg-gray-100 hover:bg-gray-200 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-900 text-gray-800",
-    converted: "bg-blue-100 hover:bg-blue-200 data-[state=on]:bg-blue-200 data-[state=on]:text-blue-900 text-blue-800",
-    follow: "bg-amber-100 hover:bg-amber-200 data-[state=on]:bg-amber-200 data-[state=on]:text-amber-900 text-amber-800"
-  };
 
   return (
     <div className="space-y-8 py-8">
@@ -260,53 +221,90 @@ const LeadsClients = () => {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="grid grid-cols-2 w-[400px]">
-          <TabsTrigger value="leads">Leads</TabsTrigger>
-          <TabsTrigger value="clients">Clients</TabsTrigger>
-        </TabsList>
-        
-        {activeTab === "leads" && (
-          <div className="mt-4 mb-4">
-            <label className="block text-sm font-medium mb-2">Filter by status:</label>
-            <ToggleGroup type="multiple" className="justify-start flex-wrap gap-3" value={leadStatusFilter} onValueChange={setLeadStatusFilter}>
-              <div className="flex flex-col items-center">
-                <ToggleGroupItem value="active" aria-label="Active" className={`flex items-center gap-1 ${statusStyles.active}`}>
-                  <CheckIcon className="h-4 w-4" /> Active
-                </ToggleGroupItem>
-                <span className="text-xs mt-1 font-medium text-green-800">{statusCounts.active}</span>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <ToggleGroupItem value="inactive" aria-label="Inactive" className={`flex items-center gap-1 ${statusStyles.inactive}`}>
-                  <XIcon className="h-4 w-4" /> Inactive
-                </ToggleGroupItem>
-                <span className="text-xs mt-1 font-medium text-gray-800">{statusCounts.inactive}</span>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <ToggleGroupItem value="converted" aria-label="Converted" className={`flex items-center gap-1 ${statusStyles.converted}`}>
-                  <CheckIcon className="h-4 w-4" /> Converted
-                </ToggleGroupItem>
-                <span className="text-xs mt-1 font-medium text-blue-800">{statusCounts.converted}</span>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <ToggleGroupItem value="follow" aria-label="Follow" className={`flex items-center gap-1 ${statusStyles.follow}`}>
-                  <ArrowRightIcon className="h-4 w-4" /> Follow
-                </ToggleGroupItem>
-                <span className="text-xs mt-1 font-medium text-amber-800">{statusCounts.follow}</span>
-              </div>
-            </ToggleGroup>
-          </div>
-        )}
+        <div className="flex justify-between items-center mb-6">
+          <TabsList className="grid grid-cols-2 w-[400px]">
+            <TabsTrigger value="leads">Leads</TabsTrigger>
+            <TabsTrigger value="clients">Clients</TabsTrigger>
+          </TabsList>
+          
+          {activeTab === "leads" && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <FilterIcon className="h-4 w-4" />
+                  Filter Leads
+                  {leadStatusFilter.length > 0 && (
+                    <span className="ml-1 rounded-full bg-blue-100 text-blue-800 px-2 py-0.5 text-xs font-medium">
+                      {leadStatusFilter.length}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="sm:max-w-md">
+                <SheetHeader>
+                  <SheetTitle>Filter Leads</SheetTitle>
+                  <SheetDescription>
+                    Select statuses to filter your leads
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="py-6">
+                  <LeadStatusFilter 
+                    selectedStatuses={leadStatusFilter}
+                    onStatusToggle={handleStatusToggle}
+                    counts={statusCounts}
+                  />
+                </div>
+                <SheetFooter>
+                  <SheetClose asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => setLeadStatusFilter([])}
+                      className="mr-2"
+                    >
+                      Reset Filters
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Button type="submit">Apply Filters</Button>
+                  </SheetClose>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
+          )}
+        </div>
         
         <div className="mt-4">
-          <TabsContent value="leads">
+          <TabsContent value="leads" className="space-y-6">
+            {/* Show lead statistics at the top */}
+            <LeadValueStats leads={leads} />
+            
+            {leadStatusFilter.length > 0 && (
+              <div className="bg-blue-50 p-3 rounded-md flex justify-between items-center mb-4">
+                <div className="flex items-center">
+                  <SlidersHorizontal className="h-4 w-4 mr-2 text-blue-700" />
+                  <span className="text-sm">
+                    Showing <strong>{filteredLeads.length}</strong> leads with 
+                    <strong className="mx-1">{leadStatusFilter.length}</strong> 
+                    active {leadStatusFilter.length === 1 ? 'filter' : 'filters'}
+                  </span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setLeadStatusFilter([])}
+                  className="text-blue-700 hover:text-blue-800 hover:bg-blue-100"
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+            
             <LeadsTable 
               leads={filteredLeads} 
               onStatusChange={handleLeadStatusChange} 
             />
           </TabsContent>
+          
           <TabsContent value="clients">
             <ClientsTable clients={clients} />
           </TabsContent>
