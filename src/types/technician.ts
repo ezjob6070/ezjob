@@ -47,9 +47,13 @@ export interface Technician {
   subRole?: string;
   initials?: string;
   ssn?: string;
-  driverLicense?: string | { number: string; state: string; expirationDate: string };
+  driverLicense?: string | { number: string; state: string; expirationDate: string; };
   idNumber?: string;
   documents?: any[];
+  profileImage?: string;
+  yearsExperience?: number;
+  workContract?: string;
+  jobCategories?: string[];
   
   // Finance and performance related properties
   paymentRate?: number;
@@ -59,10 +63,6 @@ export interface Technician {
   totalRevenue?: number;
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
-  profileImage?: string;
-  yearsExperience?: number;
-  workContract?: string;
-  jobCategories?: string[];
 }
 
 export interface Document {

@@ -37,7 +37,16 @@ export interface JobFiltersSectionProps {
   date: DateRange;
   selectAllTechnicians: () => void;
   deselectAllTechnicians: () => void;
-  // Add other properties as needed
+  // Additional properties that exist in the component implementation
+  amountRange?: any;
+  paymentMethod?: any;
+  appliedFilters?: boolean;
+  selectAllCustomers?: () => void;
+  deselectAllCustomers?: () => void;
+  selectAllJobSources?: () => void;
+  deselectAllJobSources?: () => void;
+  selectAllContractors?: () => void;
+  deselectAllContractors?: () => void;
 }
 
 export interface FilteredJobsResult {

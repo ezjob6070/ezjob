@@ -1,2 +1,3 @@
 
-export type SortOption = "date" | "amount" | "status" | "client" | "technician" | "name-asc" | "name-desc" | "newest" | "oldest" | "revenue-high" | "revenue-low" | "profit-high" | "profit-low" | "jobs-high" | "jobs-low" | string;
+// Create this file if it doesn't exist
+export type SortOption = string | "revenue-high" | "revenue-low" | "jobs-high" | "jobs-low" | "name-asc" | "name-desc" | "date-newest" | "date-oldest";

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox"; // Added missing import
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Project, ProjectExpense, ProjectContractor, ProjectMaterial, ProjectEquipment } from "@/types/project";
 import { ArrowUpRight, Banknote, Building2, ChevronRight, CircleDollarSign, FileText, ListChecks, Minus, ReceiptText, TrendingDown, TrendingUp, Truck } from "lucide-react";

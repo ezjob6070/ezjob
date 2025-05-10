@@ -3,8 +3,8 @@ export interface Task {
   id: string;
   title: string;
   dueDate: Date | string;
-  start?: string;
-  end?: string;
+  start?: string | Date;
+  end?: string | Date;
   allDay?: boolean;
   priority?: "high" | "medium" | "low" | "urgent";
   status: string;
