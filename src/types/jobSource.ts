@@ -4,7 +4,8 @@ export interface JobSource {
   name: string;
   description?: string;
   type: string;
-  active: boolean; // This is required
+  active: boolean;
+  isActive?: boolean; // For compatibility with code using isActive instead of active
   createdAt: string;
   phoneNumber?: string;
   email?: string;
@@ -20,7 +21,7 @@ export interface JobSource {
   // Additional properties needed by existing components
   profit?: number;
   phone?: string;
-  paymentType?: string;
+  paymentType?: string | "percentage" | "fixed";
   paymentValue?: number;
   logoUrl?: string;
   // Properties needed for components that used to have build errors
@@ -29,6 +30,5 @@ export interface JobSource {
   technicianId?: string;
   date?: string | Date;
   // For other components
-  isActive?: boolean;
   contractorName?: string;
 }

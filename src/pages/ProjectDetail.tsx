@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,24 @@ interface ProjectFile {
   type: "document" | "image";
   date: Date;
   url: string;
+}
+
+// Update the type definition to require 'type' in the Project interface
+interface Project {
+  id: number;
+  name: string;
+  type: string; // Make sure 'type' is defined as required
+  description: string;
+  location: string;
+  completion: number;
+  workers: number;
+  vehicles: number;
+  status: string;
+  startDate: string;
+  expectedEndDate: string;
+  budget: number;
+  actualSpent: number;
+  clientName: string;
 }
 
 export default function ProjectDetail() {

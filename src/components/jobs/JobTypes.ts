@@ -3,11 +3,11 @@ import { DateRange } from "react-day-picker";
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
 export type JobPriority = "low" | "medium" | "high" | "urgent";
-export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile";
+export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile" | "credit_card" | "zelle" | "venmo" | "paypal";
 
 export interface Job {
   id: string;
-  title?: string;
+  title: string;
   jobNumber?: string;
   clientName: string;
   amount: number;
@@ -37,12 +37,12 @@ export interface Job {
   source?: string;
   contractorName?: string;
   contractorId?: string;
+  clientId?: string;
   // Add missing properties that are being used in various components
   parts?: string[];
   signature?: string;
   hasImages?: boolean;
   imageCount?: number;
-  clientId?: string;
 }
 
 export interface JobTab {
