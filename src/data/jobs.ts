@@ -1,6 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-import { Job } from '@/components/jobs/JobTypes';
+import { Job } from '@/types/finance';
 import { addDays, subDays, addHours, setHours } from 'date-fns';
 
 // Generate sample job data for demo purposes
@@ -19,8 +18,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-123-4567",
       address: "123 Main St, Downtown",
       description: "Complete HVAC system installation for new office building",
-      scheduledDate: addDays(today, 2),
-      date: addDays(today, 2), // Fixed: Using Date object instead of string
+      scheduledDate: addDays(today, 2).toISOString(),
+      date: addDays(today, 2).toISOString(),
       assignedTechId: "tech-1",
       assignedTechName: "John Smith",
       jobSource: "Website",
@@ -31,7 +30,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-001",
       notes: "Customer requests work to begin at 8:00 AM sharp",
       attachments: [],
-      createdAt: subDays(today, 10),
+      createdAt: subDays(today, 10).toISOString(),
       category: "HVAC",
       serviceType: "Installation"
     },
@@ -44,8 +43,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-987-6543",
       address: "456 Park Ave, Midtown",
       description: "Annual electrical system inspection for apartment complex",
-      scheduledDate: addDays(today, 1),
-      date: setHours(tomorrow, 13), // 1 PM tomorrow
+      scheduledDate: addDays(today, 1).toISOString(),
+      date: setHours(tomorrow, 13).toISOString(), // 1 PM tomorrow
       assignedTechId: "tech-2",
       assignedTechName: "Sarah Johnson",
       jobSource: "Referral",
@@ -55,7 +54,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-002",
       notes: "Building manager will provide access to electrical rooms",
       attachments: [],
-      createdAt: subDays(today, 7),
+      createdAt: subDays(today, 7).toISOString(),
       category: "Electrical",
       serviceType: "Inspection"
     },
@@ -68,8 +67,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-456-7890",
       address: "789 Harbor Dr, Waterfront District",
       description: "Emergency repair of burst pipe in mall basement",
-      scheduledDate: subDays(today, 2),
-      date: subDays(today, 2), // Fixed: Using Date object instead of string
+      scheduledDate: subDays(today, 2).toISOString(),
+      date: subDays(today, 2).toISOString(), // Fixed: Using Date object instead of string
       assignedTechId: "tech-3",
       assignedTechName: "Michael Rodriguez",
       jobSource: "Direct Call",
@@ -80,7 +79,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-003",
       notes: "Additional damage found behind wall, repair completed successfully",
       attachments: [],
-      createdAt: subDays(today, 5),
+      createdAt: subDays(today, 5).toISOString(),
       category: "Plumbing",
       serviceType: "Repair"
     },
@@ -93,8 +92,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-789-0123",
       address: "101 School Rd, Mountain View",
       description: "Installation of custom bookshelves and trim in school library",
-      scheduledDate: addDays(today, 5),
-      date: addDays(today, 5), // Fixed: Using Date object instead of string
+      scheduledDate: addDays(today, 5).toISOString(),
+      date: addDays(today, 5).toISOString(), // Fixed: Using Date object instead of string
       assignedTechId: "tech-4",
       assignedTechName: "Jennifer Lopez",
       jobSource: "Referral",
@@ -104,7 +103,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-004",
       notes: "Work to be performed after school hours only",
       attachments: [],
-      createdAt: subDays(today, 14),
+      createdAt: subDays(today, 14).toISOString(),
       category: "Carpentry",
       serviceType: "Finishing"
     },
@@ -117,8 +116,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-345-6789",
       address: "555 Health Blvd, Medical District",
       description: "Structural inspection of building foundation prior to expansion",
-      scheduledDate: addDays(today, 3),
-      date: setHours(addDays(today, 3), 9), // 9 AM in 3 days
+      scheduledDate: addDays(today, 3).toISOString(),
+      date: setHours(addDays(today, 3), 9).toISOString(), // 9 AM in 3 days
       assignedTechId: "tech-5",
       assignedTechName: "David Washington",
       jobSource: "Website",
@@ -128,7 +127,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-005",
       notes: "Client requests detailed written report with photographs",
       attachments: [],
-      createdAt: subDays(today, 9),
+      createdAt: subDays(today, 9).toISOString(),
       category: "Foundation",
       serviceType: "Inspection"
     },
@@ -141,8 +140,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-234-5678",
       address: "888 Industry Way, Port District",
       description: "Excavation work for new warehouse foundation",
-      scheduledDate: subDays(today, 5),
-      date: subDays(today, 5), // Fixed: Using Date object instead of string
+      scheduledDate: subDays(today, 5).toISOString(),
+      date: subDays(today, 5).toISOString(), // Fixed: Using Date object instead of string
       assignedTechId: "tech-6",
       assignedTechName: "Robert Garcia",
       jobSource: "Repeat Client",
@@ -153,7 +152,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-006",
       notes: "All work completed according to specifications",
       attachments: [],
-      createdAt: subDays(today, 20),
+      createdAt: subDays(today, 20).toISOString(),
       category: "Heavy Equipment",
       serviceType: "Operation"
     },
@@ -166,8 +165,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-876-5432",
       address: "Downtown Financial District",
       description: "Complete interior painting of new office space",
-      scheduledDate: addDays(today, 7),
-      date: setHours(addDays(today, 7), 8), // 8 AM in 7 days
+      scheduledDate: addDays(today, 7).toISOString(),
+      date: setHours(addDays(today, 7), 8).toISOString(), // 8 AM in 7 days
       assignedTechId: "tech-7",
       assignedTechName: "Emily Chen",
       jobSource: "Repeat Client",
@@ -176,7 +175,7 @@ const generateDemoJobs = (): Job[] => {
       amount: 9800,
       notes: "Client has requested specific eco-friendly paint brand",
       attachments: [],
-      createdAt: subDays(today, 8),
+      createdAt: subDays(today, 8).toISOString(),
       category: "Interior",
       serviceType: "Painting"
     },
@@ -189,8 +188,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-765-4321",
       address: "Riverside South",
       description: "Repair of storm damage to apartment complex roof",
-      scheduledDate: subDays(today, 3),
-      date: subDays(today, 3), // Fixed: Using Date object instead of string
+      scheduledDate: subDays(today, 3).toISOString(),
+      date: subDays(today, 3).toISOString(), // Fixed: Using Date object instead of string
       assignedTechId: "tech-8",
       assignedTechName: "William Taylor",
       jobSource: "Social Media",
@@ -200,7 +199,7 @@ const generateDemoJobs = (): Job[] => {
       actualAmount: 7400,
       notes: "Additional damage discovered during repair, client approved extra work",
       attachments: [],
-      createdAt: subDays(today, 15),
+      createdAt: subDays(today, 15).toISOString(),
       category: "Roof",
       serviceType: "Repair"
     },
@@ -213,8 +212,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-654-3210",
       address: "North Innovation District",
       description: "Quarterly maintenance of office building HVAC systems",
-      scheduledDate: addDays(today, 10),
-      date: setHours(addDays(today, 10), 14), // 2 PM in 10 days
+      scheduledDate: addDays(today, 10).toISOString(),
+      date: setHours(addDays(today, 10), 14).toISOString(), // 2 PM in 10 days
       assignedTechId: "tech-9",
       assignedTechName: "Olivia Martinez",
       jobSource: "Google Ads",
@@ -223,7 +222,7 @@ const generateDemoJobs = (): Job[] => {
       amount: 3200,
       notes: "Building has 8 separate HVAC units to be serviced",
       attachments: [],
-      createdAt: subDays(today, 12),
+      createdAt: subDays(today, 12).toISOString(),
       category: "HVAC",
       serviceType: "Maintenance"
     },
@@ -236,8 +235,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-543-2109",
       address: "Harbor District",
       description: "Installation of luxury vinyl tile in hotel lobby and restaurant",
-      scheduledDate: subDays(today, 1),
-      date: setHours(yesterday, 9), // 9 AM yesterday
+      scheduledDate: subDays(today, 1).toISOString(),
+      date: setHours(yesterday, 9).toISOString(), // 9 AM yesterday
       assignedTechId: "tech-10",
       assignedTechName: "James Wilson",
       jobSource: "Trade Show",
@@ -247,7 +246,7 @@ const generateDemoJobs = (): Job[] => {
       actualAmount: 12800,
       notes: "Client extremely satisfied with quality of work",
       attachments: [],
-      createdAt: subDays(today, 18),
+      createdAt: subDays(today, 18).toISOString(),
       category: "Flooring",
       serviceType: "Installation"
     },
@@ -260,8 +259,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-111-2233",
       address: "1250 Ocean Drive, Beachside",
       description: "Multiple AC units failing in hotel lobby and restaurant area. Urgent repair needed before weekend event.",
-      scheduledDate: addDays(today, 1),
-      date: setHours(tomorrow, 10), // 10 AM tomorrow
+      scheduledDate: addDays(today, 1).toISOString(),
+      date: setHours(tomorrow, 10).toISOString(), // 10 AM tomorrow
       assignedTechId: "tech-1",
       assignedTechName: "John Smith",
       jobSource: "Repeat Client",
@@ -271,7 +270,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-011",
       notes: "Customer is VIP client. Additional technicians may be needed.",
       attachments: [],
-      createdAt: subDays(today, 2),
+      createdAt: subDays(today, 2).toISOString(),
       category: "HVAC",
       serviceType: "Emergency Repair"
     },
@@ -284,8 +283,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-444-5566",
       address: "42 Tech Lane, Highland Hills",
       description: "Complete smart home system installation including security, lighting, climate control and entertainment systems",
-      scheduledDate: addDays(today, 3),
-      date: setHours(addDays(today, 3), 11), // 11 AM in 3 days
+      scheduledDate: addDays(today, 3).toISOString(),
+      date: setHours(addDays(today, 3), 11).toISOString(), // 11 AM in 3 days
       assignedTechId: "tech-2",
       assignedTechName: "Sarah Johnson",
       jobSource: "Website",
@@ -295,7 +294,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-012",
       notes: "Client has requested all systems be Apple HomeKit compatible",
       attachments: [],
-      createdAt: subDays(today, 5),
+      createdAt: subDays(today, 5).toISOString(),
       category: "Smart Home",
       serviceType: "Installation"
     },
@@ -309,8 +308,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-222-3434",
       address: "88 Digital Drive, Tech Park",
       description: "Installing specialized cooling system for new server room",
-      scheduledDate: today,
-      date: setHours(today, 9), // 9 AM today
+      scheduledDate: today.toISOString(),
+      date: setHours(today, 9).toISOString(), // 9 AM today
       assignedTechId: "tech-1",
       assignedTechName: "John Smith",
       jobSource: "Website",
@@ -320,7 +319,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-021",
       notes: "Critical systems - must be completed today",
       attachments: [],
-      createdAt: subDays(today, 7),
+      createdAt: subDays(today, 7).toISOString(),
       category: "HVAC",
       serviceType: "Installation"
     },
@@ -333,8 +332,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-678-9012",
       address: "123 Skyline Avenue",
       description: "Fix leaking pipes in apartment 302",
-      scheduledDate: today,
-      date: setHours(today, 11), // 11 AM today
+      scheduledDate: today.toISOString(),
+      date: setHours(today, 11).toISOString(), // 11 AM today
       assignedTechId: "tech-3",
       assignedTechName: "Michael Rodriguez",
       jobSource: "Direct Call",
@@ -344,7 +343,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-022",
       notes: "Tenant will be home to provide access",
       attachments: [],
-      createdAt: subDays(today, 2),
+      createdAt: subDays(today, 2).toISOString(),
       category: "Plumbing",
       serviceType: "Repair"
     },
@@ -357,8 +356,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-321-7654",
       address: "500 Financial Plaza",
       description: "Install new security cameras and access control system",
-      scheduledDate: today,
-      date: setHours(today, 13), // 1 PM today
+      scheduledDate: today.toISOString(),
+      date: setHours(today, 13).toISOString(), // 1 PM today
       assignedTechId: "tech-2",
       assignedTechName: "Sarah Johnson",
       jobSource: "Referral",
@@ -368,7 +367,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-023",
       notes: "Security personnel will escort technicians",
       attachments: [],
-      createdAt: subDays(today, 14),
+      createdAt: subDays(today, 14).toISOString(),
       category: "Security",
       serviceType: "Installation"
     },
@@ -381,8 +380,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-789-4561",
       address: "42 Innovation Way",
       description: "Replacing fluorescent lighting with LED panels throughout office",
-      scheduledDate: today,
-      date: setHours(today, 15), // 3 PM today
+      scheduledDate: today.toISOString(),
+      date: setHours(today, 15).toISOString(), // 3 PM today
       assignedTechId: "tech-7",
       assignedTechName: "Emily Chen",
       jobSource: "Website",
@@ -392,7 +391,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-024",
       notes: "Work must be completed after hours",
       attachments: [],
-      createdAt: subDays(today, 9),
+      createdAt: subDays(today, 9).toISOString(),
       category: "Electrical",
       serviceType: "Upgrade"
     },
@@ -406,8 +405,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-123-7890",
       address: "789 Culinary Boulevard",
       description: "Installing new commercial kitchen equipment",
-      scheduledDate: addDays(today, 4),
-      date: setHours(addDays(today, 4), 8), // 8 AM in 4 days
+      scheduledDate: addDays(today, 4).toISOString(),
+      date: setHours(addDays(today, 4), 8).toISOString(), // 8 AM in 4 days
       assignedTechId: "tech-10",
       assignedTechName: "James Wilson",
       jobSource: "Referral",
@@ -417,7 +416,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-025",
       notes: "Restaurant opening scheduled for next month",
       attachments: [],
-      createdAt: subDays(today, 20),
+      createdAt: subDays(today, 20).toISOString(),
       category: "Commercial",
       serviceType: "Installation"
     },
@@ -430,8 +429,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-987-3210",
       address: "1 Oceanfront Drive",
       description: "Complete renovation of 10 premier suites",
-      scheduledDate: addDays(today, 6),
-      date: setHours(addDays(today, 6), 7), // 7 AM in 6 days
+      scheduledDate: addDays(today, 6).toISOString(),
+      date: setHours(addDays(today, 6), 7).toISOString(), // 7 AM in 6 days
       assignedTechId: "tech-4",
       assignedTechName: "Jennifer Lopez",
       jobSource: "Repeat Client",
@@ -441,7 +440,7 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-026",
       notes: "Phased approach - 2 rooms at a time",
       attachments: [],
-      createdAt: subDays(today, 45),
+      createdAt: subDays(today, 45).toISOString(),
       category: "Renovation",
       serviceType: "Hotel"
     },
@@ -454,8 +453,8 @@ const generateDemoJobs = (): Job[] => {
       clientPhone: "555-456-7890",
       address: "101 Business Plaza",
       description: "Annual building inspection for insurance compliance",
-      scheduledDate: addDays(today, 5),
-      date: setHours(addDays(today, 5), 13), // 1 PM in 5 days
+      scheduledDate: addDays(today, 5).toISOString(),
+      date: setHours(addDays(today, 5), 13).toISOString(), // 1 PM in 5 days
       assignedTechId: "tech-5",
       assignedTechName: "David Washington",
       jobSource: "Maintenance Contract",
@@ -465,11 +464,11 @@ const generateDemoJobs = (): Job[] => {
       estimateId: "est-027",
       notes: "Comprehensive report required within 48 hours",
       attachments: [],
-      createdAt: subDays(today, 15),
+      createdAt: subDays(today, 15).toISOString(),
       category: "Inspection",
       serviceType: "Commercial"
     }
   ];
 };
 
-export const initialJobs: Job[] = generateDemoJobs();
+export default generateDemoJobs;

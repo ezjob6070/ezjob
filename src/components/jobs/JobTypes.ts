@@ -1,4 +1,3 @@
-
 import { DateRange } from "react-day-picker";
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
@@ -17,8 +16,8 @@ export interface Job {
   technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  date: Date | string;
-  scheduledDate?: Date | string;
+  date: string | Date;
+  scheduledDate?: string | Date;
   createdAt?: string;
   priority?: JobPriority;
   details?: string;
@@ -37,12 +36,12 @@ export interface Job {
   source?: string;
   contractorName?: string;
   contractorId?: string;
+  clientId?: string;
   // Add missing properties that are being used in various components
   parts?: string[];
   signature?: string;
   hasImages?: boolean;
   imageCount?: number;
-  clientId?: string;
 }
 
 export interface JobTab {
