@@ -34,19 +34,30 @@ export interface JobFilterProps {
 export interface JobFiltersSectionProps {
   technicianNames: string[];
   selectedTechnicians: string[];
-  date: DateRange;
-  selectAllTechnicians: () => void;
-  deselectAllTechnicians: () => void;
-  // Additional properties that exist in the component implementation
+  date?: DateRange | undefined;
   amountRange?: any;
   paymentMethod?: any;
   appliedFilters?: boolean;
+  toggleTechnician: (techName: string) => void;
+  setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  setAmountRange?: React.Dispatch<React.SetStateAction<any>>;
+  setPaymentMethod?: React.Dispatch<React.SetStateAction<any>>;
+  clearFilters: () => void;
+  applyFilters: () => void;
+  selectAllTechnicians?: () => void;
+  deselectAllTechnicians?: () => void;
   selectAllCustomers?: () => void;
   deselectAllCustomers?: () => void;
   selectAllJobSources?: () => void;
   deselectAllJobSources?: () => void;
   selectAllContractors?: () => void;
   deselectAllContractors?: () => void;
+  jobSourceNames?: string[];
+  selectedJobSources?: string[];
+  toggleJobSource?: (sourceName: string) => void;
+  contractorNames?: string[];
+  selectedContractors?: string[];
+  toggleContractor?: (contractorName: string) => void;
 }
 
 export interface FilteredJobsResult {

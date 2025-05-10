@@ -20,8 +20,6 @@ interface JobFiltersSectionProps {
   setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   setAmountRange: React.Dispatch<React.SetStateAction<AmountRange | null>>;
   setPaymentMethod: React.Dispatch<React.SetStateAction<PaymentMethod | null>>;
-  selectAllTechnicians: () => void;
-  deselectAllTechnicians: () => void;
   clearFilters: () => void;
   applyFilters: () => void;
   jobSourceNames: string[];
@@ -35,6 +33,9 @@ interface JobFiltersSectionProps {
   toggleContractor: (contractorName: string) => void;
   selectAllContractors: () => void;
   deselectAllContractors: () => void;
+  // Adding missing required props
+  selectAllTechnicians: () => void;
+  deselectAllTechnicians: () => void;
 }
 
 const JobFiltersSection: React.FC<JobFiltersSectionProps> = ({

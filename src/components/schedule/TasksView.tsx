@@ -98,10 +98,13 @@ const TasksView = ({
 
     // Apply sort order
     filtered.sort((a, b) => {
+      const dateA = new Date(a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate));
+      const dateB = new Date(b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate));
+      
       if (sortOrder === "newest") {
-        return b.dueDate.getTime() - a.dueDate.getTime();
+        return dateB.getTime() - dateA.getTime();
       } else {
-        return a.dueDate.getTime() - b.dueDate.getTime();
+        return dateA.getTime() - dateB.getTime();
       }
     });
 

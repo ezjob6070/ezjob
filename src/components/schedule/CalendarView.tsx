@@ -1,4 +1,3 @@
-
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -54,6 +53,27 @@ const ensureValidDate = (date: any): Date | null => {
   }
   return null;
 };
+
+// Helper function to safely get hours from date that could be string or Date
+function getHoursFromDate(date: Date | string): number {
+  if (date instanceof Date) {
+    return date.getHours();
+  }
+  if (typeof date === 'string') {
+    return new Date(date).getHours();
+  }
+  return 0;
+}
+
+// Helper function to safely check if a date is the same day
+function isSameDayHelper(dateA: Date | string | undefined, dateB: Date | string | undefined): boolean {
+  if (!dateA || !dateB) return false;
+  
+  const dateObjA = typeof dateA === 'string' ? new Date(dateA) : dateA;
+  const dateObjB = typeof dateB === 'string' ? new Date(dateB) : dateB;
+  
+  return isSameDay(dateObjA, dateObjB);
+}
 
 const CalendarView = ({
   jobs,

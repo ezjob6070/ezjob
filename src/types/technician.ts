@@ -36,13 +36,13 @@ export interface Technician {
   monthlySalary?: number;
   rating?: number;
   imageUrl?: string;
+  specialty?: string;  // Make specialty optional to match actual usage
   skills?: string[];
   certifications?: string[];
   notes?: string;
   category?: string;
-  specialty?: string;
   
-  // Added required properties based on the errors
+  // Add properties that were missing and causing errors
   role?: TechnicianRole;
   subRole?: string;
   initials?: string;
