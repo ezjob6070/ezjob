@@ -1,2 +1,2 @@
 
-export type SortOption = string | "date" | "amount" | "status" | "client" | "technician";
+export type SortOption = "date" | "amount" | "status" | "client" | "technician" | string;

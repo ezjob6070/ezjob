@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useJobsContext } from "./context/JobsContext";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import AmountFilter from "./AmountFilter";
+import { AmountFilter } from "./AmountFilter";
 import PaymentMethodFilter from "./PaymentMethodFilter";
 import JobSortFilter from "./filters/JobSortFilter";
 import CustomFilterDialogContent from "./filters/CustomFilterDialogContent";
@@ -316,7 +317,7 @@ const JobsFilterBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[220px] p-4" align="start">
-            <AmountFilter value={amountRange} onChange={setAmountRange} />
+            <AmountFilter amountRange={amountRange} onAmountRangeChange={setAmountRange} />
           </PopoverContent>
         </Popover>
         
