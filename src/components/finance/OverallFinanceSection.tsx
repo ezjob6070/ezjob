@@ -60,17 +60,6 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           isBlue={true}
         />
 
-        {/* Net Profit Card */}
-        <CompactDashboardMetricCard
-          title="Net Profit"
-          value={formatCurrency(totalProfit)}
-          description={`Labor costs: ${formatCurrency(laborCosts)}`}
-          icon={<ChartBar className="h-4 w-4 text-green-600" />}
-          trend={{ value: `${profitMargin.toFixed(0)}% margin`, isPositive: true }}
-          dateRangeText={getDateRangeDisplay()}
-          isPositive={true}
-        />
-
         {/* Expenses Card - With red text and minus sign */}
         <CompactDashboardMetricCard
           title="Total Expenses"
@@ -80,6 +69,17 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           trend={{ value: "40% of revenue", isPositive: false }}
           dateRangeText={getDateRangeDisplay()}
           isNegative={true}
+        />
+
+        {/* Net Profit Card */}
+        <CompactDashboardMetricCard
+          title="Net Profit"
+          value={formatCurrency(totalProfit)}
+          description={`Labor costs: ${formatCurrency(laborCosts)}`}
+          icon={<ChartBar className="h-4 w-4 text-green-600" />}
+          trend={{ value: `${profitMargin.toFixed(0)}% margin`, isPositive: true }}
+          dateRangeText={getDateRangeDisplay()}
+          isPositive={true}
         />
       </div>
     </div>

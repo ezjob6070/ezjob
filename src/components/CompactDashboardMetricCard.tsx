@@ -41,7 +41,7 @@ const CompactDashboardMetricCard = ({
     )}>
       <CardContent className="px-3 py-3">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+          <h3 className="text-base font-semibold text-gray-700">{title}</h3>
           {icon && (
             <div className="h-6 w-6 flex items-center justify-center bg-gray-50 rounded p-1">
               {icon}
