@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox"; // Added missing import
+import { Checkbox } from "@/components/ui/checkbox";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Project, ProjectExpense, ProjectContractor, ProjectMaterial, ProjectEquipment } from "@/types/project";
 import { ArrowUpRight, Banknote, Building2, ChevronRight, CircleDollarSign, FileText, ListChecks, Minus, ReceiptText, TrendingDown, TrendingUp, Truck } from "lucide-react";
@@ -228,6 +228,7 @@ const ProjectFinanceTab: React.FC<{ project: Project }> = ({ project }) => {
               <div>
                 <p className="text-sm font-medium text-blue-700 mb-1">Total Revenue</p>
                 <h3 className="text-2xl font-bold text-blue-700">{formatCurrency(revenue)}</h3>
+                <p className="text-xs text-blue-600 mt-1">From start of project to present</p>
               </div>
               <span className="bg-blue-200 p-2 rounded-full text-blue-700">
                 <CircleDollarSign size={20} />
@@ -265,6 +266,7 @@ const ProjectFinanceTab: React.FC<{ project: Project }> = ({ project }) => {
               <div>
                 <p className="text-sm font-medium text-red-700 mb-1">Total Expenses</p>
                 <h3 className="text-2xl font-bold text-red-700">{formatCurrency(totalAllExpenses)}</h3>
+                <p className="text-xs text-red-600 mt-1">Cumulative from project inception</p>
               </div>
               <span className="bg-red-200 p-2 rounded-full text-red-700">
                 <Minus size={20} />
@@ -300,35 +302,36 @@ const ProjectFinanceTab: React.FC<{ project: Project }> = ({ project }) => {
           </CardContent>
         </Card>
         
-        {/* Profit Card */}
-        <Card className={`bg-gradient-to-br ${isProfitable ? 'from-green-50 to-green-100 border-green-200' : 'from-amber-50 to-amber-100 border-amber-200'}`}>
+        {/* Profit Card - Always in Green as per request */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <CardContent className="pt-5">
             <div className="flex justify-between items-start mb-2">
               <div>
-                <p className={`text-sm font-medium ${isProfitable ? 'text-green-700' : 'text-amber-700'} mb-1`}>Net Profit</p>
-                <h3 className={`text-2xl font-bold ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
+                <p className="text-sm font-medium text-green-700 mb-1">Net Profit</p>
+                <h3 className="text-2xl font-bold text-green-700">
                   {formatCurrency(netProfit)}
                 </h3>
+                <p className="text-xs text-green-600 mt-1">Overall project profitability to date</p>
               </div>
-              <span className={`p-2 rounded-full ${isProfitable ? 'bg-green-200 text-green-700' : 'bg-amber-200 text-amber-700'}`}>
-                {isProfitable ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+              <span className="bg-green-200 p-2 rounded-full text-green-700">
+                {netProfit >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
               </span>
             </div>
             
             <div className="mt-4 space-y-2">
-              <div className={`flex justify-between text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
+              <div className="flex justify-between text-xs text-green-700">
                 <span>Budget Remaining:</span>
                 <span className="font-semibold">{formatCurrency(budgetRemaining)}</span>
               </div>
               
-              <div className={`flex justify-between text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
+              <div className="flex justify-between text-xs text-green-700">
                 <span>Margin:</span>
                 <span className="font-semibold">
                   {revenue > 0 ? `${Math.round((netProfit / revenue) * 100)}%` : '0%'}
                 </span>
               </div>
               
-              <div className={`flex justify-between text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
+              <div className="flex justify-between text-xs text-green-700">
                 <span>Cost per completion %:</span>
                 <span className="font-semibold">
                   {project.completion > 0 
@@ -337,10 +340,10 @@ const ProjectFinanceTab: React.FC<{ project: Project }> = ({ project }) => {
                 </span>
               </div>
               
-              <div className={`flex items-center justify-end gap-1 text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'} mt-1`}>
-                {isProfitable ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+              <div className="flex items-center justify-end gap-1 text-xs text-green-700 mt-1">
+                {netProfit >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                 <span>
-                  {isProfitable 
+                  {netProfit >= 0 
                     ? `${Math.round((netProfit / budget) * 100)}% profit on budget` 
                     : `${Math.round((Math.abs(netProfit) / budget) * 100)}% loss on budget`}
                 </span>
