@@ -2,7 +2,7 @@
 import React from "react";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { DateRange } from "react-day-picker";
-import { Banknote, Wallet, PiggyBank } from "lucide-react";
+import { Banknote, Wallet, PiggyBank, TrendingUp } from "lucide-react";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 import CompactDashboardMetricCard from "@/components/CompactDashboardMetricCard";
 
