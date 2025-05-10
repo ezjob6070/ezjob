@@ -65,7 +65,7 @@ const commonNavItems: NavItem[] = [
     href: "/technicians",
   },
   {
-    label: "Estimates",
+    label: "Estimates & Quotes",
     icon: <FileTextIcon size={18} />,
     href: "/estimates",
   },
