@@ -30,19 +30,17 @@ const CompactDashboardMetricCard = ({
 }: CompactDashboardMetricCardProps) => {
   return (
     <Card className={cn(
-      "overflow-hidden shadow-sm bg-white", 
+      "overflow-hidden shadow-sm bg-white border border-gray-100", 
       className
     )}>
-      <CardContent className="p-3 pt-3">
-        <div className="flex items-center justify-between mb-1.5">
-          <h3 className="text-sm font-medium text-gray-600 flex items-center gap-1.5">
-            {icon && (
-              <div className="p-1.5 rounded-full flex items-center justify-center bg-gray-50">
-                {icon}
-              </div>
-            )}
-            {title}
-          </h3>
+      <CardContent className="px-3 py-3">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+          {icon && (
+            <div className="h-6 w-6 flex items-center justify-center bg-gray-50 rounded p-1">
+              {icon}
+            </div>
+          )}
         </div>
         
         <div className={cn(
@@ -53,15 +51,21 @@ const CompactDashboardMetricCard = ({
         </div>
         
         {description && (
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-0.5">
             {description}
           </p>
         )}
         
-        <div className="mt-2 flex items-center justify-between">
-          {trend && (
+        {dateRangeText && (
+          <p className="text-[0.65rem] text-gray-400 mt-0.5">
+            {dateRangeText}
+          </p>
+        )}
+        
+        {trend && (
+          <div className="flex items-center mt-1.5">
             <div className={cn(
-              "flex items-center text-xs font-medium px-2 py-0.5 rounded-full",
+              "flex items-center px-1.5 py-0.5 rounded text-xs",
               trend.isPositive 
                 ? "bg-green-50 text-green-600" 
                 : "bg-red-50 text-red-600"
@@ -71,16 +75,12 @@ const CompactDashboardMetricCard = ({
               ) : (
                 <TrendingDown className="mr-1 h-3 w-3" />
               )}
-              {trend.value}
+              <span className="text-xs">
+                {trend.value}
+              </span>
             </div>
-          )}
-          
-          {dateRangeText && (
-            <p className="text-[0.65rem] text-gray-400">
-              {dateRangeText}
-            </p>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
