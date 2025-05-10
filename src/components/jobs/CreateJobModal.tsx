@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,11 +27,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "@radix-ui/react-icons";
+import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { DateRange } from "react-day-picker";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,734 +40,466 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import {
-  FormPopover,
-  FormPopoverContent,
-  FormPopoverTrigger,
-} from "@/components/ui/form-popover"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
-import {
-  PopoverArrow,
-  PopoverClose,
-  PopoverAnchor,
-} from "@/components/ui/popover"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
-import {
-  DropdownMenu,
-  DropdownMenuArrow,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  ContextMenu,
-  ContextMenuArrow,
-  ContextMenuCheckboxItem,
-  ContextMenuContent,
-  ContextMenuGroup,
-  ContextMenuItem,
-  ContextMenuLabel,
-  ContextMenuRadioGroup,
-  ContextMenuRadioItem,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import {
-  Progress,
-  ProgressIndicator,
-} from "@/components/ui/progress"
-import {
-  ScrollArea,
-  ScrollBar,
-} from "@/components/ui/scroll-area"
-import {
-  AspectRatio,
-} from "@/components/ui/aspect-ratio"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  useCarousel,
-} from "@/components/ui/carousel"
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanels,
-  Resizable,
-} from "@/components/ui/resizable"
-import {
-  Separator,
-} from "@/components/ui/separator"
-import {
-  Skeleton,
-} from "@/components/ui/skeleton"
-import {
-  Slider,
-} from "@/components/ui/slider"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import {
-  Tooltip,
-  TooltipArrow,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import {
-  useToast,
-} from "@/components/ui/use-toast"
-import {
-  useFormField,
-  useFormStatus,
-} from "@/components/ui/form"
-import {
-  useDialog,
-} from "@/components/ui/use-dialog"
-import {
-  useDrawer,
-} from "@/components/ui/use-drawer"
-import {
-  useHoverCard,
-} from "@/components/ui/use-hover-card"
-import {
-  useKeyboard,
-} from "@/components/ui/use-keyboard"
-import {
-  usePopover,
-} from "@/components/ui/use-popover"
-import {
-  useSheet,
-} from "@/components/ui/use-sheet"
-import {
-  useTooltip,
-} from "@/components/ui/use-tooltip"
-import {
-  useTransitionStatus,
-} from "@/components/ui/use-transition-status"
-import {
-  useCarouselContext,
-} from "@/components/ui/use-carousel"
-import {
-  useCollapsible,
-} from "@/components/ui/use-collapsible"
-import {
-  useContextMenu,
-} from "@/components/ui/use-context-menu"
-import {
-  useRadioGroup,
-} from "@/components/ui/use-radio-group"
-import {
-  useResizable,
-} from "@/components/ui/use-resizable"
-import {
-  useTabs,
-} from "@/components/ui/use-tabs"
-import {
-  useFormFieldContext,
-} from "@/components/ui/use-form-field"
-import {
-  useFormFieldRootContext,
-} from "@/components/ui/use-form-field-root"
-import {
-  useFormFieldControlContext,
-} from "@/components/ui/use-form-field-control"
-import {
-  useFormFieldDescriptionContext,
-} from "@/components/ui/use-form-field-description"
-import {
-  useFormFieldLabelContext,
-} from "@/components/ui/use-form-field-label"
-import {
-  useFormMessageContext,
-} from "@/components/ui/use-form-message"
-import {
-  useFormFieldContext,
-} from "@/components/ui/use-form-field-context"
-import {
-  useFormItemContext,
-} from "@/components/ui/use-form-item"
-import {
-  useFormLabelContext,
-} from "@/components/ui/use-form-label"
-import {
-  useFormDescriptionContext,
-} from "@/components/ui/use-form-description"
-import {
-  useFormRootContext,
-} from "@/components/ui/use-form-root"
-import {
-  useFormContext,
-} from "@/components/ui/use-form"
-import {
-  useFormStatusContext,
-} from "@/components/ui/use-form-status"
-import {
-  useFormFieldContextProvider,
-} from "@/components/ui/use-form-field-context-provider"
-import {
-  useFormItemContextProvider,
-} from "@/components/ui/use-form-item-context-provider"
-import {
-  useFormLabelContextProvider,
-} from "@/components/ui/use-form-label-context-provider"
-import {
-  useFormDescriptionContextProvider,
-} from "@/components/ui/use-form-description-context-provider"
-import {
-  useFormRootContextProvider,
-} from "@/components/ui/use-form-root-context-provider"
-import {
-  useFormContextProvider,
-} from "@/components/ui/use-form-context-provider"
-import {
-  useFormStatusContextProvider,
-} from "@/components/ui/use-form-status-context-provider"
-import {
-  useFormFieldContextProvider,
-} from "@/components/ui/use-form-field-context-provider"
-import {
-  useFormItemContextProvider,
-} from "@/components/ui/use-form-item-context-provider"
-import {
-  useFormLabelContextProvider,
-} from "@/components/ui/use-form-label-context-provider"
-import {
-  useFormDescriptionContextProvider,
-} from "@/components/ui/use-form-description-context-provider"
-import {
-  useFormRootContextProvider,
-} from "@/components/ui/use-form-root-context-provider"
-import {
-  useFormContextProvider,
-} from "@/components/ui/use-form-context-provider"
-import {
-  useFormStatusContextProvider,
-} from "@/components/ui/use-form-status-context-provider"
-import {
-  useFormFieldControlContextProvider,
-} from "@/components/ui/use-form-field-control-context-provider"
-import {
-  useFormMessageContextProvider,
-} from "@/components/ui/use-form-message-context-provider"
-import {
-  useFormFieldRootContextProvider,
-} from "@/components/ui/use-form-field-root-context-provider"
-import {
-  useFormFieldRootContextValue,
-} from "@/components/ui/use-form-field-root-context-value"
-import {
-  useFormFieldControlContextValue,
-} from "@/components/ui/use-form-field-control-context-value"
-import {
-  useFormMessageContextValue,
-} from "@/components/ui/use-form-message-context-value"
-import {
-  useFormFieldContextValue,
-} from "@/components/ui/use-form-field-context-value"
-import {
-  useFormItemContextValue,
-} from "@/components/ui/use-form-item-context-value"
-import {
-  useFormLabelContextValue,
-} from "@/components/ui/use-form-label-context-value"
-import {
-  useFormDescriptionContextValue,
-} from "@/components/ui/use-form-description-context-value"
-import {
-  useFormRootContextValue,
-} from "@/components/ui/use-form-root-context-value"
-import {
-  useFormContextValue,
-} from "@/components/ui/use-form-context-value"
-import {
-  useFormStatusContextValue,
-} from "@/components/ui/use-form-status-context-value"
-import {
-  useFormFieldContextProviderValue,
-} from "@/components/ui/use-form-field-context-provider-value"
-import {
-  useFormItemContextProviderValue,
-} from "@/components/ui/use-form-item-context-provider-value"
-import {
-  useFormLabelContextProviderValue,
-} from "@/components/ui/use-form-label-context-provider-value"
-import {
-  useFormDescriptionContextProviderValue,
-} from "@/components/ui/use-form-description-context-provider-value"
-import {
-  useFormRootContextProviderValue,
-} from "@/components/ui/use-form-root-context-provider-value"
-import {
-  useFormContextProviderValue,
-} from "@/components/ui/use-form-context-provider-value"
-import {
-  useFormStatusContextProviderValue,
-} from "@/components/ui/use-form-status-context-provider-value"
-import {
-  useFormFieldControlContextProviderValue,
-} from "@/components/ui/use-form-field-control-context-provider-value"
-import {
-  useFormMessageContextProviderValue,
-} from "@/components/ui/use-form-message-context-provider-value"
-import {
-  useFormFieldRootContextProviderValue,
-} from "@/components/ui/use-form-field-root-context-provider-value"
-import {
-  useFormFieldRootContextValueValue,
-} from "@/components/ui/use-form-field-root-context-value-value"
-import {
-  useFormFieldControlContextValueValue,
-} from "@/components/ui/use-form-field-control-context-value-value"
-import {
-  useFormMessageContextValueValue,
-} from "@/components/ui/use-form-message-context-value-value"
-import {
-  useFormFieldContextValueValue,
-} from "@/components/ui/use-form-field-context-value-value"
-import {
-  useFormItemContextValueValue,
-} from "@/components/ui/use-form-item-context-value-value"
-import {
-  useFormLabelContextValueValue,
-} from "@/components/ui/use-form-label-context-value-value"
-import {
-  useFormDescriptionContextValueValue,
-} from "@/components/ui/use-form-description-context-value-value"
-import {
-  useFormRootContextValueValue,
-} from "@/components/ui/use-form-root-context-value-value"
-import {
-  useFormContextValueValue,
-} from "@/components/ui/use-form-context-value-value"
-import {
-  useFormStatusContextValueValue,
-} from "@/components/ui/use-form-status-context-value-value"
-import {
-  useFormFieldContextProviderValueValue,
-} from "@/components/ui/use-form-field-context-provider-value-value"
-import {
-  useFormItemContextProviderValueValue,
-} from "@/components/ui/use-form-item-context-provider-value-value"
-import {
-  useFormLabelContextProviderValueValue,
-} from "@/components/ui/use-form-label-context-provider-value-value"
-import {
-  useFormDescriptionContextProviderValueValue,
-} from "@/components/ui/use-form-description-context-provider-value-value"
-import {
-  useFormRootContextProviderValueValue,
-} from "@/components/ui/use-form-root-context-provider-value-value"
-import {
-  useFormContextProviderValueValue,
-} from "@/components/ui/use-form-context-provider-value-value"
-import {
-  useFormStatusContextProviderValueValue,
-} from "@/components/ui/use-form-status-context-provider-value-value"
-import {
-  useFormFieldControlContextProviderValueValue,
-} from "@/components/ui/use-form-field-control-context-provider-value-value"
-import {
-  useFormMessageContextProviderValueValue,
-} from "@/components/ui/use-form-message-context-provider-value-value"
-import {
-  useFormFieldRootContextProviderValueValue,
-} from "@/components/ui/use-form-field-root-context-provider-value-value"
-import {
-  useFormFieldRootContextValueValueValue,
-} from "@/components/ui/use-form-field-root-context-value-value-value"
-import {
-  useFormFieldControlContextValueValueValue,
-} from "@/components/ui/use-form-field-control-context-value-value-value"
-import {
-  useFormMessageContextValueValueValue,
-} from "@/components/ui/use-form-message-context-value-value-value"
-import {
-  useFormFieldContextValueValueValue,
-} from "@/components/ui/use-form-field-context-value-value-value"
-import {
-  useFormItemContextValueValueValue,
-} from "@/components/ui/use-form-item-context-value-value-value"
-import {
-  useFormLabelContextValueValueValue,
-} from "@/components/ui/use-form-label-context-value-value-value"
-import {
-  useFormDescriptionContextValueValueValue,
-} from "@/components/ui/use-form-description-context-value-value-value"
-import {
-  useFormRootContextValueValueValue,
-} from "@/components/ui/use-form-root-context-value-value-value"
-import {
-  useFormContextValueValueValue,
-} from "@/components/ui/use-form-context-value-value-value"
-import {
-  useFormStatusContextValueValueValue,
-} from "@/components/ui/use-form-status-context-value-value-value"
-import {
-  useFormFieldContextProviderValueValueValue,
-} from "@/components/ui/use-form-field-context-provider-value-value-value"
-import {
-  useFormItemContextProviderValueValueValue,
-} from "@/components/ui/use-form-item-context-provider-value-value-value"
-import {
-  useFormLabelContextProviderValueValueValue,
-} from "@/components/ui/use-form-label-context-provider-value-value-value"
-import {
-  useFormDescriptionContextProviderValueValueValue,
-} from "@/components/ui/use-form-description-context-provider-value-value-value"
-import {
-  useFormRootContextProviderValueValueValue,
-} from "@/components/ui/use-form-root-context-provider-value-value-value"
-import {
-  useFormContextProviderValueValueValue,
-} from "@/components/ui/use-form-context-provider-value-value-value"
-import {
-  useFormStatusContextProviderValueValueValue,
-} from "@/components/ui/use-form-status-context-provider-value-value-value"
-import {
-  useFormFieldControlContextProviderValueValueValue,
-} from "@/components/ui/use-form-field-control-context-provider-value-value-value"
-import {
-  useFormMessageContextProviderValueValueValue,
-} from "@/components/ui/use-form-message-context-provider-value-value-value"
-import {
-  useFormFieldRootContextProviderValueValueValue,
-} from "@/components/ui/use-form-field-root-context-provider-value-value-value"
-import {
-  useFormFieldRootContextValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-value-value-value-value"
-import {
-  useFormFieldControlContextValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-value-value-value-value"
-import {
-  useFormMessageContextValueValueValueValue,
-} from "@/components/ui/use-form-message-context-value-value-value-value"
-import {
-  useFormFieldContextValueValueValueValue,
-} from "@/components/ui/use-form-field-context-value-value-value-value"
-import {
-  useFormItemContextValueValueValueValue,
-} from "@/components/ui/use-form-item-context-value-value-value-value"
-import {
-  useFormLabelContextValueValueValueValue,
-} from "@/components/ui/use-form-label-context-value-value-value-value"
-import {
-  useFormDescriptionContextValueValueValueValue,
-} from "@/components/ui/use-form-description-context-value-value-value-value"
-import {
-  useFormRootContextValueValueValueValue,
-} from "@/components/ui/use-form-root-context-value-value-value-value"
-import {
-  useFormContextValueValueValueValue,
-} from "@/components/ui/use-form-context-value-value-value-value"
-import {
-  useFormStatusContextValueValueValueValue,
-} from "@/components/ui/use-form-status-context-value-value-value-value"
-import {
-  useFormFieldContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-field-context-provider-value-value-value-value"
-import {
-  useFormItemContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-item-context-provider-value-value-value-value"
-import {
-  useFormLabelContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-label-context-provider-value-value-value-value"
-import {
-  useFormDescriptionContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-description-context-provider-value-value-value-value"
-import {
-  useFormRootContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-root-context-provider-value-value-value-value"
-import {
-  useFormContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-context-provider-value-value-value-value"
-import {
-  useFormStatusContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-status-context-provider-value-value-value-value"
-import {
-  useFormFieldControlContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-provider-value-value-value-value"
-import {
-  useFormMessageContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-message-context-provider-value-value-value-value"
-import {
-  useFormFieldRootContextProviderValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-provider-value-value-value-value"
-import {
-  useFormFieldRootContextValueValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-value-value-value-value-value"
-import {
-  useFormFieldControlContextValueValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-value-value-value-value-value"
-import {
-  useFormMessageContextValueValueValueValueValue,
-} from "@/components/ui/use-form-message-context-value-value-value-value-value"
-import {
-  useFormFieldContextValueValueValueValueValue,
-} from "@/components/ui/use-form-field-context-value-value-value-value-value"
-import {
-  useFormItemContextValueValueValueValueValue,
-} from "@/components/ui/use-form-item-context-value-value-value-value-value"
-import {
-  useFormLabelContextValueValueValueValueValue,
-} from "@/components/ui/use-form-label-context-value-value-value-value-value"
-import {
-  useFormDescriptionContextValueValueValueValueValue,
-} from "@/components/ui/use-form-description-context-value-value-value-value-value"
-import {
-  useFormRootContextValueValueValueValueValue,
-} from "@/components/ui/use-form-root-context-value-value-value-value-value"
-import {
-  useFormContextValueValueValueValueValue,
-} from "@/components/ui/use-form-context-value-value-value-value-value"
-import {
-  useFormStatusContextValueValueValueValueValue,
-} from "@/components/ui/use-form-status-context-value-value-value-value-value"
-import {
-  useFormFieldContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-field-context-provider-value-value-value-value-value"
-import {
-  useFormItemContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-item-context-provider-value-value-value-value-value"
-import {
-  useFormLabelContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-label-context-provider-value-value-value-value-value"
-import {
-  useFormDescriptionContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-description-context-provider-value-value-value-value-value"
-import {
-  useFormRootContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-root-context-provider-value-value-value-value-value"
-import {
-  useFormContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-context-provider-value-value-value-value-value"
-import {
-  useFormStatusContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-status-context-provider-value-value-value-value-value"
-import {
-  useFormFieldControlContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-provider-value-value-value-value-value"
-import {
-  useFormMessageContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-message-context-provider-value-value-value-value-value"
-import {
-  useFormFieldRootContextProviderValueValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-provider-value-value-value-value-value"
-import {
-  useFormFieldRootContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-value-value-value-value-value-value"
-import {
-  useFormFieldControlContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-value-value-value-value-value-value"
-import {
-  useFormMessageContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-message-context-value-value-value-value-value-value"
-import {
-  useFormFieldContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-context-value-value-value-value-value-value"
-import {
-  useFormItemContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-item-context-value-value-value-value-value-value"
-import {
-  useFormLabelContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-label-context-value-value-value-value-value-value"
-import {
-  useFormDescriptionContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-description-context-value-value-value-value-value-value"
-import {
-  useFormRootContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-root-context-value-value-value-value-value-value"
-import {
-  useFormContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-context-value-value-value-value-value-value"
-import {
-  useFormStatusContextValueValueValueValueValueValue,
-} from "@/components/ui/use-form-status-context-value-value-value-value-value-value"
-import {
-  useFormFieldContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-context-provider-value-value-value-value-value-value"
-import {
-  useFormItemContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-item-context-provider-value-value-value-value-value-value"
-import {
-  useFormLabelContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-label-context-provider-value-value-value-value-value-value"
-import {
-  useFormDescriptionContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-description-context-provider-value-value-value-value-value-value"
-import {
-  useFormRootContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-root-context-provider-value-value-value-value-value-value"
-import {
-  useFormContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-context-provider-value-value-value-value-value-value"
-import {
-  useFormStatusContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-status-context-provider-value-value-value-value-value-value"
-import {
-  useFormFieldControlContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-provider-value-value-value-value-value-value"
-import {
-  useFormMessageContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-message-context-provider-value-value-value-value-value-value"
-import {
-  useFormFieldRootContextProviderValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-provider-value-value-value-value-value-value"
-import {
-  useFormFieldRootContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-value-value-value-value-value-value-value"
-import {
-  useFormFieldControlContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-value-value-value-value-value-value-value"
-import {
-  useFormMessageContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-message-context-value-value-value-value-value-value-value"
-import {
-  useFormFieldContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-context-value-value-value-value-value-value-value"
-import {
-  useFormItemContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-item-context-value-value-value-value-value-value-value"
-import {
-  useFormLabelContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-label-context-value-value-value-value-value-value-value"
-import {
-  useFormDescriptionContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-description-context-value-value-value-value-value-value-value"
-import {
-  useFormRootContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-root-context-value-value-value-value-value-value-value"
-import {
-  useFormContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-context-value-value-value-value-value-value-value"
-import {
-  useFormStatusContextValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-status-context-value-value-value-value-value-value-value"
-import {
-  useFormFieldContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormItemContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-item-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormLabelContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-label-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormDescriptionContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-description-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormRootContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-root-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormStatusContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-status-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormFieldControlContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormMessageContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-message-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormFieldRootContextProviderValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-provider-value-value-value-value-value-value-value"
-import {
-  useFormFieldRootContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-root-context-value-value-value-value-value-value-value-value"
-import {
-  useFormFieldControlContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-control-context-value-value-value-value-value-value-value-value"
-import {
-  useFormMessageContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-message-context-value-value-value-value-value-value-value-value"
-import {
-  useFormFieldContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-field-context-value-value-value-value-value-value-value-value"
-import {
-  useFormItemContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-item-context-value-value-value-value-value-value-value-value"
-import {
-  useFormLabelContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-label-context-value-value-value-value-value-value-value-value"
-import {
-  useFormDescriptionContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-description-context-value-value-value-value-value-value-value-value"
-import {
-  useFormRootContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-root-context-value-value-value-value-value-value-value-value"
-import {
-  useFormContextValueValueValueValueValueValueValueValue,
-} from "@/components/ui/use-form-context-value-value-value-value-value
+import { CreateJobFormData, Job, JobPriority } from "./JobTypes";
+import * as z from "zod";
+
+// Define form schema
+const formSchema = z.object({
+  title: z.string().min(1, "Job title is required"),
+  clientName: z.string().min(1, "Client name is required"),
+  technicianId: z.string().min(1, "Technician is required"),
+  amount: z.coerce.number().min(0, "Amount must be at least 0"),
+  date: z.date(),
+  time: z.date().optional(),
+  isAllDay: z.boolean().default(false),
+  priority: z.string(),
+  description: z.string().optional(),
+  category: z.string().optional(),
+  serviceType: z.string().optional(),
+  jobSourceId: z.string().optional(),
+  contractorId: z.string().optional(),
+});
+
+interface CreateJobModalProps {
+  onAddJob: (job: Job) => void;
+  technicians: { id: string; name: string; paymentType?: string; paymentRate?: number }[];
+  jobSources: { id: string; name: string; paymentType?: string; paymentValue?: number }[];
+  contractors?: { id: string; name: string; paymentType?: string; paymentRate?: number }[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+const CreateJobModal = ({
+  onAddJob,
+  technicians = [],
+  jobSources = [],
+  contractors = [],
+  open = false,
+  onOpenChange = () => {},
+}: CreateJobModalProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isAllDay, setIsAllDay] = useState(false);
+  const [selectedTime, setSelectedTime] = useState<Date | undefined>(undefined);
+  const [selectedPriority, setSelectedPriority] = useState<JobPriority>("medium");
+  const [categories] = useState([
+    "HVAC",
+    "Plumbing",
+    "Electrical",
+    "Remodeling",
+    "Security",
+    "Smart Home",
+    "Renewable Energy",
+    "Landscape",
+    "Interior Design"
+  ]);
+  
+  const [serviceTypes, setServiceTypes] = useState<Record<string, string[]>>({
+    "HVAC": ["Installation", "Repair", "Maintenance", "Cleaning"],
+    "Plumbing": ["Installation", "Repair", "Maintenance", "Drain Cleaning"],
+    "Electrical": ["Installation", "Repair", "Maintenance", "Inspection"],
+    "Remodeling": ["Kitchen", "Bathroom", "Whole House", "Addition"],
+    "Security": ["Cameras", "Alarms", "Access Control", "Monitoring"],
+    "Smart Home": ["Installation", "Integration", "Troubleshooting"],
+    "Renewable Energy": ["Solar Panel Installation", "Battery Backup", "Consultation"],
+    "Landscape": ["Design", "Installation", "Maintenance", "Irrigation"],
+    "Interior Design": ["Consultation", "Full Service", "Material Selection"]
+  });
+  
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      clientName: "",
+      technicianId: "",
+      amount: 0,
+      date: new Date(),
+      isAllDay: false,
+      priority: "medium",
+      description: "",
+      category: undefined,
+      serviceType: undefined,
+      jobSourceId: undefined,
+      contractorId: undefined,
+    },
+  });
+  
+  const selectedCategory = form.watch("category");
+  
+  // Filter service types based on selected category
+  const availableServiceTypes = selectedCategory ? serviceTypes[selectedCategory] || [] : [];
+  
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const newJob: Job = {
+      id: uuidv4(),
+      title: values.title,
+      clientName: values.clientName,
+      amount: values.amount,
+      status: "scheduled",
+      date: values.date.toISOString(),
+      scheduledDate: values.date.toISOString(),
+      technicianId: values.technicianId,
+      technicianName: technicians.find(tech => tech.id === values.technicianId)?.name || "",
+      priority: values.priority as JobPriority,
+      description: values.description || "",
+      isAllDay: values.isAllDay,
+      category: values.category,
+      serviceType: values.serviceType,
+      jobSourceId: values.jobSourceId,
+      jobSourceName: jobSources.find(source => source.id === values.jobSourceId)?.name || "",
+      contractorId: values.contractorId,
+      contractorName: contractors?.find(contractor => contractor.id === values.contractorId)?.name || "",
+    };
+    
+    onAddJob(newJob);
+    form.reset();
+    onOpenChange(false);
+    toast({
+      title: "Job created",
+      description: `New job "${values.title}" has been created.`,
+    });
+  }
+  
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create New Job</DialogTitle>
+          <DialogDescription>
+            Fill out the form below to create a new job.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter job title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="clientName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter client name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="technicianId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Technician</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a technician" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {technicians.map((tech) => (
+                          <SelectItem key={tech.id} value={tech.id}>
+                            {tech.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="0.00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(date);
+                              setSelectedDate(date);
+                            }
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="space-y-2">
+                <FormField
+                  control={form.control}
+                  name="isAllDay"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between space-x-2 space-y-0 rounded-md border p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>All Day Event</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            setIsAllDay(checked);
+                          }}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                {!form.watch("isAllDay") && (
+                  <FormField
+                    control={form.control}
+                    name="time"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Time</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="time"
+                            {...field}
+                            value={field.value ? format(field.value, "HH:mm") : ""}
+                            onChange={(e) => {
+                              const [hours, minutes] = e.target.value.split(':');
+                              const newDate = new Date(selectedDate);
+                              newDate.setHours(parseInt(hours), parseInt(minutes));
+                              field.onChange(newDate);
+                              setSelectedTime(newDate);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="serviceType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Service Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={!selectedCategory}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select service type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableServiceTypes.map((service) => (
+                          <SelectItem key={service} value={service}>
+                            {service}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="jobSourceId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Job Source</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select job source" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {jobSources.map((source) => (
+                          <SelectItem key={source.id} value={source.id}>
+                            {source.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            {contractors && contractors.length > 0 && (
+              <FormField
+                control={form.control}
+                name="contractorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contractor (optional)</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select contractor" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {contractors.map((contractor) => (
+                          <SelectItem key={contractor.id} value={contractor.id}>
+                            {contractor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter job description"
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <div className="flex justify-end space-x-4 pt-2">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Create Job</Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default CreateJobModal;
