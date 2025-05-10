@@ -224,6 +224,9 @@ const Index = () => {
               </Card>
             </div>
             
+            {/* Project section added at the top for better visibility */}
+            <ProjectsDashboardSection />
+            
             <MetricsOverview 
               financialMetrics={dashboardFinancialMetrics}
               formatCurrency={formatCurrency}
@@ -232,8 +235,6 @@ const Index = () => {
               detailedRevenueData={detailedRevenueData}
               detailedBusinessMetrics={detailedBusinessMetrics}
             />
-
-            <ProjectsDashboardSection />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <TicketsStatusCard 

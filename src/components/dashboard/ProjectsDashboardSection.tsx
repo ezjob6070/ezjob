@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, File, TrendingUp } from "lucide-react";
+import { Clock, File, TrendingUp, Building } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { projects } from "@/data/projects";
@@ -38,7 +38,7 @@ const ProjectsDashboardSection = () => {
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-medium text-purple-700">Total Projects</span>
               <div className="p-1.5 bg-purple-100 rounded-full">
-                <File className="h-3.5 w-3.5 text-purple-600" />
+                <Building className="h-3.5 w-3.5 text-purple-600" />
               </div>
             </div>
             <div className="text-xl font-bold text-purple-800">{totalProjects}</div>
@@ -86,7 +86,10 @@ const ProjectsDashboardSection = () => {
                   </div>
                   <div className="flex justify-between items-center mt-1">
                     <span className="text-xs text-gray-500">{project.type}</span>
-                    <span className="text-xs text-gray-500">{project.completion}% complete</span>
+                    <div className="flex items-center">
+                      <span className="text-xs text-gray-500 mr-2">${(project.budget / 1000).toFixed(0)}K budget</span>
+                      <span className="text-xs text-gray-500">{project.completion}% complete</span>
+                    </div>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1.5">
                     <div
