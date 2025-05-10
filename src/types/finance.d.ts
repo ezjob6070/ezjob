@@ -20,6 +20,13 @@ export interface JobSource {
   expenses?: number;
   companyProfit?: number;
   active: boolean;
+  // Additional fields that might be used in the app
+  website?: string;
+  phone?: string;
+  email?: string;
+  logoUrl?: string;
+  notes?: string;
+  isActive?: boolean; // For backward compatibility
 }
 
 export interface OfficeExpense {

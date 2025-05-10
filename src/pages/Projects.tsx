@@ -22,14 +22,22 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { initialProjects } from "@/data/projects";
+import { projects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { toast } from "sonner";
 import { SortOption } from "@/types/sortOptions";
 
 export default function Projects() {
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  // Convert the string IDs to numbers for compatibility with Project type from types/project.ts
+  const [projectsData, setProjectsData] = useState<Project[]>(
+    projects.map(p => ({
+      ...p,
+      id: Number(p.id),
+      clientName: p.client
+    } as unknown as Project))
+  );
+  
   const [view, setView] = useState<'cards' | 'list'>('cards');
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
@@ -40,7 +48,7 @@ export default function Projects() {
   };
 
   const handleChangeStatus = (projectId: number, newStatus: Project['status']) => {
-    setProjects(prevProjects => 
+    setProjectsData(prevProjects => 
       prevProjects.map(project => 
         project.id === projectId ? { ...project, status: newStatus } : project
       )
@@ -82,7 +90,7 @@ export default function Projects() {
     }
   };
 
-  const filteredProjects = projects.filter(project => 
+  const filteredProjects = projectsData.filter(project => 
     project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.clientName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -142,7 +150,7 @@ export default function Projects() {
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Total Projects</div>
-                  <div className="text-2xl font-bold">{projects.length}</div>
+                  <div className="text-2xl font-bold">{projectsData.length}</div>
                 </div>
               </div>
               
@@ -153,7 +161,7 @@ export default function Projects() {
                 <div>
                   <div className="text-sm text-muted-foreground">In Progress</div>
                   <div className="text-2xl font-bold">
-                    {projects.filter(p => p.status === "In Progress").length}
+                    {projectsData.filter(p => p.status === "In Progress").length}
                   </div>
                 </div>
               </div>
@@ -165,7 +173,7 @@ export default function Projects() {
                 <div>
                   <div className="text-sm text-muted-foreground">Total Budget</div>
                   <div className="text-2xl font-bold">
-                    {formatCurrency(projects.reduce((acc, p) => acc + p.budget, 0))}
+                    {formatCurrency(projectsData.reduce((acc, p) => acc + p.budget, 0))}
                   </div>
                 </div>
               </div>
@@ -177,7 +185,7 @@ export default function Projects() {
                 <div>
                   <div className="text-sm text-muted-foreground">Avg. Completion</div>
                   <div className="text-2xl font-bold">
-                    {Math.round(projects.reduce((acc, p) => acc + p.completion, 0) / projects.length)}%
+                    {Math.round(projectsData.reduce((acc, p) => acc + p.completion, 0) / projectsData.length)}%
                   </div>
                 </div>
               </div>

@@ -5,17 +5,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Construction, Truck, PlusIcon } from "lucide-react";
 import { AddConstructionItemModal } from "@/components/construction/AddConstructionItemModal";
 import { toast } from "sonner";
-import { initialProjects } from "@/data/projects";
+import { projects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 
 export default function Projects() {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  // Convert string IDs to numbers for compatibility with Project type
+  const [projectsData, setProjectsData] = useState<Project[]>(
+    projects.slice(0, 6).map(p => ({
+      ...p,
+      id: Number(p.id),
+      clientName: p.client
+    } as unknown as Project))
+  );
 
   const handleAddProject = (data: any) => {
     const newProject: Project = {
-      id: projects.length + 1,
+      id: projectsData.length + 1,
       name: data.name,
       type: data.type,
       description: data.description || "",
@@ -31,7 +38,7 @@ export default function Projects() {
       clientName: data.clientName || "New Client"
     };
     
-    setProjects([...projects, newProject]);
+    setProjectsData([...projectsData, newProject]);
     toast.success("New project added successfully");
   };
 
@@ -49,7 +56,7 @@ export default function Projects() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.slice(0, 6).map((project) => (
+        {projectsData.map((project) => (
           <Card key={project.id}>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">

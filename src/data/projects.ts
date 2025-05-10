@@ -240,4 +240,7 @@ export const projects: Project[] = [
   }
 ];
 
+// Export the projects array as initialProjects for backward compatibility
+export const initialProjects = projects;
+
 export default projects;

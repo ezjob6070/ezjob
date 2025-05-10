@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DateRange } from 'react-day-picker';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,6 +78,9 @@ const EnhancedProjectsSection = ({ dateFilter }: EnhancedProjectsSectionProps) =
     return p.status === "In Progress" && p.completion < 40 && 
            isAfter(today, addDays(new Date(p.startDate), 14)); // 2 weeks after start
   });
+  
+  // Make sure we're using the right type of ID when creating links
+  const getProjectUrl = (projectId: string) => `/projects/${projectId}`;
   
   return (
     <div className="space-y-4">
@@ -321,7 +323,7 @@ const EnhancedProjectsSection = ({ dateFilter }: EnhancedProjectsSectionProps) =
               .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
               .slice(0, 3)
               .map((project) => (
-                <Link key={project.id} to={`/projects/${project.id}`} className="block">
+                <Link key={project.id} to={getProjectUrl(project.id)} className="block">
                   <div className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors">
                     <div className="flex justify-between items-start">
                       <h3 className="font-medium text-sm line-clamp-1">{project.name}</h3>
