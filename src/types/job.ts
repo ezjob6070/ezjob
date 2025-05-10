@@ -16,7 +16,7 @@ export interface Job {
   paymentMethod?: string;
   notes?: string;
   
-  // Adding missing properties
+  // Properties needed by components
   date?: string | Date;
   technicianId?: string;
 }

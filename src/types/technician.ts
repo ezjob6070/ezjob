@@ -1,4 +1,24 @@
 
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
+
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
+
+export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
+
+export interface TechnicianSubRoles {
+  technician: string[];
+  salesman: string[];
+  employed: string[];
+  contractor: string[];
+}
+
+export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
+  technician: ["HVAC", "Plumbing", "Electrical", "General", "Carpentry"],
+  salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Support"],
+  employed: ["Secretary", "Management", "HR", "Finance", "Administration", "Operations"],
+  contractor: ["Independent", "Agency", "Specialized", "Consultant"]
+};
+
 export interface Technician {
   id: string;
   name: string;
@@ -12,7 +32,7 @@ export interface Technician {
   status: "active" | "inactive" | "onLeave";
   payRate?: number;
   paymentType?: "percentage" | "flat" | "hourly" | "salary";
-  salaryBasis?: "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
+  salaryBasis?: SalaryBasis;
   monthlySalary?: number;
   rating?: number;
   imageUrl?: string;
@@ -21,12 +41,53 @@ export interface Technician {
   notes?: string;
   category?: string;
   
-  // Adding missing properties
-  role?: string;
+  // Additional properties needed by components
+  role?: string | TechnicianRole;
   subRole?: string;
   initials?: string;
   ssn?: string;
-  driverLicense?: string;
+  driverLicense?: string | { number: string; state: string; expirationDate: string };
   idNumber?: string;
   documents?: any[];
+  
+  // Finance and performance related properties
+  specialty?: string;
+  paymentRate?: number;
+  hourlyRate?: number;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  incentiveType?: IncentiveType;
+  incentiveAmount?: number;
+  profileImage?: string;
+  yearsExperience?: number;
+  workContract?: string;
+  jobCategories?: string[];
+}
+
+export interface Document {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  uploadDate: string;
+  size?: number;
+}
+
+export interface TechnicianFilters {
+  search: string;
+  paymentTypes: string[];
+  status: string[];
+  categories: string[];
+  dateRange?: {
+    from: Date;
+    to: Date;
+  };
+}
+
+export interface FinancialSummary {
+  totalRevenue: number;
+  totalJobs: number;
+  averageJobValue: number;
+  paymentsDue: number;
 }
