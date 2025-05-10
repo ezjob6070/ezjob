@@ -57,6 +57,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           icon={<BadgeDollarSign className="h-4 w-4 text-blue-600" />}
           trend={{ value: "78% of goal", isPositive: true }}
           dateRangeText={getDateRangeDisplay()}
+          isPositive={true}
         />
 
         {/* Net Profit Card */}
@@ -67,9 +68,10 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           icon={<ChartBar className="h-4 w-4 text-green-600" />}
           trend={{ value: `${profitMargin.toFixed(0)}% margin`, isPositive: true }}
           dateRangeText={getDateRangeDisplay()}
+          isPositive={true}
         />
 
-        {/* Expenses Card - New with red text and minus sign */}
+        {/* Expenses Card - With red text and minus sign */}
         <CompactDashboardMetricCard
           title="Total Expenses"
           value={formatCurrency(totalExpenses)}

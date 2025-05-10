@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type CompactDashboardMetricCardProps = {
@@ -17,6 +17,7 @@ type CompactDashboardMetricCardProps = {
   description?: string;
   dateRangeText?: string;
   isNegative?: boolean;
+  isPositive?: boolean;
 };
 
 const CompactDashboardMetricCard = ({
@@ -28,7 +29,8 @@ const CompactDashboardMetricCard = ({
   valueClassName,
   description,
   dateRangeText,
-  isNegative
+  isNegative,
+  isPositive
 }: CompactDashboardMetricCardProps) => {
   return (
     <Card className={cn(
@@ -48,9 +50,11 @@ const CompactDashboardMetricCard = ({
         <div className={cn(
           "text-xl font-bold", 
           isNegative ? "text-destructive flex items-center" : "",
+          isPositive ? "text-green-600 flex items-center" : "",
           valueClassName
         )}>
           {isNegative && <Minus className="h-4 w-4 mr-1" />}
+          {isPositive && <ArrowUp className="h-4 w-4 mr-1" />}
           {value}
         </div>
         
