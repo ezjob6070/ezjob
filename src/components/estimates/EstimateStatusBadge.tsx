@@ -1,38 +1,30 @@
 
-import { Badge } from "@/components/ui/badge";
+import { CheckCircleIcon, ClockIcon, SendIcon } from "lucide-react";
 import { EstimateStatus } from "@/types/estimate";
-import { CheckCircle, Clock, Send } from "lucide-react";
 
 interface EstimateStatusBadgeProps {
   status: EstimateStatus;
 }
 
 const EstimateStatusBadge = ({ status }: EstimateStatusBadgeProps) => {
-  switch (status) {
-    case "sent":
-      return (
-        <Badge variant="outline" className="bg-blue-100 text-blue-800 flex gap-1 items-center">
-          <Send size={12} />
-          <span>Sent</span>
-        </Badge>
-      );
-    case "in-process":
-      return (
-        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 flex gap-1 items-center">
-          <Clock size={12} />
-          <span>In Process</span>
-        </Badge>
-      );
-    case "completed":
-      return (
-        <Badge variant="outline" className="bg-green-100 text-green-800 flex gap-1 items-center">
-          <CheckCircle size={12} />
-          <span>Completed</span>
-        </Badge>
-      );
-    default:
-      return <Badge variant="outline">{status}</Badge>;
-  }
+  const statusIcons = {
+    "sent": <SendIcon className="h-4 w-4 text-blue-500" />,
+    "in-process": <ClockIcon className="h-4 w-4 text-yellow-500" />,
+    "completed": <CheckCircleIcon className="h-4 w-4 text-green-500" />
+  };
+
+  const statusText = {
+    "sent": "Sent",
+    "in-process": "In Process",
+    "completed": "Completed"
+  };
+
+  return (
+    <div className="flex items-center gap-1 text-sm">
+      {statusIcons[status]}
+      <span>{statusText[status]}</span>
+    </div>
+  );
 };
 
 export default EstimateStatusBadge;
