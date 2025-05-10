@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import {
   Popover,
@@ -5,29 +6,26 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, CaretSortIcon, CheckCircledIcon, PlusCircledIcon, UpdateIcon } from "@radix-ui/react-icons";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar, ChevronDown, Check, Filter } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { AmountFilter } from "@/components/jobs/AmountFilter";
-import { PaymentMethodFilter } from "@/components/jobs/PaymentMethodFilter";
+import AmountFilter from "@/components/jobs/AmountFilter";
+import PaymentMethodFilter from "@/components/jobs/PaymentMethodFilter";
 import { DateRange } from "react-day-picker";
 import { JobFiltersState } from "@/components/jobs/jobHookTypes";
 import { AmountRange, PaymentMethod } from "@/components/jobs/JobTypes";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface JobsFilterBarProps {
   technicianNames: { id: string; name: string }[];
@@ -171,7 +169,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
             Filters
-            <UpdateIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <Filter className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[600px] p-5" align="start">
@@ -244,7 +242,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                       !filters.date && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <Calendar className="mr-2 h-4 w-4" />
                     {filters.date?.from ? (
                       filters.date.to ? (
                         `${format(filters.date.from, "LLL dd, y")} - ${format(filters.date.to, "LLL dd, y")}`
@@ -257,7 +255,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
+                  <CalendarComponent
                     mode="range"
                     defaultMonth={filters.date?.from}
                     selected={filters.date}
@@ -266,6 +264,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                       date > new Date() || date < new Date("2023-01-01")
                     }
                     numberOfMonths={2}
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -299,7 +298,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" aria-expanded={sortOpen} className="w-[150px] justify-between">
             Sort By
-            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start">
@@ -314,7 +313,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                   }}
                 >
                   Date
-                  {sortOption === "date" && <CheckCircledIcon className="ml-auto h-4 w-4" />}
+                  {sortOption === "date" && <Check className="ml-auto h-4 w-4" />}
                 </CommandItem>
                 <CommandItem
                   value="amount"
@@ -324,7 +323,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                   }}
                 >
                   Amount
-                  {sortOption === "amount" && <CheckCircledIcon className="ml-auto h-4 w-4" />}
+                  {sortOption === "amount" && <Check className="ml-auto h-4 w-4" />}
                 </CommandItem>
                 <CommandItem
                   value="status"
@@ -334,7 +333,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                   }}
                 >
                   Status
-                  {sortOption === "status" && <CheckCircledIcon className="ml-auto h-4 w-4" />}
+                  {sortOption === "status" && <Check className="ml-auto h-4 w-4" />}
                 </CommandItem>
                 <CommandItem
                   value="client"
@@ -344,7 +343,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                   }}
                 >
                   Client
-                  {sortOption === "client" && <CheckCircledIcon className="ml-auto h-4 w-4" />}
+                  {sortOption === "client" && <Check className="ml-auto h-4 w-4" />}
                 </CommandItem>
                 <CommandItem
                   value="technician"
@@ -354,7 +353,7 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
                   }}
                 >
                   Technician
-                  {sortOption === "technician" && <CheckCircledIcon className="ml-auto h-4 w-4" />}
+                  {sortOption === "technician" && <Check className="ml-auto h-4 w-4" />}
                 </CommandItem>
               </CommandGroup>
             </CommandList>
@@ -368,4 +367,4 @@ const JobsFilterBar: React.FC<JobsFilterBarProps> = ({
 export default JobsFilterBar;
 
 // Define the SortOption type or interface if it doesn't exist
-type SortOption = "date" | "amount" | "status" | "client" | "technician"; // Update as needed
+type SortOption = "date" | "amount" | "status" | "client" | "technician";

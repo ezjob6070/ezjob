@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck } from "lucide-react";
-import { projects } from "@/data/projects"; // Use projects instead of initialProjects
-import { Project } from "@/types/project";
+import { projects } from "@/data/projects"; // Use projects from projects.ts
+import { Project } from "@/types/Project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
