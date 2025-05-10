@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -221,133 +220,61 @@ const ProjectFinanceTab: React.FC<{ project: Project }> = ({ project }) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Revenue Card */}
+        {/* Revenue Card - Smaller and more concise */}
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="pt-5">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <p className="text-sm font-medium text-blue-700 mb-1">Total Revenue</p>
-                <h3 className="text-2xl font-bold text-blue-700">{formatCurrency(revenue)}</h3>
-                <p className="text-xs text-blue-600 mt-1">From start of project to present</p>
-              </div>
-              <span className="bg-blue-200 p-2 rounded-full text-blue-700">
-                <CircleDollarSign size={20} />
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-sm font-medium text-blue-700">Total Revenue</p>
+              <span className="bg-blue-200 p-1.5 rounded-full text-blue-700">
+                <CircleDollarSign size={16} />
               </span>
             </div>
+            <h3 className="text-xl font-bold text-blue-700">{formatCurrency(revenue)}</h3>
+            <p className="text-xs text-blue-600 mt-1">From project inception</p>
             
-            <div className="mt-4 space-y-2">
-              <div className="flex justify-between text-xs text-blue-700">
-                <span>Initial Budget:</span>
-                <span className="font-semibold">{formatCurrency(budget)}</span>
-              </div>
-              
-              <div className="flex justify-between text-xs text-blue-700">
-                <span>From Services:</span>
-                <span className="font-semibold">{formatCurrency(revenue * 0.7)}</span>
-              </div>
-              
-              <div className="flex justify-between text-xs text-blue-700">
-                <span>From Materials:</span>
-                <span className="font-semibold">{formatCurrency(revenue * 0.3)}</span>
-              </div>
-              
-              <div className="flex items-center justify-end gap-1 text-xs text-blue-700 mt-1">
-                <ArrowUpRight size={12} />
-                <span>+8.3% from estimate</span>
-              </div>
+            <div className="flex items-center justify-end gap-1 text-xs text-blue-700 mt-2">
+              <ArrowUpRight size={12} />
+              <span>+8.3% from estimate</span>
             </div>
           </CardContent>
         </Card>
         
-        {/* Expenses Card */}
+        {/* Expenses Card - Smaller and more concise */}
         <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-          <CardContent className="pt-5">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <p className="text-sm font-medium text-red-700 mb-1">Total Expenses</p>
-                <h3 className="text-2xl font-bold text-red-700">{formatCurrency(totalAllExpenses)}</h3>
-                <p className="text-xs text-red-600 mt-1">Cumulative from project inception</p>
-              </div>
-              <span className="bg-red-200 p-2 rounded-full text-red-700">
-                <Minus size={20} />
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-sm font-medium text-red-700">Total Expenses</p>
+              <span className="bg-red-200 p-1.5 rounded-full text-red-700">
+                <Minus size={16} />
               </span>
             </div>
+            <h3 className="text-xl font-bold text-red-700">{formatCurrency(totalAllExpenses)}</h3>
+            <p className="text-xs text-red-600 mt-1">Project-to-date</p>
             
-            <div className="mt-4 space-y-2">
-              <div className="flex justify-between text-xs text-red-700">
-                <span>Contractors:</span>
-                <span className="font-semibold">{formatCurrency(totalContractorCosts)}</span>
-              </div>
-              
-              <div className="flex justify-between text-xs text-red-700">
-                <span>Materials:</span>
-                <span className="font-semibold">{formatCurrency(totalMaterialCosts)}</span>
-              </div>
-              
-              <div className="flex justify-between text-xs text-red-700">
-                <span>Equipment:</span>
-                <span className="font-semibold">{formatCurrency(totalEquipmentCosts)}</span>
-              </div>
-              
-              <div className="flex justify-between text-xs text-red-700">
-                <span>Other Expenses:</span>
-                <span className="font-semibold">{formatCurrency(totalExpenses)}</span>
-              </div>
-              
-              <div className="flex items-center justify-end gap-1 text-xs text-red-700 mt-1">
-                <TrendingDown size={12} />
-                <span>{budgetUsagePercentage}% of budget used</span>
-              </div>
+            <div className="flex items-center justify-end gap-1 text-xs text-red-700 mt-2">
+              <TrendingDown size={12} />
+              <span>{budgetUsagePercentage}% of budget</span>
             </div>
           </CardContent>
         </Card>
         
-        {/* Profit Card - Always in Green as per request */}
+        {/* Profit Card - Always in Green as per request, smaller and more concise */}
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="pt-5">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <p className="text-sm font-medium text-green-700 mb-1">Net Profit</p>
-                <h3 className="text-2xl font-bold text-green-700">
-                  {formatCurrency(netProfit)}
-                </h3>
-                <p className="text-xs text-green-600 mt-1">Overall project profitability to date</p>
-              </div>
-              <span className="bg-green-200 p-2 rounded-full text-green-700">
-                {netProfit >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-sm font-medium text-green-700">Net Profit</p>
+              <span className="bg-green-200 p-1.5 rounded-full text-green-700">
+                {netProfit >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
               </span>
             </div>
+            <h3 className="text-xl font-bold text-green-700">{formatCurrency(netProfit)}</h3>
+            <p className="text-xs text-green-600 mt-1">Overall profitability</p>
             
-            <div className="mt-4 space-y-2">
-              <div className="flex justify-between text-xs text-green-700">
-                <span>Budget Remaining:</span>
-                <span className="font-semibold">{formatCurrency(budgetRemaining)}</span>
-              </div>
-              
-              <div className="flex justify-between text-xs text-green-700">
-                <span>Margin:</span>
-                <span className="font-semibold">
-                  {revenue > 0 ? `${Math.round((netProfit / revenue) * 100)}%` : '0%'}
-                </span>
-              </div>
-              
-              <div className="flex justify-between text-xs text-green-700">
-                <span>Cost per completion %:</span>
-                <span className="font-semibold">
-                  {project.completion > 0 
-                    ? formatCurrency(totalAllExpenses / (project.completion / 100))
-                    : formatCurrency(0)}
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-end gap-1 text-xs text-green-700 mt-1">
-                {netProfit >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                <span>
-                  {netProfit >= 0 
-                    ? `${Math.round((netProfit / budget) * 100)}% profit on budget` 
-                    : `${Math.round((Math.abs(netProfit) / budget) * 100)}% loss on budget`}
-                </span>
-              </div>
+            <div className="flex items-center justify-end gap-1 text-xs text-green-700 mt-2">
+              {netProfit >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+              <span>
+                {revenue > 0 ? `${Math.round((netProfit / revenue) * 100)}% margin` : '0%'}
+              </span>
             </div>
           </CardContent>
         </Card>
