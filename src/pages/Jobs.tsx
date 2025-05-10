@@ -108,13 +108,7 @@ const Jobs = () => {
   };
 
   const handleAddJob = (job: Job) => {
-    // Ensure amount property is set
-    const completeJob: Job = {
-      ...job,
-      amount: job.amount || 0 // Provide default if missing
-    };
-    
-    addJob(completeJob);
+    addJob(job);
     setIsCreateModalOpen(false); // Close modal after adding
     
     toast({
@@ -282,13 +276,11 @@ const Jobs = () => {
 
   // Transform job sources for the JobModals component
   const jobSourcesForModal: JobSource[] = globalJobSources.map(source => ({
-    ...source,
     id: source.id,
     name: source.name,
     type: source.type || "general",
     paymentType: (source.paymentType as "fixed" | "percentage") || "percentage",
-    paymentValue: source.paymentValue || 0,
-    active: source.isActive !== false, // Set active based on isActive property
+    paymentValue: source.paymentValue || 0, 
     isActive: source.isActive !== false,
     profit: source.profit || 0,
     createdAt: typeof source.createdAt === 'string' ? source.createdAt : new Date().toISOString(),

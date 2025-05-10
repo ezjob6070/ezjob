@@ -4,7 +4,7 @@ export interface JobSource {
   name: string;
   description?: string;
   type: string;
-  active: boolean; 
+  active: boolean; // This is required
   createdAt: string;
   phoneNumber?: string;
   email?: string;

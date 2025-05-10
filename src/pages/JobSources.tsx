@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -25,12 +24,11 @@ const JobSources = () => {
       type: newJobSource.type || 'general',
       paymentType: (newJobSource.paymentType as "fixed" | "percentage") || 'percentage',
       paymentValue: newJobSource.paymentValue || 0,
-      active: newJobSource.isActive !== false, // Use active for the type
-      isActive: newJobSource.isActive !== false, // Keep isActive for compatibility
+      isActive: newJobSource.isActive !== false,
       totalJobs: newJobSource.totalJobs || 0,
       totalRevenue: newJobSource.totalRevenue || 0,
       profit: newJobSource.profit || 0,
-      createdAt: newJobSource.createdAt || new Date().toISOString(),
+      createdAt: newJobSource.createdAt || new Date().toISOString(), // Ensure it's a string
       name: newJobSource.name || 'New Job Source',
       website: newJobSource.website || '',
       phone: newJobSource.phone || '',
@@ -55,7 +53,6 @@ const JobSources = () => {
     // Ensure createdAt is a string
     const formattedJobSource: JobSource = {
       ...updatedJobSource,
-      active: updatedJobSource.isActive !== false, // Make sure active property is set
       createdAt: typeof updatedJobSource.createdAt === 'string' 
         ? updatedJobSource.createdAt 
         : new Date().toISOString()
@@ -74,8 +71,7 @@ const JobSources = () => {
     type: source.type || 'general',
     paymentType: (source.paymentType as "fixed" | "percentage") || 'percentage',
     paymentValue: source.paymentValue || 0,
-    active: source.isActive !== false, // Set active based on isActive
-    isActive: source.isActive !== false, // Keep isActive for compatibility
+    isActive: source.isActive !== false,
     totalJobs: source.totalJobs || 0,
     totalRevenue: source.totalRevenue || 0,
     profit: source.profit || 0,

@@ -34,9 +34,6 @@ interface JobFiltersWrapperProps {
   toggleContractor: (contractorName: string) => void;
   selectAllContractors: () => void;
   deselectAllContractors: () => void;
-  // Add missing props from JobFiltersSectionProps
-  selectAllTechnicians: () => void;
-  deselectAllTechnicians: () => void;
 }
 
 const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
@@ -65,10 +62,7 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
   selectedContractors,
   toggleContractor,
   selectAllContractors,
-  deselectAllContractors,
-  // Missing props
-  selectAllTechnicians,
-  deselectAllTechnicians
+  deselectAllContractors
 }) => {
   return (
     <>
@@ -106,8 +100,6 @@ const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
         toggleContractor={toggleContractor}
         selectAllContractors={selectAllContractors}
         deselectAllContractors={deselectAllContractors}
-        selectAllTechnicians={selectAllTechnicians}
-        deselectAllTechnicians={deselectAllTechnicians}
       />
     </>
   );

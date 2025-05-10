@@ -19,7 +19,6 @@ import TechnicianInvoiceSection from "@/components/finance/TechnicianInvoiceSect
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { JobSource } from "@/types/jobSource";
 
 const Finance = () => {
   const location = useLocation();
@@ -29,13 +28,7 @@ const Finance = () => {
     to: new Date(),
   });
   
-  const { technicians, jobs, jobSources: globalJobSources } = useGlobalState();
-  
-  // Ensure jobSources have the required 'active' property
-  const jobSources: JobSource[] = globalJobSources.map(source => ({
-    ...source,
-    active: source.isActive !== false, // Set active based on isActive property
-  }));
+  const { technicians, jobs, jobSources } = useGlobalState();
   
   // Check if we have state passed from another component
   useEffect(() => {
