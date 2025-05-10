@@ -31,6 +31,15 @@ export interface JobFilterProps {
   resetFilters: () => void;
 }
 
+export interface JobFiltersSectionProps {
+  technicianNames: string[];
+  selectedTechnicians: string[];
+  date: DateRange;
+  selectAllTechnicians: () => void;
+  deselectAllTechnicians: () => void;
+  // Add other properties as needed
+}
+
 export interface FilteredJobsResult {
   jobs: Job[];
   totalCount: number;

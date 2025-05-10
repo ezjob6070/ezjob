@@ -2,7 +2,7 @@
 export interface Task {
   id: string;
   title: string;
-  dueDate: Date;
+  dueDate: Date | string;
   start?: string;
   end?: string;
   allDay?: boolean;
@@ -14,7 +14,7 @@ export interface Task {
   technician?: string;
   color?: string;
   type?: string;
-  followUpDate?: Date;
+  followUpDate?: Date | string;
   hasFollowUp?: boolean;
   parentTaskId?: string;
 }

@@ -40,9 +40,10 @@ export interface Technician {
   certifications?: string[];
   notes?: string;
   category?: string;
+  specialty?: string;
   
-  // Additional properties needed by components
-  role?: string | TechnicianRole;
+  // Added required properties based on the errors
+  role?: TechnicianRole;
   subRole?: string;
   initials?: string;
   ssn?: string;
@@ -51,7 +52,6 @@ export interface Technician {
   documents?: any[];
   
   // Finance and performance related properties
-  specialty?: string;
   paymentRate?: number;
   hourlyRate?: number;
   completedJobs?: number;
