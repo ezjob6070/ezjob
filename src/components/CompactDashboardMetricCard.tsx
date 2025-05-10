@@ -18,6 +18,7 @@ type CompactDashboardMetricCardProps = {
   dateRangeText?: string;
   isNegative?: boolean;
   isPositive?: boolean;
+  isBlue?: boolean;
 };
 
 const CompactDashboardMetricCard = ({
@@ -30,7 +31,8 @@ const CompactDashboardMetricCard = ({
   description,
   dateRangeText,
   isNegative,
-  isPositive
+  isPositive,
+  isBlue
 }: CompactDashboardMetricCardProps) => {
   return (
     <Card className={cn(
@@ -51,10 +53,12 @@ const CompactDashboardMetricCard = ({
           "text-xl font-bold", 
           isNegative ? "text-destructive flex items-center" : "",
           isPositive ? "text-green-600 flex items-center" : "",
+          isBlue ? "text-blue-600 flex items-center" : "",
           valueClassName
         )}>
           {isNegative && <Minus className="h-4 w-4 mr-1" />}
           {isPositive && <ArrowUp className="h-4 w-4 mr-1" />}
+          {isBlue && <ArrowUp className="h-4 w-4 mr-1" />}
           {value}
         </div>
         

@@ -57,7 +57,7 @@ const OverallFinanceSection: React.FC<OverallFinanceSectionProps> = ({
           icon={<BadgeDollarSign className="h-4 w-4 text-blue-600" />}
           trend={{ value: "78% of goal", isPositive: true }}
           dateRangeText={getDateRangeDisplay()}
-          isPositive={true}
+          isBlue={true}
         />
 
         {/* Net Profit Card */}
