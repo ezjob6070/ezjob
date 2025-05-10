@@ -2,33 +2,21 @@
 export interface JobSource {
   id: string;
   name: string;
-  description?: string;
   type: string;
+  paymentType: "fixed" | "percentage";
+  paymentValue: number;
   active: boolean;
-  isActive?: boolean; // For compatibility with code using isActive instead of active
+  isActive?: boolean; // Keep this for backward compatibility
+  totalJobs: number;
+  totalRevenue: number;
+  profit: number;
   createdAt: string;
-  phoneNumber?: string;
-  email?: string;
-  contactName?: string;
-  address?: string;
+  
+  // Add missing properties that are being used
   website?: string;
-  notes?: string;
-  totalJobs?: number;
-  totalRevenue?: number;
-  expenses?: number;
-  companyProfit?: number;
-  category?: string;
-  // Additional properties needed by existing components
-  profit?: number;
   phone?: string;
-  paymentType?: string | "percentage" | "fixed";
-  paymentValue?: number;
+  email?: string;
   logoUrl?: string;
-  // Properties needed for components that used to have build errors
-  role?: string;
-  subRole?: string;
-  technicianId?: string;
-  date?: string | Date;
-  // For other components
+  notes?: string;
   contractorName?: string;
 }
