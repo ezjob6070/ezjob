@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import MetricsOverview from "@/components/dashboard/MetricsOverview";
 import StatisticsSection from "@/components/dashboard/StatisticsSection";
 import TicketsStatusCard from "@/components/dashboard/TicketsStatusCard";
 import PerformanceCard from "@/components/dashboard/PerformanceCard";
@@ -15,7 +14,7 @@ import ActivitySection from "@/components/dashboard/ActivitySection";
 import DashboardDetailDialog from "@/components/DashboardDetailDialog";
 import DashboardCalendar from "@/components/dashboard/DashboardCalendar";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import ProjectsDashboardSection from "@/components/dashboard/ProjectsDashboardSection";
+import EnhancedProjectsSection from "@/components/dashboard/EnhancedProjectsSection";
 
 import {
   dashboardTaskCounts,
@@ -224,16 +223,8 @@ const Index = () => {
               </Card>
             </div>
             
-            <MetricsOverview 
-              financialMetrics={dashboardFinancialMetrics}
-              formatCurrency={formatCurrency}
-              openDetailDialog={openDetailDialog}
-              detailedTasksData={detailedTasksData}
-              detailedRevenueData={detailedRevenueData}
-              detailedBusinessMetrics={detailedBusinessMetrics}
-            />
-
-            <ProjectsDashboardSection />
+            {/* Replace MetricsOverview with EnhancedProjectsSection */}
+            <EnhancedProjectsSection dateFilter={date} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <TicketsStatusCard 
@@ -246,12 +237,12 @@ const Index = () => {
               <PerformanceCard 
                 leadSources={dashboardLeadSources.map(source => ({
                   name: source.name,
-                  count: source.value, // Map value to count
+                  count: source.value,
                   percentage: source.percentage
                 }))}
                 jobTypePerformance={dashboardJobTypePerformance.map(item => ({
                   name: item.name,
-                  count: item.value, // Map value to count
+                  count: item.value,
                   revenue: item.revenue,
                   avgValue: item.avgValue || 0
                 }))}
