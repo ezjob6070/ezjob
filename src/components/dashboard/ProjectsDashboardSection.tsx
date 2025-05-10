@@ -14,7 +14,6 @@ const ProjectsDashboardSection = () => {
   const totalProjects = projects.length;
   const inProgressProjects = projects.filter(p => p.status === "In Progress").length;
   const completionRate = totalProjects ? Math.round((projects.reduce((sum, p) => sum + p.completion, 0) / totalProjects)) : 0;
-  const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
   
   // Get the 3 most recent projects
   const recentProjects = [...projects]
@@ -34,7 +33,7 @@ const ProjectsDashboardSection = () => {
         </div>
       </CardHeader>
       <CardContent className="pt-0 pb-4">
-        <div className="grid grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-3 mb-4">
           <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-medium text-purple-700">Total Projects</span>
@@ -63,16 +62,6 @@ const ProjectsDashboardSection = () => {
               </div>
             </div>
             <div className="text-xl font-bold text-emerald-800">{completionRate}%</div>
-          </div>
-          
-          <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-amber-700">Total Budget</span>
-              <div className="p-1.5 bg-amber-100 rounded-full">
-                <TrendingUp className="h-3.5 w-3.5 text-amber-600" />
-              </div>
-            </div>
-            <div className="text-xl font-bold text-amber-800">{formatCurrency(totalBudget)}</div>
           </div>
         </div>
         
