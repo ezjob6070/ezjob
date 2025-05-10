@@ -17,8 +17,8 @@ export interface Job {
   technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  date: string | Date;
-  scheduledDate?: string | Date;
+  date: Date | string;
+  scheduledDate?: Date | string;
   createdAt?: string;
   priority?: JobPriority;
   details?: string;
@@ -37,12 +37,12 @@ export interface Job {
   source?: string;
   contractorName?: string;
   contractorId?: string;
-  clientId?: string;
   // Add missing properties that are being used in various components
   parts?: string[];
   signature?: string;
   hasImages?: boolean;
   imageCount?: number;
+  clientId?: string;
 }
 
 export interface JobTab {

@@ -1,3 +1,4 @@
+
 import { JobSource } from "./jobSource";
 
 export interface FinancialTransaction {
@@ -67,7 +68,6 @@ export interface OfficeExpense {
   category: string;
   description?: string;
   recurring?: boolean;
-  frequency?: 'monthly' | 'quarterly' | 'yearly';
   paidBy?: string;
   vendor?: string;
   paymentMethod?: string;
@@ -130,3 +130,4 @@ export interface CompanyProfile {
   taxId?: string;
   description?: string;
 }
+

@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck } from "lucide-react";
-import { projects } from "@/data/projects"; // Use projects from projects.ts
-import { Project } from "@/types/Project";
+import { initialProjects } from "@/data/projects";
+import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -50,7 +50,7 @@ export default function ProjectDetail() {
   ]);
 
   // Find project by ID
-  const project = projects.find(p => p.id === id) || {
+  const project = initialProjects.find(p => p.id === Number(id)) || {
     id: 0,
     name: "Project Not Found",
     type: "Unknown",

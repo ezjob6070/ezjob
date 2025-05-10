@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { Technician } from "@/types/technician";
-import { Job } from "@/components/jobs/JobTypes";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface ContractorsDashboardProps {
@@ -21,7 +21,7 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
   const { technicians, jobs } = useGlobalState();
   
   // Filter technicians that are contractors
-  const contractors = (technicians as Technician[]).filter((tech) => tech.role === "contractor");
+  const contractors = technicians.filter((tech) => tech.role === "contractor");
 
   // Filter by search term
   const filteredContractors = contractors.filter((contractor) =>
@@ -32,7 +32,7 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
   );
 
   // Get jobs assigned to contractors within the date range
-  const contractorJobs = (jobs as Job[]).filter(job => {
+  const contractorJobs = jobs.filter(job => {
     const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 

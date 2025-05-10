@@ -1,134 +1,107 @@
-import { useState, useEffect } from 'react';
-import { DateRange } from 'react-day-picker';
-import { AmountRange, PaymentMethod } from '@/components/jobs/JobTypes';
-import JobFiltersSection from '@/components/jobs/JobFiltersSection'; 
+
+import React from 'react';
+import { DateRange } from "react-day-picker";
+import { AmountRange } from "./AmountFilter";
+import { PaymentMethod } from "./JobTypes";
+import JobFiltersSection from "./JobFiltersSection";
+import JobsDateFilter from "./filters/JobsDateFilter";
+import JobFilterInfoBar from "./JobFilterInfoBar";
 
 interface JobFiltersWrapperProps {
   technicianNames: string[];
+  selectedTechnicians: string[];
+  date: DateRange | undefined;
+  amountRange: AmountRange | null;
+  paymentMethod: PaymentMethod | null;
+  appliedFilters: boolean;
+  toggleTechnician: (techName: string) => void;
+  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  setAmountRange: React.Dispatch<React.SetStateAction<AmountRange | null>>;
+  setPaymentMethod: React.Dispatch<React.SetStateAction<PaymentMethod | null>>;
+  clearFilters: () => void;
+  applyFilters: () => void;
   jobSourceNames: string[];
+  selectedJobSources: string[];
+  toggleJobSource: (sourceName: string) => void;
+  selectAllJobSources: () => void;
+  deselectAllJobSources: () => void;
+  hasActiveFilters: boolean;
+  filteredJobsCount: number;
+  totalJobsCount: number;
+  // New contractor filter props
   contractorNames: string[];
-  onApplyFilters: () => void;
-  onClearFilters: () => void;
-  selectAllTechnicians: () => void;
-  deselectAllTechnicians: () => void;
+  selectedContractors: string[];
+  toggleContractor: (contractorName: string) => void;
   selectAllContractors: () => void;
   deselectAllContractors: () => void;
 }
 
 const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
   technicianNames,
+  selectedTechnicians,
+  date,
+  amountRange,
+  paymentMethod,
+  appliedFilters,
+  toggleTechnician,
+  setDate,
+  setAmountRange,
+  setPaymentMethod,
+  clearFilters,
+  applyFilters,
   jobSourceNames,
+  selectedJobSources,
+  toggleJobSource,
+  selectAllJobSources,
+  deselectAllJobSources,
+  hasActiveFilters,
+  filteredJobsCount,
+  totalJobsCount,
+  // New contractor props
   contractorNames,
-  onApplyFilters,
-  onClearFilters,
-  selectAllTechnicians,
-  deselectAllTechnicians,
+  selectedContractors,
+  toggleContractor,
   selectAllContractors,
   deselectAllContractors
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
-  const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
-  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
-  const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
-  const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
-  const [appliedFilters, setAppliedFilters] = useState(false);
-  const [hasActiveFilters, setHasActiveFilters] = useState(false);
-
-  useEffect(() => {
-    setHasActiveFilters(
-      searchTerm !== '' ||
-      selectedTechnicians.length > 0 ||
-      selectedContractors.length > 0 ||
-      selectedJobSources.length > 0 ||
-      selectedServiceTypes.length > 0 ||
-      date !== undefined ||
-      amountRange !== null ||
-      paymentMethod !== null
-    );
-  }, [searchTerm, selectedTechnicians, selectedContractors, selectedJobSources, selectedServiceTypes, date, amountRange, paymentMethod]);
-
-  const toggleTechnician = (technicianName: string) => {
-    setSelectedTechnicians(prev =>
-      prev.includes(technicianName)
-        ? prev.filter(name => name !== technicianName)
-        : [...prev, technicianName]
-    );
-  };
-
-  const toggleContractor = (contractorName: string) => {
-    setSelectedContractors(prev =>
-      prev.includes(contractorName)
-        ? prev.filter(name => name !== contractorName)
-        : [...prev, contractorName]
-    );
-  };
-
-  const toggleJobSource = (jobSourceName: string) => {
-    setSelectedJobSources(prev =>
-      prev.includes(jobSourceName)
-        ? prev.filter(name => name !== jobSourceName)
-        : [...prev, jobSourceName]
-    );
-  };
-
-  const toggleServiceType = (serviceType: string) => {
-    setSelectedServiceTypes(prev =>
-      prev.includes(serviceType)
-        ? prev.filter(type => type !== serviceType)
-        : [...prev, serviceType]
-    );
-  };
-
-  const clearFilters = () => {
-    setSearchTerm('');
-    setSelectedTechnicians([]);
-    setSelectedContractors([]);
-    setSelectedJobSources([]);
-    setSelectedServiceTypes([]);
-    setDate(undefined);
-    setAmountRange(null);
-    setPaymentMethod(null);
-    setAppliedFilters(false);
-    onClearFilters();
-  };
-
-  const applyFilters = () => {
-    setAppliedFilters(true);
-    onApplyFilters();
-  };
-
   return (
-    <JobFiltersSection
-      searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
-      technicianNames={technicianNames}
-      selectedTechnicians={selectedTechnicians}
-      toggleTechnician={toggleTechnician}
-      contractorNames={contractorNames}
-      selectedContractors={selectedContractors}
-      toggleContractor={toggleContractor}
-      jobSourceNames={jobSourceNames}
-      selectedJobSources={selectedJobSources}
-      toggleJobSource={toggleJobSource}
-      selectedServiceTypes={selectedServiceTypes}
-      toggleServiceType={toggleServiceType}
-      date={date}
-      setDate={setDate}
-      amountRange={amountRange}
-      setAmountRange={setAmountRange}
-      paymentMethod={paymentMethod}
-      setPaymentMethod={setPaymentMethod}
-      hasActiveFilters={hasActiveFilters}
-      clearFilters={clearFilters}
-      applyFilters={applyFilters}
-      selectAllTechnicians={selectAllTechnicians}
-      deselectAllTechnicians={deselectAllTechnicians}
-      selectAllContractors={selectAllContractors}
-      deselectAllContractors={deselectAllContractors}
-    />
+    <>
+      <div className="flex justify-end mb-4">
+        <JobsDateFilter date={date} setDate={setDate} />
+      </div>
+      
+      <JobFilterInfoBar
+        filteredCount={filteredJobsCount}
+        totalCount={totalJobsCount}
+        hasActiveFilters={hasActiveFilters}
+        clearFilters={clearFilters}
+      />
+      
+      <JobFiltersSection 
+        technicianNames={technicianNames}
+        selectedTechnicians={selectedTechnicians}
+        date={date}
+        amountRange={amountRange}
+        paymentMethod={paymentMethod}
+        appliedFilters={appliedFilters}
+        toggleTechnician={toggleTechnician}
+        setDate={setDate}
+        setAmountRange={setAmountRange}
+        setPaymentMethod={setPaymentMethod}
+        clearFilters={clearFilters}
+        applyFilters={applyFilters}
+        jobSourceNames={jobSourceNames}
+        selectedJobSources={selectedJobSources}
+        toggleJobSource={toggleJobSource}
+        selectAllJobSources={selectAllJobSources}
+        deselectAllJobSources={deselectAllJobSources}
+        contractorNames={contractorNames}
+        selectedContractors={selectedContractors}
+        toggleContractor={toggleContractor}
+        selectAllContractors={selectAllContractors}
+        deselectAllContractors={deselectAllContractors}
+      />
+    </>
   );
 };
 
