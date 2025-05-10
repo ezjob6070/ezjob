@@ -1,4 +1,5 @@
 
+
 export interface FinancialTransaction {
   id: string;
   date: string;
@@ -90,3 +91,4 @@ export interface Job {
   contractorName?: string;
   actualAmount?: number;
 }
+

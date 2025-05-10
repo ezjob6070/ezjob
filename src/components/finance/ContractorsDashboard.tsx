@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,7 +7,8 @@ import { ArrowUpDown, Download, Filter, FileText, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { Technician, Job } from "@/types/finance";
+import { Technician } from "@/types/technician";
+import { Job } from "@/components/jobs/JobTypes";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface ContractorsDashboardProps {
