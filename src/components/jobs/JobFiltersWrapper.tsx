@@ -1,107 +1,111 @@
-
-import React from 'react';
+import { useState, useCallback } from "react";
 import { DateRange } from "react-day-picker";
-import { AmountRange } from "./AmountFilter";
-import { PaymentMethod } from "./JobTypes";
-import JobFiltersSection from "./JobFiltersSection";
-import JobsDateFilter from "./filters/JobsDateFilter";
-import JobFilterInfoBar from "./JobFilterInfoBar";
+
+import { JobFiltersSection } from "@/components/jobs/JobFiltersSection";
+import { AmountRange } from "@/components/jobs/AmountFilter";
+import { PaymentMethod } from "@/components/jobs/JobTypes";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { JobFiltersState } from "@/components/jobs/jobHookTypes";
 
 interface JobFiltersWrapperProps {
-  technicianNames: string[];
-  selectedTechnicians: string[];
-  date: DateRange | undefined;
-  amountRange: AmountRange | null;
-  paymentMethod: PaymentMethod | null;
-  appliedFilters: boolean;
-  toggleTechnician: (techName: string) => void;
-  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-  setAmountRange: React.Dispatch<React.SetStateAction<AmountRange | null>>;
-  setPaymentMethod: React.Dispatch<React.SetStateAction<PaymentMethod | null>>;
-  clearFilters: () => void;
-  applyFilters: () => void;
-  jobSourceNames: string[];
-  selectedJobSources: string[];
-  toggleJobSource: (sourceName: string) => void;
-  selectAllJobSources: () => void;
-  deselectAllJobSources: () => void;
-  hasActiveFilters: boolean;
-  filteredJobsCount: number;
-  totalJobsCount: number;
-  // New contractor filter props
-  contractorNames: string[];
-  selectedContractors: string[];
-  toggleContractor: (contractorName: string) => void;
-  selectAllContractors: () => void;
-  deselectAllContractors: () => void;
+  initialFilters: JobFiltersState;
+  onApplyFilters: (filters: JobFiltersState) => void;
+  onClearFilters: () => void;
 }
 
-const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
-  technicianNames,
-  selectedTechnicians,
-  date,
-  amountRange,
-  paymentMethod,
-  appliedFilters,
-  toggleTechnician,
-  setDate,
-  setAmountRange,
-  setPaymentMethod,
-  clearFilters,
-  applyFilters,
-  jobSourceNames,
-  selectedJobSources,
-  toggleJobSource,
-  selectAllJobSources,
-  deselectAllJobSources,
-  hasActiveFilters,
-  filteredJobsCount,
-  totalJobsCount,
-  // New contractor props
-  contractorNames,
-  selectedContractors,
-  toggleContractor,
-  selectAllContractors,
-  deselectAllContractors
-}) => {
+const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({ initialFilters, onApplyFilters, onClearFilters }) => {
+  const { technicians, jobSources } = useGlobalState();
+  const technicianNames = technicians.map(technician => ({ id: technician.id, name: technician.name }));
+  const jobSourceNames = jobSources.map(source => ({ id: source.id, name: source.name }));
+
+  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>(initialFilters.selectedTechnicians);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialFilters.selectedCategories);
+  const [selectedJobSources, setSelectedJobSources] = useState<string[]>(initialFilters.selectedJobSources);
+  const [date, setDate] = useState<DateRange | undefined>(initialFilters.date);
+  const [amountRange, setAmountRange] = useState<AmountRange | null>(initialFilters.amountRange);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(initialFilters.paymentMethod);
+  const [appliedFilters, setAppliedFilters] = useState<boolean>(initialFilters.appliedFilters);
+
+  const handleApplyFilters = useCallback(() => {
+    const filters = {
+      selectedTechnicians,
+      selectedCategories,
+      selectedJobSources,
+      date,
+      amountRange,
+      paymentMethod,
+      appliedFilters: true
+    };
+    onApplyFilters(filters);
+    setAppliedFilters(true);
+  }, [selectedTechnicians, selectedCategories, selectedJobSources, date, amountRange, paymentMethod, onApplyFilters]);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedTechnicians([]);
+    setSelectedCategories([]);
+    setSelectedJobSources([]);
+    setDate(undefined);
+    setAmountRange(null);
+    setPaymentMethod(null);
+    setAppliedFilters(false);
+    onClearFilters();
+  }, [onClearFilters]);
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(category) ? prev.filter(item => item !== category) : [...prev, category]
+    );
+  };
+
+  const handleJobSourceSelect = (jobSource: string) => {
+    setSelectedJobSources(prev =>
+      prev.includes(jobSource) ? prev.filter(item => item !== jobSource) : [...prev, jobSource]
+    );
+  };
+
+  const selectAllContractors = () => {
+    const allJobSourceIds = jobSourceNames.map(j => j.id);
+    setSelectedJobSources(allJobSourceIds);
+  };
+
+  const deselectAllContractors = () => {
+    setSelectedJobSources([]);
+  };
+
+  const selectAllTechnicians = () => {
+    const allTechnicianIds = technicianNames.map(t => t.id);
+    setSelectedTechnicians(allTechnicianIds);
+  };
+
+  const deselectAllTechnicians = () => {
+    setSelectedTechnicians([]);
+  };
+
   return (
-    <>
-      <div className="flex justify-end mb-4">
-        <JobsDateFilter date={date} setDate={setDate} />
-      </div>
-      
-      <JobFilterInfoBar
-        filteredCount={filteredJobsCount}
-        totalCount={totalJobsCount}
-        hasActiveFilters={hasActiveFilters}
-        clearFilters={clearFilters}
-      />
-      
-      <JobFiltersSection 
-        technicianNames={technicianNames}
-        selectedTechnicians={selectedTechnicians}
-        date={date}
-        amountRange={amountRange}
-        paymentMethod={paymentMethod}
-        appliedFilters={appliedFilters}
-        toggleTechnician={toggleTechnician}
-        setDate={setDate}
-        setAmountRange={setAmountRange}
-        setPaymentMethod={setPaymentMethod}
-        clearFilters={clearFilters}
-        applyFilters={applyFilters}
-        jobSourceNames={jobSourceNames}
-        selectedJobSources={selectedJobSources}
-        toggleJobSource={toggleJobSource}
-        selectAllJobSources={selectAllJobSources}
-        deselectAllJobSources={deselectAllJobSources}
-        contractorNames={contractorNames}
-        selectedContractors={selectedContractors}
-        toggleContractor={toggleContractor}
-        selectAllContractors={selectAllContractors}
-        deselectAllContractors={deselectAllContractors}
-      />
-    </>
+    <JobFiltersSection
+      technicianNames={technicianNames}
+      selectedTechnicians={selectedTechnicians}
+      setSelectedTechnicians={setSelectedTechnicians}
+      jobSourceNames={jobSourceNames}
+      selectedJobSources={selectedJobSources}
+      setSelectedJobSources={setSelectedJobSources}
+      date={date}
+      setDate={setDate}
+      amountRange={amountRange}
+      setAmountRange={setAmountRange}
+      paymentMethod={paymentMethod}
+      setPaymentMethod={setPaymentMethod}
+      appliedFilters={appliedFilters}
+      setAppliedFilters={setAppliedFilters}
+      onApplyFilters={handleApplyFilters}
+      onClearFilters={handleClearFilters}
+      handleCategorySelect={handleCategorySelect}
+      handleJobSourceSelect={handleJobSourceSelect}
+      selectAllContractors={selectAllContractors}
+      deselectAllContractors={deselectAllContractors}
+      selectAllTechnicians={selectAllTechnicians}
+      deselectAllTechnicians={deselectAllTechnicians}
+    />
   );
 };
 

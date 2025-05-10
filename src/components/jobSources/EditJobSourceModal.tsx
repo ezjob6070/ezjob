@@ -1,113 +1,153 @@
-
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { JobSource } from "@/types/jobSource";
+import { toast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { JobSource } from "@/types/finance";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  website: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
-  phone: z.string().optional().or(z.literal("")),
-  email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal("")),
-  logoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
-  paymentType: z.enum(["percentage", "fixed"]),
-  paymentValue: z.coerce.number().min(0, { message: "Payment value cannot be negative." }),
+const jobSourceEditSchema = z.object({
+  name: z.string().min(2, {
+    message: "Job source name must be at least 2 characters.",
+  }),
+  type: z.string().min(2, {
+    message: "Job source type must be at least 2 characters.",
+  }),
+  paymentType: z.enum(["fixed", "percentage"]),
+  paymentValue: z.number({
+    invalid_type_error: "Payment value must be a number.",
+  }),
   isActive: z.boolean().default(true),
-  notes: z.string().optional().or(z.literal("")),
 });
 
-type FormValues = z.infer<typeof formSchema>;
-
 interface EditJobSourceModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onUpdateJobSource: (jobSource: JobSource) => void;
-  jobSource: JobSource | null;
+  jobSource: JobSource;
+  onJobSourceUpdated: (jobSource: JobSource) => void;
+  onJobSourceDeleted: (jobSourceId: string) => void;
 }
 
-const EditJobSourceModal = ({ 
-  open, 
-  onOpenChange, 
-  onUpdateJobSource, 
-  jobSource 
-}: EditJobSourceModalProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+type JobSourceEditFormValues = z.infer<typeof jobSourceEditSchema>;
+
+const EditJobSourceModal: React.FC<EditJobSourceModalProps> = ({
+  jobSource,
+  onJobSourceUpdated,
+  onJobSourceDeleted,
+}) => {
+  const [open, setOpen] = useState(false);
+  const { updateJobSource, deleteJobSource } = useGlobalState();
+
+  const form = useForm<JobSourceEditFormValues>({
+    resolver: zodResolver(jobSourceEditSchema),
     defaultValues: {
-      name: "",
-      website: "",
-      phone: "",
-      email: "",
-      logoUrl: "",
-      paymentType: "percentage",
-      paymentValue: 0,
-      isActive: true,
-      notes: "",
+      name: jobSource.name,
+      type: jobSource.type,
+      paymentType: jobSource.paymentType as "fixed" | "percentage",
+      paymentValue: jobSource.paymentValue,
+      isActive: jobSource.active,
     },
   });
 
-  // Update form values when jobSource changes
   useEffect(() => {
-    if (jobSource) {
-      form.reset({
-        name: jobSource.name,
-        website: jobSource.website || "",
-        phone: jobSource.phone || "",
-        email: jobSource.email || "",
-        logoUrl: jobSource.logoUrl || "",
-        paymentType: jobSource.paymentType,
-        paymentValue: jobSource.paymentValue,
-        isActive: jobSource.isActive,
-        notes: jobSource.notes || "",
-      });
-    }
+    // Type assertion to ensure paymentType is correctly typed
+    const typedPaymentType = (jobSource.paymentType as "fixed" | "percentage") || "fixed";
+
+    form.setValue('name', jobSource.name);
+    form.setValue('type', jobSource.type);
+    form.setValue('paymentType', typedPaymentType);
+    form.setValue('paymentValue', jobSource.paymentValue);
+    form.setValue('isActive', jobSource.active);
   }, [jobSource, form]);
 
-  const onSubmit = (values: FormValues) => {
-    if (!jobSource) return;
-    
-    setIsSubmitting(true);
-    
-    // Create the updated job source
-    const updatedJobSource: JobSource = {
-      ...jobSource,
-      name: values.name,
-      website: values.website || undefined,
-      phone: values.phone || undefined,
-      email: values.email || undefined,
-      logoUrl: values.logoUrl || undefined,
-      paymentType: values.paymentType,
-      paymentValue: values.paymentValue,
-      isActive: values.isActive,
-      notes: values.notes || undefined,
-    };
-    
-    // Update the job source
-    onUpdateJobSource(updatedJobSource);
-    
-    setIsSubmitting(false);
-    onOpenChange(false);
+  const onSubmit = async (values: JobSourceEditFormValues) => {
+    try {
+      const updatedJobSource = {
+        ...jobSource,
+        ...values,
+        paymentValue: Number(values.paymentValue),
+        active: values.isActive,
+      };
+
+      await updateJobSource(updatedJobSource);
+      onJobSourceUpdated(updatedJobSource);
+      toast({
+        title: "Success",
+        description: "Job source updated successfully.",
+      });
+      setOpen(false);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update job source.",
+      });
+    }
   };
-  
+
+  const onDelete = async () => {
+    try {
+      await deleteJobSource(jobSource.id);
+      onJobSourceDeleted(jobSource.id);
+      toast({
+        title: "Success",
+        description: "Job source deleted successfully.",
+      });
+      setOpen(false);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete job source.",
+      });
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Edit Job Source</DialogTitle>
-        </DialogHeader>
-        
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <Pencil className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -115,150 +155,68 @@ const EditJobSourceModal = ({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input placeholder="Job Source Name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number (optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="(555) 123-4567" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email (optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="contact@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
             <FormField
               control={form.control}
-              name="website"
+              name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Website URL (optional)</FormLabel>
+                  <FormLabel>Type</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com" {...field} />
+                    <Input placeholder="Type" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
-            <FormField
-              control={form.control}
-              name="logoUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Logo URL (optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com/logo.png" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
             <FormField
               control={form.control}
               name="paymentType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Payment Type</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="flex space-x-4"
-                    >
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="percentage" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Percentage</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="fixed" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Fixed Amount</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select payment type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="fixed">Fixed</SelectItem>
+                      <SelectItem value="percentage">Percentage</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
             <FormField
               control={form.control}
               name="paymentValue"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {form.watch("paymentType") === "percentage" ? "Percentage Value" : "Fixed Amount"}
-                  </FormLabel>
+                  <FormLabel>Payment Value</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    {form.watch("paymentType") === "percentage" 
-                      ? "Enter the percentage value (e.g., 10 for 10%)" 
-                      : "Enter the fixed amount in dollars"}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Add any additional information about this job source"
-                      className="resize-none"
-                      {...field}
-                    />
+                    <Input placeholder="Payment Value" type="number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
             <FormField
               control={form.control}
               name="isActive"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">Active Status</FormLabel>
+                    <FormLabel className="text-base">Active</FormLabel>
                     <FormDescription>
-                      Set whether this job source is currently active
+                      Whether the job source is currently active.
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -270,20 +228,43 @@ const EditJobSourceModal = ({
                 </FormItem>
               )}
             />
-            
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+            <div className="flex justify-end space-x-2">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      the job source from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onDelete}>
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <Button type="submit" size="sm">
+                Update
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
-              </Button>
-            </DialogFooter>
+            </div>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </PopoverContent>
+    </Popover>
   );
 };
 
 export default EditJobSourceModal;
+
+const FormDescription = ({ children }: { children: React.ReactNode }) => {
+  return <p className="text-sm text-muted-foreground">{children}</p>;
+};

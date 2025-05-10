@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -63,25 +62,27 @@ const CreateJobSourceModal: React.FC<CreateJobSourceModalProps> = ({
     },
   });
 
-  const onSubmit = (values: FormValues) => {
-    const newJobSource: JobSource = {
-      id: uuidv4(),
-      name: values.name,
-      type: values.type,
-      website: values.website || undefined,
-      email: values.email || undefined,
-      paymentType: values.paymentType,
-      paymentValue: values.paymentValue,
-      isActive: values.isActive,
-      totalJobs: 0,
-      totalRevenue: 0,
-      profit: 0,
-      createdAt: new Date(),
-    };
-
-    onAddJobSource(newJobSource);
-    form.reset();
-    onOpenChange(false);
+  const handleSubmit = async (values: any) => {
+    try {
+      // Format the Date object to a string before sending
+      const createdAt = new Date().toISOString();
+      
+      // Create the new job source with the string date
+      const newJobSource = {
+        ...values,
+        createdAt,  // Use string format instead of Date object
+        totalJobs: 0,
+        totalRevenue: 0,
+        profit: 0,
+        active: values.isActive || false,  // Ensure active property is set
+      };
+      
+      onAddJobSource(newJobSource);
+      form.reset();
+      onOpenChange(false);
+    } catch (error) {
+      // Handle any errors that occur during submission
+    }
   };
 
   return (
@@ -92,7 +93,7 @@ const CreateJobSourceModal: React.FC<CreateJobSourceModalProps> = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"

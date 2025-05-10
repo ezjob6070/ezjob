@@ -1,3 +1,4 @@
+
 import { Project } from "../types/Project";
 
 export const projects: Project[] = [
@@ -114,3 +115,6 @@ export const projects: Project[] = [
     updatedAt: "2023-10-28"
   }
 ];
+
+// Export projects array as initialProjects for backward compatibility
+export const initialProjects = projects;

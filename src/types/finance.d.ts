@@ -1,5 +1,4 @@
 
-
 export interface FinancialTransaction {
   id: string;
   date: string;
@@ -47,7 +46,7 @@ export interface OfficeExpense {
   frequency?: 'monthly' | 'quarterly' | 'yearly';
 }
 
-// Adding Technician interface to fix type errors
+// Updated Technician interface with all properties being referenced
 export interface Technician {
   id: string;
   name: string;
@@ -68,6 +67,9 @@ export interface Technician {
   driverLicense?: string;
   idNumber?: string;
   documents?: any[];
+  status?: string;
+  startDate?: string;
+  salaryBasis?: string;
 }
 
 // Adding Job interface to address type errors
@@ -91,4 +93,3 @@ export interface Job {
   contractorName?: string;
   actualAmount?: number;
 }
-

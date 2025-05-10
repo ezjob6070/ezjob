@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck } from "lucide-react";
-import { initialProjects } from "@/data/projects";
+import { projects } from "@/data/projects"; // Use projects instead of initialProjects
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
@@ -50,7 +49,7 @@ export default function ProjectDetail() {
   ]);
 
   // Find project by ID
-  const project = initialProjects.find(p => p.id === Number(id)) || {
+  const project = projects.find(p => p.id === id) || {
     id: 0,
     name: "Project Not Found",
     type: "Unknown",

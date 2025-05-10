@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Technician, Document } from "@/types/technician";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,11 @@ interface TechnicianDocumentUploadProps {
 const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ technician }) => {
   const { toast } = useToast();
   const { updateTechnician } = useGlobalState();
-  const [documents, setDocuments] = useState<Document[]>(technician.documents || []);
+  const technicianWithDocuments = {
+    ...technician,
+    documents: technician.documents || []
+  };
+  const [documents, setDocuments] = useState<Document[]>(technicianWithDocuments.documents);
   const [technicianNotes, setTechnicianNotes] = useState<string>(technician.notes || "");
   const [activeTab, setActiveTab] = useState<string>("documents");
   

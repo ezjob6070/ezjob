@@ -23,7 +23,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { projects } from "@/data/projects";
-import { Project } from "@/types/project";
+import { Project } from "@/types/Project"; // Use consistent casing with Project.ts
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { toast } from "sonner";
 import { SortOption } from "@/types/sortOptions";
