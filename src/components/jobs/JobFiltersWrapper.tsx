@@ -1,110 +1,133 @@
-import { useState, useCallback } from "react";
-import { DateRange } from "react-day-picker";
-
-import { JobFiltersSection } from "@/components/jobs/JobFiltersSection";
-import { AmountRange } from "@/components/jobs/AmountFilter";
-import { PaymentMethod } from "@/components/jobs/JobTypes";
-import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { JobFiltersState } from "@/components/jobs/jobHookTypes";
+import { useState, useEffect } from 'react';
+import { DateRange } from 'react-day-picker';
+import { AmountRange, PaymentMethod } from '@/components/jobs/JobTypes';
+import JobFiltersSection from '@/components/jobs/JobFiltersSection'; 
 
 interface JobFiltersWrapperProps {
-  initialFilters: JobFiltersState;
-  onApplyFilters: (filters: JobFiltersState) => void;
+  technicianNames: string[];
+  jobSourceNames: string[];
+  contractorNames: string[];
+  onApplyFilters: () => void;
   onClearFilters: () => void;
+  selectAllTechnicians: () => void;
+  deselectAllTechnicians: () => void;
+  selectAllContractors: () => void;
+  deselectAllContractors: () => void;
 }
 
-const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({ initialFilters, onApplyFilters, onClearFilters }) => {
-  const { technicians, jobSources } = useGlobalState();
-  const technicianNames = technicians.map(technician => ({ id: technician.id, name: technician.name }));
-  const jobSourceNames = jobSources.map(source => ({ id: source.id, name: source.name }));
+const JobFiltersWrapper: React.FC<JobFiltersWrapperProps> = ({
+  technicianNames,
+  jobSourceNames,
+  contractorNames,
+  onApplyFilters,
+  onClearFilters,
+  selectAllTechnicians,
+  deselectAllTechnicians,
+  selectAllContractors,
+  deselectAllContractors
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
+  const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
+  const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
+  const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
+  const [amountRange, setAmountRange] = useState<AmountRange | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState(false);
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
-  const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>(initialFilters.selectedTechnicians);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialFilters.selectedCategories);
-  const [selectedJobSources, setSelectedJobSources] = useState<string[]>(initialFilters.selectedJobSources);
-  const [date, setDate] = useState<DateRange | undefined>(initialFilters.date);
-  const [amountRange, setAmountRange] = useState<AmountRange | null>(initialFilters.amountRange);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(initialFilters.paymentMethod);
-  const [appliedFilters, setAppliedFilters] = useState<boolean>(initialFilters.appliedFilters);
+  useEffect(() => {
+    setHasActiveFilters(
+      searchTerm !== '' ||
+      selectedTechnicians.length > 0 ||
+      selectedContractors.length > 0 ||
+      selectedJobSources.length > 0 ||
+      selectedServiceTypes.length > 0 ||
+      date !== undefined ||
+      amountRange !== null ||
+      paymentMethod !== null
+    );
+  }, [searchTerm, selectedTechnicians, selectedContractors, selectedJobSources, selectedServiceTypes, date, amountRange, paymentMethod]);
 
-  const handleApplyFilters = useCallback(() => {
-    const filters = {
-      selectedTechnicians,
-      selectedCategories,
-      selectedJobSources,
-      date,
-      amountRange,
-      paymentMethod,
-      appliedFilters: true
-    };
-    onApplyFilters(filters);
-    setAppliedFilters(true);
-  }, [selectedTechnicians, selectedCategories, selectedJobSources, date, amountRange, paymentMethod, onApplyFilters]);
+  const toggleTechnician = (technicianName: string) => {
+    setSelectedTechnicians(prev =>
+      prev.includes(technicianName)
+        ? prev.filter(name => name !== technicianName)
+        : [...prev, technicianName]
+    );
+  };
 
-  const handleClearFilters = useCallback(() => {
+  const toggleContractor = (contractorName: string) => {
+    setSelectedContractors(prev =>
+      prev.includes(contractorName)
+        ? prev.filter(name => name !== contractorName)
+        : [...prev, contractorName]
+    );
+  };
+
+  const toggleJobSource = (jobSourceName: string) => {
+    setSelectedJobSources(prev =>
+      prev.includes(jobSourceName)
+        ? prev.filter(name => name !== jobSourceName)
+        : [...prev, jobSourceName]
+    );
+  };
+
+  const toggleServiceType = (serviceType: string) => {
+    setSelectedServiceTypes(prev =>
+      prev.includes(serviceType)
+        ? prev.filter(type => type !== serviceType)
+        : [...prev, serviceType]
+    );
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
     setSelectedTechnicians([]);
-    setSelectedCategories([]);
+    setSelectedContractors([]);
     setSelectedJobSources([]);
+    setSelectedServiceTypes([]);
     setDate(undefined);
     setAmountRange(null);
     setPaymentMethod(null);
     setAppliedFilters(false);
     onClearFilters();
-  }, [onClearFilters]);
-
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategories(prev =>
-      prev.includes(category) ? prev.filter(item => item !== category) : [...prev, category]
-    );
   };
 
-  const handleJobSourceSelect = (jobSource: string) => {
-    setSelectedJobSources(prev =>
-      prev.includes(jobSource) ? prev.filter(item => item !== jobSource) : [...prev, jobSource]
-    );
-  };
-
-  const selectAllContractors = () => {
-    const allJobSourceIds = jobSourceNames.map(j => j.id);
-    setSelectedJobSources(allJobSourceIds);
-  };
-
-  const deselectAllContractors = () => {
-    setSelectedJobSources([]);
-  };
-
-  const selectAllTechnicians = () => {
-    const allTechnicianIds = technicianNames.map(t => t.id);
-    setSelectedTechnicians(allTechnicianIds);
-  };
-
-  const deselectAllTechnicians = () => {
-    setSelectedTechnicians([]);
+  const applyFilters = () => {
+    setAppliedFilters(true);
+    onApplyFilters();
   };
 
   return (
     <JobFiltersSection
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
       technicianNames={technicianNames}
       selectedTechnicians={selectedTechnicians}
-      setSelectedTechnicians={setSelectedTechnicians}
+      toggleTechnician={toggleTechnician}
+      contractorNames={contractorNames}
+      selectedContractors={selectedContractors}
+      toggleContractor={toggleContractor}
       jobSourceNames={jobSourceNames}
       selectedJobSources={selectedJobSources}
-      setSelectedJobSources={setSelectedJobSources}
+      toggleJobSource={toggleJobSource}
+      selectedServiceTypes={selectedServiceTypes}
+      toggleServiceType={toggleServiceType}
       date={date}
       setDate={setDate}
       amountRange={amountRange}
       setAmountRange={setAmountRange}
       paymentMethod={paymentMethod}
       setPaymentMethod={setPaymentMethod}
-      appliedFilters={appliedFilters}
-      setAppliedFilters={setAppliedFilters}
-      onApplyFilters={handleApplyFilters}
-      onClearFilters={handleClearFilters}
-      handleCategorySelect={handleCategorySelect}
-      handleJobSourceSelect={handleJobSourceSelect}
-      selectAllContractors={selectAllContractors}
-      deselectAllContractors={deselectAllContractors}
+      hasActiveFilters={hasActiveFilters}
+      clearFilters={clearFilters}
+      applyFilters={applyFilters}
       selectAllTechnicians={selectAllTechnicians}
       deselectAllTechnicians={deselectAllTechnicians}
+      selectAllContractors={selectAllContractors}
+      deselectAllContractors={deselectAllContractors}
     />
   );
 };

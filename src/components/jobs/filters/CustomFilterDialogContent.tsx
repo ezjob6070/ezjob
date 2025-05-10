@@ -1,336 +1,209 @@
-import React, { useState, useEffect } from "react";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { DateRange } from "react-day-picker";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { AmountRange } from "@/components/jobs/AmountFilter";
-import { PaymentMethod } from "@/components/jobs/JobTypes";
+import React, { useState } from 'react';
+import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Switch } from '@/components/ui/switch';
+import { DateRange } from 'react-day-picker';
 
 interface CustomFilterDialogContentProps {
-  selectedTechnicians: string[];
-  setSelectedTechnicians: (technicians: string[]) => void;
-  technicianNames: { id: string; name: string }[];
-  selectedCategories: string[];
-  setSelectedCategories: (categories: string[]) => void;
-  categoryNames: string[];
-  selectedJobSources: string[];
-  setSelectedJobSources: (jobSources: string[]) => void;
-  jobSourceNames: { id: string; name: string }[];
-  date: DateRange | undefined;
-  setDate: (date: DateRange | undefined) => void;
-  amountRange: AmountRange | null;
-  setAmountRange: (range: AmountRange | null) => void;
-  paymentMethod: PaymentMethod | null;
-  setPaymentMethod: (method: PaymentMethod | null) => void;
-  selectAllTechnicians: () => void;
-  deselectAllTechnicians: () => void;
-  selectAllCategories: () => void;
-  deselectAllCategories: () => void;
-  selectAllJobSources: () => void;
-  deselectAllJobSources: () => void;
+  title?: string;
+  onCancel: () => void;
+  onApply: (filters: any) => void;
+  initialFilters?: any;
+  showTechnicianSelector?: boolean;
+  technicianOptions?: { id: string; name: string }[];
+  selectedTechnicians?: string[];
+  toggleTechnician?: (id: string) => void;
+  showCategorySelector?: boolean;
+  categoryOptions?: string[];
+  selectedCategories?: string[];
+  toggleCategory?: (category: string) => void;
+  showStatusSelector?: boolean;
+  statusOptions?: string[];
+  selectedStatuses?: string[];
+  toggleStatus?: (status: string) => void;
+  showDateRangeSelector?: boolean;
+  initialDateRange?: DateRange | undefined;
+  setDateRange?: (range: DateRange | undefined) => void;
+  hasAllDayOption?: boolean;
+  initialAllDay?: boolean;
+  setAllDay?: (value: boolean) => void;
+  allDay?: boolean;
 }
 
-const CustomFilterDialogContent: React.FC<CustomFilterDialogContentProps> = ({
+const CustomFilterDialogContent = ({
+  title,
+  onCancel,
+  onApply,
+  initialFilters,
+  showTechnicianSelector,
+  technicianOptions,
   selectedTechnicians,
-  setSelectedTechnicians,
-  technicianNames,
+  toggleTechnician,
+  showCategorySelector,
+  categoryOptions,
   selectedCategories,
-  setSelectedCategories,
-  categoryNames,
-  selectedJobSources,
-  setSelectedJobSources,
-  jobSourceNames,
-  date,
-  setDate,
-  amountRange,
-  setAmountRange,
-  paymentMethod,
-  setPaymentMethod,
-  selectAllTechnicians,
-  deselectAllTechnicians,
-  selectAllCategories,
-  deselectAllCategories,
-  selectAllJobSources,
-  deselectAllJobSources,
-}) => {
-  const [localAmountRange, setLocalAmountRange] = useState<number[]>([0, 5000]);
+  toggleCategory,
+  showStatusSelector,
+  statusOptions,
+  selectedStatuses,
+  toggleStatus,
+  showDateRangeSelector,
+  initialDateRange,
+  setDateRange,
+  hasAllDayOption,
+  initialAllDay,
+  setAllDay,
+  allDay,
+}: CustomFilterDialogContentProps) => {
+  const [dateRange, setLocalDateRange] = useState<DateRange | undefined>(initialDateRange);
 
-  useEffect(() => {
-    if (amountRange) {
-      setLocalAmountRange([amountRange.min, amountRange.max]);
-    }
-  }, [amountRange]);
-
-  const handleAmountRangeChange = (values: number[]) => {
-    setLocalAmountRange(values);
-    setAmountRange({
-      min: values[0],
-      max: values[1],
-    });
-  };
-
-  const handleTechnicianChange = (technicianId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedTechnicians([...selectedTechnicians, technicianId]);
-    } else {
-      setSelectedTechnicians(
-        selectedTechnicians.filter((id) => id !== technicianId)
-      );
-    }
-  };
-
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories([...selectedCategories, category]);
-    } else {
-      setSelectedCategories(
-        selectedCategories.filter((c) => c !== category)
-      );
-    }
-  };
-
-  const handleJobSourceChange = (jobSourceId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedJobSources([...selectedJobSources, jobSourceId]);
-    } else {
-      setSelectedJobSources(
-        selectedJobSources.filter((id) => id !== jobSourceId)
-      );
-    }
-  };
-
-  const handlePaymentMethodChange = (method: PaymentMethod, checked: boolean) => {
-    if (checked) {
-      setPaymentMethod(method);
-    } else {
-      setPaymentMethod(null);
-    }
+  const applyFilters = () => {
+    const filters = {
+      selectedTechnicians,
+      selectedCategories,
+      selectedStatuses,
+      dateRange,
+      allDay,
+    };
+    onApply(filters);
   };
 
   return (
-    <div className="grid gap-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Filter by Technician</h3>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={selectAllTechnicians}
-            className="h-8 text-xs"
-          >
-            Select All
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={deselectAllTechnicians}
-            className="h-8 text-xs"
-          >
-            Clear All
-          </Button>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {technicianNames.map((technician) => (
-            <div key={technician.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={`technician-${technician.id}`}
-                checked={selectedTechnicians.includes(technician.id)}
-                onCheckedChange={(checked) =>
-                  handleTechnicianChange(technician.id, checked === true)
-                }
-              />
-              <Label
-                htmlFor={`technician-${technician.id}`}
-                className="text-sm"
-              >
-                {technician.name}
-              </Label>
+    <DialogContent className="max-w-screen-lg">
+      <DialogHeader>
+        <DialogTitle>{title || 'Filter Options'}</DialogTitle>
+      </DialogHeader>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Left Column */}
+        <div className="space-y-4">
+          {/* Technician Selector */}
+          {showTechnicianSelector && technicianOptions && (
+            <div className="border rounded-lg p-4">
+              <h3 className="text-sm font-medium mb-2">Technicians</h3>
+              <div className="space-y-2">
+                {technicianOptions.map((tech) => (
+                  <label
+                    key={tech.id}
+                    className="flex items-center space-x-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded text-blue-500 focus:ring-blue-500"
+                      checked={selectedTechnicians?.includes(tech.id) || false}
+                      onChange={() => toggleTechnician?.(tech.id)}
+                    />
+                    <span>{tech.name}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Filter by Category</h3>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={selectAllCategories}
-            className="h-8 text-xs"
-          >
-            Select All
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={deselectAllCategories}
-            className="h-8 text-xs"
-          >
-            Clear All
-          </Button>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {categoryNames.map((category) => (
-            <div key={category} className="flex items-center space-x-2">
-              <Checkbox
-                id={`category-${category}`}
-                checked={selectedCategories.includes(category)}
-                onCheckedChange={(checked) =>
-                  handleCategoryChange(category, checked === true)
-                }
-              />
-              <Label
-                htmlFor={`category-${category}`}
-                className="text-sm"
-              >
-                {category}
-              </Label>
+          {/* Category Selector */}
+          {showCategorySelector && categoryOptions && (
+            <div className="border rounded-lg p-4">
+              <h3 className="text-sm font-medium mb-2">Categories</h3>
+              <div className="space-y-2">
+                {categoryOptions.map((category) => (
+                  <label
+                    key={category}
+                    className="flex items-center space-x-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded text-blue-500 focus:ring-blue-500"
+                      checked={selectedCategories?.includes(category) || false}
+                      onChange={() => toggleCategory?.(category)}
+                    />
+                    <span>{category}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Filter by Job Source</h3>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={selectAllJobSources}
-            className="h-8 text-xs"
-          >
-            Select All
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={deselectAllJobSources}
-            className="h-8 text-xs"
-          >
-            Clear All
-          </Button>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {jobSourceNames.map((jobSource) => (
-            <div key={jobSource.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={`jobSource-${jobSource.id}`}
-                checked={selectedJobSources.includes(jobSource.id)}
-                onCheckedChange={(checked) =>
-                  handleJobSourceChange(jobSource.id, checked === true)
-                }
-              />
-              <Label
-                htmlFor={`jobSource-${jobSource.id}`}
-                className="text-sm"
-              >
-                {jobSource.name}
-              </Label>
+          {/* Status Selector */}
+          {showStatusSelector && statusOptions && (
+            <div className="border rounded-lg p-4">
+              <h3 className="text-sm font-medium mb-2">Status</h3>
+              <div className="space-y-2">
+                {statusOptions.map((status) => (
+                  <label
+                    key={status}
+                    className="flex items-center space-x-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded text-blue-500 focus:ring-blue-500"
+                      checked={selectedStatuses?.includes(status) || false}
+                      onChange={() => toggleStatus?.(status)}
+                    />
+                    <span>{status}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
         </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Filter by Date Range</h3>
-        <div className="grid gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                id="date"
-                variant={"outline"}
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      {format(date.from, "LLL dd, y")} -{" "}
-                      {format(date.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(date.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={(value) => {
-                  const dateRange = {
-                    from: value?.from ? new Date(value.from) : undefined,
-                    to: value?.to ? new Date(value.to) : undefined
-                  };
-                  setDate(dateRange);
-                }}
-                numberOfMonths={2}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Filter by Amount</h3>
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <span>${localAmountRange[0]}</span>
-            <span>${localAmountRange[1]}</span>
-          </div>
-          <Slider
-            defaultValue={[0, 5000]}
-            min={0}
-            max={5000}
-            step={100}
-            value={localAmountRange}
-            onValueChange={handleAmountRangeChange}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Filter by Payment Method</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {["cash", "credit", "check", "online"].map((method) => (
-            <div key={method} className="flex items-center space-x-2">
-              <Checkbox
-                id={`payment-${method}`}
-                checked={paymentMethod === method}
-                onCheckedChange={(checked) =>
-                  handlePaymentMethodChange(method as PaymentMethod, checked === true)
-                }
-              />
-              <Label
-                htmlFor={`payment-${method}`}
-                className="text-sm capitalize"
-              >
-                {typeof method === "function" ? method(checked) : method}
-              </Label>
+        
+        {/* Middle Column */}
+        <div className="space-y-4">
+          {/* Custom Date Range */}
+          {showDateRangeSelector && (
+            <div className="border rounded-lg p-4">
+              <h3 className="text-sm font-medium mb-2">Date Range</h3>
+              <div className="flex justify-center">
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={(range) => {
+                    if (range?.from) {
+                      // Ensure range.from and range.to are properly handled
+                      const newRange: DateRange = {
+                        from: range.from,
+                        to: range.to || range.from
+                      };
+                      setLocalDateRange(newRange);
+                    } else {
+                      setLocalDateRange(undefined);
+                    }
+                  }}
+                  numberOfMonths={1}
+                />
+              </div>
             </div>
-          ))}
+          )}
+        </div>
+        
+        {/* Right Column */}
+        <div className="space-y-4">
+          {/* Add any additional filter options here */}
+          
+          {/* Fix the checkbox handling issue */}
+          {hasAllDayOption && (
+            <div className="flex items-center justify-between space-x-2 border rounded-lg p-3">
+              <label htmlFor="all-day" className="text-sm font-medium">
+                All Day
+              </label>
+              <Switch
+                id="all-day"
+                checked={allDay}
+                onCheckedChange={(value) => setAllDay?.(value)}
+              />
+            </div>
+          )}
+          
+          {/* Add more options as needed */}
         </div>
       </div>
-    </div>
+      
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button onClick={applyFilters}>Apply Filters</Button>
+      </DialogFooter>
+    </DialogContent>
   );
 };
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -45,7 +46,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/use-toast";
-import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -74,12 +74,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DateRange } from "react-day-picker";
 
-interface OfficeExpenseListProps {}
+interface OfficeExpenseListProps {
+  expenses: OfficeExpense[];
+  onAddExpense: (expense: OfficeExpense) => void;
+  onEditExpense: (updatedExpense: OfficeExpense) => void;
+  onDeleteExpense: (expenseId: string) => void;
+  date?: DateRange;
+  activeCategory?: string;
+}
 
 const expenseSchema = z.object({
   date: z.string().min(1, {
@@ -99,24 +105,34 @@ const expenseSchema = z.object({
   frequency: z.string().optional(),
 });
 
-const OfficeExpenseList: React.FC<OfficeExpenseListProps> = () => {
+const OfficeExpenseList: React.FC<OfficeExpenseListProps> = ({
+  expenses,
+  onAddExpense,
+  onEditExpense,
+  onDeleteExpense,
+  date,
+  activeCategory
+}) => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<OfficeExpense | null>(
     null
   );
-  const { officeExpenses, addOfficeExpense, updateOfficeExpense, deleteOfficeExpense } =
-    useGlobalState();
 
-  const filteredExpenses = officeExpenses.filter((expense) => {
+  const filteredExpenses = expenses.filter((expense) => {
     const searchTerm = search.toLowerCase();
-    return (
-      expense.category.toLowerCase().includes(searchTerm) ||
-      expense.description.toLowerCase().includes(searchTerm) ||
+    // Filter by search term
+    const matchesSearch = expense.category.toLowerCase().includes(searchTerm) ||
+      (expense.description?.toLowerCase().includes(searchTerm) || false) ||
       expense.amount.toString().includes(searchTerm) ||
-      expense.date.includes(searchTerm)
-    );
+      (typeof expense.date === 'string' && expense.date.includes(searchTerm));
+
+    // Filter by category if activeCategory is provided
+    const matchesCategory = !activeCategory || activeCategory === 'all' || 
+      expense.category === activeCategory;
+
+    return matchesSearch && matchesCategory;
   });
 
   const expenseForm = useForm<z.infer<typeof expenseSchema>>({
@@ -147,10 +163,10 @@ const OfficeExpenseList: React.FC<OfficeExpenseListProps> = () => {
 
   useEffect(() => {
     if (selectedExpense) {
-      editExpenseForm.setValue("date", selectedExpense.date);
+      editExpenseForm.setValue("date", typeof selectedExpense.date === 'string' ? selectedExpense.date : format(selectedExpense.date, 'yyyy-MM-dd'));
       editExpenseForm.setValue("amount", selectedExpense.amount.toString());
       editExpenseForm.setValue("category", selectedExpense.category);
-      editExpenseForm.setValue("description", selectedExpense.description);
+      editExpenseForm.setValue("description", selectedExpense.description || '');
       editExpenseForm.setValue("paymentMethod", selectedExpense.paymentMethod || "");
       editExpenseForm.setValue("recurring", selectedExpense.recurring || false);
       editExpenseForm.setValue("frequency", selectedExpense.frequency || "");
@@ -159,7 +175,7 @@ const OfficeExpenseList: React.FC<OfficeExpenseListProps> = () => {
 
   const onSubmit = async (values: z.infer<typeof expenseSchema>) => {
     try {
-      await addOfficeExpense({
+      await onAddExpense({
         id: Math.random().toString(36).substring(7),
         date: values.date,
         amount: parseFloat(values.amount),
@@ -167,7 +183,7 @@ const OfficeExpenseList: React.FC<OfficeExpenseListProps> = () => {
         description: values.description,
         paymentMethod: values.paymentMethod,
         recurring: values.recurring,
-        frequency: values.frequency,
+        frequency: values.frequency as 'monthly' | 'quarterly' | 'yearly' | undefined
       });
       toast({
         title: "Success",
@@ -187,7 +203,7 @@ const OfficeExpenseList: React.FC<OfficeExpenseListProps> = () => {
   const onEditSubmit = async (values: z.infer<typeof expenseSchema>) => {
     try {
       if (selectedExpense) {
-        await updateOfficeExpense({
+        await onEditExpense({
           id: selectedExpense.id,
           date: values.date,
           amount: parseFloat(values.amount),
@@ -195,7 +211,7 @@ const OfficeExpenseList: React.FC<OfficeExpenseListProps> = () => {
           description: values.description,
           paymentMethod: values.paymentMethod,
           recurring: values.recurring,
-          frequency: values.frequency,
+          frequency: values.frequency as 'monthly' | 'quarterly' | 'yearly' | undefined
         });
         toast({
           title: "Success",

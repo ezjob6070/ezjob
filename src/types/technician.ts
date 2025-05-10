@@ -62,6 +62,10 @@ export interface Technician {
   };
   idNumber?: string;
   workContract?: string;
+  // Additional properties required by other components
+  isActive?: boolean;
+  contractorId?: string;
+  contractorName?: string;
 }
 
 export interface Document {

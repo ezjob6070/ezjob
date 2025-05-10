@@ -36,7 +36,7 @@ import { addDays, format } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { toast } from "@/components/ui/use-toast"
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { JobStatus } from "@/components/jobs/JobTypes";
+import { JobStatus, Job } from "@/components/jobs/JobTypes";
 import {
   Dialog,
   DialogContent,
@@ -70,18 +70,29 @@ const FormSchema = z.object({
     message: "Address must be at least 2 characters.",
   }),
   status: z.enum(["scheduled", "inProgress", "completed", "canceled", "rescheduled"]),
-  amount: z.string().optional(),
+  amount: z.string().or(z.number()).optional(),
   title: z.string().optional(),
   description: z.string().optional(),
 })
 
-interface CreateJobModalProps {
+export interface CreateJobModalProps {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  onOpenChange: (open: boolean) => void;
+  onAddJob: (job: Job) => void;
+  technicians: { id: string; name: string }[];
+  jobSources?: { id: string; name: string }[];
+  contractors?: { id: string; name: string }[];
 }
 
-const CreateJobModal: React.FC<CreateJobModalProps> = ({ open, setOpen }) => {
-  const { technicians, clients, jobs, setJobs } = useGlobalState();
+const CreateJobModal: React.FC<CreateJobModalProps> = ({ 
+  open, 
+  onOpenChange, 
+  onAddJob,
+  technicians,
+  jobSources = [],
+  contractors = [] 
+}) => {
+  const { globalClients } = useGlobalState();
   const [date, setDate] = useState<DateRange>();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -104,7 +115,6 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({ open, setOpen }) => {
 
   function onSubmit(values: z.infer<typeof FormSchema>) {
     // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values)
     try {
       const job = {
@@ -118,19 +128,15 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({ open, setOpen }) => {
         isAllDay: values.isAllDay,
         address: values.address,
         status: values.status as JobStatus,
-        amount: values.amount || 0,  // Add the amount field
-        title: values.title || values.description || "New Job"  // Ensure title is present
+        amount: typeof values.amount === "string" ? parseFloat(values.amount) || 0 : values.amount || 0,
+        title: values.title || values.description || "New Job"
       };
-      setJobs([...jobs, job]);
+      onAddJob(job);
       toast({
-        title: "You submitted the following values:",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-          </pre>
-        ),
+        title: "Success",
+        description: "Job created successfully",
       })
-      setOpen(false);
+      onOpenChange(false);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -141,7 +147,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({ open, setOpen }) => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline">Create Job</Button>
       </DialogTrigger>
@@ -167,7 +173,7 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({ open, setOpen }) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {clients.map((client) => (
+                      {globalClients.map((client) => (
                         <SelectItem key={client.id} value={client.name}>{client.name}</SelectItem>
                       ))}
                     </SelectContent>

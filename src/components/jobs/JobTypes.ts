@@ -1,3 +1,4 @@
+
 import { DateRange } from "react-day-picker";
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
