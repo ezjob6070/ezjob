@@ -1,243 +1,168 @@
 
-import { format, addDays, subDays } from 'date-fns';
+import { Project } from "@/types/project";
 
-// Get today's date
-const today = new Date();
-
-// Helper for creating dates
-const dateString = (date: Date) => format(date, 'yyyy-MM-dd');
-
-// Create milestone types
-type Milestone = {
-  title: string;
-  date: string;
-  completed: boolean;
-};
-
-// Create team member type
-type TeamMember = {
-  id: string;
-  name: string;
-  role: string;
-  avatarUrl?: string;
-};
-
-// Project type
-export type Project = {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  location: string;
-  status: "In Progress" | "Completed" | "On Hold" | "Planned";
-  client: string;
-  budget: number;
-  startDate: string;
-  endDate: string;
-  completion: number;
-  milestones?: Milestone[];
-  team?: TeamMember[];
-  materials?: {
-    name: string;
-    quantity: number;
-    cost: number;
-  }[];
-};
-
-// Sample projects data
-export const projects: Project[] = [
+export const initialProjects: Project[] = [
   {
-    id: "1",
-    name: "Downtown Office Renovation",
-    description: "Complete renovation of 3-story office building including new electrical, plumbing, and HVAC systems.",
-    type: "Commercial Renovation",
-    location: "123 Main St, Downtown",
-    status: "In Progress",
-    client: "Acme Corporation",
-    budget: 450000,
-    startDate: dateString(subDays(today, 45)),
-    endDate: dateString(addDays(today, 3)), // Urgent project approaching deadline
-    completion: 92,
-    milestones: [
-      {
-        title: "Demolition completed",
-        date: dateString(subDays(today, 30)),
-        completed: true
-      },
-      {
-        title: "Electrical rough-in",
-        date: dateString(subDays(today, 14)),
-        completed: true
-      },
-      {
-        title: "Final inspection",
-        date: dateString(addDays(today, 2)),
-        completed: false
-      }
-    ],
-    team: [
-      { id: "t1", name: "John Smith", role: "Project Manager" },
-      { id: "t2", name: "Maria Garcia", role: "Electrical Supervisor" },
-      { id: "t3", name: "David Chen", role: "Plumbing Contractor" },
-      { id: "t4", name: "Sarah Johnson", role: "Interior Designer" }
-    ],
-    materials: [
-      { name: "Electrical Supplies", quantity: 1, cost: 45000 },
-      { name: "Plumbing Fixtures", quantity: 1, cost: 32000 },
-      { name: "Drywall & Framing", quantity: 1, cost: 28000 },
-      { name: "Flooring", quantity: 5000, cost: 75000 }
-    ]
-  },
-  {
-    id: "2",
-    name: "Riverside Luxury Condos",
-    description: "New construction of 24-unit luxury condominium complex with underground parking and rooftop amenities.",
-    type: "New Construction - Residential",
-    location: "456 River View Dr",
-    status: "In Progress",
-    client: "Riverside Developments LLC",
-    budget: 8500000,
-    startDate: dateString(subDays(today, 180)),
-    endDate: dateString(addDays(today, 120)),
+    id: 1,
+    name: "City Center Tower",
+    type: "Commercial Building",
+    description: "42-story office and retail complex in downtown area with LEED certification and smart building technology integration. Features include underground parking for 500 vehicles, 15 high-speed elevators, and 30,000 sq ft of retail space.",
+    location: "Downtown Financial District",
     completion: 65,
-    milestones: [
-      {
-        title: "Foundation complete",
-        date: dateString(subDays(today, 150)),
-        completed: true
-      },
-      {
-        title: "Framing complete",
-        date: dateString(subDays(today, 90)),
-        completed: true
-      },
-      {
-        title: "Mechanical systems",
-        date: dateString(today), // Today's milestone
-        completed: false
-      },
-      {
-        title: "Interior finishing",
-        date: dateString(addDays(today, 60)),
-        completed: false
-      }
-    ],
-    team: [
-      { id: "t5", name: "Robert Williams", role: "Senior Project Manager" },
-      { id: "t6", name: "Emily Rodriguez", role: "Site Supervisor" },
-      { id: "t7", name: "Michael Lee", role: "Structural Engineer" }
-    ]
-  },
-  {
-    id: "3",
-    name: "Greenfield Industrial Park",
-    description: "Development of industrial park with 5 warehouse buildings and supporting infrastructure.",
-    type: "Industrial Development",
-    location: "789 Industry Way",
+    workers: 145,
+    vehicles: 28,
     status: "In Progress",
-    client: "JKL Industrial Partners",
-    budget: 12700000,
-    startDate: dateString(subDays(today, 220)),
-    endDate: dateString(addDays(today, 160)),
-    completion: 40,
-    team: [
-      { id: "t8", name: "Thomas Brown", role: "Development Manager" },
-      { id: "t9", name: "Jennifer Kim", role: "Civil Engineer" },
-      { id: "t10", name: "Carlos Mendez", role: "Construction Supervisor" }
-    ]
+    startDate: "2023-02-15",
+    expectedEndDate: "2024-11-30",
+    budget: 42500000,
+    actualSpent: 27625000,
+    clientName: "Metropolitan Development Corp"
   },
   {
-    id: "4",
-    name: "City Center Plaza Renovation",
-    description: "Renovation of public plaza including new landscaping, fountains, and seating areas.",
-    type: "Public Space",
-    location: "100 City Center",
-    status: "Completed",
-    client: "City of Metropolis",
-    budget: 2100000,
-    startDate: dateString(subDays(today, 150)),
-    endDate: dateString(subDays(today, 20)),
-    completion: 100
-  },
-  {
-    id: "5",
-    name: "Highland Shopping Mall",
-    description: "Construction of 50,000 sq ft shopping center with 25 retail spaces and food court.",
-    type: "Commercial - Retail",
-    location: "5000 Highland Ave",
-    status: "On Hold",
-    client: "Highland Retail Group",
-    budget: 9800000,
-    startDate: dateString(subDays(today, 90)),
-    endDate: dateString(addDays(today, 240)),
-    completion: 15
-  },
-  {
-    id: "6",
-    name: "Metro Transit Hub",
-    description: "Construction of multi-modal transit center connecting bus, light rail, and subway systems.",
-    type: "Public Transportation",
-    location: "Union Square",
+    id: 2,
+    name: "Riverside Residential",
+    type: "Residential Complex",
+    description: "350-unit luxury apartment complex with amenities including infinity pool, fitness center, co-working spaces, and rooftop gardens. Sustainable design with solar panels and rainwater harvesting systems.",
+    location: "Riverside South",
+    completion: 82,
+    workers: 98,
+    vehicles: 15,
     status: "In Progress",
-    client: "Metropolitan Transit Authority",
-    budget: 25000000,
-    startDate: dateString(subDays(today, 300)),
-    endDate: dateString(addDays(today, 6)), // Approaching deadline
-    completion: 78,
-    milestones: [
-      {
-        title: "Site preparation",
-        date: dateString(subDays(today, 280)),
-        completed: true
-      },
-      {
-        title: "Foundation work",
-        date: dateString(subDays(today, 250)),
-        completed: true
-      },
-      {
-        title: "Structural steel",
-        date: dateString(subDays(today, 180)),
-        completed: true
-      },
-      {
-        title: "Mechanical systems",
-        date: dateString(subDays(today, 60)),
-        completed: true
-      },
-      {
-        title: "Interior finishing",
-        date: dateString(today), // Today's milestone
-        completed: false
-      }
-    ]
+    startDate: "2023-01-10",
+    expectedEndDate: "2024-05-30",
+    budget: 28750000,
+    actualSpent: 24437500,
+    clientName: "Riverfront Properties LLC"
   },
   {
-    id: "7",
-    name: "Sunrise Medical Center",
-    description: "New 120-bed hospital with emergency department, operating rooms, and specialized care wings.",
+    id: 3,
+    name: "Tech Park Campus",
+    type: "Tech Office Campus",
+    description: "5-building technology campus with sustainable design, green roofs, and collaborative innovation spaces. Campus includes outdoor amphitheater, three cafeterias, and autonomous vehicle testing area.",
+    location: "North Innovation District",
+    completion: 35,
+    workers: 175,
+    vehicles: 32,
+    status: "In Progress",
+    startDate: "2023-05-20",
+    expectedEndDate: "2025-03-15",
+    budget: 56000000,
+    actualSpent: 19600000,
+    clientName: "TechFuture Investments"
+  },
+  {
+    id: 4,
+    name: "Harbor View Hotel",
+    type: "Hospitality",
+    description: "250-room luxury hotel with conference facilities, three restaurants, spa, and rooftop infinity pool overlooking the harbor. Features smart room technology and sustainable waste management systems.",
+    location: "Harbor District",
+    completion: 90,
+    workers: 68,
+    vehicles: 12,
+    status: "In Progress",
+    startDate: "2022-11-05",
+    expectedEndDate: "2024-01-30",
+    budget: 31250000,
+    actualSpent: 29687500,
+    clientName: "Global Hospitality Group"
+  },
+  {
+    id: 5,
+    name: "Summit Industrial Park",
+    type: "Industrial",
+    description: "Manufacturing and distribution complex with 5 buildings totaling 750,000 sq ft. Features include advanced logistics systems, automated warehouse capabilities, and dedicated truck staging areas.",
+    location: "Eastern Industrial Zone",
+    completion: 45,
+    workers: 112,
+    vehicles: 24,
+    status: "In Progress",
+    startDate: "2023-04-12",
+    expectedEndDate: "2024-09-30",
+    budget: 24500000,
+    actualSpent: 11025000,
+    clientName: "Summit Logistics Corp"
+  },
+  {
+    id: 6,
+    name: "Cedar Grove Community Center",
+    type: "Public/Community",
+    description: "Multi-purpose community center with recreation facilities, library, senior center, and public meeting spaces. Designed for accessibility and includes geothermal heating/cooling systems.",
+    location: "Cedar Grove Neighborhood",
+    completion: 75,
+    workers: 58,
+    vehicles: 8,
+    status: "In Progress",
+    startDate: "2023-03-01",
+    expectedEndDate: "2024-04-15",
+    budget: 12800000,
+    actualSpent: 9600000,
+    clientName: "City of Cedar Grove"
+  },
+  {
+    id: 7,
+    name: "Parkside Medical Center",
     type: "Healthcare",
-    location: "800 Health Parkway",
+    description: "Specialized medical facility with 120 beds, trauma center, 8 operating rooms, and cutting-edge diagnostic imaging department. Includes helipad and dedicated research wing.",
+    location: "Parkside District",
+    completion: 28,
+    workers: 135,
+    vehicles: 22,
     status: "In Progress",
-    client: "Regional Healthcare System",
-    budget: 78000000,
-    startDate: dateString(subDays(today, 400)),
-    endDate: dateString(addDays(today, 200)),
-    completion: 55
+    startDate: "2023-07-08",
+    expectedEndDate: "2025-06-30",
+    budget: 48500000,
+    actualSpent: 13580000,
+    clientName: "Regional Healthcare Systems"
   },
   {
-    id: "8",
-    name: "Westside Elementary School",
-    description: "Construction of new elementary school with classrooms, cafeteria, gymnasium, and playgrounds.",
-    type: "Education",
-    location: "200 Learning Lane",
+    id: 8,
+    name: "Westview Mall Expansion",
+    type: "Retail",
+    description: "75,000 sq ft expansion of existing shopping mall, adding 35 new retail spaces, food court renovation, and multi-level parking structure with EV charging stations.",
+    location: "West Commercial District",
+    completion: 55,
+    workers: 82,
+    vehicles: 14,
     status: "In Progress",
-    client: "Westside School District",
+    startDate: "2023-02-28",
+    expectedEndDate: "2024-06-15",
     budget: 18500000,
-    startDate: dateString(subDays(today, 180)),
-    endDate: dateString(addDays(today, 5)), // Urgent project
-    completion: 70
+    actualSpent: 10175000,
+    clientName: "Westview Retail Properties"
+  },
+  {
+    id: 9,
+    name: "Oceanfront Condominiums",
+    type: "Residential",
+    description: "Luxury 22-story condominium tower with 85 units, private beach access, underground parking, and hurricane-resistant construction. Features include smart home technology and concierge services.",
+    location: "Beachfront District",
+    completion: 40,
+    workers: 95,
+    vehicles: 18,
+    status: "In Progress",
+    startDate: "2023-06-10",
+    expectedEndDate: "2025-01-20",
+    budget: 34800000,
+    actualSpent: 13920000,
+    clientName: "Coastal Living Developers"
+  },
+  {
+    id: 10,
+    name: "Metro Transit Center",
+    type: "Infrastructure",
+    description: "Multi-modal transit hub connecting subway, bus, and light rail systems with 12 platforms, commercial spaces, and green roof. Features include rainwater collection system and solar panels.",
+    location: "Central Metro District",
+    completion: 68,
+    workers: 130,
+    vehicles: 25,
+    status: "In Progress",
+    startDate: "2023-01-25",
+    expectedEndDate: "2024-08-15",
+    budget: 29500000,
+    actualSpent: 20060000,
+    clientName: "Metropolitan Transit Authority"
   }
 ];
 
-export default projects;
+// Export for consistent reference
+export const projects = initialProjects;
