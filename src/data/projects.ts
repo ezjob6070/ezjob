@@ -1,246 +1,116 @@
+import { Project } from "../types/Project";
 
-import { format, addDays, subDays } from 'date-fns';
-
-// Get today's date
-const today = new Date();
-
-// Helper for creating dates
-const dateString = (date: Date) => format(date, 'yyyy-MM-dd');
-
-// Create milestone types
-type Milestone = {
-  title: string;
-  date: string;
-  completed: boolean;
-};
-
-// Create team member type
-type TeamMember = {
-  id: string;
-  name: string;
-  role: string;
-  avatarUrl?: string;
-};
-
-// Project type
-export type Project = {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  location: string;
-  status: "In Progress" | "Completed" | "On Hold" | "Planned";
-  client: string;
-  budget: number;
-  startDate: string;
-  endDate: string;
-  completion: number;
-  milestones?: Milestone[];
-  team?: TeamMember[];
-  materials?: {
-    name: string;
-    quantity: number;
-    cost: number;
-  }[];
-};
-
-// Sample projects data
 export const projects: Project[] = [
   {
     id: "1",
     name: "Downtown Office Renovation",
-    description: "Complete renovation of 3-story office building including new electrical, plumbing, and HVAC systems.",
-    type: "Commercial Renovation",
-    location: "123 Main St, Downtown",
+    description: "Complete renovation of 3-floor office building",
+    client: "MetroWorks Inc.",
     status: "In Progress",
-    client: "Acme Corporation",
+    completion: 75,
+    startDate: "2023-08-10",
+    endDate: "2023-11-20",
     budget: 450000,
-    startDate: dateString(subDays(today, 45)),
-    endDate: dateString(addDays(today, 3)), // Urgent project approaching deadline
-    completion: 92,
-    milestones: [
-      {
-        title: "Demolition completed",
-        date: dateString(subDays(today, 30)),
-        completed: true
-      },
-      {
-        title: "Electrical rough-in",
-        date: dateString(subDays(today, 14)),
-        completed: true
-      },
-      {
-        title: "Final inspection",
-        date: dateString(addDays(today, 2)),
-        completed: false
-      }
-    ],
-    team: [
-      { id: "t1", name: "John Smith", role: "Project Manager" },
-      { id: "t2", name: "Maria Garcia", role: "Electrical Supervisor" },
-      { id: "t3", name: "David Chen", role: "Plumbing Contractor" },
-      { id: "t4", name: "Sarah Johnson", role: "Interior Designer" }
-    ],
-    materials: [
-      { name: "Electrical Supplies", quantity: 1, cost: 45000 },
-      { name: "Plumbing Fixtures", quantity: 1, cost: 32000 },
-      { name: "Drywall & Framing", quantity: 1, cost: 28000 },
-      { name: "Flooring", quantity: 5000, cost: 75000 }
-    ]
+    team: ["John Smith", "Maria Rodriguez", "David Lee"],
+    location: "123 Business Ave, Downtown",
+    updatedAt: "2023-11-04"
   },
   {
     id: "2",
-    name: "Riverside Luxury Condos",
-    description: "New construction of 24-unit luxury condominium complex with underground parking and rooftop amenities.",
-    type: "New Construction - Residential",
-    location: "456 River View Dr",
-    status: "In Progress",
-    client: "Riverside Developments LLC",
-    budget: 8500000,
-    startDate: dateString(subDays(today, 180)),
-    endDate: dateString(addDays(today, 120)),
-    completion: 65,
-    milestones: [
-      {
-        title: "Foundation complete",
-        date: dateString(subDays(today, 150)),
-        completed: true
-      },
-      {
-        title: "Framing complete",
-        date: dateString(subDays(today, 90)),
-        completed: true
-      },
-      {
-        title: "Mechanical systems",
-        date: dateString(today), // Today's milestone
-        completed: false
-      },
-      {
-        title: "Interior finishing",
-        date: dateString(addDays(today, 60)),
-        completed: false
-      }
-    ],
-    team: [
-      { id: "t5", name: "Robert Williams", role: "Senior Project Manager" },
-      { id: "t6", name: "Emily Rodriguez", role: "Site Supervisor" },
-      { id: "t7", name: "Michael Lee", role: "Structural Engineer" }
-    ]
+    name: "Riverside Apartment Complex",
+    description: "New construction of 40-unit apartment building",
+    client: "River Development LLC",
+    status: "Planning",
+    completion: 20,
+    startDate: "2023-09-01",
+    endDate: "2024-05-15",
+    budget: 1200000,
+    team: ["Lisa Johnson", "Robert Chen", "Sarah Williams"],
+    location: "456 Riverside Dr",
+    updatedAt: "2023-11-02"
   },
   {
     id: "3",
-    name: "Greenfield Industrial Park",
-    description: "Development of industrial park with 5 warehouse buildings and supporting infrastructure.",
-    type: "Industrial Development",
-    location: "789 Industry Way",
+    name: "Highland Park Restoration",
+    description: "Historical building restoration and modernization",
+    client: "City Historical Society",
     status: "In Progress",
-    client: "JKL Industrial Partners",
-    budget: 12700000,
-    startDate: dateString(subDays(today, 220)),
-    endDate: dateString(addDays(today, 160)),
-    completion: 40,
-    team: [
-      { id: "t8", name: "Thomas Brown", role: "Development Manager" },
-      { id: "t9", name: "Jennifer Kim", role: "Civil Engineer" },
-      { id: "t10", name: "Carlos Mendez", role: "Construction Supervisor" }
-    ]
+    completion: 60,
+    startDate: "2023-06-15",
+    endDate: "2023-12-01",
+    budget: 380000,
+    team: ["Michael Brown", "Emily Davis", "James Wilson"],
+    location: "789 Heritage Ave, Highland",
+    updatedAt: "2023-11-05"
   },
   {
     id: "4",
-    name: "City Center Plaza Renovation",
-    description: "Renovation of public plaza including new landscaping, fountains, and seating areas.",
-    type: "Public Space",
-    location: "100 City Center",
-    status: "Completed",
-    client: "City of Metropolis",
-    budget: 2100000,
-    startDate: dateString(subDays(today, 150)),
-    endDate: dateString(subDays(today, 20)),
-    completion: 100
+    name: "Central Mall Expansion",
+    description: "Adding 15,000 sq ft to existing shopping center",
+    client: "Metro Retail Group",
+    status: "In Progress",
+    completion: 40,
+    startDate: "2023-07-20",
+    endDate: "2024-02-28",
+    budget: 850000,
+    team: ["Daniel Martinez", "Jessica Kim", "Thomas Anderson"],
+    location: "555 Commerce Blvd",
+    updatedAt: "2023-10-30"
   },
   {
     id: "5",
-    name: "Highland Shopping Mall",
-    description: "Construction of 50,000 sq ft shopping center with 25 retail spaces and food court.",
-    type: "Commercial - Retail",
-    location: "5000 Highland Ave",
-    status: "On Hold",
-    client: "Highland Retail Group",
-    budget: 9800000,
-    startDate: dateString(subDays(today, 90)),
-    endDate: dateString(addDays(today, 240)),
-    completion: 15
+    name: "Westside Medical Center",
+    description: "New medical facility with specialized equipment",
+    client: "Healthcare Partners",
+    status: "Planning",
+    completion: 10,
+    startDate: "2023-10-01",
+    endDate: "2024-08-15",
+    budget: 2100000,
+    team: ["Samantha Johnson", "Kevin Patel", "Amanda Lewis"],
+    location: "888 Medical Drive, Westside",
+    updatedAt: "2023-10-25"
   },
   {
     id: "6",
-    name: "Metro Transit Hub",
-    description: "Construction of multi-modal transit center connecting bus, light rail, and subway systems.",
-    type: "Public Transportation",
-    location: "Union Square",
-    status: "In Progress",
-    client: "Metropolitan Transit Authority",
-    budget: 25000000,
-    startDate: dateString(subDays(today, 300)),
-    endDate: dateString(addDays(today, 6)), // Approaching deadline
-    completion: 78,
-    milestones: [
-      {
-        title: "Site preparation",
-        date: dateString(subDays(today, 280)),
-        completed: true
-      },
-      {
-        title: "Foundation work",
-        date: dateString(subDays(today, 250)),
-        completed: true
-      },
-      {
-        title: "Structural steel",
-        date: dateString(subDays(today, 180)),
-        completed: true
-      },
-      {
-        title: "Mechanical systems",
-        date: dateString(subDays(today, 60)),
-        completed: true
-      },
-      {
-        title: "Interior finishing",
-        date: dateString(today), // Today's milestone
-        completed: false
-      }
-    ]
+    name: "Eastwood Elementary School",
+    description: "Renovation and expansion of K-5 public school",
+    client: "Public School District",
+    status: "Completed",
+    completion: 100,
+    startDate: "2023-05-10",
+    endDate: "2023-08-20",
+    budget: 620000,
+    team: ["Ryan Williams", "Sophia Garcia", "Nathan Taylor"],
+    location: "333 Learning Lane, Eastwood",
+    updatedAt: "2023-08-20"
   },
   {
     id: "7",
-    name: "Sunrise Medical Center",
-    description: "New 120-bed hospital with emergency department, operating rooms, and specialized care wings.",
-    type: "Healthcare",
-    location: "800 Health Parkway",
+    name: "North Bridge Repair",
+    description: "Structural reinforcement and road surface repair",
+    client: "Department of Transportation",
     status: "In Progress",
-    client: "Regional Healthcare System",
-    budget: 78000000,
-    startDate: dateString(subDays(today, 400)),
-    endDate: dateString(addDays(today, 200)),
-    completion: 55
+    completion: 35,
+    startDate: "2023-09-15",
+    endDate: "2023-12-10",
+    budget: 550000,
+    team: ["Eric Johnson", "Olivia Martinez", "Christopher Lee"],
+    location: "North River Crossing",
+    updatedAt: "2023-11-01"
   },
   {
     id: "8",
-    name: "Westside Elementary School",
-    description: "Construction of new elementary school with classrooms, cafeteria, gymnasium, and playgrounds.",
-    type: "Education",
-    location: "200 Learning Lane",
+    name: "Sunset Heights Luxury Homes",
+    description: "Development of 8 custom luxury homes",
+    client: "Elite Properties",
     status: "In Progress",
-    client: "Westside School District",
-    budget: 18500000,
-    startDate: dateString(subDays(today, 180)),
-    endDate: dateString(addDays(today, 5)), // Urgent project
-    completion: 70
+    completion: 55,
+    startDate: "2023-04-20",
+    endDate: "2024-01-15",
+    budget: 3200000,
+    team: ["Rachel Thompson", "Brandon Miller", "Hannah Wilson"],
+    location: "Sunset Heights Community",
+    updatedAt: "2023-10-28"
   }
 ];
-
-// Export the projects array as initialProjects for backward compatibility
-export const initialProjects = projects;
-
-export default projects;

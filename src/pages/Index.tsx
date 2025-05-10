@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
@@ -18,7 +17,18 @@ import { projects } from "@/data/projects";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Construction, HardHat, Package, Truck } from "lucide-react";
+import { 
+  Construction, 
+  HardHat, 
+  Package, 
+  Truck, 
+  Calendar, 
+  AlertTriangle, 
+  CheckCircle, 
+  Clock, 
+  TrendingUp,
+  ArrowRight
+} from "lucide-react";
 import { format, isAfter, isBefore, isToday, addDays as addDaysDate, isWithinInterval } from "date-fns";
 
 import {
@@ -116,6 +126,29 @@ const Index = () => {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
+
+  // Calculate project stats for the card
+  const totalProjects = projects.length;
+  const inProgressProjects = projects.filter(p => p.status === "In Progress").length;
+  const priorityProjects = projects.filter(p => {
+    const endDate = new Date(p.endDate);
+    const today = new Date();
+    const nextWeek = addDaysDate(today, 7);
+    return isAfter(endDate, today) && isBefore(endDate, nextWeek);
+  }).length;
+  
+  const completionRate = Math.round(projects.reduce((sum, p) => sum + p.completion, 0) / totalProjects);
+  
+  // Get the 3 most recently updated projects
+  const recentProjects = [...projects]
+    .sort((a, b) => new Date(b.updatedAt || b.startDate).getTime() - new Date(a.updatedAt || a.startDate).getTime())
+    .slice(0, 3);
+  
+  // Get the next upcoming deadlines
+  const upcomingDeadlines = [...projects]
+    .filter(p => p.status !== "Completed" && p.endDate)
+    .sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
+    .slice(0, 2);
 
   // Project Dashboard Section - New Addition
   const renderProjectSection = () => {
@@ -358,6 +391,143 @@ const Index = () => {
     );
   };
 
+  // New Project Orders Card
+  const renderProjectOrdersCard = () => {
+    return (
+      <Card className="bg-white shadow-sm mt-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-medium flex items-center">
+            <Construction className="h-5 w-5 mr-2 text-indigo-600" />
+            Project Pipeline
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Project Overview Stats */}
+            <div className="lg:col-span-1 space-y-4">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between bg-indigo-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-indigo-100 rounded-full">
+                      <Construction className="h-4 w-4 text-indigo-600" />
+                    </div>
+                    <span className="ml-3 font-medium text-sm">Total Projects</span>
+                  </div>
+                  <span className="text-lg font-bold">{totalProjects}</span>
+                </div>
+                
+                <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-blue-100 rounded-full">
+                      <Clock className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <span className="ml-3 font-medium text-sm">In Progress</span>
+                  </div>
+                  <span className="text-lg font-bold">{inProgressProjects}</span>
+                </div>
+                
+                <div className="flex items-center justify-between bg-amber-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-amber-100 rounded-full">
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    </div>
+                    <span className="ml-3 font-medium text-sm">Priority</span>
+                  </div>
+                  <span className="text-lg font-bold">{priorityProjects}</span>
+                </div>
+                
+                <div className="flex items-center justify-between bg-emerald-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-emerald-100 rounded-full">
+                      <TrendingUp className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    <span className="ml-3 font-medium text-sm">Completion Rate</span>
+                  </div>
+                  <span className="text-lg font-bold">{completionRate}%</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Recent Project Updates */}
+            <div className="lg:col-span-1">
+              <div className="flex items-center mb-2">
+                <h3 className="text-sm font-medium">Recent Updates</h3>
+              </div>
+              <div className="space-y-3">
+                {recentProjects.map((project) => (
+                  <Link key={project.id} to={`/project/${project.id}`} className="block">
+                    <div className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="mr-3 flex-shrink-0">
+                        <div className={`p-2 rounded-full 
+                          ${project.status === 'Completed' ? 'bg-green-100' : 
+                           project.status === 'In Progress' ? 'bg-blue-100' : 
+                           'bg-amber-100'}`}>
+                          <Construction className={`h-4 w-4 
+                            ${project.status === 'Completed' ? 'text-green-600' : 
+                             project.status === 'In Progress' ? 'text-blue-600' : 
+                             'text-amber-600'}`} />
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900 truncate">{project.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {project.status} • {project.completion}% complete
+                        </p>
+                      </div>
+                      <div>
+                        <ArrowRight className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            
+            {/* Upcoming Deadlines */}
+            <div className="lg:col-span-1">
+              <div className="flex items-center mb-2">
+                <h3 className="text-sm font-medium">Upcoming Deadlines</h3>
+              </div>
+              <div className="space-y-3">
+                {upcomingDeadlines.map((project) => (
+                  <Link key={project.id} to={`/project/${project.id}`} className="block">
+                    <div className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="mr-3 flex-shrink-0">
+                        <div className="p-2 bg-red-100 rounded-full">
+                          <Calendar className="h-4 w-4 text-red-600" />
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900 truncate">{project.name}</p>
+                        <p className="text-xs text-gray-500">
+                          Due {format(new Date(project.endDate), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                      <div>
+                        <Badge variant="outline" className={`
+                          ${isAfter(new Date(project.endDate), addDaysDate(new Date(), 3)) 
+                            ? 'border-amber-200 bg-amber-50 text-amber-800' 
+                            : 'border-red-200 bg-red-50 text-red-800'}`}>
+                          {isAfter(new Date(project.endDate), addDaysDate(new Date(), 3)) 
+                            ? format(new Date(project.endDate), 'd') + ' days' 
+                            : 'Urgent'}
+                        </Badge>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+                
+                <Button asChild variant="ghost" className="w-full mt-2 text-xs h-8">
+                  <Link to="/projects">View All Projects</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
@@ -469,8 +639,11 @@ const Index = () => {
               </Card>
             </div>
             
-            {/* Project Section - Replace MetricsOverview */}
+            {/* Project Section */}
             {renderProjectSection()}
+            
+            {/* New Project Orders Card */}
+            {renderProjectOrdersCard()}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <TicketsStatusCard 
