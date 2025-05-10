@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign } from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import ProjectFinanceTab from "@/components/project/ProjectFinanceTab";
 
 interface ProjectFile {
   id: string;
@@ -36,6 +37,7 @@ interface Project {
   budget: number;
   actualSpent: number;
   clientName: string;
+  revenue: number;
 }
 
 export default function ProjectDetail() {
@@ -81,7 +83,8 @@ export default function ProjectDetail() {
     expectedEndDate: "",
     budget: 0,
     actualSpent: 0,
-    clientName: "Unknown"
+    clientName: "Unknown",
+    revenue: 0
   };
 
   const handleFileUpload = (type: "document" | "image") => {
@@ -135,6 +138,12 @@ export default function ProjectDetail() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="files">Files & Documents</TabsTrigger>
+          <TabsTrigger value="finance">
+            <span className="flex items-center gap-1">
+              <DollarSign className="h-4 w-4" />
+              Finance
+            </span>
+          </TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
         </TabsList>
         
@@ -344,6 +353,10 @@ export default function ProjectDetail() {
               </p>
             </div>
           )}
+        </TabsContent>
+        
+        <TabsContent value="finance" className="py-4">
+          <ProjectFinanceTab project={project} />
         </TabsContent>
         
         <TabsContent value="timeline" className="py-4">
