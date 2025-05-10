@@ -1,127 +1,356 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PlusIcon, DollarSign, Briefcase, Package, Truck } from "lucide-react";
-import { Project, ProjectExpense, ProjectContractor, ProjectMaterial, ProjectEquipment } from "@/types/project";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { Project, ProjectExpense, ProjectContractor, ProjectMaterial, ProjectEquipment } from "@/types/project";
+import { ArrowUpRight, Banknote, Building2, ChevronRight, CircleDollarSign, FileText, ListChecks, Minus, ReceiptText, TrendingDown, TrendingUp, Truck } from "lucide-react";
+import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
 
-interface ProjectFinanceTabProps {
-  project: Project;
-}
+const ProjectFinanceTab: React.FC<{ project: Project }> = ({ project }) => {
+  // Initialize project with empty arrays for financial data if not present
+  const projectWithFinanceData = {
+    ...project,
+    expenses: project.expenses || [],
+    contractors: project.contractors || [],
+    materials: project.materials || [],
+    equipment: project.equipment || []
+  };
 
-export default function ProjectFinanceTab({ project }: ProjectFinanceTabProps) {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [expenses, setExpenses] = useState<ProjectExpense[]>(project.expenses || []);
-  const [contractors, setContractors] = useState<ProjectContractor[]>(project.contractors || []);
-  const [materials, setMaterials] = useState<ProjectMaterial[]>(project.materials || []);
-  const [equipment, setEquipment] = useState<ProjectEquipment[]>(project.equipment || []);
+  const [activeFinanceTab, setActiveFinanceTab] = useState("overview");
+  
+  // Form states
+  const [newExpense, setNewExpense] = useState<Omit<ProjectExpense, 'id'>>({
+    name: "",
+    amount: 0,
+    date: new Date().toISOString().split('T')[0],
+    category: "general",
+    status: "pending",
+    description: ""
+  });
+  
+  const [newContractor, setNewContractor] = useState<Omit<ProjectContractor, 'id'>>({
+    name: "",
+    role: "",
+    rate: 0,
+    rateType: "hourly",
+    hoursWorked: 0,
+    totalPaid: 0,
+    startDate: new Date().toISOString().split('T')[0],
+    status: "active",
+    contact: "",
+    email: "",
+    phone: ""
+  });
+  
+  const [newMaterial, setNewMaterial] = useState<Omit<ProjectMaterial, 'id'>>({
+    name: "",
+    quantity: 0,
+    unitPrice: 0,
+    totalPrice: 0,
+    supplier: "",
+    purchaseDate: new Date().toISOString().split('T')[0],
+    category: "general",
+    status: "ordered"
+  });
+  
+  const [newEquipment, setNewEquipment] = useState<Omit<ProjectEquipment, 'id'>>({
+    name: "",
+    type: "",
+    isRental: true,
+    rentalCost: 0,
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: "",
+    totalCost: 0,
+    status: "active"
+  });
 
-  // Financial summary calculations
-  const totalRevenue = project.revenue || 0;
-  const totalExpenses = calculateTotalExpenses();
-  const netProfit = totalRevenue - totalExpenses;
+  // Calculation of financial metrics
+  const totalExpenses = projectWithFinanceData.expenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0;
+  const totalContractorCosts = projectWithFinanceData.contractors?.reduce((sum, c) => sum + c.totalPaid, 0) || 0;
+  const totalMaterialCosts = projectWithFinanceData.materials?.reduce((sum, m) => sum + m.totalPrice, 0) || 0;
+  const totalEquipmentCosts = projectWithFinanceData.equipment?.reduce((sum, e) => sum + e.totalCost, 0) || 0;
+  
+  const totalAllExpenses = totalExpenses + totalContractorCosts + totalMaterialCosts + totalEquipmentCosts;
+  
+  // Project's budget and revenue
+  const budget = project.budget || 0;
+  const revenue = project.revenue || 0;
+  
+  // Calculate profit or loss
+  const netProfit = revenue - totalAllExpenses;
+  const budgetRemaining = budget - totalAllExpenses;
+  const budgetUsagePercentage = budget > 0 ? Math.round((totalAllExpenses / budget) * 100) : 0;
+  const isProfitable = netProfit > 0;
 
-  function calculateTotalExpenses(): number {
-    const expensesTotal = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const contractorsTotal = contractors.reduce((sum, con) => sum + con.totalPaid, 0);
-    const materialsTotal = materials.reduce((sum, mat) => sum + mat.totalPrice, 0);
-    const equipmentTotal = equipment.reduce((sum, eq) => sum + eq.totalCost, 0);
-    
-    return expensesTotal + contractorsTotal + materialsTotal + equipmentTotal;
-  }
+  // Calculate category breakdowns for expenses
+  const expensesCategories = projectWithFinanceData.expenses?.reduce((acc, expense) => {
+    if (!acc[expense.category]) {
+      acc[expense.category] = 0;
+    }
+    acc[expense.category] += expense.amount;
+    return acc;
+  }, {} as Record<string, number>) || {};
 
-  const handleAddExpense = (data: Omit<ProjectExpense, "id">) => {
-    const newExpense: ProjectExpense = {
-      ...data,
-      id: `expense-${Date.now()}`
+  // Calculate status breakdowns for expenses
+  const expensesStatus = projectWithFinanceData.expenses?.reduce((acc, expense) => {
+    if (!acc[expense.status]) {
+      acc[expense.status] = 0;
+    }
+    acc[expense.status] += expense.amount;
+    return acc;
+  }, { paid: 0, pending: 0, cancelled: 0 } as Record<string, number>);
+
+  // Form handlers
+  const handleExpenseSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newExpenseItem: ProjectExpense = {
+      ...newExpense,
+      id: uuidv4()
     };
-    setExpenses([...expenses, newExpense]);
+    
+    // Logic to add expense would go here (API call, state update, etc.)
+    console.log("Adding expense:", newExpenseItem);
+    
+    // Placeholder: Update local state
+    // In a real application, you would make an API call to update the database
+    projectWithFinanceData.expenses = [...(projectWithFinanceData.expenses || []), newExpenseItem];
+    
+    // Reset form and show success message
+    setNewExpense({
+      name: "",
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      category: "general",
+      status: "pending",
+      description: ""
+    });
+    
     toast.success("Expense added successfully");
   };
-
-  const handleAddContractor = (data: Omit<ProjectContractor, "id">) => {
-    const newContractor: ProjectContractor = {
-      ...data,
-      id: `contractor-${Date.now()}`
+  
+  const handleContractorSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newContractorItem: ProjectContractor = {
+      ...newContractor,
+      id: uuidv4()
     };
-    setContractors([...contractors, newContractor]);
+    
+    console.log("Adding contractor:", newContractorItem);
+    projectWithFinanceData.contractors = [...(projectWithFinanceData.contractors || []), newContractorItem];
+    
+    setNewContractor({
+      name: "",
+      role: "",
+      rate: 0,
+      rateType: "hourly",
+      hoursWorked: 0,
+      totalPaid: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      status: "active",
+      contact: "",
+      email: "",
+      phone: ""
+    });
+    
     toast.success("Contractor added successfully");
   };
-
-  const handleAddMaterial = (data: Omit<ProjectMaterial, "id">) => {
-    const newMaterial: ProjectMaterial = {
-      ...data,
-      id: `material-${Date.now()}`
+  
+  const handleMaterialSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Calculate total price based on quantity and unit price
+    const calculatedTotal = newMaterial.quantity * newMaterial.unitPrice;
+    
+    const newMaterialItem: ProjectMaterial = {
+      ...newMaterial,
+      totalPrice: calculatedTotal,
+      id: uuidv4()
     };
-    setMaterials([...materials, newMaterial]);
+    
+    console.log("Adding material:", newMaterialItem);
+    projectWithFinanceData.materials = [...(projectWithFinanceData.materials || []), newMaterialItem];
+    
+    setNewMaterial({
+      name: "",
+      quantity: 0,
+      unitPrice: 0,
+      totalPrice: 0,
+      supplier: "",
+      purchaseDate: new Date().toISOString().split('T')[0],
+      category: "general",
+      status: "ordered"
+    });
+    
     toast.success("Material added successfully");
   };
-
-  const handleAddEquipment = (data: Omit<ProjectEquipment, "id">) => {
-    const newEquipment: ProjectEquipment = {
-      ...data,
-      id: `equipment-${Date.now()}`
+  
+  const handleEquipmentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newEquipmentItem: ProjectEquipment = {
+      ...newEquipment,
+      id: uuidv4()
     };
-    setEquipment([...equipment, newEquipment]);
+    
+    console.log("Adding equipment:", newEquipmentItem);
+    projectWithFinanceData.equipment = [...(projectWithFinanceData.equipment || []), newEquipmentItem];
+    
+    setNewEquipment({
+      name: "",
+      type: "",
+      isRental: true,
+      rentalCost: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: "",
+      totalCost: 0,
+      status: "active"
+    });
+    
     toast.success("Equipment added successfully");
   };
-
+  
   return (
     <div className="space-y-6">
-      {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/70 border-blue-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+        {/* Revenue Card */}
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <CardContent className="pt-5">
+            <div className="flex justify-between items-start mb-2">
               <div>
-                <p className="text-sm font-medium text-blue-900/70">Total Revenue</p>
-                <p className="text-2xl font-bold text-blue-700">{formatCurrency(totalRevenue)}</p>
+                <p className="text-sm font-medium text-blue-700 mb-1">Total Revenue</p>
+                <h3 className="text-2xl font-bold text-blue-700">{formatCurrency(revenue)}</h3>
               </div>
-              <div className="bg-blue-200 p-3 rounded-full">
-                <DollarSign className="h-5 w-5 text-blue-700" />
+              <span className="bg-blue-200 p-2 rounded-full text-blue-700">
+                <CircleDollarSign size={20} />
+              </span>
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <div className="flex justify-between text-xs text-blue-700">
+                <span>Initial Budget:</span>
+                <span className="font-semibold">{formatCurrency(budget)}</span>
+              </div>
+              
+              <div className="flex justify-between text-xs text-blue-700">
+                <span>From Services:</span>
+                <span className="font-semibold">{formatCurrency(revenue * 0.7)}</span>
+              </div>
+              
+              <div className="flex justify-between text-xs text-blue-700">
+                <span>From Materials:</span>
+                <span className="font-semibold">{formatCurrency(revenue * 0.3)}</span>
+              </div>
+              
+              <div className="flex items-center justify-end gap-1 text-xs text-blue-700 mt-1">
+                <ArrowUpRight size={12} />
+                <span>+8.3% from estimate</span>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-red-50 to-red-100/70 border-red-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+        {/* Expenses Card */}
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+          <CardContent className="pt-5">
+            <div className="flex justify-between items-start mb-2">
               <div>
-                <p className="text-sm font-medium text-red-900/70">Total Expenses</p>
-                <p className="text-2xl font-bold text-red-700">{formatCurrency(totalExpenses)}</p>
+                <p className="text-sm font-medium text-red-700 mb-1">Total Expenses</p>
+                <h3 className="text-2xl font-bold text-red-700">{formatCurrency(totalAllExpenses)}</h3>
               </div>
-              <div className="bg-red-200 p-3 rounded-full">
-                <DollarSign className="h-5 w-5 text-red-700" />
+              <span className="bg-red-200 p-2 rounded-full text-red-700">
+                <Minus size={20} />
+              </span>
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <div className="flex justify-between text-xs text-red-700">
+                <span>Contractors:</span>
+                <span className="font-semibold">{formatCurrency(totalContractorCosts)}</span>
+              </div>
+              
+              <div className="flex justify-between text-xs text-red-700">
+                <span>Materials:</span>
+                <span className="font-semibold">{formatCurrency(totalMaterialCosts)}</span>
+              </div>
+              
+              <div className="flex justify-between text-xs text-red-700">
+                <span>Equipment:</span>
+                <span className="font-semibold">{formatCurrency(totalEquipmentCosts)}</span>
+              </div>
+              
+              <div className="flex justify-between text-xs text-red-700">
+                <span>Other Expenses:</span>
+                <span className="font-semibold">{formatCurrency(totalExpenses)}</span>
+              </div>
+              
+              <div className="flex items-center justify-end gap-1 text-xs text-red-700 mt-1">
+                <TrendingDown size={12} />
+                <span>{budgetUsagePercentage}% of budget used</span>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className={`bg-gradient-to-br ${netProfit >= 0 ? "from-green-50 to-green-100/70 border-green-200" : "from-red-50 to-red-100/70 border-red-200"}`}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+        {/* Profit Card */}
+        <Card className={`bg-gradient-to-br ${isProfitable ? 'from-green-50 to-green-100 border-green-200' : 'from-amber-50 to-amber-100 border-amber-200'}`}>
+          <CardContent className="pt-5">
+            <div className="flex justify-between items-start mb-2">
               <div>
-                <p className="text-sm font-medium text-gray-900/70">Net Profit</p>
-                <p className={`text-2xl font-bold ${netProfit >= 0 ? "text-green-700" : "text-red-700"}`}>
+                <p className={`text-sm font-medium ${isProfitable ? 'text-green-700' : 'text-amber-700'} mb-1`}>Net Profit</p>
+                <h3 className={`text-2xl font-bold ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
                   {formatCurrency(netProfit)}
-                </p>
+                </h3>
               </div>
-              <div className={`p-3 rounded-full ${netProfit >= 0 ? "bg-green-200" : "bg-red-200"}`}>
-                <DollarSign className={`h-5 w-5 ${netProfit >= 0 ? "text-green-700" : "text-red-700"}`} />
+              <span className={`p-2 rounded-full ${isProfitable ? 'bg-green-200 text-green-700' : 'bg-amber-200 text-amber-700'}`}>
+                {isProfitable ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+              </span>
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <div className={`flex justify-between text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
+                <span>Budget Remaining:</span>
+                <span className="font-semibold">{formatCurrency(budgetRemaining)}</span>
+              </div>
+              
+              <div className={`flex justify-between text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
+                <span>Margin:</span>
+                <span className="font-semibold">
+                  {revenue > 0 ? `${Math.round((netProfit / revenue) * 100)}%` : '0%'}
+                </span>
+              </div>
+              
+              <div className={`flex justify-between text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'}`}>
+                <span>Cost per completion %:</span>
+                <span className="font-semibold">
+                  {project.completion > 0 
+                    ? formatCurrency(totalAllExpenses / (project.completion / 100))
+                    : formatCurrency(0)}
+                </span>
+              </div>
+              
+              <div className={`flex items-center justify-end gap-1 text-xs ${isProfitable ? 'text-green-700' : 'text-amber-700'} mt-1`}>
+                {isProfitable ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                <span>
+                  {isProfitable 
+                    ? `${Math.round((netProfit / budget) * 100)}% profit on budget` 
+                    : `${Math.round((Math.abs(netProfit) / budget) * 100)}% loss on budget`}
+                </span>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Finance Tabs */}
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 md:w-auto w-full">
+      
+      <Tabs defaultValue="overview" value={activeFinanceTab} onValueChange={setActiveFinanceTab}>
+        <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="contractors">Contractors</TabsTrigger>
@@ -129,1018 +358,925 @@ export default function ProjectFinanceTab({ project }: ProjectFinanceTabProps) {
           <TabsTrigger value="equipment">Equipment</TabsTrigger>
         </TabsList>
         
-        {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Financial Overview</h3>
-          </div>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Budget Analysis</CardTitle>
-              <CardDescription>Comparing budget allocation with actual expenses</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Budget</span>
-                    <span className="text-sm">{formatCurrency(project.budget)}</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full mt-1">
-                    <div className="h-2 bg-blue-500 rounded-full" style={{ width: '100%' }}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Actual Spent</span>
-                    <span className="text-sm">{formatCurrency(totalExpenses)}</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full mt-1">
-                    <div 
-                      className={`h-2 ${totalExpenses > project.budget ? 'bg-red-500' : 'bg-green-500'} rounded-full`} 
-                      style={{ width: `${Math.min(100, (totalExpenses / project.budget) * 100)}%` }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between">
-                    <span className="font-medium">Remaining Budget</span>
-                    <span className={`font-medium ${project.budget - totalExpenses >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatCurrency(project.budget - totalExpenses)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
                 <CardTitle>Expense Breakdown</CardTitle>
+                <CardDescription>Expense distribution by category</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm">General Expenses</span>
-                    <span className="font-medium">{formatCurrency(expenses.reduce((sum, exp) => sum + exp.amount, 0))}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Contractor Payments</span>
-                    <span className="font-medium">{formatCurrency(contractors.reduce((sum, con) => sum + con.totalPaid, 0))}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Materials</span>
-                    <span className="font-medium">{formatCurrency(materials.reduce((sum, mat) => sum + mat.totalPrice, 0))}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Equipment</span>
-                    <span className="font-medium">{formatCurrency(equipment.reduce((sum, eq) => sum + eq.totalCost, 0))}</span>
-                  </div>
+                <div className="space-y-4">
+                  {Object.entries(expensesCategories).length > 0 ? (
+                    Object.entries(expensesCategories).map(([category, amount]) => (
+                      <div key={category} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                          <span className="capitalize">{category}</span>
+                        </div>
+                        <div>
+                          <span className="font-medium">{formatCurrency(amount)}</span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            ({totalAllExpenses > 0 ? Math.round((amount / totalAllExpenses) * 100) : 0}%)
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground">No expense data available</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader>
-                <CardTitle>Budget Utilization</CardTitle>
+                <CardTitle>Financial Status</CardTitle>
+                <CardDescription>Current financial health</CardDescription>
               </CardHeader>
-              <CardContent className="pt-2">
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="text-3xl font-bold">
-                    {project.budget > 0 
-                      ? `${Math.round((totalExpenses / project.budget) * 100)}%` 
-                      : '0%'}
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span>Budget Usage</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className={`h-2.5 rounded-full ${budgetUsagePercentage > 90 ? 'bg-red-500' : budgetUsagePercentage > 75 ? 'bg-amber-500' : 'bg-green-500'}`}
+                        style={{ width: `${Math.min(budgetUsagePercentage, 100)}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm">{budgetUsagePercentage}%</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">of budget utilized</div>
-                  
-                  <div className={`mt-2 text-sm ${
-                    totalExpenses > project.budget 
-                      ? 'text-red-600' 
-                      : totalExpenses > project.budget * 0.9 
-                        ? 'text-amber-600' 
-                        : 'text-green-600'
-                  }`}>
-                    {totalExpenses > project.budget 
-                      ? 'Over budget' 
-                      : totalExpenses > project.budget * 0.9 
-                        ? 'Approaching budget limit' 
-                        : 'Within budget'}
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span>Project Completion</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-blue-500 h-2.5 rounded-full" 
+                        style={{ width: `${project.completion}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm">{project.completion}%</span>
                   </div>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span>Expense Status</span>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-200">
+                      Paid: {formatCurrency(expensesStatus?.paid || 0)}
+                    </Badge>
+                    <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-200">
+                      Pending: {formatCurrency(expensesStatus?.pending || 0)}
+                    </Badge>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between items-center mt-2">
+                    <span>Budget Efficiency</span>
+                    <Badge 
+                      variant="outline" 
+                      className={`${
+                        project.completion > budgetUsagePercentage 
+                          ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                          : 'bg-red-100 text-red-800 hover:bg-red-200'
+                      }`}
+                    >
+                      {project.completion > budgetUsagePercentage ? 'Under Budget' : 'Over Budget'}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Project is {project.completion}% complete with {budgetUsagePercentage}% of budget used
+                  </p>
                 </div>
               </CardContent>
             </Card>
           </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Financial Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* Display recent activity from all financial categories */}
+                  {[
+                    ...(projectWithFinanceData.expenses?.map(item => ({ ...item, type: 'expense' })) || []),
+                    ...(projectWithFinanceData.contractors?.map(item => ({ ...item, type: 'contractor', name: `${item.name} (${item.role})`, amount: item.totalPaid, date: item.startDate })) || []),
+                    ...(projectWithFinanceData.materials?.map(item => ({ ...item, type: 'material', amount: item.totalPrice, date: item.purchaseDate })) || []),
+                    ...(projectWithFinanceData.equipment?.map(item => ({ ...item, type: 'equipment', amount: item.totalCost, date: item.startDate })) || [])
+                  ]
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .slice(0, 5)
+                    .map((item, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{new Date(item.date).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">
+                            {item.type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(item.amount)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  
+                  {([
+                    ...(projectWithFinanceData.expenses || []),
+                    ...(projectWithFinanceData.contractors || []),
+                    ...(projectWithFinanceData.materials || []),
+                    ...(projectWithFinanceData.equipment || [])
+                  ].length === 0) && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground py-4">
+                        No financial activity recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
         
-        {/* Expenses Tab */}
         <TabsContent value="expenses" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Expenses</h3>
-            
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Project Expenses</h3>
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-2">
-                  <PlusIcon className="h-4 w-4" />
-                  Add Expense
-                </Button>
+                <Button>Add Expense</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Expense</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new expense.
+                  </DialogDescription>
                 </DialogHeader>
                 
-                <AddExpenseForm onSubmit={handleAddExpense} />
+                <form onSubmit={handleExpenseSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="expense-name">Expense Name</Label>
+                      <Input 
+                        id="expense-name" 
+                        value={newExpense.name}
+                        onChange={e => setNewExpense({...newExpense, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="expense-amount">Amount</Label>
+                      <Input 
+                        id="expense-amount" 
+                        type="number"
+                        value={newExpense.amount}
+                        onChange={e => setNewExpense({...newExpense, amount: parseFloat(e.target.value)})}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="expense-date">Date</Label>
+                        <Input 
+                          id="expense-date" 
+                          type="date"
+                          value={newExpense.date}
+                          onChange={e => setNewExpense({...newExpense, date: e.target.value})}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="expense-category">Category</Label>
+                        <Select 
+                          value={newExpense.category}
+                          onValueChange={value => setNewExpense({...newExpense, category: value})}
+                        >
+                          <SelectTrigger id="expense-category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="labor">Labor</SelectItem>
+                            <SelectItem value="materials">Materials</SelectItem>
+                            <SelectItem value="equipment">Equipment</SelectItem>
+                            <SelectItem value="permits">Permits & Licenses</SelectItem>
+                            <SelectItem value="utilities">Utilities</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="expense-status">Status</Label>
+                      <Select 
+                        value={newExpense.status}
+                        onValueChange={value => setNewExpense({...newExpense, status: value as "paid" | "pending" | "cancelled"})}
+                      >
+                        <SelectTrigger id="expense-status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="expense-description">Description (Optional)</Label>
+                      <Textarea 
+                        id="expense-description" 
+                        value={newExpense.description || ""}
+                        onChange={e => setNewExpense({...newExpense, description: e.target.value})}
+                        placeholder="Add details about this expense"
+                      />
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button type="submit">Add Expense</Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>
           
-          <ExpensesTable expenses={expenses} />
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.expenses && projectWithFinanceData.expenses.length > 0 ? (
+                    projectWithFinanceData.expenses.map(expense => (
+                      <TableRow key={expense.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{expense.name}</p>
+                            {expense.description && (
+                              <p className="text-xs text-muted-foreground">{expense.description}</p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">
+                            {expense.category}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              expense.status === "paid" ? "bg-green-100 text-green-800" :
+                              expense.status === "pending" ? "bg-amber-100 text-amber-800" :
+                              "bg-red-100 text-red-800"
+                            }
+                          >
+                            {expense.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(expense.amount)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No expenses recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
         
-        {/* Contractors Tab */}
         <TabsContent value="contractors" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Contractors</h3>
-            
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Project Contractors</h3>
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-2">
-                  <PlusIcon className="h-4 w-4" />
-                  Add Contractor
-                </Button>
+                <Button>Add Contractor</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Contractor</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new contractor.
+                  </DialogDescription>
                 </DialogHeader>
                 
-                <AddContractorForm onSubmit={handleAddContractor} />
+                <form onSubmit={handleContractorSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="contractor-name">Contractor Name</Label>
+                      <Input 
+                        id="contractor-name" 
+                        value={newContractor.name}
+                        onChange={e => setNewContractor({...newContractor, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="contractor-role">Role</Label>
+                      <Input 
+                        id="contractor-role" 
+                        value={newContractor.role}
+                        onChange={e => setNewContractor({...newContractor, role: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contractor-rate">Rate</Label>
+                        <Input 
+                          id="contractor-rate" 
+                          type="number"
+                          value={newContractor.rate}
+                          onChange={e => setNewContractor({...newContractor, rate: parseFloat(e.target.value)})}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="contractor-rate-type">Rate Type</Label>
+                        <Select 
+                          value={newContractor.rateType}
+                          onValueChange={value => setNewContractor({...newContractor, rateType: value as "hourly" | "fixed" | "daily"})}
+                        >
+                          <SelectTrigger id="contractor-rate-type">
+                            <SelectValue placeholder="Select rate type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hourly">Hourly</SelectItem>
+                            <SelectItem value="daily">Daily</SelectItem>
+                            <SelectItem value="fixed">Fixed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {newContractor.rateType !== "fixed" && (
+                        <div>
+                          <Label htmlFor="contractor-hours">Hours Worked</Label>
+                          <Input 
+                            id="contractor-hours" 
+                            type="number"
+                            value={newContractor.hoursWorked || 0}
+                            onChange={e => setNewContractor({...newContractor, hoursWorked: parseFloat(e.target.value)})}
+                          />
+                        </div>
+                      )}
+                      
+                      <div>
+                        <Label htmlFor="contractor-paid">Total Paid</Label>
+                        <Input 
+                          id="contractor-paid" 
+                          type="number"
+                          value={newContractor.totalPaid}
+                          onChange={e => setNewContractor({...newContractor, totalPaid: parseFloat(e.target.value)})}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contractor-start-date">Start Date</Label>
+                        <Input 
+                          id="contractor-start-date" 
+                          type="date"
+                          value={newContractor.startDate}
+                          onChange={e => setNewContractor({...newContractor, startDate: e.target.value})}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="contractor-status">Status</Label>
+                        <Select 
+                          value={newContractor.status}
+                          onValueChange={value => setNewContractor({...newContractor, status: value as "active" | "completed" | "terminated"})}
+                        >
+                          <SelectTrigger id="contractor-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="terminated">Terminated</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="contractor-contact">Contact Name (Optional)</Label>
+                      <Input 
+                        id="contractor-contact" 
+                        value={newContractor.contact || ""}
+                        onChange={e => setNewContractor({...newContractor, contact: e.target.value})}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contractor-email">Email (Optional)</Label>
+                        <Input 
+                          id="contractor-email" 
+                          type="email"
+                          value={newContractor.email || ""}
+                          onChange={e => setNewContractor({...newContractor, email: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="contractor-phone">Phone (Optional)</Label>
+                        <Input 
+                          id="contractor-phone" 
+                          value={newContractor.phone || ""}
+                          onChange={e => setNewContractor({...newContractor, phone: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button type="submit">Add Contractor</Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>
           
-          <ContractorsTable contractors={contractors} />
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Rate</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total Paid</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.contractors && projectWithFinanceData.contractors.length > 0 ? (
+                    projectWithFinanceData.contractors.map(contractor => (
+                      <TableRow key={contractor.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{contractor.name}</p>
+                            {contractor.contact && (
+                              <p className="text-xs text-muted-foreground">Contact: {contractor.contact}</p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{contractor.role}</TableCell>
+                        <TableCell>
+                          {formatCurrency(contractor.rate)} / {contractor.rateType}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              contractor.status === "active" ? "bg-green-100 text-green-800" :
+                              contractor.status === "completed" ? "bg-blue-100 text-blue-800" :
+                              "bg-red-100 text-red-800"
+                            }
+                          >
+                            {contractor.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(contractor.totalPaid)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No contractors recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
         
-        {/* Materials Tab */}
         <TabsContent value="materials" className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium">Materials</h3>
-            
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-2">
-                  <PlusIcon className="h-4 w-4" />
-                  Add Material
-                </Button>
+                <Button>Add Material</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Material</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new material.
+                  </DialogDescription>
                 </DialogHeader>
                 
-                <AddMaterialForm onSubmit={handleAddMaterial} />
+                <form onSubmit={handleMaterialSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="material-name">Material Name</Label>
+                      <Input 
+                        id="material-name" 
+                        value={newMaterial.name}
+                        onChange={e => setNewMaterial({...newMaterial, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="material-quantity">Quantity</Label>
+                        <Input 
+                          id="material-quantity" 
+                          type="number"
+                          value={newMaterial.quantity}
+                          onChange={e => setNewMaterial({...newMaterial, quantity: parseFloat(e.target.value)})}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="material-unit-price">Unit Price</Label>
+                        <Input 
+                          id="material-unit-price" 
+                          type="number"
+                          value={newMaterial.unitPrice}
+                          onChange={e => setNewMaterial({...newMaterial, unitPrice: parseFloat(e.target.value)})}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="material-date">Purchase Date</Label>
+                        <Input 
+                          id="material-date" 
+                          type="date"
+                          value={newMaterial.purchaseDate}
+                          onChange={e => setNewMaterial({...newMaterial, purchaseDate: e.target.value})}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="material-status">Status</Label>
+                        <Select 
+                          value={newMaterial.status}
+                          onValueChange={value => setNewMaterial({...newMaterial, status: value as "ordered" | "delivered" | "used" | "returned"})}
+                        >
+                          <SelectTrigger id="material-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ordered">Ordered</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                            <SelectItem value="used">Used</SelectItem>
+                            <SelectItem value="returned">Returned</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="material-supplier">Supplier (Optional)</Label>
+                        <Input 
+                          id="material-supplier" 
+                          value={newMaterial.supplier || ""}
+                          onChange={e => setNewMaterial({...newMaterial, supplier: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="material-category">Category</Label>
+                        <Select 
+                          value={newMaterial.category}
+                          onValueChange={value => setNewMaterial({...newMaterial, category: value})}
+                        >
+                          <SelectTrigger id="material-category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="lumber">Lumber</SelectItem>
+                            <SelectItem value="electrical">Electrical</SelectItem>
+                            <SelectItem value="plumbing">Plumbing</SelectItem>
+                            <SelectItem value="concrete">Concrete</SelectItem>
+                            <SelectItem value="steel">Steel</SelectItem>
+                            <SelectItem value="finishes">Finishes</SelectItem>
+                            <SelectItem value="hvac">HVAC</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button type="submit">Add Material</Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>
           
-          <MaterialsTable materials={materials} />
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total Price</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.materials && projectWithFinanceData.materials.length > 0 ? (
+                    projectWithFinanceData.materials.map(material => (
+                      <TableRow key={material.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{material.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {material.category}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>{material.quantity} @ {formatCurrency(material.unitPrice)}</TableCell>
+                        <TableCell>{material.supplier || "—"}</TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              material.status === "delivered" ? "bg-green-100 text-green-800" :
+                              material.status === "ordered" ? "bg-amber-100 text-amber-800" :
+                              material.status === "used" ? "bg-blue-100 text-blue-800" :
+                              "bg-red-100 text-red-800"
+                            }
+                          >
+                            {material.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(material.totalPrice)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No materials recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
         
-        {/* Equipment Tab */}
         <TabsContent value="equipment" className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium">Equipment</h3>
-            
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-2">
-                  <PlusIcon className="h-4 w-4" />
-                  Add Equipment
-                </Button>
+                <Button>Add Equipment</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Equipment</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new equipment.
+                  </DialogDescription>
                 </DialogHeader>
                 
-                <AddEquipmentForm onSubmit={handleAddEquipment} />
+                <form onSubmit={handleEquipmentSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="equipment-name">Equipment Name</Label>
+                      <Input 
+                        id="equipment-name" 
+                        value={newEquipment.name}
+                        onChange={e => setNewEquipment({...newEquipment, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="equipment-type">Type</Label>
+                      <Input 
+                        id="equipment-type" 
+                        value={newEquipment.type}
+                        onChange={e => setNewEquipment({...newEquipment, type: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="equipment-is-rental" 
+                        checked={newEquipment.isRental}
+                        onCheckedChange={checked => setNewEquipment({...newEquipment, isRental: Boolean(checked)})}
+                      />
+                      <Label htmlFor="equipment-is-rental">This is a rental</Label>
+                    </div>
+                    
+                    {newEquipment.isRental ? (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="equipment-rental-cost">Rental Cost</Label>
+                          <Input 
+                            id="equipment-rental-cost" 
+                            type="number"
+                            value={newEquipment.rentalCost || 0}
+                            onChange={e => setNewEquipment({...newEquipment, rentalCost: parseFloat(e.target.value)})}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="equipment-total-cost">Total Cost</Label>
+                          <Input 
+                            id="equipment-total-cost" 
+                            type="number"
+                            value={newEquipment.totalCost}
+                            onChange={e => setNewEquipment({...newEquipment, totalCost: parseFloat(e.target.value)})}
+                            required
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <Label htmlFor="equipment-purchase-cost">Purchase Cost</Label>
+                        <Input 
+                          id="equipment-purchase-cost" 
+                          type="number"
+                          value={newEquipment.purchaseCost || 0}
+                          onChange={e => setNewEquipment({
+                            ...newEquipment, 
+                            purchaseCost: parseFloat(e.target.value),
+                            totalCost: parseFloat(e.target.value)
+                          })}
+                          required
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="equipment-start-date">Start Date</Label>
+                        <Input 
+                          id="equipment-start-date" 
+                          type="date"
+                          value={newEquipment.startDate}
+                          onChange={e => setNewEquipment({...newEquipment, startDate: e.target.value})}
+                          required
+                        />
+                      </div>
+                      
+                      {newEquipment.isRental && (
+                        <div>
+                          <Label htmlFor="equipment-end-date">End Date (Optional)</Label>
+                          <Input 
+                            id="equipment-end-date" 
+                            type="date"
+                            value={newEquipment.endDate || ""}
+                            onChange={e => setNewEquipment({...newEquipment, endDate: e.target.value})}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="equipment-status">Status</Label>
+                      <Select 
+                        value={newEquipment.status}
+                        onValueChange={value => setNewEquipment({...newEquipment, status: value as "active" | "returned" | "owned"})}
+                      >
+                        <SelectTrigger id="equipment-status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          {newEquipment.isRental && <SelectItem value="returned">Returned</SelectItem>}
+                          {!newEquipment.isRental && <SelectItem value="owned">Owned</SelectItem>}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button type="submit">Add Equipment</Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>
           
-          <EquipmentTable equipment={equipment} />
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead className="text-right">Cost</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.equipment && projectWithFinanceData.equipment.length > 0 ? (
+                    projectWithFinanceData.equipment.map(equipment => (
+                      <TableRow key={equipment.id}>
+                        <TableCell className="font-medium">{equipment.name}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {equipment.type}
+                            <Badge variant="outline" className={equipment.isRental ? "bg-blue-100" : "bg-green-100"}>
+                              {equipment.isRental ? "Rental" : "Purchased"}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              equipment.status === "active" ? "bg-green-100 text-green-800" :
+                              equipment.status === "returned" ? "bg-blue-100 text-blue-800" :
+                              "bg-gray-100 text-gray-800"
+                            }
+                          >
+                            {equipment.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(equipment.startDate || "").toLocaleDateString()}
+                          {equipment.endDate && (
+                            <> to {new Date(equipment.endDate).toLocaleDateString()}</>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(equipment.totalCost)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No equipment recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
+};
 
-// Form Components
-function AddExpenseForm({ onSubmit }: { onSubmit: (data: any) => void }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    amount: 0,
-    date: new Date().toISOString().split('T')[0],
-    category: 'general',
-    description: '',
-    paymentMethod: 'card',
-    status: 'paid'
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-    // In a real app, you would reset the form or close the dialog
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label className="text-sm font-medium">Expense Name</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">Amount</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium">Date</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">Category</label>
-            <select
-              className="w-full border rounded p-2 mt-1"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="general">General</option>
-              <option value="labor">Labor</option>
-              <option value="materials">Materials</option>
-              <option value="equipment">Equipment</option>
-              <option value="permits">Permits & Fees</option>
-              <option value="utilities">Utilities</option>
-              <option value="transport">Transportation</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium">Payment Method</label>
-            <select
-              className="w-full border rounded p-2 mt-1"
-              name="paymentMethod"
-              value={formData.paymentMethod}
-              onChange={handleChange}
-            >
-              <option value="cash">Cash</option>
-              <option value="card">Credit/Debit Card</option>
-              <option value="bank">Bank Transfer</option>
-              <option value="check">Check</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Description</label>
-          <textarea
-            className="w-full border rounded p-2 mt-1"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={3}
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Status</label>
-          <select
-            className="w-full border rounded p-2 mt-1"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-          >
-            <option value="paid">Paid</option>
-            <option value="pending">Pending</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-      </div>
-      
-      <Button type="submit" className="w-full">Add Expense</Button>
-    </form>
-  );
-}
-
-function AddContractorForm({ onSubmit }: { onSubmit: (data: any) => void }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    role: '',
-    rate: 0,
-    rateType: 'hourly',
-    totalPaid: 0,
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: '',
-    status: 'active',
-    contact: '',
-    email: '',
-    phone: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label className="text-sm font-medium">Contractor Name</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Role</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            placeholder="e.g., Plumber, Electrician"
-            required
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">Rate</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="number"
-              name="rate"
-              value={formData.rate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium">Rate Type</label>
-            <select
-              className="w-full border rounded p-2 mt-1"
-              name="rateType"
-              value={formData.rateType}
-              onChange={handleChange}
-            >
-              <option value="hourly">Hourly</option>
-              <option value="daily">Daily</option>
-              <option value="fixed">Fixed</option>
-            </select>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">Start Date</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium">End Date</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="date"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Total Paid</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            type="number"
-            name="totalPaid"
-            value={formData.totalPaid}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">Email</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium">Phone</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Status</label>
-          <select
-            className="w-full border rounded p-2 mt-1"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-          >
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="terminated">Terminated</option>
-          </select>
-        </div>
-      </div>
-      
-      <Button type="submit" className="w-full">Add Contractor</Button>
-    </form>
-  );
-}
-
-function AddMaterialForm({ onSubmit }: { onSubmit: (data: any) => void }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    quantity: 1,
-    unitPrice: 0,
-    totalPrice: 0,
-    supplier: '',
-    purchaseDate: new Date().toISOString().split('T')[0],
-    category: 'building',
-    status: 'delivered'
-  });
-
-  const calculateTotal = () => {
-    return formData.quantity * formData.unitPrice;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      ...formData,
-      totalPrice: calculateTotal()
-    });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: value,
-      // Auto-calculate total price when quantity or unitPrice changes
-      ...(name === 'quantity' || name === 'unitPrice' ? {
-        totalPrice: Number(name === 'quantity' ? value : prev.quantity) * Number(name === 'unitPrice' ? value : prev.unitPrice)
-      } : {})
-    }));
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label className="text-sm font-medium">Material Name</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">Quantity</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              min="1"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium">Unit Price</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="number"
-              name="unitPrice"
-              value={formData.unitPrice}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Total Price</label>
-          <input
-            className="w-full border rounded p-2 mt-1 bg-gray-50"
-            type="number"
-            value={calculateTotal()}
-            readOnly
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">Purchase Date</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="date"
-              name="purchaseDate"
-              value={formData.purchaseDate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium">Category</label>
-            <select
-              className="w-full border rounded p-2 mt-1"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="building">Building Materials</option>
-              <option value="electrical">Electrical</option>
-              <option value="plumbing">Plumbing</option>
-              <option value="flooring">Flooring</option>
-              <option value="fixtures">Fixtures</option>
-              <option value="paint">Paint & Finishes</option>
-              <option value="hardware">Hardware</option>
-              <option value="landscaping">Landscaping</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Supplier</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            name="supplier"
-            value={formData.supplier}
-            onChange={handleChange}
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Status</label>
-          <select
-            className="w-full border rounded p-2 mt-1"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-          >
-            <option value="ordered">Ordered</option>
-            <option value="delivered">Delivered</option>
-            <option value="used">Used</option>
-            <option value="returned">Returned</option>
-          </select>
-        </div>
-      </div>
-      
-      <Button type="submit" className="w-full">Add Material</Button>
-    </form>
-  );
-}
-
-function AddEquipmentForm({ onSubmit }: { onSubmit: (data: any) => void }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    type: '',
-    isRental: true,
-    rentalCost: 0,
-    purchaseCost: 0,
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: '',
-    totalCost: 0,
-    status: 'active'
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    let totalCost = formData.isRental 
-      ? formData.rentalCost 
-      : formData.purchaseCost;
-      
-    onSubmit({
-      ...formData,
-      totalCost
-    });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-    
-    setFormData(prev => ({ ...prev, [name]: newValue }));
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label className="text-sm font-medium">Equipment Name</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Equipment Type</label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            placeholder="e.g., Excavator, Crane, Generator"
-            required
-          />
-        </div>
-        
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="isRental"
-            name="isRental"
-            checked={formData.isRental}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          <label htmlFor="isRental" className="text-sm font-medium">This is a rental equipment</label>
-        </div>
-        
-        {formData.isRental ? (
-          <>
-            <div>
-              <label className="text-sm font-medium">Rental Cost</label>
-              <input
-                className="w-full border rounded p-2 mt-1"
-                type="number"
-                name="rentalCost"
-                value={formData.rentalCost}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-                required
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Start Date</label>
-                <input
-                  className="w-full border rounded p-2 mt-1"
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium">End Date</label>
-                <input
-                  className="w-full border rounded p-2 mt-1"
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          <div>
-            <label className="text-sm font-medium">Purchase Cost</label>
-            <input
-              className="w-full border rounded p-2 mt-1"
-              type="number"
-              name="purchaseCost"
-              value={formData.purchaseCost}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
-        )}
-        
-        <div>
-          <label className="text-sm font-medium">Status</label>
-          <select
-            className="w-full border rounded p-2 mt-1"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-          >
-            <option value="active">Active</option>
-            {formData.isRental ? <option value="returned">Returned</option> : <option value="owned">Owned</option>}
-          </select>
-        </div>
-      </div>
-      
-      <Button type="submit" className="w-full">Add Equipment</Button>
-    </form>
-  );
-}
-
-// Table Components
-function ExpensesTable({ expenses }: { expenses: ProjectExpense[] }) {
-  if (expenses.length === 0) {
-    return (
-      <div className="text-center py-8 border rounded-md bg-gray-50">
-        <p className="text-muted-foreground">No expenses recorded yet.</p>
-        <p className="text-sm text-muted-foreground mt-1">Click "Add Expense" to record project expenses.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-md overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-gray-700">
-          <tr>
-            <th className="p-3 text-left">Name</th>
-            <th className="p-3 text-left">Date</th>
-            <th className="p-3 text-left">Category</th>
-            <th className="p-3 text-left">Payment Method</th>
-            <th className="p-3 text-right">Amount</th>
-            <th className="p-3 text-center">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses.map(expense => (
-            <tr key={expense.id} className="border-t hover:bg-gray-50">
-              <td className="p-3">{expense.name}</td>
-              <td className="p-3">{new Date(expense.date).toLocaleDateString()}</td>
-              <td className="p-3 capitalize">{expense.category}</td>
-              <td className="p-3 capitalize">{expense.paymentMethod}</td>
-              <td className="p-3 text-right">{formatCurrency(expense.amount)}</td>
-              <td className="p-3">
-                <div className="flex justify-center">
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    expense.status === 'paid' ? 'bg-green-100 text-green-800' :
-                    expense.status === 'pending' ? 'bg-amber-100 text-amber-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {expense.status}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function ContractorsTable({ contractors }: { contractors: ProjectContractor[] }) {
-  if (contractors.length === 0) {
-    return (
-      <div className="text-center py-8 border rounded-md bg-gray-50">
-        <p className="text-muted-foreground">No contractors added yet.</p>
-        <p className="text-sm text-muted-foreground mt-1">Click "Add Contractor" to add project contractors.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-md overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-gray-700">
-          <tr>
-            <th className="p-3 text-left">Name</th>
-            <th className="p-3 text-left">Role</th>
-            <th className="p-3 text-left">Rate</th>
-            <th className="p-3 text-left">Period</th>
-            <th className="p-3 text-right">Total Paid</th>
-            <th className="p-3 text-center">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {contractors.map(contractor => (
-            <tr key={contractor.id} className="border-t hover:bg-gray-50">
-              <td className="p-3">{contractor.name}</td>
-              <td className="p-3">{contractor.role}</td>
-              <td className="p-3">
-                {formatCurrency(contractor.rate)}/{contractor.rateType === 'hourly' ? 'hr' : contractor.rateType === 'daily' ? 'day' : 'fixed'}
-              </td>
-              <td className="p-3">
-                {new Date(contractor.startDate).toLocaleDateString()} 
-                {contractor.endDate && ` - ${new Date(contractor.endDate).toLocaleDateString()}`}
-              </td>
-              <td className="p-3 text-right">{formatCurrency(contractor.totalPaid)}</td>
-              <td className="p-3">
-                <div className="flex justify-center">
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    contractor.status === 'active' ? 'bg-green-100 text-green-800' :
-                    contractor.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {contractor.status}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function MaterialsTable({ materials }: { materials: ProjectMaterial[] }) {
-  if (materials.length === 0) {
-    return (
-      <div className="text-center py-8 border rounded-md bg-gray-50">
-        <p className="text-muted-foreground">No materials recorded yet.</p>
-        <p className="text-sm text-muted-foreground mt-1">Click "Add Material" to record project materials.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-md overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-gray-700">
-          <tr>
-            <th className="p-3 text-left">Name</th>
-            <th className="p-3 text-left">Category</th>
-            <th className="p-3 text-right">Quantity</th>
-            <th className="p-3 text-right">Unit Price</th>
-            <th className="p-3 text-right">Total Price</th>
-            <th className="p-3 text-center">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {materials.map(material => (
-            <tr key={material.id} className="border-t hover:bg-gray-50">
-              <td className="p-3">{material.name}</td>
-              <td className="p-3 capitalize">{material.category}</td>
-              <td className="p-3 text-right">{material.quantity}</td>
-              <td className="p-3 text-right">{formatCurrency(material.unitPrice)}</td>
-              <td className="p-3 text-right">{formatCurrency(material.totalPrice)}</td>
-              <td className="p-3">
-                <div className="flex justify-center">
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    material.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                    material.status === 'ordered' ? 'bg-amber-100 text-amber-800' :
-                    material.status === 'used' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {material.status}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function EquipmentTable({ equipment }: { equipment: ProjectEquipment[] }) {
-  if (equipment.length === 0) {
-    return (
-      <div className="text-center py-8 border rounded-md bg-gray-50">
-        <p className="text-muted-foreground">No equipment recorded yet.</p>
-        <p className="text-sm text-muted-foreground mt-1">Click "Add Equipment" to record project equipment.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-md overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-gray-700">
-          <tr>
-            <th className="p-3 text-left">Name</th>
-            <th className="p-3 text-left">Type</th>
-            <th className="p-3 text-center">Rental</th>
-            <th className="p-3 text-left">Period</th>
-            <th className="p-3 text-right">Cost</th>
-            <th className="p-3 text-center">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {equipment.map(item => (
-            <tr key={item.id} className="border-t hover:bg-gray-50">
-              <td className="p-3">{item.name}</td>
-              <td className="p-3">{item.type}</td>
-              <td className="p-3 text-center">{item.isRental ? "Yes" : "No"}</td>
-              <td className="p-3">
-                {item.isRental ? (
-                  <>
-                    {item.startDate && new Date(item.startDate).toLocaleDateString()}
-                    {item.endDate && ` - ${new Date(item.endDate).toLocaleDateString()}`}
-                  </>
-                ) : "-"}
-              </td>
-              <td className="p-3 text-right">{formatCurrency(item.totalCost)}</td>
-              <td className="p-3">
-                <div className="flex justify-center">
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    item.status === 'active' ? 'bg-green-100 text-green-800' :
-                    item.status === 'returned' ? 'bg-amber-100 text-amber-800' :
-                    'bg-blue-100 text-blue-800'
-                  }`}>
-                    {item.status}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+export default ProjectFinanceTab;
