@@ -21,6 +21,9 @@ export interface Project {
   materials?: ProjectMaterial[];
   equipment?: ProjectEquipment[];
   revenue?: number;
+  
+  // Adding salesmen for filtering
+  salesmen?: ProjectSalesperson[];
 }
 
 export interface ProjectExpense {
@@ -46,6 +49,18 @@ export interface ProjectContractor {
   startDate: string;
   endDate?: string;
   status: "active" | "completed" | "terminated";
+  contact?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface ProjectSalesperson {
+  id: string;
+  name: string;
+  commission: number;
+  commissionType: "fixed" | "percentage";
+  totalSales: number;
+  totalCommission: number;
   contact?: string;
   email?: string;
   phone?: string;

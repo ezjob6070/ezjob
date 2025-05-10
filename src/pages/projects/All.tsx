@@ -2,18 +2,96 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChartIcon, ListIcon, PlusIcon } from "lucide-react";
+import { BarChartIcon, ListIcon, PlusIcon, FilterIcon } from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { toast } from "sonner";
+import ProjectFilters from "@/components/projects/ProjectFilters";
+import { DateRange } from "react-day-picker";
 
 export default function ProjectsAll() {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [view, setView] = useState<'cards' | 'list'>('list');
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>(initialProjects);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // Filter states
+  const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
+  const [selectedSalesmen, setSelectedSalesmen] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   
   const handleCreateProject = () => {
     toast.info("Create project functionality will be implemented soon");
+  };
+  
+  // Extract unique contractor names from projects
+  const contractorNames = Array.from(
+    new Set(
+      projects.flatMap(project => 
+        project.contractors?.map(contractor => contractor.name) || []
+      )
+    )
+  );
+  
+  // For this example, we'll assume salesmen could be stored in a similar field
+  // In a real app, you might have a dedicated field for sales representatives
+  const salesmenNames = Array.from(
+    new Set(
+      projects.flatMap(project => 
+        project.salesmen?.map(salesman => salesman.name) || []
+      ).filter(Boolean)
+    )
+  );
+  
+  // Apply filters when they change
+  const applyFilters = () => {
+    let filtered = [...projects];
+    
+    // Filter by contractors
+    if (selectedContractors.length > 0) {
+      filtered = filtered.filter(project => 
+        project.contractors?.some(contractor => 
+          selectedContractors.includes(contractor.name)
+        )
+      );
+    }
+    
+    // Filter by salesmen
+    if (selectedSalesmen.length > 0) {
+      filtered = filtered.filter(project => 
+        project.salesmen?.some(salesman => 
+          selectedSalesmen.includes(salesman.name)
+        )
+      );
+    }
+    
+    // Filter by date range
+    if (dateRange?.from) {
+      const fromDate = new Date(dateRange.from);
+      const toDate = dateRange.to ? new Date(dateRange.to) : new Date();
+      
+      filtered = filtered.filter(project => {
+        const projectStartDate = new Date(project.startDate);
+        return projectStartDate >= fromDate && projectStartDate <= toDate;
+      });
+    }
+    
+    setFilteredProjects(filtered);
+  };
+  
+  // Handle filter changes
+  const handleFilterChange = () => {
+    applyFilters();
+    setIsFilterOpen(false);
+  };
+  
+  // Reset all filters
+  const handleResetFilters = () => {
+    setSelectedContractors([]);
+    setSelectedSalesmen([]);
+    setDateRange(undefined);
+    setFilteredProjects(projects);
   };
 
   return (
@@ -24,6 +102,14 @@ export default function ProjectsAll() {
           <p className="text-muted-foreground">Complete list of all projects in the system</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="flex items-center gap-1"
+          >
+            <FilterIcon className="h-4 w-4" />
+            Filter
+          </Button>
           <div className="bg-gray-100 rounded-md p-1 flex">
             <button 
               className={`p-1.5 rounded ${view === 'cards' ? 'bg-white shadow-sm' : ''}`}
@@ -50,6 +136,21 @@ export default function ProjectsAll() {
         </div>
       </div>
       
+      {isFilterOpen && (
+        <ProjectFilters 
+          contractorNames={contractorNames}
+          selectedContractors={selectedContractors}
+          setSelectedContractors={setSelectedContractors}
+          salesmenNames={salesmenNames}
+          selectedSalesmen={selectedSalesmen}
+          setSelectedSalesmen={setSelectedSalesmen}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          onApply={handleFilterChange}
+          onReset={handleResetFilters}
+        />
+      )}
+      
       {view === 'list' ? (
         <Card className="bg-white shadow-sm">
           <CardContent className="p-0">
@@ -66,7 +167,7 @@ export default function ProjectsAll() {
                   </tr>
                 </thead>
                 <tbody>
-                  {projects.map((project) => (
+                  {filteredProjects.map((project) => (
                     <tr key={project.id} className="border-b hover:bg-gray-50">
                       <td className="p-4 font-medium">{project.name}</td>
                       <td className="p-4 text-gray-600">{project.type}</td>
@@ -103,7 +204,7 @@ export default function ProjectsAll() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {projects.map((project) => (
+          {filteredProjects.map((project) => (
             <Card key={project.id} className="bg-white shadow-sm hover:shadow-md transition-shadow">
               <div className="p-4">
                 <div className="flex justify-between mb-2">
