@@ -1,107 +1,82 @@
-
-import React from "react";
 import { 
-  HomeIcon, 
-  UsersIcon, 
-  CalendarIcon, 
-  SettingsIcon, 
-  ClipboardIcon, 
-  PhoneIcon, 
-  CreditCardIcon,
-  BriefcaseIcon,
-  UserIcon,
-  WrenchIcon,
-  MapPinIcon,
-  FileTextIcon,
-  CircleDollarSign,
-  FolderIcon,
+  LayoutDashboard, 
+  Calendar, 
+  Users, 
+  Briefcase, 
+  FileText, 
+  Settings,
+  Phone,
+  Receipt,
 } from "lucide-react";
-import { NavItem } from "./sidebarTypes";
+import { NavItem, IndustryType } from "./sidebarTypes";
 
 export const INDUSTRY_TYPES = {
-  SERVICE: "service",
+  SERVICE: 'service',
+  REAL_ESTATE: 'real_estate',
+  CONSTRUCTION: 'construction',
+  GENERAL: 'general'
 };
 
-// Navigation items for service industry
-const commonNavItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    icon: <HomeIcon size={18} />,
-    href: "/dashboard",
-  },
-  {
-    label: "Projects",
-    icon: <FolderIcon size={18} />,
-    href: "/projects",
-  },
-  {
-    label: "Leads & Clients",
-    icon: <UsersIcon size={18} />,
-    href: "/leads-clients",
-  },
-  {
-    label: "Schedule",
-    icon: <CalendarIcon size={18} />,
-    href: "/schedule",
-  },
-  {
-    label: "Tasks",
-    icon: <ClipboardIcon size={18} />,
-    href: "/tasks",
-  },
-  {
-    label: "Calls",
-    icon: <PhoneIcon size={18} />,
-    href: "/calls",
-  },
-  {
-    label: "Jobs",
-    icon: <BriefcaseIcon size={18} />,
-    href: "/jobs",
-  },
-  {
-    label: "Team Management",
-    icon: <WrenchIcon size={18} />,
-    href: "/technicians",
-  },
-  {
-    label: "Estimates",
-    icon: <FileTextIcon size={18} />,
-    href: "/estimates",
-  },
-  {
-    label: "Payments",
-    icon: <CreditCardIcon size={18} />,
-    href: "/payments",
-  },
-  {
-    label: "Finance & Reports",
-    icon: <CircleDollarSign size={18} />,
-    href: "/finance",
-  },
-  {
-    label: "GPS Tracking",
-    icon: <MapPinIcon size={18} />,
-    href: "/gps-tracking",
-  },
-  {
-    label: "Job Sources",
-    icon: <FileTextIcon size={18} />,
-    href: "/job-sources",
-  },
-  {
-    label: "Employed",
-    icon: <UsersIcon size={18} />,
-    href: "/employed",
-  },
-  {
-    label: "Settings",
-    icon: <SettingsIcon size={18} />,
-    href: "/settings",
-  },
-];
-
-// Export only service navigation items
+// Update the navigation items to include Estimates with proper highlighting
 export const getIndustrySpecificNavItems = (): NavItem[] => {
-  return commonNavItems;
+  // Common menu items across all industries
+  const commonItems: NavItem[] = [
+    {
+      label: "Dashboard",
+      icon: <LayoutDashboard size={20} />,
+      href: "/",
+    },
+    {
+      label: "Schedule",
+      icon: <Calendar size={20} />,
+      href: "/schedule",
+    },
+    {
+      label: "Jobs",
+      icon: <Briefcase size={20} />,
+      href: "/jobs",
+    },
+    {
+      label: "Estimates",
+      icon: <Receipt size={20} />,
+      href: "/estimates",
+    },
+    {
+      label: "Technicians",
+      icon: <Users size={20} />,
+      href: "/technicians",
+    },
+    {
+      label: "Job Sources",
+      icon: <FileText size={20} />,
+      href: "/job-sources",
+    },
+    {
+      label: "Calls",
+      icon: <Phone size={20} />,
+      href: "/calls",
+    },
+    {
+      label: "Settings",
+      icon: <Settings size={20} />,
+      href: "/settings",
+    },
+  ];
+  
+  return commonItems;
+};
+
+export const cycleIndustry = (currentIndustry: IndustryType): IndustryType => {
+  switch (currentIndustry) {
+    case INDUSTRY_TYPES.SERVICE:
+      return INDUSTRY_TYPES.REAL_ESTATE;
+    case INDUSTRY_TYPES.REAL_ESTATE:
+      return INDUSTRY_TYPES.CONSTRUCTION;
+    case INDUSTRY_TYPES.CONSTRUCTION:
+      return INDUSTRY_TYPES.GENERAL;
+    case INDUSTRY_TYPES.GENERAL:
+      return INDUSTRY_TYPES.SERVICE;
+    default:
+      return INDUSTRY_TYPES.SERVICE;
+  }
 };
