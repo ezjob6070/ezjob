@@ -12,13 +12,29 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
-import { Project } from "@/types/project";
+import { Project, ProjectContractor, ProjectSalesperson } from "@/types/project";
 import { v4 as uuidv4 } from "uuid";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Plus, X } from "lucide-react";
 
 interface CreateProjectModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddProject: (project: Project) => void;
+}
+
+interface ContractorInput {
+  name: string;
+  role: string;
+  rate: number;
+  rateType: "hourly" | "fixed" | "daily";
+}
+
+interface SalesmanInput {
+  name: string;
+  commission: number;
+  commissionType: "fixed" | "percentage";
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
@@ -36,6 +52,20 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     status: "Not Started" as Project["status"]
   });
 
+  const [contractors, setContractors] = useState<ContractorInput[]>([]);
+  const [salesmen, setSalesmen] = useState<SalesmanInput[]>([]);
+  const [newContractor, setNewContractor] = useState<ContractorInput>({
+    name: "",
+    role: "",
+    rate: 0,
+    rateType: "hourly"
+  });
+  const [newSalesman, setNewSalesman] = useState<SalesmanInput>({
+    name: "",
+    commission: 0,
+    commissionType: "percentage"
+  });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -51,12 +81,77 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     }));
   };
 
+  const handleContractorChange = (field: keyof ContractorInput, value: string | number) => {
+    setNewContractor(prev => ({
+      ...prev,
+      [field]: field === "rate" ? parseFloat(value as string) || 0 : value
+    }));
+  };
+
+  const handleSalesmanChange = (field: keyof SalesmanInput, value: string | number) => {
+    setNewSalesman(prev => ({
+      ...prev,
+      [field]: field === "commission" ? parseFloat(value as string) || 0 : value
+    }));
+  };
+
+  const addContractor = () => {
+    if (newContractor.name && newContractor.role) {
+      setContractors([...contractors, { ...newContractor }]);
+      setNewContractor({
+        name: "",
+        role: "",
+        rate: 0,
+        rateType: "hourly"
+      });
+    }
+  };
+
+  const addSalesman = () => {
+    if (newSalesman.name) {
+      setSalesmen([...salesmen, { ...newSalesman }]);
+      setNewSalesman({
+        name: "",
+        commission: 0,
+        commissionType: "percentage"
+      });
+    }
+  };
+
+  const removeContractor = (index: number) => {
+    setContractors(contractors.filter((_, i) => i !== index));
+  };
+
+  const removeSalesman = (index: number) => {
+    setSalesmen(salesmen.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const today = new Date();
     const endDate = new Date();
     endDate.setMonth(today.getMonth() + 6); // Default project duration: 6 months
+    
+    const formattedContractors: ProjectContractor[] = contractors.map(c => ({
+      id: uuidv4(),
+      name: c.name,
+      role: c.role,
+      rate: c.rate,
+      rateType: c.rateType,
+      totalPaid: 0,
+      startDate: today.toISOString().split("T")[0],
+      status: "active",
+    }));
+
+    const formattedSalesmen: ProjectSalesperson[] = salesmen.map(s => ({
+      id: uuidv4(),
+      name: s.name,
+      commission: s.commission,
+      commissionType: s.commissionType,
+      totalSales: 0,
+      totalCommission: 0,
+    }));
     
     const newProject: Project = {
       id: Math.floor(Math.random() * 1000) + 100, // Generate random ID
@@ -67,8 +162,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       startDate: today.toISOString().split("T")[0],
       expectedEndDate: endDate.toISOString().split("T")[0],
       actualSpent: 0,
-      contractors: [],
-      salesmen: []
+      contractors: formattedContractors,
+      salesmen: formattedSalesmen
     };
     
     onAddProject(newProject);
@@ -85,11 +180,24 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       budget: 0,
       status: "Not Started"
     });
+    setContractors([]);
+    setSalesmen([]);
+    setNewContractor({
+      name: "",
+      role: "",
+      rate: 0,
+      rateType: "hourly"
+    });
+    setNewSalesman({
+      name: "",
+      commission: 0,
+      commissionType: "percentage"
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
           <DialogDescription>
@@ -209,7 +317,169 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 onChange={handleInputChange}
               />
             </div>
+
+            {/* Contractors section */}
+            <div className="mt-4 border-t pt-4">
+              <h3 className="text-sm font-medium mb-2">Contractors</h3>
+              <div className="space-y-4">
+                {contractors.map((contractor, index) => (
+                  <div key={index} className="flex items-center space-x-2 p-3 border rounded-md bg-gray-50">
+                    <div className="flex-1">
+                      <div className="font-medium">{contractor.name}</div>
+                      <div className="text-sm text-gray-500">
+                        {contractor.role} - ${contractor.rate}/{contractor.rateType}
+                      </div>
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => removeContractor(index)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <Label htmlFor="contractor-name">Contractor Name</Label>
+                    <Input
+                      id="contractor-name"
+                      placeholder="Enter name"
+                      value={newContractor.name}
+                      onChange={(e) => handleContractorChange("name", e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="contractor-role">Role</Label>
+                    <Input
+                      id="contractor-role"
+                      placeholder="e.g. Electrician, Plumber"
+                      value={newContractor.role}
+                      onChange={(e) => handleContractorChange("role", e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <Label htmlFor="contractor-rate">Rate</Label>
+                    <Input
+                      id="contractor-rate"
+                      type="number"
+                      placeholder="0.00"
+                      value={newContractor.rate || ""}
+                      onChange={(e) => handleContractorChange("rate", e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="contractor-rate-type">Rate Type</Label>
+                    <Select
+                      value={newContractor.rateType}
+                      onValueChange={(value) => handleContractorChange("rateType", value as "hourly" | "fixed" | "daily")}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hourly">Hourly</SelectItem>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="fixed">Fixed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={addContractor}
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Contractor
+                </Button>
+              </div>
+            </div>
+
+            {/* Salesmen section */}
+            <div className="mt-4 border-t pt-4">
+              <h3 className="text-sm font-medium mb-2">Salesmen</h3>
+              <div className="space-y-4">
+                {salesmen.map((salesman, index) => (
+                  <div key={index} className="flex items-center space-x-2 p-3 border rounded-md bg-gray-50">
+                    <div className="flex-1">
+                      <div className="font-medium">{salesman.name}</div>
+                      <div className="text-sm text-gray-500">
+                        {salesman.commission}{salesman.commissionType === "percentage" ? "%" : "$"} Commission
+                      </div>
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => removeSalesman(index)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="grid gap-2">
+                    <Label htmlFor="salesman-name">Salesman Name</Label>
+                    <Input
+                      id="salesman-name"
+                      placeholder="Enter name"
+                      value={newSalesman.name}
+                      onChange={(e) => handleSalesmanChange("name", e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="grid gap-2">
+                      <Label htmlFor="salesman-commission">Commission</Label>
+                      <Input
+                        id="salesman-commission"
+                        type="number"
+                        placeholder={newSalesman.commissionType === "percentage" ? "%" : "$"}
+                        value={newSalesman.commission || ""}
+                        onChange={(e) => handleSalesmanChange("commission", e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="salesman-commission-type">Commission Type</Label>
+                      <Select
+                        value={newSalesman.commissionType}
+                        onValueChange={(value) => handleSalesmanChange("commissionType", value as "percentage" | "fixed")}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="percentage">Percentage (%)</SelectItem>
+                          <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={addSalesman}
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Salesman
+                </Button>
+              </div>
+            </div>
           </div>
+          
           <DialogFooter>
             <Button 
               type="button" 
