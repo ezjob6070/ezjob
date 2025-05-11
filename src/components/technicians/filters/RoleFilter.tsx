@@ -2,6 +2,7 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface RoleFilterProps {
   selected: string;
@@ -15,36 +16,38 @@ const RoleFilter: React.FC<RoleFilterProps> = ({
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium">Role</h3>
-      <RadioGroup 
-        value={selected} 
-        onValueChange={onSelect}
-        className="space-y-2.5"
-      >
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="all" id="role-all" className="h-5 w-5" />
-          <Label htmlFor="role-all" className="text-sm font-medium cursor-pointer">All Roles</Label>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="technician" id="role-technician" className="h-5 w-5" />
-          <Label htmlFor="role-technician" className="text-sm font-medium cursor-pointer">Technician</Label>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="salesman" id="role-salesman" className="h-5 w-5" />
-          <Label htmlFor="role-salesman" className="text-sm font-medium cursor-pointer">Salesman</Label>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="employed" id="role-employed" className="h-5 w-5" />
-          <Label htmlFor="role-employed" className="text-sm font-medium cursor-pointer">Employed</Label>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="contractor" id="role-contractor" className="h-5 w-5" />
-          <Label htmlFor="role-contractor" className="text-sm font-medium cursor-pointer">Contractor</Label>
-        </div>
-      </RadioGroup>
+      <ScrollArea className="h-[180px] pr-4">
+        <RadioGroup 
+          value={selected} 
+          onValueChange={onSelect}
+          className="space-y-2.5"
+        >
+          <div className="flex items-center space-x-3">
+            <RadioGroupItem value="all" id="role-all" className="h-5 w-5" />
+            <Label htmlFor="role-all" className="text-sm font-medium cursor-pointer">All Roles</Label>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <RadioGroupItem value="technician" id="role-technician" className="h-5 w-5" />
+            <Label htmlFor="role-technician" className="text-sm font-medium cursor-pointer">Technician</Label>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <RadioGroupItem value="salesman" id="role-salesman" className="h-5 w-5" />
+            <Label htmlFor="role-salesman" className="text-sm font-medium cursor-pointer">Salesman</Label>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <RadioGroupItem value="employed" id="role-employed" className="h-5 w-5" />
+            <Label htmlFor="role-employed" className="text-sm font-medium cursor-pointer">Employed</Label>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <RadioGroupItem value="contractor" id="role-contractor" className="h-5 w-5" />
+            <Label htmlFor="role-contractor" className="text-sm font-medium cursor-pointer">Contractor</Label>
+          </div>
+        </RadioGroup>
+      </ScrollArea>
     </div>
   );
 };
