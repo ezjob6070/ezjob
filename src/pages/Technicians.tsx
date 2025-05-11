@@ -155,7 +155,7 @@ const Technicians = () => {
         </p>
       </div>
       
-      {/* Role Filter Buttons - Updated with more appropriate icons */}
+      {/* Role Filter Buttons - Updated with custom icon for salesman */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
@@ -198,7 +198,13 @@ const Technicians = () => {
               : "hover:bg-[#ECFDF5] hover:text-[#10B981] border-[#10B981]/30"}`}
         >
           <div className="relative">
-            <Briefcase className={`h-16 w-16 mb-3 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
+            <div className={`h-16 w-16 mb-3 flex items-center justify-center`}>
+              <img 
+                src="/lovable-uploads/7ea3374a-aefd-4ba6-8f2e-1f3f5de75205.png" 
+                className="h-16 w-16 mb-3" 
+                alt="Salesman" 
+              />
+            </div>
             <User className={`h-8 w-8 absolute -bottom-1 -right-1 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
           </div>
           <div className="text-base font-medium">Salesmen</div>

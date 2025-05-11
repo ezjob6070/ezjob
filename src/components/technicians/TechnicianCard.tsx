@@ -43,7 +43,7 @@ export default function TechnicianCard({
         return {
           color: "#10B981", // Emerald Green
           bgColor: "#ECFDF5",
-          icon: <Briefcase className="h-4 w-4 text-[#10B981]" />,
+          icon: <img src="/lovable-uploads/7ea3374a-aefd-4ba6-8f2e-1f3f5de75205.png" className="h-4 w-4" alt="Salesman" />,
           label: "Salesman",
           borderHover: "hover:border-[#10B981]",
           gradientFrom: "from-green-50",
