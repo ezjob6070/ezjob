@@ -1,33 +1,41 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { Control, useWatch, UseFormSetValue } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Control } from "react-hook-form";
-import { TechnicianRole, TechnicianSubRoles, DEFAULT_SUB_ROLES } from "@/types/technician";
+import { DEFAULT_SUB_ROLES } from "@/types/technician";
 
-interface TechnicianSubRoleFieldProps {
+export interface TechnicianSubRoleFieldProps {
   control: Control<any>;
-  selectedRole: TechnicianRole;
+  setValue: UseFormSetValue<any>;
+  defaultValue?: string;
 }
 
 export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
   control,
-  selectedRole = "technician"
+  setValue,
+  defaultValue
 }) => {
-  const [customRoles, setCustomRoles] = useState<TechnicianSubRoles>(DEFAULT_SUB_ROLES);
-  
-  useEffect(() => {
-    const savedRoles = localStorage.getItem('customRoles');
-    if (savedRoles) {
-      try {
-        setCustomRoles(JSON.parse(savedRoles));
-      } catch (e) {
-        console.error('Failed to parse saved roles:', e);
-      }
-    }
-  }, []);
+  // Watch for role changes to update sub-role options
+  const role = useWatch({
+    control,
+    name: "role",
+    defaultValue: "technician"
+  });
 
-  const subRoles = customRoles[selectedRole] || DEFAULT_SUB_ROLES[selectedRole];
+  // Reset sub-role when role changes
+  useEffect(() => {
+    if (!defaultValue) {
+      setValue("subRole", "");
+    }
+  }, [role, setValue, defaultValue]);
+
+  // Get available sub-roles based on selected role
+  const getSubRolesForRole = (selectedRole: string) => {
+    return DEFAULT_SUB_ROLES[selectedRole as keyof typeof DEFAULT_SUB_ROLES] || [];
+  };
+
+  const subRoles = getSubRolesForRole(role);
 
   return (
     <FormField
@@ -35,24 +43,25 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
       name="subRole"
       render={({ field }) => (
         <FormItem className="flex-1">
-          <FormLabel>Specialty</FormLabel>
-          <FormControl>
-            <Select
-              onValueChange={field.onChange}
-              value={field.value || ""}
-            >
+          <FormLabel>Specialty/Sub-Role</FormLabel>
+          <Select
+            value={field.value || ""}
+            onValueChange={field.onChange}
+          >
+            <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder="Select specialty" />
               </SelectTrigger>
-              <SelectContent>
-                {subRoles.map((subRole) => (
-                  <SelectItem key={subRole} value={subRole}>
-                    {subRole}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormControl>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="">None</SelectItem>
+              {subRoles.map((subRole) => (
+                <SelectItem key={subRole} value={subRole}>
+                  {subRole}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}

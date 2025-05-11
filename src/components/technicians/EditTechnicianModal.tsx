@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   AlertDialog,
@@ -43,6 +42,23 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = React.useState("basic");
   
+  // Extract driver's license info with proper type checking
+  const getLicenseInfo = (driverLicense: string | { number: string; state: string; expirationDate: string; } | undefined) => {
+    if (!driverLicense) return { number: "", state: "", expirationDate: "" };
+    
+    if (typeof driverLicense === 'string') {
+      return { number: driverLicense, state: "", expirationDate: "" };
+    }
+    
+    return {
+      number: driverLicense.number || "",
+      state: driverLicense.state || "",
+      expirationDate: driverLicense.expirationDate || ""
+    };
+  };
+  
+  const licenseInfo = getLicenseInfo(technician?.driverLicense);
+  
   const form = useForm<TechnicianEditFormValues>({
     resolver: zodResolver(technicianEditSchema),
     defaultValues: {
@@ -65,11 +81,11 @@ const EditTechnicianModal: React.FC<EditTechnicianModalProps> = ({
       incentiveAmount: String(technician?.incentiveAmount || ""),
       role: technician?.role || "technician",
       subRole: technician?.subRole || "",
-      // Sensitive fields
+      // Sensitive fields with proper type handling
       ssn: technician?.ssn || "",
-      driverLicenseNumber: technician?.driverLicense?.number || "",
-      driverLicenseState: technician?.driverLicense?.state || "",
-      driverLicenseExpiration: technician?.driverLicense?.expirationDate || "",
+      driverLicenseNumber: licenseInfo.number,
+      driverLicenseState: licenseInfo.state,
+      driverLicenseExpiration: licenseInfo.expirationDate,
       idNumber: technician?.idNumber || "",
       workContract: technician?.workContract || "",
     },

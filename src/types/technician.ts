@@ -67,7 +67,7 @@ export interface Technician {
   
   // Finance and performance related properties
   paymentRate: number;
-  hourlyRate?: number;
+  hourlyRate: number;  // Change from optional to required as it's causing errors
   completedJobs?: number;
   cancelledJobs?: number;
   totalRevenue?: number;

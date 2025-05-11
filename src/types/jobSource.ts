@@ -1,25 +1,18 @@
-
 export interface JobSource {
   id: string;
   name: string;
-  type?: string;
-  paymentType?: string;
-  paymentValue?: number;
-  isActive?: boolean;
-  active?: boolean;  // Adding both isActive and active to ensure compatibility
-  totalJobs?: number;
-  totalRevenue?: number;
-  profit?: number;
-  createdAt?: string;
+  type: string;
+  paymentType: "fixed" | "percentage";
+  paymentValue: number;
+  isActive: boolean;
+  profit: number;
+  createdAt: string;
+  totalJobs: number;
+  totalRevenue: number;
+  // Add missing properties
   website?: string;
   phone?: string;
   email?: string;
   logoUrl?: string;
   notes?: string;
-  address?: string;
-  
-  // Adding missing properties needed by finance components
-  expenses?: number;
-  companyProfit?: number;
-  category?: string;
 }
