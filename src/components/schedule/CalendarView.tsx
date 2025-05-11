@@ -75,6 +75,14 @@ function isSameDayHelper(dateA: Date | string | undefined, dateB: Date | string 
   return isSameDay(dateObjA, dateObjB);
 }
 
+// Helper function to get time from date string
+const getTimeFromDateString = (dateTime: string | Date): number => {
+  if (typeof dateTime === 'string') {
+    return new Date(dateTime).getHours();
+  }
+  return dateTime.getHours();
+};
+
 const CalendarView = ({
   jobs,
   tasks,

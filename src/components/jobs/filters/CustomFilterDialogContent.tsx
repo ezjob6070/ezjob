@@ -1,5 +1,5 @@
-
-import React, { useState } from "react";
+import React from 'react';
+import { RangeValue } from '@/components/ui/date-range-picker';
 import { useJobsContext } from "../context/JobsContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -294,7 +294,9 @@ const CustomFilterDialogContent = () => {
                 <Calendar
                   mode="single"
                   selected={condition.value as Date}
-                  onSelect={(date) => updateCondition(index, { value: date as Date })}
+                  onSelect={(date) => updateCondition(index, { 
+                    value: date as Date 
+                  })}
                   initialFocus
                 />
               </PopoverContent>

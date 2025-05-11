@@ -1,70 +1,27 @@
 
-import { SortOption } from "@/types/sortOptions";
-import { JobPriority, JobStatus, PaymentMethod } from "@/types/job";
+// Import the types from the main definitions
+import type { Job as JobType, JobStatus, JobPriority, PaymentMethod } from '@/types/job';
+import type { SortOption } from '@/types/sortOptions';
 
-export interface Job {
-  id: string;
-  clientName: string;
-  clientId?: string;
-  address?: string;
+// Re-export them properly with 'export type'
+export type Job = JobType;
+export type { JobStatus, JobPriority, PaymentMethod, SortOption };
+
+// Add any additional types needed specifically for components
+export interface CreateJobFormData {
+  title: string;
   description?: string;
+  clientName: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  address: string;
+  date: string;
+  time: string;
   status: JobStatus;
-  date: Date | string; // Accept both Date and string
-  scheduledDate?: Date | string; // Accept both Date and string
-  expectedEndDate?: string;
-  amount: number;
-  actualAmount?: number;
-  jobType?: string;
-  serviceType?: string;
-  source?: string;
-  sourceId?: string;
-  isAllDay?: boolean;
+  priority: JobPriority;
+  technicians?: string[];
+  jobSource?: string;
   paymentMethod?: PaymentMethod;
-  paymentStatus?: string;
-  technicianId?: string; // Add technician ID field
-  notes?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  
-  // Additional fields needed by calendar components
-  title?: string;
-  technicianName?: string; 
-  
-  // Job source related properties
-  jobSourceId?: string;
-  jobSourceName?: string;
-  
-  // Contractor related properties
-  contractorId?: string;
-  contractorName?: string;
-  
-  // Category and other properties
+  totalAmount?: number;
   category?: string;
-  
-  // Job priority
-  priority?: JobPriority;
-  
-  // Cancellation related
-  cancellationReason?: string;
-}
-
-export { JobPriority, JobStatus, PaymentMethod };
-export type { AmountRange, CreateJobFormData } from "@/types/job";
-
-export interface JobViewProps {
-  jobs: Job[];
-}
-
-export type JobStatusType = Job["status"];
-
-export interface JobBaseProps {
-  onAddJob?: (job: Job) => void;
-  onUpdateJob?: (job: Job) => void;
-  onDeleteJob?: (id: string) => void;
-}
-
-export interface JobListProps extends JobBaseProps {
-  jobs: Job[];
-  sortBy?: SortOption;
-  searchTerm?: string;
 }

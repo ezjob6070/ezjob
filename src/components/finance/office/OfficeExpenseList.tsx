@@ -1,546 +1,550 @@
-
-import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { 
-  Table, TableHeader, TableRow, TableHead, 
-  TableBody, TableCell 
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState, useEffect } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, MoreVertical, Edit, Trash2, Search, Plus, Receipt, Calendar, FileImage } from "lucide-react";
-import { OfficeExpense } from "@/types/finance";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import { Plus, Edit, Trash2 } from 'lucide-react';
+import { cn } from "@/lib/utils"
+import { format } from 'date-fns';
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Expense } from '@/types/finance';
 
-type OfficeExpenseListProps = {
-  date: DateRange | undefined;
-  activeCategory: string | null;
-  expenses: OfficeExpense[];
-  onAddExpense?: (expense: OfficeExpense) => void;
-  onEditExpense?: (expense: OfficeExpense) => void;
-  onDeleteExpense?: (expenseId: string) => void;
-};
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Expense name must be at least 2 characters.",
+  }),
+  amount: z.string().refine((value) => {
+    const num = Number(value);
+    return !isNaN(num) && num > 0;
+  }, {
+    message: "Amount must be a valid number greater than zero.",
+  }),
+  date: z.date(),
+  category: z.string().min(2, {
+    message: "Category must be at least 2 characters.",
+  }),
+  description: z.string().optional(),
+  receipt: z.string().optional(),
+  paymentMethod: z.string().min(2, {
+    message: "Payment method must be at least 2 characters.",
+  }),
+  status: z.string().min(2, {
+    message: "Status must be at least 2 characters.",
+  }),
+})
 
-const OfficeExpenseList = ({ 
-  date, 
-  activeCategory, 
-  expenses,
-  onAddExpense,
-  onEditExpense,
-  onDeleteExpense
-}: OfficeExpenseListProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedExpense, setSelectedExpense] = useState<OfficeExpense | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [newExpense, setNewExpense] = useState<Partial<OfficeExpense>>({
-    date: new Date().toISOString().split('T')[0],
-    category: activeCategory || "",
-    description: "",
-    amount: 0,
-    paymentMethod: "credit",
-    vendor: "",
-    status: "paid",
-    recurring: false
+interface OfficeExpenseListProps {
+  expenses: Expense[];
+  setExpenses: React.Dispatch<React.SetStateAction<Expense[]>>;
+}
+
+const OfficeExpenseList: React.FC<OfficeExpenseListProps> = ({ expenses, setExpenses }) => {
+  const [open, setOpen] = React.useState(false)
+  const [editOpen, setEditOpen] = React.useState(false)
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [date, setDate] = React.useState<Date | undefined>(new Date())
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      amount: "",
+      date: date || new Date(),
+      category: "",
+      description: "",
+      receipt: "",
+      paymentMethod: "",
+      status: "",
+    },
+  })
+
+  const editForm = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: selectedExpense?.name || "",
+      amount: selectedExpense?.amount?.toString() || "",
+      date: selectedExpense?.date ? new Date(selectedExpense.date) : new Date(),
+      category: selectedExpense?.category || "",
+      description: selectedExpense?.description || "",
+      receipt: selectedExpense?.receipt || "",
+      paymentMethod: selectedExpense?.paymentMethod || "",
+      status: selectedExpense?.status || "",
+    },
   });
-  
-  const filteredExpenses = expenses.filter(expense => {
-    const matchesCategory = !activeCategory || expense.category === activeCategory;
-    const matchesSearch = !searchTerm || 
-      expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.vendor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.amount.toString().includes(searchTerm);
-    
-    return matchesCategory && matchesSearch;
-  });
 
-  const handleAddEditExpense = () => {
-    if (!newExpense.description || !newExpense.amount || !newExpense.category) {
-      return; // Todo: Add validation feedback
-    }
-
-    const expenseData = {
-      id: selectedExpense?.id || `expense-${Date.now()}`,
-      date: newExpense.date || new Date().toISOString().split('T')[0],
-      category: newExpense.category || "",
-      description: newExpense.description || "",
-      amount: Number(newExpense.amount),
-      paymentMethod: newExpense.paymentMethod || "credit",
-      vendor: newExpense.vendor || "",
-      recurring: newExpense.recurring || false,
-      status: newExpense.status || "paid"
-    } as OfficeExpense;
-
+  useEffect(() => {
     if (selectedExpense) {
-      onEditExpense && onEditExpense(expenseData);
-    } else {
-      onAddExpense && onAddExpense(expenseData);
+      editForm.reset({
+        name: selectedExpense.name || "",
+        amount: selectedExpense.amount?.toString() || "",
+        date: selectedExpense.date ? new Date(selectedExpense.date) : new Date(),
+        category: selectedExpense.category || "",
+        description: selectedExpense.description || "",
+        receipt: selectedExpense.receipt || "",
+        paymentMethod: selectedExpense.paymentMethod || "",
+        status: selectedExpense.status || "",
+      });
     }
+  }, [selectedExpense, editForm]);
 
-    setIsAddEditDialogOpen(false);
-    setSelectedExpense(null);
-    setNewExpense({
-      date: new Date().toISOString().split('T')[0],
-      category: activeCategory || "",
-      description: "",
-      amount: 0,
-      paymentMethod: "credit",
-      vendor: "",
-      status: "paid",
-      recurring: false
-    });
-  };
-
-  const handleDeleteExpense = () => {
-    if (selectedExpense && onDeleteExpense) {
-      onDeleteExpense(selectedExpense.id);
-    }
-    setIsDeleteDialogOpen(false);
-    setSelectedExpense(null);
-  };
-
-  const handleViewExpense = (expense: OfficeExpense) => {
-    setSelectedExpense(expense);
-    setIsViewDialogOpen(true);
-  };
-
-  const handleEditExpense = (expense: OfficeExpense) => {
-    setSelectedExpense(expense);
-    setNewExpense({
-      date: expense.date,
-      category: expense.category,
-      description: expense.description,
-      amount: expense.amount,
-      paymentMethod: expense.paymentMethod || "credit",
-      vendor: expense.vendor || "",
-      status: expense.status || "paid",
-      recurring: expense.recurring || false
-    });
-    setIsAddEditDialogOpen(true);
-  };
-
-  const confirmDeleteExpense = (expense: OfficeExpense) => {
-    setSelectedExpense(expense);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const getCategoryName = (categoryId: string): string => {
-    const categories: { [key: string]: string } = {
-      "rent": "Rent",
-      "secretary": "Secretary",
-      "equipment": "Equipment",
-      "inventory": "Inventory",
-      "warehouse": "Warehouse",
-      "utilities": "Utilities",
-      "insurance": "Insurance",
-      "staff": "Staff",
-      "other": "Other"
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const newExpense: Expense = {
+      id: `expense-${Date.now()}`,
+      ...values,
+      amount: parseFloat(values.amount),
+      date: values.date.toISOString().split('T')[0],
     };
-    return categories[categoryId] || categoryId;
+
+    setExpenses([...expenses, newExpense]);
+    toast.success("Expense created successfully!");
+    form.reset();
+    setOpen(false);
+  }
+
+  const handleEditExpense = (expense: Expense) => {
+    setSelectedExpense(expense);
+    setEditOpen(true);
   };
 
-  const getCategoryColor = (categoryId: string): string => {
-    const colors: { [key: string]: string } = {
-      "rent": "blue",
-      "secretary": "pink",
-      "equipment": "amber",
-      "inventory": "emerald",
-      "warehouse": "indigo",
-      "utilities": "red",
-      "insurance": "purple",
-      "staff": "cyan",
-      "other": "gray"
+  const handleUpdateExpense = (values: z.infer<typeof formSchema>) => {
+    if (!selectedExpense) return;
+
+    const updatedExpense: Expense = {
+      ...selectedExpense,
+      ...values,
+      amount: parseFloat(values.amount),
+      date: values.date.toISOString().split('T')[0],
     };
-    return colors[categoryId] || "gray";
-  };
 
-  const getStatusBadge = (status: string | undefined) => {
-    if (!status) return null;
-    
-    switch(status) {
-      case "paid":
-        return <Badge variant="outline" className="bg-green-100 text-green-800">Paid</Badge>;
-      case "pending":
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Pending</Badge>;
-      case "overdue":
-        return <Badge variant="outline" className="bg-red-100 text-red-800">Overdue</Badge>;
-      default:
-        return null;
-    }
-  };
+    const updatedExpenses = expenses.map(exp =>
+      exp.id === selectedExpense.id ? updatedExpense : exp
+    );
 
-  const handleAddNew = () => {
+    setExpenses(updatedExpenses);
+    toast.success("Expense updated successfully!");
+    setEditOpen(false);
     setSelectedExpense(null);
-    setNewExpense({
-      date: new Date().toISOString().split('T')[0],
-      category: activeCategory || "",
-      description: "",
-      amount: 0,
-      paymentMethod: "credit",
-      vendor: "",
-      status: "paid",
-      recurring: false
-    });
-    setIsAddEditDialogOpen(true);
+  };
+
+  const handleDeleteExpense = (expenseId: string) => {
+    setExpenses(expenses.filter(expense => expense.id !== expenseId));
+    toast.success("Expense deleted successfully!");
+  };
+
+  const handleDateChange = (date: string | number | readonly string[]) => {
+    if (date instanceof Date) {
+      form.setValue("date", date);
+    }
   };
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-        <h3 className="text-xl font-bold">Expense Transactions</h3>
-        
-        <div className="flex w-full sm:w-auto gap-2">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search expenses..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          {onAddExpense && (
-            <Button onClick={handleAddNew} variant="default">
-              <Plus className="h-4 w-4 mr-1" />
-              Add
-            </Button>
-          )}
+      <div className="md:flex items-center justify-between space-y-4 md:space-y-0">
+        <div>
+          <h3 className="text-lg font-semibold">Office Expenses</h3>
+          <p className="text-sm text-muted-foreground">Manage and track office-related expenses.</p>
         </div>
+        <Button onClick={() => setOpen(true)} className="bg-blue-500 text-white hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">
+          <Plus className="mr-2 h-4 w-4" />
+          Add Expense
+        </Button>
       </div>
-      
-      <div className="border rounded-md overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Vendor</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              {(onEditExpense || onDeleteExpense) && <TableHead></TableHead>}
+
+      <Table className="mt-6">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Payment Method</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {expenses.map((expense) => (
+            <TableRow key={expense.id}>
+              <TableCell>{expense.name}</TableCell>
+              <TableCell>${expense.amount}</TableCell>
+              <TableCell>{expense.date}</TableCell>
+              <TableCell>{expense.category}</TableCell>
+              <TableCell>{expense.paymentMethod}</TableCell>
+              <TableCell>{expense.status}</TableCell>
+              <TableCell className="text-right">
+                <Button variant="ghost" size="sm" onClick={() => handleEditExpense(expense)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleDeleteExpense(expense.id)}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredExpenses.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={(onEditExpense || onDeleteExpense) ? 7 : 6} className="text-center py-8 text-muted-foreground">
-                  {searchTerm ? "No matching expenses found." : "No expenses found for the selected category."}
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredExpenses.map((expense) => (
-                <TableRow key={expense.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleViewExpense(expense)}>
-                  <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`bg-${getCategoryColor(expense.category)}-100`}>
-                      {getCategoryName(expense.category)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{expense.description}</TableCell>
-                  <TableCell>{expense.vendor || "-"}</TableCell>
-                  <TableCell>{getStatusBadge(expense.status)}</TableCell>
-                  <TableCell className="text-right font-medium">${expense.amount.toLocaleString()}</TableCell>
-                  {(onEditExpense || onDeleteExpense) && (
-                    <TableCell className="text-right p-0 px-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewExpense(expense);
-                          }}>
-                            <Eye className="h-4 w-4 mr-2" /> View Details
-                          </DropdownMenuItem>
-                          {onEditExpense && (
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditExpense(expense);
-                            }}>
-                              <Edit className="h-4 w-4 mr-2" /> Edit
-                            </DropdownMenuItem>
-                          )}
-                          {onDeleteExpense && (
-                            <DropdownMenuItem 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                confirmDeleteExpense(expense);
-                              }}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" /> Delete
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+          ))}
+        </TableBody>
+      </Table>
 
-      {/* View Expense Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Expense Details</DialogTitle>
-          </DialogHeader>
-          
-          {selectedExpense && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Date</h4>
-                  <p>{new Date(selectedExpense.date).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Amount</h4>
-                  <p className="font-semibold">${selectedExpense.amount.toLocaleString()}</p>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Category</h4>
-                <Badge variant="outline" className={`bg-${getCategoryColor(selectedExpense.category)}-100`}>
-                  {getCategoryName(selectedExpense.category)}
-                </Badge>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Description</h4>
-                <p>{selectedExpense.description}</p>
-              </div>
-              
-              {selectedExpense.vendor && (
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Vendor</h4>
-                  <p>{selectedExpense.vendor}</p>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Payment Method</h4>
-                  <p>{selectedExpense.paymentMethod || "Not specified"}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Status</h4>
-                  {getStatusBadge(selectedExpense.status)}
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Recurring</h4>
-                <p>{selectedExpense.recurring ? "Yes" : "No"}</p>
-              </div>
-              
-              {selectedExpense.receipt && (
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Receipt</h4>
-                  <Button variant="outline" size="sm" className="mt-1">
-                    <FileImage className="h-4 w-4 mr-2" />
-                    View Receipt
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-          
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>Close</Button>
-            {onEditExpense && selectedExpense && (
-              <Button onClick={() => {
-                setIsViewDialogOpen(false);
-                handleEditExpense(selectedExpense);
-              }}>Edit</Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add/Edit Expense Dialog */}
-      <Dialog open={isAddEditDialogOpen} onOpenChange={setIsAddEditDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{selectedExpense ? "Edit Expense" : "Add New Expense"}</DialogTitle>
+            <DialogTitle>Add New Expense</DialogTitle>
             <DialogDescription>
-              {selectedExpense 
-                ? "Update the details of this expense." 
-                : "Enter the details for the new expense."}
+              Create a new office expense to track your finances.
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="date">Date</Label>
-                <div className="flex">
-                  <Calendar className="h-4 w-4 absolute mt-3 ml-3 text-muted-foreground" />
-                  <Input
-                    id="date"
-                    type="date"
-                    value={newExpense.date}
-                    onChange={(e) => setNewExpense({...newExpense, date: e.target.value})}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="amount">Amount ($)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={newExpense.amount}
-                  onChange={(e) => setNewExpense({...newExpense, amount: parseFloat(e.target.value)})}
-                />
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="category">Category</Label>
-              <select
-                id="category"
-                value={newExpense.category}
-                onChange={(e) => setNewExpense({...newExpense, category: e.target.value})}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Select Category</option>
-                <option value="rent">Rent</option>
-                <option value="secretary">Secretary</option>
-                <option value="equipment">Equipment</option>
-                <option value="inventory">Inventory</option>
-                <option value="warehouse">Warehouse</option>
-                <option value="utilities">Utilities</option>
-                <option value="insurance">Insurance</option>
-                <option value="staff">Staff</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                value={newExpense.description}
-                onChange={(e) => setNewExpense({...newExpense, description: e.target.value})}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Expense Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter expense name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="vendor">Vendor</Label>
-                <Input
-                  id="vendor"
-                  value={newExpense.vendor}
-                  onChange={(e) => setNewExpense({...newExpense, vendor: e.target.value})}
-                />
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter amount" type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col space-y-1.5">
+                    <FormLabel>Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={handleDateChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter category" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter description"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="receipt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Receipt URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter receipt URL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Method</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter payment method" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter status" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end">
+                <Button type="submit">Add Expense</Button>
               </div>
-              
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="paymentMethod">Payment Method</Label>
-                <select
-                  id="paymentMethod"
-                  value={newExpense.paymentMethod}
-                  onChange={(e) => setNewExpense({...newExpense, paymentMethod: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="credit">Credit Card</option>
-                  <option value="cash">Cash</option>
-                  <option value="check">Check</option>
-                  <option value="bank">Bank Transfer</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  value={newExpense.status}
-                  onChange={(e) => setNewExpense({...newExpense, status: e.target.value as any})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="paid">Paid</option>
-                  <option value="pending">Pending</option>
-                  <option value="overdue">Overdue</option>
-                </select>
-              </div>
-              
-              <div className="flex items-center gap-2 mt-8">
-                <Checkbox 
-                  id="recurring"
-                  checked={newExpense.recurring} 
-                  onCheckedChange={(checked) => setNewExpense({...newExpense, recurring: !!checked})}
-                />
-                <Label htmlFor="recurring" className="cursor-pointer">Recurring Expense</Label>
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="receipt">Receipt</Label>
-              <Input id="receipt" type="file" />
-              <p className="text-xs text-muted-foreground">Upload a receipt image (optional)</p>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddEditDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleAddEditExpense}>
-              {selectedExpense ? "Save Changes" : "Add Expense"}
-            </Button>
-          </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Delete Expense</DialogTitle>
+            <DialogTitle>Edit Expense</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this expense? This action cannot be undone.
+              Edit the details of the selected office expense.
             </DialogDescription>
           </DialogHeader>
-          
           {selectedExpense && (
-            <div className="py-4">
-              <p><strong>Description:</strong> {selectedExpense.description}</p>
-              <p><strong>Amount:</strong> ${selectedExpense.amount.toLocaleString()}</p>
-              <p><strong>Date:</strong> {new Date(selectedExpense.date).toLocaleDateString()}</p>
-            </div>
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit(handleUpdateExpense)} className="space-y-4">
+                <FormField
+                  control={editForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expense Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter expense name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter amount" type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col space-y-1.5">
+                      <FormLabel>Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-[240px] pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={(date) => {
+                              if (date) {
+                                editForm.setValue("date", date);
+                              }
+                            }}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter category" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter description"
+                          className="resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="receipt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Receipt URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter receipt URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="paymentMethod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Payment Method</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter payment method" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter status" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end">
+                  <Button type="submit">Update Expense</Button>
+                </div>
+              </form>
+            </Form>
           )}
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteExpense}>Delete</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
