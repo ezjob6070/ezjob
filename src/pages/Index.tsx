@@ -13,7 +13,6 @@ import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
 import ActivitySection from "@/components/dashboard/ActivitySection";
 import DashboardDetailDialog from "@/components/DashboardDetailDialog";
-import DashboardCalendar from "@/components/dashboard/DashboardCalendar";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import ProjectsDashboardSection from "@/components/dashboard/ProjectsDashboardSection";
 
@@ -55,8 +54,8 @@ const Index = () => {
   const taskCounts = {
     completed: dashboardTaskCounts.completed,
     inProgress: dashboardTaskCounts.inProgress,
-    scheduled: dashboardTaskCounts.rescheduled, // Changed from scheduled to rescheduled
-    cancelled: dashboardTaskCounts.canceled // Changed from cancelled to canceled
+    scheduled: dashboardTaskCounts.rescheduled, 
+    cancelled: dashboardTaskCounts.canceled
   };
   
   const totalTasks = Object.values(taskCounts).reduce((sum, count) => sum + count, 0);
@@ -187,45 +186,8 @@ const Index = () => {
       default: // Dashboard tab
         return (
           <>
-            {/* Display Projects Dashboard Section at the top */}
+            {/* Display Projects Dashboard Section */}
             <ProjectsDashboardSection />
-
-            <DashboardCalendar date={date} setDate={setDate} />
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-              <Card className="bg-white shadow-sm border border-gray-100">
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-sm font-medium">Revenue</h3>
-                    <span className="text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded">+{dashboardFinancialMetrics.monthlyGrowth}%</span>
-                  </div>
-                  <div className="text-xl font-bold">{formatCurrency(dashboardFinancialMetrics.totalRevenue)}</div>
-                  <div className="text-xs text-gray-500 mt-1">From {totalTasks} jobs</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-white shadow-sm border border-gray-100">
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-sm font-medium">Job Completion</h3>
-                    <span className="text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{Math.round((dashboardTaskCounts.completed / totalTasks) * 100)}%</span>
-                  </div>
-                  <div className="text-xl font-bold">{dashboardTaskCounts.completed}/{totalTasks}</div>
-                  <div className="text-xs text-gray-500 mt-1">{dashboardTaskCounts.inProgress} in progress</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-white shadow-sm border border-gray-100">
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-sm font-medium">Average Value</h3>
-                    <span className="text-xs text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">Per Job</span>
-                  </div>
-                  <div className="text-xl font-bold">{formatCurrency(dashboardFinancialMetrics.avgJobValue)}</div>
-                  <div className="text-xs text-gray-500 mt-1">Conversion rate: {dashboardFinancialMetrics.conversionRate}%</div>
-                </CardContent>
-              </Card>
-            </div>
             
             <MetricsOverview 
               financialMetrics={dashboardFinancialMetrics}
