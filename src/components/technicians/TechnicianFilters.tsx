@@ -121,7 +121,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Specific Role</SelectItem>
+            <SelectItem value="all">Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
             <SelectItem value="onLeave">On Leave</SelectItem>
