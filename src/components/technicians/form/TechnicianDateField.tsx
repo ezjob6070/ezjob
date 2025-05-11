@@ -8,19 +8,20 @@ export interface TechnicianDateFieldProps {
   control: Control<any>;
   name: string;
   label: string;
-  defaultValue?: string;
+  description?: string;
 }
 
-const TechnicianDateField: React.FC<TechnicianDateFieldProps> = ({
+// Changed the export to export a named constant instead of default export
+export const TechnicianDateField: React.FC<TechnicianDateFieldProps> = ({
   control,
   name,
   label,
-  defaultValue
+  description
 }) => {
   const { field } = useController({
     name,
     control,
-    defaultValue: defaultValue || '',
+    defaultValue: '',
   });
 
   return (
@@ -32,8 +33,7 @@ const TechnicianDateField: React.FC<TechnicianDateFieldProps> = ({
         {...field}
         className="w-full border rounded-md h-10 px-3"
       />
+      {description && <p className="text-sm text-muted-foreground">{description}</p>}
     </div>
   );
 };
-
-export default TechnicianDateField;
