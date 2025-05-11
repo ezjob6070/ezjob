@@ -46,26 +46,28 @@ const EmployedSubRoleFilter: React.FC<EmployedSubRoleFilterProps> = ({
             id="select-all-employed-subroles"
             checked={allSelected}
             onCheckedChange={handleSelectAll}
+            className="h-5 w-5"
           />
           <Label
             htmlFor="select-all-employed-subroles"
-            className="ml-2 text-sm font-medium"
+            className="ml-2.5 text-sm font-medium cursor-pointer"
           >
             All Staff Positions
           </Label>
         </div>
       </div>
-      <div className="space-y-1 max-h-40 overflow-y-auto">
+      <div className="space-y-2 max-h-40 overflow-y-auto">
         {employedSubRoles.map((role) => (
           <div key={role} className="flex items-center">
             <Checkbox
               id={`employed-subrole-${role}`}
               checked={selectedSubRoles.includes(role)}
               onCheckedChange={() => onToggleSubRole(role)}
+              className="h-5 w-5"
             />
             <Label
               htmlFor={`employed-subrole-${role}`}
-              className="ml-2 text-sm font-normal"
+              className="ml-2.5 text-sm cursor-pointer"
             >
               {role}
             </Label>
