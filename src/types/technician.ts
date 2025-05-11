@@ -16,6 +16,7 @@ export interface Technician {
   notes?: string;
   rating?: number;
   completedJobs?: number;
+  cancelledJobs?: number;
   totalRevenue?: number;
   image?: string;
   paymentType: string;
@@ -37,6 +38,7 @@ export interface Technician {
   subRole?: string;
   documents?: Document[];
   initials?: string;
+  category?: string;
 }
 
 export interface Document {
@@ -48,3 +50,48 @@ export interface Document {
   uploadDate: string;
   url: string;
 }
+
+export type TechnicianRole = 'technician' | 'salesman' | 'employed' | 'contractor';
+
+// Add the missing DEFAULT_SUB_ROLES export
+export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
+  technician: [
+    'HVAC Technician',
+    'Plumber',
+    'Electrician',
+    'General Handyman',
+    'Appliance Repair',
+    'Carpet Cleaner',
+    'Locksmith',
+    'Painter',
+    'Pest Control',
+    'Roofer'
+  ],
+  salesman: [
+    'Inside Sales',
+    'Outside Sales',
+    'Sales Manager',
+    'Business Development',
+    'Account Executive',
+    'Sales Representative',
+    'Telemarketer'
+  ],
+  employed: [
+    'Office Staff',
+    'Customer Support',
+    'Dispatcher',
+    'Manager',
+    'Accountant',
+    'Human Resources',
+    'Marketing Specialist',
+    'Administrative Assistant'
+  ],
+  contractor: [
+    'Independent Contractor',
+    'Subcontractor',
+    'Project-based Contractor',
+    'Seasonal Contractor',
+    'Remote Contractor',
+    'Consulting Contractor'
+  ]
+};
