@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -19,7 +20,7 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
   const [searchTerm, setSearchTerm] = useState("");
   const { technicians, jobs } = useGlobalState();
   
-  // Filter technicians that are contractors - ensure role exists before checking it
+  // Filter technicians that are contractors
   const contractors = technicians.filter((tech) => tech.role === "contractor");
 
   // Filter by search term
@@ -32,16 +33,11 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
 
   // Get jobs assigned to contractors within the date range
   const contractorJobs = jobs.filter(job => {
-    // Safely access date properties
-    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : 
-                  (typeof job.date === 'string' ? new Date(job.date) : 
-                  (job.date instanceof Date ? job.date : new Date()));
-    
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);
     
-    // Check if job is assigned to a contractor
     return isInDateRange && contractors.some(c => c.id === job.technicianId);
   });
 
@@ -56,12 +52,12 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
     // Calculate payment based on contractor's payment type
     let payment = 0;
     if (contractor.paymentType === "percentage") {
-      payment = totalRevenue * ((contractor.paymentRate || 0) / 100);
+      payment = totalRevenue * (contractor.paymentRate / 100);
     } else if (contractor.paymentType === "flat") {
-      payment = completedJobs * (contractor.paymentRate || 0);
+      payment = completedJobs * contractor.paymentRate;
     } else if (contractor.paymentType === "hourly") {
       // Assuming average 2 hours per job for calculation purposes
-      payment = completedJobs * 2 * (contractor.hourlyRate || 0);
+      payment = completedJobs * 2 * contractor.hourlyRate;
     }
     
     return {
@@ -186,8 +182,8 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
                         {contractor.paymentType === "percentage" 
                           ? `${contractor.paymentRate}% of revenue` 
                           : contractor.paymentType === "flat"
-                          ? `${formatCurrency(contractor.paymentRate || 0)} per job`
-                          : `${formatCurrency(contractor.hourlyRate || 0)}/hr`}
+                          ? `${formatCurrency(contractor.paymentRate)} per job`
+                          : `${formatCurrency(contractor.hourlyRate)}/hr`}
                       </TableCell>
                       <TableCell className="text-right">{contractor.jobCount}</TableCell>
                       <TableCell className="text-right text-blue-600">

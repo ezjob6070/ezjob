@@ -7,19 +7,17 @@ import { Label } from "@/components/ui/label";
 interface StatusSelectionProps {
   status: string;
   onStatusChange: (value: string) => void;
-  job: { status: string };
-  currentStatus?: JobStatus; // Add this optional prop
+  job: { status: JobStatus };
 }
 
 const StatusSelection: React.FC<StatusSelectionProps> = ({ 
   status, 
   onStatusChange,
-  job,
-  currentStatus, // Add this prop
+  job
 }) => {
   // Get available status options based on current job status
   const getStatusOptions = () => {
-    const options: { value: string; label: string }[] = [];
+    const options: { value: JobStatus | "reschedule" | "estimate"; label: string }[] = [];
     
     // Always add these options
     options.push({ value: "completed", label: "Completed" });

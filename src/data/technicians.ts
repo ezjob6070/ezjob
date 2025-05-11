@@ -711,12 +711,3 @@ export const technicians = [...createSampleTechnicians(), ...additionalTechnicia
 
 // Export the same array as initialTechnicians for consistent reference
 export const initialTechnicians = technicians;
-
-// Extract unique categories and departments from technicians for filters
-export const categories = Array.from(new Set(
-  technicians.map(tech => tech.category || "Uncategorized")
-));
-
-export const departments = Array.from(new Set(
-  technicians.map(tech => tech.department || "General")
-));

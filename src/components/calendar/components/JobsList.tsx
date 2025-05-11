@@ -34,12 +34,11 @@ const JobsList = ({
     switch (status) {
       case "scheduled":
         return "bg-blue-500 hover:bg-blue-600";
-      case "in-progress":
+      case "in_progress":
         return "bg-yellow-500 hover:bg-yellow-600";
       case "completed":
         return "bg-green-500 hover:bg-green-600";
       case "cancelled":
-      case "canceled":
         return "bg-red-500 hover:bg-red-600";
       default:
         return "bg-gray-500 hover:bg-gray-600";
@@ -90,7 +89,7 @@ const JobsList = ({
             <Card key={job.id} className="overflow-hidden">
               <CardHeader className="p-4 pb-2">
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-md">{job.title || job.description || `Job for ${job.clientName}`}</CardTitle>
+                  <CardTitle className="text-md">{job.title}</CardTitle>
                   <Badge className={getStatusBadgeColor(job.status)}>
                     {job.status.replace('_', ' ')}
                   </Badge>

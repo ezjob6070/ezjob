@@ -1,73 +1,61 @@
 
-import { SortOption } from "@/types/sortOptions";
+import { DateRange } from "react-day-picker";
+
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
+export type JobPriority = "low" | "medium" | "high" | "urgent";
+export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile" | "credit_card" | "zelle" | "venmo" | "paypal";
 
 export interface Job {
   id: string;
+  title: string;
+  jobNumber?: string;
   clientName: string;
-  clientId?: string;
-  address?: string;
-  description?: string;
-  status: "scheduled" | "in-progress" | "in_progress" | "completed" | "cancelled" | "canceled";
-  date: Date | string; // Accept both Date and string
-  scheduledDate?: Date | string; // Accept both Date and string
-  expectedEndDate?: string;
   amount: number;
+  status: JobStatus;
   actualAmount?: number;
-  jobType?: string;
-  serviceType?: string;
-  source?: string;
-  sourceId?: string;
-  isAllDay?: boolean;
-  paymentMethod?: PaymentMethod;
-  paymentStatus?: string;
-  technicianId?: string; // Add technician ID field
-  notes?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  jobNumber?: string; // Add jobNumber field that's used in data/jobs.ts
-  clientEmail?: string;
-  clientPhone?: string;
-  estimateId?: string;
-  
-  // Additional fields needed by calendar components
-  title?: string;
+  technicianId?: string;  // Added for the TS errors
   technicianName?: string;
-  
-  // Additional fields for compatibility
   jobSourceId?: string;
   jobSourceName?: string;
-  contractorId?: string;
-  contractorName?: string;
-  category?: string;
-  cancellationReason?: string;
+  date: Date | string;  // Updated to accept Date or string
+  scheduledDate?: Date | string;  // Updated to accept Date or string
+  createdAt?: string;
   priority?: JobPriority;
-  parts?: any[];
+  details?: string;
+  address?: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  notes?: string;
+  description?: string;
+  serviceType?: string;
+  category?: string;
+  estimateId?: string;
+  isAllDay?: boolean;
+  paymentStatus?: "paid" | "unpaid" | "partial";
+  paymentMethod?: PaymentMethod;
+  cancellationReason?: string;
+  source?: string;
+  contractorName?: string;
+  contractorId?: string;
+  clientId?: string;
+  // Add missing properties that are being used in various components
+  parts?: string[];
+  signature?: string;
+  hasImages?: boolean;
+  imageCount?: number;
 }
 
-export interface AmountRange {
-  min: number;
-  max: number;
+export interface JobTab {
+  id: string;
+  label: string;
+  status: string;
+  count: number;
 }
 
-export interface JobViewProps {
-  jobs: Job[];
-}
-
-export type JobStatusType = Job["status"];
-export type JobStatus = "scheduled" | "in-progress" | "in_progress" | "completed" | "cancelled" | "canceled" | "reschedule" | "estimate";
-export type PaymentMethod = "cash" | "credit" | "check" | "invoice" | "other" | "";
-export type JobPriority = "low" | "medium" | "high" | "urgent";
-
-export interface JobBaseProps {
-  onAddJob?: (job: Job) => void;
-  onUpdateJob?: (job: Job) => void;
-  onDeleteJob?: (id: string) => void;
-}
-
-export interface JobListProps extends JobBaseProps {
-  jobs: Job[];
-  sortBy?: SortOption;
-  searchTerm?: string;
+export interface ServiceTypeFilter {
+  name: string;
+  amount: number;
+  percentage: number;
 }
 
 export interface CreateJobFormData {
@@ -78,10 +66,22 @@ export interface CreateJobFormData {
   date: Date;
   time?: Date;
   isAllDay: boolean;
-  priority: string;
+  priority: JobPriority;
   description?: string;
   category?: string;
   serviceType?: string;
   jobSourceId?: string;
   contractorId?: string;
+}
+
+export interface JobFilters {
+  searchTerm: string;
+  technicianFilter: string;
+  dateFilter: "today" | "tomorrow" | "yesterday" | "thisWeek" | "nextWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
+  customDateRange: DateRange;
+}
+
+export interface AmountRange {
+  min?: number;
+  max?: number;
 }

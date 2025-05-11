@@ -14,13 +14,13 @@ export interface Project {
   budget: number;
   actualSpent: number;
   clientName: string;
-  revenue?: number; // Add revenue as optional property
   
   // Financial data
   expenses?: ProjectExpense[];
   contractors?: ProjectContractor[];
   materials?: ProjectMaterial[];
   equipment?: ProjectEquipment[];
+  revenue?: number;
   
   // Adding salesmen for filtering
   salesmen?: ProjectSalesperson[];

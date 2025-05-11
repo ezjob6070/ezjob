@@ -4,7 +4,6 @@ import JobsFilterBar from "./JobsFilterBar";
 import JobsFilterPopovers from "./JobsFilterPopovers";
 import JobTabs from "./JobTabs";
 import { useJobsContext } from "./context/JobsContext";
-import { Job } from "./JobTypes"; // Ensure we're using the local Job type
 
 const JobsContainer = ({ 
   technicianNames, 
@@ -66,16 +65,13 @@ const JobsContainer = ({
     handleRescheduleJob(jobId, newDate, isAllDay);
   };
 
-  // Update jobs as the local Job type to avoid type conflicts
-  const typedJobs = filteredJobs as unknown as Job[];
-
   return (
     <div className="space-y-4">
       <JobsFilterBar />
       
       {/* Jobs Tabs and Table */}
       <JobTabs 
-        jobs={typedJobs}
+        jobs={filteredJobs} 
         searchTerm={searchTerm}
         onCancelJob={handleCancelJob}
         onCompleteJob={handleCompleteJob}

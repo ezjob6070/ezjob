@@ -1,10 +1,3 @@
 
-// Define SortOption type for use in various components
-export type SortOption = 
-  | "newest" 
-  | "oldest" 
-  | "name-asc" 
-  | "name-desc" 
-  | "revenue-high" 
-  | "revenue-low"
-  | string; // Add string to handle cases where a string is passed
+// Create this file if it doesn't exist
+export type SortOption = string | "revenue-high" | "revenue-low" | "jobs-high" | "jobs-low" | "name-asc" | "name-desc" | "date-newest" | "date-oldest";

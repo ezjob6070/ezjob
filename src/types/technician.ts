@@ -3,23 +3,21 @@ export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "mont
 
 export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
 
-// Default sub-roles for each technician role
-export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
-  technician: ["HVAC", "Plumbing", "Electrical", "Carpentry", "General"],
-  salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Manager"],
-  employed: ["Office Staff", "Manager", "Customer Service", "Administrative"],
-  contractor: ["Jobs Contractor", "General Contractor", "Electrical Contractor", "Plumbing Contractor", "HVAC Contractor", "Specialty Contractor", "Independent", "1099", "Specialist", "Consultant"]
-};
+export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
 
-export interface Document {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
-  url: string;
-  uploadDate: string;
-  expirationDate?: string;
+export interface TechnicianSubRoles {
+  technician: string[];
+  salesman: string[];
+  employed: string[];
+  contractor: string[];
 }
+
+export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
+  technician: ["HVAC", "Plumbing", "Electrical", "General", "Carpentry"],
+  salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Support"],
+  employed: ["Secretary", "Management", "HR", "Finance", "Administration", "Operations"],
+  contractor: ["Independent", "Agency", "Specialized", "Consultant"]
+};
 
 export interface Technician {
   id: string;
@@ -32,44 +30,64 @@ export interface Technician {
   hireDate: string;
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
-  
-  // Role related fields
-  role: TechnicianRole; // Contractor, employee, etc.
-  subRole?: string; // Specific role within the main role
-  specialty: string; // Technical specialty (make this required as it's causing errors)
-  
-  // Payment related fields
+  payRate?: number;
   paymentType?: "percentage" | "flat" | "hourly" | "salary";
-  paymentRate?: number;
-  hourlyRate?: number;
   salaryBasis?: SalaryBasis;
-  
-  // Document related fields
-  ssn?: string;
-  driverLicense?: string | { number: string; state: string; expirationDate: string };
-  idNumber?: string;
-  documents?: Document[]; // Add Document type
-  initials?: string;
-  
-  // Additional fields for finance components
-  incentiveType?: string;
-  incentiveAmount?: number;
-  
-  // Performance metrics fields
-  completedJobs?: number;
-  cancelledJobs?: number;
-  totalRevenue?: number;
+  monthlySalary?: number;
   rating?: number;
-  
-  // Other fields that might be needed
-  category?: string;
-  certifications?: string[];
-  skills?: string[];
   imageUrl?: string;
+  specialty?: string;  // Make specialty optional to match actual usage
+  skills?: string[];
+  certifications?: string[];
+  notes?: string;
+  category?: string;
+  
+  // Add properties that were missing and causing errors
+  role?: TechnicianRole;
+  subRole?: string;
+  initials?: string;
+  ssn?: string;
+  driverLicense?: string | { number: string; state: string; expirationDate: string; };
+  idNumber?: string;
+  documents?: any[];
   profileImage?: string;
   yearsExperience?: number;
   workContract?: string;
+  jobCategories?: string[];
   
-  // Notes for technicians
-  notes?: string;
+  // Finance and performance related properties
+  paymentRate?: number;
+  hourlyRate?: number;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  incentiveType?: IncentiveType;
+  incentiveAmount?: number;
+}
+
+export interface Document {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  uploadDate: string;
+  size?: number;
+}
+
+export interface TechnicianFilters {
+  search: string;
+  paymentTypes: string[];
+  status: string[];
+  categories: string[];
+  dateRange?: {
+    from: Date;
+    to: Date;
+  };
+}
+
+export interface FinancialSummary {
+  totalRevenue: number;
+  totalJobs: number;
+  averageJobValue: number;
+  paymentsDue: number;
 }

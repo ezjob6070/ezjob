@@ -36,7 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TechnicianDateField } from "./form/TechnicianDateField";
 import { TechnicianImageUpload } from "./TechnicianImageUpload";
 import { TechnicianRoleField } from "./form/TechnicianRoleField";
-import TechnicianSubRoleField from "./form/TechnicianSubRoleField";
+import { TechnicianSubRoleField } from "./form/TechnicianSubRoleField";
 import { Shield, FileText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

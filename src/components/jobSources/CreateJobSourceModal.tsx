@@ -76,7 +76,7 @@ const CreateJobSourceModal: React.FC<CreateJobSourceModalProps> = ({
       totalJobs: 0,
       totalRevenue: 0,
       profit: 0,
-      createdAt: new Date().toISOString(), // Convert Date to string
+      createdAt: new Date(),
     };
 
     onAddJobSource(newJobSource);

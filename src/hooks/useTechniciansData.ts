@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
@@ -16,7 +17,6 @@ export function useTechniciansData() {
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [selectedSubRoles, setSelectedSubRoles] = useState<string[]>([]);
   
   // Extract unique categories and departments
   const categories = useMemo(() => {
@@ -31,46 +31,13 @@ export function useTechniciansData() {
     ));
   }, [technicians]);
 
-  // Extract unique sub-roles for each role type
-  const technicianSubRoles = useMemo(() => {
-    return Array.from(new Set(
-      technicians
-        .filter(tech => tech.role === "technician" && tech.subRole)
-        .map(tech => tech.subRole as string)
-    ));
-  }, [technicians]);
-
-  const salesmanSubRoles = useMemo(() => {
-    return Array.from(new Set(
-      technicians
-        .filter(tech => tech.role === "salesman" && tech.subRole)
-        .map(tech => tech.subRole as string)
-    ));
-  }, [technicians]);
-
-  const employedSubRoles = useMemo(() => {
-    return Array.from(new Set(
-      technicians
-        .filter(tech => tech.role === "employed" && tech.subRole)
-        .map(tech => tech.subRole as string)
-    ));
-  }, [technicians]);
-
-  const contractorSubRoles = useMemo(() => {
-    return Array.from(new Set(
-      technicians
-        .filter(tech => tech.role === "contractor" && tech.subRole)
-        .map(tech => tech.subRole as string)
-    ));
-  }, [technicians]);
-
   // Filtered technicians based on all criteria
   const filteredTechnicians = useMemo(() => {
     return technicians
       .filter(tech => {
         const matchesSearch = searchQuery === "" || 
           tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          tech.specialty?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
           tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
         
@@ -89,12 +56,8 @@ export function useTechniciansData() {
           
         const matchesRole = roleFilter === "all" ||
           (tech.role || "technician") === roleFilter;
-          
-        const matchesSubRole = selectedSubRoles.length === 0 ||
-          (tech.subRole && selectedSubRoles.includes(tech.subRole));
         
-        return matchesSearch && matchesCategory && matchesStatus && 
-               matchesDepartment && matchesDateRange && matchesRole && matchesSubRole;
+        return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange && matchesRole;
       })
       .sort((a, b) => {
         switch (sortOption) {
@@ -114,8 +77,7 @@ export function useTechniciansData() {
             return 0;
         }
       });
-  }, [technicians, searchQuery, selectedCategories, statusFilter, selectedDepartments, 
-      dateRange, roleFilter, sortOption, selectedSubRoles]);
+  }, [technicians, searchQuery, selectedCategories, statusFilter, selectedDepartments, dateRange, roleFilter, sortOption]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -147,16 +109,6 @@ export function useTechniciansData() {
         return prev.filter(d => d !== department);
       } else {
         return [...prev, department];
-      }
-    });
-  };
-  
-  const toggleSubRole = (subRole: string) => {
-    setSelectedSubRoles(prev => {
-      if (prev.includes(subRole)) {
-        return prev.filter(sr => sr !== subRole);
-      } else {
-        return [...prev, subRole];
       }
     });
   };
@@ -204,24 +156,17 @@ export function useTechniciansData() {
     sortOption,
     dateRange,
     roleFilter,
-    selectedSubRoles,
     categories,
     departments,
-    technicianSubRoles,
-    salesmanSubRoles,
-    employedSubRoles,
-    contractorSubRoles,
     setTechnicians,
     handleSearchChange,
     toggleTechnician,
     toggleCategory,
     toggleDepartment,
-    toggleSubRole,
     handleSortChange,
     setStatusFilter,
     setDateRange,
     setRoleFilter,
-    setSelectedSubRoles,
     addCategory,
     exportTechnicians
   };
