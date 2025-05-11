@@ -1,6 +1,10 @@
 
+// Define SortOption type for use in various components
 export type SortOption = 
-  // Default options
-  "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low" |
-  // Additional options for job sources
-  "profit-high" | "profit-low" | "jobs-high" | "jobs-low";
+  | "newest" 
+  | "oldest" 
+  | "name-asc" 
+  | "name-desc" 
+  | "revenue-high" 
+  | "revenue-low"
+  | string; // Add string to handle cases where a string is passed

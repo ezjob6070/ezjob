@@ -1,64 +1,148 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Job } from '@/types/job';
-import { JobTab } from '@/types/job';
+import React, { useState } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Job, JobStatus } from "./JobTypes";
+import JobsTable from "./JobsTable";
 
 interface JobTabsProps {
   jobs: Job[];
-  activeTab: JobTab;
-  onTabChange: (tab: JobTab) => void;
+  searchTerm?: string;
+  onCancelJob: (jobId: string) => void;
+  onCompleteJob: (jobId: string) => void;
+  onRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
+  onSendToEstimate?: (job: Job) => void;
+  onSearchChange?: (term: string) => void;
+  selectedJob?: Job | null;
+  isStatusModalOpen?: boolean;
+  openStatusModal?: (job: Job) => void;
+  closeStatusModal?: () => void;
+  setDatePopoverOpen?: (open: boolean) => void;
+  setTechPopoverOpen?: (open: boolean) => void;
+  setContractorPopoverOpen?: (open: boolean) => void;
+  setSourcePopoverOpen?: (open: boolean) => void;
+  setAmountPopoverOpen?: (open: boolean) => void;
+  setPaymentPopoverOpen?: (open: boolean) => void;
 }
 
-const JobTabs: React.FC<JobTabsProps> = ({ jobs, activeTab, onTabChange }) => {
-  // Count jobs for each status
-  const counts = jobs.reduce(
-    (acc, job) => {
-      const status = job.status.toLowerCase();
-      if (status === 'scheduled') {
-        acc.scheduled++;
-      } else if (status === 'in-progress' || status === 'in_progress') {
-        acc.inProgress++;
-      } else if (status === 'completed') {
-        acc.completed++;
-      } else if (status === 'canceled' || status === 'cancelled') {
-        acc.canceled++;
-      }
-      acc.all++;
-      return acc;
-    },
-    { all: 0, scheduled: 0, inProgress: 0, completed: 0, canceled: 0 }
-  );
+const JobTabs: React.FC<JobTabsProps> = ({
+  jobs,
+  searchTerm = '',
+  onCancelJob,
+  onCompleteJob,
+  onRescheduleJob,
+  onSendToEstimate,
+  onSearchChange,
+  selectedJob,
+  isStatusModalOpen,
+  openStatusModal,
+  closeStatusModal,
+  setDatePopoverOpen,
+  setTechPopoverOpen,
+  setContractorPopoverOpen,
+  setSourcePopoverOpen,
+  setAmountPopoverOpen,
+  setPaymentPopoverOpen
+}) => {
+  const [activeTab, setActiveTab] = useState("all");
 
+  // Fix for onTabChange issue - define a handler that works with string values
   const handleChangeTab = (value: string) => {
-    onTabChange(value as JobTab);
+    setActiveTab(value);
+  };
+
+  const getFilteredJobs = (status?: JobStatus | 'all') => {
+    if (!status || status === 'all') return jobs;
+
+    return jobs.filter(job => {
+      // Handle the 'in-progress' tab separately due to different status formats in the data
+      if (status === 'in-progress') {
+        return job.status === 'in-progress' || job.status === 'in_progress';
+      }
+      
+      // For canceled/cancelled
+      if (status === 'canceled') {
+        return job.status === 'canceled' || job.status === 'cancelled';
+      }
+      
+      return job.status === status;
+    });
+  };
+
+  const updateStatus = (job: Job) => {
+    if (openStatusModal) {
+      openStatusModal(job);
+    }
   };
 
   return (
-    <Tabs value={activeTab} onValueChange={handleChangeTab} className="w-full">
-      <TabsList className="grid grid-cols-5 w-full max-w-2xl">
-        <TabsTrigger value="all">
-          All Jobs
-          <Badge variant="outline" className="ml-2">{counts.all}</Badge>
-        </TabsTrigger>
+    <Tabs defaultValue="all" value={activeTab} onValueChange={handleChangeTab}>
+      <TabsList>
+        <TabsTrigger value="all">All Jobs ({jobs.length})</TabsTrigger>
         <TabsTrigger value="scheduled">
-          Scheduled
-          <Badge variant="outline" className="ml-2">{counts.scheduled}</Badge>
+          Scheduled ({getFilteredJobs('scheduled').length})
         </TabsTrigger>
         <TabsTrigger value="in-progress">
-          In Progress
-          <Badge variant="outline" className="ml-2">{counts.inProgress}</Badge>
+          In Progress ({getFilteredJobs('in-progress').length})
         </TabsTrigger>
         <TabsTrigger value="completed">
-          Completed
-          <Badge variant="outline" className="ml-2">{counts.completed}</Badge>
+          Completed ({getFilteredJobs('completed').length})
         </TabsTrigger>
         <TabsTrigger value="canceled">
-          Canceled
-          <Badge variant="outline" className="ml-2">{counts.canceled}</Badge>
+          Cancelled ({getFilteredJobs('canceled').length})
         </TabsTrigger>
       </TabsList>
+
+      <div className="mt-4">
+        {/* All Jobs */}
+        <TabsContent value="all">
+          <JobsTable 
+            jobs={jobs} 
+            onUpdateStatus={updateStatus}
+            onSendToEstimate={onSendToEstimate} 
+            searchTerm={searchTerm}
+          />
+        </TabsContent>
+
+        {/* Scheduled Jobs */}
+        <TabsContent value="scheduled">
+          <JobsTable 
+            jobs={getFilteredJobs('scheduled')} 
+            onUpdateStatus={updateStatus}
+            onSendToEstimate={onSendToEstimate}
+            searchTerm={searchTerm}
+          />
+        </TabsContent>
+
+        {/* In Progress Jobs */}
+        <TabsContent value="in-progress">
+          <JobsTable 
+            jobs={getFilteredJobs('in-progress')} 
+            onUpdateStatus={updateStatus} 
+            onSendToEstimate={onSendToEstimate}
+            searchTerm={searchTerm}
+          />
+        </TabsContent>
+
+        {/* Completed Jobs */}
+        <TabsContent value="completed">
+          <JobsTable 
+            jobs={getFilteredJobs('completed')} 
+            onUpdateStatus={updateStatus} 
+            onSendToEstimate={onSendToEstimate}
+            searchTerm={searchTerm}
+          />
+        </TabsContent>
+
+        {/* Cancelled Jobs */}
+        <TabsContent value="canceled">
+          <JobsTable 
+            jobs={getFilteredJobs('canceled')} 
+            onUpdateStatus={updateStatus} 
+            onSendToEstimate={onSendToEstimate}
+            searchTerm={searchTerm}
+          />
+        </TabsContent>
+      </div>
     </Tabs>
   );
 };

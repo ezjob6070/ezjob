@@ -8,12 +8,14 @@ interface StatusSelectionProps {
   status: string;
   onStatusChange: (value: string) => void;
   job: { status: string };
+  currentStatus?: JobStatus; // Add this optional prop
 }
 
 const StatusSelection: React.FC<StatusSelectionProps> = ({ 
   status, 
   onStatusChange,
-  job
+  job,
+  currentStatus, // Add this prop
 }) => {
   // Get available status options based on current job status
   const getStatusOptions = () => {

@@ -11,6 +11,16 @@ export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
   contractor: ["Jobs Contractor", "General Contractor", "Electrical Contractor", "Plumbing Contractor", "HVAC Contractor", "Specialty Contractor", "Independent", "1099", "Specialist", "Consultant"]
 };
 
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  url: string;
+  uploadDate: string;
+  expirationDate?: string;
+}
+
 export interface Technician {
   id: string;
   name: string;
@@ -23,10 +33,10 @@ export interface Technician {
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
   
-  // Required properties being added/fixed
-  role?: TechnicianRole; // Contractor, employee, etc.
+  // Role related fields
+  role: TechnicianRole; // Contractor, employee, etc.
   subRole?: string; // Specific role within the main role
-  specialty?: string; // Technical specialty
+  specialty: string; // Technical specialty (make this required as it's causing errors)
   
   // Payment related fields
   paymentType?: "percentage" | "flat" | "hourly" | "salary";
@@ -38,7 +48,7 @@ export interface Technician {
   ssn?: string;
   driverLicense?: string | { number: string; state: string; expirationDate: string };
   idNumber?: string;
-  documents?: any[]; // Allow documents array
+  documents?: Document[]; // Add Document type
   initials?: string;
   
   // Additional fields for finance components

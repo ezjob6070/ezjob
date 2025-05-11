@@ -6,7 +6,7 @@ export interface Job {
   clientName: string;
   clientPhone?: string;
   clientEmail?: string;
-  address: string;
+  address?: string; // Make address optional to match the JobTypes.ts definition
   status: "scheduled" | "in-progress" | "in_progress" | "completed" | "canceled" | "cancelled" | "rescheduled" | "reschedule" | "estimate" | string;
   scheduledDate: string;
   amount: number;
@@ -51,6 +51,9 @@ export interface Job {
   
   // Job priority
   priority?: JobPriority;
+  
+  // Additional field to match jobs.ts
+  jobNumber?: string;
 }
 
 export interface AmountRange {

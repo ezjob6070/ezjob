@@ -24,6 +24,10 @@ export interface Job {
   notes?: string;
   createdAt?: string;
   updatedAt?: string;
+  jobNumber?: string; // Add jobNumber field that's used in data/jobs.ts
+  clientEmail?: string;
+  clientPhone?: string;
+  estimateId?: string;
   
   // Additional fields needed by calendar components
   title?: string;

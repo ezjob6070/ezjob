@@ -66,8 +66,8 @@ const JobsContainer = ({
     handleRescheduleJob(jobId, newDate, isAllDay);
   };
 
-  // Convert jobs to ensure type compatibility if needed
-  const convertedJobs = filteredJobs as Job[]; // Since we're now using the local Job type
+  // Update jobs as the local Job type to avoid type conflicts
+  const typedJobs = filteredJobs as unknown as Job[];
 
   return (
     <div className="space-y-4">
@@ -75,7 +75,7 @@ const JobsContainer = ({
       
       {/* Jobs Tabs and Table */}
       <JobTabs 
-        jobs={convertedJobs}
+        jobs={typedJobs}
         searchTerm={searchTerm}
         onCancelJob={handleCancelJob}
         onCompleteJob={handleCompleteJob}
