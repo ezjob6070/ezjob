@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,8 @@ import {
   PlusIcon,
   CheckCircle,
   XCircle,
-  Clock4
+  Clock4,
+  Search
 } from "lucide-react";
 import { Project, ProjectTask, ProjectTaskInspection } from "@/types/project";
 import { format } from "date-fns";
@@ -49,6 +49,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"priority" | "dueDate" | "progress">("priority");
   const [activeTasksTab, setActiveTasksTab] = useState<"all" | "pending" | "in_progress" | "completed" | "blocked">("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleAddTask = () => {
     if (!newTask.title) {
@@ -195,6 +196,16 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
     // Apply status filter from tab selection
     if (activeTasksTab !== "all") {
       filtered = filtered.filter(task => task.status === activeTasksTab);
+    }
+    
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(task => 
+        task.title.toLowerCase().includes(query) || 
+        (task.description && task.description.toLowerCase().includes(query)) ||
+        (task.assignedTo && task.assignedTo.toLowerCase().includes(query))
+      );
     }
     
     // Apply sorting
@@ -439,19 +450,19 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         </Card>
       </div>
 
-      {/* Progress Overview Card */}
+      {/* Progress Overview Card - Now Smaller and More Compact */}
       <Card className="bg-white border-none shadow-md">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-gray-800">Progress Overview</CardTitle>
+        <CardHeader className="py-4">
+          <CardTitle className="text-lg font-semibold text-gray-800">Progress Overview</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <CardContent className="space-y-4 pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col">
-              <div className="text-sm text-gray-500 mb-2">Project Completion</div>
-              <div className="flex items-center gap-3">
-                <div className="text-3xl font-bold text-blue-600">{project.completion}%</div>
+              <div className="text-xs text-gray-500 mb-1">Project Completion</div>
+              <div className="flex items-center gap-2">
+                <div className="text-2xl font-bold text-blue-600">{project.completion}%</div>
                 <div className="flex-1">
-                  <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div 
                       className="h-full rounded-full bg-blue-500" 
                       style={{ width: `${project.completion}%` }}
@@ -462,11 +473,11 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
             </div>
             
             <div className="flex flex-col">
-              <div className="text-sm text-gray-500 mb-2">Task Completion</div>
-              <div className="flex items-center gap-3">
-                <div className="text-3xl font-bold text-green-600">{calculateOverallProgress()}%</div>
+              <div className="text-xs text-gray-500 mb-1">Task Completion</div>
+              <div className="flex items-center gap-2">
+                <div className="text-2xl font-bold text-green-600">{calculateOverallProgress()}%</div>
                 <div className="flex-1">
-                  <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div 
                       className="h-full rounded-full bg-green-500" 
                       style={{ width: `${calculateOverallProgress()}%` }}
@@ -477,20 +488,20 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
             </div>
             
             <div className="flex flex-col">
-              <div className="text-sm text-gray-500 mb-2">Tasks Status</div>
+              <div className="text-xs text-gray-500 mb-1">Tasks Status</div>
               <div className="flex items-center gap-2">
-                <div className="text-3xl font-bold text-purple-600">
+                <div className="text-2xl font-bold text-purple-600">
                   {completedTasksCount}/{tasks.length}
                 </div>
-                <div className="text-lg text-gray-600">Complete</div>
+                <div className="text-sm text-gray-600">Complete</div>
               </div>
             </div>
           </div>
           
           {/* Task Status Distribution */}
-          <div className="pt-4">
-            <div className="text-sm text-gray-500 mb-3">Task Status Distribution</div>
-            <div className="flex gap-1 h-4">
+          <div>
+            <div className="text-xs text-gray-500 mb-2">Task Status Distribution</div>
+            <div className="flex gap-1 h-3">
               {tasks.length > 0 && (
                 <>
                   <div 
@@ -517,21 +528,21 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
               )}
             </div>
             
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
               <div className="flex items-center gap-1">
-                <span className="inline-block w-3 h-3 bg-green-500 rounded-full"></span>
+                <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
                 Completed
               </div>
               <div className="flex items-center gap-1">
-                <span className="inline-block w-3 h-3 bg-blue-500 rounded-full"></span>
+                <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
                 In Progress
               </div>
               <div className="flex items-center gap-1">
-                <span className="inline-block w-3 h-3 bg-gray-400 rounded-full"></span>
+                <span className="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
                 Pending
               </div>
               <div className="flex items-center gap-1">
-                <span className="inline-block w-3 h-3 bg-red-500 rounded-full"></span>
+                <span className="inline-block w-2 h-2 bg-red-500 rounded-full"></span>
                 Blocked
               </div>
             </div>
@@ -539,9 +550,9 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         </CardContent>
       </Card>
 
-      {/* Tasks List with Tabs */}
+      {/* Tasks List with Search Bar and Tabs */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h3 className="font-medium text-lg">
             {activeTasksTab === "all" ? "All Tasks" :
              activeTasksTab === "completed" ? "Completed Tasks" :
@@ -549,9 +560,18 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
              activeTasksTab === "pending" ? "Pending Tasks" :
              activeTasksTab === "blocked" ? "Blocked Tasks" : "Tasks"}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input 
+                className="pl-9 w-full"
+                placeholder="Search tasks..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
             <Select defaultValue="priority" onValueChange={(value) => setSortOrder(value as any)}>
-              <SelectTrigger className="w-[130px]">
+              <SelectTrigger className="w-full sm:w-[130px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -601,10 +621,13 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
           </Tabs>
         </div>
         
-        {filteredTasks.length === 0 ? (
+        {/* Empty State for No Results */}
+        {filteredTasks.length === 0 && (
           <Card className="text-center p-8 border-dashed">
             <div className="mb-3">
-              {activeTasksTab === "completed" ? (
+              {searchQuery ? (
+                <Search className="h-12 w-12 text-gray-400 mx-auto" />
+              ) : activeTasksTab === "completed" ? (
                 <CheckCircle className="h-12 w-12 text-gray-400 mx-auto" />
               ) : activeTasksTab === "pending" ? (
                 <Clock className="h-12 w-12 text-gray-400 mx-auto" />
@@ -616,20 +639,32 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                 <ClipboardCheck className="h-12 w-12 text-gray-400 mx-auto" />
               )}
             </div>
-            <h3 className="text-lg font-medium mb-1">No {activeTasksTab !== "all" ? activeTasksTab.replace("_", " ") : ""} tasks yet</h3>
+            <h3 className="text-lg font-medium mb-1">
+              {searchQuery 
+                ? "No matching tasks found" 
+                : `No ${activeTasksTab !== "all" ? activeTasksTab.replace("_", " ") : ""} tasks yet`}
+            </h3>
             <p className="text-gray-500 mb-4">
-              {activeTasksTab === "all" 
-                ? "Create your first task to start tracking project progress"
-                : `No ${activeTasksTab.replace("_", " ")} tasks available`}
+              {searchQuery 
+                ? "Try adjusting your search query"
+                : activeTasksTab === "all" 
+                  ? "Create your first task to start tracking project progress"
+                  : `No ${activeTasksTab.replace("_", " ")} tasks available`}
             </p>
             <Button 
-              onClick={() => setNewTaskOpen(true)} 
+              onClick={() => {
+                setSearchQuery("");
+                setNewTaskOpen(true);
+              }} 
               className="mx-auto flex items-center gap-2"
             >
               <PlusIcon size={16} /> Add Task
             </Button>
           </Card>
-        ) : (
+        )}
+        
+        {/* Task Cards */}
+        {filteredTasks.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredTasks.map((task) => (
               <Card key={task.id} className="overflow-hidden hover:shadow-md transition-shadow duration-200">
