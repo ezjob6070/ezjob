@@ -46,14 +46,14 @@ export interface Technician {
   monthlySalary?: number;
   rating?: number;
   imageUrl?: string;
-  specialty: string;  // Make specialty required to match actual usage
+  specialty: string;
   skills?: string[];
   certifications?: string[];
   notes?: string;
   category?: string;
   
-  // Add properties that were missing and causing errors
-  role?: TechnicianRole;
+  // Required properties that were previously optional
+  role: TechnicianRole;
   subRole?: string;
   initials?: string;
   ssn?: string;
@@ -67,7 +67,7 @@ export interface Technician {
   
   // Finance and performance related properties
   paymentRate: number;
-  hourlyRate: number;  // Change from optional to required as it's causing errors
+  hourlyRate: number;
   completedJobs?: number;
   cancelledJobs?: number;
   totalRevenue?: number;

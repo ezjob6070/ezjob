@@ -14,27 +14,18 @@ import {
 } from "@/components/ui/dialog";
 import { Project, ProjectContractor, ProjectSalesperson } from "@/types/project";
 import { v4 as uuidv4 } from "uuid";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Plus, X } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { technicians as techniciansList } from "@/data/technicians";
 
 interface CreateProjectModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddProject: (project: Project) => void;
-}
-
-interface ContractorInput {
-  name: string;
-  role: string;
-  rate: number;
-  rateType: "hourly" | "fixed" | "daily";
-}
-
-interface SalesmanInput {
-  name: string;
-  commission: number;
-  commissionType: "fixed" | "percentage";
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
@@ -52,19 +43,25 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     status: "Not Started" as Project["status"]
   });
 
-  const [contractors, setContractors] = useState<ContractorInput[]>([]);
-  const [salesmen, setSalesmen] = useState<SalesmanInput[]>([]);
-  const [newContractor, setNewContractor] = useState<ContractorInput>({
-    name: "",
-    role: "",
-    rate: 0,
-    rateType: "hourly"
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(() => {
+    // Default end date is 3 months from now
+    const date = new Date();
+    date.setMonth(date.getMonth() + 3);
+    return date;
   });
-  const [newSalesman, setNewSalesman] = useState<SalesmanInput>({
-    name: "",
-    commission: 0,
-    commissionType: "percentage"
-  });
+
+  const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
+  const [selectedSalesmen, setSelectedSalesmen] = useState<string[]>([]);
+
+  // Filter technicians by role
+  const availableContractors = techniciansList.filter(tech => 
+    tech.role === "contractor" || tech.paymentType === "flat" || tech.paymentType === "hourly"
+  );
+  
+  const availableSalesmen = techniciansList.filter(tech => 
+    tech.role === "salesman" || tech.incentiveType === "commission"
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -81,86 +78,66 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     }));
   };
 
-  const handleContractorChange = (field: keyof ContractorInput, value: string | number) => {
-    setNewContractor(prev => ({
-      ...prev,
-      [field]: field === "rate" ? parseFloat(value as string) || 0 : value
-    }));
+  const toggleContractor = (contractorId: string) => {
+    setSelectedContractors(prev => 
+      prev.includes(contractorId) 
+        ? prev.filter(id => id !== contractorId)
+        : [...prev, contractorId]
+    );
   };
 
-  const handleSalesmanChange = (field: keyof SalesmanInput, value: string | number) => {
-    setNewSalesman(prev => ({
-      ...prev,
-      [field]: field === "commission" ? parseFloat(value as string) || 0 : value
-    }));
-  };
-
-  const addContractor = () => {
-    if (newContractor.name && newContractor.role) {
-      setContractors([...contractors, { ...newContractor }]);
-      setNewContractor({
-        name: "",
-        role: "",
-        rate: 0,
-        rateType: "hourly"
-      });
-    }
-  };
-
-  const addSalesman = () => {
-    if (newSalesman.name) {
-      setSalesmen([...salesmen, { ...newSalesman }]);
-      setNewSalesman({
-        name: "",
-        commission: 0,
-        commissionType: "percentage"
-      });
-    }
-  };
-
-  const removeContractor = (index: number) => {
-    setContractors(contractors.filter((_, i) => i !== index));
-  };
-
-  const removeSalesman = (index: number) => {
-    setSalesmen(salesmen.filter((_, i) => i !== index));
+  const toggleSalesman = (salesmanId: string) => {
+    setSelectedSalesmen(prev => 
+      prev.includes(salesmanId) 
+        ? prev.filter(id => id !== salesmanId)
+        : [...prev, salesmanId]
+    );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const today = new Date();
-    const endDate = new Date();
-    endDate.setMonth(today.getMonth() + 6); // Default project duration: 6 months
-    
-    const formattedContractors: ProjectContractor[] = contractors.map(c => ({
-      id: uuidv4(),
-      name: c.name,
-      role: c.role,
-      rate: c.rate,
-      rateType: c.rateType,
-      totalPaid: 0,
-      startDate: today.toISOString().split("T")[0],
-      status: "active",
-    }));
+    // Format contractors
+    const formattedContractors: ProjectContractor[] = selectedContractors.map(id => {
+      const contractor = availableContractors.find(c => c.id === id);
+      if (!contractor) return {} as ProjectContractor;
+      
+      return {
+        id: contractor.id,
+        name: contractor.name,
+        role: contractor.subRole || contractor.specialty || "General Contractor",
+        rate: contractor.payRate || contractor.hourlyRate || 0,
+        rateType: contractor.paymentType === "hourly" ? "hourly" : 
+                 contractor.paymentType === "flat" ? "fixed" : "daily",
+        totalPaid: 0,
+        startDate: format(startDate, 'yyyy-MM-dd'),
+        status: "active",
+      };
+    });
 
-    const formattedSalesmen: ProjectSalesperson[] = salesmen.map(s => ({
-      id: uuidv4(),
-      name: s.name,
-      commission: s.commission,
-      commissionType: s.commissionType,
-      totalSales: 0,
-      totalCommission: 0,
-    }));
+    // Format salesmen
+    const formattedSalesmen: ProjectSalesperson[] = selectedSalesmen.map(id => {
+      const salesman = availableSalesmen.find(s => s.id === id);
+      if (!salesman) return {} as ProjectSalesperson;
+      
+      return {
+        id: salesman.id,
+        name: salesman.name,
+        commission: salesman.incentiveAmount || 5,
+        commissionType: salesman.paymentType === "percentage" ? "percentage" : "fixed",
+        totalSales: 0,
+        totalCommission: 0,
+      };
+    });
     
     const newProject: Project = {
       id: Math.floor(Math.random() * 1000) + 100, // Generate random ID
       ...formData,
       completion: 0,
-      workers: 0,
+      workers: selectedContractors.length,
       vehicles: 0,
-      startDate: today.toISOString().split("T")[0],
-      expectedEndDate: endDate.toISOString().split("T")[0],
+      startDate: format(startDate, 'yyyy-MM-dd'),
+      expectedEndDate: format(endDate, 'yyyy-MM-dd'),
       actualSpent: 0,
       contractors: formattedContractors,
       salesmen: formattedSalesmen
@@ -180,19 +157,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       budget: 0,
       status: "Not Started"
     });
-    setContractors([]);
-    setSalesmen([]);
-    setNewContractor({
-      name: "",
-      role: "",
-      rate: 0,
-      rateType: "hourly"
-    });
-    setNewSalesman({
-      name: "",
-      commission: 0,
-      commissionType: "percentage"
-    });
+    setStartDate(new Date());
+    const newEndDate = new Date();
+    newEndDate.setMonth(newEndDate.getMonth() + 3);
+    setEndDate(newEndDate);
+    setSelectedContractors([]);
+    setSelectedSalesmen([]);
   };
 
   return (
@@ -318,165 +288,148 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               />
             </div>
 
+            {/* Project Timeline Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Start Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={(date) => date && setStartDate(date)}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Expected End Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !endDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={(date) => date && setEndDate(date)}
+                      disabled={(date) => date < startDate}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
             {/* Contractors section */}
             <div className="mt-4 border-t pt-4">
-              <h3 className="text-sm font-medium mb-2">Contractors</h3>
-              <div className="space-y-4">
-                {contractors.map((contractor, index) => (
-                  <div key={index} className="flex items-center space-x-2 p-3 border rounded-md bg-gray-50">
-                    <div className="flex-1">
-                      <div className="font-medium">{contractor.name}</div>
-                      <div className="text-sm text-gray-500">
-                        {contractor.role} - ${contractor.rate}/{contractor.rateType}
-                      </div>
-                    </div>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => removeContractor(index)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="grid gap-2">
-                    <Label htmlFor="contractor-name">Contractor Name</Label>
-                    <Input
-                      id="contractor-name"
-                      placeholder="Enter name"
-                      value={newContractor.name}
-                      onChange={(e) => handleContractorChange("name", e.target.value)}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="contractor-role">Role</Label>
-                    <Input
-                      id="contractor-role"
-                      placeholder="e.g. Electrician, Plumber"
-                      value={newContractor.role}
-                      onChange={(e) => handleContractorChange("role", e.target.value)}
-                    />
-                  </div>
+              <h3 className="text-sm font-medium mb-2">Assign Contractors</h3>
+              {selectedContractors.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {selectedContractors.map(id => {
+                    const contractor = availableContractors.find(c => c.id === id);
+                    return contractor && (
+                      <Badge 
+                        key={id} 
+                        variant="secondary" 
+                        className="flex items-center gap-1 py-1 px-2"
+                        onClick={() => toggleContractor(id)}
+                      >
+                        {contractor.name}
+                        <span className="text-xs ml-2 cursor-pointer hover:text-red-500">✕</span>
+                      </Badge>
+                    );
+                  })}
                 </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="grid gap-2">
-                    <Label htmlFor="contractor-rate">Rate</Label>
-                    <Input
-                      id="contractor-rate"
-                      type="number"
-                      placeholder="0.00"
-                      value={newContractor.rate || ""}
-                      onChange={(e) => handleContractorChange("rate", e.target.value)}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="contractor-rate-type">Rate Type</Label>
-                    <Select
-                      value={newContractor.rateType}
-                      onValueChange={(value) => handleContractorChange("rateType", value as "hourly" | "fixed" | "daily")}
+              )}
+              
+              <Select onValueChange={toggleContractor}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select contractor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableContractors.map(contractor => (
+                    <SelectItem 
+                      key={contractor.id} 
+                      value={contractor.id}
+                      disabled={selectedContractors.includes(contractor.id)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="hourly">Hourly</SelectItem>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="fixed">Fixed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={addContractor}
-                >
-                  <Plus className="h-4 w-4 mr-2" /> Add Contractor
-                </Button>
-              </div>
+                      {contractor.name} ({contractor.specialty || contractor.subRole || "Contractor"})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {availableContractors.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-2">No contractors available in the system.</p>
+              )}
             </div>
 
             {/* Salesmen section */}
             <div className="mt-4 border-t pt-4">
-              <h3 className="text-sm font-medium mb-2">Salesmen</h3>
-              <div className="space-y-4">
-                {salesmen.map((salesman, index) => (
-                  <div key={index} className="flex items-center space-x-2 p-3 border rounded-md bg-gray-50">
-                    <div className="flex-1">
-                      <div className="font-medium">{salesman.name}</div>
-                      <div className="text-sm text-gray-500">
-                        {salesman.commission}{salesman.commissionType === "percentage" ? "%" : "$"} Commission
-                      </div>
-                    </div>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => removeSalesman(index)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="grid gap-2">
-                    <Label htmlFor="salesman-name">Salesman Name</Label>
-                    <Input
-                      id="salesman-name"
-                      placeholder="Enter name"
-                      value={newSalesman.name}
-                      onChange={(e) => handleSalesmanChange("name", e.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="grid gap-2">
-                      <Label htmlFor="salesman-commission">Commission</Label>
-                      <Input
-                        id="salesman-commission"
-                        type="number"
-                        placeholder={newSalesman.commissionType === "percentage" ? "%" : "$"}
-                        value={newSalesman.commission || ""}
-                        onChange={(e) => handleSalesmanChange("commission", e.target.value)}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="salesman-commission-type">Commission Type</Label>
-                      <Select
-                        value={newSalesman.commissionType}
-                        onValueChange={(value) => handleSalesmanChange("commissionType", value as "percentage" | "fixed")}
+              <h3 className="text-sm font-medium mb-2">Assign Salesmen</h3>
+              {selectedSalesmen.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {selectedSalesmen.map(id => {
+                    const salesman = availableSalesmen.find(s => s.id === id);
+                    return salesman && (
+                      <Badge 
+                        key={id} 
+                        variant="secondary" 
+                        className="flex items-center gap-1 py-1 px-2"
+                        onClick={() => toggleSalesman(id)}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="percentage">Percentage (%)</SelectItem>
-                          <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                        {salesman.name}
+                        <span className="text-xs ml-2 cursor-pointer hover:text-red-500">✕</span>
+                      </Badge>
+                    );
+                  })}
                 </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={addSalesman}
-                >
-                  <Plus className="h-4 w-4 mr-2" /> Add Salesman
-                </Button>
-              </div>
+              )}
+              
+              <Select onValueChange={toggleSalesman}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select salesman" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableSalesmen.map(salesman => (
+                    <SelectItem 
+                      key={salesman.id} 
+                      value={salesman.id}
+                      disabled={selectedSalesmen.includes(salesman.id)}
+                    >
+                      {salesman.name} ({salesman.subRole || "Sales"})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {availableSalesmen.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-2">No salesmen available in the system.</p>
+              )}
             </div>
           </div>
           
