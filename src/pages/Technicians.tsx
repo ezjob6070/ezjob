@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -176,7 +177,38 @@ const Technicians = () => {
         </p>
       </div>
       
-      {/* Role Filter Buttons - All Staff card now with light yellow background */}
+      {/* Action buttons - Moved up */}
+      <TechniciansPageHeader 
+        onAddTechnician={() => setShowAddModal(true)}
+        exportTechnicians={exportTechnicians}
+        onEditRoles={() => setShowRolesModal(true)}
+      />
+      
+      {/* Search filter - Moved up */}
+      <div className="mb-4">
+        <TechnicianSearchBar
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+        />
+      </div>
+        
+      <TechnicianFilters 
+        status={statusFilter}
+        onStatusChange={setStatusFilter}
+        technicians={globalTechnicians}
+        selectedTechnicians={selectedTechnicians}
+        onTechnicianToggle={toggleTechnician}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        sortOption={sortOption as any}
+        onSortChange={handleSortChangeAdapted}
+        date={dateRange}
+        setDate={setDateRange}
+        roleFilter={roleFilter}
+        onRoleChange={setRoleFilter}
+      />
+      
+      {/* Role Filter Buttons - Moved down after the filters */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
@@ -242,38 +274,6 @@ const Technicians = () => {
           <div className="text-base font-medium">Contractors</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`}>{contractorCount}</div>
         </Button>
-      </div>
-      
-      {/* Action buttons */}
-      <TechniciansPageHeader 
-        onAddTechnician={() => setShowAddModal(true)}
-        exportTechnicians={exportTechnicians}
-        onEditRoles={() => setShowRolesModal(true)}
-      />
-      
-      <div className="mb-6">
-        <div className="mb-4">
-          <TechnicianSearchBar
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-          />
-        </div>
-        
-        <TechnicianFilters 
-          status={statusFilter}
-          onStatusChange={setStatusFilter}
-          technicians={globalTechnicians}
-          selectedTechnicians={selectedTechnicians}
-          onTechnicianToggle={toggleTechnician}
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-          sortOption={sortOption as any}
-          onSortChange={handleSortChangeAdapted}
-          date={dateRange}
-          setDate={setDateRange}
-          roleFilter={roleFilter}
-          onRoleChange={setRoleFilter}
-        />
       </div>
       
       <TechniciansList 
