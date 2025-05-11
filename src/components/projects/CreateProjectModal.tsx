@@ -398,43 +398,45 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 </div>
               )}
               
-              {/* Contractors list */}
-              <ScrollArea className="h-36 border rounded-md">
-                {filteredContractors.length > 0 ? (
-                  <div className="p-2">
-                    {filteredContractors.map(contractor => (
-                      <div 
-                        key={contractor.id} 
-                        className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted ${
-                          selectedContractors.includes(contractor.id) ? 'bg-muted' : ''
-                        }`}
-                        onClick={() => toggleContractor(contractor.id)}
-                      >
-                        <input 
-                          type="checkbox" 
-                          checked={selectedContractors.includes(contractor.id)} 
-                          onChange={() => {}} 
-                          className="h-4 w-4"
-                        />
-                        <div>
-                          <p className="text-sm font-medium">{contractor.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {contractor.specialty || contractor.subRole || "Contractor"}
-                          </p>
+              {/* Contractors list with improved scrolling */}
+              <div className="border rounded-md">
+                <ScrollArea className="h-32">
+                  {filteredContractors.length > 0 ? (
+                    <div className="p-2">
+                      {filteredContractors.map(contractor => (
+                        <div 
+                          key={contractor.id} 
+                          className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted ${
+                            selectedContractors.includes(contractor.id) ? 'bg-muted' : ''
+                          }`}
+                          onClick={() => toggleContractor(contractor.id)}
+                        >
+                          <input 
+                            type="checkbox" 
+                            checked={selectedContractors.includes(contractor.id)} 
+                            onChange={() => {}} 
+                            className="h-4 w-4"
+                          />
+                          <div>
+                            <p className="text-sm font-medium">{contractor.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {contractor.specialty || contractor.subRole || "Contractor"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full p-4 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      {availableContractors.length === 0
-                        ? "No contractors available in the system."
-                        : "No contractors match your search."}
-                    </p>
-                  </div>
-                )}
-              </ScrollArea>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-32 p-4 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        {availableContractors.length === 0
+                          ? "No contractors available in the system."
+                          : "No contractors match your search."}
+                      </p>
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
             </div>
 
             {/* Salesmen section with search - OPTIONAL */}
@@ -474,43 +476,45 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 </div>
               )}
               
-              {/* Salesmen list */}
-              <ScrollArea className="h-36 border rounded-md">
-                {filteredSalesmen.length > 0 ? (
-                  <div className="p-2">
-                    {filteredSalesmen.map(salesman => (
-                      <div 
-                        key={salesman.id} 
-                        className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted ${
-                          selectedSalesmen.includes(salesman.id) ? 'bg-muted' : ''
-                        }`}
-                        onClick={() => toggleSalesman(salesman.id)}
-                      >
-                        <input 
-                          type="checkbox" 
-                          checked={selectedSalesmen.includes(salesman.id)} 
-                          onChange={() => {}} 
-                          className="h-4 w-4"
-                        />
-                        <div>
-                          <p className="text-sm font-medium">{salesman.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {salesman.subRole || "Sales"}
-                          </p>
+              {/* Salesmen list with improved scrolling */}
+              <div className="border rounded-md">
+                <ScrollArea className="h-32">
+                  {filteredSalesmen.length > 0 ? (
+                    <div className="p-2">
+                      {filteredSalesmen.map(salesman => (
+                        <div 
+                          key={salesman.id} 
+                          className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted ${
+                            selectedSalesmen.includes(salesman.id) ? 'bg-muted' : ''
+                          }`}
+                          onClick={() => toggleSalesman(salesman.id)}
+                        >
+                          <input 
+                            type="checkbox" 
+                            checked={selectedSalesmen.includes(salesman.id)} 
+                            onChange={() => {}} 
+                            className="h-4 w-4"
+                          />
+                          <div>
+                            <p className="text-sm font-medium">{salesman.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {salesman.subRole || "Sales"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full p-4 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      {availableSalesmen.length === 0
-                        ? "No salesmen available in the system."
-                        : "No salesmen match your search."}
-                    </p>
-                  </div>
-                )}
-              </ScrollArea>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-32 p-4 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        {availableSalesmen.length === 0
+                          ? "No salesmen available in the system."
+                          : "No salesmen match your search."}
+                      </p>
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
             </div>
           </div>
           
