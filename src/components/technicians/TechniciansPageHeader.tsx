@@ -48,10 +48,9 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
         
         <Button 
           onClick={onEditRoles}
-          variant="outline"
-          className="border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+          className="bg-green-500 hover:bg-green-600 text-white"
         >
-          <Edit className="mr-2 h-4 w-4" /> Edit Roles
+          <Edit className="mr-2 h-4 w-4" /> Edit/Add Roles
         </Button>
         
         <Button 
