@@ -361,9 +361,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               </div>
             </div>
 
-            {/* Contractors section with search */}
+            {/* Contractors section with search - OPTIONAL */}
             <div className="mt-4 border-t pt-4">
-              <h3 className="text-sm font-medium mb-2">Assign Contractors</h3>
+              <h3 className="text-sm font-medium mb-2 flex items-center">
+                Assign Contractors <span className="text-xs ml-2 text-muted-foreground italic">(Optional)</span>
+              </h3>
               
               {/* Search input for contractors */}
               <div className="relative mb-2">
@@ -397,7 +399,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               )}
               
               {/* Contractors list */}
-              <ScrollArea className="h-48 border rounded-md">
+              <ScrollArea className="h-36 border rounded-md">
                 {filteredContractors.length > 0 ? (
                   <div className="p-2">
                     {filteredContractors.map(contractor => (
@@ -435,9 +437,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               </ScrollArea>
             </div>
 
-            {/* Salesmen section with search */}
-            <div className="mt-4 border-t pt-4">
-              <h3 className="text-sm font-medium mb-2">Assign Salesmen</h3>
+            {/* Salesmen section with search - OPTIONAL */}
+            <div className="mt-2 border-t pt-4">
+              <h3 className="text-sm font-medium mb-2 flex items-center">
+                Assign Salesmen <span className="text-xs ml-2 text-muted-foreground italic">(Optional)</span>
+              </h3>
               
               {/* Search input for salesmen */}
               <div className="relative mb-2">
@@ -471,7 +475,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               )}
               
               {/* Salesmen list */}
-              <ScrollArea className="h-48 border rounded-md">
+              <ScrollArea className="h-36 border rounded-md">
                 {filteredSalesmen.length > 0 ? (
                   <div className="p-2">
                     {filteredSalesmen.map(salesman => (
