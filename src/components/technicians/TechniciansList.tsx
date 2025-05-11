@@ -29,38 +29,10 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
   const [displayMode, setDisplayMode] = useState<"card" | "table">(initialDisplayMode);
   const navigate = useNavigate();
 
-  // Calculate how many of each role we have
-  const technicianCount = technicians.filter(t => (t.role || "technician") === "technician").length;
-  const salesmanCount = technicians.filter(t => t.role === "salesman").length;
-  const employedCount = technicians.filter(t => t.role === "employed").length;
-  const contractorCount = technicians.filter(t => t.role === "contractor").length;
-
   // Handle clicking on a technician card
   const handleCardClick = (technicianId: string) => {
     navigate(`/technicians/${technicianId}`);
   };
-
-  // Role legend for quick visual reference
-  const renderRoleLegend = () => (
-    <div className="flex flex-wrap gap-3 mb-2">
-      <div className="flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
-        <Wrench className="h-3 w-3 mr-1" />
-        Technician ({technicianCount})
-      </div>
-      <div className="flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-        <Briefcase className="h-3 w-3 mr-1" />
-        Salesman ({salesmanCount})
-      </div>
-      <div className="flex items-center px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
-        <UserCheck className="h-3 w-3 mr-1" />
-        Employed ({employedCount}) 
-      </div>
-      <div className="flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-medium">
-        <Hammer className="h-3 w-3 mr-1" />
-        Contractor ({contractorCount}) 
-      </div>
-    </div>
-  );
 
   return (
     <Card className="shadow-sm">
@@ -73,7 +45,7 @@ const TechniciansList: React.FC<TechniciansListProps> = ({
               onDisplayModeChange={setDisplayMode}
             />
           </div>
-          {renderRoleLegend()}
+          {/* Role legend removed from here */}
         </div>
 
         {displayMode === "card" ? (
