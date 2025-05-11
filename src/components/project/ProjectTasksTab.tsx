@@ -17,12 +17,16 @@ import {
   Eye, 
   FileCheck, 
   FileText, 
-  PlusIcon 
+  PlusIcon,
+  CheckCircle,
+  XCircle,
+  Clock4
 } from "lucide-react";
 import { Project, ProjectTask, ProjectTaskInspection } from "@/types/project";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import TaskDetailDialog from "./TaskDetailDialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProjectTasksTabProps {
   project: Project;
@@ -44,6 +48,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
   });
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"priority" | "dueDate" | "progress">("priority");
+  const [activeTasksTab, setActiveTasksTab] = useState<"all" | "pending" | "in_progress" | "completed" | "blocked">("all");
 
   const handleAddTask = () => {
     if (!newTask.title) {
@@ -170,11 +175,11 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
     const failedCount = inspections.filter(i => i.status === "failed").length;
     
     if (failedCount > 0) {
-      return <AlertTriangle className="h-4 w-4 text-red-500" title={`${failedCount} failed inspection${failedCount > 1 ? 's' : ''}`} />;
+      return <AlertTriangle className="h-4 w-4 text-red-500" aria-label="Failed inspections" />;
     } else if (passedCount === inspections.length) {
-      return <FileCheck className="h-4 w-4 text-green-500" title="All inspections passed" />;
+      return <FileCheck className="h-4 w-4 text-green-500" aria-label="All inspections passed" />;
     } else {
-      return <ClipboardCheck className="h-4 w-4 text-amber-500" title="Some inspections pending" />;
+      return <ClipboardCheck className="h-4 w-4 text-amber-500" aria-label="Some inspections pending" />;
     }
   };
 
@@ -187,9 +192,9 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
   const getFilteredTasks = () => {
     let filtered = [...tasks];
     
-    // Apply status filter
-    if (filterStatus !== "all") {
-      filtered = filtered.filter(task => task.status === filterStatus);
+    // Apply status filter from tab selection
+    if (activeTasksTab !== "all") {
+      filtered = filtered.filter(task => task.status === activeTasksTab);
     }
     
     // Apply sorting
@@ -211,6 +216,10 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
   };
 
   const filteredTasks = getFilteredTasks();
+  const completedTasksCount = tasks.filter(task => task.status === "completed").length;
+  const pendingTasksCount = tasks.filter(task => task.status === "pending").length;
+  const inProgressTasksCount = tasks.filter(task => task.status === "in_progress").length;
+  const blockedTasksCount = tasks.filter(task => task.status === "blocked").length;
 
   return (
     <div className="space-y-6">
@@ -218,7 +227,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         <h2 className="text-xl font-semibold">Tasks & Progress</h2>
         <Dialog open={newTaskOpen} onOpenChange={setNewTaskOpen}>
           <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
+            <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
               <PlusIcon size={16} /> Add New Task
             </Button>
           </DialogTrigger>
@@ -327,69 +336,220 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         </Dialog>
       </div>
 
+      {/* Task Status Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 overflow-hidden">
+          <div className="bg-blue-600 h-1"></div>
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-blue-700">Total Tasks</p>
+                <p className="text-3xl font-bold">{tasks.length}</p>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-full">
+                <ClipboardCheck className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-blue-700 hover:text-blue-800 hover:bg-blue-200 p-0 h-auto"
+                onClick={() => setActiveTasksTab("all")}
+              >
+                View All Tasks
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 overflow-hidden">
+          <div className="bg-green-600 h-1"></div>
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-green-700">Completed</p>
+                <p className="text-3xl font-bold">{completedTasksCount}</p>
+              </div>
+              <div className="bg-green-100 p-3 rounded-full">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-green-700 hover:text-green-800 hover:bg-green-200 p-0 h-auto"
+                onClick={() => setActiveTasksTab("completed")}
+              >
+                View Completed Tasks
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 overflow-hidden">
+          <div className="bg-yellow-500 h-1"></div>
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-yellow-700">In Progress</p>
+                <p className="text-3xl font-bold">{inProgressTasksCount}</p>
+              </div>
+              <div className="bg-yellow-100 p-3 rounded-full">
+                <Clock4 className="h-6 w-6 text-yellow-600" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-yellow-700 hover:text-yellow-800 hover:bg-yellow-200 p-0 h-auto"
+                onClick={() => setActiveTasksTab("in_progress")}
+              >
+                View In-Progress Tasks
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 overflow-hidden">
+          <div className="bg-gray-500 h-1"></div>
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-gray-700">Pending</p>
+                <p className="text-3xl font-bold">{pendingTasksCount}</p>
+              </div>
+              <div className="bg-gray-200 p-3 rounded-full">
+                <Clock className="h-6 w-6 text-gray-600" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-700 hover:text-gray-800 hover:bg-gray-200 p-0 h-auto"
+                onClick={() => setActiveTasksTab("pending")}
+              >
+                View Pending Tasks
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Progress Overview Card */}
-      <Card>
+      <Card className="bg-white border-none shadow-md">
         <CardHeader>
-          <CardTitle>Progress Overview</CardTitle>
+          <CardTitle className="text-xl font-semibold text-gray-800">Progress Overview</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">Overall Project Completion</div>
-              <div className="text-2xl font-bold">{project.completion}%</div>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="flex flex-col">
+              <div className="text-sm text-gray-500 mb-2">Project Completion</div>
+              <div className="flex items-center gap-3">
+                <div className="text-3xl font-bold text-blue-600">{project.completion}%</div>
+                <div className="flex-1">
+                  <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full rounded-full bg-blue-500" 
+                      style={{ width: `${project.completion}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">Task Completion</div>
-              <div className="text-2xl font-bold">{calculateOverallProgress()}%</div>
+            
+            <div className="flex flex-col">
+              <div className="text-sm text-gray-500 mb-2">Task Completion</div>
+              <div className="flex items-center gap-3">
+                <div className="text-3xl font-bold text-green-600">{calculateOverallProgress()}%</div>
+                <div className="flex-1">
+                  <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full rounded-full bg-green-500" 
+                      style={{ width: `${calculateOverallProgress()}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">Tasks Status</div>
-              <div className="text-2xl font-bold">
-                {tasks.filter(t => t.status === "completed").length}/{tasks.length} Complete
+            
+            <div className="flex flex-col">
+              <div className="text-sm text-gray-500 mb-2">Tasks Status</div>
+              <div className="flex items-center gap-2">
+                <div className="text-3xl font-bold text-purple-600">
+                  {completedTasksCount}/{tasks.length}
+                </div>
+                <div className="text-lg text-gray-600">Complete</div>
               </div>
             </div>
           </div>
           
-          <div>
-            <div className="text-sm text-muted-foreground mb-2">Project Progress</div>
-            <div className="w-full h-3 bg-gray-100 rounded-full">
-              <div 
-                className="h-full rounded-full bg-blue-500" 
-                style={{ width: `${project.completion}%` }}
-              ></div>
+          {/* Task Status Distribution */}
+          <div className="pt-4">
+            <div className="text-sm text-gray-500 mb-3">Task Status Distribution</div>
+            <div className="flex gap-1 h-4">
+              {tasks.length > 0 && (
+                <>
+                  <div 
+                    className="bg-green-500 rounded-l"
+                    style={{ width: `${(completedTasksCount / tasks.length) * 100}%` }}
+                    title={`Completed: ${completedTasksCount} tasks`}
+                  ></div>
+                  <div 
+                    className="bg-blue-500"
+                    style={{ width: `${(inProgressTasksCount / tasks.length) * 100}%` }}
+                    title={`In Progress: ${inProgressTasksCount} tasks`}
+                  ></div>
+                  <div 
+                    className="bg-gray-400"
+                    style={{ width: `${(pendingTasksCount / tasks.length) * 100}%` }}
+                    title={`Pending: ${pendingTasksCount} tasks`}
+                  ></div>
+                  <div 
+                    className="bg-red-500 rounded-r"
+                    style={{ width: `${(blockedTasksCount / tasks.length) * 100}%` }}
+                    title={`Blocked: ${blockedTasksCount} tasks`}
+                  ></div>
+                </>
+              )}
             </div>
-          </div>
-          
-          <div>
-            <div className="text-sm text-muted-foreground mb-2">Task Progress</div>
-            <div className="w-full h-3 bg-gray-100 rounded-full">
-              <div 
-                className="h-full rounded-full bg-green-500" 
-                style={{ width: `${calculateOverallProgress()}%` }}
-              ></div>
+            
+            <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <div className="flex items-center gap-1">
+                <span className="inline-block w-3 h-3 bg-green-500 rounded-full"></span>
+                Completed
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="inline-block w-3 h-3 bg-blue-500 rounded-full"></span>
+                In Progress
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="inline-block w-3 h-3 bg-gray-400 rounded-full"></span>
+                Pending
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="inline-block w-3 h-3 bg-red-500 rounded-full"></span>
+                Blocked
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tasks List with Filters */}
+      {/* Tasks List with Tabs */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium text-lg">Tasks List</h3>
+          <h3 className="font-medium text-lg">
+            {activeTasksTab === "all" ? "All Tasks" :
+             activeTasksTab === "completed" ? "Completed Tasks" :
+             activeTasksTab === "in_progress" ? "In Progress Tasks" :
+             activeTasksTab === "pending" ? "Pending Tasks" :
+             activeTasksTab === "blocked" ? "Blocked Tasks" : "Tasks"}
+          </h3>
           <div className="flex gap-2">
-            <Select defaultValue="all" onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-[130px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Tasks</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="blocked">Blocked</SelectItem>
-              </SelectContent>
-            </Select>
-
             <Select defaultValue="priority" onValueChange={(value) => setSortOrder(value as any)}>
               <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Sort by" />
@@ -402,15 +562,65 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
             </Select>
           </div>
         </div>
+
+        {/* Task Status Tabs */}
+        <div className="bg-gray-50 p-1 rounded-lg">
+          <Tabs value={activeTasksTab} onValueChange={(value) => setActiveTasksTab(value as any)} className="w-full">
+            <TabsList className="grid grid-cols-5 w-full bg-transparent">
+              <TabsTrigger 
+                value="all" 
+                className={`${activeTasksTab === 'all' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'} rounded-lg`}
+              >
+                All ({tasks.length})
+              </TabsTrigger>
+              <TabsTrigger 
+                value="pending" 
+                className={`${activeTasksTab === 'pending' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'} rounded-lg`}
+              >
+                Pending ({pendingTasksCount})
+              </TabsTrigger>
+              <TabsTrigger 
+                value="in_progress" 
+                className={`${activeTasksTab === 'in_progress' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'} rounded-lg`}
+              >
+                In Progress ({inProgressTasksCount})
+              </TabsTrigger>
+              <TabsTrigger 
+                value="completed" 
+                className={`${activeTasksTab === 'completed' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'} rounded-lg`}
+              >
+                Completed ({completedTasksCount})
+              </TabsTrigger>
+              <TabsTrigger 
+                value="blocked" 
+                className={`${activeTasksTab === 'blocked' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'} rounded-lg`}
+              >
+                Blocked ({blockedTasksCount})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
         
-        {tasks.length === 0 ? (
-          <Card className="text-center p-8">
+        {filteredTasks.length === 0 ? (
+          <Card className="text-center p-8 border-dashed">
             <div className="mb-3">
-              <Clock className="h-12 w-12 text-gray-400 mx-auto" />
+              {activeTasksTab === "completed" ? (
+                <CheckCircle className="h-12 w-12 text-gray-400 mx-auto" />
+              ) : activeTasksTab === "pending" ? (
+                <Clock className="h-12 w-12 text-gray-400 mx-auto" />
+              ) : activeTasksTab === "in_progress" ? (
+                <Clock4 className="h-12 w-12 text-gray-400 mx-auto" />
+              ) : activeTasksTab === "blocked" ? (
+                <XCircle className="h-12 w-12 text-gray-400 mx-auto" />
+              ) : (
+                <ClipboardCheck className="h-12 w-12 text-gray-400 mx-auto" />
+              )}
             </div>
-            <h3 className="text-lg font-medium mb-1">No tasks yet</h3>
+            <h3 className="text-lg font-medium mb-1">No {activeTasksTab !== "all" ? activeTasksTab.replace("_", " ") : ""} tasks yet</h3>
             <p className="text-gray-500 mb-4">
-              Create your first task to start tracking project progress
+              {activeTasksTab === "all" 
+                ? "Create your first task to start tracking project progress"
+                : `No ${activeTasksTab.replace("_", " ")} tasks available`}
             </p>
             <Button 
               onClick={() => setNewTaskOpen(true)} 
@@ -420,16 +630,16 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
             </Button>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredTasks.map((task) => (
-              <Card key={task.id} className="overflow-hidden">
-                <div className={`h-1 ${
+              <Card key={task.id} className="overflow-hidden hover:shadow-md transition-shadow duration-200">
+                <div className={`h-1.5 ${
                   task.status === "completed" ? "bg-green-500" : 
                   task.status === "in_progress" ? "bg-blue-500" :
                   task.status === "blocked" ? "bg-red-500" :
                   "bg-gray-300"
                 }`}></div>
-                <CardContent className="p-4 space-y-4">
+                <CardContent className="p-5 space-y-4">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium line-clamp-1">{task.title}</h3>
@@ -444,20 +654,20 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                   
                   <div className="flex flex-wrap gap-2 text-sm">
                     {task.dueDate && (
-                      <div className="flex items-center gap-1 text-gray-600">
+                      <div className="flex items-center gap-1 text-gray-600 bg-gray-50 px-2 py-1 rounded">
                         <CalendarIcon className="h-3.5 w-3.5" />
-                        <span>Due: {format(new Date(task.dueDate), "MMM d, yyyy")}</span>
+                        <span>{format(new Date(task.dueDate), "MMM d, yyyy")}</span>
                       </div>
                     )}
                     
                     {task.assignedTo && (
-                      <div className="flex items-center gap-1 text-gray-600">
-                        <span>Assigned to: {task.assignedTo}</span>
+                      <div className="flex items-center gap-1 text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                        <span>{task.assignedTo}</span>
                       </div>
                     )}
                     
                     <Badge className={getPriorityColor(task.priority)}>
-                      {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+                      {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                     </Badge>
                   </div>
                   
@@ -466,7 +676,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                       <span className="text-gray-600">Progress</span>
                       <span className="font-medium">{task.progress}%</span>
                     </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full">
+                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div 
                         className={`h-full rounded-full ${
                           task.progress === 100 ? "bg-green-500" : "bg-blue-500"
@@ -524,7 +734,8 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                       {task.status === "pending" && (
                         <Button 
                           variant="outline" 
-                          size="sm" 
+                          size="sm"
+                          className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
                           onClick={() => handleUpdateTaskStatus(task.id, "in_progress")}
                         >
                           Start Task
