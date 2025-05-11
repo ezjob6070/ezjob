@@ -39,6 +39,8 @@ interface TechnicianFiltersProps {
   toggleDepartment: (department: string) => void;
   roleFilter: string;
   onRoleChange: (role: string) => void;
+  setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedDepartments: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
@@ -56,7 +58,9 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   selectedDepartments,
   toggleDepartment,
   roleFilter,
-  onRoleChange
+  onRoleChange,
+  setSelectedCategories,
+  setSelectedDepartments
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSubRoles, setSelectedSubRoles] = useState<string[]>([]);
