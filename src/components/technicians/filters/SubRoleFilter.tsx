@@ -31,10 +31,10 @@ const SubRoleFilter: React.FC<SubRoleFilterProps> = ({
       }}
     >
       <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="All Status" />
+        <SelectValue placeholder="All Roles" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="all">All Status</SelectItem>
+        <SelectItem value="all">All Roles</SelectItem>
         {subRoles.map((subRole) => (
           <SelectItem key={subRole} value={subRole}>
             {subRole}
