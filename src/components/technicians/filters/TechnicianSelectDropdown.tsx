@@ -56,7 +56,7 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
         <Button variant="outline" className="flex items-center gap-2 h-10">
           <UserCheck className="h-4 w-4" />
           {selectedTechnicians.length === 0 
-            ? "Select Technicians" 
+            ? "Filter by Technicians" 
             : `${selectedTechnicians.length} Selected`}
         </Button>
       </DropdownMenuTrigger>
