@@ -118,10 +118,10 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         
         <Select value={status} onValueChange={onStatusChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Status</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
             <SelectItem value="onLeave">On Leave</SelectItem>
