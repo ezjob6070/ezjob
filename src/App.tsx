@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -38,7 +39,6 @@ import Properties from "./pages/Properties";
 import Listings from "./pages/Listings";
 import ProjectsOverview from "./pages/Projects"; // Main projects page
 import ProjectDetail from "./pages/ProjectDetail"; // Project detail page
-import ProjectTasksPage from "@/pages/ProjectTasksPage";
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 

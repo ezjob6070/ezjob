@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
@@ -9,18 +9,18 @@ import { toast } from "sonner";
 
 interface TechnicianImageUploadProps {
   initials: string;
-  onImageChange: (image: string) => void;
-  size: "lg" | "md" | "sm";
-  initialImage?: string;
+  defaultImage?: string;
+  onImageChange: (image: string | null) => void;
+  size?: "sm" | "md" | "lg";
 }
 
-export const TechnicianImageUpload: React.FC<TechnicianImageUploadProps> = ({ 
+export function TechnicianImageUpload({ 
   initials, 
-  onImageChange, 
-  size, 
-  initialImage 
-}) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(initialImage || null);
+  defaultImage, 
+  onImageChange,
+  size = "md"
+}: TechnicianImageUploadProps) {
+  const [selectedImage, setSelectedImage] = useState<string | null>(defaultImage || null);
   const [isHovered, setIsHovered] = useState(false);
 
   const sizeClasses = {
@@ -136,6 +136,4 @@ export const TechnicianImageUpload: React.FC<TechnicianImageUploadProps> = ({
       </div>
     </div>
   );
-};
-
-export default TechnicianImageUpload;
+}

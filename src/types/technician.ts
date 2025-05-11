@@ -1,5 +1,16 @@
 
-// Assuming this file exists and we need to add the missing properties
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
+
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
+
+// Default sub-roles for each technician role
+export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
+  technician: ["HVAC", "Plumbing", "Electrical", "Carpentry", "General"],
+  salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Manager"],
+  employed: ["Office Staff", "Manager", "Customer Service", "Administrative"],
+  contractor: ["Jobs Contractor", "General Contractor", "Electrical Contractor", "Plumbing Contractor", "HVAC Contractor", "Specialty Contractor", "Independent", "1099", "Specialist", "Consultant"]
+};
+
 export interface Technician {
   id: string;
   name: string;
@@ -10,88 +21,45 @@ export interface Technician {
   department?: string;
   hireDate: string;
   startDate?: string;
-  status: 'active' | 'inactive' | 'onLeave';
-  availability?: string;
-  specialty?: string;
-  notes?: string;
-  rating?: number;
+  status: "active" | "inactive" | "onLeave";
+  
+  // Required properties being added/fixed
+  role?: TechnicianRole; // Contractor, employee, etc.
+  subRole?: string; // Specific role within the main role
+  specialty?: string; // Technical specialty
+  
+  // Payment related fields
+  paymentType?: "percentage" | "flat" | "hourly" | "salary";
+  paymentRate?: number;
+  hourlyRate?: number;
+  salaryBasis?: SalaryBasis;
+  
+  // Document related fields
+  ssn?: string;
+  driverLicense?: string | { number: string; state: string; expirationDate: string };
+  idNumber?: string;
+  documents?: any[]; // Allow documents array
+  initials?: string;
+  
+  // Additional fields for finance components
+  incentiveType?: string;
+  incentiveAmount?: number;
+  
+  // Performance metrics fields
   completedJobs?: number;
   cancelledJobs?: number;
   totalRevenue?: number;
-  image?: string;
-  paymentType: string;
-  paymentRate: number;
-  hourlyRate: number;
-  commission?: number;
-  salaryBasis?: string;
-  weeklyHours?: number;
-  monthlySalary?: number;
-  periodPayment?: number;
-  bankAccount?: string;
-  insurance?: string;
-  licenseNumber?: string | { number: string; state: string; expirationDate: string };
-  certifications?: string[];
-  education?: string;
-  emergencyContact?: string;
-  workContract?: string;
-  role: 'technician' | 'salesman' | 'employed' | 'contractor';
-  subRole?: string;
-  documents?: Document[];
-  initials?: string;
+  rating?: number;
+  
+  // Other fields that might be needed
   category?: string;
+  certifications?: string[];
+  skills?: string[];
+  imageUrl?: string;
+  profileImage?: string;
+  yearsExperience?: number;
+  workContract?: string;
+  
+  // Notes for technicians
+  notes?: string;
 }
-
-export interface Document {
-  id: string;
-  name: string;
-  title?: string;
-  type: string;
-  size?: number;
-  uploadDate: string;
-  url: string;
-}
-
-export type TechnicianRole = 'technician' | 'salesman' | 'employed' | 'contractor';
-
-// Add the missing DEFAULT_SUB_ROLES export
-export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
-  technician: [
-    'HVAC Technician',
-    'Plumber',
-    'Electrician',
-    'General Handyman',
-    'Appliance Repair',
-    'Carpet Cleaner',
-    'Locksmith',
-    'Painter',
-    'Pest Control',
-    'Roofer'
-  ],
-  salesman: [
-    'Inside Sales',
-    'Outside Sales',
-    'Sales Manager',
-    'Business Development',
-    'Account Executive',
-    'Sales Representative',
-    'Telemarketer'
-  ],
-  employed: [
-    'Office Staff',
-    'Customer Support',
-    'Dispatcher',
-    'Manager',
-    'Accountant',
-    'Human Resources',
-    'Marketing Specialist',
-    'Administrative Assistant'
-  ],
-  contractor: [
-    'Independent Contractor',
-    'Subcontractor',
-    'Project-based Contractor',
-    'Seasonal Contractor',
-    'Remote Contractor',
-    'Consulting Contractor'
-  ]
-};

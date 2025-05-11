@@ -1,162 +1,214 @@
-import React from 'react';
-// Ensure proper imports
-import { Technician } from '@/types/technician';
-import { Job } from '@/types/job';
 
-// Fix the component to correctly use the updated types
-const SalesmenDashboard = ({ technicians, jobs }: { technicians: Technician[], jobs: Job[] }) => {
-  // Filter salesmen
-  const salesmen = technicians.filter(tech => tech.role === 'salesman');
-  
-  // Check for subRole if needed
-  const realEstateSalesmen = salesmen.filter(s => s.subRole === 'real_estate');
-  
-  // Calculate metrics
-  const calculateMetrics = (salesmanId: string) => {
-    // Use the correct properties from the Job type
-    const salesmanJobs = jobs.filter(job => job.technicianId === salesmanId && 
-      new Date(job.date) >= new Date(new Date().setDate(new Date().getDate() - 30)) && 
-      new Date(job.date) <= new Date());
+import React, { useState } from "react";
+import { DateRange } from "react-day-picker";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown, Download, Filter, Search, Calendar, DollarSign } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { Technician } from "@/types/technician";
+import DateRangeSelector from "./DateRangeSelector";
 
-    const totalRevenue = salesmanJobs.reduce((sum, job) => sum + (job.totalAmount || 0), 0);
-    const jobCount = salesmanJobs.length;
-    const averageSaleValue = jobCount > 0 ? totalRevenue / jobCount : 0;
+interface SalesmenDashboardProps {
+  dateRange?: DateRange;
+  setDateRange?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+}
+
+const SalesmenDashboard: React.FC<SalesmenDashboardProps> = ({ dateRange, setDateRange }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const { technicians, jobs } = useGlobalState();
+  
+  // Filter technicians that are salesmen
+  const salesmen = technicians.filter((tech) => tech.role === "salesman");
+
+  // Filter by search term
+  const filteredSalesmen = salesmen.filter((salesman) =>
+    salesman.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    salesman.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    salesman.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (salesman.subRole?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
+  );
+
+  // Get jobs assigned to salesmen within the date range
+  const salesJobs = jobs.filter(job => {
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
+    const isInDateRange = 
+      (!dateRange?.from || jobDate >= dateRange.from) && 
+      (!dateRange?.to || jobDate <= dateRange.to);
     
-    return { totalRevenue, jobCount, averageSaleValue };
-  };
-  
-  // Calculate commission based on payment type and rate
-  const calculateCommission = (salesman: Technician, revenue: number) => {
-    if (salesman.paymentType === 'percentage') {
-      return (salesman.paymentRate / 100) * revenue;
-    } else if (salesman.paymentType === 'flat') {
-      return salesman.paymentRate * (revenue / 1000); // Example: $X per $1000 in sales
+    return isInDateRange && salesmen.some(s => s.id === job.technicianId);
+  });
+
+  // Calculate financial metrics for each salesman
+  const salesmenMetrics = salesmen.map(salesman => {
+    const salesmanFilteredJobs = salesJobs.filter(job => job.technicianId === salesman.id);
+    const totalRevenue = salesmanFilteredJobs.reduce(
+      (sum, job) => sum + (job.actualAmount || job.amount), 0
+    );
+    const completedSales = salesmanFilteredJobs.filter(job => job.status === "completed").length;
+    
+    // Calculate commission based on salesman's incentive type
+    let commission = 0;
+    if (salesman.incentiveType === "commission" && salesman.incentiveAmount) {
+      commission = totalRevenue * (salesman.incentiveAmount / 100);
+    } else if (salesman.paymentType === "percentage" && salesman.paymentRate) {
+      commission = totalRevenue * (salesman.paymentRate / 100);
+    } else if (salesman.paymentType === "flat") {
+      commission = completedSales * salesman.paymentRate;
     }
-    return 0;
-  };
-  
-  // Prepare data for display
-  const salesmenData = salesmen.map(salesman => {
-    const { totalRevenue, jobCount, averageSaleValue } = calculateMetrics(salesman.id);
-    const commission = calculateCommission(salesman, totalRevenue);
+    
     const profit = totalRevenue - commission;
+    const averageSaleValue = completedSales > 0 ? totalRevenue / completedSales : 0;
     
     return {
       ...salesman,
       totalRevenue,
       commission,
-      salesCount: jobCount,
+      salesCount: completedSales,
       averageSaleValue,
       profit
     };
   });
-  
-  // Sort by revenue (highest first)
-  const sortedSalesmen = [...salesmenData].sort((a, b) => b.totalRevenue - a.totalRevenue);
-  
-  // Calculate totals
-  const totalRevenue = salesmenData.reduce((sum, s) => sum + s.totalRevenue, 0);
-  const totalCommission = salesmenData.reduce((sum, s) => sum + s.commission, 0);
-  const totalProfit = salesmenData.reduce((sum, s) => sum + s.profit, 0);
-  const totalSales = salesmenData.reduce((sum, s) => sum + s.salesCount, 0);
-  
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-500">Total Revenue</div>
-          <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
-          <div className="text-xs text-gray-400">Last 30 days</div>
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Salesmen Finance</h1>
+          <p className="text-muted-foreground">Monitor sales performance and commissions</p>
         </div>
-        
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-500">Total Commission</div>
-          <div className="text-2xl font-bold">${totalCommission.toLocaleString()}</div>
-          <div className="text-xs text-gray-400">Last 30 days</div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-500">Net Profit</div>
-          <div className="text-2xl font-bold">${totalProfit.toLocaleString()}</div>
-          <div className="text-xs text-gray-400">Last 30 days</div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-500">Total Sales</div>
-          <div className="text-2xl font-bold">{totalSales}</div>
-          <div className="text-xs text-gray-400">Last 30 days</div>
+        <div className="flex items-center gap-2">
+          <DateRangeSelector date={dateRange} setDate={setDateRange} />
+          <Button variant="outline" className="gap-2">
+            <Download size={16} /> Export
+          </Button>
         </div>
       </div>
-      
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-medium">Salesmen Performance</h2>
+
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search salesmen..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialty</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Sale</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Commission</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {sortedSalesmen.map((salesman) => (
-                <tr key={salesman.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium">
-                        {salesman.initials || salesman.name.charAt(0)}
-                      </div>
-                      <div className="ml-3">
-                        <div className="font-medium text-gray-900">{salesman.name}</div>
-                        <div className="text-xs text-gray-500">{salesman.email}</div>
-                      </div>
+        <Button variant="outline" className="gap-2">
+          <Filter size={16} /> Filter
+        </Button>
+        <Button variant="outline" className="gap-2">
+          <ArrowUpDown size={16} /> Sort
+        </Button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Salesmen</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{salesmen.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales Revenue</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {formatCurrency(salesmenMetrics.reduce((sum, s) => sum + s.totalRevenue, 0))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Commissions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">
+              {formatCurrency(salesmenMetrics.reduce((sum, s) => sum + s.commission, 0))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Completed Sales</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {salesmenMetrics.reduce((sum, s) => sum + s.salesCount, 0)}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Salesmen table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales Performance</CardTitle>
+          <CardDescription>Review financial data for all salesmen</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Salesperson</TableHead>
+                <TableHead>Position</TableHead>
+                <TableHead>Commission Type</TableHead>
+                <TableHead className="text-right">Sales</TableHead>
+                <TableHead className="text-right">Revenue</TableHead>
+                <TableHead className="text-right">Commission</TableHead>
+                <TableHead className="text-right">Profit</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSalesmen.length > 0 ? (
+                salesmenMetrics
+                  .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                  .map((salesman) => (
+                    <TableRow key={salesman.id}>
+                      <TableCell className="font-medium">{salesman.name}</TableCell>
+                      <TableCell>{salesman.subRole || "Sales Representative"}</TableCell>
+                      <TableCell>
+                        {salesman.incentiveType === "commission" 
+                          ? `${salesman.incentiveAmount}% of revenue` 
+                          : salesman.paymentType === "percentage"
+                          ? `${salesman.paymentRate}% of revenue`
+                          : salesman.paymentType === "flat"
+                          ? `${formatCurrency(salesman.paymentRate)} per sale`
+                          : "No commission"}
+                      </TableCell>
+                      <TableCell className="text-right">{salesman.salesCount}</TableCell>
+                      <TableCell className="text-right text-blue-600">
+                        {formatCurrency(salesman.totalRevenue)}
+                      </TableCell>
+                      <TableCell className="text-right text-red-600">
+                        {formatCurrency(salesman.commission)}
+                      </TableCell>
+                      <TableCell className="text-right text-green-600">
+                        {formatCurrency(salesman.profit)}
+                      </TableCell>
+                    </TableRow>
+                  ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="text-muted-foreground mb-2">No salesmen found</div>
+                      <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
                     </div>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{salesman.subRole || 'General'}</div>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                    ${salesman.totalRevenue.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
-                    {salesman.salesCount}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
-                    ${salesman.averageSaleValue.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
-                    ${salesman.commission.toLocaleString()}
-                    <div className="text-xs text-gray-500">
-                      {salesman.paymentType === 'percentage' 
-                        ? `${salesman.paymentRate}%` 
-                        : `$${salesman.paymentRate}/${salesman.paymentType}`}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                    ${salesman.profit.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-              
-              {sortedSalesmen.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
-                    No salesmen data available
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
