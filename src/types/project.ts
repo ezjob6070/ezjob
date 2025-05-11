@@ -24,6 +24,9 @@ export interface Project {
   
   // Adding salesmen for filtering
   salesmen?: ProjectSalesperson[];
+  
+  // Adding tasks for progress tracking
+  tasks?: ProjectTask[];
 }
 
 export interface ProjectExpense {
@@ -89,4 +92,18 @@ export interface ProjectEquipment {
   endDate?: string;
   totalCost: number;
   status: "active" | "returned" | "owned";
+}
+
+export interface ProjectTask {
+  id: string;
+  title: string;
+  description?: string;
+  status: "pending" | "in_progress" | "completed" | "blocked";
+  priority: "low" | "medium" | "high" | "urgent";
+  dueDate?: string;
+  assignedTo?: string;
+  completedAt?: string;
+  createdAt: string;
+  dependencies?: string[]; // Task IDs this task depends on
+  progress: number; // 0-100
 }

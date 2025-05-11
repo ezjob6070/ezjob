@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo } from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import ProjectFinanceTab from "@/components/project/ProjectFinanceTab";
+import ProjectTasksTab from "@/components/project/ProjectTasksTab";
 
 interface ProjectFile {
   id: string;
@@ -137,6 +138,12 @@ export default function ProjectDetail() {
       <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tasks">
+            <span className="flex items-center gap-1">
+              <ListTodo className="h-4 w-4" />
+              Tasks & Progress
+            </span>
+          </TabsTrigger>
           <TabsTrigger value="files">Files & Documents</TabsTrigger>
           <TabsTrigger value="finance">
             <span className="flex items-center gap-1">
@@ -268,6 +275,10 @@ export default function ProjectDetail() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="tasks" className="py-4">
+          <ProjectTasksTab project={project} />
         </TabsContent>
         
         <TabsContent value="files" className="space-y-6 py-4">
