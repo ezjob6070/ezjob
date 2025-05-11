@@ -1,12 +1,13 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User } from "lucide-react";
 import { initialProjects } from "@/data/projects";
-import { Project } from "@/types/project";
+import { Project, ProjectContractor } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -22,29 +23,11 @@ interface ProjectFile {
   url: string;
 }
 
-// Update the type definition to require 'type' in the Project interface
-interface Project {
-  id: number;
-  name: string;
-  type: string; // Make sure 'type' is defined as required
-  description: string;
-  location: string;
-  completion: number;
-  workers: number;
-  vehicles: number;
-  status: string;
-  startDate: string;
-  expectedEndDate: string;
-  budget: number;
-  actualSpent: number;
-  clientName: string;
-  revenue: number;
-}
-
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [files, setFiles] = useState<ProjectFile[]>([
     {
       id: "file-1",
@@ -85,7 +68,8 @@ export default function ProjectDetail() {
     budget: 0,
     actualSpent: 0,
     clientName: "Unknown",
-    revenue: 0
+    revenue: 0,
+    contractors: []
   };
 
   const handleFileUpload = (type: "document" | "image") => {
@@ -100,6 +84,12 @@ export default function ProjectDetail() {
 
     setFiles(prev => [...prev, newFile]);
     toast.success(`${type === "document" ? "Document" : "Image"} uploaded successfully`);
+  };
+
+  const handleEditProject = () => {
+    // This would be replaced with actual edit logic
+    toast.success("Project details updated successfully");
+    setShowEditDialog(false);
   };
 
   const handleGoBack = () => {
@@ -158,9 +148,17 @@ export default function ProjectDetail() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Project Info Card */}
             <Card className="col-span-1 md:col-span-2">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Project Details</CardTitle>
-                <CardDescription>General information about this project</CardDescription>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-2"
+                  onClick={() => setShowEditDialog(true)}
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit Project
+                </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -200,6 +198,35 @@ export default function ProjectDetail() {
                     </div>
                   </div>
                 </div>
+
+                {/* Contractors Section */}
+                {project.contractors && project.contractors.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="font-medium mb-3">Contractors</h3>
+                      <div className="space-y-3">
+                        {project.contractors.map((contractor: ProjectContractor) => (
+                          <div key={contractor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md border">
+                            <div className="flex items-center gap-3">
+                              <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+                                <User size={16} />
+                              </div>
+                              <div>
+                                <p className="font-medium">{contractor.name}</p>
+                                <p className="text-sm text-gray-600">{contractor.role}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium">{formatCurrency(contractor.totalPaid)}</p>
+                              <p className="text-xs text-muted-foreground">${contractor.rate}/{contractor.rateType}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
             
@@ -433,6 +460,132 @@ export default function ProjectDetail() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Edit Project Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+            <DialogDescription>
+              Update project details and information
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="project-name" className="text-sm font-medium">
+                Project Name
+              </label>
+              <input
+                id="project-name"
+                defaultValue={project.name}
+                className="border rounded-md p-2"
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="project-description" className="text-sm font-medium">
+                Description
+              </label>
+              <textarea
+                id="project-description"
+                defaultValue={project.description}
+                rows={3}
+                className="border rounded-md p-2"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="project-location" className="text-sm font-medium">
+                  Location
+                </label>
+                <input
+                  id="project-location"
+                  defaultValue={project.location}
+                  className="border rounded-md p-2"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="project-client" className="text-sm font-medium">
+                  Client
+                </label>
+                <input
+                  id="project-client"
+                  defaultValue={project.clientName}
+                  className="border rounded-md p-2"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="project-start" className="text-sm font-medium">
+                  Start Date
+                </label>
+                <input
+                  id="project-start"
+                  type="date"
+                  defaultValue={project.startDate}
+                  className="border rounded-md p-2"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="project-end" className="text-sm font-medium">
+                  Expected End Date
+                </label>
+                <input
+                  id="project-end"
+                  type="date"
+                  defaultValue={project.expectedEndDate}
+                  className="border rounded-md p-2"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="project-budget" className="text-sm font-medium">
+                  Budget
+                </label>
+                <input
+                  id="project-budget"
+                  type="number"
+                  defaultValue={project.budget}
+                  className="border rounded-md p-2"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="project-status" className="text-sm font-medium">
+                  Status
+                </label>
+                <select
+                  id="project-status"
+                  defaultValue={project.status}
+                  className="border rounded-md p-2"
+                >
+                  <option value="Not Started">Not Started</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                  <option value="On Hold">On Hold</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditProject}>
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
