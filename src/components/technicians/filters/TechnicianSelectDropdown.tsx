@@ -52,54 +52,32 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
     });
   };
 
-  // Determine the filter label and icon based on the roleFilter
-  const getFilterInfo = () => {
+  // Determine the filter label based on the roleFilter
+  const getFilterLabel = () => {
     if (selectedTechnicians.length > 0) {
-      return { 
-        label: `${selectedTechnicians.length} Selected`,
-        icon: <UserCheck className="h-4 w-4" />
-      };
+      return `${selectedTechnicians.length} Selected`;
     }
     
     switch (roleFilter) {
       case "technician":
-        return {
-          label: "Filter by Technicians",
-          icon: <UserCheck className="h-4 w-4" />
-        };
+        return "Filter by Technicians";
       case "salesman":
-        return {
-          label: "Filter by Salesmen",
-          icon: roleFilter === "salesman" ? 
-            <img src="/lovable-uploads/7ea3374a-aefd-4ba6-8f2e-1f3f5de75205.png" className="h-4 w-4" alt="Salesman" /> :
-            <UserCheck className="h-4 w-4" />
-        };
+        return "Filter by Salesmen";
       case "employed":
-        return {
-          label: "Filter by Employees",
-          icon: <UserCheck className="h-4 w-4" />
-        };
+        return "Filter by Employees";
       case "contractor":
-        return {
-          label: "Filter by Contractors",
-          icon: <UserCheck className="h-4 w-4" />
-        };
+        return "Filter by Contractors";
       default:
-        return {
-          label: "Filter by Staff",
-          icon: <UserCheck className="h-4 w-4" />
-        };
+        return "Filter by Staff";
     }
   };
-  
-  const filterInfo = getFilterInfo();
 
   return (
     <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2 h-10">
-          {filterInfo.icon}
-          {filterInfo.label}
+          <UserCheck className="h-4 w-4" />
+          {getFilterLabel()}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2" align="start">
