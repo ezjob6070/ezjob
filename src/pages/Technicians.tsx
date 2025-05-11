@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -160,7 +159,7 @@ const Technicians = () => {
               : "hover:bg-[#FEF7CD] hover:text-[#8B7E2F] border-[#8B7E2F]/30"}`}
         >
           <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`} />
-          <div className="text-base font-medium">All Roles</div>
+          <div className="text-base font-medium">All Staff</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`}>{totalCount}</div>
         </Button>
         

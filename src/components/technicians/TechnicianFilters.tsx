@@ -95,10 +95,10 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
             setSelectedSubRole(null); // Reset sub-role when main role changes
           }}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Roles" />
+              <SelectValue placeholder="All Staff" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="all">All Staff</SelectItem>
               <SelectItem value="technician">Technicians</SelectItem>
               <SelectItem value="salesman">Salesmen</SelectItem>
               <SelectItem value="employed">Employed</SelectItem>
