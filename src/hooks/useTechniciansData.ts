@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
@@ -32,7 +31,31 @@ export function useTechniciansData() {
     ));
   }, [technicians]);
 
-  // Extract unique sub-roles for contractors
+  // Extract unique sub-roles for each role type
+  const technicianSubRoles = useMemo(() => {
+    return Array.from(new Set(
+      technicians
+        .filter(tech => tech.role === "technician" && tech.subRole)
+        .map(tech => tech.subRole as string)
+    ));
+  }, [technicians]);
+
+  const salesmanSubRoles = useMemo(() => {
+    return Array.from(new Set(
+      technicians
+        .filter(tech => tech.role === "salesman" && tech.subRole)
+        .map(tech => tech.subRole as string)
+    ));
+  }, [technicians]);
+
+  const employedSubRoles = useMemo(() => {
+    return Array.from(new Set(
+      technicians
+        .filter(tech => tech.role === "employed" && tech.subRole)
+        .map(tech => tech.subRole as string)
+    ));
+  }, [technicians]);
+
   const contractorSubRoles = useMemo(() => {
     return Array.from(new Set(
       technicians
@@ -184,6 +207,9 @@ export function useTechniciansData() {
     selectedSubRoles,
     categories,
     departments,
+    technicianSubRoles,
+    salesmanSubRoles,
+    employedSubRoles,
     contractorSubRoles,
     setTechnicians,
     handleSearchChange,

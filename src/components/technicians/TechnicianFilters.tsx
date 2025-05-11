@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,6 +14,9 @@ import SortFilter from "./filters/SortFilter";
 import { SortOption } from "@/types/sortOptions";
 import RoleFilter from "./filters/RoleFilter";
 import ContractorSubRoleFilter from "./filters/ContractorSubRoleFilter";
+import SalesmanSubRoleFilter from "./filters/SalesmanSubRoleFilter";
+import EmployedSubRoleFilter from "./filters/EmployedSubRoleFilter";
+import TechnicianSubRoleFilter from "./filters/TechnicianSubRoleFilter";
 
 interface TechnicianFiltersProps {
   categories: string[];
@@ -97,11 +99,47 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
     return count;
   };
 
+  // Determine which sub-role filter to show based on the selected role
+  const renderSubRoleFilter = () => {
+    switch (roleFilter) {
+      case "contractor":
+        return (
+          <ContractorSubRoleFilter
+            selectedSubRoles={selectedSubRoles}
+            onToggleSubRole={toggleSubRole}
+          />
+        );
+      case "salesman":
+        return (
+          <SalesmanSubRoleFilter
+            selectedSubRoles={selectedSubRoles}
+            onToggleSubRole={toggleSubRole}
+          />
+        );
+      case "employed":
+        return (
+          <EmployedSubRoleFilter
+            selectedSubRoles={selectedSubRoles}
+            onToggleSubRole={toggleSubRole}
+          />
+        );
+      case "technician":
+        return (
+          <TechnicianSubRoleFilter
+            selectedSubRoles={selectedSubRoles}
+            onToggleSubRole={toggleSubRole}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="h-9 border-dashed">
+          <Button variant="outline" className="h-10 border-dashed">
             <Filter className="h-4 w-4 mr-2" />
             Filters
             {getActiveFilterCount() > 0 && (
@@ -127,12 +165,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
               onSelect={onRoleChange}
             />
 
-            {roleFilter === "contractor" && (
-              <ContractorSubRoleFilter
-                selectedSubRoles={selectedSubRoles}
-                onToggleSubRole={toggleSubRole}
-              />
-            )}
+            {roleFilter !== "all" && renderSubRoleFilter()}
             
             <Separator />
             
@@ -179,9 +212,13 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           </Badge>
         )}
         
-        {selectedSubRoles.length > 0 && roleFilter === "contractor" && (
+        {selectedSubRoles.length > 0 && roleFilter !== "all" && (
           <Badge variant="secondary" className="py-1 px-3">
-            Contractor Types: {selectedSubRoles.length}
+            {roleFilter === "technician" && "Specialties: "}
+            {roleFilter === "salesman" && "Sales Positions: "}
+            {roleFilter === "employed" && "Staff Positions: "}
+            {roleFilter === "contractor" && "Contractor Types: "}
+            {selectedSubRoles.length}
             <X 
               className="h-3 w-3 ml-1 cursor-pointer" 
               onClick={() => setSelectedSubRoles([])}
