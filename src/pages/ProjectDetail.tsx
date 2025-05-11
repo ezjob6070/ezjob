@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign } from "lucide-react";
 import { initialProjects } from "@/data/projects";
-import { Project } from "@/types/project";
+import { Project as ProjectType } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -21,25 +21,7 @@ interface ProjectFile {
   url: string;
 }
 
-// Update the type definition to require 'type' in the Project interface
-interface Project {
-  id: number;
-  name: string;
-  type: string; // Make sure 'type' is defined as required
-  description: string;
-  location: string;
-  completion: number;
-  workers: number;
-  vehicles: number;
-  status: string;
-  startDate: string;
-  expectedEndDate: string;
-  budget: number;
-  actualSpent: number;
-  clientName: string;
-  revenue: number;
-}
-
+// Using the imported ProjectType instead of redefining
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();

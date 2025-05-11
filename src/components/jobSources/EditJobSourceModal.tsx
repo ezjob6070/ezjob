@@ -65,9 +65,9 @@ const EditJobSourceModal = ({
         phone: jobSource.phone || "",
         email: jobSource.email || "",
         logoUrl: jobSource.logoUrl || "",
-        paymentType: jobSource.paymentType,
-        paymentValue: jobSource.paymentValue,
-        isActive: jobSource.isActive,
+        paymentType: (jobSource.paymentType || "percentage") as "percentage" | "fixed", // Cast to expected type
+        paymentValue: jobSource.paymentValue || 0,
+        isActive: jobSource.isActive !== false,
         notes: jobSource.notes || "",
       });
     }

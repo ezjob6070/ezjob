@@ -33,7 +33,7 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
 
   // Get jobs assigned to contractors within the date range
   const contractorJobs = jobs.filter(job => {
-    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date instanceof Date ? job.date : job.date || new Date());
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);

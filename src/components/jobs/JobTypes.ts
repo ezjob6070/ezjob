@@ -1,87 +1,50 @@
 
-import { DateRange } from "react-day-picker";
-
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
-export type JobPriority = "low" | "medium" | "high" | "urgent";
-export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile" | "credit_card" | "zelle" | "venmo" | "paypal";
+import { SortOption } from "@/types/sortOptions";
 
 export interface Job {
   id: string;
-  title: string;
-  jobNumber?: string;
   clientName: string;
-  amount: number;
-  status: JobStatus;
-  actualAmount?: number;
-  technicianId?: string;  // Added for the TS errors
-  technicianName?: string;
-  jobSourceId?: string;
-  jobSourceName?: string;
-  date: Date | string;  // Updated to accept Date or string
-  scheduledDate?: Date | string;  // Updated to accept Date or string
-  createdAt?: string;
-  priority?: JobPriority;
-  details?: string;
-  address?: string;
-  clientPhone?: string;
-  clientEmail?: string;
-  notes?: string;
-  description?: string;
-  serviceType?: string;
-  category?: string;
-  estimateId?: string;
-  isAllDay?: boolean;
-  paymentStatus?: "paid" | "unpaid" | "partial";
-  paymentMethod?: PaymentMethod;
-  cancellationReason?: string;
-  source?: string;
-  contractorName?: string;
-  contractorId?: string;
   clientId?: string;
-  // Add missing properties that are being used in various components
-  parts?: string[];
-  signature?: string;
-  hasImages?: boolean;
-  imageCount?: number;
-}
-
-export interface JobTab {
-  id: string;
-  label: string;
-  status: string;
-  count: number;
-}
-
-export interface ServiceTypeFilter {
-  name: string;
-  amount: number;
-  percentage: number;
-}
-
-export interface CreateJobFormData {
-  title: string;
-  clientName: string;
-  technicianId: string;
-  amount: number;
-  date: Date;
-  time?: Date;
-  isAllDay: boolean;
-  priority: JobPriority;
+  address?: string;
   description?: string;
-  category?: string;
+  status: "scheduled" | "in-progress" | "completed" | "cancelled" | "canceled";
+  date: Date | string; // Accept both Date and string
+  scheduledDate?: Date | string; // Accept both Date and string
+  expectedEndDate?: string;
+  amount: number;
+  actualAmount?: number;
+  jobType?: string;
   serviceType?: string;
-  jobSourceId?: string;
-  contractorId?: string;
-}
-
-export interface JobFilters {
-  searchTerm: string;
-  technicianFilter: string;
-  dateFilter: "today" | "tomorrow" | "yesterday" | "thisWeek" | "nextWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
-  customDateRange: DateRange;
+  source?: string;
+  sourceId?: string;
+  isAllDay?: boolean;
+  paymentMethod?: string;
+  paymentStatus?: string;
+  technicianId?: string; // Add technician ID field
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AmountRange {
-  min?: number;
-  max?: number;
+  min: number;
+  max: number;
+}
+
+export interface JobViewProps {
+  jobs: Job[];
+}
+
+export type JobStatusType = Job["status"];
+
+export interface JobBaseProps {
+  onAddJob?: (job: Job) => void;
+  onUpdateJob?: (job: Job) => void;
+  onDeleteJob?: (id: string) => void;
+}
+
+export interface JobListProps extends JobBaseProps {
+  jobs: Job[];
+  sortBy?: SortOption;
+  searchTerm?: string;
 }
