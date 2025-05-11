@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
@@ -186,6 +187,9 @@ const Index = () => {
       default: // Dashboard tab
         return (
           <>
+            {/* Display Projects Dashboard Section at the top */}
+            <ProjectsDashboardSection />
+
             <DashboardCalendar date={date} setDate={setDate} />
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
@@ -223,9 +227,6 @@ const Index = () => {
               </Card>
             </div>
             
-            {/* Project section added at the top for better visibility */}
-            <ProjectsDashboardSection />
-            
             <MetricsOverview 
               financialMetrics={dashboardFinancialMetrics}
               formatCurrency={formatCurrency}
@@ -246,12 +247,12 @@ const Index = () => {
               <PerformanceCard 
                 leadSources={dashboardLeadSources.map(source => ({
                   name: source.name,
-                  count: source.value, // Map value to count
+                  count: source.value, 
                   percentage: source.percentage
                 }))}
                 jobTypePerformance={dashboardJobTypePerformance.map(item => ({
                   name: item.name,
-                  count: item.value, // Map value to count
+                  count: item.value,
                   revenue: item.revenue,
                   avgValue: item.avgValue || 0
                 }))}

@@ -17,4 +17,9 @@ export interface JobSource {
   logoUrl?: string;
   notes?: string;
   address?: string;
+  
+  // Adding missing properties needed by finance components
+  expenses?: number;
+  companyProfit?: number;
+  category?: string;
 }

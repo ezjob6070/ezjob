@@ -33,7 +33,9 @@ const ProjectsDashboardSection = () => {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-4">
+      <h2 className="text-xl font-bold tracking-tight">Projects Dashboard</h2>
+      
       {/* Project Quick Look section - NOW FIRST for better visibility */}
       <Card className="bg-white shadow-sm border-gray-100">
         <CardHeader className="pb-2">
