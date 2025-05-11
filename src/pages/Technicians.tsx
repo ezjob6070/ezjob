@@ -303,6 +303,7 @@ const Technicians = () => {
         onOpenChange={setShowRolesModal}
         onSaveRoles={handleSaveRoles}
         currentRoles={customRoles}
+        technicians={globalTechnicians}
       />
     </div>
   );

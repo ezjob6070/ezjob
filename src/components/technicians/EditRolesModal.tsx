@@ -11,15 +11,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusIcon, Trash2, Edit } from "lucide-react";
+import { PlusIcon, Trash2, ChevronDown } from "lucide-react";
 import { TechnicianRole, TechnicianSubRoles, DEFAULT_SUB_ROLES } from "@/types/technician";
 import { toast } from "@/components/ui/use-toast";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
 
 interface EditRolesModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSaveRoles: (roles: TechnicianSubRoles) => void;
   currentRoles: TechnicianSubRoles;
+  technicians: Array<{id: string, role?: TechnicianRole}>;
 }
 
 const EditRolesModal: React.FC<EditRolesModalProps> = ({
@@ -27,10 +30,17 @@ const EditRolesModal: React.FC<EditRolesModalProps> = ({
   onOpenChange,
   onSaveRoles,
   currentRoles = DEFAULT_SUB_ROLES,
+  technicians = [],
 }) => {
   const [roles, setRoles] = useState<TechnicianSubRoles>(currentRoles);
   const [newRoleName, setNewRoleName] = useState("");
   const [selectedRoleType, setSelectedRoleType] = useState<TechnicianRole>("technician");
+  const [openRoles, setOpenRoles] = useState<Record<string, boolean>>({
+    technician: false,
+    salesman: false,
+    employed: false,
+    contractor: false
+  });
 
   const handleAddRole = () => {
     if (!newRoleName.trim()) {
@@ -58,6 +68,12 @@ const EditRolesModal: React.FC<EditRolesModalProps> = ({
     }));
 
     setNewRoleName("");
+    
+    // Open the relevant role section when adding a new role
+    setOpenRoles(prev => ({
+      ...prev,
+      [selectedRoleType]: true
+    }));
   };
 
   const handleRemoveRole = (roleType: TechnicianRole, roleName: string) => {
@@ -70,6 +86,18 @@ const EditRolesModal: React.FC<EditRolesModalProps> = ({
   const handleSave = () => {
     onSaveRoles(roles);
     onOpenChange(false);
+  };
+
+  const toggleRoleSection = (roleType: TechnicianRole) => {
+    setOpenRoles(prev => ({
+      ...prev,
+      [roleType]: !prev[roleType]
+    }));
+  };
+
+  // Count technicians by role
+  const getRoleCount = (role: TechnicianRole) => {
+    return technicians.filter(tech => tech.role === role).length;
   };
 
   return (
@@ -113,29 +141,57 @@ const EditRolesModal: React.FC<EditRolesModalProps> = ({
           </div>
 
           {/* Role Lists */}
-          <div className="space-y-6">
+          <div className="space-y-2">
             {Object.entries(roles).map(([roleType, roleNames]) => (
-              <div key={roleType} className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-700 capitalize">{roleType} Roles</h3>
-                <div className="border rounded-md divide-y">
-                  {roleNames.length === 0 ? (
-                    <p className="text-sm text-gray-500 p-3">No roles defined</p>
-                  ) : (
-                    roleNames.map((roleName, index) => (
-                      <div key={index} className="flex justify-between items-center p-2 hover:bg-gray-50">
-                        <span className="text-sm">{roleName}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveRole(roleType as TechnicianRole, roleName)}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+              <Collapsible 
+                key={roleType} 
+                open={openRoles[roleType]} 
+                onOpenChange={() => toggleRoleSection(roleType as TechnicianRole)}
+                className="border rounded-md overflow-hidden"
+              >
+                <CollapsibleTrigger className="flex w-full justify-between items-center p-3 hover:bg-gray-50">
+                  <div className="flex items-center">
+                    <h3 className="text-sm font-medium text-gray-700 capitalize">{roleType} Roles</h3>
+                    <Badge variant="secondary" className="ml-2">
+                      {getRoleCount(roleType as TechnicianRole)}
+                    </Badge>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${openRoles[roleType] ? 'rotate-180' : ''}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="border-t divide-y">
+                    {roleNames.length === 0 ? (
+                      <p className="text-sm text-gray-500 p-3">No roles defined</p>
+                    ) : (
+                      roleNames.map((roleName, index) => (
+                        <div key={index} className="flex justify-between items-center p-3 hover:bg-gray-50">
+                          <span className="text-sm">{roleName}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveRole(roleType as TechnicianRole, roleName)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                    <div className="p-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full border-dashed border border-gray-300 text-gray-500"
+                        onClick={() => {
+                          setSelectedRoleType(roleType as TechnicianRole);
+                          document.getElementById('roleName')?.focus();
+                        }}
+                      >
+                        <PlusIcon className="h-4 w-4 mr-1" /> Add new {roleType} role
+                      </Button>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             ))}
           </div>
         </div>
