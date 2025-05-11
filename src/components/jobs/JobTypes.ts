@@ -1,5 +1,6 @@
 
 import { SortOption } from "@/types/sortOptions";
+import { JobPriority, JobStatus, PaymentMethod } from "@/types/job";
 
 export interface Job {
   id: string;
@@ -7,7 +8,7 @@ export interface Job {
   clientId?: string;
   address?: string;
   description?: string;
-  status: "scheduled" | "in-progress" | "completed" | "cancelled" | "canceled";
+  status: JobStatus;
   date: Date | string; // Accept both Date and string
   scheduledDate?: Date | string; // Accept both Date and string
   expectedEndDate?: string;
@@ -18,7 +19,7 @@ export interface Job {
   source?: string;
   sourceId?: string;
   isAllDay?: boolean;
-  paymentMethod?: string;
+  paymentMethod?: PaymentMethod;
   paymentStatus?: string;
   technicianId?: string; // Add technician ID field
   notes?: string;
@@ -28,12 +29,27 @@ export interface Job {
   // Additional fields needed by calendar components
   title?: string;
   technicianName?: string; 
+  
+  // Job source related properties
+  jobSourceId?: string;
+  jobSourceName?: string;
+  
+  // Contractor related properties
+  contractorId?: string;
+  contractorName?: string;
+  
+  // Category and other properties
+  category?: string;
+  
+  // Job priority
+  priority?: JobPriority;
+  
+  // Cancellation related
+  cancellationReason?: string;
 }
 
-export interface AmountRange {
-  min: number;
-  max: number;
-}
+export { JobPriority, JobStatus, PaymentMethod };
+export type { AmountRange, CreateJobFormData } from "@/types/job";
 
 export interface JobViewProps {
   jobs: Job[];

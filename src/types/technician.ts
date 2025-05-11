@@ -22,6 +22,8 @@ export interface Document {
   url?: string;
   uploadDate: string;
   expirationDate?: string;
+  title?: string; // Added for compatibility with existing code
+  size?: number;   // Added for compatibility with existing code
 }
 
 export interface Technician {
@@ -36,13 +38,13 @@ export interface Technician {
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
   
-  // Required properties being added/fixed
-  role?: TechnicianRole; // Contractor, employee, etc.
+  // Required properties
+  role: TechnicianRole; // Contractor, employee, etc.
   subRole?: string; // Specific role within the main role
-  specialty: string; // Technical specialty - make required
+  specialty: string; // Technical specialty
   
   // Payment related fields
-  paymentType?: "percentage" | "flat" | "hourly" | "salary";
+  paymentType: "percentage" | "flat" | "hourly" | "salary";
   paymentRate?: number;
   hourlyRate?: number;
   salaryBasis?: SalaryBasis;
