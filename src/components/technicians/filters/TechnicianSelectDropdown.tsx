@@ -19,6 +19,7 @@ interface TechnicianSelectDropdownProps {
   onTechnicianToggle: (technicianId: string) => void;
   dropdownOpen: boolean;
   setDropdownOpen: (open: boolean) => void;
+  roleFilter?: string; // New prop to determine the filter label
 }
 
 const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
@@ -27,6 +28,7 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
   onTechnicianToggle,
   dropdownOpen,
   setDropdownOpen,
+  roleFilter = "all", // Default to "all"
 }) => {
   const [technicianFilterQuery, setTechnicianFilterQuery] = React.useState("");
 
@@ -50,20 +52,38 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
     });
   };
 
+  // Determine the filter label based on the roleFilter
+  const getFilterLabel = () => {
+    if (selectedTechnicians.length > 0) {
+      return `${selectedTechnicians.length} Selected`;
+    }
+    
+    switch (roleFilter) {
+      case "technician":
+        return "Filter by Technicians";
+      case "salesman":
+        return "Filter by Salesmen";
+      case "employed":
+        return "Filter by Employees";
+      case "contractor":
+        return "Filter by Contractors";
+      default:
+        return "Filter by Staff";
+    }
+  };
+
   return (
     <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2 h-10">
           <UserCheck className="h-4 w-4" />
-          {selectedTechnicians.length === 0 
-            ? "Filter by Technicians" 
-            : `${selectedTechnicians.length} Selected`}
+          {getFilterLabel()}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2" align="start">
         <div className="mb-2">
           <Input
-            placeholder="Find technician..."
+            placeholder="Find staff member..."
             className="w-full"
             value={technicianFilterQuery}
             onChange={(e) => setTechnicianFilterQuery(e.target.value)}
@@ -110,7 +130,7 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
             </div>
           ))}
           {filteredTechniciansForDropdown.length === 0 && (
-            <div className="py-2 px-2 text-sm text-gray-500">No technicians found</div>
+            <div className="py-2 px-2 text-sm text-gray-500">No staff found</div>
           )}
         </div>
         {selectedTechnicians.length > 0 && selectedTechnicians.length <= 3 && (

@@ -151,6 +151,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
             onTechnicianToggle={onTechnicianToggle}
             dropdownOpen={technicianDropdownOpen}
             setDropdownOpen={setTechnicianDropdownOpen}
+            roleFilter={roleFilter} // Pass the roleFilter prop to the dropdown
           />
         )}
         
