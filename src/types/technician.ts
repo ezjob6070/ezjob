@@ -1,5 +1,15 @@
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
 
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
+
+// Default sub-roles for each technician role
+export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
+  technician: ["HVAC", "Plumbing", "Electrical", "Carpentry", "General"],
+  salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Manager"],
+  employed: ["Office Staff", "Manager", "Customer Service", "Administrative"],
+  contractor: ["Independent", "1099", "Specialist", "Consultant"]
+};
+
 export interface Technician {
   id: string;
   name: string;
@@ -13,7 +23,7 @@ export interface Technician {
   status: "active" | "inactive" | "onLeave";
   
   // Required properties being added/fixed
-  role?: string; // Contractor, employee, etc.
+  role?: TechnicianRole; // Contractor, employee, etc.
   subRole?: string; // Specific role within the main role
   specialty?: string; // Technical specialty
   
@@ -33,6 +43,12 @@ export interface Technician {
   // Additional fields for finance components
   incentiveType?: string;
   incentiveAmount?: number;
+  
+  // Performance metrics fields
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  rating?: number;
   
   // Other fields that might be needed
   category?: string;

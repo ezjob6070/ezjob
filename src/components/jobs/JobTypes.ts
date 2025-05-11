@@ -24,6 +24,10 @@ export interface Job {
   notes?: string;
   createdAt?: string;
   updatedAt?: string;
+  
+  // Additional fields needed by calendar components
+  title?: string;
+  technicianName?: string; 
 }
 
 export interface AmountRange {

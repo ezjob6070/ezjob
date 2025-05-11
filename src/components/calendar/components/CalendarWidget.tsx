@@ -23,7 +23,7 @@ const CalendarWidget = ({ selectedDate, setSelectedDate, jobs, tasks, currentMon
     if (!dayJobs.length && !dayTasks.length) return "";
     
     if (dayTasks.some(task => task.priority === "high") || 
-        dayJobs.some(job => job.status === "in_progress")) {
+        dayJobs.some(job => job.status === "in-progress")) {
       return "bg-yellow-100 text-yellow-800";
     } else if (dayJobs.some(job => job.status === "scheduled")) {
       return "bg-blue-100 text-blue-800";

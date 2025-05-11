@@ -7,7 +7,7 @@ export interface Job {
   clientPhone?: string;
   clientEmail?: string;
   address: string;
-  status: "scheduled" | "in progress" | "completed" | "canceled" | "rescheduled" | string;
+  status: "scheduled" | "in-progress" | "completed" | "canceled" | "cancelled" | "rescheduled" | string;
   scheduledDate: string;
   amount: number;
   description?: string;
@@ -19,6 +19,7 @@ export interface Job {
   // Properties needed by components
   date?: string | Date;
   technicianId?: string;
+  title?: string;
 }
 
 export interface AmountRange {
