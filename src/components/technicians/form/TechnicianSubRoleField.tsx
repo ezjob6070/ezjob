@@ -1,52 +1,48 @@
 
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Control, UseFormSetValue, useWatch } from "react-hook-form";
-import { DEFAULT_SUB_ROLES, TechnicianRole } from "@/types/technician";
+import { Control } from "react-hook-form";
+import { TechnicianRole, TechnicianSubRoles, DEFAULT_SUB_ROLES } from "@/types/technician";
 
 interface TechnicianSubRoleFieldProps {
   control: Control<any>;
-  setValue: UseFormSetValue<any>;
-  defaultValue?: string;
+  selectedRole: TechnicianRole;
 }
 
 export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
   control,
-  setValue,
-  defaultValue,
+  selectedRole = "technician"
 }) => {
-  const selectedRole = useWatch({
-    control,
-    name: "role",
-    defaultValue: "technician"
-  }) as TechnicianRole;
+  const [customRoles, setCustomRoles] = useState<TechnicianSubRoles>(DEFAULT_SUB_ROLES);
   
-  const subRoles = DEFAULT_SUB_ROLES[selectedRole] || [];
-  
-  // Reset sub-role when role changes
   useEffect(() => {
-    // Only reset if no default value is provided
-    if (!defaultValue) {
-      setValue("subRole", "");
+    const savedRoles = localStorage.getItem('customRoles');
+    if (savedRoles) {
+      try {
+        setCustomRoles(JSON.parse(savedRoles));
+      } catch (e) {
+        console.error('Failed to parse saved roles:', e);
+      }
     }
-  }, [selectedRole, setValue, defaultValue]);
+  }, []);
+
+  const subRoles = customRoles[selectedRole] || DEFAULT_SUB_ROLES[selectedRole];
 
   return (
     <FormField
       control={control}
       name="subRole"
-      defaultValue={defaultValue || ""}
       render={({ field }) => (
         <FormItem className="flex-1">
-          <FormLabel>Industry/Department</FormLabel>
+          <FormLabel>Specialty</FormLabel>
           <FormControl>
             <Select
               onValueChange={field.onChange}
-              value={field.value}
+              value={field.value || ""}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select industry/department (optional)" />
+                <SelectValue placeholder="Select specialty" />
               </SelectTrigger>
               <SelectContent>
                 {subRoles.map((subRole) => (
@@ -63,3 +59,5 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
     />
   );
 };
+
+export default TechnicianSubRoleField;

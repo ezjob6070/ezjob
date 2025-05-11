@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, Download, Filter, MoreHorizontal } from "lucide-react";
+import { PlusIcon, Download, Filter, MoreHorizontal, Edit } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,11 +14,13 @@ import {
 interface TechniciansPageHeaderProps {
   onAddTechnician: () => void;
   exportTechnicians: () => void;
+  onEditRoles?: () => void;
 }
 
 const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
   onAddTechnician,
-  exportTechnicians
+  exportTechnicians,
+  onEditRoles
 }) => {
   return (
     <div className="flex justify-end items-center">
@@ -43,6 +45,14 @@ const TechniciansPageHeader: React.FC<TechniciansPageHeaderProps> = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        
+        <Button 
+          onClick={onEditRoles}
+          variant="outline"
+          className="border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+        >
+          <Edit className="mr-2 h-4 w-4" /> Edit Roles
+        </Button>
         
         <Button 
           onClick={onAddTechnician}

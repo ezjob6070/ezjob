@@ -4,6 +4,7 @@ import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import AddTechnicianModal from "@/components/technicians/AddTechnicianModal";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
+import EditRolesModal from "@/components/technicians/EditRolesModal";
 import TechniciansList from "@/components/technicians/TechniciansList";
 import TechniciansPageHeader from "@/components/technicians/TechniciansPageHeader";
 import TechnicianSearchBar from "@/components/technicians/filters/TechnicianSearchBar";
@@ -13,13 +14,18 @@ import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
 import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
+import { TechnicianSubRoles, DEFAULT_SUB_ROLES } from "@/types/technician";
+import { useToast } from "@/components/ui/use-toast";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showRolesModal, setShowRolesModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [roleFilter, setRoleFilter] = useState("all");
   const [subRoleFilter, setSubRoleFilter] = useState<string | null>(null);
+  const [customRoles, setCustomRoles] = useState<TechnicianSubRoles>(DEFAULT_SUB_ROLES);
+  const { toast } = useToast();
   
   const { technicians: globalTechnicians, addTechnician, updateTechnician } = useGlobalState();
   
@@ -118,6 +124,28 @@ const Technicians = () => {
     
     setShowEditModal(false);
   };
+
+  const handleSaveRoles = (updatedRoles: TechnicianSubRoles) => {
+    setCustomRoles(updatedRoles);
+    // In a real application, you might want to save this to a database or localStorage
+    localStorage.setItem('customRoles', JSON.stringify(updatedRoles));
+    toast({
+      title: "Roles Updated",
+      description: "Staff roles have been successfully updated.",
+    });
+  };
+
+  // Load saved roles from localStorage on initial render
+  useEffect(() => {
+    const savedRoles = localStorage.getItem('customRoles');
+    if (savedRoles) {
+      try {
+        setCustomRoles(JSON.parse(savedRoles));
+      } catch (e) {
+        console.error('Failed to parse saved roles:', e);
+      }
+    }
+  }, []);
 
   const isSalaryDataVisible = true; // Always visible now that departments filter is removed
 
@@ -220,6 +248,7 @@ const Technicians = () => {
       <TechniciansPageHeader 
         onAddTechnician={() => setShowAddModal(true)}
         exportTechnicians={exportTechnicians}
+        onEditRoles={() => setShowRolesModal(true)}
       />
       
       <div className="mb-6">
@@ -267,6 +296,13 @@ const Technicians = () => {
         onOpenChange={setShowEditModal}
         onUpdateTechnician={handleUpdateTechnicianForm}
         technician={selectedTechnician}
+      />
+      
+      <EditRolesModal
+        open={showRolesModal}
+        onOpenChange={setShowRolesModal}
+        onSaveRoles={handleSaveRoles}
+        currentRoles={customRoles}
       />
     </div>
   );

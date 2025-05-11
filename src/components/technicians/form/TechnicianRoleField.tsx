@@ -1,9 +1,9 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from "react-hook-form";
-import { TechnicianRole } from "@/types/technician";
+import { TechnicianRole, TechnicianSubRoles, DEFAULT_SUB_ROLES } from "@/types/technician";
 
 interface TechnicianRoleFieldProps {
   control: Control<any>;
@@ -14,6 +14,20 @@ export const TechnicianRoleField: React.FC<TechnicianRoleFieldProps> = ({
   control,
   defaultValue = "technician",
 }) => {
+  // Try to load custom roles from localStorage
+  const [customRoles, setCustomRoles] = useState<TechnicianSubRoles>(DEFAULT_SUB_ROLES);
+  
+  useEffect(() => {
+    const savedRoles = localStorage.getItem('customRoles');
+    if (savedRoles) {
+      try {
+        setCustomRoles(JSON.parse(savedRoles));
+      } catch (e) {
+        console.error('Failed to parse saved roles:', e);
+      }
+    }
+  }, []);
+
   return (
     <FormField
       control={control}
