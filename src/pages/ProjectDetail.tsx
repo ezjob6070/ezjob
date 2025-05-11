@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, List } from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project as ProjectType } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -87,6 +87,10 @@ export default function ProjectDetail() {
     navigate(-1);
   };
 
+  const navigateToTasks = () => {
+    navigate(`/project/${id}/tasks`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with back button */}
@@ -100,15 +104,26 @@ export default function ProjectDetail() {
           Back to Projects
         </Button>
         
-        <Badge 
-          className={`
-            ${project.status === "In Progress" ? "bg-blue-100 text-blue-800 hover:bg-blue-200" : 
-              project.status === "Completed" ? "bg-green-100 text-green-800 hover:bg-green-200" : 
-              "bg-amber-100 text-amber-800 hover:bg-amber-200"}
-          `}
-        >
-          {project.status}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline"
+            onClick={navigateToTasks}
+            className="flex items-center gap-2"
+          >
+            <List size={16} />
+            View Tasks & Progress
+          </Button>
+          
+          <Badge 
+            className={`
+              ${project.status === "In Progress" ? "bg-blue-100 text-blue-800 hover:bg-blue-200" : 
+                project.status === "Completed" ? "bg-green-100 text-green-800 hover:bg-green-200" : 
+                "bg-amber-100 text-amber-800 hover:bg-amber-200"}
+            `}
+          >
+            {project.status}
+          </Badge>
+        </div>
       </div>
       
       <div>
