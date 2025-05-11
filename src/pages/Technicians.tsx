@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -19,6 +20,7 @@ const Technicians = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [roleFilter, setRoleFilter] = useState("all");
+  const [subRoleFilter, setSubRoleFilter] = useState<string | null>(null);
   
   const { technicians: globalTechnicians, addTechnician, updateTechnician } = useGlobalState();
   
@@ -27,16 +29,13 @@ const Technicians = () => {
     searchQuery,
     selectedTechnicians,
     selectedCategories,
-    selectedDepartments = [], 
     statusFilter,
     sortOption,
     dateRange,
     categories,
-    departments = [], 
     handleSearchChange,
     toggleTechnician,
     toggleCategory,
-    toggleDepartment,
     handleSortChange,
     setStatusFilter,
     setDateRange,
@@ -125,7 +124,7 @@ const Technicians = () => {
     setShowEditModal(false);
   };
 
-  const isSalaryDataVisible = !selectedDepartments || selectedDepartments.length === 0 || selectedDepartments.includes("Finance");
+  const isSalaryDataVisible = true; // Always visible now that departments filter is removed
 
   // Get staff counts by role
   const technicianCount = globalTechnicians.filter(tech => (tech.role || "technician") === "technician").length;
@@ -165,7 +164,7 @@ const Technicians = () => {
               : "hover:bg-[#FEF7CD] hover:text-[#8B7E2F] border-[#8B7E2F]/30"}`}
         >
           <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`} />
-          <div className="text-base font-medium">All Staff</div>
+          <div className="text-base font-medium">All Roles</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`}>{totalCount}</div>
         </Button>
         
@@ -252,9 +251,6 @@ const Technicians = () => {
           onSortChange={handleSortChangeAdapted}
           date={dateRange}
           setDate={setDateRange}
-          departments={departments}
-          selectedDepartments={selectedDepartments}
-          toggleDepartment={toggleDepartment}
           roleFilter={roleFilter}
           onRoleChange={setRoleFilter}
         />

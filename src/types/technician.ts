@@ -31,12 +31,12 @@ export interface Technician {
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
   payRate?: number;
-  paymentType?: "percentage" | "flat" | "hourly" | "salary";
+  paymentType: "percentage" | "flat" | "hourly" | "salary";
   salaryBasis?: SalaryBasis;
   monthlySalary?: number;
   rating?: number;
   imageUrl?: string;
-  specialty?: string;  // Make specialty optional to match actual usage
+  specialty: string;  // Make specialty required to match actual usage
   skills?: string[];
   certifications?: string[];
   notes?: string;
@@ -67,11 +67,12 @@ export interface Technician {
 
 export interface Document {
   id: string;
-  title: string;
+  name: string;
   type: string;
   url: string;
   uploadDate: string;
   size?: number;
+  title?: string;
 }
 
 export interface TechnicianFilters {

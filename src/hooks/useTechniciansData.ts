@@ -12,32 +12,26 @@ export function useTechniciansData() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [subRoleFilter, setSubRoleFilter] = useState<string | null>(null);
   
-  // Extract unique categories and departments
+  // Extract unique categories 
   const categories = useMemo(() => {
     return Array.from(new Set(
       technicians.map(tech => tech.category || "Uncategorized")
     ));
   }, [technicians]);
   
-  const departments = useMemo(() => {
-    return Array.from(new Set(
-      technicians.map(tech => tech.department || "General")
-    ));
-  }, [technicians]);
-
   // Filtered technicians based on all criteria
   const filteredTechnicians = useMemo(() => {
     return technicians
       .filter(tech => {
         const matchesSearch = searchQuery === "" || 
           tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          tech.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (tech.specialty && tech.specialty.toLowerCase().includes(searchQuery.toLowerCase())) ||
           tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
         
@@ -47,17 +41,17 @@ export function useTechniciansData() {
         const matchesStatus = statusFilter === "all" || 
           tech.status === statusFilter;
         
-        const matchesDepartment = selectedDepartments.length === 0 ||
-          selectedDepartments.includes(tech.department || "General");
-        
         const matchesDateRange = !dateRange?.from ||
           (tech.hireDate && new Date(tech.hireDate) >= dateRange.from &&
           (!dateRange.to || new Date(tech.hireDate) <= dateRange.to));
           
         const matchesRole = roleFilter === "all" ||
           (tech.role || "technician") === roleFilter;
+          
+        const matchesSubRole = !subRoleFilter || 
+          (tech.subRole && tech.subRole === subRoleFilter);
         
-        return matchesSearch && matchesCategory && matchesStatus && matchesDepartment && matchesDateRange && matchesRole;
+        return matchesSearch && matchesCategory && matchesStatus && matchesDateRange && matchesRole && matchesSubRole;
       })
       .sort((a, b) => {
         switch (sortOption) {
@@ -77,7 +71,7 @@ export function useTechniciansData() {
             return 0;
         }
       });
-  }, [technicians, searchQuery, selectedCategories, statusFilter, selectedDepartments, dateRange, roleFilter, sortOption]);
+  }, [technicians, searchQuery, selectedCategories, statusFilter, dateRange, roleFilter, subRoleFilter, sortOption]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -99,16 +93,6 @@ export function useTechniciansData() {
         return prev.filter(c => c !== category);
       } else {
         return [...prev, category];
-      }
-    });
-  };
-  
-  const toggleDepartment = (department: string) => {
-    setSelectedDepartments(prev => {
-      if (prev.includes(department)) {
-        return prev.filter(d => d !== department);
-      } else {
-        return [...prev, department];
       }
     });
   };
@@ -151,22 +135,21 @@ export function useTechniciansData() {
     searchQuery,
     selectedTechnicians,
     selectedCategories,
-    selectedDepartments,
     statusFilter,
     sortOption,
     dateRange,
     roleFilter,
+    subRoleFilter,
     categories,
-    departments,
     setTechnicians,
     handleSearchChange,
     toggleTechnician,
     toggleCategory,
-    toggleDepartment,
     handleSortChange,
     setStatusFilter,
     setDateRange,
     setRoleFilter,
+    setSubRoleFilter,
     addCategory,
     exportTechnicians
   };

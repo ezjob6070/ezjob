@@ -22,6 +22,7 @@ import CategoryFilter from "@/components/finance/technician-filters/CategoryFilt
 import { Technician } from "@/types/technician";
 import TechnicianSelectDropdown from "./filters/TechnicianSelectDropdown";
 import DateSortFilter from "./filters/DateSortFilter";
+import SubRoleFilter from "./filters/SubRoleFilter";
 
 // Define extended sort options
 type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
@@ -63,18 +64,30 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   onSortChange,
   date,
   setDate,
-  departments = [],
-  selectedDepartments = [],
-  toggleDepartment,
   roleFilter = "all",
   onRoleChange
 }) => {
   const [technicianDropdownOpen, setTechnicianDropdownOpen] = React.useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
   
-  // Create safe copies of arrays to prevent "undefined is not iterable" errors
-  const safeDepartments = departments || [];
-  const safeSelectedDepartments = selectedDepartments || [];
+  // Get available sub-roles based on selected role
+  const getSubRolesForRole = (role: string) => {
+    switch(role) {
+      case "technician":
+        return ["HVAC", "Plumbing", "Electrical", "General", "Carpentry"];
+      case "salesman":
+        return ["Inside Sales", "Outside Sales", "Account Manager", "Sales Support"];
+      case "employed":
+        return ["Secretary", "Management", "HR", "Finance", "Administration", "Operations"];
+      case "contractor":
+        return ["Independent", "Agency", "Specialized", "Consultant"];
+      default:
+        return [];
+    }
+  };
+  
+  const availableSubRoles = roleFilter !== "all" ? getSubRolesForRole(roleFilter) : [];
   
   return (
     <div className="space-y-4 w-full">
@@ -89,16 +102,30 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
         
         {/* Role filter */}
         {onRoleChange && (
-          <Select value={roleFilter} onValueChange={onRoleChange}>
+          <Select value={roleFilter} onValueChange={(value) => {
+            onRoleChange(value);
+            setSelectedSubRole(null); // Reset sub-role when main role changes
+          }}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by role" />
+              <SelectValue placeholder="All Roles" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="technician">Technicians</SelectItem>
               <SelectItem value="salesman">Salesmen</SelectItem>
+              <SelectItem value="employed">Employed</SelectItem>
+              <SelectItem value="contractor">Contractors</SelectItem>
             </SelectContent>
           </Select>
+        )}
+        
+        {/* Sub-role filter - only visible when a role is selected */}
+        {roleFilter !== "all" && availableSubRoles.length > 0 && (
+          <SubRoleFilter 
+            subRoles={availableSubRoles}
+            selectedSubRole={selectedSubRole}
+            onSubRoleChange={setSelectedSubRole}
+          />
         )}
         
         <Select value={status} onValueChange={onStatusChange}>
@@ -118,39 +145,6 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
           <div className="w-[220px]">
             <DateRangeSelector date={date} setDate={setDate} />
           </div>
-        )}
-
-        {/* Department filter if available */}
-        {safeDepartments.length > 0 && toggleDepartment && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <UserPlus className="h-4 w-4" />
-                Departments
-                {safeSelectedDepartments.length > 0 && (
-                  <Badge variant="secondary" className="ml-1">{safeSelectedDepartments.length}</Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-72" align="start" side="bottom" avoidCollisions={false}>
-              <div className="space-y-2">
-                <div className="font-medium">Filter by Department</div>
-                <Separator />
-                <div className="h-48 overflow-y-auto space-y-1">
-                  {safeDepartments.map((department) => (
-                    <div key={department} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`department-${department}`} 
-                        checked={safeSelectedDepartments.includes(department)}
-                        onCheckedChange={() => toggleDepartment(department)}
-                      />
-                      <Label htmlFor={`department-${department}`} className="cursor-pointer">{department}</Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
         )}
         
         {/* Enhanced date/name/revenue sort filter */}
