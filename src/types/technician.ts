@@ -10,17 +10,6 @@ export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
   contractor: ["Independent", "1099", "Specialist", "Consultant"]
 };
 
-// User permission types
-export type UserPermission = "admin" | "manager" | "standard" | "limited";
-
-// Permission descriptions
-export const PERMISSION_DESCRIPTIONS: Record<UserPermission, string> = {
-  admin: "Full access to all system features and data",
-  manager: "Access to most features and all data",
-  standard: "Access to assigned features and relevant data",
-  limited: "Access only to own jobs and limited features"
-};
-
 export interface Technician {
   id: string;
   name: string;
@@ -33,7 +22,7 @@ export interface Technician {
   startDate?: string;
   status: "active" | "inactive" | "onLeave";
   
-  // Role related fields
+  // Required properties being added/fixed
   role?: TechnicianRole; // Contractor, employee, etc.
   subRole?: string; // Specific role within the main role
   specialty?: string; // Technical specialty
@@ -61,11 +50,6 @@ export interface Technician {
   totalRevenue?: number;
   rating?: number;
   
-  // Permission related fields
-  userPermission?: UserPermission;
-  canViewOwnJobsOnly?: boolean;
-  
   // Other fields that might be needed
   category?: string;
-  notes?: string;
 }
