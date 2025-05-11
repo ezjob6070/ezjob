@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DEFAULT_SUB_ROLES } from "@/types/technician";
 
 interface ContractorSubRoleFilterProps {
@@ -12,27 +12,34 @@ const ContractorSubRoleFilter: React.FC<ContractorSubRoleFilterProps> = ({
   selectedSubRoles,
   onToggleSubRole
 }) => {
-  const contractorSubRoles = DEFAULT_SUB_ROLES.contractor;
+  // Get the contractor sub-roles from the DEFAULT_SUB_ROLES object
+  const contractorSubRoles = DEFAULT_SUB_ROLES["contractor"] || [];
 
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium">Contractor Type</h3>
-      <div className="flex flex-wrap gap-2">
-        {contractorSubRoles.map((subRole) => {
-          const isSelected = selectedSubRoles.includes(subRole);
-          return (
-            <Badge
-              key={subRole}
-              variant={isSelected ? "default" : "outline"}
-              className={`cursor-pointer hover:bg-primary/90 ${
-                isSelected ? "bg-primary text-primary-foreground" : ""
-              }`}
-              onClick={() => onToggleSubRole(subRole)}
+      <div className="space-y-2 max-h-48 overflow-y-auto">
+        {contractorSubRoles.map((subRole) => (
+          <div key={subRole} className="flex items-center space-x-2">
+            <Checkbox 
+              id={`subRole-${subRole}`} 
+              checked={selectedSubRoles.includes(subRole)}
+              onCheckedChange={() => onToggleSubRole(subRole)}
+            />
+            <label 
+              htmlFor={`subRole-${subRole}`}
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               {subRole}
-            </Badge>
-          );
-        })}
+            </label>
+          </div>
+        ))}
+        
+        {contractorSubRoles.length === 0 && (
+          <div className="text-sm text-muted-foreground py-2">
+            No contractor types available
+          </div>
+        )}
       </div>
     </div>
   );

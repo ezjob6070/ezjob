@@ -1,20 +1,21 @@
 
 import React from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, X } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface DateRangeFilterProps {
   date: DateRange | undefined;
-  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  setDate: (date: DateRange | undefined) => void;
 }
 
 const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
   date,
-  setDate,
+  setDate
 }) => {
   return (
     <div className="space-y-2">
@@ -24,8 +25,11 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
           <PopoverTrigger asChild>
             <Button
               id="date"
-              variant="outline"
-              className={`w-full justify-start text-left font-normal ${!date && "text-muted-foreground"}`}
+              variant={"outline"}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {date?.from ? (
@@ -39,15 +43,6 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                 )
               ) : (
                 <span>Pick a date range</span>
-              )}
-              {date && (
-                <X 
-                  className="ml-auto h-4 w-4 cursor-pointer hover:opacity-70" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDate(undefined);
-                  }}
-                />
               )}
             </Button>
           </PopoverTrigger>
