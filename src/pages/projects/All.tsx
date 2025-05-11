@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,12 +8,14 @@ import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { toast } from "sonner";
 import ProjectFilters from "@/components/projects/ProjectFilters";
 import { DateRange } from "react-day-picker";
+import CreateProjectModal from "@/components/projects/CreateProjectModal";
 
 export default function ProjectsAll() {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [view, setView] = useState<'cards' | 'list'>('list');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>(initialProjects);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   // Filter states
   const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
@@ -22,7 +23,14 @@ export default function ProjectsAll() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   
   const handleCreateProject = () => {
-    toast.info("Create project functionality will be implemented soon");
+    setIsCreateModalOpen(true);
+  };
+
+  const handleAddProject = (project: Project) => {
+    setProjects([project, ...projects]);
+    setFilteredProjects([project, ...filteredProjects]);
+    toast.success("Project created successfully!");
+    setIsCreateModalOpen(false);
   };
   
   // Extract unique contractor names from projects
@@ -243,6 +251,13 @@ export default function ProjectsAll() {
           ))}
         </div>
       )}
+      
+      {/* Create Project Modal */}
+      <CreateProjectModal 
+        open={isCreateModalOpen} 
+        onOpenChange={setIsCreateModalOpen} 
+        onAddProject={handleAddProject} 
+      />
     </div>
   );
 }
