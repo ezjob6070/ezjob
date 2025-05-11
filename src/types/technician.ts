@@ -19,6 +19,16 @@ export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
   contractor: ["Independent", "Agency", "Specialized", "Consultant"]
 };
 
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  uploadDate: string;
+  size?: number;
+  title?: string;
+}
+
 export interface Technician {
   id: string;
   name: string;
@@ -49,30 +59,20 @@ export interface Technician {
   ssn?: string;
   driverLicense?: string | { number: string; state: string; expirationDate: string; };
   idNumber?: string;
-  documents?: any[];
+  documents?: Document[];
   profileImage?: string;
   yearsExperience?: number;
   workContract?: string;
   jobCategories?: string[];
   
   // Finance and performance related properties
-  paymentRate?: number;
+  paymentRate: number;
   hourlyRate?: number;
   completedJobs?: number;
   cancelledJobs?: number;
   totalRevenue?: number;
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
-}
-
-export interface Document {
-  id: string;
-  name: string;
-  type: string;
-  url: string;
-  uploadDate: string;
-  size?: number;
-  title?: string;
 }
 
 export interface TechnicianFilters {
