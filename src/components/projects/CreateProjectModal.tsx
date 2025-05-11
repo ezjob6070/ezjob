@@ -14,12 +14,13 @@ import {
 } from "@/components/ui/dialog";
 import { Project, ProjectContractor, ProjectSalesperson } from "@/types/project";
 import { v4 as uuidv4 } from "uuid";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Search } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { technicians as techniciansList } from "@/data/technicians";
 
 interface CreateProjectModalProps {
@@ -53,6 +54,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 
   const [selectedContractors, setSelectedContractors] = useState<string[]>([]);
   const [selectedSalesmen, setSelectedSalesmen] = useState<string[]>([]);
+  const [contractorSearchQuery, setContractorSearchQuery] = useState<string>("");
+  const [salesmanSearchQuery, setSalesmanSearchQuery] = useState<string>("");
 
   // Filter technicians by role
   const availableContractors = techniciansList.filter(tech => 
@@ -61,6 +64,16 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   
   const availableSalesmen = techniciansList.filter(tech => 
     tech.role === "salesman" || tech.incentiveType === "commission"
+  );
+
+  // Filter contractors based on search query
+  const filteredContractors = availableContractors.filter(contractor =>
+    contractor.name.toLowerCase().includes(contractorSearchQuery.toLowerCase())
+  );
+
+  // Filter salesmen based on search query
+  const filteredSalesmen = availableSalesmen.filter(salesman =>
+    salesman.name.toLowerCase().includes(salesmanSearchQuery.toLowerCase())
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -163,6 +176,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     setEndDate(newEndDate);
     setSelectedContractors([]);
     setSelectedSalesmen([]);
+    setContractorSearchQuery("");
+    setSalesmanSearchQuery("");
   };
 
   return (
@@ -346,9 +361,22 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               </div>
             </div>
 
-            {/* Contractors section */}
+            {/* Contractors section with search */}
             <div className="mt-4 border-t pt-4">
               <h3 className="text-sm font-medium mb-2">Assign Contractors</h3>
+              
+              {/* Search input for contractors */}
+              <div className="relative mb-2">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search contractors..."
+                  className="pl-8"
+                  value={contractorSearchQuery}
+                  onChange={(e) => setContractorSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              {/* Selected contractors badges */}
               {selectedContractors.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {selectedContractors.map(id => {
@@ -368,30 +396,61 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 </div>
               )}
               
-              <Select onValueChange={toggleContractor}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select contractor" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableContractors.map(contractor => (
-                    <SelectItem 
-                      key={contractor.id} 
-                      value={contractor.id}
-                      disabled={selectedContractors.includes(contractor.id)}
-                    >
-                      {contractor.name} ({contractor.specialty || contractor.subRole || "Contractor"})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {availableContractors.length === 0 && (
-                <p className="text-sm text-muted-foreground mt-2">No contractors available in the system.</p>
-              )}
+              {/* Contractors list */}
+              <ScrollArea className="h-48 border rounded-md">
+                {filteredContractors.length > 0 ? (
+                  <div className="p-2">
+                    {filteredContractors.map(contractor => (
+                      <div 
+                        key={contractor.id} 
+                        className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted ${
+                          selectedContractors.includes(contractor.id) ? 'bg-muted' : ''
+                        }`}
+                        onClick={() => toggleContractor(contractor.id)}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={selectedContractors.includes(contractor.id)} 
+                          onChange={() => {}} 
+                          className="h-4 w-4"
+                        />
+                        <div>
+                          <p className="text-sm font-medium">{contractor.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {contractor.specialty || contractor.subRole || "Contractor"}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full p-4 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {availableContractors.length === 0
+                        ? "No contractors available in the system."
+                        : "No contractors match your search."}
+                    </p>
+                  </div>
+                )}
+              </ScrollArea>
             </div>
 
-            {/* Salesmen section */}
+            {/* Salesmen section with search */}
             <div className="mt-4 border-t pt-4">
               <h3 className="text-sm font-medium mb-2">Assign Salesmen</h3>
+              
+              {/* Search input for salesmen */}
+              <div className="relative mb-2">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search salesmen..."
+                  className="pl-8"
+                  value={salesmanSearchQuery}
+                  onChange={(e) => setSalesmanSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              {/* Selected salesmen badges */}
               {selectedSalesmen.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {selectedSalesmen.map(id => {
@@ -411,25 +470,43 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 </div>
               )}
               
-              <Select onValueChange={toggleSalesman}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select salesman" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableSalesmen.map(salesman => (
-                    <SelectItem 
-                      key={salesman.id} 
-                      value={salesman.id}
-                      disabled={selectedSalesmen.includes(salesman.id)}
-                    >
-                      {salesman.name} ({salesman.subRole || "Sales"})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {availableSalesmen.length === 0 && (
-                <p className="text-sm text-muted-foreground mt-2">No salesmen available in the system.</p>
-              )}
+              {/* Salesmen list */}
+              <ScrollArea className="h-48 border rounded-md">
+                {filteredSalesmen.length > 0 ? (
+                  <div className="p-2">
+                    {filteredSalesmen.map(salesman => (
+                      <div 
+                        key={salesman.id} 
+                        className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted ${
+                          selectedSalesmen.includes(salesman.id) ? 'bg-muted' : ''
+                        }`}
+                        onClick={() => toggleSalesman(salesman.id)}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={selectedSalesmen.includes(salesman.id)} 
+                          onChange={() => {}} 
+                          className="h-4 w-4"
+                        />
+                        <div>
+                          <p className="text-sm font-medium">{salesman.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {salesman.subRole || "Sales"}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full p-4 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {availableSalesmen.length === 0
+                        ? "No salesmen available in the system."
+                        : "No salesmen match your search."}
+                    </p>
+                  </div>
+                )}
+              </ScrollArea>
             </div>
           </div>
           

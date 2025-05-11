@@ -27,7 +27,9 @@ export const additionalTechnicians: Technician[] = [
     skills: ["Solar Panel Installation", "Electrical Systems", "Grid Connections"],
     imageUrl: "/avatars/tech-11.jpg",
     yearsExperience: 6,
-    initials: "AC"
+    initials: "AC",
+    role: "technician",
+    subRole: "Solar Technician"
   },
   {
     id: "tech-12",
@@ -52,7 +54,9 @@ export const additionalTechnicians: Technician[] = [
     skills: ["Home Automation", "Security Systems", "Audio/Video Integration"],
     imageUrl: "/avatars/tech-12.jpg",
     yearsExperience: 5,
-    initials: "MP"
+    initials: "MP",
+    role: "technician",
+    subRole: "Integration Specialist"
   },
   {
     id: "tech-13",
@@ -77,7 +81,9 @@ export const additionalTechnicians: Technician[] = [
     skills: ["Landscape Lighting", "Low-Voltage Systems", "Design & Planning"],
     imageUrl: "/avatars/tech-13.jpg",
     yearsExperience: 8,
-    initials: "SW"
+    initials: "SW",
+    role: "contractor",
+    subRole: "Lighting Designer"
   },
   {
     id: "tech-14",
@@ -102,7 +108,9 @@ export const additionalTechnicians: Technician[] = [
     skills: ["Space Planning", "Color Theory", "Material Selection"],
     imageUrl: "/avatars/tech-14.jpg",
     yearsExperience: 7,
-    initials: "LR"
+    initials: "LR",
+    role: "salesman",
+    subRole: "Inside Sales"
   },
   {
     id: "tech-15",
@@ -127,6 +135,8 @@ export const additionalTechnicians: Technician[] = [
     skills: ["Alarm Systems", "CCTV Installation", "Access Control"],
     imageUrl: "/avatars/tech-15.jpg",
     yearsExperience: 9,
-    initials: "NJ"
+    initials: "NJ",
+    role: "employed",
+    subRole: "Management"
   }
 ];

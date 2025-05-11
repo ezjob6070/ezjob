@@ -52,7 +52,7 @@ export interface Technician {
   notes?: string;
   category?: string;
   
-  // Required properties that were previously optional
+  // Required properties
   role: TechnicianRole;
   subRole?: string;
   initials?: string;
@@ -73,6 +73,7 @@ export interface Technician {
   totalRevenue?: number;
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
+  date?: string; // For compatibility with existing code
 }
 
 export interface TechnicianFilters {
