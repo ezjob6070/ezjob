@@ -28,18 +28,14 @@ const Technicians = () => {
     filteredTechnicians,
     searchQuery,
     selectedTechnicians,
-    selectedCategories,
     statusFilter,
     sortOption,
     dateRange,
-    categories,
     handleSearchChange,
     toggleTechnician,
-    toggleCategory,
     handleSortChange,
     setStatusFilter,
     setDateRange,
-    addCategory,
     exportTechnicians,
     setTechnicians
   } = useTechniciansData();
@@ -236,10 +232,6 @@ const Technicians = () => {
         </div>
         
         <TechnicianFilters 
-          categories={categories}
-          selectedCategories={selectedCategories}
-          toggleCategory={toggleCategory}
-          addCategory={addCategory}
           status={statusFilter}
           onStatusChange={setStatusFilter}
           technicians={globalTechnicians}

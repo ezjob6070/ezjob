@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
@@ -11,14 +10,13 @@ export function useTechniciansData() {
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [subRoleFilter, setSubRoleFilter] = useState<string | null>(null);
   
-  // Extract unique categories 
+  // Extract unique categories (keeping this for compatibility)
   const categories = useMemo(() => {
     return Array.from(new Set(
       technicians.map(tech => tech.category || "Uncategorized")
@@ -35,9 +33,6 @@ export function useTechniciansData() {
           tech.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (tech.phone && tech.phone.toLowerCase().includes(searchQuery.toLowerCase()));
         
-        const matchesCategory = selectedCategories.length === 0 || 
-          selectedCategories.includes(tech.category || "Uncategorized");
-        
         const matchesStatus = statusFilter === "all" || 
           tech.status === statusFilter;
         
@@ -51,7 +46,7 @@ export function useTechniciansData() {
         const matchesSubRole = !subRoleFilter || 
           (tech.subRole && tech.subRole === subRoleFilter);
         
-        return matchesSearch && matchesCategory && matchesStatus && matchesDateRange && matchesRole && matchesSubRole;
+        return matchesSearch && matchesStatus && matchesDateRange && matchesRole && matchesSubRole;
       })
       .sort((a, b) => {
         switch (sortOption) {
@@ -71,7 +66,7 @@ export function useTechniciansData() {
             return 0;
         }
       });
-  }, [technicians, searchQuery, selectedCategories, statusFilter, dateRange, roleFilter, subRoleFilter, sortOption]);
+  }, [technicians, searchQuery, statusFilter, dateRange, roleFilter, subRoleFilter, sortOption]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -87,27 +82,10 @@ export function useTechniciansData() {
     });
   };
 
-  const toggleCategory = (category: string) => {
-    setSelectedCategories(prev => {
-      if (prev.includes(category)) {
-        return prev.filter(c => c !== category);
-      } else {
-        return [...prev, category];
-      }
-    });
-  };
-
   const handleSortChange = (option: SortOption) => {
     setSortOption(option);
   };
 
-  const addCategory = (category: string) => {
-    toast({
-      title: "Category Added",
-      description: `New category "${category}" has been added.`,
-    });
-  };
-  
   const exportTechnicians = () => {
     const dataToExport = filteredTechnicians;
     const json = JSON.stringify(dataToExport, null, 2);
@@ -134,7 +112,6 @@ export function useTechniciansData() {
     filteredTechnicians,
     searchQuery,
     selectedTechnicians,
-    selectedCategories,
     statusFilter,
     sortOption,
     dateRange,
@@ -144,13 +121,11 @@ export function useTechniciansData() {
     setTechnicians,
     handleSearchChange,
     toggleTechnician,
-    toggleCategory,
     handleSortChange,
     setStatusFilter,
     setDateRange,
     setRoleFilter,
     setSubRoleFilter,
-    addCategory,
     exportTechnicians
   };
 }

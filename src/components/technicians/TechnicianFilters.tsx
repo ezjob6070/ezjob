@@ -18,7 +18,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DateRange } from "react-day-picker";
 import DateRangeSelector from "@/components/finance/DateRangeSelector";
 
-import CategoryFilter from "@/components/finance/technician-filters/CategoryFilter";
 import { Technician } from "@/types/technician";
 import TechnicianSelectDropdown from "./filters/TechnicianSelectDropdown";
 import DateSortFilter from "./filters/DateSortFilter";
@@ -28,10 +27,10 @@ import SubRoleFilter from "./filters/SubRoleFilter";
 type SortOption = "newest" | "oldest" | "name-asc" | "name-desc" | "revenue-high" | "revenue-low";
 
 interface TechnicianFiltersProps {
-  categories: string[];
-  selectedCategories: string[];
-  toggleCategory: (category: string) => void;
-  addCategory: (category: string) => void;
+  categories?: string[];
+  selectedCategories?: string[];
+  toggleCategory?: (category: string) => void;
+  addCategory?: (category: string) => void;
   status: string;
   onStatusChange: (status: string) => void;
   technicians?: Technician[];
@@ -51,10 +50,6 @@ interface TechnicianFiltersProps {
 }
 
 const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
-  categories,
-  selectedCategories,
-  toggleCategory,
-  addCategory,
   status,
   onStatusChange,
   technicians = [],
@@ -93,13 +88,6 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
     <div className="space-y-4 w-full">
       {/* Top row with main filters */}
       <div className="flex flex-wrap items-center gap-2">
-        <CategoryFilter 
-          categories={categories}
-          selectedCategories={selectedCategories}
-          toggleCategory={toggleCategory}
-          addCategory={addCategory}
-        />
-        
         {/* Role filter */}
         {onRoleChange && (
           <Select value={roleFilter} onValueChange={(value) => {
