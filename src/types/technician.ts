@@ -3,6 +3,9 @@ export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "mont
 
 export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
 
+// Define incentive types
+export type IncentiveType = "none" | "bonus" | "commission" | "hourly" | "weekly" | "monthly";
+
 // Default sub-roles for each technician role
 export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
   technician: ["HVAC", "Plumbing", "Electrical", "Carpentry", "General"],
@@ -10,6 +13,16 @@ export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
   employed: ["Office Staff", "Manager", "Customer Service", "Administrative"],
   contractor: ["Jobs Contractor", "General Contractor", "Electrical Contractor", "Plumbing Contractor", "HVAC Contractor", "Specialty Contractor", "Independent", "1099", "Specialist", "Consultant"]
 };
+
+// Define Document type
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  url?: string;
+  uploadDate: string;
+  expirationDate?: string;
+}
 
 export interface Technician {
   id: string;
@@ -26,7 +39,7 @@ export interface Technician {
   // Required properties being added/fixed
   role?: TechnicianRole; // Contractor, employee, etc.
   subRole?: string; // Specific role within the main role
-  specialty?: string; // Technical specialty
+  specialty: string; // Technical specialty - make required
   
   // Payment related fields
   paymentType?: "percentage" | "flat" | "hourly" | "salary";
@@ -38,11 +51,11 @@ export interface Technician {
   ssn?: string;
   driverLicense?: string | { number: string; state: string; expirationDate: string };
   idNumber?: string;
-  documents?: any[]; // Allow documents array
+  documents?: Document[]; // Define documents array with the Document interface
   initials?: string;
   
   // Additional fields for finance components
-  incentiveType?: string;
+  incentiveType?: IncentiveType; // Use strict IncentiveType
   incentiveAmount?: number;
   
   // Performance metrics fields

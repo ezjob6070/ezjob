@@ -1,8 +1,19 @@
 
 import React from "react";
-import { JobStatus } from "../JobTypes";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+
+// Define JobStatus type locally to resolve imports
+type JobStatus = 
+  | "scheduled"
+  | "in_progress"
+  | "in-progress" // Support both versions for backward compatibility
+  | "completed" 
+  | "canceled" 
+  | "cancelled"
+  | "rescheduled"
+  | "reschedule"
+  | "estimate";
 
 interface StatusSelectionProps {
   status: string;
@@ -26,7 +37,7 @@ const StatusSelection: React.FC<StatusSelectionProps> = ({
     options.push({ value: "estimate", label: "Send to Estimate" });
     
     // Only add in_progress if not already in that status
-    if (job.status !== "in_progress") {
+    if (job.status !== "in_progress" && job.status !== "in-progress") {
       options.push({ value: "in_progress", label: "In Progress" });
     }
     
