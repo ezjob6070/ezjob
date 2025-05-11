@@ -106,4 +106,38 @@ export interface ProjectTask {
   createdAt: string;
   dependencies?: string[]; // Task IDs this task depends on
   progress: number; // 0-100
+  
+  // Inspection fields
+  inspections?: ProjectTaskInspection[];
+  
+  // Additional fields for tracking
+  lastUpdatedAt?: string;
+  comments?: ProjectTaskComment[];
+  attachments?: ProjectTaskAttachment[];
+}
+
+export interface ProjectTaskInspection {
+  id: string;
+  title: string;
+  status: "pending" | "passed" | "failed" | "not_applicable";
+  date?: string;
+  inspector?: string;
+  notes?: string;
+  photos?: string[];
+}
+
+export interface ProjectTaskComment {
+  id: string;
+  text: string;
+  author: string;
+  date: string;
+}
+
+export interface ProjectTaskAttachment {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  uploadedAt: string;
+  uploadedBy: string;
 }

@@ -8,10 +8,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, CheckIcon, Clock, PlusIcon } from "lucide-react";
-import { Project, ProjectTask } from "@/types/project";
+import { 
+  AlertTriangle, 
+  CalendarIcon, 
+  CheckIcon, 
+  Clock, 
+  ClipboardCheck, 
+  Eye, 
+  FileCheck, 
+  FileText, 
+  PlusIcon 
+} from "lucide-react";
+import { Project, ProjectTask, ProjectTaskInspection } from "@/types/project";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import TaskDetailDialog from "./TaskDetailDialog";
 
 interface ProjectTasksTabProps {
   project: Project;
@@ -20,6 +31,8 @@ interface ProjectTasksTabProps {
 const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
   const [tasks, setTasks] = useState<ProjectTask[]>(project.tasks || []);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
+  const [taskDetailOpen, setTaskDetailOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<ProjectTask | null>(null);
   const [newTask, setNewTask] = useState<Partial<ProjectTask>>({
     title: "",
     description: "",
@@ -29,6 +42,8 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
     assignedTo: "",
     progress: 0,
   });
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<"priority" | "dueDate" | "progress">("priority");
 
   const handleAddTask = () => {
     if (!newTask.title) {
@@ -46,6 +61,10 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
       assignedTo: newTask.assignedTo,
       createdAt: new Date().toISOString(),
       progress: newTask.progress || 0,
+      lastUpdatedAt: new Date().toISOString(),
+      inspections: [],
+      comments: [],
+      attachments: []
     };
     
     setTasks([...tasks, task]);
@@ -63,12 +82,34 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
     toast.success("Task added successfully");
   };
 
+  const handleUpdateTask = (taskId: string, updates: Partial<ProjectTask>) => {
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        const updatedTask = { ...task, ...updates };
+        // If selected task is being updated, update the selected task as well
+        if (selectedTask && selectedTask.id === taskId) {
+          setSelectedTask(updatedTask);
+        }
+        return updatedTask;
+      }
+      return task;
+    });
+    
+    setTasks(updatedTasks);
+  };
+
+  const handleOpenTaskDetail = (task: ProjectTask) => {
+    setSelectedTask(task);
+    setTaskDetailOpen(true);
+  };
+
   const handleUpdateTaskStatus = (taskId: string, status: "pending" | "in_progress" | "completed" | "blocked") => {
     const updatedTasks = tasks.map(task => {
       if (task.id === taskId) {
         const updatedTask = { 
           ...task, 
           status, 
+          lastUpdatedAt: new Date().toISOString(),
           completedAt: status === "completed" ? new Date().toISOString() : task.completedAt,
           progress: status === "completed" ? 100 : task.progress
         };
@@ -87,6 +128,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         const updatedTask = { 
           ...task, 
           progress, 
+          lastUpdatedAt: new Date().toISOString(),
           status: progress === 100 ? "completed" : (progress > 0 ? "in_progress" : task.status),
           completedAt: progress === 100 ? new Date().toISOString() : task.completedAt
         };
@@ -119,11 +161,56 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
     }
   };
 
+  const getInspectionStatusIcon = (inspections: ProjectTaskInspection[] | undefined) => {
+    if (!inspections || inspections.length === 0) {
+      return null;
+    }
+    
+    const passedCount = inspections.filter(i => i.status === "passed").length;
+    const failedCount = inspections.filter(i => i.status === "failed").length;
+    
+    if (failedCount > 0) {
+      return <AlertTriangle className="h-4 w-4 text-red-500" title={`${failedCount} failed inspection${failedCount > 1 ? 's' : ''}`} />;
+    } else if (passedCount === inspections.length) {
+      return <FileCheck className="h-4 w-4 text-green-500" title="All inspections passed" />;
+    } else {
+      return <ClipboardCheck className="h-4 w-4 text-amber-500" title="Some inspections pending" />;
+    }
+  };
+
   const calculateOverallProgress = () => {
     if (tasks.length === 0) return 0;
     const totalProgress = tasks.reduce((sum, task) => sum + task.progress, 0);
     return Math.round(totalProgress / tasks.length);
   };
+
+  const getFilteredTasks = () => {
+    let filtered = [...tasks];
+    
+    // Apply status filter
+    if (filterStatus !== "all") {
+      filtered = filtered.filter(task => task.status === filterStatus);
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      if (sortOrder === "priority") {
+        const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+        return priorityOrder[a.priority as keyof typeof priorityOrder] - 
+               priorityOrder[b.priority as keyof typeof priorityOrder];
+      } else if (sortOrder === "dueDate") {
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      } else { // progress
+        return b.progress - a.progress;
+      }
+    });
+    
+    return filtered;
+  };
+
+  const filteredTasks = getFilteredTasks();
 
   return (
     <div className="space-y-6">
@@ -285,9 +372,36 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         </CardContent>
       </Card>
 
-      {/* Tasks List */}
+      {/* Tasks List with Filters */}
       <div className="space-y-4">
-        <h3 className="font-medium text-lg">Tasks List</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium text-lg">Tasks List</h3>
+          <div className="flex gap-2">
+            <Select defaultValue="all" onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tasks</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="blocked">Blocked</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select defaultValue="priority" onValueChange={(value) => setSortOrder(value as any)}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="priority">By Priority</SelectItem>
+                <SelectItem value="dueDate">By Due Date</SelectItem>
+                <SelectItem value="progress">By Progress</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         
         {tasks.length === 0 ? (
           <Card className="text-center p-8">
@@ -307,7 +421,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
               <Card key={task.id} className="overflow-hidden">
                 <div className={`h-1 ${
                   task.status === "completed" ? "bg-green-500" : 
@@ -317,12 +431,15 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                 }`}></div>
                 <CardContent className="p-4 space-y-4">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-medium">{task.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium line-clamp-1">{task.title}</h3>
+                      {getInspectionStatusIcon(task.inspections)}
+                    </div>
                     <Badge className={getStatusColor(task.status)}>{task.status.replace('_', ' ')}</Badge>
                   </div>
                   
                   {task.description && (
-                    <p className="text-sm text-gray-600">{task.description}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">{task.description}</p>
                   )}
                   
                   <div className="flex flex-wrap gap-2 text-sm">
@@ -394,6 +511,16 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                     </div>
                     
                     <div className="space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() => handleOpenTaskDetail(task)}
+                      >
+                        <Eye className="h-4 w-4" />
+                        Details
+                      </Button>
+                      
                       {task.status === "pending" && (
                         <Button 
                           variant="outline" 
@@ -423,6 +550,16 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
           </div>
         )}
       </div>
+
+      {/* Task Detail Dialog */}
+      {selectedTask && (
+        <TaskDetailDialog 
+          task={selectedTask}
+          open={taskDetailOpen}
+          onOpenChange={setTaskDetailOpen}
+          onTaskUpdate={handleUpdateTask}
+        />
+      )}
     </div>
   );
 };
