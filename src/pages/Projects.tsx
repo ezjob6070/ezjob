@@ -27,16 +27,24 @@ import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { toast } from "sonner";
 import { SortOption } from "@/types/sortOptions";
+import CreateProjectModal from "@/components/projects/CreateProjectModal";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [view, setView] = useState<'cards' | 'list'>('cards');
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const navigate = useNavigate();
   
   const handleCreateProject = () => {
-    toast.info("Create project functionality will be implemented soon");
+    setIsCreateModalOpen(true);
+  };
+
+  const handleAddProject = (project: Project) => {
+    setProjects([project, ...projects]);
+    toast.success("Project created successfully!");
+    setIsCreateModalOpen(false);
   };
 
   const handleChangeStatus = (projectId: number, newStatus: Project['status']) => {
@@ -46,18 +54,6 @@ export default function Projects() {
       )
     );
     toast.success(`Project status changed to ${newStatus}`);
-  };
-
-  const getPlaceholderImage = (projectId: number) => {
-    const imageIds = [
-      "photo-1488590528505-98d2b5aba04b",
-      "photo-1461749280684-dccba630e2f6",
-      "photo-1486312338219-ce68d2c6f44d",
-      "photo-1581091226825-a6a2a5aee158",
-      "photo-1498050108023-c5249f4df085"
-    ];
-    const index = projectId % imageIds.length;
-    return `https://images.unsplash.com/${imageIds[index]}?auto=format&fit=crop&w=300&h=200&q=80`;
   };
 
   // Sort function
@@ -80,6 +76,18 @@ export default function Projects() {
       default:
         return sortedProjects;
     }
+  };
+
+  const getPlaceholderImage = (projectId: number) => {
+    const imageIds = [
+      "photo-1488590528505-98d2b5aba04b",
+      "photo-1461749280684-dccba630e2f6",
+      "photo-1486312338219-ce68d2c6f44d",
+      "photo-1581091226825-a6a2a5aee158",
+      "photo-1498050108023-c5249f4df085"
+    ];
+    const index = projectId % imageIds.length;
+    return `https://images.unsplash.com/${imageIds[index]}?auto=format&fit=crop&w=300&h=200&q=80`;
   };
 
   const filteredProjects = projects.filter(project => 
@@ -119,8 +127,8 @@ export default function Projects() {
             </button>
           </div>
           <Button 
-            className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
             onClick={handleCreateProject}
+            className="bg-gradient-to-r from-green-600 to-green-800 hover:from-green-800 hover:to-green-900"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             New Project
@@ -840,6 +848,13 @@ export default function Projects() {
           )}
         </TabsContent>
       </Tabs>
+      
+      {/* Create Project Modal */}
+      <CreateProjectModal 
+        open={isCreateModalOpen} 
+        onOpenChange={setIsCreateModalOpen} 
+        onAddProject={handleAddProject} 
+      />
     </div>
   );
 }

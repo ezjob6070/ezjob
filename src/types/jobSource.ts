@@ -1,3 +1,4 @@
+
 export interface JobSource {
   id: string;
   name: string;
@@ -15,4 +16,7 @@ export interface JobSource {
   email?: string;
   logoUrl?: string;
   notes?: string;
+  expenses?: number;
+  companyProfit?: number;
+  category?: string;
 }
