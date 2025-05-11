@@ -7,7 +7,7 @@ export interface Job {
   clientPhone?: string;
   clientEmail?: string;
   address: string;
-  status: "scheduled" | "in-progress" | "completed" | "canceled" | "cancelled" | "rescheduled" | "in_progress" | "reschedule" | "estimate" | string;
+  status: "scheduled" | "in-progress" | "in_progress" | "completed" | "canceled" | "cancelled" | "rescheduled" | "reschedule" | "estimate" | string;
   scheduledDate: string;
   amount: number;
   actualAmount?: number;

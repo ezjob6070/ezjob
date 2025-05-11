@@ -53,4 +53,13 @@ export interface Technician {
   
   // Other fields that might be needed
   category?: string;
+  certifications?: string[];
+  skills?: string[];
+  imageUrl?: string;
+  profileImage?: string;
+  yearsExperience?: number;
+  workContract?: string;
+  
+  // Notes for technicians
+  notes?: string;
 }
