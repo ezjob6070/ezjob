@@ -1,9 +1,8 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Technician } from "@/types/technician";
-import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
+import { UserCheck, Briefcase, HardHat, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface TechnicianCardProps {
@@ -26,14 +25,14 @@ export default function TechnicianCard({
     maximumFractionDigits: 0,
   }) || "0";
   
-  // Role-specific styling with proper colors
+  // Role-specific styling with proper colors and updated icons
   const getRoleStyles = () => {
     switch(technician.role) {
       case "technician":
         return {
           color: "#0EA5E9", // Ocean Blue
           bgColor: "#E0F2FE",
-          icon: <Wrench className="h-4 w-4 text-[#0EA5E9]" />,
+          icon: <HardHat className="h-4 w-4 text-[#0EA5E9]" />,
           label: "Technician",
           borderHover: "hover:border-[#0EA5E9]",
           gradientFrom: "from-blue-50",
@@ -66,7 +65,7 @@ export default function TechnicianCard({
         return {
           color: "#F97316", // Bright Orange
           bgColor: "#FFEDD5",
-          icon: <Hammer className="h-4 w-4 text-[#F97316]" />,
+          icon: <Briefcase className="h-4 w-4 text-[#F97316]" />,
           label: "Contractor",
           borderHover: "hover:border-[#F97316]",
           gradientFrom: "from-orange-50",
@@ -77,7 +76,7 @@ export default function TechnicianCard({
         return {
           color: "#8B7E2F", // Dark Yellow for "All Staff"
           bgColor: "#FEF7CD", // Light Yellow
-          icon: <UserCheck className="h-4 w-4 text-[#8B7E2F]" />,
+          icon: <User className="h-4 w-4 text-[#8B7E2F]" />,
           label: "Staff",
           borderHover: "hover:border-[#8B7E2F]",
           gradientFrom: "from-yellow-50",

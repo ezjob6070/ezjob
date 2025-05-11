@@ -12,7 +12,14 @@ import { useTechniciansData } from "@/hooks/useTechniciansData";
 import { SortOption } from "@/types/sortOptions";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
-import { Wrench, Briefcase, UserCheck, Hammer } from "lucide-react";
+import { 
+  UserCheck, 
+  User, 
+  Users, 
+  Briefcase, 
+  HardHat, 
+  UserCircle2
+} from "lucide-react";
 
 const Technicians = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -148,7 +155,7 @@ const Technicians = () => {
         </p>
       </div>
       
-      {/* Role Filter Buttons - All Staff card now with light yellow background */}
+      {/* Role Filter Buttons - Updated with more appropriate icons */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
@@ -158,7 +165,10 @@ const Technicians = () => {
               ? "bg-[#FEF7CD] text-[#8B7E2F] hover:bg-[#FEF7CD]/90" 
               : "hover:bg-[#FEF7CD] hover:text-[#8B7E2F] border-[#8B7E2F]/30"}`}
         >
-          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`} />
+          <div className="relative">
+            <Users className={`h-16 w-16 mb-3 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`} />
+            <UserCircle2 className={`h-8 w-8 absolute -bottom-1 -right-1 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`} />
+          </div>
           <div className="text-base font-medium">All Staff</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "all" ? "text-[#8B7E2F]" : "text-[#6E59A5]"}`}>{totalCount}</div>
         </Button>
@@ -171,7 +181,10 @@ const Technicians = () => {
               ? "bg-[#0EA5E9] text-white hover:bg-[#0D96D6]" 
               : "hover:bg-[#E0F2FE] hover:text-[#0EA5E9] border-[#0EA5E9]/30"}`}
         >
-          <Wrench className={`h-20 w-20 mb-3 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`} />
+          <div className="relative">
+            <HardHat className={`h-16 w-16 mb-3 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`} />
+            <User className={`h-8 w-8 absolute -bottom-1 -right-1 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`} />
+          </div>
           <div className="text-base font-medium">Technicians</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`}>{technicianCount}</div>
         </Button>
@@ -184,7 +197,10 @@ const Technicians = () => {
               ? "bg-[#10B981] text-white hover:bg-[#0EA874]" 
               : "hover:bg-[#ECFDF5] hover:text-[#10B981] border-[#10B981]/30"}`}
         >
-          <Briefcase className={`h-20 w-20 mb-3 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
+          <div className="relative">
+            <Briefcase className={`h-16 w-16 mb-3 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
+            <User className={`h-8 w-8 absolute -bottom-1 -right-1 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
+          </div>
           <div className="text-base font-medium">Salesmen</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`}>{salesmanCount}</div>
         </Button>
@@ -197,7 +213,10 @@ const Technicians = () => {
               ? "bg-[#8B5CF6] text-white hover:bg-[#7C4EE7]" 
               : "hover:bg-[#F3E8FF] hover:text-[#8B5CF6] border-[#8B5CF6]/30"}`}
         >
-          <UserCheck className={`h-20 w-20 mb-3 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`} />
+          <div className="relative">
+            <UserCheck className={`h-16 w-16 mb-3 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`} />
+            <UserCircle2 className={`h-8 w-8 absolute -bottom-1 -right-1 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`} />
+          </div>
           <div className="text-base font-medium">Employed</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "employed" ? "text-white" : "text-[#8B5CF6]"}`}>{employedCount}</div>
         </Button>
@@ -210,7 +229,10 @@ const Technicians = () => {
               ? "bg-[#F97316] text-white hover:bg-[#E76A14]" 
               : "hover:bg-[#FFEDD5] hover:text-[#F97316] border-[#F97316]/30"}`}
         >
-          <Hammer className={`h-20 w-20 mb-3 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`} />
+          <div className="relative">
+            <Briefcase className={`h-16 w-16 mb-3 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`} />
+            <User className={`h-8 w-8 absolute -bottom-1 -right-1 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`} />
+          </div>
           <div className="text-base font-medium">Contractors</div>
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "contractor" ? "text-white" : "text-[#F97316]"}`}>{contractorCount}</div>
         </Button>
