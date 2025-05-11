@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
@@ -19,6 +20,7 @@ const Technicians = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [roleFilter, setRoleFilter] = useState("all");
+  const [selectedContractorSubRoles, setSelectedContractorSubRoles] = useState<string[]>([]);
   
   const { technicians: globalTechnicians, addTechnician, updateTechnician } = useGlobalState();
   
@@ -143,6 +145,25 @@ const Technicians = () => {
     contractor: "#F97316"
   };
 
+  // Filter by contractor sub-roles if contractor role is selected and sub-roles are selected
+  const contractorFilteredTechnicians = roleFilter === "contractor" && selectedContractorSubRoles.length > 0
+    ? filteredTechnicians.filter(tech => 
+        tech.role === "contractor" && 
+        tech.subRole && 
+        selectedContractorSubRoles.includes(tech.subRole)
+      )
+    : filteredTechnicians;
+
+  const toggleContractorSubRole = (subRole: string) => {
+    setSelectedContractorSubRoles(prev => {
+      if (prev.includes(subRole)) {
+        return prev.filter(sr => sr !== subRole);
+      } else {
+        return [...prev, subRole];
+      }
+    });
+  };
+
   return (
     <div className="space-y-6 py-8">
       <div className="mb-2">
@@ -154,7 +175,7 @@ const Technicians = () => {
         </p>
       </div>
       
-      {/* Role Filter Buttons - All Staff card now with light yellow background */}
+      {/* Role Filter Buttons */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
@@ -261,7 +282,7 @@ const Technicians = () => {
       </div>
       
       <TechniciansList 
-        technicians={filteredTechnicians}
+        technicians={contractorFilteredTechnicians}
         selectedTechnicians={selectedTechnicians}
         onToggleSelect={toggleTechnician}
         onEditTechnician={handleEditTechnician}

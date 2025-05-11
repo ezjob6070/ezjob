@@ -7,46 +7,48 @@ import { DEFAULT_SUB_ROLES, TechnicianRole } from "@/types/technician";
 
 interface TechnicianSubRoleFieldProps {
   control: Control<any>;
-  setValue: UseFormSetValue<any>;
+  setValue?: UseFormSetValue<any>;
   defaultValue?: string;
 }
 
-export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
+const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
   control,
   setValue,
-  defaultValue,
+  defaultValue = "",
 }) => {
-  const selectedRole = useWatch({
+  // Watch role field to determine sub-role options
+  const role = useWatch({
     control,
     name: "role",
-    defaultValue: "technician"
+    defaultValue: "technician",
   }) as TechnicianRole;
-  
-  const subRoles = DEFAULT_SUB_ROLES[selectedRole] || [];
-  
+
   // Reset sub-role when role changes
   useEffect(() => {
-    // Only reset if no default value is provided
-    if (!defaultValue) {
+    if (setValue) {
       setValue("subRole", "");
     }
-  }, [selectedRole, setValue, defaultValue]);
+  }, [role, setValue]);
+
+  // Get sub-roles based on selected role
+  const subRoles = DEFAULT_SUB_ROLES[role] || [];
 
   return (
     <FormField
       control={control}
       name="subRole"
-      defaultValue={defaultValue || ""}
+      defaultValue={defaultValue}
       render={({ field }) => (
         <FormItem className="flex-1">
-          <FormLabel>Industry/Department</FormLabel>
+          <FormLabel>Specific Role</FormLabel>
           <FormControl>
             <Select
               onValueChange={field.onChange}
-              value={field.value}
+              defaultValue={field.value}
+              value={field.value || ""}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select industry/department (optional)" />
+                <SelectValue placeholder="Select specific role" />
               </SelectTrigger>
               <SelectContent>
                 {subRoles.map((subRole) => (
@@ -63,3 +65,5 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
     />
   );
 };
+
+export default TechnicianSubRoleField;

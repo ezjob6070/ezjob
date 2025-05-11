@@ -1,3 +1,4 @@
+
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
 
 export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
@@ -7,7 +8,7 @@ export const DEFAULT_SUB_ROLES: Record<TechnicianRole, string[]> = {
   technician: ["HVAC", "Plumbing", "Electrical", "Carpentry", "General"],
   salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Manager"],
   employed: ["Office Staff", "Manager", "Customer Service", "Administrative"],
-  contractor: ["Independent", "1099", "Specialist", "Consultant"]
+  contractor: ["Jobs Contractor", "General Contractor", "Electrical Contractor", "Plumbing Contractor", "HVAC Contractor", "Specialty Contractor", "Independent", "1099", "Specialist", "Consultant"]
 };
 
 export interface Technician {
