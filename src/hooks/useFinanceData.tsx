@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { JobSource, FinancialTransaction } from "@/types/finance";
@@ -20,6 +21,8 @@ export const useFinanceData = () => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<string[]>([]);
   const [selectedJobSources, setSelectedJobSources] = useState<string[]>([]);
   const [jobSources, setJobSources] = useState<JobSource[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [activeQuoteTab, setActiveQuoteTab] = useState<string>("all");
   
   // Calculate total metrics from actual data
   const totalRevenue = jobSources.reduce((sum, source) => sum + (source.totalRevenue || 0), 0);
@@ -93,8 +96,10 @@ export const useFinanceData = () => {
   };
 
   return {
-    activeTab: "overview",
-    setActiveTab: (tab: string) => {},
+    activeTab,
+    setActiveTab,
+    activeQuoteTab,
+    setActiveQuoteTab,
     date,
     setDate,
     transactions,

@@ -15,12 +15,16 @@ import ProjectInvoiceModal from "@/components/projects/ProjectInvoiceModal";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { useFinanceData } from "@/hooks/useFinanceData";
 
 interface ProjectFinanceTabProps {
   project: Project;
 }
 
 const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
+  // Use the finance data hook to manage the active tab
+  const { activeTab, setActiveTab, activeQuoteTab, setActiveQuoteTab } = useFinanceData();
+  
   // State for modals
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
@@ -151,9 +155,17 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     return expense.category === expenseCategory;
   });
   
-  // Filter quotes based on status - simplified to only show completed vs active
+  // Filter quotes based on status and tab selection
   const filteredQuotes = quotes.filter(quote => {
-    return true; // Show all quotes, removing the filtering functionality
+    if (activeQuoteTab === "all") return true;
+    if (activeQuoteTab === "pending") return quote.status === "sent" || quote.status === "draft";
+    if (activeQuoteTab === "completed") return quote.status === "accepted" || quote.status === "rejected";
+    if (activeQuoteTab === "overdue") {
+      const validUntilDate = new Date(quote.validUntil);
+      const today = new Date();
+      return (quote.status === "sent" || quote.status === "draft") && validUntilDate < today;
+    }
+    return true;
   });
   
   // Expense breakdown for chart
@@ -698,6 +710,24 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </Button>
           </div>
           
+          {/* New Quotes Filter Tabs */}
+          <Tabs value={activeQuoteTab} onValueChange={setActiveQuoteTab} className="mt-2 mb-4">
+            <TabsList className="grid grid-cols-4 w-full max-w-md mx-auto">
+              <TabsTrigger value="all">
+                All
+              </TabsTrigger>
+              <TabsTrigger value="pending" variant="blue">
+                Pending
+              </TabsTrigger>
+              <TabsTrigger value="completed" variant="green">
+                Completed
+              </TabsTrigger>
+              <TabsTrigger value="overdue" variant="red">
+                Overdue
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
           {/* Quote content - listing all quotes */}
           {filteredQuotes.length > 0 ? (
             <div className="grid gap-4">
@@ -806,7 +836,13 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
               <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
               <p className="text-lg font-medium text-gray-500">No quotes found</p>
               <p className="text-gray-400 max-w-md mx-auto mt-2 mb-4">
-                Create quotes to send to clients for this project
+                {activeQuoteTab === "all" 
+                  ? "Create quotes to send to clients for this project" 
+                  : activeQuoteTab === "pending"
+                    ? "No pending quotes found"
+                    : activeQuoteTab === "completed"
+                      ? "No completed quotes found"
+                      : "No overdue quotes found"}
               </p>
               <Button onClick={() => setShowQuoteModal(true)}>
                 <Plus className="h-4 w-4 mr-2" />

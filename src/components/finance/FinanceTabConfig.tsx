@@ -15,6 +15,16 @@ export const financeTabOptions = [
 
 export type FinanceTabId = "overview" | "jobSources" | "technicians" | "contractors" | "employees" | "salesmen" | "transactions" | "salaries" | "office";
 
+// Quote tab options
+export const quoteTabOptions = [
+  { id: "all", label: "All Quotes", color: "bg-gray-100 text-gray-800" },
+  { id: "pending", label: "Pending", color: "bg-blue-100 text-blue-800" },
+  { id: "completed", label: "Completed", color: "bg-green-100 text-green-800" },
+  { id: "overdue", label: "Overdue", color: "bg-red-100 text-red-800" }
+];
+
+export type QuoteTabId = "all" | "pending" | "completed" | "overdue";
+
 // Sort options for various sections
 export const sortOptions = [
   { id: "newest", label: "Newest First", icon: <ArrowUpDown className="h-4 w-4" /> },
