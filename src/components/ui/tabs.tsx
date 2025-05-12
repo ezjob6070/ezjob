@@ -40,7 +40,7 @@ const TabsTrigger = React.forwardRef<
       variant === "purple" && "data-[state=active]:bg-purple-100 data-[state=active]:text-purple-800 data-[state=active]:shadow-sm",
       
       // Blue variant
-      variant === "blue" && "data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm",
+      variant === "blue" && "data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 data-[state=active]:shadow-sm",
       
       // Amber variant
       variant === "amber" && "data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800 data-[state=active]:shadow-sm",
