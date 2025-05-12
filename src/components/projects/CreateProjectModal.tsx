@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -152,11 +153,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       expectedEndDate: format(endDate, 'yyyy-MM-dd'),
       actualSpent: 0,
       contractors: formattedContractors,
-      salesmen: formattedSalesmen,
-      
-      // Initialize empty quotes and invoices arrays
-      quotes: [],
-      invoices: []
+      salesmen: formattedSalesmen
     };
     
     onAddProject(newProject);

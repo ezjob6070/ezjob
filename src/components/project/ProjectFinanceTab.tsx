@@ -1,777 +1,1212 @@
-
-import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { DollarSign, FileText, Plus, PieChart, Receipt, SendHorizontal, TrendingUp, ArrowUpRight, ArrowDownRight, FileCheck } from "lucide-react";
-import { Project, ProjectExpense, ProjectInvoice, ProjectQuote } from "@/types/project";
-import { Separator } from "@/components/ui/separator";
-import ProjectQuoteModal from "@/components/projects/ProjectQuoteModal";
-import ProjectInvoiceModal from "@/components/projects/ProjectInvoiceModal";
+import { Project, ProjectExpense, ProjectContractor, ProjectMaterial, ProjectEquipment } from "@/types/project";
+import { ArrowUpRight, Banknote, Building2, ChevronRight, CircleDollarSign, FileText, ListChecks, Minus, ReceiptText, TrendingDown, TrendingUp, Truck } from "lucide-react";
+import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
 
-interface ProjectFinanceTabProps {
-  project: Project;
-}
+const ProjectFinanceTab: React.FC<{ project: Project }> = ({ project }) => {
+  // Initialize project with empty arrays for financial data if not present
+  const projectWithFinanceData = {
+    ...project,
+    expenses: project.expenses || [],
+    contractors: project.contractors || [],
+    materials: project.materials || [],
+    equipment: project.equipment || []
+  };
 
-const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   const [activeFinanceTab, setActiveFinanceTab] = useState("overview");
-  const [expenses, setExpenses] = useState(project.expenses || []);
-  const [quotes, setQuotes] = useState<ProjectQuote[]>(project.quotes || []);
-  const [invoices, setInvoices] = useState<ProjectInvoice[]>(project.invoices || []);
-  const [expenseFilter, setExpenseFilter] = useState("all");
-  const [expenseSearchQuery, setExpenseSearchQuery] = useState("");
-  const [quoteFilter, setQuoteFilter] = useState("all");
-  const [invoiceFilter, setInvoiceFilter] = useState("all");
-
-  // Modal states
-  const [showQuoteModal, setShowQuoteModal] = useState(false);
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-  const [editingQuote, setEditingQuote] = useState<ProjectQuote | undefined>();
-  const [editingInvoice, setEditingInvoice] = useState<ProjectInvoice | undefined>();
-
-  // Calculate total project revenue (using the revenue property or sum of completed quotes)
-  const totalRevenue = useMemo(() => {
-    if (project.revenue) return project.revenue;
-    
-    const acceptedQuotes = quotes.filter(q => q.status === "accepted");
-    return acceptedQuotes.reduce((sum, quote) => sum + quote.total, 0);
-  }, [project.revenue, quotes]);
-
-  // Calculate profit
-  const totalProfit = useMemo(() => {
-    return totalRevenue - project.actualSpent;
-  }, [totalRevenue, project.actualSpent]);
-
-  // Filter expenses based on current filter
-  const filteredExpenses = useMemo(() => {
-    let filtered = [...expenses];
-    
-    // Filter by status
-    if (expenseFilter !== "all") {
-      filtered = filtered.filter(expense => expense.status === expenseFilter);
-    }
-    
-    // Filter by search query
-    if (expenseSearchQuery) {
-      const query = expenseSearchQuery.toLowerCase();
-      filtered = filtered.filter(expense => 
-        expense.name.toLowerCase().includes(query) || 
-        expense.category.toLowerCase().includes(query) ||
-        expense.description?.toLowerCase().includes(query)
-      );
-    }
-    
-    return filtered;
-  }, [expenses, expenseFilter, expenseSearchQuery]);
   
-  // Filter quotes based on current filter
-  const filteredQuotes = useMemo(() => {
-    if (quoteFilter === "all") return quotes;
-    return quotes.filter(quote => quote.status === quoteFilter);
-  }, [quotes, quoteFilter]);
+  // Form states
+  const [newExpense, setNewExpense] = useState<Omit<ProjectExpense, 'id'>>({
+    name: "",
+    amount: 0,
+    date: new Date().toISOString().split('T')[0],
+    category: "general",
+    status: "pending",
+    description: ""
+  });
   
-  // Filter invoices based on current filter
-  const filteredInvoices = useMemo(() => {
-    if (invoiceFilter === "all") return invoices;
-    return invoices.filter(invoice => invoice.status === invoiceFilter);
-  }, [invoices, invoiceFilter]);
+  const [newContractor, setNewContractor] = useState<Omit<ProjectContractor, 'id'>>({
+    name: "",
+    role: "",
+    rate: 0,
+    rateType: "hourly",
+    hoursWorked: 0,
+    totalPaid: 0,
+    startDate: new Date().toISOString().split('T')[0],
+    status: "active",
+    contact: "",
+    email: "",
+    phone: ""
+  });
+  
+  const [newMaterial, setNewMaterial] = useState<Omit<ProjectMaterial, 'id'>>({
+    name: "",
+    quantity: 0,
+    unitPrice: 0,
+    totalPrice: 0,
+    supplier: "",
+    purchaseDate: new Date().toISOString().split('T')[0],
+    category: "general",
+    status: "ordered"
+  });
+  
+  const [newEquipment, setNewEquipment] = useState<Omit<ProjectEquipment, 'id'>>({
+    name: "",
+    type: "",
+    isRental: true,
+    rentalCost: 0,
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: "",
+    totalCost: 0,
+    status: "active"
+  });
 
-  // Calculate expense categories breakdown
-  const expenseCategories = useMemo(() => {
-    const categories: Record<string, number> = {};
+  // Calculation of financial metrics
+  const totalExpenses = projectWithFinanceData.expenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0;
+  const totalContractorCosts = projectWithFinanceData.contractors?.reduce((sum, c) => sum + c.totalPaid, 0) || 0;
+  const totalMaterialCosts = projectWithFinanceData.materials?.reduce((sum, m) => sum + m.totalPrice, 0) || 0;
+  const totalEquipmentCosts = projectWithFinanceData.equipment?.reduce((sum, e) => sum + e.totalCost, 0) || 0;
+  
+  const totalAllExpenses = totalExpenses + totalContractorCosts + totalMaterialCosts + totalEquipmentCosts;
+  
+  // Project's budget and revenue
+  const budget = project.budget || 0;
+  const revenue = project.revenue || 0;
+  
+  // Calculate profit or loss
+  const netProfit = revenue - totalAllExpenses;
+  const budgetRemaining = budget - totalAllExpenses;
+  const budgetUsagePercentage = budget > 0 ? Math.round((totalAllExpenses / budget) * 100) : 0;
+  const isProfitable = netProfit > 0;
+
+  // Calculate category breakdowns for expenses
+  const expensesCategories = projectWithFinanceData.expenses?.reduce((acc, expense) => {
+    if (!acc[expense.category]) {
+      acc[expense.category] = 0;
+    }
+    acc[expense.category] += expense.amount;
+    return acc;
+  }, {} as Record<string, number>) || {};
+
+  // Calculate status breakdowns for expenses
+  const expensesStatus = projectWithFinanceData.expenses?.reduce((acc, expense) => {
+    if (!acc[expense.status]) {
+      acc[expense.status] = 0;
+    }
+    acc[expense.status] += expense.amount;
+    return acc;
+  }, { paid: 0, pending: 0, cancelled: 0 } as Record<string, number>);
+
+  // Form handlers
+  const handleExpenseSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newExpenseItem: ProjectExpense = {
+      ...newExpense,
+      id: uuidv4()
+    };
     
-    expenses.forEach(expense => {
-      if (!categories[expense.category]) {
-        categories[expense.category] = 0;
-      }
-      categories[expense.category] += expense.amount;
+    // Logic to add expense would go here (API call, state update, etc.)
+    console.log("Adding expense:", newExpenseItem);
+    
+    // Placeholder: Update local state
+    // In a real application, you would make an API call to update the database
+    projectWithFinanceData.expenses = [...(projectWithFinanceData.expenses || []), newExpenseItem];
+    
+    // Reset form and show success message
+    setNewExpense({
+      name: "",
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      category: "general",
+      status: "pending",
+      description: ""
     });
     
-    return Object.entries(categories)
-      .map(([category, amount]) => ({ category, amount }))
-      .sort((a, b) => b.amount - a.amount);
-  }, [expenses]);
+    toast.success("Expense added successfully");
+  };
   
-  // Calculate expense status breakdown
-  const expenseStatuses = useMemo(() => {
-    const paid = expenses.filter(e => e.status === "paid")
-      .reduce((sum, e) => sum + e.amount, 0);
-    const pending = expenses.filter(e => e.status === "pending")
-      .reduce((sum, e) => sum + e.amount, 0);
-    const cancelled = expenses.filter(e => e.status === "cancelled")
-      .reduce((sum, e) => sum + e.amount, 0);
-    
-    return { paid, pending, cancelled };
-  }, [expenses]);
-
-  // Calculate metrics for quotes
-  const quoteMetrics = useMemo(() => {
-    const total = quotes.length;
-    const accepted = quotes.filter(q => q.status === "accepted").length;
-    const pending = quotes.filter(q => q.status === "sent").length;
-    const rejected = quotes.filter(q => q.status === "rejected").length;
-    const acceptanceRate = total > 0 ? (accepted / total * 100).toFixed(1) : "0";
-    
-    const totalValue = quotes.reduce((sum, q) => sum + q.total, 0);
-    const acceptedValue = quotes.filter(q => q.status === "accepted")
-      .reduce((sum, q) => sum + q.total, 0);
-    
-    return {
-      total,
-      accepted,
-      pending,
-      rejected,
-      acceptanceRate,
-      totalValue,
-      acceptedValue
+  const handleContractorSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newContractorItem: ProjectContractor = {
+      ...newContractor,
+      id: uuidv4()
     };
-  }, [quotes]);
-
-  // Calculate metrics for invoices
-  const invoiceMetrics = useMemo(() => {
-    const total = invoices.length;
-    const paid = invoices.filter(i => i.status === "paid").length;
-    const pending = invoices.filter(i => i.status === "sent").length;
-    const overdue = invoices.filter(i => i.status === "overdue").length;
-    const paymentRate = total > 0 ? (paid / total * 100).toFixed(1) : "0";
     
-    const totalValue = invoices.reduce((sum, i) => sum + i.total, 0);
-    const paidValue = invoices.filter(i => i.status === "paid")
-      .reduce((sum, i) => sum + i.total, 0);
+    console.log("Adding contractor:", newContractorItem);
+    projectWithFinanceData.contractors = [...(projectWithFinanceData.contractors || []), newContractorItem];
     
-    return {
-      total,
-      paid,
-      pending,
-      overdue,
-      paymentRate,
-      totalValue,
-      paidValue
+    setNewContractor({
+      name: "",
+      role: "",
+      rate: 0,
+      rateType: "hourly",
+      hoursWorked: 0,
+      totalPaid: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      status: "active",
+      contact: "",
+      email: "",
+      phone: ""
+    });
+    
+    toast.success("Contractor added successfully");
+  };
+  
+  const handleMaterialSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Calculate total price based on quantity and unit price
+    const calculatedTotal = newMaterial.quantity * newMaterial.unitPrice;
+    
+    const newMaterialItem: ProjectMaterial = {
+      ...newMaterial,
+      totalPrice: calculatedTotal,
+      id: uuidv4()
     };
-  }, [invoices]);
-
-  // Handle adding a new expense (placeholder function)
-  const handleAddExpense = () => {
-    toast.info("Add expense functionality would be implemented here");
+    
+    console.log("Adding material:", newMaterialItem);
+    projectWithFinanceData.materials = [...(projectWithFinanceData.materials || []), newMaterialItem];
+    
+    setNewMaterial({
+      name: "",
+      quantity: 0,
+      unitPrice: 0,
+      totalPrice: 0,
+      supplier: "",
+      purchaseDate: new Date().toISOString().split('T')[0],
+      category: "general",
+      status: "ordered"
+    });
+    
+    toast.success("Material added successfully");
   };
-
-  // Handle editing of quotes
-  const handleEditQuote = (quote: ProjectQuote) => {
-    setEditingQuote(quote);
-    setShowQuoteModal(true);
+  
+  const handleEquipmentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newEquipmentItem: ProjectEquipment = {
+      ...newEquipment,
+      id: uuidv4()
+    };
+    
+    console.log("Adding equipment:", newEquipmentItem);
+    projectWithFinanceData.equipment = [...(projectWithFinanceData.equipment || []), newEquipmentItem];
+    
+    setNewEquipment({
+      name: "",
+      type: "",
+      isRental: true,
+      rentalCost: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: "",
+      totalCost: 0,
+      status: "active"
+    });
+    
+    toast.success("Equipment added successfully");
   };
-
-  // Handle creating or updating quotes
-  const handleSaveQuote = (quote: ProjectQuote) => {
-    if (editingQuote) {
-      // Update existing quote
-      setQuotes(prev => prev.map(q => q.id === quote.id ? quote : q));
-    } else {
-      // Add new quote
-      setQuotes(prev => [...prev, quote]);
-    }
-    setEditingQuote(undefined);
-  };
-
-  // Handle editing of invoices
-  const handleEditInvoice = (invoice: ProjectInvoice) => {
-    setEditingInvoice(invoice);
-    setShowInvoiceModal(true);
-  };
-
-  // Handle creating or updating invoices
-  const handleSaveInvoice = (invoice: ProjectInvoice) => {
-    if (editingInvoice) {
-      // Update existing invoice
-      setInvoices(prev => prev.map(i => i.id === invoice.id ? invoice : i));
-    } else {
-      // Add new invoice
-      setInvoices(prev => [...prev, invoice]);
-    }
-    setEditingInvoice(undefined);
-  };
-
-  // Handle sending quote/invoice (placeholder function)
-  const handleSendDocument = (type: 'quote' | 'invoice', id: string) => {
-    if (type === 'quote') {
-      setQuotes(prev => 
-        prev.map(q => q.id === id ? {...q, status: "sent", lastSent: format(new Date(), "yyyy-MM-dd")} : q)
-      );
-      toast.success("Quote marked as sent");
-    } else {
-      setInvoices(prev => 
-        prev.map(i => i.id === id ? {...i, status: "sent", lastSent: format(new Date(), "yyyy-MM-dd")} : i)
-      );
-      toast.success("Invoice marked as sent");
-    }
-  };
-
-  // This function would be needed but we don't have an import for it
-  const format = (date: Date, format: string): string => {
-    // Simple function to format date as YYYY-MM-DD
-    return date.toISOString().split('T')[0];
-  };
-
+  
   return (
-    <>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Revenue Card - Smaller and more concise */}
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-sm font-medium text-blue-700">Total Revenue</p>
+              <span className="bg-blue-200 p-1.5 rounded-full text-blue-700">
+                <CircleDollarSign size={16} />
+              </span>
+            </div>
+            <h3 className="text-xl font-bold text-blue-700">{formatCurrency(revenue)}</h3>
+            <p className="text-xs text-blue-600 mt-1">From project inception</p>
+            
+            <div className="flex items-center justify-end gap-1 text-xs text-blue-700 mt-2">
+              <ArrowUpRight size={12} />
+              <span>+8.3% from estimate</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Expenses Card - Smaller and more concise */}
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-sm font-medium text-red-700">Total Expenses</p>
+              <span className="bg-red-200 p-1.5 rounded-full text-red-700">
+                <Minus size={16} />
+              </span>
+            </div>
+            <h3 className="text-xl font-bold text-red-700">{formatCurrency(totalAllExpenses)}</h3>
+            <p className="text-xs text-red-600 mt-1">Project-to-date</p>
+            
+            <div className="flex items-center justify-end gap-1 text-xs text-red-700 mt-2">
+              <TrendingDown size={12} />
+              <span>{budgetUsagePercentage}% of budget</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Profit Card - Always in Green as per request, smaller and more concise */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-sm font-medium text-green-700">Net Profit</p>
+              <span className="bg-green-200 p-1.5 rounded-full text-green-700">
+                {netProfit >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+              </span>
+            </div>
+            <h3 className="text-xl font-bold text-green-700">{formatCurrency(netProfit)}</h3>
+            <p className="text-xs text-green-600 mt-1">Overall profitability</p>
+            
+            <div className="flex items-center justify-end gap-1 text-xs text-green-700 mt-2">
+              {netProfit >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+              <span>
+                {revenue > 0 ? `${Math.round((netProfit / revenue) * 100)}% margin` : '0%'}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
       <Tabs defaultValue="overview" value={activeFinanceTab} onValueChange={setActiveFinanceTab}>
-        <TabsList className="mb-4">
+        <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          <TabsTrigger value="quotes">Client Quotes</TabsTrigger>
-          <TabsTrigger value="invoices">Contractor Invoices</TabsTrigger>
+          <TabsTrigger value="contractors">Contractors</TabsTrigger>
+          <TabsTrigger value="materials">Materials</TabsTrigger>
+          <TabsTrigger value="equipment">Equipment</TabsTrigger>
         </TabsList>
         
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          {/* Financial Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md font-medium flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-blue-500" />
-                  Total Revenue
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
-                <p className="text-muted-foreground text-sm flex items-center mt-1">
-                  <TrendingUp className="h-4 w-4 mr-1 text-green-500" />
-                  From {quoteMetrics.accepted} accepted quotes
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md font-medium flex items-center gap-2">
-                  <FileCheck className="h-5 w-5 text-red-500" />
-                  Total Expenses
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(project.actualSpent)}</div>
-                <p className="text-muted-foreground text-sm flex items-center mt-1">
-                  {project.budget > project.actualSpent ? (
-                    <>
-                      <ArrowDownRight className="h-4 w-4 mr-1 text-green-500" />
-                      {(project.actualSpent / project.budget * 100).toFixed(1)}% of budget
-                    </>
-                  ) : (
-                    <>
-                      <ArrowUpRight className="h-4 w-4 mr-1 text-red-500" />
-                      {((project.actualSpent - project.budget) / project.budget * 100).toFixed(1)}% over budget
-                    </>
-                  )}
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md font-medium flex items-center gap-2">
-                  <PieChart className="h-5 w-5 text-green-500" />
-                  Total Profit
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatCurrency(totalProfit)}
-                </div>
-                <p className="text-muted-foreground text-sm mt-1">
-                  {totalProfit >= 0 ? 'Profit margin: ' : 'Loss margin: '}
-                  <span className={totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
-                    {totalRevenue > 0 
-                      ? Math.abs((totalProfit / totalRevenue * 100)).toFixed(1) + '%' 
-                      : '0%'
-                    }
-                  </span>
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Financial Breakdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Expense Breakdown Card */}
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
                 <CardTitle>Expense Breakdown</CardTitle>
-                <CardDescription>How project expenses are distributed</CardDescription>
+                <CardDescription>Expense distribution by category</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {expenseCategories.length > 0 ? (
-                  <>
-                    {expenseCategories.map(({ category, amount }, index) => (
-                      <div key={category} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>{category}</span>
-                          <span className="font-medium">{formatCurrency(amount)}</span>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(expensesCategories).length > 0 ? (
+                    Object.entries(expensesCategories).map(([category, amount]) => (
+                      <div key={category} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                          <span className="capitalize">{category}</span>
                         </div>
-                        <div className="w-full h-2 bg-gray-100 rounded-full">
-                          <div 
-                            className={`h-full rounded-full ${
-                              ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500'][index % 5]
-                            }`} 
-                            style={{ width: `${(amount / project.actualSpent) * 100}%` }}
-                          ></div>
+                        <div>
+                          <span className="font-medium">{formatCurrency(amount)}</span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            ({totalAllExpenses > 0 ? Math.round((amount / totalAllExpenses) * 100) : 0}%)
+                          </span>
                         </div>
                       </div>
-                    ))}
-                  </>
-                ) : (
-                  <div className="text-center text-gray-500 py-4">
-                    No expense data available
-                  </div>
-                )}
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground">No expense data available</p>
+                  )}
+                </div>
               </CardContent>
             </Card>
-
-            {/* Profit Summary Card */}
+            
             <Card>
               <CardHeader>
-                <CardTitle>Profit Summary</CardTitle>
-                <CardDescription>Financial performance analysis</CardDescription>
+                <CardTitle>Financial Status</CardTitle>
+                <CardDescription>Current financial health</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="p-2 bg-gray-50 rounded-md">
-                    <p className="text-sm text-muted-foreground">Budget</p>
-                    <p className="font-medium">{formatCurrency(project.budget)}</p>
-                  </div>
-                  <div className="p-2 bg-gray-50 rounded-md">
-                    <p className="text-sm text-muted-foreground">Actual</p>
-                    <p className="font-medium">{formatCurrency(project.actualSpent)}</p>
-                  </div>
-                  <div className={`p-2 rounded-md ${project.budget >= project.actualSpent ? 'bg-green-50' : 'bg-red-50'}`}>
-                    <p className="text-sm text-muted-foreground">Variance</p>
-                    <p className={`font-medium ${project.budget >= project.actualSpent ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatCurrency(project.budget - project.actualSpent)}
-                    </p>
+                <div className="flex justify-between items-center">
+                  <span>Budget Usage</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className={`h-2.5 rounded-full ${budgetUsagePercentage > 90 ? 'bg-red-500' : budgetUsagePercentage > 75 ? 'bg-amber-500' : 'bg-green-500'}`}
+                        style={{ width: `${Math.min(budgetUsagePercentage, 100)}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm">{budgetUsagePercentage}%</span>
                   </div>
                 </div>
-
-                <Separator />
-
-                {/* Status Breakdown */}
+                
+                <div className="flex justify-between items-center">
+                  <span>Project Completion</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-blue-500 h-2.5 rounded-full" 
+                        style={{ width: `${project.completion}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm">{project.completion}%</span>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span>Expense Status</span>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-200">
+                      Paid: {formatCurrency(expensesStatus?.paid || 0)}
+                    </Badge>
+                    <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-200">
+                      Pending: {formatCurrency(expensesStatus?.pending || 0)}
+                    </Badge>
+                  </div>
+                </div>
+                
                 <div>
-                  <h3 className="text-sm font-medium mb-2">Expense Status</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-sm">Paid</span>
-                      </div>
-                      <span className="text-sm font-medium">{formatCurrency(expenseStatuses.paid)}</span>
+                  <div className="flex justify-between items-center mt-2">
+                    <span>Budget Efficiency</span>
+                    <Badge 
+                      variant="outline" 
+                      className={`${
+                        project.completion > budgetUsagePercentage 
+                          ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                          : 'bg-red-100 text-red-800 hover:bg-red-200'
+                      }`}
+                    >
+                      {project.completion > budgetUsagePercentage ? 'Under Budget' : 'Over Budget'}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Project is {project.completion}% complete with {budgetUsagePercentage}% of budget used
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Financial Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* Display recent activity from all financial categories */}
+                  {[
+                    ...(projectWithFinanceData.expenses?.map(item => ({ ...item, type: 'expense' })) || []),
+                    ...(projectWithFinanceData.contractors?.map(item => ({ ...item, type: 'contractor', name: `${item.name} (${item.role})`, amount: item.totalPaid, date: item.startDate })) || []),
+                    ...(projectWithFinanceData.materials?.map(item => ({ ...item, type: 'material', amount: item.totalPrice, date: item.purchaseDate })) || []),
+                    ...(projectWithFinanceData.equipment?.map(item => ({ ...item, type: 'equipment', amount: item.totalCost, date: item.startDate })) || [])
+                  ]
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .slice(0, 5)
+                    .map((item, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{new Date(item.date).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">
+                            {item.type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(item.amount)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  
+                  {([
+                    ...(projectWithFinanceData.expenses || []),
+                    ...(projectWithFinanceData.contractors || []),
+                    ...(projectWithFinanceData.materials || []),
+                    ...(projectWithFinanceData.equipment || [])
+                  ].length === 0) && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground py-4">
+                        No financial activity recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="expenses" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Project Expenses</h3>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Add Expense</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Expense</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new expense.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={handleExpenseSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="expense-name">Expense Name</Label>
+                      <Input 
+                        id="expense-name" 
+                        value={newExpense.name}
+                        onChange={e => setNewExpense({...newExpense, name: e.target.value})}
+                        required
+                      />
                     </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                        <span className="text-sm">Pending</span>
-                      </div>
-                      <span className="text-sm font-medium">{formatCurrency(expenseStatuses.pending)}</span>
+                    
+                    <div>
+                      <Label htmlFor="expense-amount">Amount</Label>
+                      <Input 
+                        id="expense-amount" 
+                        type="number"
+                        value={newExpense.amount}
+                        onChange={e => setNewExpense({...newExpense, amount: parseFloat(e.target.value)})}
+                        required
+                      />
                     </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                        <span className="text-sm">Cancelled</span>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="expense-date">Date</Label>
+                        <Input 
+                          id="expense-date" 
+                          type="date"
+                          value={newExpense.date}
+                          onChange={e => setNewExpense({...newExpense, date: e.target.value})}
+                          required
+                        />
                       </div>
-                      <span className="text-sm font-medium">{formatCurrency(expenseStatuses.cancelled)}</span>
+                      
+                      <div>
+                        <Label htmlFor="expense-category">Category</Label>
+                        <Select 
+                          value={newExpense.category}
+                          onValueChange={value => setNewExpense({...newExpense, category: value})}
+                        >
+                          <SelectTrigger id="expense-category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="labor">Labor</SelectItem>
+                            <SelectItem value="materials">Materials</SelectItem>
+                            <SelectItem value="equipment">Equipment</SelectItem>
+                            <SelectItem value="permits">Permits & Licenses</SelectItem>
+                            <SelectItem value="utilities">Utilities</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="expense-status">Status</Label>
+                      <Select 
+                        value={newExpense.status}
+                        onValueChange={value => setNewExpense({...newExpense, status: value as "paid" | "pending" | "cancelled"})}
+                      >
+                        <SelectTrigger id="expense-status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="expense-description">Description (Optional)</Label>
+                      <Textarea 
+                        id="expense-description" 
+                        value={newExpense.description || ""}
+                        onChange={e => setNewExpense({...newExpense, description: e.target.value})}
+                        placeholder="Add details about this expense"
+                      />
                     </div>
                   </div>
-                </div>
-
-                <Separator />
-
-                {/* Quote/Invoice Summary */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Quotes</h3>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span>Total Quotes:</span>
-                        <span className="font-medium">{quoteMetrics.total}</span>
+                  
+                  <DialogFooter>
+                    <Button type="submit">Add Expense</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.expenses && projectWithFinanceData.expenses.length > 0 ? (
+                    projectWithFinanceData.expenses.map(expense => (
+                      <TableRow key={expense.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{expense.name}</p>
+                            {expense.description && (
+                              <p className="text-xs text-muted-foreground">{expense.description}</p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">
+                            {expense.category}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              expense.status === "paid" ? "bg-green-100 text-green-800" :
+                              expense.status === "pending" ? "bg-amber-100 text-amber-800" :
+                              "bg-red-100 text-red-800"
+                            }
+                          >
+                            {expense.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(expense.amount)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No expenses recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="contractors" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Project Contractors</h3>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Add Contractor</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Contractor</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new contractor.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={handleContractorSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="contractor-name">Contractor Name</Label>
+                      <Input 
+                        id="contractor-name" 
+                        value={newContractor.name}
+                        onChange={e => setNewContractor({...newContractor, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="contractor-role">Role</Label>
+                      <Input 
+                        id="contractor-role" 
+                        value={newContractor.role}
+                        onChange={e => setNewContractor({...newContractor, role: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contractor-rate">Rate</Label>
+                        <Input 
+                          id="contractor-rate" 
+                          type="number"
+                          value={newContractor.rate}
+                          onChange={e => setNewContractor({...newContractor, rate: parseFloat(e.target.value)})}
+                          required
+                        />
                       </div>
-                      <div className="flex justify-between">
-                        <span>Acceptance Rate:</span>
-                        <span className="font-medium">{quoteMetrics.acceptanceRate}%</span>
+                      
+                      <div>
+                        <Label htmlFor="contractor-rate-type">Rate Type</Label>
+                        <Select 
+                          value={newContractor.rateType}
+                          onValueChange={value => setNewContractor({...newContractor, rateType: value as "hourly" | "fixed" | "daily"})}
+                        >
+                          <SelectTrigger id="contractor-rate-type">
+                            <SelectValue placeholder="Select rate type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hourly">Hourly</SelectItem>
+                            <SelectItem value="daily">Daily</SelectItem>
+                            <SelectItem value="fixed">Fixed</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Value:</span>
-                        <span className="font-medium">{formatCurrency(quoteMetrics.acceptedValue)}</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {newContractor.rateType !== "fixed" && (
+                        <div>
+                          <Label htmlFor="contractor-hours">Hours Worked</Label>
+                          <Input 
+                            id="contractor-hours" 
+                            type="number"
+                            value={newContractor.hoursWorked || 0}
+                            onChange={e => setNewContractor({...newContractor, hoursWorked: parseFloat(e.target.value)})}
+                          />
+                        </div>
+                      )}
+                      
+                      <div>
+                        <Label htmlFor="contractor-paid">Total Paid</Label>
+                        <Input 
+                          id="contractor-paid" 
+                          type="number"
+                          value={newContractor.totalPaid}
+                          onChange={e => setNewContractor({...newContractor, totalPaid: parseFloat(e.target.value)})}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contractor-start-date">Start Date</Label>
+                        <Input 
+                          id="contractor-start-date" 
+                          type="date"
+                          value={newContractor.startDate}
+                          onChange={e => setNewContractor({...newContractor, startDate: e.target.value})}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="contractor-status">Status</Label>
+                        <Select 
+                          value={newContractor.status}
+                          onValueChange={value => setNewContractor({...newContractor, status: value as "active" | "completed" | "terminated"})}
+                        >
+                          <SelectTrigger id="contractor-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="terminated">Terminated</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="contractor-contact">Contact Name (Optional)</Label>
+                      <Input 
+                        id="contractor-contact" 
+                        value={newContractor.contact || ""}
+                        onChange={e => setNewContractor({...newContractor, contact: e.target.value})}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contractor-email">Email (Optional)</Label>
+                        <Input 
+                          id="contractor-email" 
+                          type="email"
+                          value={newContractor.email || ""}
+                          onChange={e => setNewContractor({...newContractor, email: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="contractor-phone">Phone (Optional)</Label>
+                        <Input 
+                          id="contractor-phone" 
+                          value={newContractor.phone || ""}
+                          onChange={e => setNewContractor({...newContractor, phone: e.target.value})}
+                        />
                       </div>
                     </div>
                   </div>
                   
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Invoices</h3>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span>Total Invoices:</span>
-                        <span className="font-medium">{invoiceMetrics.total}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Payment Rate:</span>
-                        <span className="font-medium">{invoiceMetrics.paymentRate}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Value:</span>
-                        <span className="font-medium">{formatCurrency(invoiceMetrics.paidValue)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        {/* Expenses Tab */}
-        <TabsContent value="expenses" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-semibold">Expenses</h2>
-              <p className="text-muted-foreground">
-                Manage and track project expenses
-              </p>
-            </div>
-            <Button onClick={handleAddExpense} className="flex items-center gap-1">
-              <Plus className="h-4 w-4" /> Add Expense
-            </Button>
+                  <DialogFooter>
+                    <Button type="submit">Add Contractor</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
           
-          {/* Filter and Search */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="w-full sm:w-64">
-              <Select value={expenseFilter} onValueChange={setExpenseFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Expenses</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex-1">
-              <Input 
-                placeholder="Search expenses by name, category, or description..." 
-                value={expenseSearchQuery}
-                onChange={(e) => setExpenseSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          {/* Expenses Table */}
-          <div className="border rounded-md overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-slate-50 border-b">
-                    <th className="text-left whitespace-nowrap px-4 py-2 font-medium">Name</th>
-                    <th className="text-left whitespace-nowrap px-4 py-2 font-medium">Category</th>
-                    <th className="text-left whitespace-nowrap px-4 py-2 font-medium">Date</th>
-                    <th className="text-right whitespace-nowrap px-4 py-2 font-medium">Amount</th>
-                    <th className="text-center whitespace-nowrap px-4 py-2 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredExpenses.length > 0 ? (
-                    filteredExpenses.map((expense: ProjectExpense) => (
-                      <tr key={expense.id} className="border-b last:border-b-0 hover:bg-slate-50">
-                        <td className="px-4 py-2">{expense.name}</td>
-                        <td className="px-4 py-2">{expense.category}</td>
-                        <td className="px-4 py-2">{expense.date}</td>
-                        <td className="px-4 py-2 text-right">{formatCurrency(expense.amount)}</td>
-                        <td className="px-4 py-2 text-center">
-                          <Badge variant={
-                            expense.status === "paid" ? "success" : 
-                            expense.status === "pending" ? "warning" : "destructive"
-                          }>
-                            {expense.status}
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Rate</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total Paid</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.contractors && projectWithFinanceData.contractors.length > 0 ? (
+                    projectWithFinanceData.contractors.map(contractor => (
+                      <TableRow key={contractor.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{contractor.name}</p>
+                            {contractor.contact && (
+                              <p className="text-xs text-muted-foreground">Contact: {contractor.contact}</p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{contractor.role}</TableCell>
+                        <TableCell>
+                          {formatCurrency(contractor.rate)} / {contractor.rateType}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              contractor.status === "active" ? "bg-green-100 text-green-800" :
+                              contractor.status === "completed" ? "bg-blue-100 text-blue-800" :
+                              "bg-red-100 text-red-800"
+                            }
+                          >
+                            {contractor.status}
                           </Badge>
-                        </td>
-                      </tr>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(contractor.totalPaid)}
+                        </TableCell>
+                      </TableRow>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                        No expenses found
-                      </td>
-                    </tr>
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No contractors recorded
+                      </TableCell>
+                    </TableRow>
                   )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
         
-        {/* Quotes Tab */}
-        <TabsContent value="quotes" className="space-y-6">
+        <TabsContent value="materials" className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-semibold">Client Quotes</h2>
-              <p className="text-muted-foreground">
-                Create and manage quotes for your clients
-              </p>
-            </div>
-            <Button onClick={() => {
-              setEditingQuote(undefined);
-              setShowQuoteModal(true);
-            }} className="flex items-center gap-1">
-              <Plus className="h-4 w-4" /> New Quote
-            </Button>
-          </div>
-          
-          {/* Filter */}
-          <div className="w-full sm:w-64">
-            <Select value={quoteFilter} onValueChange={setQuoteFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Quotes</SelectItem>
-                <SelectItem value="draft">Drafts</SelectItem>
-                <SelectItem value="sent">Sent</SelectItem>
-                <SelectItem value="accepted">Accepted</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Quotes List */}
-          <div className="grid grid-cols-1 gap-4">
-            {filteredQuotes.length > 0 ? (
-              filteredQuotes.map(quote => (
-                <Card key={quote.id} className="overflow-hidden">
-                  <div className="border-l-4 border-blue-500">
-                    <div className="p-4 sm:p-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                        <div className="mb-3 sm:mb-0">
-                          <div className="flex items-center gap-2">
-                            <Receipt className="h-5 w-5 text-blue-500" />
-                            <h3 className="text-lg font-medium">{quote.quoteNumber}</h3>
-                            <Badge variant={
-                              quote.status === "accepted" ? "success" :
-                              quote.status === "sent" ? "default" : 
-                              quote.status === "draft" ? "outline" :
-                              quote.status === "rejected" ? "destructive" : "secondary"
-                            }>
-                              {quote.status}
-                            </Badge>
-                          </div>
-                          <p className="text-muted-foreground mt-1">{quote.clientName}</p>
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-2">
-                          {quote.status === "draft" && (
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => handleSendDocument('quote', quote.id)}
-                              className="flex items-center gap-1"
-                            >
-                              <SendHorizontal className="h-4 w-4" /> Send
-                            </Button>
-                          )}
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleEditQuote(quote)}
-                            className="flex items-center gap-1"
-                          >
-                            <FileText className="h-4 w-4" /> View & Edit
-                          </Button>
-                        </div>
+            <h3 className="text-lg font-medium">Materials</h3>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Add Material</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Material</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new material.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={handleMaterialSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="material-name">Material Name</Label>
+                      <Input 
+                        id="material-name" 
+                        value={newMaterial.name}
+                        onChange={e => setNewMaterial({...newMaterial, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="material-quantity">Quantity</Label>
+                        <Input 
+                          id="material-quantity" 
+                          type="number"
+                          value={newMaterial.quantity}
+                          onChange={e => setNewMaterial({...newMaterial, quantity: parseFloat(e.target.value)})}
+                          required
+                        />
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Issue Date</p>
-                          <p>{quote.issueDate}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Valid Until</p>
-                          <p>{quote.validUntil}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Items</p>
-                          <p>{quote.items.length} items</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Total</p>
-                          <p className="font-medium">{formatCurrency(quote.total)}</p>
-                        </div>
+                      <div>
+                        <Label htmlFor="material-unit-price">Unit Price</Label>
+                        <Input 
+                          id="material-unit-price" 
+                          type="number"
+                          value={newMaterial.unitPrice}
+                          onChange={e => setNewMaterial({...newMaterial, unitPrice: parseFloat(e.target.value)})}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="material-date">Purchase Date</Label>
+                        <Input 
+                          id="material-date" 
+                          type="date"
+                          value={newMaterial.purchaseDate}
+                          onChange={e => setNewMaterial({...newMaterial, purchaseDate: e.target.value})}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="material-status">Status</Label>
+                        <Select 
+                          value={newMaterial.status}
+                          onValueChange={value => setNewMaterial({...newMaterial, status: value as "ordered" | "delivered" | "used" | "returned"})}
+                        >
+                          <SelectTrigger id="material-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ordered">Ordered</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                            <SelectItem value="used">Used</SelectItem>
+                            <SelectItem value="returned">Returned</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="material-supplier">Supplier (Optional)</Label>
+                        <Input 
+                          id="material-supplier" 
+                          value={newMaterial.supplier || ""}
+                          onChange={e => setNewMaterial({...newMaterial, supplier: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="material-category">Category</Label>
+                        <Select 
+                          value={newMaterial.category}
+                          onValueChange={value => setNewMaterial({...newMaterial, category: value})}
+                        >
+                          <SelectTrigger id="material-category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="lumber">Lumber</SelectItem>
+                            <SelectItem value="electrical">Electrical</SelectItem>
+                            <SelectItem value="plumbing">Plumbing</SelectItem>
+                            <SelectItem value="concrete">Concrete</SelectItem>
+                            <SelectItem value="steel">Steel</SelectItem>
+                            <SelectItem value="finishes">Finishes</SelectItem>
+                            <SelectItem value="hvac">HVAC</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>
-                </Card>
-              ))
-            ) : (
-              <div className="text-center py-12 border rounded-md bg-slate-50">
-                <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-medium mb-1">No quotes created yet</h3>
-                <p className="text-gray-500 mb-4">
-                  Create a new quote for your client to get started
-                </p>
-                <Button onClick={() => {
-                  setEditingQuote(undefined);
-                  setShowQuoteModal(true);
-                }} className="flex items-center gap-1 mx-auto">
-                  <Plus className="h-4 w-4" /> Create Quote
-                </Button>
-              </div>
-            )}
+                  
+                  <DialogFooter>
+                    <Button type="submit">Add Material</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
+          
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total Price</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.materials && projectWithFinanceData.materials.length > 0 ? (
+                    projectWithFinanceData.materials.map(material => (
+                      <TableRow key={material.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{material.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {material.category}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>{material.quantity} @ {formatCurrency(material.unitPrice)}</TableCell>
+                        <TableCell>{material.supplier || "—"}</TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              material.status === "delivered" ? "bg-green-100 text-green-800" :
+                              material.status === "ordered" ? "bg-amber-100 text-amber-800" :
+                              material.status === "used" ? "bg-blue-100 text-blue-800" :
+                              "bg-red-100 text-red-800"
+                            }
+                          >
+                            {material.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(material.totalPrice)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No materials recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
         
-        {/* Invoices Tab */}
-        <TabsContent value="invoices" className="space-y-6">
+        <TabsContent value="equipment" className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-semibold">Contractor Invoices</h2>
-              <p className="text-muted-foreground">
-                Create and manage invoices for your contractors
-              </p>
-            </div>
-            <Button onClick={() => {
-              setEditingInvoice(undefined);
-              setShowInvoiceModal(true);
-            }} className="flex items-center gap-1">
-              <Plus className="h-4 w-4" /> New Invoice
-            </Button>
-          </div>
-          
-          {/* Filter */}
-          <div className="w-full sm:w-64">
-            <Select value={invoiceFilter} onValueChange={setInvoiceFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Invoices</SelectItem>
-                <SelectItem value="draft">Drafts</SelectItem>
-                <SelectItem value="sent">Sent</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="overdue">Overdue</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Invoices List */}
-          <div className="grid grid-cols-1 gap-4">
-            {filteredInvoices.length > 0 ? (
-              filteredInvoices.map(invoice => (
-                <Card key={invoice.id} className="overflow-hidden">
-                  <div className="border-l-4 border-green-500">
-                    <div className="p-4 sm:p-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                        <div className="mb-3 sm:mb-0">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5 text-green-500" />
-                            <h3 className="text-lg font-medium">{invoice.invoiceNumber}</h3>
-                            <Badge variant={
-                              invoice.status === "paid" ? "success" :
-                              invoice.status === "sent" ? "default" : 
-                              invoice.status === "draft" ? "outline" :
-                              invoice.status === "overdue" ? "destructive" : "secondary"
-                            }>
-                              {invoice.status}
-                            </Badge>
-                          </div>
-                          <p className="text-muted-foreground mt-1">{invoice.contractorName}</p>
+            <h3 className="text-lg font-medium">Equipment</h3>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Add Equipment</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Equipment</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new equipment.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={handleEquipmentSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="equipment-name">Equipment Name</Label>
+                      <Input 
+                        id="equipment-name" 
+                        value={newEquipment.name}
+                        onChange={e => setNewEquipment({...newEquipment, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="equipment-type">Type</Label>
+                      <Input 
+                        id="equipment-type" 
+                        value={newEquipment.type}
+                        onChange={e => setNewEquipment({...newEquipment, type: e.target.value})}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="equipment-is-rental" 
+                        checked={newEquipment.isRental}
+                        onCheckedChange={checked => setNewEquipment({...newEquipment, isRental: Boolean(checked)})}
+                      />
+                      <Label htmlFor="equipment-is-rental">This is a rental</Label>
+                    </div>
+                    
+                    {newEquipment.isRental ? (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="equipment-rental-cost">Rental Cost</Label>
+                          <Input 
+                            id="equipment-rental-cost" 
+                            type="number"
+                            value={newEquipment.rentalCost || 0}
+                            onChange={e => setNewEquipment({...newEquipment, rentalCost: parseFloat(e.target.value)})}
+                            required
+                          />
                         </div>
-                        
-                        <div className="flex flex-wrap gap-2">
-                          {invoice.status === "draft" && (
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => handleSendDocument('invoice', invoice.id)}
-                              className="flex items-center gap-1"
-                            >
-                              <SendHorizontal className="h-4 w-4" /> Send
-                            </Button>
-                          )}
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleEditInvoice(invoice)}
-                            className="flex items-center gap-1"
-                          >
-                            <FileText className="h-4 w-4" /> View & Edit
-                          </Button>
+                        <div>
+                          <Label htmlFor="equipment-total-cost">Total Cost</Label>
+                          <Input 
+                            id="equipment-total-cost" 
+                            type="number"
+                            value={newEquipment.totalCost}
+                            onChange={e => setNewEquipment({...newEquipment, totalCost: parseFloat(e.target.value)})}
+                            required
+                          />
                         </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <Label htmlFor="equipment-purchase-cost">Purchase Cost</Label>
+                        <Input 
+                          id="equipment-purchase-cost" 
+                          type="number"
+                          value={newEquipment.purchaseCost || 0}
+                          onChange={e => setNewEquipment({
+                            ...newEquipment, 
+                            purchaseCost: parseFloat(e.target.value),
+                            totalCost: parseFloat(e.target.value)
+                          })}
+                          required
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="equipment-start-date">Start Date</Label>
+                        <Input 
+                          id="equipment-start-date" 
+                          type="date"
+                          value={newEquipment.startDate}
+                          onChange={e => setNewEquipment({...newEquipment, startDate: e.target.value})}
+                          required
+                        />
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
+                      {newEquipment.isRental && (
                         <div>
-                          <p className="text-sm text-muted-foreground">Issue Date</p>
-                          <p>{invoice.issueDate}</p>
+                          <Label htmlFor="equipment-end-date">End Date (Optional)</Label>
+                          <Input 
+                            id="equipment-end-date" 
+                            type="date"
+                            value={newEquipment.endDate || ""}
+                            onChange={e => setNewEquipment({...newEquipment, endDate: e.target.value})}
+                          />
                         </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Due Date</p>
-                          <p>{invoice.dueDate}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Items</p>
-                          <p>{invoice.items.length} items</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Total</p>
-                          <p className="font-medium">{formatCurrency(invoice.total)}</p>
-                        </div>
-                      </div>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="equipment-status">Status</Label>
+                      <Select 
+                        value={newEquipment.status}
+                        onValueChange={value => setNewEquipment({...newEquipment, status: value as "active" | "returned" | "owned"})}
+                      >
+                        <SelectTrigger id="equipment-status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          {newEquipment.isRental && <SelectItem value="returned">Returned</SelectItem>}
+                          {!newEquipment.isRental && <SelectItem value="owned">Owned</SelectItem>}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                </Card>
-              ))
-            ) : (
-              <div className="text-center py-12 border rounded-md bg-slate-50">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-medium mb-1">No invoices created yet</h3>
-                <p className="text-gray-500 mb-4">
-                  Create a new invoice for your contractor to get started
-                </p>
-                <Button onClick={() => {
-                  setEditingInvoice(undefined);
-                  setShowInvoiceModal(true);
-                }} className="flex items-center gap-1 mx-auto">
-                  <Plus className="h-4 w-4" /> Create Invoice
-                </Button>
-              </div>
-            )}
+                  
+                  <DialogFooter>
+                    <Button type="submit">Add Equipment</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
+          
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead className="text-right">Cost</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectWithFinanceData.equipment && projectWithFinanceData.equipment.length > 0 ? (
+                    projectWithFinanceData.equipment.map(equipment => (
+                      <TableRow key={equipment.id}>
+                        <TableCell className="font-medium">{equipment.name}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {equipment.type}
+                            <Badge variant="outline" className={equipment.isRental ? "bg-blue-100" : "bg-green-100"}>
+                              {equipment.isRental ? "Rental" : "Purchased"}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              equipment.status === "active" ? "bg-green-100 text-green-800" :
+                              equipment.status === "returned" ? "bg-blue-100 text-blue-800" :
+                              "bg-gray-100 text-gray-800"
+                            }
+                          >
+                            {equipment.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(equipment.startDate || "").toLocaleDateString()}
+                          {equipment.endDate && (
+                            <> to {new Date(equipment.endDate).toLocaleDateString()}</>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(equipment.totalCost)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                        No equipment recorded
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
-      
-      {/* Modals */}
-      <ProjectQuoteModal
-        open={showQuoteModal}
-        onOpenChange={setShowQuoteModal}
-        project={project}
-        onSave={handleSaveQuote}
-        editingQuote={editingQuote}
-      />
-      
-      <ProjectInvoiceModal
-        open={showInvoiceModal}
-        onOpenChange={setShowInvoiceModal}
-        project={project}
-        onSave={handleSaveInvoice}
-        editingInvoice={editingInvoice}
-      />
-    </>
+    </div>
   );
 };
 

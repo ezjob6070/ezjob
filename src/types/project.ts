@@ -27,10 +27,6 @@ export interface Project {
   
   // Adding tasks for progress tracking
   tasks?: ProjectTask[];
-
-  // Adding quotes and invoices
-  quotes?: ProjectQuote[];
-  invoices?: ProjectInvoice[];
 }
 
 export interface ProjectExpense {
@@ -144,54 +140,4 @@ export interface ProjectTaskAttachment {
   url: string;
   uploadedAt: string;
   uploadedBy: string;
-}
-
-// New interfaces for quotes and invoices
-export interface ProjectQuote {
-  id: string;
-  quoteNumber: string;
-  clientName: string;
-  clientEmail?: string;
-  clientPhone?: string;
-  issueDate: string;
-  validUntil: string;
-  status: "draft" | "sent" | "accepted" | "rejected" | "expired";
-  items: QuoteInvoiceItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
-  notes?: string;
-  terms?: string;
-  lastSent?: string;
-  lastUpdated?: string;
-}
-
-export interface ProjectInvoice {
-  id: string;
-  invoiceNumber: string;
-  contractorId?: string;
-  contractorName: string;
-  contractorEmail?: string;
-  contractorPhone?: string;
-  issueDate: string;
-  dueDate: string;
-  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
-  items: QuoteInvoiceItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
-  notes?: string;
-  paymentTerms?: string;
-  paymentMethod?: string;
-  lastSent?: string;
-  lastUpdated?: string;
-  paidDate?: string;
-}
-
-export interface QuoteInvoiceItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  amount: number;
 }
