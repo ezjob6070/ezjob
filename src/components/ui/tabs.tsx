@@ -39,8 +39,8 @@ const TabsTrigger = React.forwardRef<
       // Purple variant
       variant === "purple" && "data-[state=active]:bg-purple-100 data-[state=active]:text-purple-800 data-[state=active]:shadow-sm",
       
-      // Blue variant
-      variant === "blue" && "data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 data-[state=active]:shadow-sm",
+      // Blue variant - updated with stronger blue color
+      variant === "blue" && "data-[state=active]:bg-blue-200 data-[state=active]:text-blue-900 data-[state=active]:shadow-sm",
       
       // Amber variant
       variant === "amber" && "data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800 data-[state=active]:shadow-sm",
@@ -62,7 +62,7 @@ const TabsTrigger = React.forwardRef<
           "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-medium",
           variant === "default" && "bg-gray-200 text-gray-700",
           variant === "purple" && "bg-purple-100 text-purple-800",
-          variant === "blue" && "bg-blue-100 text-blue-800",
+          variant === "blue" && "bg-blue-200 text-blue-900",
           variant === "amber" && "bg-amber-100 text-amber-800",
           variant === "green" && "bg-green-100 text-green-800",
           variant === "red" && "bg-red-100 text-red-800",
