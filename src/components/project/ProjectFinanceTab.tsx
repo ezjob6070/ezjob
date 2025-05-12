@@ -337,73 +337,6 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
         {/* Finance Overview Tab */}
         <TabsContent value="overview" className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Quote Status Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Quote Summary</CardTitle>
-                <CardDescription>Status of client quotes</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Quotes</p>
-                    <p className="text-2xl font-bold">{quotes.length}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Value</p>
-                    <p className="text-2xl font-bold text-blue-600">{formatCurrency(quoteStats.totalValue)}</p>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className={quoteStatusColors.draft}>Draft</Badge>
-                      <span className="text-sm">{quoteStats.draft} quotes</span>
-                    </div>
-                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.draft / quotes.length) * 100 : 0} />
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className={quoteStatusColors.sent}>Sent</Badge>
-                      <span className="text-sm">{quoteStats.sent} quotes</span>
-                    </div>
-                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.sent / quotes.length) * 100 : 0} />
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className={quoteStatusColors.accepted}>Accepted</Badge>
-                      <span className="text-sm">{quoteStats.accepted} quotes</span>
-                    </div>
-                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.accepted / quotes.length) * 100 : 0} />
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className={quoteStatusColors.rejected}>Rejected</Badge>
-                      <span className="text-sm">{quoteStats.rejected} quotes</span>
-                    </div>
-                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.rejected / quotes.length) * 100 : 0} />
-                  </div>
-                </div>
-                
-                <div className="mt-2 pt-2 border-t">
-                  <div className="flex justify-between">
-                    <span className="font-medium">Acceptance Rate</span>
-                    <span className="font-bold">
-                      {quotes.length > 0
-                        ? `${Math.round((quoteStats.accepted / (quoteStats.accepted + quoteStats.rejected)) * 100)}%`
-                        : "0%"}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
             {/* Invoice Status Card */}
             <Card>
               <CardHeader>
@@ -466,6 +399,55 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                         ? `${Math.round((invoiceStats.paid / invoices.length) * 100)}%`
                         : "0%"}
                     </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Financial Health Card replaces the unused card space */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Financial Health</CardTitle>
+                <CardDescription>Project budget utilization and cost analysis</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Total Budget</p>
+                    <p className="text-2xl font-bold">{formatCurrency(project.budget)}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Spent So Far</p>
+                    <p className="text-2xl font-bold text-red-600">{formatCurrency(project.actualSpent)}</p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm font-medium">Budget Utilization</span>
+                      <span className="text-sm font-medium">
+                        {project.budget > 0 ? Math.round((project.actualSpent / project.budget) * 100) : 0}%
+                      </span>
+                    </div>
+                    <Progress 
+                      className="h-2" 
+                      value={project.budget > 0 ? (project.actualSpent / project.budget) * 100 : 0} 
+                      color="bg-blue-600"
+                    />
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm font-medium">Project Completion</span>
+                      <span className="text-sm font-medium">{project.completion}%</span>
+                    </div>
+                    <Progress 
+                      className="h-2" 
+                      value={project.completion} 
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -537,22 +519,18 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
           {/* Financial Health Card - Modified to emphasize cost metrics */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Financial Health</CardTitle>
-              <CardDescription>Project budget utilization and cost analysis</CardDescription>
+              <CardTitle className="text-lg">Project Performance</CardTitle>
+              <CardDescription>Financial performance metrics</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Total Budget</p>
-                  <p className="text-2xl font-bold">{formatCurrency(project.budget)}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Spent So Far</p>
-                  <p className="text-2xl font-bold text-red-600">{formatCurrency(project.actualSpent)}</p>
-                </div>
-                <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
                   <p className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Total Expenses</p>
+                  <p className="text-2xl font-bold text-red-600">{formatCurrency(project.actualSpent)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Net Balance</p>
@@ -560,25 +538,17 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                     {formatCurrency(totalIncome - project.actualSpent)}
                   </p>
                 </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Profit Margin</p>
+                  <p className={`text-2xl font-bold ${totalIncome > 0 && totalIncome > project.actualSpent ? 'text-green-600' : 'text-red-600'}`}>
+                    {totalIncome > 0 ? Math.round(((totalIncome - project.actualSpent) / totalIncome) * 100) : 0}%
+                  </p>
+                </div>
               </div>
               
               <Separator />
               
               <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">Budget Utilization</span>
-                    <span className="text-sm font-medium">
-                      {project.budget > 0 ? Math.round((project.actualSpent / project.budget) * 100) : 0}%
-                    </span>
-                  </div>
-                  <Progress 
-                    className="h-2" 
-                    value={project.budget > 0 ? (project.actualSpent / project.budget) * 100 : 0} 
-                    color="bg-blue-600"
-                  />
-                </div>
-                
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-sm font-medium">Project Completion vs. Budget Used</span>
@@ -597,6 +567,19 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                       className="h-2 w-1 bg-black z-10 absolute top-0" 
                       style={{ left: `${project.completion}%` }}
                     ></div>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Cost Efficiency</span>
+                    <span className={`font-medium ${project.completion > 0 && (project.actualSpent / project.budget) < (project.completion / 100) 
+                      ? 'text-green-600' : 'text-amber-600'}`}>
+                      {project.completion > 0 ? 
+                        (project.actualSpent / project.budget) < (project.completion / 100) 
+                          ? "Under Budget" : "Over Budget" 
+                        : "N/A"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -713,86 +696,6 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             }}>
               <Plus className="h-4 w-4 mr-1" /> Create Quote
             </Button>
-          </div>
-          
-          {/* Quote Status Summary - Simplified and focused on costs */}
-          <div className="flex flex-col gap-4 pb-4">
-            <div className="bg-gray-50 border rounded-lg shadow-sm p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-semibold text-gray-800">Quote Summary</h4>
-                <Badge variant="outline" className="px-3 py-1">
-                  Total: {quotes.length} quotes
-                </Badge>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-white p-4 rounded-lg border shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <h5 className="font-medium text-gray-700">Total Quote Value</h5>
-                    <DollarSign className="h-5 w-5 text-blue-500" />
-                  </div>
-                  <p className="text-2xl font-bold text-blue-600 mt-2">
-                    {formatCurrency(quoteStats.totalValue)}
-                  </p>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg border shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <h5 className="font-medium text-gray-700">Accepted Quote Value</h5>
-                    <Check className="h-5 w-5 text-green-500" />
-                  </div>
-                  <p className="text-2xl font-bold text-green-600 mt-2">
-                    {formatCurrency(quoteStats.acceptedValue)}
-                  </p>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg border shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <h5 className="font-medium text-gray-700">Acceptance Rate</h5>
-                    <TrendingUp className="h-5 w-5 text-purple-500" />
-                  </div>
-                  <p className="text-2xl font-bold text-purple-600 mt-2">
-                    {quotes.length > 0
-                      ? `${Math.round((quoteStats.accepted / (quoteStats.accepted + quoteStats.rejected)) * 100)}%`
-                      : "0%"}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Badge className={quoteStatusColors.draft}>Draft</Badge>
-                    <span>{quoteStats.draft} quotes</span>
-                  </div>
-                  <span className="text-sm font-medium">{quoteStats.draft > 0 && formatCurrency(quotes.filter(q => q.status === "draft").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Badge className={quoteStatusColors.sent}>Sent</Badge>
-                    <span>{quoteStats.sent} quotes</span>
-                  </div>
-                  <span className="text-sm font-medium">{quoteStats.sent > 0 && formatCurrency(quotes.filter(q => q.status === "sent").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Badge className={quoteStatusColors.accepted}>Accepted</Badge>
-                    <span>{quoteStats.accepted} quotes</span>
-                  </div>
-                  <span className="text-sm font-medium">{quoteStats.accepted > 0 && formatCurrency(quotes.filter(q => q.status === "accepted").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Badge className={quoteStatusColors.rejected}>Rejected</Badge>
-                    <span>{quoteStats.rejected} quotes</span>
-                  </div>
-                  <span className="text-sm font-medium">{quoteStats.rejected > 0 && formatCurrency(quotes.filter(q => q.status === "rejected").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
-                </div>
-              </div>
-            </div>
           </div>
           
           {/* Quote content - listing all quotes */}
