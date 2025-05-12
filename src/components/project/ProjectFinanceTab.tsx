@@ -7,7 +7,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Briefcase, FileText } from "lucide-react"; // Changed from unavailable CoatRack and Invoice icons
+import { Briefcase, FileText } from "lucide-react"; // Using available icons
 import TechnicianInvoiceGenerator from "@/components/technicians/invoices/TechnicianInvoiceGenerator";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
@@ -32,22 +32,22 @@ export const ProjectFinanceTab = ({ projectId }: ProjectFinanceTabProps) => {
           <TabsList className="mb-4">
             <TabsTrigger 
               value="overview"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              variant="blue"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="expenses"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              variant="blue"
             >
-              <Briefcase className="h-4 w-4 mr-1" /> {/* Changed from CoatRack */}
+              <Briefcase className="h-4 w-4 mr-1" />
               Expenses
             </TabsTrigger>
             <TabsTrigger 
               value="invoices"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              variant="blue"
             >
-              <FileText className="h-4 w-4 mr-1" /> {/* Changed from Invoice */}
+              <FileText className="h-4 w-4 mr-1" />
               Invoices
             </TabsTrigger>
           </TabsList>
