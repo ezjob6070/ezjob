@@ -61,10 +61,10 @@ const TechnicianDetail = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full">
-          <TabsTrigger value="overview" variant="blue">Overview</TabsTrigger>
-          <TabsTrigger value="financial" variant="blue">Financial</TabsTrigger>
-          <TabsTrigger value="history" variant="blue">Job History</TabsTrigger>
-          <TabsTrigger value="documents" variant="blue">Documents & Notes</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="financial">Financial</TabsTrigger>
+          <TabsTrigger value="history">Job History</TabsTrigger>
+          <TabsTrigger value="documents">Documents & Notes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
