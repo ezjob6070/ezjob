@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Plus, Send, Download, Check, X, TrendingDown, TrendingUp, Wallet, Receipt } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Plus, Send, Download, Check, X, TrendingDown, TrendingUp, Wallet, Receipt, Clock } from "lucide-react";
 import { Project, ProjectQuote, ProjectInvoice, ProjectExpense } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
@@ -29,7 +29,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   const [financeTab, setFinanceTab] = useState("overview");
   const [expenseCategory, setExpenseCategory] = useState<string>("all");
   const [expensePeriod, setExpensePeriod] = useState<string>("all");
-  const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("all");
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("pending");
   
   // Project quotes & invoices
   const [quotes, setQuotes] = useState<ProjectQuote[]>(project.quotes || []);
@@ -154,9 +154,13 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   
   // Filter quotes based on status
   const filteredQuotes = quotes.filter(quote => {
-    if (quoteStatusFilter === "all") return true;
     if (quoteStatusFilter === "pending") return quote.status === "sent" || quote.status === "draft";
-    if (quoteStatusFilter === "completed") return quote.status === "accepted" || quote.status === "rejected" || quote.status === "expired";
+    if (quoteStatusFilter === "completed") return quote.status === "accepted" || quote.status === "rejected";
+    if (quoteStatusFilter === "overdue") {
+      const validUntilDate = new Date(quote.validUntil);
+      const today = new Date();
+      return (quote.status === "sent" || quote.status === "draft") && validUntilDate < today;
+    }
     return true;
   });
   
@@ -182,7 +186,12 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     rejected: quotes.filter(q => q.status === "rejected").length,
     expired: quotes.filter(q => q.status === "expired").length,
     totalValue: quotes.reduce((sum, q) => sum + q.totalAmount, 0),
-    acceptedValue: quotes.filter(q => q.status === "accepted").reduce((sum, q) => sum + q.totalAmount, 0)
+    acceptedValue: quotes.filter(q => q.status === "accepted").reduce((sum, q) => sum + q.totalAmount, 0),
+    overdue: quotes.filter(q => {
+      const validUntilDate = new Date(q.validUntil);
+      const today = new Date();
+      return (q.status === "sent" || q.status === "draft") && validUntilDate < today;
+    }).length
   };
   
   // Calculate invoice statistics
@@ -707,9 +716,9 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Quotes</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="pending">Pending Quotes</SelectItem>
+                  <SelectItem value="completed">Completed Quotes</SelectItem>
+                  <SelectItem value="overdue">Overdue Quotes</SelectItem>
                 </SelectContent>
               </Select>
               <Button onClick={() => {
@@ -721,67 +730,91 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </div>
           </div>
           
-          {/* Quote Status Filter Buttons */}
-          <div className="flex flex-wrap gap-2 pb-4">
-            <Button 
-              variant={quoteStatusFilter === "all" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setQuoteStatusFilter("all")}
-              className="flex items-center gap-1.5"
-            >
-              All Quotes 
-              <Badge className="ml-1 bg-gray-200 text-gray-800">{quotes.length}</Badge>
-            </Button>
-            <Button 
-              variant={quoteStatusFilter === "pending" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setQuoteStatusFilter("pending")}
-              className="flex items-center gap-1.5"
-            >
-              Pending
-              <Badge className="ml-1 bg-blue-200 text-blue-800">
-                {quotes.filter(q => q.status === "sent" || q.status === "draft").length}
-              </Badge>
-            </Button>
-            <Button 
-              variant={quoteStatusFilter === "completed" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setQuoteStatusFilter("completed")}
-              className="flex items-center gap-1.5"
-            >
-              Completed
-              <Badge className="ml-1 bg-green-200 text-green-800">
-                {quotes.filter(q => q.status === "accepted" || q.status === "rejected" || q.status === "expired").length}
-              </Badge>
-            </Button>
-            
-            {/* Individual Status Filters */}
-            <Separator className="my-2 w-full" />
-            <div className="flex flex-wrap gap-2 w-full">
-              <Badge 
-                className={`${quoteStatusColors.draft} cursor-pointer px-3 py-1`}
-                onClick={() => setQuotes(quotes.map(q => ({...q, status: "draft"})))}
-              >
-                Set All to Draft ({quoteStats.draft})
-              </Badge>
-              <Badge 
-                className={`${quoteStatusColors.sent} cursor-pointer px-3 py-1`}
-                onClick={() => setQuotes(quotes.map(q => ({...q, status: "sent", sentAt: new Date().toISOString().split('T')[0]})))}
-              >
-                Set All to Sent ({quoteStats.sent})
-              </Badge>
-              <Badge 
-                className={`${quoteStatusColors.accepted} cursor-pointer px-3 py-1`}
-                onClick={() => setQuotes(quotes.map(q => ({...q, status: "accepted"})))}
-              >
-                Set All to Accepted ({quoteStats.accepted})
-              </Badge>
-              <Badge 
-                className={`${quoteStatusColors.rejected} cursor-pointer px-3 py-1`}
-                onClick={() => setQuotes(quotes.map(q => ({...q, status: "rejected"})))}
-              >
-                Set All to Rejected ({quoteStats.rejected})
-              </Badge>
+          {/* Quote Status Filter Buttons - IMPROVED */}
+          <div className="flex flex-col gap-4 pb-4">
+            <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Quote Filters</h4>
+              
+              <div className="grid grid-cols-3 gap-3">
+                <Button 
+                  variant={quoteStatusFilter === "pending" ? "default" : "outline"} 
+                  size="lg"
+                  onClick={() => setQuoteStatusFilter("pending")}
+                  className="flex flex-col items-center justify-center h-24 gap-2 border border-gray-200 rounded-lg"
+                >
+                  <div className="bg-blue-100 text-blue-800 p-2 rounded-full">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold">Pending</p>
+                    <Badge variant="secondary" className="mt-1">
+                      {quotes.filter(q => q.status === "sent" || q.status === "draft").length}
+                    </Badge>
+                  </div>
+                </Button>
+                
+                <Button 
+                  variant={quoteStatusFilter === "completed" ? "default" : "outline"} 
+                  size="lg"
+                  onClick={() => setQuoteStatusFilter("completed")}
+                  className="flex flex-col items-center justify-center h-24 gap-2 border border-gray-200 rounded-lg"
+                >
+                  <div className="bg-green-100 text-green-800 p-2 rounded-full">
+                    <Check className="h-5 w-5" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold">Completed</p>
+                    <Badge variant="secondary" className="mt-1">
+                      {quotes.filter(q => q.status === "accepted" || q.status === "rejected").length}
+                    </Badge>
+                  </div>
+                </Button>
+                
+                <Button 
+                  variant={quoteStatusFilter === "overdue" ? "default" : "outline"} 
+                  size="lg"
+                  onClick={() => setQuoteStatusFilter("overdue")}
+                  className="flex flex-col items-center justify-center h-24 gap-2 border border-gray-200 rounded-lg"
+                >
+                  <div className="bg-red-100 text-red-800 p-2 rounded-full">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold">Overdue</p>
+                    <Badge variant="secondary" className="mt-1">
+                      {quoteStats.overdue}
+                    </Badge>
+                  </div>
+                </Button>
+              </div>
+              
+              <div className="mt-4 flex flex-wrap gap-2">
+                <p className="text-sm text-muted-foreground mr-2">Quick actions:</p>
+                <Badge 
+                  className={`${quoteStatusColors.draft} cursor-pointer px-3 py-1`}
+                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "draft"})))}
+                >
+                  Set All to Draft ({quoteStats.draft})
+                </Badge>
+                <Badge 
+                  className={`${quoteStatusColors.sent} cursor-pointer px-3 py-1`}
+                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "sent", sentAt: new Date().toISOString().split('T')[0]})))}
+                >
+                  Set All to Sent ({quoteStats.sent})
+                </Badge>
+                <Badge 
+                  className={`${quoteStatusColors.accepted} cursor-pointer px-3 py-1`}
+                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "accepted"})))}
+                >
+                  Set All to Accepted ({quoteStats.accepted})
+                </Badge>
+                <Badge 
+                  className={`${quoteStatusColors.rejected} cursor-pointer px-3 py-1`}
+                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "rejected"})))}
+                >
+                  Set All to Rejected ({quoteStats.rejected})
+                </Badge>
+              </div>
             </div>
           </div>
           
@@ -854,7 +887,20 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                         <p className="text-sm text-muted-foreground">Valid Until</p>
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                          <p>{new Date(quote.validUntil).toLocaleDateString()}</p>
+                          <p 
+                            className={
+                              new Date(quote.validUntil) < new Date() && 
+                              (quote.status === "sent" || quote.status === "draft") 
+                                ? "text-red-600 font-medium" 
+                                : ""
+                            }
+                          >
+                            {new Date(quote.validUntil).toLocaleDateString()}
+                            {new Date(quote.validUntil) < new Date() && 
+                              (quote.status === "sent" || quote.status === "draft") && 
+                              " (overdue)"
+                            }
+                          </p>
                         </div>
                       </div>
                       <div className="space-y-1">
@@ -919,15 +965,15 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
               <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
               <p className="text-lg font-medium text-gray-500">No quotes found</p>
               <p className="text-gray-400 max-w-md mx-auto mt-2 mb-4">
-                {quoteStatusFilter === "all" 
-                  ? "Create and send quotes to clients for this project" 
-                  : quoteStatusFilter === "pending" 
-                    ? "No pending quotes found" 
-                    : "No completed quotes found"}
+                {quoteStatusFilter === "pending" 
+                  ? "No pending quotes found" 
+                  : quoteStatusFilter === "completed"
+                    ? "No completed quotes found"
+                    : "No overdue quotes found"}
               </p>
               <Button onClick={() => setShowQuoteModal(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Create First Quote
+                Create New Quote
               </Button>
             </div>
           )}
