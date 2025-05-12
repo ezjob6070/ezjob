@@ -128,33 +128,33 @@ export default function ProjectDetail() {
       
       <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="overview" variant="blue">Overview</TabsTrigger>
-          <TabsTrigger value="tasks" variant="blue">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tasks">
             <span className="flex items-center gap-1">
               <ListTodo className="h-4 w-4" />
               Tasks & Progress
             </span>
           </TabsTrigger>
-          <TabsTrigger value="staff" variant="blue">
+          <TabsTrigger value="staff">
             <span className="flex items-center gap-1">
               <Users className="h-4 w-4" />
               Staff & Contractors
             </span>
           </TabsTrigger>
-          <TabsTrigger value="equipment" variant="blue">
+          <TabsTrigger value="equipment">
             <span className="flex items-center gap-1">
               <Package className="h-4 w-4" />
               Equipment & Materials
             </span>
           </TabsTrigger>
-          <TabsTrigger value="files" variant="blue">Files & Documents</TabsTrigger>
-          <TabsTrigger value="finance" variant="blue">
+          <TabsTrigger value="files">Files & Documents</TabsTrigger>
+          <TabsTrigger value="finance">
             <span className="flex items-center gap-1">
               <DollarSign className="h-4 w-4" />
               Finance
             </span>
           </TabsTrigger>
-          <TabsTrigger value="timeline" variant="blue">Timeline</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-6 py-4">
