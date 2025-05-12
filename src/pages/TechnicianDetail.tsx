@@ -1,7 +1,7 @@
 
 import { useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, FileText, User, DollarSign, Briefcase } from "lucide-react";
 import TechnicianJobHistory from "@/components/technicians/TechnicianJobHistory";
 import TechnicianDocumentUpload from "@/components/technicians/TechnicianDocumentUpload";
 import EditTechnicianModal from "@/components/technicians/EditTechnicianModal";
@@ -60,11 +60,31 @@ const TechnicianDetail = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-4 w-full">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="financial">Financial</TabsTrigger>
-          <TabsTrigger value="history">Job History</TabsTrigger>
-          <TabsTrigger value="documents">Documents & Notes</TabsTrigger>
+        <TabsList className="grid grid-cols-4 w-full bg-muted/50">
+          <TabsTrigger value="overview" variant="blue">
+            <span className="flex items-center gap-1">
+              <User className="h-4 w-4" />
+              Overview
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="financial" variant="blue">
+            <span className="flex items-center gap-1">
+              <DollarSign className="h-4 w-4" />
+              Financial
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="history" variant="blue">
+            <span className="flex items-center gap-1">
+              <Briefcase className="h-4 w-4" />
+              Job History
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="documents" variant="blue">
+            <span className="flex items-center gap-1">
+              <FileText className="h-4 w-4" />
+              Documents & Notes
+            </span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
