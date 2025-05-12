@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { SearchIcon, ArrowUpDown, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -20,7 +19,6 @@ import { format } from "date-fns";
 import EntityFilter, { Entity } from "@/components/finance/EntityFilter";
 import { X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
@@ -205,22 +203,6 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
           title="Select Technicians"
           buttonText="Technicians"
         />
-
-        {/* Improved Status Filter using Tabs */}
-        <div className="flex items-center">
-          <Tabs 
-            value={jobStatus} 
-            onValueChange={setJobStatus}
-            className="w-full border rounded-md overflow-hidden"
-          >
-            <TabsList className="w-full bg-background grid grid-cols-4 p-1 h-10">
-              <TabsTrigger value="all" className="text-sm">All Jobs</TabsTrigger>
-              <TabsTrigger value="completed" className="text-sm">Completed</TabsTrigger>
-              <TabsTrigger value="cancelled" className="text-sm">Cancelled</TabsTrigger>
-              <TabsTrigger value="scheduled" className="text-sm">Scheduled</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
         
         <Popover>
           <PopoverTrigger asChild>
@@ -241,6 +223,19 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
             />
           </PopoverContent>
         </Popover>
+        
+        {/* Job Status Filter */}
+        <Select value={jobStatus} onValueChange={setJobStatus}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Job Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Jobs</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+          </SelectContent>
+        </Select>
         
         {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm || jobStatus !== "all") && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1">
