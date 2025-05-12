@@ -1,301 +1,347 @@
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Project, ProjectQuote } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { Project } from "@/types/project";
-import { BarChart, CheckCircle, Clock, PlusCircle, AlertTriangle } from "lucide-react";
-import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Check, Clock, FileText, X } from "lucide-react";
 
-type Quote = {
-  id: number;
-  title: string;
-  description: string;
-  amount: number;
-  status: "pending" | "completed" | "overdue";
-  date: string;
-}
-
-type ProjectFinanceTabProps = {
+interface ProjectFinanceTabProps {
   project: Project;
 }
 
-const ProjectFinanceTab = ({ project }: ProjectFinanceTabProps) => {
-  // Sample quotes data
-  const [quotes, setQuotes] = useState<Quote[]>([
-    {
-      id: 1,
-      title: "Initial Site Assessment",
-      description: "Comprehensive evaluation of the project site and requirements",
-      amount: 2500,
-      status: "completed",
-      date: "2023-11-15"
-    },
-    {
-      id: 2,
-      title: "Materials Supply (Phase 1)",
-      description: "Supply of materials for the first construction phase",
-      amount: 15800,
-      status: "pending",
-      date: "2024-01-10"
-    },
-    {
-      id: 3,
-      title: "Labor Costs (Month 1)",
-      description: "Specialized labor for foundation and structural work",
-      amount: 12500,
-      status: "completed",
-      date: "2023-12-05"
-    },
-    {
-      id: 4,
-      title: "Equipment Rental",
-      description: "Heavy machinery rental for excavation and site preparation",
-      amount: 8750,
-      status: "overdue",
-      date: "2023-10-20"
-    },
-    {
-      id: 5,
-      title: "Consulting Services",
-      description: "Engineering consultation and technical specifications",
-      amount: 4200,
-      status: "pending",
-      date: "2024-02-18"
-    }
-  ]);
-  
-  const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>(quotes);
-  
-  // Apply filters when selection changes
-  useEffect(() => {
-    if (activeFilter === "all") {
-      setFilteredQuotes(quotes);
-    } else {
-      setFilteredQuotes(quotes.filter(quote => quote.status === activeFilter));
-    }
-  }, [quotes, activeFilter]);
+type QuoteStatus = "all" | "draft" | "sent" | "accepted" | "rejected" | "expired" | "overdue";
 
-  // Calculate finance statistics
-  const totalQuotes = quotes.length;
-  const totalValue = quotes.reduce((sum, quote) => sum + quote.amount, 0);
-  const pendingValue = quotes
-    .filter(quote => quote.status === "pending")
-    .reduce((sum, quote) => sum + quote.amount, 0);
-  const completedValue = quotes
-    .filter(quote => quote.status === "completed")
-    .reduce((sum, quote) => sum + quote.amount, 0);
-  const overdueValue = quotes
-    .filter(quote => quote.status === "overdue")
-    .reduce((sum, quote) => sum + quote.amount, 0);
+const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<QuoteStatus>("all");
+  
+  const projectQuotes = project.quotes || [];
+  
+  // Apply status filter to quotes
+  const filteredQuotes = projectQuotes.filter(quote => {
+    if (quoteStatusFilter === "all") return true;
+    if (quoteStatusFilter === "overdue") {
+      const validUntil = new Date(quote.validUntil);
+      const today = new Date();
+      return validUntil < today && quote.status !== "accepted" && quote.status !== "rejected";
+    }
+    return quote.status === quoteStatusFilter;
+  });
 
-  // Handle status change for a quote
-  const handleStatusChange = (id: number, status: "pending" | "completed" | "overdue") => {
-    const updatedQuotes = quotes.map(quote => 
-      quote.id === id ? { ...quote, status } : quote
-    );
-    setQuotes(updatedQuotes);
-    toast.success(`Quote status updated to ${status}`);
+  // Function to update quote status
+  const handleStatusChange = (quoteId: string, newStatus: "draft" | "sent" | "accepted" | "rejected" | "expired") => {
+    toast.success(`Quote #${quoteId.slice(0, 5)} status updated to ${newStatus}`);
   };
 
-  // Handle setting all quotes to a specific status
-  const setAllQuotesToStatus = (status: "pending" | "completed" | "overdue") => {
-    const updatedQuotes = quotes.map(quote => ({
-      ...quote,
-      status
-    }));
-    setQuotes(updatedQuotes);
-    toast.success(`All quotes set to ${status}`);
+  // Function to set all quotes to a specific status
+  const updateAllQuotesStatus = (status: "draft" | "sent" | "accepted" | "rejected" | "expired") => {
+    toast.success(`All quotes updated to ${status}`);
   };
 
-  // Function to get status badge style
-  const getStatusStyles = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800 hover:bg-green-200';
-      case 'pending':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-      case 'overdue':
-        return 'bg-red-100 text-red-800 hover:bg-red-200';
+  const getQuoteBadgeStyles = (status: string) => {
+    switch(status) {
+      case "draft":
+        return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+      case "sent":
+        return "bg-blue-100 text-blue-800 hover:bg-blue-200";
+      case "accepted":
+        return "bg-green-100 text-green-800 hover:bg-green-200";
+      case "rejected":
+        return "bg-red-100 text-red-800 hover:bg-red-200";
+      case "expired":
+        return "bg-amber-100 text-amber-800 hover:bg-amber-200";
       default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+        return "bg-gray-100 text-gray-800 hover:bg-gray-200";
     }
+  };
+
+  // Check if quote is overdue
+  const isQuoteOverdue = (validUntil: string) => {
+    const validUntilDate = new Date(validUntil);
+    const today = new Date();
+    return validUntilDate < today;
   };
 
   return (
     <div className="space-y-6">
-      {/* Finance Overview Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Total Quotes</CardDescription>
-            <CardTitle className="text-2xl">{totalQuotes}</CardTitle>
+            <CardTitle className="text-lg font-medium">Total Budget</CardTitle>
           </CardHeader>
-          <CardContent className="pb-2">
-            <p className="text-lg font-medium">{formatCurrency(totalValue)}</p>
+          <CardContent>
+            <p className="text-2xl font-bold">{formatCurrency(project.budget)}</p>
+            <p className="text-muted-foreground text-sm">Allocated budget</p>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Pending</CardDescription>
-            <CardTitle className="text-2xl">{quotes.filter(q => q.status === "pending").length}</CardTitle>
+            <CardTitle className="text-lg font-medium">Actual Spent</CardTitle>
           </CardHeader>
-          <CardContent className="pb-2">
-            <p className="text-lg font-medium">{formatCurrency(pendingValue)}</p>
+          <CardContent>
+            <p className="text-2xl font-bold">{formatCurrency(project.actualSpent)}</p>
+            <p className="text-muted-foreground text-sm">Total expenses to date</p>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Completed</CardDescription>
-            <CardTitle className="text-2xl">{quotes.filter(q => q.status === "completed").length}</CardTitle>
+            <CardTitle className="text-lg font-medium">Remaining</CardTitle>
           </CardHeader>
-          <CardContent className="pb-2">
-            <p className="text-lg font-medium">{formatCurrency(completedValue)}</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Overdue</CardDescription>
-            <CardTitle className="text-2xl">{quotes.filter(q => q.status === "overdue").length}</CardTitle>
-          </CardHeader>
-          <CardContent className="pb-2">
-            <p className="text-lg font-medium">{formatCurrency(overdueValue)}</p>
+          <CardContent>
+            <p className="text-2xl font-bold">{formatCurrency(project.budget - project.actualSpent)}</p>
+            <p className="text-muted-foreground text-sm">Available budget</p>
           </CardContent>
         </Card>
       </div>
-      
+
       {/* Quotes Section */}
       <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <CardTitle>Project Quotes</CardTitle>
-              <CardDescription>Manage and track all project quotes</CardDescription>
+        <CardHeader className="border-b">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>Project Quotes</CardTitle>
+            <div className="flex gap-2">
+              <Select onValueChange={(value) => updateAllQuotesStatus(value as any)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Set All Quotes To..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Set All to Draft</SelectItem>
+                  <SelectItem value="sent">Set All to Sent</SelectItem>
+                  <SelectItem value="accepted">Set All to Accepted</SelectItem>
+                  <SelectItem value="rejected">Set All to Rejected</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Button className="flex items-center gap-2 self-start md:self-center">
-              <PlusCircle className="h-4 w-4" />
-              Add New Quote
-            </Button>
           </div>
         </CardHeader>
-        
-        <CardContent className="space-y-6">
-          {/* Quote Filters */}
-          <div className="mb-6">
+        <CardContent className="p-0">
+          {/* Improved Quote Status Filter - similar to Task & Progress tab */}
+          <div className="p-4 border-b">
             <Tabs 
-              defaultValue="all" 
-              value={activeFilter}
-              onValueChange={setActiveFilter} 
+              value={quoteStatusFilter} 
+              onValueChange={(value) => setQuoteStatusFilter(value as QuoteStatus)}
               className="w-full"
             >
-              <TabsList className="grid grid-cols-4 md:w-auto mb-2">
-                <TabsTrigger value="all" className="text-base">
-                  All Quotes
+              <TabsList className="w-full bg-muted/50 p-1 grid grid-cols-5 sm:grid-cols-7 h-10 mb-2">
+                <TabsTrigger value="all" className="flex gap-1 items-center">
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">All</span>
                 </TabsTrigger>
-                <TabsTrigger value="pending" className="text-base">
-                  <Clock className="h-4 w-4 mr-2 inline" />
-                  Pending
+                <TabsTrigger value="draft" className="flex gap-1 items-center">
+                  <Clock className="h-4 w-4" />
+                  <span className="hidden sm:inline">Draft</span>
                 </TabsTrigger>
-                <TabsTrigger value="completed" className="text-base">
-                  <CheckCircle className="h-4 w-4 mr-2 inline" />
-                  Completed
+                <TabsTrigger value="sent" className="flex gap-1 items-center">
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sent</span>
                 </TabsTrigger>
-                <TabsTrigger value="overdue" className="text-base">
-                  <AlertTriangle className="h-4 w-4 mr-2 inline" />
-                  Overdue
+                <TabsTrigger value="accepted" className="flex gap-1 items-center">
+                  <Check className="h-4 w-4" />
+                  <span className="hidden sm:inline">Accepted</span>
+                </TabsTrigger>
+                <TabsTrigger value="rejected" className="flex gap-1 items-center">
+                  <X className="h-4 w-4" />
+                  <span className="hidden sm:inline">Rejected</span>
+                </TabsTrigger>
+                <TabsTrigger value="expired" className="flex gap-1 items-center">
+                  <Clock className="h-4 w-4" />
+                  <span className="hidden sm:inline">Expired</span>
+                </TabsTrigger>
+                <TabsTrigger value="overdue" className="flex gap-1 items-center">
+                  <Clock className="h-4 w-4 text-red-500" />
+                  <span className="hidden sm:inline">Overdue</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-          </div>
-          
-          {/* Quick Actions */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="text-gray-700"
-              onClick={() => setAllQuotesToStatus("pending")}
-            >
-              Set All to Pending
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="text-gray-700"
-              onClick={() => setAllQuotesToStatus("completed")}
-            >
-              Complete All Quotes
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="text-gray-700"
-              onClick={() => setAllQuotesToStatus("overdue")}
-            >
-              Mark All as Overdue
-            </Button>
-          </div>
-          
-          {/* Quotes List */}
-          <div className="space-y-4">
-            {filteredQuotes.length > 0 ? (
-              filteredQuotes.map(quote => (
-                <Card key={quote.id} className={`overflow-hidden ${quote.status === 'overdue' ? 'border-red-300 bg-red-50' : ''}`}>
-                  <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <h3 className="text-lg font-medium">{quote.title}</h3>
-                          <div className="flex items-center">
-                            <Select 
-                              defaultValue={quote.status}
-                              onValueChange={(value) => handleStatusChange(quote.id, value as any)}
-                            >
-                              <SelectTrigger className={`w-[120px] h-8 ${getStatusStyles(quote.status)}`}>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="overdue">Overdue</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">{quote.description}</p>
-                        <div className="flex items-center gap-6 mt-3">
-                          <div>
-                            <p className="text-sm text-gray-500">Date</p>
-                            <p className="font-medium">{quote.date}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-500">Amount</p>
-                            <p className="font-medium">{formatCurrency(quote.amount)}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <div className="text-center py-8 bg-gray-50 rounded-lg">
-                <BarChart className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-medium">No quotes found</h3>
-                <p className="text-gray-500 max-w-md mx-auto mt-1">
-                  {activeFilter === 'all' 
-                    ? 'There are no quotes for this project yet.' 
-                    : `There are no ${activeFilter} quotes for this project.`}
-                </p>
+            
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium">
+                  {filteredQuotes.length} {filteredQuotes.length === 1 ? 'Quote' : 'Quotes'} 
+                  {quoteStatusFilter !== "all" ? 
+                    ` • ${quoteStatusFilter.charAt(0).toUpperCase() + quoteStatusFilter.slice(1)}` : ''}
+                </h3>
               </div>
-            )}
+            </div>
           </div>
+          
+          {filteredQuotes.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Quote ID</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Valid Until</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredQuotes.map((quote) => {
+                  const isOverdue = isQuoteOverdue(quote.validUntil) && quote.status !== "accepted" && quote.status !== "rejected";
+                  
+                  return (
+                    <TableRow key={quote.id} className={isOverdue ? "bg-red-50" : ""}>
+                      <TableCell className="font-medium">#{quote.id.slice(0, 5)}</TableCell>
+                      <TableCell>{new Date(quote.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {new Date(quote.validUntil).toLocaleDateString()}
+                        {isOverdue && (
+                          <Badge variant="destructive" className="ml-2">Overdue</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>{formatCurrency(quote.totalAmount)}</TableCell>
+                      <TableCell>
+                        <Select 
+                          defaultValue={quote.status}
+                          onValueChange={(value) => handleStatusChange(quote.id, value as any)}
+                        >
+                          <SelectTrigger className={`w-[120px] ${getQuoteBadgeStyles(quote.status)}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="draft">Draft</SelectItem>
+                            <SelectItem value="sent">Sent</SelectItem>
+                            <SelectItem value="accepted">Accepted</SelectItem>
+                            <SelectItem value="rejected">Rejected</SelectItem>
+                            <SelectItem value="expired">Expired</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <button className="text-blue-600 hover:text-blue-800 text-sm">
+                            View
+                          </button>
+                          <button className="text-blue-600 hover:text-blue-800 text-sm">
+                            Download
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <FileText className="h-12 w-12 text-gray-400 mb-3" />
+              <h3 className="text-lg font-medium mb-1">No quotes found</h3>
+              <p className="text-gray-500 max-w-sm mb-4">
+                {quoteStatusFilter !== "all" 
+                  ? `There are no quotes with ${quoteStatusFilter} status` 
+                  : "No quotes have been created for this project yet"}
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Invoices Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Invoices</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {project.invoices && project.invoices.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Invoice ID</TableHead>
+                  <TableHead>Contractor</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Due Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {project.invoices.map((invoice) => (
+                  <TableRow key={invoice.id}>
+                    <TableCell className="font-medium">#{invoice.id.slice(0, 5)}</TableCell>
+                    <TableCell>{invoice.contractorName}</TableCell>
+                    <TableCell>{new Date(invoice.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
+                    <TableCell>
+                      <Badge className={
+                        invoice.status === "paid" ? "bg-green-100 text-green-800" : 
+                        invoice.status === "overdue" ? "bg-red-100 text-red-800" :
+                        invoice.status === "sent" ? "bg-blue-100 text-blue-800" :
+                        "bg-gray-100 text-gray-800"
+                      }>
+                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <FileText className="h-12 w-12 text-gray-400 mb-3" />
+              <h3 className="text-lg font-medium mb-1">No invoices found</h3>
+              <p className="text-gray-500 max-w-sm mb-4">
+                No invoices have been created for this project yet
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Expenses Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Expenses</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {project.expenses && project.expenses.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Expense ID</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {project.expenses.map((expense) => (
+                  <TableRow key={expense.id}>
+                    <TableCell className="font-medium">#{expense.id.slice(0, 5)}</TableCell>
+                    <TableCell>{expense.name}</TableCell>
+                    <TableCell>{expense.category}</TableCell>
+                    <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatCurrency(expense.amount)}</TableCell>
+                    <TableCell>
+                      <Badge className={
+                        expense.status === "paid" ? "bg-green-100 text-green-800" : 
+                        expense.status === "cancelled" ? "bg-red-100 text-red-800" :
+                        "bg-amber-100 text-amber-800"
+                      }>
+                        {expense.status.charAt(0).toUpperCase() + expense.status.slice(1)}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <FileText className="h-12 w-12 text-gray-400 mb-3" />
+              <h3 className="text-lg font-medium mb-1">No expenses found</h3>
+              <p className="text-gray-500 max-w-sm mb-4">
+                No expenses have been recorded for this project yet
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
