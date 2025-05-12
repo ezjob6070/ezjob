@@ -31,6 +31,10 @@ const SortFilterDropdown: React.FC<SortFilterDropdownProps> = ({
       case "name-desc": return "Name (Z-A)";
       case "revenue-high": return "Revenue (High-Low)";
       case "revenue-low": return "Revenue (Low-High)";
+      case "profit-high": return "Profit (High-Low)";
+      case "profit-low": return "Profit (Low-High)";
+      case "jobs-high": return "Jobs (High-Low)";
+      case "jobs-low": return "Jobs (Low-High)";
       default: return "Sort By";
     }
   };
@@ -89,6 +93,34 @@ const SortFilterDropdown: React.FC<SortFilterDropdownProps> = ({
         >
           <ArrowUp className="h-4 w-4" />
           <span>Revenue (Low-High)</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          className="flex items-center gap-2" 
+          onClick={() => onSortChange("profit-high")}
+        >
+          <ArrowDown className="h-4 w-4" />
+          <span>Profit (High-Low)</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          className="flex items-center gap-2" 
+          onClick={() => onSortChange("profit-low")}
+        >
+          <ArrowUp className="h-4 w-4" />
+          <span>Profit (Low-High)</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          className="flex items-center gap-2" 
+          onClick={() => onSortChange("jobs-high")}
+        >
+          <ArrowDown className="h-4 w-4" />
+          <span>Jobs (High-Low)</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          className="flex items-center gap-2" 
+          onClick={() => onSortChange("jobs-low")}
+        >
+          <ArrowUp className="h-4 w-4" />
+          <span>Jobs (Low-High)</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

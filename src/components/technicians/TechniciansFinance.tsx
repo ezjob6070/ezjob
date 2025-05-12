@@ -52,7 +52,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   });
   const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>(transactions);
   const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("all");
-  const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
 
   // Convert technicians to Entity type for the filter component
   const technicianEntities: Entity[] = technicians.map(tech => ({
@@ -169,6 +169,14 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
         return b.totalRevenue - a.totalRevenue;
       case "revenue-low":
         return a.totalRevenue - b.totalRevenue;
+      case "profit-high":
+        return b.companyProfit - a.companyProfit;
+      case "profit-low":
+        return a.companyProfit - b.companyProfit;
+      case "jobs-high":
+        return b.totalJobs - a.totalJobs;
+      case "jobs-low":
+        return a.totalJobs - b.totalJobs;
       default:
         // For column-based sorting (existing logic)
         const valueA = a[sortColumn];
@@ -210,7 +218,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     setSearchTerm("");
     setJobStatus("all");
     setQuoteStatusFilter("all");
-    setSortOption("newest");
+    setSortOption("revenue-high");
   };
 
   return (
@@ -221,12 +229,6 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
           onSearchChange={setSearchTerm}
           placeholder="Search technicians..."
           className="flex-1 min-w-[180px]"
-        />
-        
-        <SortFilterDropdown
-          sortBy={sortOption}
-          onSortChange={setSortOption}
-          compact={true}
         />
         
         <EntityFilter
@@ -269,6 +271,12 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
             <SelectItem value="scheduled">Scheduled</SelectItem>
           </SelectContent>
         </Select>
+        
+        <SortFilterDropdown
+          sortBy={sortOption}
+          onSortChange={setSortOption}
+          compact={true}
+        />
         
         {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm || jobStatus !== "all" || quoteStatusFilter !== "all") && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1">
@@ -406,13 +414,20 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
         </Tabs>
       </div>
 
-      {/* Search bar for quotes/customers */}
-      <div className="mb-4">
+      {/* Search and Sort Row */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <SearchBar
           searchTerm=""
           onSearchChange={() => {}}
           placeholder="Search by customer name, phone, or quote details..."
           showIcons={true}
+          className="flex-1"
+        />
+        
+        <SortFilterDropdown
+          sortBy={sortOption}
+          onSortChange={setSortOption}
+          compact={true}
         />
       </div>
 
