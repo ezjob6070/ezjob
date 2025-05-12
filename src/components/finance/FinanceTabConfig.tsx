@@ -17,10 +17,10 @@ export type FinanceTabId = "overview" | "jobSources" | "technicians" | "contract
 
 // Quote tab options
 export const quoteTabOptions = [
-  { id: "all", label: "All Quotes", color: "bg-gray-100 text-gray-800" },
-  { id: "pending", label: "Pending", color: "bg-blue-100 text-blue-800" },
-  { id: "completed", label: "Completed", color: "bg-green-100 text-green-800" },
-  { id: "overdue", label: "Overdue", color: "bg-red-100 text-red-800" }
+  { id: "all", label: "All Quotes", color: "bg-gray-100 text-gray-800", variant: "default" },
+  { id: "pending", label: "Pending", color: "bg-blue-100 text-blue-800", variant: "blue" },
+  { id: "completed", label: "Completed", color: "bg-green-100 text-green-800", variant: "amber" },
+  { id: "overdue", label: "Overdue", color: "bg-red-100 text-red-800", variant: "red" }
 ];
 
 export type QuoteTabId = "all" | "pending" | "completed" | "overdue";

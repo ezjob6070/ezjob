@@ -25,8 +25,9 @@ const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & {
     variant?: "default" | "purple" | "blue" | "amber" | "red"
+    badge?: number
   }
->(({ className, variant = "default", ...props }, ref) => (
+>(({ className, variant = "default", badge, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -50,7 +51,23 @@ const TabsTrigger = React.forwardRef<
       className
     )}
     {...props}
-  />
+  >
+    <div className="flex items-center gap-1.5">
+      {props.children}
+      {typeof badge === 'number' && (
+        <span className={cn(
+          "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-medium",
+          variant === "default" && "bg-gray-200 text-gray-700",
+          variant === "purple" && "bg-purple-100 text-purple-800",
+          variant === "blue" && "bg-blue-100 text-blue-800",
+          variant === "amber" && "bg-amber-100 text-amber-800",
+          variant === "red" && "bg-red-100 text-red-800",
+        )}>
+          {badge}
+        </span>
+      )}
+    </div>
+  </TabsPrimitive.Trigger>
 ))
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 

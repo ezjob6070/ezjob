@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useFinanceData } from "@/hooks/useFinanceData";
+import { quoteTabOptions } from "@/components/finance/FinanceTabConfig";
 
 interface ProjectFinanceTabProps {
   project: Project;
@@ -191,6 +192,18 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     expired: quotes.filter(q => q.status === "expired").length,
     totalValue: quotes.reduce((sum, q) => sum + q.totalAmount, 0),
     acceptedValue: quotes.filter(q => q.status === "accepted").reduce((sum, q) => sum + q.totalAmount, 0),
+    overdue: quotes.filter(q => {
+      const validUntilDate = new Date(q.validUntil);
+      const today = new Date();
+      return (q.status === "sent" || q.status === "draft") && validUntilDate < today;
+    }).length
+  };
+  
+  // Calculate counts for each quote tab
+  const quoteCounts = {
+    all: quotes.length,
+    pending: quotes.filter(q => q.status === "sent" || q.status === "draft").length,
+    completed: quotes.filter(q => q.status === "accepted" || q.status === "rejected").length,
     overdue: quotes.filter(q => {
       const validUntilDate = new Date(q.validUntil);
       const today = new Date();
@@ -710,21 +723,19 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </Button>
           </div>
           
-          {/* New Quotes Filter Tabs */}
+          {/* New Quotes Filter Tabs - Updated with wider layout and badges */}
           <Tabs value={activeQuoteTab} onValueChange={setActiveQuoteTab} className="mt-2 mb-4">
-            <TabsList className="grid grid-cols-4 w-full max-w-md mx-auto">
-              <TabsTrigger value="all">
-                All
-              </TabsTrigger>
-              <TabsTrigger value="pending" variant="blue">
-                Pending
-              </TabsTrigger>
-              <TabsTrigger value="completed" variant="green">
-                Completed
-              </TabsTrigger>
-              <TabsTrigger value="overdue" variant="red">
-                Overdue
-              </TabsTrigger>
+            <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto">
+              {quoteTabOptions.map((tab) => (
+                <TabsTrigger 
+                  key={tab.id} 
+                  value={tab.id} 
+                  variant={tab.variant as "default" | "blue" | "amber" | "red"}
+                  badge={quoteCounts[tab.id as keyof typeof quoteCounts]}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </Tabs>
           
