@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Package } from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project, ProjectContractor } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -15,6 +14,7 @@ import { toast } from "sonner";
 import ProjectFinanceTab from "@/components/project/ProjectFinanceTab";
 import ProjectTasksTab from "@/components/project/ProjectTasksTab";
 import ProjectStaffTab from "@/components/project/ProjectStaffTab";
+import ProjectEquipmentTab from "@/components/project/ProjectEquipmentTab";
 
 interface ProjectFile {
   id: string;
@@ -139,6 +139,12 @@ export default function ProjectDetail() {
             <span className="flex items-center gap-1">
               <Users className="h-4 w-4" />
               Staff & Contractors
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="equipment">
+            <span className="flex items-center gap-1">
+              <Package className="h-4 w-4" />
+              Equipment & Materials
             </span>
           </TabsTrigger>
           <TabsTrigger value="files">Files & Documents</TabsTrigger>
@@ -317,6 +323,14 @@ export default function ProjectDetail() {
         
         <TabsContent value="staff" className="py-4">
           <ProjectStaffTab projectId={project.id} />
+        </TabsContent>
+        
+        <TabsContent value="equipment" className="py-4">
+          <ProjectEquipmentTab 
+            projectId={project.id} 
+            projectEquipment={project.equipment} 
+            projectMaterials={project.materials} 
+          />
         </TabsContent>
         
         <TabsContent value="files" className="space-y-6 py-4">
