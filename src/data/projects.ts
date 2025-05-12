@@ -53,7 +53,9 @@ export const initialProjects: Project[] = [
         email: "robert@metrodev.com",
         phone: "555-123-4567"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 2,
@@ -95,7 +97,9 @@ export const initialProjects: Project[] = [
         email: "diana@riverprops.com",
         phone: "555-234-5678"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 3,
@@ -149,7 +153,9 @@ export const initialProjects: Project[] = [
         email: "mchang@techfuture.com",
         phone: "555-345-6789"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 4,
@@ -191,7 +197,9 @@ export const initialProjects: Project[] = [
         email: "robert@metrodev.com",
         phone: "555-123-4567"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 5,
@@ -233,7 +241,9 @@ export const initialProjects: Project[] = [
         email: "jadams@summit.com",
         phone: "555-456-7890"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 6,
@@ -275,7 +285,9 @@ export const initialProjects: Project[] = [
         email: "wfoster@cityplanning.gov",
         phone: "555-567-8901"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 7,
@@ -317,7 +329,9 @@ export const initialProjects: Project[] = [
         email: "pnelson@healthcare.org",
         phone: "555-678-9012"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 8,
@@ -359,7 +373,9 @@ export const initialProjects: Project[] = [
         email: "diana@riverprops.com",
         phone: "555-234-5678"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 9,
@@ -401,7 +417,9 @@ export const initialProjects: Project[] = [
         email: "kbarnes@coastal.com",
         phone: "555-789-0123"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   },
   {
     id: 10,
@@ -443,7 +461,9 @@ export const initialProjects: Project[] = [
         email: "wfoster@cityplanning.gov",
         phone: "555-567-8901"
       }
-    ]
+    ],
+    invoices: [],
+    quotes: []
   }
 ];
 

@@ -27,6 +27,10 @@ export interface Project {
   
   // Adding tasks for progress tracking
   tasks?: ProjectTask[];
+  
+  // Adding invoices and quotes
+  invoices?: ProjectInvoice[];
+  quotes?: ProjectQuote[];
 }
 
 export interface ProjectExpense {
@@ -140,4 +144,45 @@ export interface ProjectTaskAttachment {
   url: string;
   uploadedAt: string;
   uploadedBy: string;
+}
+
+// New interfaces for invoices and quotes
+export interface ProjectInvoice {
+  id: string;
+  number: string;
+  recipientType: "client" | "contractor" | "supplier";
+  recipientName: string;
+  recipientEmail?: string;
+  items: InvoiceItem[];
+  totalAmount: number;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  issueDate: string;
+  dueDate: string;
+  paymentDate?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface ProjectQuote {
+  id: string;
+  number: string;
+  clientName: string;
+  clientEmail?: string;
+  items: InvoiceItem[];
+  totalAmount: number;
+  status: "draft" | "sent" | "accepted" | "rejected" | "expired";
+  issueDate: string;
+  validUntil: string;
+  acceptedDate?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  category?: string;
 }

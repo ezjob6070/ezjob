@@ -53,7 +53,7 @@ export default function ProjectDetail() {
   ]);
 
   // Find project by ID
-  const project = initialProjects.find(p => p.id === Number(id)) || {
+  const defaultProject = {
     id: 0,
     name: "Project Not Found",
     type: "Unknown",
@@ -69,8 +69,13 @@ export default function ProjectDetail() {
     actualSpent: 0,
     clientName: "Unknown",
     revenue: 0,
-    contractors: []
+    contractors: [],
+    invoices: [],
+    quotes: []
   };
+  
+  const foundProject = initialProjects.find(p => p.id === Number(id));
+  const [project, setProject] = useState<Project>(foundProject || defaultProject);
 
   const handleFileUpload = (type: "document" | "image") => {
     // This would be replaced with actual file upload logic
@@ -94,6 +99,12 @@ export default function ProjectDetail() {
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+  
+  const handleProjectUpdate = (updatedProject: Project) => {
+    setProject(updatedProject);
+    // In a real application, this would save to the backend
+    // For now, we just update the local state
   };
 
   return (
