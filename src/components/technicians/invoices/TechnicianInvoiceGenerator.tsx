@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import { Technician } from "@/types/technician";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Printer, X, Invoice, CoatRack } from "lucide-react";
+import { FileText, Download, Printer, X, FileText as FileTextIcon, Briefcase } from "lucide-react";
 import TechnicianInvoiceDialog from "./TechnicianInvoiceDialog";
 import TechnicianInvoicePreview from "./TechnicianInvoicePreview";
 import { toast } from "@/components/ui/use-toast";
