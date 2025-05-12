@@ -173,10 +173,6 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
         return b.companyProfit - a.companyProfit;
       case "profit-low":
         return a.companyProfit - b.companyProfit;
-      case "jobs-high":
-        return b.totalJobs - a.totalJobs;
-      case "jobs-low":
-        return a.totalJobs - b.totalJobs;
       default:
         // For column-based sorting (existing logic)
         const valueA = a[sortColumn];
