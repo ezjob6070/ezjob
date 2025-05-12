@@ -1,28 +1,14 @@
 
-import { INDUSTRY_TYPES } from "./sidebarConstants";
+import { ReactNode } from "react";
 
-export type IndustryType = 'service' | 'real_estate' | 'construction' | 'general';
+export type IndustryType = "construction" | "real-estate" | "general";
 
-export type NavItem = {
+export interface NavItem {
   label: string;
-  icon: JSX.Element;
   href?: string;
+  icon?: ReactNode;
+  disabled?: boolean;
+  external?: boolean;
+  industry?: IndustryType[];
   children?: NavItem[];
-  industries?: string[]; // Only show for specific industries
-};
-
-export type SidebarProps = {
-  isMobile: boolean;
-};
-
-export type NavItemProps = {
-  item: NavItem;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
-  currentPath: string;
-};
-
-export type SubNavItemProps = {
-  item: NavItem;
-  currentPath: string;
-};
+}
