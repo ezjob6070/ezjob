@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -723,9 +722,9 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </Button>
           </div>
           
-          {/* New Quotes Filter Tabs - Updated with wider layout and badges */}
+          {/* Quote Tabs - Updated with uniform width and icons */}
           <Tabs value={activeQuoteTab} onValueChange={setActiveQuoteTab} className="mt-2 mb-4">
-            <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto">
+            <TabsList className="grid grid-cols-4 w-full">
               {quoteTabOptions.map((tab) => (
                 <TabsTrigger 
                   key={tab.id} 
@@ -733,7 +732,10 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                   variant={tab.variant as "default" | "blue" | "amber" | "red"}
                   badge={quoteCounts[tab.id as keyof typeof quoteCounts]}
                 >
-                  {tab.label}
+                  <span className="flex items-center gap-2">
+                    {tab.icon}
+                    {tab.label}
+                  </span>
                 </TabsTrigger>
               ))}
             </TabsList>
