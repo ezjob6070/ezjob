@@ -14,18 +14,36 @@ interface SortFilterDropdownProps {
   sortBy: SortOption;
   onSortChange: (option: SortOption) => void;
   label?: string;
+  compact?: boolean;
 }
 
 const SortFilterDropdown: React.FC<SortFilterDropdownProps> = ({
   sortBy,
   onSortChange,
-  label = "Sort By"
+  label = "Sort By",
+  compact = false
 }) => {
+  const getActiveOptionLabel = () => {
+    switch(sortBy) {
+      case "newest": return "Newest First";
+      case "oldest": return "Oldest First";
+      case "name-asc": return "Name (A-Z)";
+      case "name-desc": return "Name (Z-A)";
+      case "revenue-high": return "Revenue (High-Low)";
+      case "revenue-low": return "Revenue (Low-High)";
+      default: return "Sort By";
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-1 h-9">
-          {label}
+        <Button 
+          variant="outline" 
+          size={compact ? "sm" : "default"}
+          className="flex items-center gap-1"
+        >
+          {compact ? getActiveOptionLabel() : label}
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>

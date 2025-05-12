@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { ArrowUpDown, Calendar, List, Clock, Check, CalendarX } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -21,6 +20,8 @@ import { X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SearchBar from "@/components/finance/filters/SearchBar";
+import SortFilterDropdown from "@/components/common/SortFilterDropdown";
+import { SortOption } from "@/types/sortOptions";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
@@ -51,6 +52,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   });
   const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>(transactions);
   const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("all");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
 
   // Convert technicians to Entity type for the filter component
   const technicianEntities: Entity[] = technicians.map(tech => ({
@@ -152,23 +154,38 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     record.technician.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Sort records
+  // Sort records based on sortOption
   const sortedRecords = [...filteredRecords].sort((a, b) => {
-    const valueA = a[sortColumn];
-    const valueB = b[sortColumn];
-    
-    if (typeof valueA === 'number' && typeof valueB === 'number') {
-      return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
+    switch (sortOption) {
+      case "newest":
+        return new Date(b.technician.hireDate || 0).getTime() - new Date(a.technician.hireDate || 0).getTime();
+      case "oldest":
+        return new Date(a.technician.hireDate || 0).getTime() - new Date(b.technician.hireDate || 0).getTime();
+      case "name-asc":
+        return a.technician.name.localeCompare(b.technician.name);
+      case "name-desc":
+        return b.technician.name.localeCompare(a.technician.name);
+      case "revenue-high":
+        return b.totalRevenue - a.totalRevenue;
+      case "revenue-low":
+        return a.totalRevenue - b.totalRevenue;
+      default:
+        // For column-based sorting (existing logic)
+        const valueA = a[sortColumn];
+        const valueB = b[sortColumn];
+        
+        if (typeof valueA === 'number' && typeof valueB === 'number') {
+          return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
+        }
+        
+        if (sortColumn === "technician") {
+          return sortDirection === "asc" 
+            ? a.technician.name.localeCompare(b.technician.name)
+            : b.technician.name.localeCompare(a.technician.name);
+        }
+        
+        return 0;
     }
-    
-    // Handle technician object differently
-    if (sortColumn === "technician") {
-      return sortDirection === "asc" 
-        ? a.technician.name.localeCompare(b.technician.name)
-        : b.technician.name.localeCompare(a.technician.name);
-    }
-    
-    return 0;
   });
 
   const handleSort = (column: keyof TechnicianFinanceRecord) => {
@@ -193,6 +210,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     setSearchTerm("");
     setJobStatus("all");
     setQuoteStatusFilter("all");
+    setSortOption("newest");
   };
 
   return (
@@ -203,6 +221,12 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
           onSearchChange={setSearchTerm}
           placeholder="Search technicians..."
           className="flex-1 min-w-[180px]"
+        />
+        
+        <SortFilterDropdown
+          sortBy={sortOption}
+          onSortChange={setSortOption}
+          compact={true}
         />
         
         <EntityFilter
@@ -370,7 +394,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
               <Clock className="h-3.5 w-3.5 mr-1.5" />
               <span>Pending</span>
             </TabsTrigger>
-            <TabsTrigger value="completed" className="h-7 px-3 text-xs">
+            <TabsTrigger value="completed" className="h-7 px-3 text-xs text-green-800 data-[state=active]:bg-green-100">
               <Check className="h-3.5 w-3.5 mr-1.5" />
               <span>Completed</span>
             </TabsTrigger>
@@ -380,6 +404,16 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
             </TabsTrigger>
           </TabsList>
         </Tabs>
+      </div>
+
+      {/* Search bar for quotes/customers */}
+      <div className="mb-4">
+        <SearchBar
+          searchTerm=""
+          onSearchChange={() => {}}
+          placeholder="Search by customer name, phone, or quote details..."
+          showIcons={true}
+        />
       </div>
 
       <div className="rounded-md border overflow-hidden">
