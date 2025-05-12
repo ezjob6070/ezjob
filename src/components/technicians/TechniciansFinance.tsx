@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SearchBar from "@/components/finance/filters/SearchBar";
 import SortFilterDropdown from "@/components/common/SortFilterDropdown";
+import PriceRangeFilter from "@/components/common/PriceRangeFilter";
 import { SortOption } from "@/types/sortOptions";
 
 type TechnicianFinanceRecord = {
@@ -53,6 +54,8 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>(transactions);
   const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("all");
   const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
+  const [minAmount, setMinAmount] = useState<number>(0);
+  const [maxAmount, setMaxAmount] = useState<number>(Number.MAX_SAFE_INTEGER);
 
   // Convert technicians to Entity type for the filter component
   const technicianEntities: Entity[] = technicians.map(tech => ({
@@ -97,8 +100,14 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
       });
     }
     
+    // Filter by price range
+    filtered = filtered.filter(transaction => 
+      transaction.amount >= minAmount && 
+      transaction.amount <= maxAmount
+    );
+    
     setFilteredTransactions(filtered);
-  }, [selectedTechnicianIds, jobStatus, dateRange, transactions, technicians, quoteStatusFilter]);
+  }, [selectedTechnicianIds, jobStatus, dateRange, transactions, technicians, quoteStatusFilter, minAmount, maxAmount]);
 
   // Calculate financial metrics for each technician
   const technicianFinances: TechnicianFinanceRecord[] = technicians
@@ -215,6 +224,13 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     setJobStatus("all");
     setQuoteStatusFilter("all");
     setSortOption("revenue-high");
+    setMinAmount(0);
+    setMaxAmount(Number.MAX_SAFE_INTEGER);
+  };
+
+  const handlePriceRangeChange = (min: number, max: number) => {
+    setMinAmount(min);
+    setMaxAmount(max);
   };
 
   return (
@@ -274,7 +290,15 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
           compact={true}
         />
         
-        {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm || jobStatus !== "all" || quoteStatusFilter !== "all") && (
+        <PriceRangeFilter
+          minAmount={minAmount}
+          maxAmount={maxAmount}
+          onRangeChange={handlePriceRangeChange}
+          compact={true}
+        />
+        
+        {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm || jobStatus !== "all" || 
+          quoteStatusFilter !== "all" || minAmount > 0 || maxAmount < Number.MAX_SAFE_INTEGER) && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1">
             <X className="h-4 w-4" />
             Clear Filters
