@@ -1,3 +1,4 @@
+
 export interface Project {
   id: number;
   name: string;
@@ -30,6 +31,24 @@ export interface Project {
   // Adding quotes and invoices
   quotes?: ProjectQuote[];
   invoices?: ProjectInvoice[];
+  
+  // Adding staff management
+  staff?: ProjectStaff[];
+}
+
+export interface ProjectStaff {
+  id: string;
+  name: string;
+  role: string;
+  email?: string;
+  phone?: string;
+  hourlyRate?: number;
+  startDate: string;
+  endDate?: string;
+  status: "active" | "completed" | "terminated";
+  notes?: string;
+  specialty?: string;
+  assignedTasks?: string[];
 }
 
 export interface ProjectExpense {

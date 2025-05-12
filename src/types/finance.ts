@@ -17,6 +17,7 @@ export interface FinancialTransaction {
   jobTitle?: string;
   jobSourceId?: string;
   jobSourceName?: string;
+  quoteStatus?: "pending" | "accepted" | "rejected" | "completed";
 }
 
 export interface FinancialReport {
@@ -131,3 +132,18 @@ export interface CompanyProfile {
   description?: string;
 }
 
+// Project staff management types
+export interface ProjectStaff {
+  id: string;
+  name: string;
+  role: string;
+  email?: string;
+  phone?: string;
+  hourlyRate?: number;
+  startDate: string;
+  endDate?: string;
+  status: "active" | "completed" | "terminated";
+  notes?: string;
+  specialty?: string;
+  assignedTasks?: string[];
+}

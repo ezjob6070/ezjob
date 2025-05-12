@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { toast } from "sonner";
 import ProjectFinanceTab from "@/components/project/ProjectFinanceTab";
 import ProjectTasksTab from "@/components/project/ProjectTasksTab";
+import ProjectStaffTab from "@/components/project/ProjectStaffTab";
 
 interface ProjectFile {
   id: string;
@@ -132,6 +133,12 @@ export default function ProjectDetail() {
             <span className="flex items-center gap-1">
               <ListTodo className="h-4 w-4" />
               Tasks & Progress
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="staff">
+            <span className="flex items-center gap-1">
+              <Users className="h-4 w-4" />
+              Staff & Contractors
             </span>
           </TabsTrigger>
           <TabsTrigger value="files">Files & Documents</TabsTrigger>
@@ -306,6 +313,10 @@ export default function ProjectDetail() {
         
         <TabsContent value="tasks" className="py-4">
           <ProjectTasksTab project={project} />
+        </TabsContent>
+        
+        <TabsContent value="staff" className="py-4">
+          <ProjectStaffTab projectId={project.id} />
         </TabsContent>
         
         <TabsContent value="files" className="space-y-6 py-4">
