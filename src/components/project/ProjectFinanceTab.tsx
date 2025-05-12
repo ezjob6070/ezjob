@@ -29,7 +29,6 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   const [financeTab, setFinanceTab] = useState("overview");
   const [expenseCategory, setExpenseCategory] = useState<string>("all");
   const [expensePeriod, setExpensePeriod] = useState<string>("all");
-  const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("pending");
   
   // Project quotes & invoices
   const [quotes, setQuotes] = useState<ProjectQuote[]>(project.quotes || []);
@@ -152,16 +151,9 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     return expense.category === expenseCategory;
   });
   
-  // Filter quotes based on status
+  // Filter quotes based on status - simplified to only show completed vs active
   const filteredQuotes = quotes.filter(quote => {
-    if (quoteStatusFilter === "pending") return quote.status === "sent" || quote.status === "draft";
-    if (quoteStatusFilter === "completed") return quote.status === "accepted" || quote.status === "rejected";
-    if (quoteStatusFilter === "overdue") {
-      const validUntilDate = new Date(quote.validUntil);
-      const today = new Date();
-      return (quote.status === "sent" || quote.status === "draft") && validUntilDate < today;
-    }
-    return true;
+    return true; // Show all quotes, removing the filtering functionality
   });
   
   // Expense breakdown for chart
@@ -342,7 +334,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
           <TabsTrigger value="invoices">Invoices</TabsTrigger>
         </TabsList>
         
-        {/* Finance Overview Tab - NEW */}
+        {/* Finance Overview Tab */}
         <TabsContent value="overview" className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Quote Status Card */}
@@ -480,17 +472,17 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </Card>
           </div>
           
-          {/* Expense Summary Card */}
+          {/* Expense Summary Card - Enhanced with clearer cost breakdown */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Expense Breakdown</CardTitle>
-              <CardDescription>Project expense distribution by category</CardDescription>
+              <CardTitle className="text-lg">Project Cost Breakdown</CardTitle>
+              <CardDescription>Detailed cost distribution by category</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Total Expenses</p>
+                    <p className="text-sm text-muted-foreground">Total Project Costs</p>
                     <p className="text-2xl font-bold text-red-600">{formatCurrency(totalExpenses + totalContractorCosts)}</p>
                   </div>
                   <div className="space-y-1">
@@ -500,7 +492,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Contractor Payments</p>
+                    <p className="text-sm text-muted-foreground">Labor Costs</p>
                     <p className="text-2xl font-bold text-purple-600">{formatCurrency(totalContractorCosts)}</p>
                   </div>
                 </div>
@@ -542,11 +534,11 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </CardContent>
           </Card>
           
-          {/* Financial Health Card */}
+          {/* Financial Health Card - Modified to emphasize cost metrics */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Financial Health</CardTitle>
-              <CardDescription>Project budget utilization and revenue comparison</CardDescription>
+              <CardDescription>Project budget utilization and cost analysis</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -589,15 +581,23 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                 
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">Invoices vs Revenue</span>
+                    <span className="text-sm font-medium">Project Completion vs. Budget Used</span>
                     <span className="text-sm font-medium">
-                      {totalIncome > 0 ? Math.round((invoiceStats.totalValue / totalIncome) * 100) : 0}%
+                      {project.budget > 0 && project.completion > 0 
+                        ? `${project.completion}% complete / ${Math.round((project.actualSpent / project.budget) * 100)}% spent` 
+                        : "0% / 0%"}
                     </span>
                   </div>
-                  <Progress 
-                    className="h-2" 
-                    value={totalIncome > 0 ? (invoiceStats.totalValue / totalIncome) * 100 : 0} 
-                  />
+                  <div className="relative h-2">
+                    <Progress 
+                      className="h-2 absolute w-full" 
+                      value={project.budget > 0 ? (project.actualSpent / project.budget) * 100 : 0}
+                    />
+                    <div 
+                      className="h-2 w-1 bg-black z-10 absolute top-0" 
+                      style={{ left: `${project.completion}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -707,118 +707,95 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
         <TabsContent value="quotes" className="space-y-4 py-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Client Quotes</h3>
-            <div className="flex items-center gap-2">
-              <Select 
-                value={quoteStatusFilter} 
-                onValueChange={setQuoteStatusFilter}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending Quotes</SelectItem>
-                  <SelectItem value="completed">Completed Quotes</SelectItem>
-                  <SelectItem value="overdue">Overdue Quotes</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button onClick={() => {
-                setSelectedQuote(undefined);
-                setShowQuoteModal(true);
-              }}>
-                <Plus className="h-4 w-4 mr-1" /> Create Quote
-              </Button>
-            </div>
+            <Button onClick={() => {
+              setSelectedQuote(undefined);
+              setShowQuoteModal(true);
+            }}>
+              <Plus className="h-4 w-4 mr-1" /> Create Quote
+            </Button>
           </div>
           
-          {/* Quote Status Filter Buttons - IMPROVED */}
+          {/* Quote Status Summary - Simplified and focused on costs */}
           <div className="flex flex-col gap-4 pb-4">
-            <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">Quote Filters</h4>
-              
-              <div className="grid grid-cols-3 gap-3">
-                <Button 
-                  variant={quoteStatusFilter === "pending" ? "default" : "outline"} 
-                  size="lg"
-                  onClick={() => setQuoteStatusFilter("pending")}
-                  className="flex flex-col items-center justify-center h-24 gap-2 border border-gray-200 rounded-lg"
-                >
-                  <div className="bg-blue-100 text-blue-800 p-2 rounded-full">
-                    <Clock className="h-5 w-5" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold">Pending</p>
-                    <Badge variant="secondary" className="mt-1">
-                      {quotes.filter(q => q.status === "sent" || q.status === "draft").length}
-                    </Badge>
-                  </div>
-                </Button>
-                
-                <Button 
-                  variant={quoteStatusFilter === "completed" ? "default" : "outline"} 
-                  size="lg"
-                  onClick={() => setQuoteStatusFilter("completed")}
-                  className="flex flex-col items-center justify-center h-24 gap-2 border border-gray-200 rounded-lg"
-                >
-                  <div className="bg-green-100 text-green-800 p-2 rounded-full">
-                    <Check className="h-5 w-5" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold">Completed</p>
-                    <Badge variant="secondary" className="mt-1">
-                      {quotes.filter(q => q.status === "accepted" || q.status === "rejected").length}
-                    </Badge>
-                  </div>
-                </Button>
-                
-                <Button 
-                  variant={quoteStatusFilter === "overdue" ? "default" : "outline"} 
-                  size="lg"
-                  onClick={() => setQuoteStatusFilter("overdue")}
-                  className="flex flex-col items-center justify-center h-24 gap-2 border border-gray-200 rounded-lg"
-                >
-                  <div className="bg-red-100 text-red-800 p-2 rounded-full">
-                    <Calendar className="h-5 w-5" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold">Overdue</p>
-                    <Badge variant="secondary" className="mt-1">
-                      {quoteStats.overdue}
-                    </Badge>
-                  </div>
-                </Button>
+            <div className="bg-gray-50 border rounded-lg shadow-sm p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="text-lg font-semibold text-gray-800">Quote Summary</h4>
+                <Badge variant="outline" className="px-3 py-1">
+                  Total: {quotes.length} quotes
+                </Badge>
               </div>
               
-              <div className="mt-4 flex flex-wrap gap-2">
-                <p className="text-sm text-muted-foreground mr-2">Quick actions:</p>
-                <Badge 
-                  className={`${quoteStatusColors.draft} cursor-pointer px-3 py-1`}
-                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "draft"})))}
-                >
-                  Set All to Draft ({quoteStats.draft})
-                </Badge>
-                <Badge 
-                  className={`${quoteStatusColors.sent} cursor-pointer px-3 py-1`}
-                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "sent", sentAt: new Date().toISOString().split('T')[0]})))}
-                >
-                  Set All to Sent ({quoteStats.sent})
-                </Badge>
-                <Badge 
-                  className={`${quoteStatusColors.accepted} cursor-pointer px-3 py-1`}
-                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "accepted"})))}
-                >
-                  Set All to Accepted ({quoteStats.accepted})
-                </Badge>
-                <Badge 
-                  className={`${quoteStatusColors.rejected} cursor-pointer px-3 py-1`}
-                  onClick={() => setQuotes(quotes.map(q => ({...q, status: "rejected"})))}
-                >
-                  Set All to Rejected ({quoteStats.rejected})
-                </Badge>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-medium text-gray-700">Total Quote Value</h5>
+                    <DollarSign className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <p className="text-2xl font-bold text-blue-600 mt-2">
+                    {formatCurrency(quoteStats.totalValue)}
+                  </p>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-medium text-gray-700">Accepted Quote Value</h5>
+                    <Check className="h-5 w-5 text-green-500" />
+                  </div>
+                  <p className="text-2xl font-bold text-green-600 mt-2">
+                    {formatCurrency(quoteStats.acceptedValue)}
+                  </p>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-medium text-gray-700">Acceptance Rate</h5>
+                    <TrendingUp className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <p className="text-2xl font-bold text-purple-600 mt-2">
+                    {quotes.length > 0
+                      ? `${Math.round((quoteStats.accepted / (quoteStats.accepted + quoteStats.rejected)) * 100)}%`
+                      : "0%"}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Badge className={quoteStatusColors.draft}>Draft</Badge>
+                    <span>{quoteStats.draft} quotes</span>
+                  </div>
+                  <span className="text-sm font-medium">{quoteStats.draft > 0 && formatCurrency(quotes.filter(q => q.status === "draft").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Badge className={quoteStatusColors.sent}>Sent</Badge>
+                    <span>{quoteStats.sent} quotes</span>
+                  </div>
+                  <span className="text-sm font-medium">{quoteStats.sent > 0 && formatCurrency(quotes.filter(q => q.status === "sent").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Badge className={quoteStatusColors.accepted}>Accepted</Badge>
+                    <span>{quoteStats.accepted} quotes</span>
+                  </div>
+                  <span className="text-sm font-medium">{quoteStats.accepted > 0 && formatCurrency(quotes.filter(q => q.status === "accepted").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Badge className={quoteStatusColors.rejected}>Rejected</Badge>
+                    <span>{quoteStats.rejected} quotes</span>
+                  </div>
+                  <span className="text-sm font-medium">{quoteStats.rejected > 0 && formatCurrency(quotes.filter(q => q.status === "rejected").reduce((sum, q) => sum + q.totalAmount, 0))}</span>
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Quote content with filtering */}
+          {/* Quote content - listing all quotes */}
           {filteredQuotes.length > 0 ? (
             <div className="grid gap-4">
               {filteredQuotes.map((quote) => (
@@ -833,48 +810,9 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Select 
-                        value={quote.status} 
-                        onValueChange={(newStatus) => {
-                          const updatedQuotes = quotes.map(q => 
-                            q.id === quote.id 
-                              ? { 
-                                  ...q, 
-                                  status: newStatus as ProjectQuote["status"],
-                                  sentAt: newStatus === "sent" && !q.sentAt 
-                                    ? new Date().toISOString().split('T')[0] 
-                                    : q.sentAt
-                                } 
-                              : q
-                          );
-                          setQuotes(updatedQuotes);
-                          
-                          const statusMessages = {
-                            "draft": "Quote set to draft",
-                            "sent": "Quote marked as sent",
-                            "accepted": "Quote marked as accepted",
-                            "rejected": "Quote marked as rejected",
-                            "expired": "Quote marked as expired"
-                          };
-                          
-                          toast.success(statusMessages[newStatus as keyof typeof statusMessages] || "Quote status updated");
-                        }}
-                      >
-                        <SelectTrigger className="w-[130px] h-8">
-                          <Badge className={quoteStatusColors[quote.status]}>
-                            {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
-                          </Badge>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="sent">Sent</SelectItem>
-                          <SelectItem value="accepted">Accepted</SelectItem>
-                          <SelectItem value="rejected">Rejected</SelectItem>
-                          <SelectItem value="expired">Expired</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Badge className={quoteStatusColors[quote.status]}>
+                      {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
+                    </Badge>
                   </div>
                   
                   <CardContent className="p-4">
@@ -965,11 +903,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
               <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
               <p className="text-lg font-medium text-gray-500">No quotes found</p>
               <p className="text-gray-400 max-w-md mx-auto mt-2 mb-4">
-                {quoteStatusFilter === "pending" 
-                  ? "No pending quotes found" 
-                  : quoteStatusFilter === "completed"
-                    ? "No completed quotes found"
-                    : "No overdue quotes found"}
+                Create quotes to send to clients for this project
               </p>
               <Button onClick={() => setShowQuoteModal(true)}>
                 <Plus className="h-4 w-4 mr-2" />
