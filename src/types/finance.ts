@@ -1,4 +1,3 @@
-
 import { JobSource } from "./jobSource";
 
 export interface FinancialTransaction {
@@ -132,7 +131,6 @@ export interface CompanyProfile {
   description?: string;
 }
 
-// Project staff management types
 export interface ProjectStaff {
   id: string;
   name: string;

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Package } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Package, Clock } from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project, ProjectContractor } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -15,6 +15,7 @@ import ProjectFinanceTab from "@/components/project/ProjectFinanceTab";
 import ProjectTasksTab from "@/components/project/ProjectTasksTab";
 import ProjectStaffTab from "@/components/project/ProjectStaffTab";
 import ProjectEquipmentTab from "@/components/project/ProjectEquipmentTab";
+import ProjectTimeScheduleTab from "@/components/project/ProjectTimeScheduleTab";
 
 interface ProjectFile {
   id: string;
@@ -129,6 +130,12 @@ export default function ProjectDetail() {
       <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="bg-muted/50">
           <TabsTrigger value="overview" variant="blue">Overview</TabsTrigger>
+          <TabsTrigger value="time-schedule" variant="blue">
+            <span className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              Time & Schedule
+            </span>
+          </TabsTrigger>
           <TabsTrigger value="tasks" variant="blue">
             <span className="flex items-center gap-1">
               <ListTodo className="h-4 w-4" />
@@ -327,12 +334,16 @@ export default function ProjectDetail() {
           </div>
         </TabsContent>
         
+        <TabsContent value="time-schedule" className="py-4">
+          <ProjectTimeScheduleTab projectId={project.id} projectStaff={project.staff} />
+        </TabsContent>
+        
         <TabsContent value="tasks" className="py-4">
           <ProjectTasksTab project={project} />
         </TabsContent>
         
         <TabsContent value="staff" className="py-4">
-          <ProjectStaffTab projectId={project.id} />
+          <ProjectStaffTab projectId={project.id} projectStaff={project.staff} />
         </TabsContent>
         
         <TabsContent value="equipment" className="py-4">
