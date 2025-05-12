@@ -275,17 +275,17 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
           </div>
         
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="mb-6 bg-gray-100/70">
-              <TabsTrigger value="all" className="data-[state=active]:bg-white">
+            <TabsList className="mb-6 bg-muted/50">
+              <TabsTrigger value="all" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 All Staff ({staffMembers.length})
               </TabsTrigger>
-              <TabsTrigger value="staff" className="data-[state=active]:bg-white">
+              <TabsTrigger value="staff" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Staff ({getStaffCountByRole("staff")})
               </TabsTrigger>
-              <TabsTrigger value="contractor" className="data-[state=active]:bg-white">
+              <TabsTrigger value="contractor" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Contractors ({getStaffCountByRole("contractor")})
               </TabsTrigger>
-              <TabsTrigger value="technician" className="data-[state=active]:bg-white">
+              <TabsTrigger value="technician" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Technicians ({getStaffCountByRole("technician")})
               </TabsTrigger>
             </TabsList>
