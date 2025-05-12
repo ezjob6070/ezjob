@@ -153,7 +153,9 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       expectedEndDate: format(endDate, 'yyyy-MM-dd'),
       actualSpent: 0,
       contractors: formattedContractors,
-      salesmen: formattedSalesmen
+      salesmen: formattedSalesmen,
+      quotes: [], // Initialize empty quotes array
+      invoices: [], // Initialize empty invoices array
     };
     
     onAddProject(newProject);
