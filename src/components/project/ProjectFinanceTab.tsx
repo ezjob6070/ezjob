@@ -32,20 +32,20 @@ export const ProjectFinanceTab = ({ projectId }: ProjectFinanceTabProps) => {
           <TabsList className="mb-4">
             <TabsTrigger 
               value="overview"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              variant="blue"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="expenses"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              variant="blue"
             >
               <Briefcase className="h-4 w-4 mr-1" /> {/* Changed from CoatRack */}
               Expenses
             </TabsTrigger>
             <TabsTrigger 
               value="invoices"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              variant="blue"
             >
               <FileText className="h-4 w-4 mr-1" /> {/* Changed from Invoice */}
               Invoices
