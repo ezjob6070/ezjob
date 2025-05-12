@@ -8,8 +8,6 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import SearchBar from "@/components/finance/filters/SearchBar";
-import PriceRangeFilter from "@/components/common/PriceRangeFilter";
 
 type Invoice = {
   id: string;
@@ -92,9 +90,6 @@ const InvoiceList = () => {
   });
 
   const [showFilterBar, setShowFilterBar] = useState(false);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [minPriceFilter, setMinPriceFilter] = useState<number>(0);
-  const [maxPriceFilter, setMaxPriceFilter] = useState<number>(Number.MAX_SAFE_INTEGER);
 
   const toggleOption = (option: keyof InvoiceDisplayOptions) => {
     setDisplayOptions(prev => ({
@@ -129,22 +124,6 @@ const InvoiceList = () => {
       day: 'numeric',
       year: 'numeric'
     });
-  };
-
-  // Filter invoices based on search term and price range
-  const filteredInvoices = invoices.filter(invoice => {
-    const matchesSearch = !searchTerm || 
-      invoice.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPrice = invoice.amount >= minPriceFilter && 
-      invoice.amount <= maxPriceFilter;
-    return matchesSearch && matchesPrice;
-  });
-
-  // Handle price range filter changes
-  const handlePriceRangeChange = (min: number, max: number) => {
-    setMinPriceFilter(min);
-    setMaxPriceFilter(max);
   };
 
   // Sample job data for demonstration
@@ -209,23 +188,6 @@ const InvoiceList = () => {
           <FilterIcon className="h-4 w-4" />
           Invoice Display Options
         </Button>
-      </div>
-
-      {/* Search and Filter Row */}
-      <div className="flex flex-wrap gap-2 items-center mb-4">
-        <SearchBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          placeholder="Search invoices by number, client..."
-          className="flex-1 min-w-[180px]"
-        />
-        
-        <PriceRangeFilter
-          minAmount={minPriceFilter}
-          maxAmount={maxPriceFilter}
-          onRangeChange={handlePriceRangeChange}
-          compact={true}
-        />
       </div>
 
       {showFilterBar && (
@@ -303,7 +265,7 @@ const InvoiceList = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredInvoices.map((invoice) => (
+            {invoices.map((invoice) => (
               <TableRow key={invoice.id}>
                 <TableCell>
                   <div className="flex items-center">
@@ -334,7 +296,7 @@ const InvoiceList = () => {
                 </TableCell>
               </TableRow>
             ))}
-            {filteredInvoices.length === 0 && (
+            {invoices.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
                   No invoices found
