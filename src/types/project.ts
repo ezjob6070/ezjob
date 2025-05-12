@@ -1,4 +1,3 @@
-
 export interface Project {
   id: number;
   name: string;
@@ -146,7 +145,7 @@ export interface ProjectTaskAttachment {
   uploadedBy: string;
 }
 
-// New interfaces for quotes and invoices
+// Quote and invoice interfaces - these remain the same
 export interface ProjectQuote {
   id: string;
   createdAt: string;

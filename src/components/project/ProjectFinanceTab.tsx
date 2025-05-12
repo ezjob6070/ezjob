@@ -2,15 +2,19 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Project, ProjectQuote, ProjectInvoice } from "@/types/project";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Plus, Send, Download, Check, X, TrendingDown, TrendingUp, Wallet, Receipt } from "lucide-react";
+import { Project, ProjectQuote, ProjectInvoice, ProjectExpense } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
-import { CalendarIcon, FileText, Plus, Send, Download, Check, X, DollarSign } from "lucide-react";
-import { format } from "date-fns";
+import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import ProjectQuoteModal from "@/components/projects/ProjectQuoteModal";
 import ProjectInvoiceModal from "@/components/projects/ProjectInvoiceModal";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
 
 interface ProjectFinanceTabProps {
   project: Project;
@@ -23,10 +27,46 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   const [selectedQuote, setSelectedQuote] = useState<ProjectQuote | undefined>(undefined);
   const [selectedInvoice, setSelectedInvoice] = useState<ProjectInvoice | undefined>(undefined);
   const [financeTab, setFinanceTab] = useState("overview");
+  const [expenseCategory, setExpenseCategory] = useState<string>("all");
+  const [expensePeriod, setExpensePeriod] = useState<string>("all");
   
   // Project quotes & invoices
   const [quotes, setQuotes] = useState<ProjectQuote[]>(project.quotes || []);
   const [invoices, setInvoices] = useState<ProjectInvoice[]>(project.invoices || []);
+  
+  // Sample expenses
+  const [expenses, setExpenses] = useState<ProjectExpense[]>(project.expenses || [
+    {
+      id: "exp-001",
+      name: "Materials Purchase",
+      amount: project.budget * 0.15,
+      date: new Date().toISOString().split('T')[0],
+      category: "materials",
+      description: "Initial materials for project foundation",
+      paymentMethod: "credit-card",
+      status: "paid"
+    },
+    {
+      id: "exp-002",
+      name: "Equipment Rental",
+      amount: project.budget * 0.08,
+      date: new Date().toISOString().split('T')[0],
+      category: "equipment",
+      description: "Heavy machinery rental for excavation",
+      paymentMethod: "bank-transfer",
+      status: "paid"
+    },
+    {
+      id: "exp-003",
+      name: "Permit Fees",
+      amount: project.budget * 0.03,
+      date: new Date().toISOString().split('T')[0],
+      category: "permits",
+      description: "City permits and inspection fees",
+      paymentMethod: "check",
+      status: "paid"
+    }
+  ]);
   
   // Quote status color mapping
   const quoteStatusColors: Record<string, string> = {
@@ -46,6 +86,17 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     "cancelled": "bg-amber-100 text-amber-800",
   };
   
+  // Expense category color mapping
+  const expenseCategoryColors: Record<string, string> = {
+    "materials": "#3b82f6",
+    "equipment": "#f97316",
+    "labor": "#10b981",
+    "permits": "#8b5cf6",
+    "subcontractors": "#ef4444",
+    "overhead": "#64748b",
+    "other": "#94a3b8"
+  };
+  
   // Calculate finances
   const totalIncome = quotes
     .filter(q => q.status === "accepted")
@@ -55,16 +106,67 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     .filter(i => i.status === "paid")
     .reduce((sum, i) => sum + (i.paidAmount || i.totalAmount), 0);
   
+  const totalExpenses = expenses
+    .filter(e => e.status === "paid")
+    .reduce((sum, e) => sum + e.amount, 0);
+  
   // Create financial summaries
   const financialSummary = [
-    { title: "Budget", value: project.budget, color: "text-blue-600" },
-    { title: "Spent", value: project.actualSpent, color: "text-amber-600" },
-    { title: "Quoted Revenue", value: totalIncome, color: "text-green-600" },
-    { title: "Contractor Payments", value: totalContractorCosts, color: "text-red-600" },
+    { 
+      title: "Total Revenue", 
+      value: totalIncome, 
+      color: "text-blue-600",
+      icon: <TrendingUp className="h-5 w-5 text-blue-600" />,
+      trend: "+8% from last month"
+    },
+    { 
+      title: "Total Expenses", 
+      value: totalExpenses + totalContractorCosts, 
+      color: "text-red-600",
+      icon: <TrendingDown className="h-5 w-5 text-red-600" />,
+      trend: "-3% from last month" 
+    },
+    { 
+      title: "Material Costs", 
+      value: expenses.filter(e => e.category === "materials").reduce((sum, e) => sum + e.amount, 0), 
+      color: "text-amber-600",
+      icon: <DollarSign className="h-5 w-5 text-amber-600" />,
+      trend: "32% of expenses"
+    },
+    { 
+      title: "Labor Costs", 
+      value: totalContractorCosts, 
+      color: "text-purple-600",
+      icon: <Users className="h-5 w-5 text-purple-600" />,
+      trend: "45% of expenses" 
+    },
   ];
   
-  const projectedProfit = totalIncome - project.actualSpent;
+  const projectedProfit = totalIncome - (totalExpenses + totalContractorCosts);
   const profitMargin = totalIncome > 0 ? (projectedProfit / totalIncome) * 100 : 0;
+  
+  // Get expense categories
+  const expenseCategories = Array.from(new Set(expenses.map(e => e.category)));
+  
+  // Filter expenses based on category
+  const filteredExpenses = expenses.filter(expense => {
+    if (expenseCategory === "all") return true;
+    return expense.category === expenseCategory;
+  });
+  
+  // Expense breakdown for chart
+  const expenseBreakdown = expenseCategories.map(category => {
+    const categoryExpenses = expenses.filter(e => e.category === category);
+    const total = categoryExpenses.reduce((sum, e) => sum + e.amount, 0);
+    return {
+      name: category.charAt(0).toUpperCase() + category.slice(1),
+      value: total,
+      color: expenseCategoryColors[category] || "#94a3b8"
+    };
+  });
+  
+  // Calculate expense distribution
+  const totalExpensesSum = expenseBreakdown.reduce((sum, item) => sum + item.value, 0);
   
   // Quote handlers
   const handleCreateQuote = (quote: ProjectQuote) => {
@@ -106,7 +208,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
         return {
           ...q,
           status: newStatus,
-          sentAt: action === "send" ? format(new Date(), 'yyyy-MM-dd') : q.sentAt
+          sentAt: action === "send" ? new Date().toISOString().split('T')[0] : q.sentAt
         };
       }
       return q;
@@ -155,8 +257,8 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
         return {
           ...i,
           status: newStatus,
-          sentAt: action === "send" ? format(new Date(), 'yyyy-MM-dd') : i.sentAt,
-          paidDate: action === "mark-paid" && !i.paidDate ? format(new Date(), 'yyyy-MM-dd') : i.paidDate,
+          sentAt: action === "send" ? new Date().toISOString().split('T')[0] : i.sentAt,
+          paidDate: action === "mark-paid" && !i.paidDate ? new Date().toISOString().split('T')[0] : i.paidDate,
           paidAmount: action === "mark-paid" && !i.paidAmount ? i.totalAmount : i.paidAmount
         };
       }
@@ -165,40 +267,180 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     
     setInvoices(updatedInvoices);
   };
+  
+  // Add new expense
+  const handleAddExpense = () => {
+    // In a real app, this would open a modal
+    toast.success("Expense added successfully");
+  };
 
   return (
     <div className="space-y-6">
-      {/* Financial Summary Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Financial Overview</CardTitle>
-          <CardDescription>Key financial metrics for this project</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {financialSummary.map((item, index) => (
-              <div key={index} className="space-y-2">
-                <p className="text-sm text-muted-foreground">{item.title}</p>
+      {/* Financial Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {financialSummary.map((item, index) => (
+          <Card key={index} className="overflow-hidden bg-gradient-to-br from-white to-gray-50 border-t-4" style={{ borderTopColor: item.color.replace('text-', '') }}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-sm font-medium text-gray-500">{item.title}</h4>
+                {item.icon}
+              </div>
+              <div className="space-y-1">
                 <p className={`text-2xl font-bold ${item.color}`}>
                   {formatCurrency(item.value)}
                 </p>
+                <p className="text-xs text-muted-foreground">{item.trend}</p>
               </div>
-            ))}
-          </div>
-          
-          {/* Profit Calculation */}
-          <div className="mt-6 border-t pt-4">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Projected Profit:</span>
-              <span className={`text-lg font-bold ${projectedProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(projectedProfit)}
-              </span>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Profit Summary */}
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-gray-50 to-white pb-2">
+          <CardTitle>Profit Summary</CardTitle>
+          <CardDescription>Project financial health overview</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left column: Profit metrics */}
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-medium">Projected Profit</h3>
+                  <span className={`text-xl font-bold ${projectedProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(projectedProfit)}
+                  </span>
+                </div>
+                <Progress 
+                  value={profitMargin > 0 ? profitMargin : 0} 
+                  max={100}
+                  className={`h-2 ${profitMargin >= 20 ? 'bg-green-600' : profitMargin >= 10 ? 'bg-amber-500' : 'bg-red-500'}`}
+                />
+                <div className="flex justify-between mt-1 text-sm">
+                  <span className="text-muted-foreground">Profit Margin</span>
+                  <span className={`font-medium ${profitMargin >= 20 ? 'text-green-600' : profitMargin >= 10 ? 'text-amber-600' : 'text-red-600'}`}>
+                    {profitMargin.toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="font-medium">Budget vs Actual</h3>
+                <div className="space-y-2">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Budget</span>
+                      <span className="font-medium">{formatCurrency(project.budget)}</span>
+                    </div>
+                    <Progress value={100} max={100} className="h-2 bg-blue-600" />
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Actual Spent</span>
+                      <span className="font-medium">{formatCurrency(totalExpenses + totalContractorCosts)}</span>
+                    </div>
+                    <Progress 
+                      value={(totalExpenses + totalContractorCosts) / project.budget * 100} 
+                      max={100} 
+                      className={`h-2 ${(totalExpenses + totalContractorCosts) <= project.budget ? 'bg-green-600' : 'bg-red-600'}`}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="font-medium">Revenue vs Expenses</h3>
+                <div className="space-y-2">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Revenue</span>
+                      <span className="font-medium text-blue-600">{formatCurrency(totalIncome)}</span>
+                    </div>
+                    <Progress value={100} max={100} className="h-2 bg-blue-600" />
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Expenses</span>
+                      <span className="font-medium text-red-600">{formatCurrency(totalExpenses + totalContractorCosts)}</span>
+                    </div>
+                    <Progress 
+                      value={(totalExpenses + totalContractorCosts) / (totalIncome > 0 ? totalIncome : 1) * 100} 
+                      max={100} 
+                      className="h-2 bg-red-600"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-sm text-muted-foreground">Profit Margin:</span>
-              <span className={`${profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {profitMargin.toFixed(1)}%
-              </span>
+            
+            {/* Middle column: Expense breakdown */}
+            <div className="space-y-4">
+              <h3 className="font-medium">Expense Breakdown</h3>
+              <div className="space-y-4">
+                {expenseBreakdown.map((category) => (
+                  <div key={category.name} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }}></div>
+                        <span>{category.name}</span>
+                      </div>
+                      <span className="font-medium">{formatCurrency(category.value)}</span>
+                    </div>
+                    <Progress 
+                      value={totalExpensesSum > 0 ? (category.value / totalExpensesSum) * 100 : 0} 
+                      max={100} 
+                      className="h-1"
+                      style={{ backgroundColor: category.color }}
+                    />
+                    <div className="text-right text-xs text-muted-foreground">
+                      {totalExpensesSum > 0 ? ((category.value / totalExpensesSum) * 100).toFixed(1) : 0}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Right column: Cost Distribution */}
+            <div className="space-y-4">
+              <h3 className="font-medium">Cost Distribution</h3>
+              <div className="h-52 flex items-center justify-center">
+                <div className="relative h-40 w-40">
+                  <div className="absolute inset-0 rounded-full bg-blue-100 border border-blue-200"></div>
+                  {/* This would be replaced with a proper chart in a real app */}
+                  <div className="absolute inset-5 rounded-full bg-white flex items-center justify-center border">
+                    <div className="text-center">
+                      <div className="text-xl font-bold">{formatCurrency(totalExpenses + totalContractorCosts)}</div>
+                      <div className="text-xs text-muted-foreground">Total Cost</div>
+                    </div>
+                  </div>
+                  
+                  {/* Sample pie chart segments */}
+                  <div className="absolute inset-0 overflow-hidden" style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }}>
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: expenseCategoryColors.materials }}></div>
+                  </div>
+                  <div className="absolute inset-0 overflow-hidden" style={{ clipPath: 'polygon(50% 50%, 50% 0, 100% 0, 100% 50%)' }}>
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: expenseCategoryColors.equipment }}></div>
+                  </div>
+                  <div className="absolute inset-0 overflow-hidden" style={{ clipPath: 'polygon(50% 50%, 0 0, 50% 0)' }}>
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: expenseCategoryColors.labor }}></div>
+                  </div>
+                  <div className="absolute inset-0 overflow-hidden" style={{ clipPath: 'polygon(50% 50%, 0 50%, 0 0)' }}>
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: expenseCategoryColors.permits }}></div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {expenseBreakdown.map((category) => (
+                  <div key={category.name} className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color }}></div>
+                    <span>{category.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -215,23 +457,101 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
         <TabsContent value="overview" className="space-y-4 py-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Project Expenses</h3>
-            <Button variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-1" /> Add Expense
-            </Button>
+            <div className="flex items-center gap-2">
+              <Select 
+                value={expenseCategory} 
+                onValueChange={setExpenseCategory}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {expenseCategories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="sm" onClick={handleAddExpense}>
+                <Plus className="h-4 w-4 mr-1" /> Add Expense
+              </Button>
+            </div>
           </div>
           
-          {/* This is a placeholder for expenses that could be implemented later */}
-          <div className="text-center py-8 border rounded-md bg-gray-50">
-            <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-            <p className="text-lg font-medium text-gray-500">No expenses recorded yet</p>
-            <p className="text-gray-400 max-w-md mx-auto mt-2 mb-4">
-              Track expenses for materials, equipment, and other project costs
-            </p>
-            <Button variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Add First Expense
-            </Button>
-          </div>
+          {filteredExpenses.length > 0 ? (
+            <div className="space-y-3">
+              {filteredExpenses.map((expense) => (
+                <Card key={expense.id} className="overflow-hidden">
+                  <div className="grid grid-cols-12 items-center p-4">
+                    <div className="col-span-6 md:col-span-5 flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-gray-100">
+                        <Receipt className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{expense.name}</p>
+                        <p className="text-sm text-gray-500">{expense.description}</p>
+                      </div>
+                    </div>
+                    <div className="col-span-3 md:col-span-2">
+                      <Badge className={`
+                        ${expense.category === 'materials' ? 'bg-blue-100 text-blue-800' : 
+                          expense.category === 'equipment' ? 'bg-amber-100 text-amber-800' : 
+                          expense.category === 'labor' ? 'bg-green-100 text-green-800' : 
+                          expense.category === 'permits' ? 'bg-purple-100 text-purple-800' : 
+                          'bg-gray-100 text-gray-800'}
+                      `}>
+                        {expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}
+                      </Badge>
+                    </div>
+                    <div className="col-span-3 md:col-span-2 text-right">
+                      <p className="text-sm text-gray-500">
+                        {new Date(expense.date).toLocaleDateString()}
+                      </p>
+                      <p className="text-sm text-gray-500">{expense.paymentMethod}</p>
+                    </div>
+                    <div className="hidden md:block md:col-span-2 text-right">
+                      <Badge className={`
+                        ${expense.status === 'paid' ? 'bg-green-100 text-green-800' : 
+                          expense.status === 'pending' ? 'bg-amber-100 text-amber-800' : 
+                          'bg-red-100 text-red-800'}
+                      `}>
+                        {expense.status.charAt(0).toUpperCase() + expense.status.slice(1)}
+                      </Badge>
+                    </div>
+                    <div className="col-span-3 md:col-span-1 text-right">
+                      <p className="font-semibold text-gray-900">{formatCurrency(expense.amount)}</p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              
+              <div className="flex justify-between items-center pt-2 px-2">
+                <p className="text-sm text-muted-foreground">Showing {filteredExpenses.length} expenses</p>
+                <div className="flex items-center gap-1 text-sm">
+                  <span className="font-medium">Total:</span>
+                  <span className="font-bold">
+                    {formatCurrency(filteredExpenses.reduce((sum, e) => sum + e.amount, 0))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 border rounded-md bg-gray-50">
+              <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+              <p className="text-lg font-medium text-gray-500">No expenses found</p>
+              <p className="text-gray-400 max-w-md mx-auto mt-2 mb-4">
+                {expenseCategory === "all" 
+                  ? "Track expenses for materials, equipment, and other project costs" 
+                  : `No expenses in the "${expenseCategory}" category`}
+              </p>
+              <Button variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Add First Expense
+              </Button>
+            </div>
+          )}
         </TabsContent>
         
         <TabsContent value="quotes" className="space-y-4 py-4">
@@ -245,6 +565,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </Button>
           </div>
           
+          {/* Quote content stays the same */}
           {quotes.length > 0 ? (
             <div className="grid gap-4">
               {quotes.map((quote) => (
@@ -255,7 +576,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                       <div>
                         <p className="font-medium">Quote for {quote.clientName}</p>
                         <p className="text-sm text-muted-foreground">
-                          Created on {format(new Date(quote.createdAt), 'MMM d, yyyy')}
+                          Created on {new Date(quote.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -273,8 +594,8 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Valid Until</p>
                         <div className="flex items-center">
-                          <CalendarIcon className="h-4 w-4 mr-1 text-muted-foreground" />
-                          <p>{format(new Date(quote.validUntil), 'MMM d, yyyy')}</p>
+                          <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
+                          <p>{new Date(quote.validUntil).toLocaleDateString()}</p>
                         </div>
                       </div>
                       <div className="space-y-1">
@@ -360,6 +681,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </Button>
           </div>
           
+          {/* Invoice content stays the same */}
           {invoices.length > 0 ? (
             <div className="grid gap-4">
               {invoices.map((invoice) => (
@@ -370,7 +692,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                       <div>
                         <p className="font-medium">Invoice for {invoice.contractorName}</p>
                         <p className="text-sm text-muted-foreground">
-                          {invoice.reference} • Created on {format(new Date(invoice.createdAt), 'MMM d, yyyy')}
+                          {invoice.reference} • Created on {new Date(invoice.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -388,8 +710,8 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Due Date</p>
                         <div className="flex items-center">
-                          <CalendarIcon className="h-4 w-4 mr-1 text-muted-foreground" />
-                          <p>{format(new Date(invoice.dueDate), 'MMM d, yyyy')}</p>
+                          <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
+                          <p>{new Date(invoice.dueDate).toLocaleDateString()}</p>
                         </div>
                       </div>
                       {invoice.status === "paid" && invoice.paidDate && (
@@ -397,7 +719,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                           <p className="text-sm text-muted-foreground">Paid On</p>
                           <div className="flex items-center">
                             <DollarSign className="h-4 w-4 mr-1 text-green-600" />
-                            <p>{format(new Date(invoice.paidDate), 'MMM d, yyyy')}</p>
+                            <p>{new Date(invoice.paidDate).toLocaleDateString()}</p>
                           </div>
                         </div>
                       )}
