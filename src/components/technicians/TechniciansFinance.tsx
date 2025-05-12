@@ -88,8 +88,11 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     }
 
     // Filter by quote status if applicable
-    if (quoteStatusFilter !== "all" && transaction.quoteStatus) {
-      filtered = filtered.filter(transaction => transaction.quoteStatus === quoteStatusFilter);
+    if (quoteStatusFilter !== "all") {
+      filtered = filtered.filter(transaction => {
+        // Only apply the filter if the transaction has a quoteStatus property
+        return transaction.quoteStatus === undefined || transaction.quoteStatus === quoteStatusFilter;
+      });
     }
     
     setFilteredTransactions(filtered);
