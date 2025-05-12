@@ -721,6 +721,70 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </div>
           </div>
           
+          {/* Quote Status Filter Buttons */}
+          <div className="flex flex-wrap gap-2 pb-4">
+            <Button 
+              variant={quoteStatusFilter === "all" ? "default" : "outline"} 
+              size="sm"
+              onClick={() => setQuoteStatusFilter("all")}
+              className="flex items-center gap-1.5"
+            >
+              All Quotes 
+              <Badge className="ml-1 bg-gray-200 text-gray-800">{quotes.length}</Badge>
+            </Button>
+            <Button 
+              variant={quoteStatusFilter === "pending" ? "default" : "outline"} 
+              size="sm"
+              onClick={() => setQuoteStatusFilter("pending")}
+              className="flex items-center gap-1.5"
+            >
+              Pending
+              <Badge className="ml-1 bg-blue-200 text-blue-800">
+                {quotes.filter(q => q.status === "sent" || q.status === "draft").length}
+              </Badge>
+            </Button>
+            <Button 
+              variant={quoteStatusFilter === "completed" ? "default" : "outline"} 
+              size="sm"
+              onClick={() => setQuoteStatusFilter("completed")}
+              className="flex items-center gap-1.5"
+            >
+              Completed
+              <Badge className="ml-1 bg-green-200 text-green-800">
+                {quotes.filter(q => q.status === "accepted" || q.status === "rejected" || q.status === "expired").length}
+              </Badge>
+            </Button>
+            
+            {/* Individual Status Filters */}
+            <Separator className="my-2 w-full" />
+            <div className="flex flex-wrap gap-2 w-full">
+              <Badge 
+                className={`${quoteStatusColors.draft} cursor-pointer px-3 py-1`}
+                onClick={() => setQuotes(quotes.map(q => ({...q, status: "draft"})))}
+              >
+                Set All to Draft ({quoteStats.draft})
+              </Badge>
+              <Badge 
+                className={`${quoteStatusColors.sent} cursor-pointer px-3 py-1`}
+                onClick={() => setQuotes(quotes.map(q => ({...q, status: "sent", sentAt: new Date().toISOString().split('T')[0]})))}
+              >
+                Set All to Sent ({quoteStats.sent})
+              </Badge>
+              <Badge 
+                className={`${quoteStatusColors.accepted} cursor-pointer px-3 py-1`}
+                onClick={() => setQuotes(quotes.map(q => ({...q, status: "accepted"})))}
+              >
+                Set All to Accepted ({quoteStats.accepted})
+              </Badge>
+              <Badge 
+                className={`${quoteStatusColors.rejected} cursor-pointer px-3 py-1`}
+                onClick={() => setQuotes(quotes.map(q => ({...q, status: "rejected"})))}
+              >
+                Set All to Rejected ({quoteStats.rejected})
+              </Badge>
+            </div>
+          </div>
+          
           {/* Quote content with filtering */}
           {filteredQuotes.length > 0 ? (
             <div className="grid gap-4">
@@ -736,9 +800,48 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                         </p>
                       </div>
                     </div>
-                    <Badge className={quoteStatusColors[quote.status]}>
-                      {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Select 
+                        value={quote.status} 
+                        onValueChange={(newStatus) => {
+                          const updatedQuotes = quotes.map(q => 
+                            q.id === quote.id 
+                              ? { 
+                                  ...q, 
+                                  status: newStatus as ProjectQuote["status"],
+                                  sentAt: newStatus === "sent" && !q.sentAt 
+                                    ? new Date().toISOString().split('T')[0] 
+                                    : q.sentAt
+                                } 
+                              : q
+                          );
+                          setQuotes(updatedQuotes);
+                          
+                          const statusMessages = {
+                            "draft": "Quote set to draft",
+                            "sent": "Quote marked as sent",
+                            "accepted": "Quote marked as accepted",
+                            "rejected": "Quote marked as rejected",
+                            "expired": "Quote marked as expired"
+                          };
+                          
+                          toast.success(statusMessages[newStatus as keyof typeof statusMessages] || "Quote status updated");
+                        }}
+                      >
+                        <SelectTrigger className="w-[130px] h-8">
+                          <Badge className={quoteStatusColors[quote.status]}>
+                            {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
+                          </Badge>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Draft</SelectItem>
+                          <SelectItem value="sent">Sent</SelectItem>
+                          <SelectItem value="accepted">Accepted</SelectItem>
+                          <SelectItem value="rejected">Rejected</SelectItem>
+                          <SelectItem value="expired">Expired</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   
                   <CardContent className="p-4">
@@ -977,4 +1080,3 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
 };
 
 export default ProjectFinanceTab;
-
