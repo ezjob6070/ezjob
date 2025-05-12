@@ -29,6 +29,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   const [financeTab, setFinanceTab] = useState("overview");
   const [expenseCategory, setExpenseCategory] = useState<string>("all");
   const [expensePeriod, setExpensePeriod] = useState<string>("all");
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("all");
   
   // Project quotes & invoices
   const [quotes, setQuotes] = useState<ProjectQuote[]>(project.quotes || []);
@@ -149,6 +150,14 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   const filteredExpenses = expenses.filter(expense => {
     if (expenseCategory === "all") return true;
     return expense.category === expenseCategory;
+  });
+  
+  // Filter quotes based on status
+  const filteredQuotes = quotes.filter(quote => {
+    if (quoteStatusFilter === "all") return true;
+    if (quoteStatusFilter === "pending") return quote.status === "sent" || quote.status === "draft";
+    if (quoteStatusFilter === "completed") return quote.status === "accepted" || quote.status === "rejected" || quote.status === "expired";
+    return true;
   });
   
   // Expense breakdown for chart
@@ -689,18 +698,33 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
         <TabsContent value="quotes" className="space-y-4 py-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Client Quotes</h3>
-            <Button onClick={() => {
-              setSelectedQuote(undefined);
-              setShowQuoteModal(true);
-            }}>
-              <Plus className="h-4 w-4 mr-1" /> Create Quote
-            </Button>
+            <div className="flex items-center gap-2">
+              <Select 
+                value={quoteStatusFilter} 
+                onValueChange={setQuoteStatusFilter}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Quotes</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={() => {
+                setSelectedQuote(undefined);
+                setShowQuoteModal(true);
+              }}>
+                <Plus className="h-4 w-4 mr-1" /> Create Quote
+              </Button>
+            </div>
           </div>
           
-          {/* Quote content stays the same */}
-          {quotes.length > 0 ? (
+          {/* Quote content with filtering */}
+          {filteredQuotes.length > 0 ? (
             <div className="grid gap-4">
-              {quotes.map((quote) => (
+              {filteredQuotes.map((quote) => (
                 <Card key={quote.id} className="overflow-hidden">
                   <div className="bg-gray-50 border-b px-4 py-3 flex justify-between items-center">
                     <div className="flex items-center gap-3">
@@ -790,9 +814,13 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
           ) : (
             <div className="text-center py-8 border rounded-md bg-gray-50">
               <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-              <p className="text-lg font-medium text-gray-500">No quotes created yet</p>
+              <p className="text-lg font-medium text-gray-500">No quotes found</p>
               <p className="text-gray-400 max-w-md mx-auto mt-2 mb-4">
-                Create and send quotes to clients for this project
+                {quoteStatusFilter === "all" 
+                  ? "Create and send quotes to clients for this project" 
+                  : quoteStatusFilter === "pending" 
+                    ? "No pending quotes found" 
+                    : "No completed quotes found"}
               </p>
               <Button onClick={() => setShowQuoteModal(true)}>
                 <Plus className="h-4 w-4 mr-2" />
