@@ -24,7 +24,7 @@ TabsList.displayName = TabsPrimitive.List.displayName
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & {
-    variant?: "default" | "purple" | "blue" | "amber" | "red"
+    variant?: "default" | "purple" | "blue" | "amber" | "green" | "red"
     badge?: number
   }
 >(({ className, variant = "default", badge, ...props }, ref) => (
@@ -45,6 +45,9 @@ const TabsTrigger = React.forwardRef<
       // Amber variant
       variant === "amber" && "data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800 data-[state=active]:shadow-sm",
       
+      // Green variant
+      variant === "green" && "data-[state=active]:bg-green-100 data-[state=active]:text-green-800 data-[state=active]:shadow-sm",
+      
       // Red variant
       variant === "red" && "data-[state=active]:bg-red-100 data-[state=active]:text-red-800 data-[state=active]:shadow-sm",
       
@@ -61,6 +64,7 @@ const TabsTrigger = React.forwardRef<
           variant === "purple" && "bg-purple-100 text-purple-800",
           variant === "blue" && "bg-blue-100 text-blue-800",
           variant === "amber" && "bg-amber-100 text-amber-800",
+          variant === "green" && "bg-green-100 text-green-800",
           variant === "red" && "bg-red-100 text-red-800",
         )}>
           {badge}

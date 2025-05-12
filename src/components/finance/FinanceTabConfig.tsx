@@ -19,7 +19,7 @@ export type FinanceTabId = "overview" | "jobSources" | "technicians" | "contract
 export const quoteTabOptions = [
   { id: "all", label: "All Quotes", color: "bg-gray-100 text-gray-800", variant: "default", icon: <FileText className="h-4 w-4" /> },
   { id: "pending", label: "Pending", color: "bg-blue-100 text-blue-800", variant: "blue", icon: <Clock className="h-4 w-4" /> },
-  { id: "completed", label: "Completed", color: "bg-green-100 text-green-800", variant: "amber", icon: <CheckCircle className="h-4 w-4" /> },
+  { id: "completed", label: "Completed", color: "bg-green-100 text-green-800", variant: "green", icon: <CheckCircle className="h-4 w-4" /> },
   { id: "overdue", label: "Overdue", color: "bg-red-100 text-red-800", variant: "red", icon: <AlertTriangle className="h-4 w-4" /> }
 ];
 
