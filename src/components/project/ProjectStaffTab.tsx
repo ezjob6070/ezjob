@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PlusCircle, User, Trash2, CalendarDays, DollarSign, Check, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { ProjectStaff } from "@/types/finance";
@@ -76,10 +76,6 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
     }
   };
   
-  const filteredStaffMembers = activeTab === "all" 
-    ? staffMembers 
-    : staffMembers.filter(staff => staff.role === activeTab);
-
   const getStaffCountByRole = (role: string) => {
     return staffMembers.filter(staff => staff.role === role).length;
   };
@@ -97,6 +93,106 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
     
     toast.success("Staff data exported successfully");
   };
+
+  // Staff Card Component to reduce duplication
+  const StaffCard = ({ staff }: { staff: ProjectStaff }) => (
+    <Card key={staff.id} className="overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-200">
+      <CardHeader className="bg-gray-50/70 pb-2 border-b">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+              <User size={18} />
+            </div>
+            <div>
+              <CardTitle className="text-lg">{staff.name}</CardTitle>
+              <p className="text-xs text-gray-500 capitalize">{staff.role}</p>
+            </div>
+          </div>
+          <Badge className={getStatusBadgeColor(staff.status)}>
+            {staff.status === "active" && <Check className="h-3 w-3 mr-1" />}
+            {staff.status}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <div className="space-y-3">
+          {staff.specialty && (
+            <div className="px-3 py-2 bg-blue-50 rounded-md mb-3">
+              <p className="text-blue-800 font-medium">{staff.specialty}</p>
+            </div>
+          )}
+          
+          {(staff.email || staff.phone) && (
+            <div className="space-y-2">
+              {staff.email && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail size={14} className="text-gray-400" />
+                  <span className="text-gray-700">{staff.email}</span>
+                </div>
+              )}
+              {staff.phone && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone size={14} className="text-gray-400" />
+                  <span className="text-gray-700">{staff.phone}</span>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <div className="flex flex-col gap-2 mt-3">
+            <div className="flex items-center gap-2">
+              <CalendarDays size={14} className="text-gray-400" />
+              <span className="text-sm">Started on {staff.startDate}</span>
+            </div>
+            
+            {staff.hourlyRate && (
+              <div className="flex items-center gap-2">
+                <DollarSign size={14} className="text-gray-400" />
+                <span className="text-sm">${staff.hourlyRate}/hour</span>
+              </div>
+            )}
+          </div>
+          
+          {staff.notes && (
+            <>
+              <Separator className="my-3" />
+              <div>
+                <p className="text-gray-500 text-sm font-medium mb-1">Notes</p>
+                <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded-md">{staff.notes}</p>
+              </div>
+            </>
+          )}
+          
+          <div className="pt-3 mt-2">
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              className="w-full flex items-center justify-center gap-1"
+              onClick={() => handleRemoveStaff(staff.id)}
+            >
+              <Trash2 size={14} />
+              Remove
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // Empty state component
+  const EmptyState = ({ role }: { role: string }) => (
+    <Card className="border-dashed border-2 bg-gray-50/50">
+      <CardContent className="flex flex-col items-center justify-center py-10">
+        <User size={48} className="text-gray-300 mb-3" />
+        <p className="text-xl font-medium text-gray-500">No {role} yet</p>
+        <p className="text-gray-400 mb-4">Add {role} to this project</p>
+        <Button onClick={() => setShowAddDialog(true)} className="flex items-center gap-2">
+          <PlusCircle className="h-4 w-4" />
+          Add {role}
+        </Button>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="space-y-6">
@@ -254,7 +350,7 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
       {staffMembers.length > 0 ? (
         <>
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               <div className="bg-white rounded-md p-4 shadow-sm border">
                 <div className="text-sm font-medium text-gray-500">Total Staff</div>
                 <div className="text-2xl font-bold mt-1">{staffMembers.length}</div>
@@ -268,6 +364,14 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
                 <div className="text-2xl font-bold mt-1">{getStaffCountByRole("technician")}</div>
               </div>
               <div className="bg-white rounded-md p-4 shadow-sm border">
+                <div className="text-sm font-medium text-gray-500">Engineers</div>
+                <div className="text-2xl font-bold mt-1">{getStaffCountByRole("engineer")}</div>
+              </div>
+              <div className="bg-white rounded-md p-4 shadow-sm border">
+                <div className="text-sm font-medium text-gray-500">Managers</div>
+                <div className="text-2xl font-bold mt-1">{getStaffCountByRole("manager")}</div>
+              </div>
+              <div className="bg-white rounded-md p-4 shadow-sm border">
                 <div className="text-sm font-medium text-gray-500">Active Members</div>
                 <div className="text-2xl font-bold mt-1">{staffMembers.filter(s => s.status === "active").length}</div>
               </div>
@@ -276,106 +380,100 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
         
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="mb-6 bg-gray-100/70">
-              <TabsTrigger value="all" className="data-[state=active]:bg-white">
+              <TabsTrigger value="all" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 All Staff ({staffMembers.length})
               </TabsTrigger>
-              <TabsTrigger value="staff" className="data-[state=active]:bg-white">
+              <TabsTrigger value="staff" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Staff ({getStaffCountByRole("staff")})
               </TabsTrigger>
-              <TabsTrigger value="contractor" className="data-[state=active]:bg-white">
+              <TabsTrigger value="contractor" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Contractors ({getStaffCountByRole("contractor")})
               </TabsTrigger>
-              <TabsTrigger value="technician" className="data-[state=active]:bg-white">
+              <TabsTrigger value="technician" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Technicians ({getStaffCountByRole("technician")})
               </TabsTrigger>
+              <TabsTrigger value="engineer" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Engineers ({getStaffCountByRole("engineer")})
+              </TabsTrigger>
+              <TabsTrigger value="manager" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Managers ({getStaffCountByRole("manager")})
+              </TabsTrigger>
             </TabsList>
+            
+            {/* All Staff Tab Content */}
+            <TabsContent value="all">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.map((staff) => (
+                  <StaffCard key={staff.id} staff={staff} />
+                ))}
+              </div>
+            </TabsContent>
+            
+            {/* Staff Tab Content */}
+            <TabsContent value="staff">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.filter(s => s.role === "staff").length > 0 ? (
+                  staffMembers.filter(s => s.role === "staff").map((staff) => (
+                    <StaffCard key={staff.id} staff={staff} />
+                  ))
+                ) : (
+                  <EmptyState role="staff members" />
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Contractor Tab Content */}
+            <TabsContent value="contractor">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.filter(s => s.role === "contractor").length > 0 ? (
+                  staffMembers.filter(s => s.role === "contractor").map((staff) => (
+                    <StaffCard key={staff.id} staff={staff} />
+                  ))
+                ) : (
+                  <EmptyState role="contractors" />
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Technician Tab Content */}
+            <TabsContent value="technician">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.filter(s => s.role === "technician").length > 0 ? (
+                  staffMembers.filter(s => s.role === "technician").map((staff) => (
+                    <StaffCard key={staff.id} staff={staff} />
+                  ))
+                ) : (
+                  <EmptyState role="technicians" />
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Engineer Tab Content */}
+            <TabsContent value="engineer">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.filter(s => s.role === "engineer").length > 0 ? (
+                  staffMembers.filter(s => s.role === "engineer").map((staff) => (
+                    <StaffCard key={staff.id} staff={staff} />
+                  ))
+                ) : (
+                  <EmptyState role="engineers" />
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Manager Tab Content */}
+            <TabsContent value="manager">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.filter(s => s.role === "manager").length > 0 ? (
+                  staffMembers.filter(s => s.role === "manager").map((staff) => (
+                    <StaffCard key={staff.id} staff={staff} />
+                  ))
+                ) : (
+                  <EmptyState role="managers" />
+                )}
+              </div>
+            </TabsContent>
           </Tabs>
-        
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredStaffMembers.map((staff) => (
-              <Card key={staff.id} className="overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="bg-gray-50/70 pb-2 border-b">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
-                        <User size={18} />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{staff.name}</CardTitle>
-                        <p className="text-xs text-gray-500 capitalize">{staff.role}</p>
-                      </div>
-                    </div>
-                    <Badge className={getStatusBadgeColor(staff.status)}>
-                      {staff.status === "active" && <Check className="h-3 w-3 mr-1" />}
-                      {staff.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="space-y-3">
-                    {staff.specialty && (
-                      <div className="px-3 py-2 bg-blue-50 rounded-md mb-3">
-                        <p className="text-blue-800 font-medium">{staff.specialty}</p>
-                      </div>
-                    )}
-                    
-                    {(staff.email || staff.phone) && (
-                      <div className="space-y-2">
-                        {staff.email && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Mail size={14} className="text-gray-400" />
-                            <span className="text-gray-700">{staff.email}</span>
-                          </div>
-                        )}
-                        {staff.phone && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Phone size={14} className="text-gray-400" />
-                            <span className="text-gray-700">{staff.phone}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-col gap-2 mt-3">
-                      <div className="flex items-center gap-2">
-                        <CalendarDays size={14} className="text-gray-400" />
-                        <span className="text-sm">Started on {staff.startDate}</span>
-                      </div>
-                      
-                      {staff.hourlyRate && (
-                        <div className="flex items-center gap-2">
-                          <DollarSign size={14} className="text-gray-400" />
-                          <span className="text-sm">${staff.hourlyRate}/hour</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {staff.notes && (
-                      <>
-                        <Separator className="my-3" />
-                        <div>
-                          <p className="text-gray-500 text-sm font-medium mb-1">Notes</p>
-                          <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded-md">{staff.notes}</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    <div className="pt-3 mt-2">
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        className="w-full flex items-center justify-center gap-1"
-                        onClick={() => handleRemoveStaff(staff.id)}
-                      >
-                        <Trash2 size={14} />
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </>
       ) : (
         <Card className="border-dashed border-2 bg-gray-50/50">
