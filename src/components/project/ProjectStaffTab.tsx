@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlusCircle, User, Trash2, CalendarDays, DollarSign, Check, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { ProjectStaff } from "@/types/finance";
@@ -75,6 +75,10 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
         return "bg-gray-100 text-gray-800 hover:bg-gray-200";
     }
   };
+  
+  const filteredStaffMembers = activeTab === "all" 
+    ? staffMembers 
+    : staffMembers.filter(staff => staff.role === activeTab);
 
   const getStaffCountByRole = (role: string) => {
     return staffMembers.filter(staff => staff.role === role).length;
@@ -271,130 +275,107 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
           </div>
         
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="mb-6 bg-muted/50">
-              <TabsTrigger value="all" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsList className="mb-6 bg-gray-100/70">
+              <TabsTrigger value="all" className="data-[state=active]:bg-white">
                 All Staff ({staffMembers.length})
               </TabsTrigger>
-              <TabsTrigger value="staff" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger value="staff" className="data-[state=active]:bg-white">
                 Staff ({getStaffCountByRole("staff")})
               </TabsTrigger>
-              <TabsTrigger value="contractor" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger value="contractor" className="data-[state=active]:bg-white">
                 Contractors ({getStaffCountByRole("contractor")})
               </TabsTrigger>
-              <TabsTrigger value="technician" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger value="technician" className="data-[state=active]:bg-white">
                 Technicians ({getStaffCountByRole("technician")})
               </TabsTrigger>
-              <TabsTrigger value="engineer" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                Engineers ({getStaffCountByRole("engineer")})
-              </TabsTrigger>
-              <TabsTrigger value="manager" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                Managers ({getStaffCountByRole("manager")})
-              </TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="all">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {staffMembers.map((staff) => (
-                  <StaffCard 
-                    key={staff.id} 
-                    staff={staff} 
-                    handleRemoveStaff={handleRemoveStaff}
-                    getStatusBadgeColor={getStatusBadgeColor}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="staff">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {staffMembers.filter(staff => staff.role === "staff").map((staff) => (
-                  <StaffCard 
-                    key={staff.id} 
-                    staff={staff} 
-                    handleRemoveStaff={handleRemoveStaff}
-                    getStatusBadgeColor={getStatusBadgeColor}
-                  />
-                ))}
-                {staffMembers.filter(staff => staff.role === "staff").length === 0 && (
-                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No staff members found</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="contractor">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {staffMembers.filter(staff => staff.role === "contractor").map((staff) => (
-                  <StaffCard 
-                    key={staff.id} 
-                    staff={staff} 
-                    handleRemoveStaff={handleRemoveStaff}
-                    getStatusBadgeColor={getStatusBadgeColor}
-                  />
-                ))}
-                {staffMembers.filter(staff => staff.role === "contractor").length === 0 && (
-                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No contractors found</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="technician">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {staffMembers.filter(staff => staff.role === "technician").map((staff) => (
-                  <StaffCard 
-                    key={staff.id} 
-                    staff={staff} 
-                    handleRemoveStaff={handleRemoveStaff}
-                    getStatusBadgeColor={getStatusBadgeColor}
-                  />
-                ))}
-                {staffMembers.filter(staff => staff.role === "technician").length === 0 && (
-                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No technicians found</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="engineer">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {staffMembers.filter(staff => staff.role === "engineer").map((staff) => (
-                  <StaffCard 
-                    key={staff.id} 
-                    staff={staff} 
-                    handleRemoveStaff={handleRemoveStaff}
-                    getStatusBadgeColor={getStatusBadgeColor}
-                  />
-                ))}
-                {staffMembers.filter(staff => staff.role === "engineer").length === 0 && (
-                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No engineers found</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="manager">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {staffMembers.filter(staff => staff.role === "manager").map((staff) => (
-                  <StaffCard 
-                    key={staff.id} 
-                    staff={staff} 
-                    handleRemoveStaff={handleRemoveStaff}
-                    getStatusBadgeColor={getStatusBadgeColor}
-                  />
-                ))}
-                {staffMembers.filter(staff => staff.role === "manager").length === 0 && (
-                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No managers found</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
           </Tabs>
+        
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredStaffMembers.map((staff) => (
+              <Card key={staff.id} className="overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-200">
+                <CardHeader className="bg-gray-50/70 pb-2 border-b">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+                        <User size={18} />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{staff.name}</CardTitle>
+                        <p className="text-xs text-gray-500 capitalize">{staff.role}</p>
+                      </div>
+                    </div>
+                    <Badge className={getStatusBadgeColor(staff.status)}>
+                      {staff.status === "active" && <Check className="h-3 w-3 mr-1" />}
+                      {staff.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="space-y-3">
+                    {staff.specialty && (
+                      <div className="px-3 py-2 bg-blue-50 rounded-md mb-3">
+                        <p className="text-blue-800 font-medium">{staff.specialty}</p>
+                      </div>
+                    )}
+                    
+                    {(staff.email || staff.phone) && (
+                      <div className="space-y-2">
+                        {staff.email && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Mail size={14} className="text-gray-400" />
+                            <span className="text-gray-700">{staff.email}</span>
+                          </div>
+                        )}
+                        {staff.phone && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Phone size={14} className="text-gray-400" />
+                            <span className="text-gray-700">{staff.phone}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-col gap-2 mt-3">
+                      <div className="flex items-center gap-2">
+                        <CalendarDays size={14} className="text-gray-400" />
+                        <span className="text-sm">Started on {staff.startDate}</span>
+                      </div>
+                      
+                      {staff.hourlyRate && (
+                        <div className="flex items-center gap-2">
+                          <DollarSign size={14} className="text-gray-400" />
+                          <span className="text-sm">${staff.hourlyRate}/hour</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {staff.notes && (
+                      <>
+                        <Separator className="my-3" />
+                        <div>
+                          <p className="text-gray-500 text-sm font-medium mb-1">Notes</p>
+                          <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded-md">{staff.notes}</p>
+                        </div>
+                      </>
+                    )}
+                    
+                    <div className="pt-3 mt-2">
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="w-full flex items-center justify-center gap-1"
+                        onClick={() => handleRemoveStaff(staff.id)}
+                      >
+                        <Trash2 size={14} />
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </>
       ) : (
         <Card className="border-dashed border-2 bg-gray-50/50">
@@ -410,101 +391,6 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
         </Card>
       )}
     </div>
-  );
-};
-
-// Extract StaffCard component to improve code organization
-const StaffCard = ({ 
-  staff, 
-  handleRemoveStaff, 
-  getStatusBadgeColor 
-}: { 
-  staff: ProjectStaff; 
-  handleRemoveStaff: (id: string) => void; 
-  getStatusBadgeColor: (status: string) => string;
-}) => {
-  return (
-    <Card key={staff.id} className="overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-200">
-      <CardHeader className="bg-gray-50/70 pb-2 border-b">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
-              <User size={18} />
-            </div>
-            <div>
-              <CardTitle className="text-lg">{staff.name}</CardTitle>
-              <p className="text-xs text-gray-500 capitalize">{staff.role}</p>
-            </div>
-          </div>
-          <Badge className={getStatusBadgeColor(staff.status)}>
-            {staff.status === "active" && <Check className="h-3 w-3 mr-1" />}
-            {staff.status}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <div className="space-y-3">
-          {staff.specialty && (
-            <div className="px-3 py-2 bg-blue-50 rounded-md mb-3">
-              <p className="text-blue-800 font-medium">{staff.specialty}</p>
-            </div>
-          )}
-          
-          {(staff.email || staff.phone) && (
-            <div className="space-y-2">
-              {staff.email && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Mail size={14} className="text-gray-400" />
-                  <span className="text-gray-700">{staff.email}</span>
-                </div>
-              )}
-              {staff.phone && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone size={14} className="text-gray-400" />
-                  <span className="text-gray-700">{staff.phone}</span>
-                </div>
-              )}
-            </div>
-          )}
-          
-          <div className="flex flex-col gap-2 mt-3">
-            <div className="flex items-center gap-2">
-              <CalendarDays size={14} className="text-gray-400" />
-              <span className="text-sm">Started on {staff.startDate}</span>
-            </div>
-            
-            {staff.hourlyRate && (
-              <div className="flex items-center gap-2">
-                <DollarSign size={14} className="text-gray-400" />
-                <span className="text-sm">${staff.hourlyRate}/hour</span>
-              </div>
-            )}
-          </div>
-          
-          {staff.notes && (
-            <>
-              <Separator className="my-3" />
-              <div>
-                <p className="text-gray-500 text-sm font-medium mb-1">Notes</p>
-                <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded-md">{staff.notes}</p>
-              </div>
-            </>
-          )}
-          
-          <div className="pt-3 mt-2">
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              className="w-full flex items-center justify-center gap-1"
-              onClick={() => handleRemoveStaff(staff.id)}
-            >
-              <Trash2 size={14} />
-              Remove
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 };
 
