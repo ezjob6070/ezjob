@@ -42,32 +42,6 @@ export interface ContractorDetail extends Technician {
   };
   agreementSigned?: boolean;
   agreementDate?: string;
-  invoices?: ContractorInvoice[];
-  quotes?: ContractorQuote[];
-}
-
-export interface ContractorInvoice {
-  id: string;
-  invoiceNumber: string;
-  date: string;
-  dueDate: string;
-  amount: number;
-  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
-  projectId?: number;
-  projectName?: string;
-  description?: string;
-}
-
-export interface ContractorQuote {
-  id: string;
-  quoteNumber: string;
-  date: string;
-  validUntil: string;
-  amount: number;
-  status: "draft" | "sent" | "accepted" | "rejected" | "expired";
-  projectId?: number;
-  projectName?: string;
-  description?: string;
 }
 
 export interface ContractorFilter {
