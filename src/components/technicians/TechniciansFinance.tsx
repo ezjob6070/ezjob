@@ -90,8 +90,8 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     // Filter by quote status if applicable
     if (quoteStatusFilter !== "all") {
       filtered = filtered.filter(transaction => {
-        // Only apply the filter if the transaction has a quoteStatus property
-        return transaction.quoteStatus === undefined || transaction.quoteStatus === quoteStatusFilter;
+        if (!transaction.quoteStatus) return quoteStatusFilter === "all";
+        return transaction.quoteStatus === quoteStatusFilter;
       });
     }
     
@@ -356,24 +356,29 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
         </Card>
       </div>
       
-      {/* Quote Status Filter Tabs */}
+      {/* Quote Status Filter Tabs - REDESIGNED TO BE MORE COMPACT */}
       <div className="mb-4">
-        <Tabs defaultValue="all" value={quoteStatusFilter} onValueChange={setQuoteStatusFilter} className="w-full">
-          <TabsList className="grid grid-cols-4 max-w-[400px]">
-            <TabsTrigger value="all" className="flex items-center gap-1.5">
-              <List className="h-4 w-4" />
+        <Tabs 
+          defaultValue="all" 
+          value={quoteStatusFilter} 
+          onValueChange={setQuoteStatusFilter} 
+          className="w-full"
+        >
+          <TabsList className="inline-flex h-9 items-center justify-start gap-1 px-1 py-1 bg-muted/50 w-auto">
+            <TabsTrigger value="all" className="h-7 px-3 text-xs">
+              <List className="h-3.5 w-3.5 mr-1.5" />
               <span>All Quotes</span>
             </TabsTrigger>
-            <TabsTrigger value="pending" className="flex items-center gap-1.5">
-              <Clock className="h-4 w-4" />
+            <TabsTrigger value="pending" className="h-7 px-3 text-xs">
+              <Clock className="h-3.5 w-3.5 mr-1.5" />
               <span>Pending</span>
             </TabsTrigger>
-            <TabsTrigger value="completed" className="flex items-center gap-1.5">
-              <Check className="h-4 w-4" />
+            <TabsTrigger value="completed" className="h-7 px-3 text-xs">
+              <Check className="h-3.5 w-3.5 mr-1.5" />
               <span>Completed</span>
             </TabsTrigger>
-            <TabsTrigger value="overdue" className="flex items-center gap-1.5">
-              <CalendarX className="h-4 w-4" />
+            <TabsTrigger value="overdue" className="h-7 px-3 text-xs">
+              <CalendarX className="h-3.5 w-3.5 mr-1.5" />
               <span>Overdue</span>
             </TabsTrigger>
           </TabsList>
