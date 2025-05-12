@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,8 @@ import { Progress } from "@/components/ui/progress";
 import { useFinanceData } from "@/hooks/useFinanceData";
 import { quoteTabOptions } from "@/components/finance/FinanceTabConfig";
 import SearchBar from "@/components/finance/filters/SearchBar";
+import SortFilterDropdown from "@/components/common/SortFilterDropdown";
+import { SortOption } from "@/types/sortOptions";
 
 interface ProjectFinanceTabProps {
   project: Project;
@@ -38,6 +39,9 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   
   // Search functionality
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Sort functionality
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
   
   // Project quotes & invoices
   const [quotes, setQuotes] = useState<ProjectQuote[]>(project.quotes || []);
@@ -160,7 +164,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     return expense.category === expenseCategory;
   });
   
-  // Filter quotes based on status, tab selection, and search term
+  // Filter quotes based on status, tab selection, search term and sort
   const filteredQuotes = quotes.filter(quote => {
     const matchesTab = activeQuoteTab === "all" || 
       (activeQuoteTab === "pending" && (quote.status === "sent" || quote.status === "draft")) ||
@@ -171,10 +175,27 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
       quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (quote.clientPhone && quote.clientPhone.includes(searchTerm)) ||
       (quote.clientEmail && quote.clientEmail.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      quote.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quote.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      quote.id.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesTab && matchesSearch;
+  }).sort((a, b) => {
+    // Sort based on the selected sort option
+    switch (sortOption) {
+      case "newest":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case "oldest":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      case "name-asc":
+        return a.clientName.localeCompare(b.clientName);
+      case "name-desc":
+        return b.clientName.localeCompare(a.clientName);
+      case "revenue-high":
+        return b.totalAmount - a.totalAmount;
+      case "revenue-low":
+        return a.totalAmount - b.totalAmount;
+      default:
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
   });
   
   // Expense breakdown for chart
@@ -750,12 +771,19 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
             </TabsList>
           </Tabs>
           
-          {/* Search Bar */}
-          <div className="mb-4">
+          {/* Search Bar and Sort Filter */}
+          <div className="flex items-center justify-between gap-3 mb-4">
             <SearchBar 
               searchTerm={searchTerm} 
               onSearchChange={setSearchTerm} 
               placeholder="Search quotes by client name, phone, email..." 
+              className="flex-1"
+            />
+            
+            <SortFilterDropdown
+              sortBy={sortOption}
+              onSortChange={setSortOption}
+              compact={true}
             />
           </div>
           
