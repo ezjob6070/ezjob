@@ -165,6 +165,28 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   // Calculate expense distribution
   const totalExpensesSum = expenseBreakdown.reduce((sum, item) => sum + item.value, 0);
   
+  // Calculate quote statistics
+  const quoteStats = {
+    draft: quotes.filter(q => q.status === "draft").length,
+    sent: quotes.filter(q => q.status === "sent").length,
+    accepted: quotes.filter(q => q.status === "accepted").length,
+    rejected: quotes.filter(q => q.status === "rejected").length,
+    expired: quotes.filter(q => q.status === "expired").length,
+    totalValue: quotes.reduce((sum, q) => sum + q.totalAmount, 0),
+    acceptedValue: quotes.filter(q => q.status === "accepted").reduce((sum, q) => sum + q.totalAmount, 0)
+  };
+  
+  // Calculate invoice statistics
+  const invoiceStats = {
+    draft: invoices.filter(i => i.status === "draft").length,
+    sent: invoices.filter(i => i.status === "sent").length,
+    paid: invoices.filter(i => i.status === "paid").length,
+    overdue: invoices.filter(i => i.status === "overdue").length,
+    cancelled: invoices.filter(i => i.status === "cancelled").length,
+    totalValue: invoices.reduce((sum, i) => sum + i.totalAmount, 0),
+    paidValue: invoices.filter(i => i.status === "paid").reduce((sum, i) => sum + i.paidAmount || i.totalAmount, 0)
+  };
+  
   // Quote handlers
   const handleCreateQuote = (quote: ProjectQuote) => {
     if (selectedQuote) {
@@ -293,17 +315,278 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
         ))}
       </div>
       
-      {/* Removing the Profit Summary section as requested */}
-      
-      {/* Quotes and Invoices Section */}
+      {/* Tabs for Finance Overview, Expenses, Quotes and Invoices */}
       <Tabs value={financeTab} onValueChange={setFinanceTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Expenses</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Finance Overview</TabsTrigger>
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
           <TabsTrigger value="invoices">Invoices</TabsTrigger>
         </TabsList>
         
+        {/* Finance Overview Tab - NEW */}
         <TabsContent value="overview" className="space-y-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Quote Status Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Quote Summary</CardTitle>
+                <CardDescription>Status of client quotes</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Quotes</p>
+                    <p className="text-2xl font-bold">{quotes.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Value</p>
+                    <p className="text-2xl font-bold text-blue-600">{formatCurrency(quoteStats.totalValue)}</p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={quoteStatusColors.draft}>Draft</Badge>
+                      <span className="text-sm">{quoteStats.draft} quotes</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.draft / quotes.length) * 100 : 0} />
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={quoteStatusColors.sent}>Sent</Badge>
+                      <span className="text-sm">{quoteStats.sent} quotes</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.sent / quotes.length) * 100 : 0} />
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={quoteStatusColors.accepted}>Accepted</Badge>
+                      <span className="text-sm">{quoteStats.accepted} quotes</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.accepted / quotes.length) * 100 : 0} />
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={quoteStatusColors.rejected}>Rejected</Badge>
+                      <span className="text-sm">{quoteStats.rejected} quotes</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={quotes.length > 0 ? (quoteStats.rejected / quotes.length) * 100 : 0} />
+                  </div>
+                </div>
+                
+                <div className="mt-2 pt-2 border-t">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Acceptance Rate</span>
+                    <span className="font-bold">
+                      {quotes.length > 0
+                        ? `${Math.round((quoteStats.accepted / (quoteStats.accepted + quoteStats.rejected)) * 100)}%`
+                        : "0%"}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Invoice Status Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Invoice Summary</CardTitle>
+                <CardDescription>Status of contractor invoices</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Invoices</p>
+                    <p className="text-2xl font-bold">{invoices.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Value</p>
+                    <p className="text-2xl font-bold text-red-600">{formatCurrency(invoiceStats.totalValue)}</p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={invoiceStatusColors.draft}>Draft</Badge>
+                      <span className="text-sm">{invoiceStats.draft} invoices</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={invoices.length > 0 ? (invoiceStats.draft / invoices.length) * 100 : 0} />
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={invoiceStatusColors.sent}>Sent</Badge>
+                      <span className="text-sm">{invoiceStats.sent} invoices</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={invoices.length > 0 ? (invoiceStats.sent / invoices.length) * 100 : 0} />
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={invoiceStatusColors.paid}>Paid</Badge>
+                      <span className="text-sm">{invoiceStats.paid} invoices</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={invoices.length > 0 ? (invoiceStats.paid / invoices.length) * 100 : 0} />
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Badge className={invoiceStatusColors.overdue}>Overdue</Badge>
+                      <span className="text-sm">{invoiceStats.overdue} invoices</span>
+                    </div>
+                    <Progress className="w-1/3 h-2" value={invoices.length > 0 ? (invoiceStats.overdue / invoices.length) * 100 : 0} />
+                  </div>
+                </div>
+                
+                <div className="mt-2 pt-2 border-t">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Payment Rate</span>
+                    <span className="font-bold">
+                      {invoices.length > 0
+                        ? `${Math.round((invoiceStats.paid / invoices.length) * 100)}%`
+                        : "0%"}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Expense Summary Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Expense Breakdown</CardTitle>
+              <CardDescription>Project expense distribution by category</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Total Expenses</p>
+                    <p className="text-2xl font-bold text-red-600">{formatCurrency(totalExpenses + totalContractorCosts)}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Material Costs</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {formatCurrency(expenses.filter(e => e.category === "materials").reduce((sum, e) => sum + e.amount, 0))}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Contractor Payments</p>
+                    <p className="text-2xl font-bold text-purple-600">{formatCurrency(totalContractorCosts)}</p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  {expenseBreakdown.map((category) => (
+                    <div key={category.name} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }}></div>
+                        <span>{category.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span>{formatCurrency(category.value)}</span>
+                        <span className="text-sm text-muted-foreground">
+                          ({totalExpensesSum > 0 ? Math.round((category.value / totalExpensesSum) * 100) : 0}%)
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <div className="flex items-center justify-between border-t pt-2 mt-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-purple-600"></div>
+                      <span>Contractor Payments</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span>{formatCurrency(totalContractorCosts)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        ({(totalExpensesSum + totalContractorCosts) > 0 
+                          ? Math.round((totalContractorCosts / (totalExpensesSum + totalContractorCosts)) * 100) 
+                          : 0}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Financial Health Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Financial Health</CardTitle>
+              <CardDescription>Project budget utilization and revenue comparison</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Total Budget</p>
+                  <p className="text-2xl font-bold">{formatCurrency(project.budget)}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Spent So Far</p>
+                  <p className="text-2xl font-bold text-red-600">{formatCurrency(project.actualSpent)}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Net Balance</p>
+                  <p className={`text-2xl font-bold ${totalIncome - project.actualSpent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(totalIncome - project.actualSpent)}
+                  </p>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium">Budget Utilization</span>
+                    <span className="text-sm font-medium">
+                      {project.budget > 0 ? Math.round((project.actualSpent / project.budget) * 100) : 0}%
+                    </span>
+                  </div>
+                  <Progress 
+                    className="h-2" 
+                    value={project.budget > 0 ? (project.actualSpent / project.budget) * 100 : 0} 
+                    color="bg-blue-600"
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium">Invoices vs Revenue</span>
+                    <span className="text-sm font-medium">
+                      {totalIncome > 0 ? Math.round((invoiceStats.totalValue / totalIncome) * 100) : 0}%
+                    </span>
+                  </div>
+                  <Progress 
+                    className="h-2" 
+                    value={totalIncome > 0 ? (invoiceStats.totalValue / totalIncome) * 100 : 0} 
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="expenses" className="space-y-4 py-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Project Expenses</h3>
             <div className="flex items-center gap-2">
@@ -666,3 +949,4 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
 };
 
 export default ProjectFinanceTab;
+
