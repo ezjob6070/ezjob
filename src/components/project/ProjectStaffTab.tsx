@@ -212,7 +212,7 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
             <DialogTrigger asChild>
               <Button size="sm" className="flex items-center gap-2">
                 <PlusCircle className="h-4 w-4" />
-                Add Member
+                Add Staff
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
@@ -483,7 +483,7 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
             <p className="text-gray-400 mb-4">Add team members to this project</p>
             <Button onClick={() => setShowAddDialog(true)} className="flex items-center gap-2">
               <PlusCircle className="h-4 w-4" />
-              Add Staff/Contractor
+              Add Staff
             </Button>
           </CardContent>
         </Card>
