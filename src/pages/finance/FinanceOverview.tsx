@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DateRange } from "react-day-picker";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, CoatRack, Invoice, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FinancialTransaction, JobSource } from "@/types/finance";
 import { sampleTransactions, getDateRangeForTimeFrame } from "@/data/finances";
@@ -64,6 +64,30 @@ const FinanceOverview = () => {
         date={date}
         setDate={setDate}
       />
+
+      {/* Category Buttons */}
+      <div className="mt-8 flex flex-wrap gap-3">
+        <Link to="/finance" state={{ activeTab: "office" }}>
+          <Button variant="outline" className="flex items-center gap-2">
+            <CoatRack className="h-5 w-5 text-blue-600" />
+            Expenses
+          </Button>
+        </Link>
+
+        <Link to="/finance" state={{ activeTab: "technicians" }}>
+          <Button variant="outline" className="flex items-center gap-2">
+            <Invoice className="h-5 w-5 text-blue-600" />
+            Invoices
+          </Button>
+        </Link>
+
+        <Link to="/finance" state={{ activeTab: "transactions" }}>
+          <Button variant="outline" className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-blue-600" />
+            Transactions
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

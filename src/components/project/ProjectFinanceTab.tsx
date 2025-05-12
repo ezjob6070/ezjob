@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Plus, Send, Download, Check, X, TrendingDown, TrendingUp, Wallet, Receipt, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Plus, Send, Download, Check, X, TrendingDown, TrendingUp, Wallet, Receipt, Clock, Invoice, CoatRack } from "lucide-react";
 import { Project, ProjectQuote, ProjectInvoice, ProjectExpense } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
@@ -382,10 +383,34 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
       {/* Tabs for Finance Overview, Expenses, Quotes and Invoices */}
       <Tabs value={financeTab} onValueChange={setFinanceTab}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Finance Overview</TabsTrigger>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          <TabsTrigger value="quotes">Quotes</TabsTrigger>
-          <TabsTrigger value="invoices">Invoices</TabsTrigger>
+          <TabsTrigger 
+            value="overview" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex items-center gap-2"
+          >
+            <DollarSign className="h-4 w-4" />
+            Finance Overview
+          </TabsTrigger>
+          <TabsTrigger 
+            value="expenses" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex items-center gap-2"
+          >
+            <CoatRack className="h-4 w-4" />
+            Expenses
+          </TabsTrigger>
+          <TabsTrigger 
+            value="quotes" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex items-center gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            Quotes
+          </TabsTrigger>
+          <TabsTrigger 
+            value="invoices" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex items-center gap-2"
+          >
+            <Invoice className="h-4 w-4" />
+            Invoices
+          </TabsTrigger>
         </TabsList>
         
         {/* Finance Overview Tab */}

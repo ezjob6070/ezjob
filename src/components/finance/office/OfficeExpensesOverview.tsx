@@ -1,6 +1,6 @@
 
 import { DateRange } from "react-day-picker";
-import { DollarSign, TrendingDown, Building, Clock } from "lucide-react";
+import { DollarSign, TrendingDown, Building, Clock, CoatRack, Invoice } from "lucide-react";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 import { OfficeExpense } from "@/types/finance";
 import { format } from "date-fns";
@@ -38,7 +38,7 @@ const OfficeExpensesOverview = ({
         title="Total Expenses"
         value={`$${totalExpenses.toLocaleString()}`}
         description={filterDescription}
-        icon={<DollarSign className="h-4 w-4" />}
+        icon={<CoatRack className="h-4 w-4" />}
         trend={{ value: dateRangeText, isPositive: false }}
       />
       
