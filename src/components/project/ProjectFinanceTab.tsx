@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { useFinanceData } from "@/hooks/useFinanceData";
 import { quoteTabOptions } from "@/components/finance/FinanceTabConfig";
+import SearchBar from "@/components/finance/filters/SearchBar";
 
 interface ProjectFinanceTabProps {
   project: Project;
@@ -33,6 +35,9 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
   const [financeTab, setFinanceTab] = useState("overview");
   const [expenseCategory, setExpenseCategory] = useState<string>("all");
   const [expensePeriod, setExpensePeriod] = useState<string>("all");
+  
+  // Search functionality
+  const [searchTerm, setSearchTerm] = useState("");
   
   // Project quotes & invoices
   const [quotes, setQuotes] = useState<ProjectQuote[]>(project.quotes || []);
@@ -155,17 +160,21 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
     return expense.category === expenseCategory;
   });
   
-  // Filter quotes based on status and tab selection
+  // Filter quotes based on status, tab selection, and search term
   const filteredQuotes = quotes.filter(quote => {
-    if (activeQuoteTab === "all") return true;
-    if (activeQuoteTab === "pending") return quote.status === "sent" || quote.status === "draft";
-    if (activeQuoteTab === "completed") return quote.status === "accepted" || quote.status === "rejected";
-    if (activeQuoteTab === "overdue") {
-      const validUntilDate = new Date(quote.validUntil);
-      const today = new Date();
-      return (quote.status === "sent" || quote.status === "draft") && validUntilDate < today;
-    }
-    return true;
+    const matchesTab = activeQuoteTab === "all" || 
+      (activeQuoteTab === "pending" && (quote.status === "sent" || quote.status === "draft")) ||
+      (activeQuoteTab === "completed" && (quote.status === "accepted" || quote.status === "rejected")) ||
+      (activeQuoteTab === "overdue" && ((quote.status === "sent" || quote.status === "draft") && new Date(quote.validUntil) < new Date()));
+    
+    const matchesSearch = searchTerm === "" || 
+      quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (quote.clientPhone && quote.clientPhone.includes(searchTerm)) ||
+      (quote.clientEmail && quote.clientEmail.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      quote.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      quote.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesTab && matchesSearch;
   });
   
   // Expense breakdown for chart
@@ -729,7 +738,7 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
                 <TabsTrigger 
                   key={tab.id} 
                   value={tab.id} 
-                  variant={tab.variant as "default" | "blue" | "amber" | "red"}
+                  variant={tab.variant as "default" | "blue" | "amber" | "green" | "red"}
                   badge={quoteCounts[tab.id as keyof typeof quoteCounts]}
                 >
                   <span className="flex items-center gap-2">
@@ -740,6 +749,15 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
               ))}
             </TabsList>
           </Tabs>
+          
+          {/* Search Bar */}
+          <div className="mb-4">
+            <SearchBar 
+              searchTerm={searchTerm} 
+              onSearchChange={setSearchTerm} 
+              placeholder="Search quotes by client name, phone, email..." 
+            />
+          </div>
           
           {/* Quote content - listing all quotes */}
           {filteredQuotes.length > 0 ? (
@@ -850,7 +868,9 @@ const ProjectFinanceTab: React.FC<ProjectFinanceTabProps> = ({ project }) => {
               <p className="text-lg font-medium text-gray-500">No quotes found</p>
               <p className="text-gray-400 max-w-md mx-auto mt-2 mb-4">
                 {activeQuoteTab === "all" 
-                  ? "Create quotes to send to clients for this project" 
+                  ? searchTerm 
+                    ? "No quotes match your search criteria" 
+                    : "Create quotes to send to clients for this project"
                   : activeQuoteTab === "pending"
                     ? "No pending quotes found"
                     : activeQuoteTab === "completed"

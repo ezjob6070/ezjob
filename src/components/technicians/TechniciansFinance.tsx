@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { SearchIcon, ArrowUpDown, Calendar, List, Clock, Check, CalendarX } from "lucide-react";
+import { ArrowUpDown, Calendar, List, Clock, Check, CalendarX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import EntityFilter, { Entity } from "@/components/finance/EntityFilter";
 import { X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import SearchBar from "@/components/finance/filters/SearchBar";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
@@ -197,15 +198,12 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-2 mb-4">
-        <div className="relative flex-1 min-w-[180px]">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search technicians..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <SearchBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          placeholder="Search technicians..."
+          className="flex-1 min-w-[180px]"
+        />
         
         <EntityFilter
           entities={technicianEntities}
@@ -355,7 +353,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
         </Card>
       </div>
       
-      {/* Quote Status Filter Tabs - REDESIGNED TO BE MORE COMPACT */}
+      {/* Quote Status Filter Tabs */}
       <div className="mb-4">
         <Tabs 
           defaultValue="all" 

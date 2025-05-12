@@ -1,27 +1,45 @@
 
 import React from "react";
-import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { FinanceFilters } from "../FinanceFilterTypes";
+import { Search, Phone, Mail, User } from "lucide-react";
 
 interface SearchBarProps {
   searchTerm: string;
-  updateFilter: <K extends keyof FinanceFilters>(key: K, value: FinanceFilters[K]) => void;
+  onSearchChange: (value: string) => void;
+  showIcons?: boolean;
   hidden?: boolean;
+  placeholder?: string;
+  className?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, updateFilter, hidden = false }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  searchTerm,
+  onSearchChange,
+  showIcons = true,
+  hidden = false,
+  placeholder = "Search...",
+  className = ""
+}) => {
   if (hidden) return null;
   
   return (
-    <div className="relative flex-1 min-w-[200px]">
-      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+    <div className={`w-full relative ${className}`}>
+      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <Search className="h-4 w-4 text-muted-foreground" />
+      </div>
       <Input
-        placeholder="Search transactions..."
-        className="pl-8"
+        placeholder={placeholder}
+        className={`w-full pl-10 ${showIcons ? 'pr-10' : 'pr-4'}`}
         value={searchTerm}
-        onChange={(e) => updateFilter("searchTerm", e.target.value)}
+        onChange={(e) => onSearchChange(e.target.value)}
       />
+      {showIcons && (
+        <div className="absolute inset-y-0 right-3 flex items-center space-x-1 text-muted-foreground">
+          <User className="h-3 w-3" />
+          <Mail className="h-3 w-3" />
+          <Phone className="h-3 w-3" />
+        </div>
+      )}
     </div>
   );
 };
