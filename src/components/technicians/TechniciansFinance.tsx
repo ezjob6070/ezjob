@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { SearchIcon, ArrowUpDown, Calendar } from "lucide-react";
+import { SearchIcon, ArrowUpDown, Calendar, List, Clock, Check, CalendarX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { format } from "date-fns";
 import EntityFilter, { Entity } from "@/components/finance/EntityFilter";
 import { X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 type TechnicianFinanceRecord = {
   technician: Technician;
@@ -48,6 +50,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     to: undefined,
   });
   const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>(transactions);
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>("all");
 
   // Convert technicians to Entity type for the filter component
   const technicianEntities: Entity[] = technicians.map(tech => ({
@@ -83,9 +86,14 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
                transactionDate <= dateRange.to!;
       });
     }
+
+    // Filter by quote status if applicable
+    if (quoteStatusFilter !== "all" && transaction.quoteStatus) {
+      filtered = filtered.filter(transaction => transaction.quoteStatus === quoteStatusFilter);
+    }
     
     setFilteredTransactions(filtered);
-  }, [selectedTechnicianIds, jobStatus, dateRange, transactions, technicians]);
+  }, [selectedTechnicianIds, jobStatus, dateRange, transactions, technicians, quoteStatusFilter]);
 
   // Calculate financial metrics for each technician
   const technicianFinances: TechnicianFinanceRecord[] = technicians
@@ -181,6 +189,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
     setDateRange({ from: undefined, to: undefined });
     setSearchTerm("");
     setJobStatus("all");
+    setQuoteStatusFilter("all");
   };
 
   return (
@@ -237,7 +246,7 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
           </SelectContent>
         </Select>
         
-        {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm || jobStatus !== "all") && (
+        {(selectedTechnicianIds.length > 0 || dateRange.from || searchTerm || jobStatus !== "all" || quoteStatusFilter !== "all") && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-1">
             <X className="h-4 w-4" />
             Clear Filters
@@ -344,6 +353,30 @@ const TechniciansFinance = ({ technicians, transactions }: TechniciansFinancePro
         </Card>
       </div>
       
+      {/* Quote Status Filter Tabs */}
+      <div className="mb-4">
+        <Tabs defaultValue="all" value={quoteStatusFilter} onValueChange={setQuoteStatusFilter} className="w-full">
+          <TabsList className="grid grid-cols-4 max-w-[400px]">
+            <TabsTrigger value="all" className="flex items-center gap-1.5">
+              <List className="h-4 w-4" />
+              <span>All Quotes</span>
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="flex items-center gap-1.5">
+              <Clock className="h-4 w-4" />
+              <span>Pending</span>
+            </TabsTrigger>
+            <TabsTrigger value="completed" className="flex items-center gap-1.5">
+              <Check className="h-4 w-4" />
+              <span>Completed</span>
+            </TabsTrigger>
+            <TabsTrigger value="overdue" className="flex items-center gap-1.5">
+              <CalendarX className="h-4 w-4" />
+              <span>Overdue</span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       <div className="rounded-md border overflow-hidden">
         <Table>
           <TableHeader>
