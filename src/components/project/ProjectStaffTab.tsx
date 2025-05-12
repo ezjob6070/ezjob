@@ -75,10 +75,6 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
         return "bg-gray-100 text-gray-800 hover:bg-gray-200";
     }
   };
-  
-  const filteredStaffMembers = activeTab === "all" 
-    ? staffMembers 
-    : staffMembers.filter(staff => staff.role === activeTab);
 
   const getStaffCountByRole = (role: string) => {
     return staffMembers.filter(staff => staff.role === role).length;
@@ -288,10 +284,15 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
               <TabsTrigger value="technician" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Technicians ({getStaffCountByRole("technician")})
               </TabsTrigger>
+              <TabsTrigger value="engineer" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Engineers ({getStaffCountByRole("engineer")})
+              </TabsTrigger>
+              <TabsTrigger value="manager" variant="blue" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Managers ({getStaffCountByRole("manager")})
+              </TabsTrigger>
             </TabsList>
             
-            {/* Add TabsContent for each tab */}
-            <TabsContent value="all" className="mt-0">
+            <TabsContent value="all">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {staffMembers.map((staff) => (
                   <StaffCard 
@@ -303,7 +304,8 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
                 ))}
               </div>
             </TabsContent>
-            <TabsContent value="staff" className="mt-0">
+            
+            <TabsContent value="staff">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {staffMembers.filter(staff => staff.role === "staff").map((staff) => (
                   <StaffCard 
@@ -313,9 +315,15 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
                     getStatusBadgeColor={getStatusBadgeColor}
                   />
                 ))}
+                {staffMembers.filter(staff => staff.role === "staff").length === 0 && (
+                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No staff members found</p>
+                  </div>
+                )}
               </div>
             </TabsContent>
-            <TabsContent value="contractor" className="mt-0">
+            
+            <TabsContent value="contractor">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {staffMembers.filter(staff => staff.role === "contractor").map((staff) => (
                   <StaffCard 
@@ -325,9 +333,15 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
                     getStatusBadgeColor={getStatusBadgeColor}
                   />
                 ))}
+                {staffMembers.filter(staff => staff.role === "contractor").length === 0 && (
+                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No contractors found</p>
+                  </div>
+                )}
               </div>
             </TabsContent>
-            <TabsContent value="technician" className="mt-0">
+            
+            <TabsContent value="technician">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {staffMembers.filter(staff => staff.role === "technician").map((staff) => (
                   <StaffCard 
@@ -337,6 +351,47 @@ const ProjectStaffTab: React.FC<ProjectStaffTabProps> = ({ projectId, projectSta
                     getStatusBadgeColor={getStatusBadgeColor}
                   />
                 ))}
+                {staffMembers.filter(staff => staff.role === "technician").length === 0 && (
+                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No technicians found</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="engineer">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.filter(staff => staff.role === "engineer").map((staff) => (
+                  <StaffCard 
+                    key={staff.id} 
+                    staff={staff} 
+                    handleRemoveStaff={handleRemoveStaff}
+                    getStatusBadgeColor={getStatusBadgeColor}
+                  />
+                ))}
+                {staffMembers.filter(staff => staff.role === "engineer").length === 0 && (
+                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No engineers found</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="manager">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.filter(staff => staff.role === "manager").map((staff) => (
+                  <StaffCard 
+                    key={staff.id} 
+                    staff={staff} 
+                    handleRemoveStaff={handleRemoveStaff}
+                    getStatusBadgeColor={getStatusBadgeColor}
+                  />
+                ))}
+                {staffMembers.filter(staff => staff.role === "manager").length === 0 && (
+                  <div className="col-span-3 text-center py-10 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No managers found</p>
+                  </div>
+                )}
               </div>
             </TabsContent>
           </Tabs>
