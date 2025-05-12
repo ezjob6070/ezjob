@@ -34,6 +34,8 @@ import { CalendarIcon, Trash2, Plus, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Project, ProjectQuote, ProjectQuoteItem } from "@/types/project";
 import { toast } from "sonner";
+import PriceRangeFilter from "@/components/common/PriceRangeFilter";
+import SearchBar from "@/components/finance/filters/SearchBar";
 
 interface ProjectQuoteModalProps {
   open: boolean;
@@ -90,6 +92,9 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
   });
   
   const [status, setStatus] = useState(existingQuote?.status || "draft");
+  const [minPriceFilter, setMinPriceFilter] = useState<number>(0);
+  const [maxPriceFilter, setMaxPriceFilter] = useState<number>(Number.MAX_SAFE_INTEGER);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   
   // Calculate totals
   const subtotal = quoteData.items.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -99,6 +104,15 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
   const taxableAmount = subtotal - discount;
   const taxAmount = (taxableAmount * quoteData.taxRate) / 100;
   const total = taxableAmount + taxAmount;
+  
+  // Filter items based on search and price range
+  const filteredItems = quoteData.items.filter(item => {
+    const matchesSearch = !searchTerm || 
+      item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesPrice = item.totalPrice >= minPriceFilter && 
+      item.totalPrice <= maxPriceFilter;
+    return matchesSearch && matchesPrice;
+  });
   
   // Handle item updates
   const updateItem = (index: number, field: keyof ProjectQuoteItem, value: any) => {
@@ -171,6 +185,11 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
   const previewQuote = () => {
     // In a real app, this would generate a PDF preview
     toast.success("Quote preview generated");
+  };
+  
+  const handlePriceRangeChange = (min: number, max: number) => {
+    setMinPriceFilter(min);
+    setMaxPriceFilter(max);
   };
   
   return (
@@ -303,6 +322,23 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
               </Button>
             </div>
             
+            {/* Search and Filter Row */}
+            <div className="flex flex-wrap gap-2 items-center">
+              <SearchBar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                placeholder="Search quote items..."
+                className="flex-1 min-w-[180px]"
+              />
+              
+              <PriceRangeFilter
+                minAmount={minPriceFilter}
+                maxAmount={maxPriceFilter}
+                onRangeChange={handlePriceRangeChange}
+                compact={true}
+              />
+            </div>
+            
             <div className="border rounded-md">
               {/* Header */}
               <div className="grid grid-cols-12 gap-2 p-3 bg-muted text-sm font-medium">
@@ -315,53 +351,62 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
               
               {/* Items */}
               <div className="divide-y">
-                {quoteData.items.map((item, index) => (
-                  <div key={item.id} className="grid grid-cols-12 gap-2 p-3 items-center">
-                    <div className="col-span-5">
-                      <Input 
-                        value={item.description} 
-                        onChange={(e) => updateItem(index, "description", e.target.value)}
-                        placeholder="Item description"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <Input 
-                        type="number" 
-                        value={item.quantity} 
-                        onChange={(e) => updateItem(index, "quantity", parseFloat(e.target.value) || 0)}
-                        min="0"
-                        step="1"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2">$</span>
-                        <Input 
-                          type="number" 
-                          value={item.unitPrice} 
-                          onChange={(e) => updateItem(index, "unitPrice", parseFloat(e.target.value) || 0)}
-                          className="pl-7"
-                          min="0"
-                          step="0.01"
-                        />
+                {filteredItems.length > 0 ? (
+                  filteredItems.map((item, index) => {
+                    const originalIndex = quoteData.items.findIndex(i => i.id === item.id);
+                    return (
+                      <div key={item.id} className="grid grid-cols-12 gap-2 p-3 items-center">
+                        <div className="col-span-5">
+                          <Input 
+                            value={item.description} 
+                            onChange={(e) => updateItem(originalIndex, "description", e.target.value)}
+                            placeholder="Item description"
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <Input 
+                            type="number" 
+                            value={item.quantity} 
+                            onChange={(e) => updateItem(originalIndex, "quantity", parseFloat(e.target.value) || 0)}
+                            min="0"
+                            step="1"
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2">$</span>
+                            <Input 
+                              type="number" 
+                              value={item.unitPrice} 
+                              onChange={(e) => updateItem(originalIndex, "unitPrice", parseFloat(e.target.value) || 0)}
+                              className="pl-7"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-span-2 font-medium">
+                          ${item.totalPrice.toFixed(2)}
+                        </div>
+                        <div className="col-span-1 text-right">
+                          <Button 
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeItem(originalIndex)}
+                            disabled={quoteData.items.length === 1}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-span-2 font-medium">
-                      ${item.totalPrice.toFixed(2)}
-                    </div>
-                    <div className="col-span-1 text-right">
-                      <Button 
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeItem(index)}
-                        disabled={quoteData.items.length === 1}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
+                    );
+                  })
+                ) : (
+                  <div className="p-6 text-center text-muted-foreground">
+                    No items match your search criteria
                   </div>
-                ))}
+                )}
               </div>
             </div>
             
