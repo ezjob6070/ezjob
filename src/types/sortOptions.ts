@@ -9,7 +9,11 @@ export type SortOption =
   | "jobs-high" 
   | "jobs-low" 
   | "price-high" 
-  | "price-low";
+  | "price-low"
+  | "newest"
+  | "oldest"
+  | "profit-high"
+  | "profit-low";
 
 export const sortOptions = {
   "revenue-high": "Revenue (High to Low)",
@@ -21,5 +25,9 @@ export const sortOptions = {
   "jobs-high": "Jobs (High to Low)",
   "jobs-low": "Jobs (Low to High)",
   "price-high": "Price (High to Low)",
-  "price-low": "Price (Low to High)"
+  "price-low": "Price (Low to High)",
+  "newest": "Newest First",
+  "oldest": "Oldest First",
+  "profit-high": "Profit (High to Low)",
+  "profit-low": "Profit (Low to High)"
 };

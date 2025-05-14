@@ -1,42 +1,55 @@
 
-// Defines utilities for filtering technicians
 import { Technician } from "@/types/technician";
 
 /**
- * Filter technicians based on role
+ * Filter technicians based on payment type and selected names
  */
-export const filterTechniciansByRole = (
+export const filterTechnicians = (
   technicians: Technician[],
-  role: string
+  paymentTypeFilter: string,
+  selectedTechnicianNames: string[]
 ): Technician[] => {
-  if (role === "all") {
-    return technicians;
-  }
-  return technicians.filter((tech) => tech.role === role);
+  return technicians.filter(tech => {
+    // Apply payment type filter
+    const matchesPaymentType = 
+      paymentTypeFilter === "all" || 
+      tech.paymentType === paymentTypeFilter;
+    
+    // Apply technician name filter if any names are selected
+    const matchesName = 
+      selectedTechnicianNames.length === 0 || 
+      selectedTechnicianNames.includes(tech.name);
+    
+    return matchesPaymentType && matchesName;
+  });
 };
 
 /**
- * Filter technicians based on subRole
+ * Toggle a technician name in a filter array
  */
-export const filterTechniciansBySubRole = (
-  technicians: Technician[],
-  subRole: string | null
-): Technician[] => {
-  if (!subRole) {
-    return technicians;
+export const toggleTechnicianInFilter = (
+  techName: string,
+  currentSelection: string[]
+): string[] => {
+  if (currentSelection.includes(techName)) {
+    return currentSelection.filter(name => name !== techName);
+  } else {
+    return [...currentSelection, techName];
   }
-  return technicians.filter((tech) => tech.subRole === subRole);
 };
 
 /**
- * Filter technicians based on status
+ * Select all technicians for filtering
  */
-export const filterTechniciansByStatus = (
-  technicians: Technician[],
-  status: string
-): Technician[] => {
-  if (status === "all") {
-    return technicians;
-  }
-  return technicians.filter((tech) => tech.status === status);
+export const selectAllTechnicians = (
+  technicians: Technician[]
+): string[] => {
+  return technicians.map(tech => tech.name);
+};
+
+/**
+ * Clear all technician selections
+ */
+export const clearTechnicianSelection = (): string[] => {
+  return [];
 };

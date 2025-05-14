@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
-import { SortOption } from '@/types/sortOptions';
+import { SortOption, sortOptions } from '@/types/sortOptions';
 
 interface SortFilterDropdownProps {
   sortBy: SortOption;
@@ -24,17 +24,7 @@ const SortFilterDropdown: React.FC<SortFilterDropdownProps> = ({
   compact = false
 }) => {
   const getActiveOptionLabel = () => {
-    switch(sortBy) {
-      case "newest": return "Newest First";
-      case "oldest": return "Oldest First";
-      case "name-asc": return "Name (A-Z)";
-      case "name-desc": return "Name (Z-A)";
-      case "revenue-high": return "Revenue (High-Low)";
-      case "revenue-low": return "Revenue (Low-High)";
-      case "profit-high": return "Profit (High-Low)";
-      case "profit-low": return "Profit (Low-High)";
-      default: return "Sort By";
-    }
+    return sortOptions[sortBy] || "Sort By";
   };
 
   return (
