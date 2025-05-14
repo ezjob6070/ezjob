@@ -1,91 +1,79 @@
 
 import { Technician } from "@/types/technician";
 
-export interface FinancialMetrics {
-  totalRevenue: number;
-  totalJobs: number;
-  technicianEarnings: number;
-  companyProfit: number;
-  averageJobValue: number;
-  paymentsDue: number;
-}
-
-// Calculate financial metrics for a collection of technicians
-export const calculateFinancialMetrics = (technicians: Technician[]): FinancialMetrics => {
-  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
-  const totalJobs = technicians.reduce((sum, tech) => sum + ((tech.completedJobs || 0) + (tech.cancelledJobs || 0)), 0);
+/**
+ * Calculate total financial metrics for all technicians
+ */
+export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) => {
+  // Default values if no technicians or empty array
+  if (!displayedTechnicians || displayedTechnicians.length === 0) {
+    return { 
+      totalRevenue: 0, 
+      technicianEarnings: 0, 
+      totalExpenses: 0, 
+      companyProfit: 0 
+    };
+  }
   
-  // Calculate technician earnings based on their payment type
-  const technicianEarnings = technicians.reduce((sum, tech) => {
-    switch (tech.paymentType) {
-      case 'percentage':
-        return sum + ((tech.totalRevenue || 0) * (tech.paymentRate || 0) / 100);
-      case 'flat':
-        return sum + (tech.paymentRate || 0) * (tech.completedJobs || 0);
-      case 'hourly':
-        // Assume an average of 2 hours per job for this calculation
-        return sum + ((tech.hourlyRate || 0) * 2 * (tech.completedJobs || 0));
-      case 'salary':
-        // For salaried technicians, we'll just use a portion of their revenue
-        return sum + ((tech.totalRevenue || 0) * 0.3); // 30% as a placeholder
-      default:
-        return sum;
-    }
+  // Calculate total revenue from technicians
+  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech?.totalRevenue || 0), 0);
+  
+  // Calculate total technician payments
+  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => {
+    if (!tech) return sum;
+    const rate = tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1;
+    return sum + (tech.totalRevenue || 0) * rate;
   }, 0);
   
-  // Company profit is the revenue minus technician earnings
-  const companyProfit = totalRevenue - technicianEarnings;
+  // Estimate expenses as 33% of revenue
+  const totalExpenses = totalRevenue * 0.33;
   
-  // Average job value
-  const averageJobValue = totalJobs > 0 ? totalRevenue / totalJobs : 0;
+  // Calculate net profit
+  const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
   
-  // Payments due (just a placeholder calculation - in a real app this would come from actual payment data)
-  const paymentsDue = totalRevenue * 0.2; // Assume 20% of revenue is still due
-  
-  return {
-    totalRevenue,
-    totalJobs,
-    technicianEarnings,
-    companyProfit,
-    averageJobValue,
-    paymentsDue
+  return { 
+    totalRevenue, 
+    technicianEarnings, 
+    totalExpenses, 
+    companyProfit 
   };
 };
 
-// Calculate metrics for a single technician
-export const calculateTechnicianMetrics = (technician: Technician): FinancialMetrics => {
-  const totalRevenue = technician.totalRevenue || 0;
-  const totalJobs = (technician.completedJobs || 0) + (technician.cancelledJobs || 0);
+/**
+ * Calculate financial metrics for a single technician
+ */
+export const calculateTechnicianMetrics = (technician: Technician | null) => {
+  if (!technician) return null;
   
-  // Calculate earnings based on payment type
-  let technicianEarnings = 0;
-  switch (technician.paymentType) {
-    case 'percentage':
-      technicianEarnings = totalRevenue * (technician.paymentRate || 0) / 100;
-      break;
-    case 'flat':
-      technicianEarnings = (technician.paymentRate || 0) * (technician.completedJobs || 0);
-      break;
-    case 'hourly':
-      // Assume an average of 2 hours per job
-      technicianEarnings = (technician.hourlyRate || 0) * 2 * (technician.completedJobs || 0);
-      break;
-    case 'salary':
-      // For salaried technicians, we'll just use a portion of their revenue
-      technicianEarnings = totalRevenue * 0.3; // 30% as a placeholder
-      break;
-  }
+  const revenue = technician.totalRevenue || 0;
+  const earnings = revenue * (technician.paymentType === "percentage" 
+    ? technician.paymentRate / 100 
+    : 1);
+  const expenses = revenue * 0.33;
+  const profit = revenue - earnings - expenses;
+  const partsValue = revenue * 0.2; // Assuming parts are 20% of total revenue
   
-  const companyProfit = totalRevenue - technicianEarnings;
-  const averageJobValue = totalJobs > 0 ? totalRevenue / totalJobs : 0;
-  const paymentsDue = totalRevenue * 0.2; // Placeholder
+  return { revenue, earnings, expenses, profit, partsValue };
+};
+
+/**
+ * Format date range for display
+ */
+export const formatDateRangeText = (from?: Date, to?: Date) => {
+  if (!from) return "";
   
-  return {
-    totalRevenue,
-    totalJobs,
-    technicianEarnings,
-    companyProfit,
-    averageJobValue,
-    paymentsDue
-  };
+  return to
+    ? `${formatDate(from)} - ${formatDate(to)}`
+    : formatDate(from);
+};
+
+/**
+ * Format date for display
+ */
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
 };
