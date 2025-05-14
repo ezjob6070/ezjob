@@ -27,7 +27,7 @@ const TechnicianDropdown = ({
       </SelectTrigger>
       <SelectContent>
         {technicians.map((tech) => (
-          <SelectItem key={tech} value={tech}>
+          <SelectItem key={tech} value={tech || `tech-${Math.random().toString(36)}`}> {/* Added fallback for empty values */}
             {tech}
           </SelectItem>
         ))}
