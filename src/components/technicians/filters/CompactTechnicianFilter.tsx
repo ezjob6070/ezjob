@@ -1,15 +1,13 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Filter, Check } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
 } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Users, Filter } from "lucide-react";
+import TechnicianFilter from "@/components/jobs/filters/TechnicianFilter";
 
 interface CompactTechnicianFilterProps {
   technicianNames: string[];
@@ -17,6 +15,7 @@ interface CompactTechnicianFilterProps {
   toggleTechnician: (techName: string) => void;
   clearFilters: () => void;
   applyFilters: () => void;
+  appliedFilters?: boolean;
 }
 
 const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
@@ -25,102 +24,51 @@ const CompactTechnicianFilter: React.FC<CompactTechnicianFilterProps> = ({
   toggleTechnician,
   clearFilters,
   applyFilters,
+  appliedFilters = false
 }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-
-  const filteredTechnicianNames = technicianNames.filter(name =>
-    name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const allTechniciansSelected = technicianNames.length > 0 && 
-    technicianNames.every(tech => selectedTechnicians.includes(tech));
-
-  const toggleAllTechnicians = (checked: boolean) => {
-    if (checked) {
-      technicianNames.forEach(tech => {
-        if (!selectedTechnicians.includes(tech)) {
-          toggleTechnician(tech);
-        }
-      });
-    } else {
-      selectedTechnicians.forEach(tech => {
-        toggleTechnician(tech);
-      });
-    }
+  const [open, setOpen] = useState(false);
+  
+  const handleSelectAll = () => {
+    // Implementation would set all technicians as selected
+    technicianNames.forEach(name => {
+      if (!selectedTechnicians.includes(name)) {
+        toggleTechnician(name);
+      }
+    });
+  };
+  
+  const handleDeselectAll = () => {
+    clearFilters();
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button 
-          variant="outline" 
-          size="sm" 
-          className={`h-9 ${selectedTechnicians.length > 0 ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}
+          variant={selectedTechnicians.length > 0 ? "default" : "outline"} 
+          size="sm"
+          className="min-w-[160px] justify-start"
         >
-          <Filter className="h-4 w-4 mr-2" />
-          Technicians
+          <Users className="h-4 w-4 mr-2" />
+          {selectedTechnicians.length > 0 
+            ? `${selectedTechnicians.length} Technicians` 
+            : "All Technicians"}
           {selectedTechnicians.length > 0 && (
-            <Badge variant="secondary" className="ml-2">
+            <div className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-xs font-medium">
               {selectedTechnicians.length}
-            </Badge>
+            </div>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-0" align="start">
-        <div className="p-3">
-          <div className="pb-2 mb-2 border-b">
-            <Input
-              placeholder="Search technicians..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="mb-2"
-            />
-            <div className="flex items-center space-x-2 py-1">
-              <Checkbox 
-                id="select-all-techs"
-                checked={allTechniciansSelected}
-                onCheckedChange={toggleAllTechnicians}
-              />
-              <label 
-                htmlFor="select-all-techs"
-                className="text-sm font-medium cursor-pointer text-gray-900"
-              >
-                Select All Technicians
-              </label>
-            </div>
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {filteredTechnicianNames.map(tech => (
-              <div key={tech} className="flex items-center space-x-2 py-1">
-                <Checkbox 
-                  id={`tech-${tech}`} 
-                  checked={selectedTechnicians.includes(tech)}
-                  onCheckedChange={() => toggleTechnician(tech)}
-                />
-                <label 
-                  htmlFor={`tech-${tech}`}
-                  className="text-sm cursor-pointer text-gray-900"
-                >
-                  {tech}
-                </label>
-              </div>
-            ))}
-            {filteredTechnicianNames.length === 0 && (
-              <div className="text-sm text-muted-foreground py-2">No technicians found</div>
-            )}
-          </div>
-        </div>
-        <div className="border-t p-3 flex justify-between">
-          <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
-          <Button size="sm" onClick={() => {
-            applyFilters();
-            setIsOpen(false);
-          }} className="gap-1">
-            <Check className="h-3.5 w-3.5" />
-            Apply
-          </Button>
-        </div>
+      <PopoverContent className="w-[260px] p-0">
+        <TechnicianFilter
+          technicians={technicianNames}
+          selectedNames={selectedTechnicians}
+          onToggle={toggleTechnician}
+          onSelectAll={handleSelectAll}
+          onDeselectAll={handleDeselectAll}
+          appliedFilters={appliedFilters}
+        />
       </PopoverContent>
     </Popover>
   );
