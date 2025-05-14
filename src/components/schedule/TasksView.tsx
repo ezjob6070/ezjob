@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -47,6 +47,34 @@ const TasksView = ({
     );
     
     onTasksChange(updatedTasks);
+  };
+
+  const handleCreateReminder = () => {
+    if (!onTasksChange) return;
+    
+    const reminderTime = new Date(selectedDate);
+    // Default to 9:00 AM for new reminders
+    reminderTime.setHours(9, 0, 0, 0);
+    
+    const newReminder: Task = {
+      id: uuid(),
+      title: "New Reminder",
+      dueDate: reminderTime,
+      start: reminderTime.toISOString(),
+      end: new Date(reminderTime.getTime() + 30 * 60 * 1000).toISOString(),
+      status: "scheduled",
+      priority: "medium",
+      client: { name: "", id: "" },
+      description: "",
+      technician: { name: "", id: "" },
+      color: "#9b87f5", // Purple for reminders
+      type: "reminder",
+      isReminder: true,
+      hasFollowUp: false
+    };
+    
+    onTasksChange([...tasksForSelectedDate, newReminder]);
+    toast.success("Reminder created");
   };
 
   const handleCreateFollowUp = (task: Task) => {
@@ -152,12 +180,28 @@ const TasksView = ({
       
       <div className="mb-4">
         <div className="flex flex-col gap-3">
-          <Input 
-            placeholder="Search tasks & reminders..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
-          />
+          <div className="flex gap-2">
+            <Input 
+              placeholder="Search tasks & reminders..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
+            />
+            
+            {onTasksChange && (
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={handleCreateReminder}
+                  title="Add Reminder"
+                >
+                  <Bell className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
           
           <div className="flex gap-2">
             <Tabs 
@@ -232,7 +276,7 @@ const TasksView = ({
       
       <div className="space-y-4">
         <h3 className="font-medium">
-          {viewMode === "all" ? "Items" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
+          {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
         </h3>
         
         {filteredTasks.length === 0 ? (
