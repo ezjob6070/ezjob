@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon, CheckIcon, Clock3Icon, Bell } from "lucide-react";
+import { CalendarIcon, CheckIcon, Clock3Icon } from "lucide-react";
 
 type TaskPriority = "low" | "medium" | "high";
 type TaskStatus = "todo" | "in-progress" | "completed";
@@ -32,7 +31,6 @@ type Task = {
 type TasksListProps = {
   tasks: Task[];
   onStatusChange?: (taskId: string, completed: boolean) => void;
-  onAddReminder?: (taskId: string) => void;
 };
 
 const priorityColors = {
@@ -53,7 +51,7 @@ const statusColors = {
   "completed": "bg-green-100 text-green-800 hover:bg-green-200",
 };
 
-const TasksList = ({ tasks, onStatusChange, onAddReminder }: TasksListProps) => {
+const TasksList = ({ tasks, onStatusChange }: TasksListProps) => {
   const navigate = useNavigate();
   const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>(
     tasks.reduce((acc, task) => {
@@ -67,13 +65,6 @@ const TasksList = ({ tasks, onStatusChange, onAddReminder }: TasksListProps) => 
     setCompletedTasks((prev) => ({ ...prev, [taskId]: completed }));
     if (onStatusChange) {
       onStatusChange(taskId, completed);
-    }
-  };
-
-  const handleAddReminder = (e: React.MouseEvent, taskId: string) => {
-    e.stopPropagation(); // Prevent triggering the task click when clicking the reminder button
-    if (onAddReminder) {
-      onAddReminder(taskId);
     }
   };
 
@@ -136,16 +127,6 @@ const TasksList = ({ tasks, onStatusChange, onAddReminder }: TasksListProps) => 
                     </div>
                   </Badge>
                 </div>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 px-2 border-purple-200 hover:bg-purple-50 text-purple-700"
-                  onClick={(e) => handleAddReminder(e, task.id)}
-                >
-                  <Bell className="h-4 w-4 mr-1" />
-                  Reminder
-                </Button>
               </div>
               <p
                 className={`text-sm ${
