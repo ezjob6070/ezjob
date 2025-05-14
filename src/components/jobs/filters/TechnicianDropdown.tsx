@@ -27,7 +27,7 @@ const TechnicianDropdown = ({
       </SelectTrigger>
       <SelectContent>
         {technicians.map((tech) => (
-          <SelectItem key={tech} value={tech}>
+          <SelectItem key={tech} value={tech || "unknown-tech"}>
             {tech}
           </SelectItem>
         ))}

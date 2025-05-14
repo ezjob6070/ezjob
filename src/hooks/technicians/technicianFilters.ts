@@ -8,40 +8,63 @@ export const filterTechnicians = (
   technicians: Technician[],
   paymentTypeFilter: string,
   selectedTechnicianNames: string[]
-) => {
-  // Ensure technicians is not null or undefined
-  if (!technicians || technicians.length === 0) {
-    return [];
+): Technician[] => {
+  // Start with all technicians
+  let filtered = [...technicians];
+  
+  // Apply payment type filter if it's not "all"
+  if (paymentTypeFilter !== "all") {
+    filtered = filtered.filter(tech => tech.paymentType === paymentTypeFilter);
   }
-
-  return technicians.filter(tech => {
-    // Ensure tech is not null before accessing properties
-    if (!tech) return false;
-    
-    // Filter by payment type
-    const matchesPaymentType = 
-      paymentTypeFilter === "all" || 
-      tech.paymentType === paymentTypeFilter;
-    
-    // Filter by selected technicians
-    const matchesTechnician = 
-      selectedTechnicianNames.length === 0 || 
-      selectedTechnicianNames.includes(tech.name);
-    
-    return matchesPaymentType && matchesTechnician;
-  });
+  
+  // Apply selected technician names filter if any are selected
+  if (selectedTechnicianNames.length > 0) {
+    filtered = filtered.filter(tech => selectedTechnicianNames.includes(tech.name));
+  }
+  
+  return filtered;
 };
 
 /**
- * Toggle technician selection in filter
+ * Toggle a technician in a filter list
  */
 export const toggleTechnicianInFilter = (
   techName: string,
-  selectedTechnicianNames: string[]
-) => {
-  if (!techName) return selectedTechnicianNames;
+  currentlySelected: string[]
+): string[] => {
+  if (currentlySelected.includes(techName)) {
+    // Remove if already selected
+    return currentlySelected.filter(name => name !== techName);
+  } else {
+    // Add if not already selected
+    return [...currentlySelected, techName];
+  }
+};
+
+/**
+ * Filter technicians based on role type
+ */
+export const filterTechniciansByRole = (
+  technicians: Technician[],
+  roleFilter: string
+): Technician[] => {
+  if (roleFilter === "all") {
+    return technicians; // Return all technicians if "all" is selected
+  }
   
-  return selectedTechnicianNames.includes(techName) 
-    ? selectedTechnicianNames.filter(t => t !== techName)
-    : [...selectedTechnicianNames, techName];
+  return technicians.filter(tech => tech.role === roleFilter);
+};
+
+/**
+ * Filter technicians based on sub-role
+ */
+export const filterTechniciansBySubRole = (
+  technicians: Technician[],
+  subRoleFilter: string | null
+): Technician[] => {
+  if (!subRoleFilter) {
+    return technicians; // Return all technicians if no sub-role filter
+  }
+  
+  return technicians.filter(tech => tech.subRole === subRoleFilter);
 };

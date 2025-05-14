@@ -1,29 +1,55 @@
 
-import { DateRange } from "react-day-picker";
+export type JobStatus =
+  | "scheduled"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
+  | "pending";
 
 export interface Job {
   id: string;
-  clientName: string;
-  clientPhone?: string;
-  clientEmail?: string;
-  address: string;
-  status: "scheduled" | "in progress" | "completed" | "canceled" | "rescheduled" | string;
-  scheduledDate: string;
-  amount: number;
+  customerId?: string;
+  customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  title: string;
   description?: string;
+  type?: string;
+  category?: string;
+  date: string; // ISO date string
+  time?: string;
+  scheduledDate?: string; // ISO date string
+  scheduledTime?: string;
+  status: JobStatus;
+  address?: string;
   technician?: string;
-  technicianName?: string;
-  paymentMethod?: string;
+  technicianId?: string; // Added technician ID
+  amount: number;
+  actualAmount?: number;
+  depositRequired?: boolean;
+  depositAmount?: number;
+  depositPaid?: boolean;
+  paymentStatus?: "paid" | "unpaid" | "partial";
   notes?: string;
-  
-  // Properties needed by components
-  date?: string | Date;
-  technicianId?: string;
+  createdAt?: string; // ISO date string
+  updatedAt?: string; // ISO date string
+  source?: string;
+  sourceId?: string;
+  priority?: "low" | "medium" | "high" | "urgent";
+  images?: string[];
+  documentIds?: string[];
+  projectId?: string;
 }
 
-export interface AmountRange {
-  min: number;
-  max: number;
+export interface JobFilters {
+  status: string[];
+  dateRange?: {
+    from: Date | null;
+    to: Date | null;
+  };
+  technicians: string[];
+  search: string;
+  categories: string[];
+  types: string[];
+  sources: string[];
 }
-
-export type PaymentMethod = "cash" | "credit" | "check" | "invoice" | "other" | "";
