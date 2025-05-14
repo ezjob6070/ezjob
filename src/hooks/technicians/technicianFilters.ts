@@ -1,47 +1,87 @@
 
 import { Technician } from "@/types/technician";
+import { DateRange } from "react-day-picker";
 
-/**
- * Filter technicians based on payment type and selected names
- */
+export interface TechnicianFilters {
+  searchTerm?: string;
+  status?: string;
+  role?: string;
+  subRole?: string;
+  dateRange?: DateRange;
+}
+
 export const filterTechnicians = (
   technicians: Technician[],
-  paymentTypeFilter: string,
-  selectedTechnicianNames: string[]
-) => {
-  // Ensure technicians is not null or undefined
-  if (!technicians || technicians.length === 0) {
-    return [];
-  }
-
-  return technicians.filter(tech => {
-    // Ensure tech is not null before accessing properties
-    if (!tech) return false;
+  filters: TechnicianFilters
+): Technician[] => {
+  return technicians.filter((tech) => {
+    // Filter by role
+    if (filters.role && filters.role !== "all" && tech.role !== filters.role) {
+      return false;
+    }
     
-    // Filter by payment type
-    const matchesPaymentType = 
-      paymentTypeFilter === "all" || 
-      tech.paymentType === paymentTypeFilter;
+    // Filter by subRole
+    if (filters.subRole && tech.subRole !== filters.subRole) {
+      return false;
+    }
     
-    // Filter by selected technicians
-    const matchesTechnician = 
-      selectedTechnicianNames.length === 0 || 
-      selectedTechnicianNames.includes(tech.name);
+    // Filter by status
+    if (filters.status && filters.status !== "all" && tech.status !== filters.status) {
+      return false;
+    }
     
-    return matchesPaymentType && matchesTechnician;
+    // Filter by search term
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      const matchesSearch = 
+        tech.name.toLowerCase().includes(searchLower) ||
+        tech.email.toLowerCase().includes(searchLower) ||
+        tech.specialty?.toLowerCase().includes(searchLower) ||
+        tech.phone?.toLowerCase().includes(searchLower) ||
+        tech.position?.toLowerCase().includes(searchLower) ||
+        tech.department?.toLowerCase().includes(searchLower) ||
+        tech.subRole?.toLowerCase().includes(searchLower);
+        
+      if (!matchesSearch) return false;
+    }
+    
+    // Filter by date range (hire date)
+    if (filters.dateRange?.from || filters.dateRange?.to) {
+      const hireDate = new Date(tech.hireDate);
+      
+      if (filters.dateRange.from && hireDate < filters.dateRange.from) {
+        return false;
+      }
+      
+      if (filters.dateRange.to) {
+        const toDateEnd = new Date(filters.dateRange.to);
+        toDateEnd.setHours(23, 59, 59, 999);
+        if (hireDate > toDateEnd) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
   });
 };
 
-/**
- * Toggle technician selection in filter
- */
-export const toggleTechnicianInFilter = (
-  techName: string,
-  selectedTechnicianNames: string[]
-) => {
-  if (!techName) return selectedTechnicianNames;
+export const getTechniciansByRole = (
+  technicians: Technician[],
+  role: string
+): Technician[] => {
+  if (role === "all") return technicians;
+  return technicians.filter((tech) => tech.role === role);
+};
+
+export const getUniqueSubRoles = (technicians: Technician[]): string[] => {
+  const subRoles = new Set<string>();
   
-  return selectedTechnicianNames.includes(techName) 
-    ? selectedTechnicianNames.filter(t => t !== techName)
-    : [...selectedTechnicianNames, techName];
+  technicians.forEach((tech) => {
+    if (tech.subRole) {
+      subRoles.add(tech.subRole);
+    }
+  });
+  
+  return Array.from(subRoles);
 };
