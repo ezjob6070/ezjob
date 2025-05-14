@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,20 +10,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Plus, X, Check, FileText, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Plus, X, Check, FileText, MapPin, ListTodo } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ProjectStaff } from "@/types/project";
+import { ProjectStaff, ProjectTask } from "@/types/project";
+import { convertEventToTask, convertTaskToEvent, generateId } from "./utils/scheduleTaskIntegration";
 
 interface ProjectTimeScheduleTabProps {
   projectId: number;
   projectStaff?: ProjectStaff[];
+  projectTasks?: ProjectTask[];
+  onTaskCreate?: (task: ProjectTask) => void;
+  onTaskUpdate?: (taskId: string, updates: Partial<ProjectTask>) => void;
 }
 
 // Event types
-interface ScheduleEvent {
+export interface ScheduleEvent {
   id: string;
   title: string;
   start: Date;
@@ -34,7 +40,13 @@ interface ScheduleEvent {
   type: "meeting" | "deadline" | "milestone" | "task" | "inspection";
 }
 
-export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }: ProjectTimeScheduleTabProps) {
+export default function ProjectTimeScheduleTab({ 
+  projectId, 
+  projectStaff = [], 
+  projectTasks = [],
+  onTaskCreate,
+  onTaskUpdate
+}: ProjectTimeScheduleTabProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("calendar");
   const [events, setEvents] = useState<ScheduleEvent[]>([
@@ -91,6 +103,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
       type: "task"
     }
   ]);
+
   const [showAddEventDialog, setShowAddEventDialog] = useState(false);
   const [newEvent, setNewEvent] = useState<Omit<ScheduleEvent, "id">>({
     title: "",
@@ -102,15 +115,53 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
     status: "scheduled",
     type: "meeting"
   });
+  
+  // New state for task creation option
+  const [createTask, setCreateTask] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
 
+  // Initialize with tasks converted to events
+  useEffect(() => {
+    if (projectTasks && projectTasks.length > 0) {
+      const taskEvents = projectTasks.map(task => {
+        const eventBase = convertTaskToEvent(task);
+        return {
+          ...eventBase,
+          id: `task-event-${task.id}`
+        };
+      });
+      
+      // Filter out any duplicate events (if task was already converted)
+      const taskEventIds = taskEvents.map(e => e.id);
+      const filteredEvents = events.filter(e => !e.id.startsWith('task-event-'));
+      
+      setEvents([...filteredEvents, ...taskEvents]);
+    }
+  }, [projectTasks]);
+
   const handleAddEvent = () => {
     const newEventWithId: ScheduleEvent = {
-      id: `event-${events.length + 1}`,
+      id: generateId('event'),
       ...newEvent
     };
+    
     setEvents(prev => [...prev, newEventWithId]);
+    
+    // If the create task option is checked, also create a task
+    if (createTask && onTaskCreate) {
+      const newTask: ProjectTask = {
+        id: generateId('task'),
+        ...convertEventToTask(newEventWithId),
+        createdAt: format(new Date(), "yyyy-MM-dd")
+      };
+      
+      onTaskCreate(newTask);
+      toast.success("Event and task added successfully");
+    } else {
+      toast.success("Event added successfully");
+    }
+    
     setShowAddEventDialog(false);
     setNewEvent({
       title: "",
@@ -122,7 +173,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
       status: "scheduled",
       type: "meeting"
     });
-    toast.success("Event added successfully");
+    setCreateTask(false);
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -137,8 +188,28 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
         event.id === id ? { ...event, status: status } : event
       )
     );
+    
+    // If this is a task-linked event, update the task too
+    if (id.startsWith('task-event-') && onTaskUpdate) {
+      const taskId = id.replace('task-event-', '');
+      onTaskUpdate(taskId, {
+        status: status === "completed" ? "completed" : 
+                status === "cancelled" ? "blocked" : "in_progress",
+        progress: status === "completed" ? 100 : status === "cancelled" ? 0 : 50,
+        completedAt: status === "completed" ? format(new Date(), "yyyy-MM-dd") : undefined
+      });
+    }
+    
     setSelectedEvent(prev => (prev?.id === id ? { ...prev, status: status } : prev) || null);
     toast.success(`Event ${status} successfully`);
+  };
+  
+  // Handler for viewing task details
+  const handleViewTask = (taskId: string) => {
+    if (taskId.startsWith('task-event-')) {
+      const actualTaskId = taskId.replace('task-event-', '');
+      // You could navigate to task detail or show a task detail dialog here
+    }
   };
   
   return (
@@ -181,22 +252,27 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                     mode="single"
                     selected={date}
                     onSelect={setDate}
-                    className="rounded-md border"
+                    className="rounded-md border pointer-events-auto"
                     style={{width: "300px"}}
                   />
                 </PopoverContent>
               </Popover>
               
-              {/* Display Events for Selected Date */}
+              {/* Display Events for Selected Date - now shows task-linked events too */}
               <div className="mt-4">
                 {events.filter(event => format(event.start, "yyyy-MM-dd") === format(date || new Date(), "yyyy-MM-dd")).length > 0 ? (
                   events
                     .filter(event => format(event.start, "yyyy-MM-dd") === format(date || new Date(), "yyyy-MM-dd"))
                     .map(event => (
-                      <Card key={event.id} className="mb-2">
+                      <Card key={event.id} className={`mb-2 ${event.id.startsWith('task-event-') ? 'border-l-4 border-l-blue-500' : ''}`}>
                         <CardContent className="p-3">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium">{event.title}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{event.title}</p>
+                              {event.id.startsWith('task-event-') && (
+                                <Badge className="bg-blue-100 text-blue-800">Task</Badge>
+                              )}
+                            </div>
                             <Button variant="secondary" size="sm" onClick={() => setSelectedEvent(event)}>
                               View Details
                             </Button>
@@ -224,10 +300,15 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
               <div className="space-y-3">
                 {events.length > 0 ? (
                   events.map(event => (
-                    <Card key={event.id}>
+                    <Card key={event.id} className={`${event.id.startsWith('task-event-') ? 'border-l-4 border-l-blue-500' : ''}`}>
                       <CardContent className="flex items-center justify-between p-4">
                         <div>
-                          <p className="font-medium">{event.title}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{event.title}</p>
+                            {event.id.startsWith('task-event-') && (
+                              <Badge className="bg-blue-100 text-blue-800">Task</Badge>
+                            )}
+                          </div>
                           <p className="text-sm text-muted-foreground">
                             {format(event.start, "PPP")} • {format(event.start, "p")} - {format(event.end, "p")}
                           </p>
@@ -272,7 +353,12 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                         .filter(event => event.assignedTo?.includes(staff.id))
                         .map(event => (
                           <li key={event.id} className="flex items-center justify-between">
-                            <span>{event.title}</span>
+                            <div className="flex items-center gap-2">
+                              <span>{event.title}</span>
+                              {event.id.startsWith('task-event-') && (
+                                <Badge className="bg-blue-100 text-blue-800">Task</Badge>
+                              )}
+                            </div>
                             <Badge className={
                               event.status === "completed" ? "bg-green-100 text-green-800" : 
                               event.status === "cancelled" ? "bg-red-100 text-red-800" : 
@@ -294,7 +380,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
         </TabsContent>
       </Tabs>
 
-      {/* Add Event Dialog */}
+      {/* Add Event Dialog - Now with task creation option */}
       <Dialog open={showAddEventDialog} onOpenChange={setShowAddEventDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -335,7 +421,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                       mode="single"
                       selected={newEvent.start}
                       onSelect={(date) => setNewEvent({ ...newEvent, start: date || new Date() })}
-                      className="rounded-md border"
+                      className="rounded-md border pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
@@ -363,7 +449,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                       mode="single"
                       selected={newEvent.end}
                       onSelect={(date) => setNewEvent({ ...newEvent, end: date || new Date() })}
-                      className="rounded-md border"
+                      className="rounded-md border pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
@@ -412,6 +498,43 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                 rows={3}
               />
             </div>
+            
+            {/* Staff assignment */}
+            <div className="grid gap-2">
+              <label htmlFor="event-staff" className="text-sm font-medium">
+                Assign Staff
+              </label>
+              <Select 
+                onValueChange={(value) => setNewEvent({ 
+                  ...newEvent, 
+                  assignedTo: value ? [value] : [] 
+                })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select staff member" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectStaff.map(staff => (
+                    <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Option to create task */}
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="create-task" 
+                checked={createTask} 
+                onCheckedChange={(checked) => setCreateTask(!!checked)} 
+              />
+              <label 
+                htmlFor="create-task" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Also create a task from this event
+              </label>
+            </div>
           </div>
           <DialogFooter>
             <Button type="submit" onClick={handleAddEvent}>
@@ -421,12 +544,17 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
         </DialogContent>
       </Dialog>
 
-      {/* Event Details Dialog */}
+      {/* Event Details Dialog - Now with task link */}
       <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
         {selectedEvent && (
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{selectedEvent.title}</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                {selectedEvent.title}
+                {selectedEvent.id.startsWith('task-event-') && (
+                  <Badge className="bg-blue-100 text-blue-800">Task</Badge>
+                )}
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="flex items-start gap-3">
@@ -478,6 +606,25 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                   </div>
                 </div>
               )}
+              
+              {/* Add link to task if this is a task-event */}
+              {selectedEvent.id.startsWith('task-event-') && (
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <ListTodo className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Task</p>
+                    <Button 
+                      variant="link" 
+                      className="p-0 h-6 text-sm" 
+                      onClick={() => handleViewTask(selectedEvent.id)}
+                    >
+                      View Task Details
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <DialogFooter className="sm:justify-between">
@@ -513,3 +660,4 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
     </div>
   );
 }
+
