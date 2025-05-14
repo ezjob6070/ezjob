@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -112,6 +111,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
     }
   ]);
   const [showAddEventDialog, setShowAddEventDialog] = useState(false);
+  const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
   const [newEvent, setNewEvent] = useState<Omit<ScheduleEvent, "id">>({
     title: "",
     start: new Date(),
@@ -121,6 +121,14 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
     assignedTo: [],
     status: "scheduled",
     type: "meeting"
+  });
+  const [newReminder, setNewReminder] = useState<Omit<ScheduleEvent, "id">>({
+    title: "",
+    start: new Date(),
+    end: new Date(new Date().getTime() + 30 * 60000), // 30 minutes later
+    description: "",
+    status: "scheduled",
+    type: "reminder"
   });
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
@@ -144,6 +152,24 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
       type: "meeting"
     });
     toast.success("Event added successfully");
+  };
+
+  const handleAddReminder = () => {
+    const newReminderWithId: ScheduleEvent = {
+      id: `reminder-${events.length + 1}`,
+      ...newReminder
+    };
+    setEvents(prev => [...prev, newReminderWithId]);
+    setShowAddReminderDialog(false);
+    setNewReminder({
+      title: "",
+      start: new Date(),
+      end: new Date(new Date().getTime() + 30 * 60000),
+      description: "",
+      status: "scheduled",
+      type: "reminder"
+    });
+    toast.success("Reminder added successfully");
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -219,9 +245,17 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
               onCheckedChange={setShowReminders} 
             />
           </div>
-          <Button onClick={() => setShowAddEventDialog(true)} className="flex items-center gap-2">
-            <Plus size={16} /> Add Event
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setShowAddReminderDialog(true)} 
+              className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700"
+            >
+              <Bell size={16} /> Add Reminder
+            </Button>
+            <Button onClick={() => setShowAddEventDialog(true)} className="flex items-center gap-2">
+              <Plus size={16} /> Add Event
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -378,7 +412,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                               "bg-blue-100 text-blue-800"
                             }>
                               {event.status === "scheduled" ? "Scheduled" : 
-                               event.status === "completed" ? "Completed" : "Cancelled"}
+                              event.status === "completed" ? "Completed" : "Cancelled"}
                             </Badge>
                           </li>
                         ))}
@@ -392,7 +426,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
           </Card>
         </TabsContent>
         
-        {/* New Reminders Tab */}
+        {/* Reminders Tab */}
         <TabsContent value="reminders" className="py-4">
           <Card>
             <CardHeader>
@@ -401,18 +435,8 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="flex items-center gap-1" 
-                  onClick={() => {
-                    setNewEvent({
-                      title: "",
-                      start: new Date(),
-                      end: new Date(new Date().getTime() + 30 * 60000), // 30 minutes later
-                      description: "",
-                      status: "scheduled",
-                      type: "reminder"
-                    });
-                    setShowAddEventDialog(true);
-                  }}
+                  className="flex items-center gap-1 text-purple-800 border-purple-300 hover:bg-purple-50" 
+                  onClick={() => setShowAddReminderDialog(true)}
                 >
                   <Plus size={14} /> Add Reminder
                 </Button>
@@ -477,22 +501,12 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                     ))
                 ) : (
                   <div className="text-center py-8">
-                    <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                    <Bell className="h-12 w-12 text-purple-300 mx-auto mb-3" />
                     <p className="text-lg font-medium text-gray-800 mb-1">No reminders yet</p>
                     <p className="text-gray-500 mb-4">Add reminders to keep track of important events</p>
                     <Button 
-                      onClick={() => {
-                        setNewEvent({
-                          title: "",
-                          start: new Date(),
-                          end: new Date(new Date().getTime() + 30 * 60000), // 30 minutes later
-                          description: "",
-                          status: "scheduled",
-                          type: "reminder"
-                        });
-                        setShowAddEventDialog(true);
-                      }}
-                      className="flex items-center gap-1"
+                      onClick={() => setShowAddReminderDialog(true)}
+                      className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700"
                     >
                       <Plus size={16} /> Add Your First Reminder
                     </Button>
@@ -525,7 +539,6 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                   <SelectItem value="milestone">Milestone</SelectItem>
                   <SelectItem value="task">Task</SelectItem>
                   <SelectItem value="inspection">Inspection</SelectItem>
-                  <SelectItem value="reminder">Reminder</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -599,18 +612,16 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
               </div>
             </div>
 
-            {newEvent.type !== "reminder" && (
-              <div className="grid gap-2">
-                <label htmlFor="event-location" className="text-sm font-medium">
-                  Location
-                </label>
-                <Input
-                  id="event-location"
-                  value={newEvent.location}
-                  onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
-                />
-              </div>
-            )}
+            <div className="grid gap-2">
+              <label htmlFor="event-location" className="text-sm font-medium">
+                Location
+              </label>
+              <Input
+                id="event-location"
+                value={newEvent.location}
+                onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
+              />
+            </div>
 
             <div className="grid gap-2">
               <label htmlFor="event-description" className="text-sm font-medium">
@@ -627,6 +638,118 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
           <DialogFooter>
             <Button type="submit" onClick={handleAddEvent}>
               Add Event
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Reminder Dialog */}
+      <Dialog open={showAddReminderDialog} onOpenChange={setShowAddReminderDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-purple-600" />
+              Add New Reminder
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="reminder-title" className="text-sm font-medium">
+                Reminder Title
+              </label>
+              <Input
+                id="reminder-title"
+                placeholder="What do you need to remember?"
+                value={newReminder.title}
+                onChange={e => setNewReminder({ ...newReminder, title: e.target.value })}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="reminder-date" className="text-sm font-medium">
+                Reminder Date & Time
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "justify-start text-left font-normal",
+                        !newReminder.start && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {newReminder.start ? format(newReminder.start, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={newReminder.start}
+                      onSelect={(date) => {
+                        if (date) {
+                          const currentStart = newReminder.start;
+                          const hours = currentStart.getHours();
+                          const minutes = currentStart.getMinutes();
+                          
+                          const newDate = new Date(date);
+                          newDate.setHours(hours, minutes);
+                          
+                          setNewReminder({
+                            ...newReminder,
+                            start: newDate,
+                            end: new Date(newDate.getTime() + 30 * 60000) // 30 min later
+                          });
+                        }
+                      }}
+                      className="rounded-md border"
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <div>
+                  <Input 
+                    type="time"
+                    value={`${newReminder.start.getHours().toString().padStart(2, '0')}:${newReminder.start.getMinutes().toString().padStart(2, '0')}`}
+                    onChange={(e) => {
+                      const [hours, minutes] = e.target.value.split(':').map(Number);
+                      
+                      const newDate = new Date(newReminder.start);
+                      newDate.setHours(hours, minutes);
+                      
+                      setNewReminder({
+                        ...newReminder,
+                        start: newDate,
+                        end: new Date(newDate.getTime() + 30 * 60000) // 30 min later
+                      });
+                    }}
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="reminder-description" className="text-sm font-medium">
+                Description (optional)
+              </label>
+              <Textarea
+                id="reminder-description"
+                placeholder="Add more details about this reminder"
+                value={newReminder.description || ""}
+                onChange={e => setNewReminder({ ...newReminder, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              type="submit" 
+              onClick={handleAddReminder}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <Bell className="h-4 w-4 mr-2" /> Add Reminder
             </Button>
           </DialogFooter>
         </DialogContent>
