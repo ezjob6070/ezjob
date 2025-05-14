@@ -8,48 +8,40 @@ export const filterTechnicians = (
   technicians: Technician[],
   paymentTypeFilter: string,
   selectedTechnicianNames: string[]
-): Technician[] => {
+) => {
+  // Ensure technicians is not null or undefined
+  if (!technicians || technicians.length === 0) {
+    return [];
+  }
+
   return technicians.filter(tech => {
-    // Apply payment type filter
+    // Ensure tech is not null before accessing properties
+    if (!tech) return false;
+    
+    // Filter by payment type
     const matchesPaymentType = 
       paymentTypeFilter === "all" || 
       tech.paymentType === paymentTypeFilter;
     
-    // Apply technician name filter if any names are selected
-    const matchesName = 
+    // Filter by selected technicians
+    const matchesTechnician = 
       selectedTechnicianNames.length === 0 || 
       selectedTechnicianNames.includes(tech.name);
     
-    return matchesPaymentType && matchesName;
+    return matchesPaymentType && matchesTechnician;
   });
 };
 
 /**
- * Toggle a technician name in a filter array
+ * Toggle technician selection in filter
  */
 export const toggleTechnicianInFilter = (
   techName: string,
-  currentSelection: string[]
-): string[] => {
-  if (currentSelection.includes(techName)) {
-    return currentSelection.filter(name => name !== techName);
-  } else {
-    return [...currentSelection, techName];
-  }
-};
-
-/**
- * Select all technicians for filtering
- */
-export const selectAllTechnicians = (
-  technicians: Technician[]
-): string[] => {
-  return technicians.map(tech => tech.name);
-};
-
-/**
- * Clear all technician selections
- */
-export const clearTechnicianSelection = (): string[] => {
-  return [];
+  selectedTechnicianNames: string[]
+) => {
+  if (!techName) return selectedTechnicianNames;
+  
+  return selectedTechnicianNames.includes(techName) 
+    ? selectedTechnicianNames.filter(t => t !== techName)
+    : [...selectedTechnicianNames, techName];
 };

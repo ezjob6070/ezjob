@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +16,7 @@ import { v4 as uuid } from "uuid";
 import { Project, ProjectStaff, ProjectTask, ProjectTaskInspection } from "@/types/project";
 import { 
   CalendarIcon, Clock, Plus, X, Check, FileText, 
-  Calendar as CalendarIcon2, ListTodo, User, AlertTriangle, MapPin 
+  Calendar as CalendarIcon2, ListTodo, User, AlertTriangle 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TaskDetailDialog from "./TaskDetailDialog";
@@ -219,8 +220,7 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [] 
         start: taskDueDate,
         end: endDate,
         description: newTask.description || "",
-        status: task.status === "completed" ? "completed" : 
-             task.status === "blocked" ? "cancelled" : "scheduled",
+        status: "scheduled",
         type: "task",
         assignedTo: newTask.assignedTo ? [newTask.assignedTo] : [],
         relatedTaskId: newTaskId
@@ -1229,10 +1229,7 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [] 
                 <label htmlFor="event-type" className="text-sm font-medium">
                   Event Type
                 </label>
-                <Select onValueChange={(value) => setNewEvent({ 
-                  ...newEvent, 
-                  type: value as ScheduleEvent["type"] 
-                })}>
+                <Select onValueChange={(value) => setNewEvent({ ...newEvent, type: value as ScheduleEvent["type"] })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>

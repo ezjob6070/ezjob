@@ -11,8 +11,8 @@ import {
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
 import { SortOption } from "@/types/sortOptions";
-import TechnicianFinancialFilterBar from "./TechnicianFinancialFilterBar";
-import TechnicianFinancialTableContent from "./TechnicianFinancialTableContent";
+import TechnicianFinancialFilterBar from "@/components/technicians/charts/TechnicianFinancialFilterBar";
+import TechnicianFinancialTableContent from "@/components/technicians/charts/TechnicianFinancialTableContent";
 
 interface TechnicianFinancialTableProps {
   filteredTechnicians: Technician[];
@@ -73,23 +73,24 @@ const TechnicianFinancialTable = ({
         setPaymentTypeFilter={setPaymentTypeFilter}
         localDateRange={localDateRange}
         setLocalDateRange={setLocalDateRange}
-        appliedFilters={appliedFilters}
         showDateFilter={showDateFilter}
         setShowDateFilter={setShowDateFilter}
       />
       
-      <CardContent>
-        <TechnicianFinancialTableContent
-          displayedTechnicians={displayedTechnicians}
-          onTechnicianSelect={onTechnicianSelect}
-          selectedTechnicianId={selectedTechnicianId}
-          localDateRange={localDateRange}
-        />
+      <CardContent className="p-3 sm:p-4">
+        <div className="overflow-x-auto">
+          <TechnicianFinancialTableContent
+            displayedTechnicians={displayedTechnicians}
+            onTechnicianSelect={onTechnicianSelect}
+            selectedTechnicianId={selectedTechnicianId}
+            localDateRange={localDateRange}
+          />
+        </div>
       </CardContent>
       
-      <CardFooter className="bg-muted/50 py-2 px-6 flex justify-between items-center">
-        <div className="text-sm text-muted-foreground">
-          {displayedTechnicians.length} technicians displayed
+      <CardFooter className="flex justify-between border-t px-4 py-3 text-xs">
+        <div className="text-muted-foreground">
+          Showing {displayedTechnicians.length} technicians
         </div>
       </CardFooter>
     </Card>

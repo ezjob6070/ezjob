@@ -1,33 +1,41 @@
 
 import { Technician } from "@/types/technician";
-import { format } from "date-fns";
 
 /**
- * Calculate financial metrics for a group of technicians
+ * Calculate total financial metrics for all technicians
  */
-export const calculateFinancialMetrics = (technicians: Technician[]) => {
-  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
-  const completedJobs = technicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0);
-  const averageJobValue = completedJobs > 0 ? totalRevenue / completedJobs : 0;
+export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) => {
+  // Default values if no technicians or empty array
+  if (!displayedTechnicians || displayedTechnicians.length === 0) {
+    return { 
+      totalRevenue: 0, 
+      technicianEarnings: 0, 
+      totalExpenses: 0, 
+      companyProfit: 0 
+    };
+  }
   
-  // Calculate total payment due to technicians based on their payment types
-  const totalPaymentsDue = technicians.reduce((sum, tech) => {
-    if (tech.paymentType === "percentage") {
-      return sum + (tech.totalRevenue || 0) * (tech.paymentRate / 100);
-    } else if (tech.paymentType === "flat") {
-      return sum + (tech.completedJobs || 0) * tech.paymentRate;
-    } else if (tech.paymentType === "hourly") {
-      // Estimate hours per job (2 hours per job as default)
-      return sum + (tech.completedJobs || 0) * 2 * tech.hourlyRate;
-    }
-    return sum;
+  // Calculate total revenue from technicians
+  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech?.totalRevenue || 0), 0);
+  
+  // Calculate total technician payments
+  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => {
+    if (!tech) return sum;
+    const rate = tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1;
+    return sum + (tech.totalRevenue || 0) * rate;
   }, 0);
   
-  return {
-    totalRevenue,
-    totalJobs: completedJobs,
-    averageJobValue,
-    paymentsDue: totalPaymentsDue
+  // Estimate expenses as 33% of revenue
+  const totalExpenses = totalRevenue * 0.33;
+  
+  // Calculate net profit
+  const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
+  
+  return { 
+    totalRevenue, 
+    technicianEarnings, 
+    totalExpenses, 
+    companyProfit 
   };
 };
 
@@ -35,57 +43,37 @@ export const calculateFinancialMetrics = (technicians: Technician[]) => {
  * Calculate financial metrics for a single technician
  */
 export const calculateTechnicianMetrics = (technician: Technician | null) => {
-  if (!technician) {
-    return {
-      technician: null,
-      totalRevenue: 0,
-      completedJobs: 0,
-      cancelledJobs: 0, 
-      paymentDue: 0,
-      profit: 0
-    };
-  }
+  if (!technician) return null;
   
-  const totalRevenue = technician.totalRevenue || 0;
-  const completedJobs = technician.completedJobs || 0;
-  const cancelledJobs = technician.cancelledJobs || 0;
+  const revenue = technician.totalRevenue || 0;
+  const earnings = revenue * (technician.paymentType === "percentage" 
+    ? technician.paymentRate / 100 
+    : 1);
+  const expenses = revenue * 0.33;
+  const profit = revenue - earnings - expenses;
+  const partsValue = revenue * 0.2; // Assuming parts are 20% of total revenue
   
-  // Calculate payment due based on payment type
-  let paymentDue = 0;
-  if (technician.paymentType === "percentage") {
-    paymentDue = totalRevenue * (technician.paymentRate / 100);
-  } else if (technician.paymentType === "flat") {
-    paymentDue = completedJobs * technician.paymentRate;
-  } else if (technician.paymentType === "hourly") {
-    // Estimate hours per job (2 hours per job as default)
-    paymentDue = completedJobs * 2 * technician.hourlyRate;
-  }
-  
-  const profit = totalRevenue - paymentDue;
-  
-  return {
-    technician,
-    totalRevenue,
-    completedJobs,
-    cancelledJobs,
-    paymentDue,
-    profit
-  };
+  return { revenue, earnings, expenses, profit, partsValue };
 };
 
 /**
- * Format date range as display text
+ * Format date range for display
  */
-export const formatDateRangeText = (dateRange: { from?: Date, to?: Date }): string => {
-  if (!dateRange.from) return "All time";
+export const formatDateRangeText = (from?: Date, to?: Date) => {
+  if (!from) return "";
   
-  if (dateRange.to) {
-    if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
-      // Same day
-      return format(dateRange.from, "MMM d, yyyy");
-    }
-    return `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
-  }
-  
-  return format(dateRange.from, "MMM d, yyyy");
+  return to
+    ? `${formatDate(from)} - ${formatDate(to)}`
+    : formatDate(from);
+};
+
+/**
+ * Format date for display
+ */
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
 };

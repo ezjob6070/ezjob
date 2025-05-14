@@ -15,16 +15,16 @@ const SubRoleFilter: React.FC<SubRoleFilterProps> = ({
 }) => {
   return (
     <Select
-      value={selectedSubRole || "all-roles"}
-      onValueChange={(value) => onSubRoleChange(value === "all-roles" ? null : value)}
+      value={selectedSubRole || ""}
+      onValueChange={(value) => onSubRoleChange(value === "" ? null : value)}
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="All Roles" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="all-roles">All Roles</SelectItem>
+        <SelectItem value="">All Roles</SelectItem>
         {subRoles.map((role) => (
-          <SelectItem key={role} value={role || "unknown-role"}>
+          <SelectItem key={role} value={role}>
             {role}
           </SelectItem>
         ))}
