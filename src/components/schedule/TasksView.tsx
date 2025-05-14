@@ -1,9 +1,10 @@
 
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
+import ReminderCard from "@/components/schedule/ReminderCard";
 import { useState } from "react";
 import { 
   DropdownMenu, 
@@ -15,6 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 interface TasksViewProps {
   selectedDate: Date;
@@ -34,6 +37,7 @@ const TasksView = ({
   const [filterType, setFilterType] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"all" | "tasks" | "reminders">("all");
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
     if (!onTasksChange) return;
@@ -82,6 +86,13 @@ const TasksView = ({
   const filterTasks = () => {
     let filtered = [...tasksForSelectedDate];
 
+    // Apply view mode filter
+    if (viewMode === "tasks") {
+      filtered = filtered.filter(task => !task.isReminder);
+    } else if (viewMode === "reminders") {
+      filtered = filtered.filter(task => task.isReminder);
+    }
+
     // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(task => 
@@ -112,6 +123,8 @@ const TasksView = ({
   };
 
   const filteredTasks = filterTasks();
+  const tasksCount = tasksForSelectedDate.filter(task => !task.isReminder).length;
+  const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
 
   return (
     <div className="mb-6">
@@ -138,77 +151,116 @@ const TasksView = ({
       </div>
       
       <div className="mb-4">
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-3">
           <Input 
-            placeholder="Search tasks..." 
+            placeholder="Search tasks & reminders..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
+            className="w-full"
           />
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                {filterType === "all" ? "All Status" : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setFilterType("all")}>
-                All Status
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType("scheduled")}>
-                Scheduled
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType("in progress")}>
-                In Progress
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType("completed")}>
-                Completed
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterType("overdue")}>
-                Overdue
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex gap-2">
+            <Tabs 
+              value={viewMode} 
+              onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
+              className="w-full"
+            >
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="all" className="text-xs">
+                  All ({tasksCount + remindersCount})
+                </TabsTrigger>
+                <TabsTrigger value="tasks" className="text-xs">
+                  <Calendar className="h-3.5 w-3.5 mr-1" />
+                  Tasks ({tasksCount})
+                </TabsTrigger>
+                <TabsTrigger value="reminders" className="text-xs">
+                  <Bell className="h-3.5 w-3.5 mr-1" />
+                  Reminders ({remindersCount})
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                {sortOrder === "newest" ? (
-                  <><ArrowDown className="h-4 w-4 mr-1" /> Newest</>
-                ) : (
-                  <><ArrowUp className="h-4 w-4 mr-1" /> Oldest</>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setSortOrder("newest")}>
-                <ArrowDown className="h-4 w-4 mr-2" /> Newest First
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
-                <ArrowUp className="h-4 w-4 mr-2" /> Oldest First
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-1">
+                  {filterType === "all" ? "All Status" : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setFilterType("all")}>
+                  All Status
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("scheduled")}>
+                  Scheduled
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("in progress")}>
+                  In Progress
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("completed")}>
+                  Completed
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("overdue")}>
+                  Overdue
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-1">
+                  {sortOrder === "newest" ? (
+                    <><ArrowDown className="h-4 w-4 mr-1" /> Newest</>
+                  ) : (
+                    <><ArrowUp className="h-4 w-4 mr-1" /> Oldest</>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSortOrder("newest")}>
+                  <ArrowDown className="h-4 w-4 mr-2" /> Newest First
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
+                  <ArrowUp className="h-4 w-4 mr-2" /> Oldest First
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
       
       <div className="space-y-4">
         <h3 className="font-medium">
-          Tasks ({filteredTasks.length})
+          {viewMode === "all" ? "Items" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
         </h3>
         
         {filteredTasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No tasks scheduled for this day.</p>
+          <p className="text-sm text-muted-foreground">
+            {viewMode === "all" 
+              ? "No tasks or reminders scheduled for this day." 
+              : viewMode === "tasks" 
+                ? "No tasks scheduled for this day."
+                : "No reminders scheduled for this day."
+            }
+          </p>
         ) : (
           <div className="space-y-4">
             {filteredTasks.map((task) => (
-              <TaskCard 
-                key={task.id} 
-                task={task} 
-                onTaskUpdate={handleUpdateTask}
-                onCreateFollowUp={handleCreateFollowUp}
-              />
+              task.isReminder ? (
+                <ReminderCard 
+                  key={task.id} 
+                  reminder={task} 
+                  onReminderUpdate={handleUpdateTask}
+                />
+              ) : (
+                <TaskCard 
+                  key={task.id} 
+                  task={task} 
+                  onTaskUpdate={handleUpdateTask}
+                  onCreateFollowUp={handleCreateFollowUp}
+                />
+              )
             ))}
           </div>
         )}

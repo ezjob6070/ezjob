@@ -19,10 +19,13 @@ const CalendarWidget = ({ selectedDate, setSelectedDate, jobs, tasks, currentMon
   const getDayColor = (day: Date) => {
     const dayJobs = jobs.filter(job => isSameDay(job.date, day));
     const dayTasks = tasks.filter(task => isSameDay(task.dueDate, day));
+    const dayReminders = tasks.filter(task => task.isReminder && isSameDay(task.dueDate, day));
     
     if (!dayJobs.length && !dayTasks.length) return "";
     
-    if (dayTasks.some(task => task.priority === "high") || 
+    if (dayReminders.length > 0 && dayReminders.some(task => task.status !== "completed")) {
+      return "bg-purple-100 text-purple-800";
+    } else if (dayTasks.some(task => task.priority === "high") || 
         dayJobs.some(job => job.status === "in_progress")) {
       return "bg-yellow-100 text-yellow-800";
     } else if (dayJobs.some(job => job.status === "scheduled")) {
@@ -46,9 +49,12 @@ const CalendarWidget = ({ selectedDate, setSelectedDate, jobs, tasks, currentMon
           hasEvents: (date) => 
             jobs.some(job => isSameDay(job.date, date)) || 
             tasks.some(task => isSameDay(task.dueDate, date)),
+          hasReminders: (date) => 
+            tasks.some(task => task.isReminder && isSameDay(task.dueDate, date)),
         }}
         modifiersClassNames={{
           hasEvents: "font-bold",
+          hasReminders: "underline decoration-purple-500 decoration-2 underline-offset-4",
         }}
         components={{
           Day: ({ date, displayMonth, ...props }: DayProps) => {
@@ -57,7 +63,8 @@ const CalendarWidget = ({ selectedDate, setSelectedDate, jobs, tasks, currentMon
             const dayColor = getDayColor(date);
             
             const jobsCount = jobs.filter(job => isSameDay(job.date, date)).length;
-            const tasksCount = tasks.filter(task => isSameDay(task.dueDate, date)).length;
+            const tasksCount = tasks.filter(task => !task.isReminder && isSameDay(task.dueDate, date)).length;
+            const remindersCount = tasks.filter(task => task.isReminder && isSameDay(task.dueDate, date)).length;
             
             return (
               <button 
@@ -74,7 +81,8 @@ const CalendarWidget = ({ selectedDate, setSelectedDate, jobs, tasks, currentMon
                 {format(date, "d")}
                 <CalendarEventIndicator 
                   jobsCount={jobsCount} 
-                  tasksCount={tasksCount} 
+                  tasksCount={tasksCount}
+                  remindersCount={remindersCount}
                 />
               </button>
             );
