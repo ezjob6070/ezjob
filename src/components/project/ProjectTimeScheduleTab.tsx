@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Plus, X, Check, FileText, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Plus, X, Check, FileText, MapPin, Bell, BellRing } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -31,7 +33,7 @@ interface ScheduleEvent {
   description?: string;
   assignedTo?: string[];
   status: "scheduled" | "completed" | "cancelled";
-  type: "meeting" | "deadline" | "milestone" | "task" | "inspection";
+  type: "meeting" | "deadline" | "milestone" | "task" | "inspection" | "reminder";
 }
 
 export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }: ProjectTimeScheduleTabProps) {
@@ -89,6 +91,24 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
       assignedTo: projectStaff.slice(1, 3).map(staff => staff.id),
       status: "scheduled",
       type: "task"
+    },
+    {
+      id: "event-6",
+      title: "Order Materials Reminder",
+      start: new Date(2024, 5, 25, 10, 0),
+      end: new Date(2024, 5, 25, 10, 30),
+      description: "Remember to order construction materials for next phase.",
+      status: "scheduled",
+      type: "reminder"
+    },
+    {
+      id: "event-7",
+      title: "Invoice Due Reminder",
+      start: new Date(2024, 6, 5, 9, 0),
+      end: new Date(2024, 6, 5, 9, 30),
+      description: "Client invoice is due today.",
+      status: "scheduled",
+      type: "reminder"
     }
   ]);
   const [showAddEventDialog, setShowAddEventDialog] = useState(false);
@@ -104,6 +124,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
   });
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
+  const [showReminders, setShowReminders] = useState(true);
 
   const handleAddEvent = () => {
     const newEventWithId: ScheduleEvent = {
@@ -140,14 +161,68 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
     setSelectedEvent(prev => (prev?.id === id ? { ...prev, status: status } : prev) || null);
     toast.success(`Event ${status} successfully`);
   };
+
+  const getEventTypeIcon = (type: string) => {
+    switch (type) {
+      case "reminder":
+        return <BellRing className="h-4 w-4 text-purple-600" />;
+      case "meeting":
+        return <CalendarIcon className="h-4 w-4 text-blue-600" />;
+      case "deadline":
+        return <Clock className="h-4 w-4 text-red-600" />;
+      case "milestone":
+        return <Check className="h-4 w-4 text-green-600" />;
+      case "inspection":
+        return <FileText className="h-4 w-4 text-amber-600" />;
+      case "task":
+        return <FileText className="h-4 w-4 text-blue-600" />;
+      default:
+        return <CalendarIcon className="h-4 w-4 text-blue-600" />;
+    }
+  };
+
+  const getEventTypeBadgeColor = (type: string) => {
+    switch (type) {
+      case "reminder":
+        return "bg-purple-100 text-purple-800";
+      case "meeting":
+        return "bg-blue-100 text-blue-800";
+      case "deadline":
+        return "bg-red-100 text-red-800";
+      case "milestone":
+        return "bg-green-100 text-green-800";
+      case "inspection":
+        return "bg-amber-100 text-amber-800";
+      case "task":
+        return "bg-indigo-100 text-indigo-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Filter events based on showReminders toggle
+  const filteredEvents = showReminders 
+    ? events 
+    : events.filter(event => event.type !== "reminder");
+    
+  const remindersCount = events.filter(event => event.type === "reminder").length;
   
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Project Schedule</h2>
-        <Button onClick={() => setShowAddEventDialog(true)} className="flex items-center gap-2">
-          <Plus size={16} /> Add Event
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Show Reminders</span>
+            <Switch 
+              checked={showReminders} 
+              onCheckedChange={setShowReminders} 
+            />
+          </div>
+          <Button onClick={() => setShowAddEventDialog(true)} className="flex items-center gap-2">
+            <Plus size={16} /> Add Event
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="calendar" className="w-full">
@@ -155,6 +230,12 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
           <TabsTrigger value="calendar" variant="blue">Calendar View</TabsTrigger>
           <TabsTrigger value="list" variant="blue">List View</TabsTrigger>
           <TabsTrigger value="staff" variant="blue">Staff Schedule</TabsTrigger>
+          <TabsTrigger value="reminders" variant="blue">
+            <div className="flex items-center gap-1">
+              <Bell className="h-4 w-4" />
+              Reminders ({remindersCount})
+            </div>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="calendar" className="py-4">
@@ -189,14 +270,20 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
               
               {/* Display Events for Selected Date */}
               <div className="mt-4">
-                {events.filter(event => format(event.start, "yyyy-MM-dd") === format(date || new Date(), "yyyy-MM-dd")).length > 0 ? (
-                  events
+                {filteredEvents.filter(event => format(event.start, "yyyy-MM-dd") === format(date || new Date(), "yyyy-MM-dd")).length > 0 ? (
+                  filteredEvents
                     .filter(event => format(event.start, "yyyy-MM-dd") === format(date || new Date(), "yyyy-MM-dd"))
                     .map(event => (
-                      <Card key={event.id} className="mb-2">
+                      <Card key={event.id} className={`mb-2 ${event.type === "reminder" ? "border-purple-200" : ""}`}>
                         <CardContent className="p-3">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium">{event.title}</p>
+                            <div className="flex items-center gap-2">
+                              {getEventTypeIcon(event.type)}
+                              <p className="font-medium">{event.title}</p>
+                              <Badge className={getEventTypeBadgeColor(event.type)}>
+                                {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                              </Badge>
+                            </div>
                             <Button variant="secondary" size="sm" onClick={() => setSelectedEvent(event)}>
                               View Details
                             </Button>
@@ -222,12 +309,18 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {events.length > 0 ? (
-                  events.map(event => (
-                    <Card key={event.id}>
+                {filteredEvents.length > 0 ? (
+                  filteredEvents.map(event => (
+                    <Card key={event.id} className={event.type === "reminder" ? "border-purple-200" : ""}>
                       <CardContent className="flex items-center justify-between p-4">
                         <div>
-                          <p className="font-medium">{event.title}</p>
+                          <div className="flex items-center gap-2">
+                            {getEventTypeIcon(event.type)}
+                            <p className="font-medium">{event.title}</p>
+                            <Badge className={getEventTypeBadgeColor(event.type)}>
+                              {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                            </Badge>
+                          </div>
                           <p className="text-sm text-muted-foreground">
                             {format(event.start, "PPP")} • {format(event.start, "p")} - {format(event.end, "p")}
                           </p>
@@ -268,11 +361,17 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                     <h3 className="text-lg font-semibold">{staff.name}</h3>
                     <p className="text-muted-foreground">{staff.role}</p>
                     <ul className="mt-2 space-y-1">
-                      {events
+                      {filteredEvents
                         .filter(event => event.assignedTo?.includes(staff.id))
                         .map(event => (
                           <li key={event.id} className="flex items-center justify-between">
-                            <span>{event.title}</span>
+                            <div className="flex items-center gap-2">
+                              {getEventTypeIcon(event.type)}
+                              <span>{event.title}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {format(event.start, "MMM d, h:mm a")}
+                              </span>
+                            </div>
                             <Badge className={
                               event.status === "completed" ? "bg-green-100 text-green-800" : 
                               event.status === "cancelled" ? "bg-red-100 text-red-800" : 
@@ -292,6 +391,117 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
             </CardContent>
           </Card>
         </TabsContent>
+        
+        {/* New Reminders Tab */}
+        <TabsContent value="reminders" className="py-4">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>Project Reminders</CardTitle>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1" 
+                  onClick={() => {
+                    setNewEvent({
+                      title: "",
+                      start: new Date(),
+                      end: new Date(new Date().getTime() + 30 * 60000), // 30 minutes later
+                      description: "",
+                      status: "scheduled",
+                      type: "reminder"
+                    });
+                    setShowAddEventDialog(true);
+                  }}
+                >
+                  <Plus size={14} /> Add Reminder
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {events.filter(event => event.type === "reminder").length > 0 ? (
+                  events
+                    .filter(event => event.type === "reminder")
+                    .sort((a, b) => a.start.getTime() - b.start.getTime())
+                    .map(event => (
+                      <Card key={event.id} className="border-purple-200">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <BellRing className="h-5 w-5 text-purple-600" />
+                              <p className="font-medium">{event.title}</p>
+                            </div>
+                            <Badge className={
+                              event.status === "completed" ? "bg-green-100 text-green-800" : 
+                              event.status === "cancelled" ? "bg-red-100 text-red-800" : 
+                              "bg-blue-100 text-blue-800"
+                            }>
+                              {event.status === "scheduled" ? "Scheduled" : 
+                               event.status === "completed" ? "Completed" : "Cancelled"}
+                            </Badge>
+                          </div>
+                          
+                          {event.description && (
+                            <p className="text-sm text-gray-600 mt-2">{event.description}</p>
+                          )}
+                          
+                          <div className="flex items-center gap-2 mt-3">
+                            <CalendarIcon className="h-4 w-4 text-gray-500" />
+                            <p className="text-sm text-gray-600">
+                              {format(event.start, "PPP")} at {format(event.start, "h:mm a")}
+                            </p>
+                          </div>
+                          
+                          <div className="flex justify-end gap-2 mt-3">
+                            {event.status === "scheduled" && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="flex items-center gap-1 bg-green-50 text-green-700 hover:bg-green-100"
+                                onClick={() => handleUpdateEventStatus(event.id, "completed")}
+                              >
+                                <Check size={14} /> Mark as Done
+                              </Button>
+                            )}
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setSelectedEvent(event)}
+                            >
+                              View Details
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-lg font-medium text-gray-800 mb-1">No reminders yet</p>
+                    <p className="text-gray-500 mb-4">Add reminders to keep track of important events</p>
+                    <Button 
+                      onClick={() => {
+                        setNewEvent({
+                          title: "",
+                          start: new Date(),
+                          end: new Date(new Date().getTime() + 30 * 60000), // 30 minutes later
+                          description: "",
+                          status: "scheduled",
+                          type: "reminder"
+                        });
+                        setShowAddEventDialog(true);
+                      }}
+                      className="flex items-center gap-1"
+                    >
+                      <Plus size={16} /> Add Your First Reminder
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       {/* Add Event Dialog */}
@@ -301,6 +511,25 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
             <DialogTitle>Add New Event</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="event-type" className="text-sm font-medium">
+                Event Type
+              </label>
+              <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value as ScheduleEvent["type"] })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="meeting">Meeting</SelectItem>
+                  <SelectItem value="deadline">Deadline</SelectItem>
+                  <SelectItem value="milestone">Milestone</SelectItem>
+                  <SelectItem value="task">Task</SelectItem>
+                  <SelectItem value="inspection">Inspection</SelectItem>
+                  <SelectItem value="reminder">Reminder</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          
             <div className="grid gap-2">
               <label htmlFor="event-title" className="text-sm font-medium">
                 Event Title
@@ -370,7 +599,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {newEvent.type !== "reminder" && (
               <div className="grid gap-2">
                 <label htmlFor="event-location" className="text-sm font-medium">
                   Location
@@ -381,25 +610,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
                   onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
                 />
               </div>
-
-              <div className="grid gap-2">
-                <label htmlFor="event-type" className="text-sm font-medium">
-                  Event Type
-                </label>
-                <Select onValueChange={(value) => setNewEvent({ ...newEvent, type: value as ScheduleEvent["type"] })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="meeting">Meeting</SelectItem>
-                    <SelectItem value="deadline">Deadline</SelectItem>
-                    <SelectItem value="milestone">Milestone</SelectItem>
-                    <SelectItem value="task">Task</SelectItem>
-                    <SelectItem value="inspection">Inspection</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            )}
 
             <div className="grid gap-2">
               <label htmlFor="event-description" className="text-sm font-medium">
@@ -426,9 +637,26 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
         {selectedEvent && (
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{selectedEvent.title}</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                {getEventTypeIcon(selectedEvent.type)}
+                {selectedEvent.title}
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Badge className={getEventTypeBadgeColor(selectedEvent.type)}>
+                  {selectedEvent.type.charAt(0).toUpperCase() + selectedEvent.type.slice(1)}
+                </Badge>
+                <Badge className={
+                  selectedEvent.status === "completed" ? "bg-green-100 text-green-800" : 
+                  selectedEvent.status === "cancelled" ? "bg-red-100 text-red-800" : 
+                  "bg-blue-100 text-blue-800"
+                }>
+                  {selectedEvent.status === "scheduled" ? "Scheduled" : 
+                   selectedEvent.status === "completed" ? "Completed" : "Cancelled"}
+                </Badge>
+              </div>
+            
               <div className="flex items-start gap-3">
                 <div className="bg-blue-100 p-2 rounded-full">
                   <CalendarIcon className="h-4 w-4 text-blue-600" />

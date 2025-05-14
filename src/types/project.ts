@@ -129,6 +129,11 @@ export interface ProjectTask {
   dependencies?: string[]; // Task IDs this task depends on
   progress: number; // 0-100
   
+  // Reminder-related fields
+  isReminder?: boolean;
+  reminderTime?: string; // Specific time for the reminder
+  reminderSent?: boolean;
+  
   // Inspection fields
   inspections?: ProjectTaskInspection[];
   

@@ -2,490 +2,426 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ProjectTask, ProjectStaff } from "@/types/project";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { 
-  CalendarDays, 
-  Check, 
+  Calendar as CalendarIcon, 
   Clock, 
+  Check, 
+  X, 
   FileText, 
-  AlertTriangle,
-  Calendar as CalendarIcon,
-  ListTodo,
-  User,
-  Edit,
-  Trash2,
-  X
+  AlertTriangle, 
+  Trash, 
+  Calendar,
+  BellRing,
+  Bell
 } from "lucide-react";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { format } from "date-fns";
 import { toast } from "sonner";
-import { ProjectTask, ProjectStaff } from "@/types/project";
-import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 export interface TaskDetailDialogProps {
+  task: ProjectTask;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  task: ProjectTask;
   onTaskUpdate: (taskId: string, updates: Partial<ProjectTask>) => void;
-  onUpdateStatus: (taskId: string, status: ProjectTask["status"]) => void;
+  onUpdateStatus: (taskId: string, status: "pending" | "in_progress" | "completed" | "blocked") => void;
   onDelete: (taskId: string) => void;
   onAddToCalendar: (task: ProjectTask) => void;
   projectStaff: ProjectStaff[];
 }
 
-export default function TaskDetailDialog({
+const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
+  task,
   open,
   onOpenChange,
-  task,
   onTaskUpdate,
   onUpdateStatus,
   onDelete,
   onAddToCalendar,
   projectStaff
-}: TaskDetailDialogProps) {
+}) => {
   const [editMode, setEditMode] = useState(false);
-  const [editedTask, setEditedTask] = useState<ProjectTask>(task);
-  const [loading, setLoading] = useState(false);
-
-  React.useEffect(() => {
-    setEditedTask(task);
-    setEditMode(false);
-  }, [task]);
-
-  const handleStatusChange = (newStatus: ProjectTask["status"]) => {
-    setLoading(true);
-    setTimeout(() => {
-      onUpdateStatus(task.id, newStatus);
-      setLoading(false);
-    }, 500);
-  };
-  
-  const handlePriorityChange = (newPriority: ProjectTask["priority"]) => {
-    onTaskUpdate(task.id, { priority: newPriority });
-    toast.success(`Task priority updated to ${newPriority}`);
-  };
-
-  const handleAssigneeChange = (staffId: string) => {
-    onTaskUpdate(task.id, { assignedTo: staffId });
-    toast.success("Task assignee updated");
-  };
-
-  const handleProgressChange = (progress: number) => {
-    onTaskUpdate(task.id, { progress });
-    toast.success(`Progress updated to ${progress}%`);
-  };
+  const [editedTask, setEditedTask] = useState<ProjectTask>({...task});
 
   const handleSaveChanges = () => {
     onTaskUpdate(task.id, editedTask);
     setEditMode(false);
-    toast.success("Task updated successfully");
+    toast.success(task.isReminder ? "Reminder updated successfully" : "Task updated successfully");
   };
 
-  const handleDeleteTask = () => {
-    if (confirm("Are you sure you want to delete this task?")) {
-      onDelete(task.id);
-      onOpenChange(false);
-      toast.success("Task deleted successfully");
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending": return "bg-gray-100 text-gray-800";
+      case "in_progress": return "bg-blue-100 text-blue-800";
+      case "completed": return "bg-green-100 text-green-800";
+      case "blocked": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "low": return "bg-gray-100 text-gray-800";
+      case "medium": return "bg-blue-100 text-blue-800";
+      case "high": return "bg-amber-100 text-amber-800";
+      case "urgent": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+  
+  const handleToggleReminder = () => {
+    // Convert between task and reminder
+    const updates = {
+      isReminder: !editedTask.isReminder,
+      // If converting to a reminder, set default reminder time
+      reminderTime: !editedTask.isReminder && editedTask.dueDate 
+        ? `${editedTask.dueDate}T09:00:00` 
+        : editedTask.reminderTime
+    };
+    
+    setEditedTask({...editedTask, ...updates});
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {task && (
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex justify-between items-center">
-              <span>{editMode ? "Edit Task" : "Task Details"}</span>
-              <div className="flex items-center gap-2">
-                {!editMode && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 w-8 p-0" 
-                    onClick={() => setEditMode(true)}
-                  >
-                    <Edit size={16} />
-                  </Button>
-                )}
-              </div>
-            </DialogTitle>
-          </DialogHeader>
-          
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {task.isReminder ? (
+              <>
+                <BellRing className="h-5 w-5 text-purple-500" />
+                <span>Reminder Details</span>
+              </>
+            ) : (
+              <>
+                <FileText className="h-5 w-5 text-blue-500" />
+                <span>Task Details</span>
+              </>
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="py-4">
           {editMode ? (
-            <div className="space-y-4 py-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isReminder" className="font-medium text-base">Type</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isReminder" className={`text-sm ${editedTask.isReminder ? 'text-purple-500 font-medium' : 'text-blue-500 font-medium'}`}>
+                    {editedTask.isReminder ? 'Reminder' : 'Task'}
+                  </Label>
+                  <Switch
+                    id="isReminder"
+                    checked={editedTask.isReminder}
+                    onCheckedChange={handleToggleReminder}
+                  />
+                </div>
+              </div>
+
               <div className="grid gap-2">
-                <label htmlFor="task-title" className="text-sm font-medium">
-                  Task Title
-                </label>
-                <input
-                  type="text"
-                  id="task-title"
-                  className="w-full border rounded-md p-2"
-                  value={editedTask.title}
-                  onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
+                <Label htmlFor="edit-title">Title</Label>
+                <Input 
+                  id="edit-title" 
+                  value={editedTask.title} 
+                  onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
                 />
               </div>
               
               <div className="grid gap-2">
-                <label htmlFor="task-description" className="text-sm font-medium">
-                  Description
-                </label>
-                <Textarea
-                  id="task-description"
-                  value={editedTask.description || ""}
-                  onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea 
+                  id="edit-description" 
+                  value={editedTask.description || ""} 
+                  onChange={(e) => setEditedTask({...editedTask, description: e.target.value})}
                   rows={3}
                 />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <label htmlFor="task-priority" className="text-sm font-medium">
-                    Priority
-                  </label>
-                  <Select 
-                    value={editedTask.priority} 
-                    onValueChange={(value) => setEditedTask({ 
-                      ...editedTask, 
-                      priority: value as ProjectTask["priority"] 
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="urgent">Urgent</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="edit-due-date">{editedTask.isReminder ? "Reminder Date" : "Due Date"}</Label>
+                  <Input 
+                    id="edit-due-date" 
+                    type="date" 
+                    value={editedTask.dueDate || ""}
+                    onChange={(e) => setEditedTask({...editedTask, dueDate: e.target.value})}
+                  />
                 </div>
                 
-                <div className="grid gap-2">
-                  <label htmlFor="task-status" className="text-sm font-medium">
-                    Status
-                  </label>
-                  <Select 
-                    value={editedTask.status} 
-                    onValueChange={(value) => setEditedTask({
-                      ...editedTask,
-                      status: value as ProjectTask["status"]
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="blocked">Blocked</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {editedTask.isReminder ? (
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-reminder-time">Reminder Time</Label>
+                    <Input 
+                      id="edit-reminder-time" 
+                      type="time" 
+                      value={editedTask.reminderTime?.split('T')[1]?.substring(0, 5) || ""}
+                      onChange={(e) => {
+                        if (editedTask.dueDate) {
+                          setEditedTask({
+                            ...editedTask, 
+                            reminderTime: `${editedTask.dueDate}T${e.target.value}:00`
+                          });
+                        } else {
+                          toast.error("Please select a date first");
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-assigned-to">Assigned To</Label>
+                    <Input 
+                      id="edit-assigned-to" 
+                      value={editedTask.assignedTo || ""} 
+                      onChange={(e) => setEditedTask({...editedTask, assignedTo: e.target.value})}
+                    />
+                  </div>
+                )}
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="task-assigned" className="text-sm font-medium">
-                    Assign To
-                  </label>
-                  <Select 
-                    value={editedTask.assignedTo || ""} 
-                    onValueChange={(value) => setEditedTask({
-                      ...editedTask,
-                      assignedTo: value
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Unassigned" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
-                      {projectStaff.map(staff => (
-                        <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="grid gap-2">
-                  <label htmlFor="task-progress" className="text-sm font-medium">
-                    Progress
-                  </label>
-                  <Select 
-                    value={String(editedTask.progress)} 
-                    onValueChange={(value) => setEditedTask({
-                      ...editedTask,
-                      progress: Number(value)
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Not Started (0%)</SelectItem>
-                      <SelectItem value="25">Initial Work (25%)</SelectItem>
-                      <SelectItem value="50">Half Complete (50%)</SelectItem>
-                      <SelectItem value="75">Almost Complete (75%)</SelectItem>
-                      <SelectItem value="100">Complete (100%)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="grid gap-2">
-                <label htmlFor="task-due-date" className="text-sm font-medium">
-                  Due Date
-                </label>
-                <input
-                  type="date"
-                  id="task-due-date"
-                  className="w-full border rounded-md p-2"
-                  value={editedTask.dueDate}
-                  onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value })}
-                />
-              </div>
-              
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setEditMode(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSaveChanges}>
-                  Save Changes
-                </Button>
-              </DialogFooter>
+              {!editedTask.isReminder && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-status">Status</Label>
+                      <Select 
+                        value={editedTask.status} 
+                        onValueChange={(value) => setEditedTask({...editedTask, status: value as any})}
+                      >
+                        <SelectTrigger id="edit-status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="in_progress">In Progress</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="blocked">Blocked</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-priority">Priority</Label>
+                      <Select 
+                        value={editedTask.priority} 
+                        onValueChange={(value) => setEditedTask({...editedTask, priority: value as any})}
+                      >
+                        <SelectTrigger id="edit-priority">
+                          <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="urgent">Urgent</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-progress">Progress ({editedTask.progress}%)</Label>
+                    <Input 
+                      id="edit-progress" 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      step="5"
+                      value={editedTask.progress} 
+                      onChange={(e) => setEditedTask({...editedTask, progress: parseInt(e.target.value)})}
+                    />
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>0%</span>
+                      <span>50%</span>
+                      <span>100%</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
-            <div className="space-y-4 py-2">
-              <div>
-                <h2 className="text-xl font-semibold mb-2">{task.title}</h2>
-                <div className="flex flex-wrap gap-2">
-                  <Badge className={cn(
-                    task.status === "completed" ? "bg-green-100 text-green-800" : 
-                    task.status === "in_progress" ? "bg-blue-100 text-blue-800" : 
-                    task.status === "blocked" ? "bg-red-100 text-red-800" : 
-                    "bg-amber-100 text-amber-800"
-                  )}>
-                    {task.status.replace('_', ' ')}
-                  </Badge>
-                  
-                  <Badge variant="outline" className="capitalize">
-                    {task.priority} priority
-                  </Badge>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="bg-blue-100 p-2 rounded-full">
-                  <CalendarDays className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Due Date</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(new Date(task.dueDate), "PPP")}
-                  </p>
+            <div className="space-y-4">
+              <div className="flex justify-between items-start">
+                <h2 className="text-xl font-semibold">{task.title}</h2>
+                <div className="flex gap-2">
+                  {task.isReminder ? (
+                    <Badge className="bg-purple-100 text-purple-800">Reminder</Badge>
+                  ) : (
+                    <>
+                      <Badge className={getPriorityColor(task.priority)}>
+                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                      </Badge>
+                      <Badge className={getStatusColor(task.status)}>
+                        {task.status.replace('_', ' ')}
+                      </Badge>
+                    </>
+                  )}
                 </div>
               </div>
               
               {task.description && (
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <FileText className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Description</p>
-                    <p className="text-sm text-muted-foreground">{task.description}</p>
-                  </div>
+                <div className="text-gray-700 mt-2">
+                  {task.description}
                 </div>
               )}
               
-              {task.assignedTo && (
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <User className="h-4 w-4 text-blue-600" />
-                  </div>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <p className="text-sm text-gray-500">{task.isReminder ? "Reminder Date" : "Due Date"}</p>
+                  <p className="font-medium flex items-center gap-1 mt-1">
+                    <CalendarIcon className="h-4 w-4 text-gray-500" />
+                    {task.dueDate ? format(new Date(task.dueDate), "MMM d, yyyy") : "Not set"}
+                  </p>
+                </div>
+                
+                {task.isReminder && task.reminderTime ? (
                   <div>
-                    <p className="text-sm font-medium">Assigned To</p>
-                    <p className="text-sm text-muted-foreground">
-                      {projectStaff.find(staff => staff.id === task.assignedTo)?.name || "Unassigned"}
+                    <p className="text-sm text-gray-500">Reminder Time</p>
+                    <p className="font-medium flex items-center gap-1 mt-1">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      {format(new Date(task.reminderTime), "h:mm a")}
                     </p>
+                  </div>
+                ) : null}
+                
+                {!task.isReminder && (
+                  <div>
+                    <p className="text-sm text-gray-500">Assigned To</p>
+                    <p className="font-medium flex items-center gap-1 mt-1">
+                      {task.assignedTo || "Unassigned"}
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {!task.isReminder && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500 mb-2">Progress</p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full ${
+                            task.progress === 100 ? "bg-green-500" : "bg-blue-500"
+                          }`}
+                          style={{ width: `${task.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <span className="font-medium text-sm">{task.progress}%</span>
                   </div>
                 </div>
               )}
               
               {task.createdAt && (
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Clock className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Created</p>
-                    <p className="text-sm text-muted-foreground">
-                      {format(new Date(task.createdAt), "PPP")}
-                    </p>
-                  </div>
+                <div className="text-xs text-gray-500 mt-4">
+                  Created: {format(new Date(task.createdAt), "MMM d, yyyy")}
+                  {task.completedAt && ` • Completed: ${format(new Date(task.completedAt), "MMM d, yyyy")}`}
                 </div>
               )}
-              
-              {/* Progress bar */}
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Progress</span>
-                  <span>{task.progress}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={cn(
-                      "h-2 rounded-full",
-                      task.progress >= 100 ? "bg-green-500" :
-                      task.progress >= 70 ? "bg-blue-500" :
-                      task.progress >= 30 ? "bg-yellow-500" :
-                      "bg-red-500"
-                    )}
-                    style={{ width: `${task.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              {/* Task inspections if any */}
-              {task.inspections && task.inspections.length > 0 && (
-                <div className="border-t pt-3">
-                  <h3 className="text-sm font-medium mb-2">Inspections</h3>
-                  <div className="space-y-2">
-                    {task.inspections.map(inspection => (
-                      <div key={inspection.id} className="bg-gray-50 p-2 rounded-md text-sm">
-                        <div className="flex justify-between">
-                          <span className="font-medium">{inspection.title}</span>
-                          <Badge className={
-                            inspection.status === "passed" ? "bg-green-100 text-green-800" :
-                            inspection.status === "failed" ? "bg-red-100 text-red-800" :
-                            "bg-gray-100 text-gray-800"
-                          }>
-                            {inspection.status}
-                          </Badge>
-                        </div>
-                        {inspection.notes && (
-                          <p className="text-xs text-gray-600 mt-1">{inspection.notes}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Quick actions */}
-              <div className="border-t pt-3">
-                <h3 className="text-sm font-medium mb-2">Update Progress</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Button size="sm" onClick={() => handleProgressChange(25)} disabled={task.status === "completed"}>
-                    25%
-                  </Button>
-                  <Button size="sm" onClick={() => handleProgressChange(50)} disabled={task.status === "completed"}>
-                    50%
-                  </Button>
-                  <Button size="sm" onClick={() => handleProgressChange(75)} disabled={task.status === "completed"}>
-                    75%
-                  </Button>
-                  <Button size="sm" onClick={() => handleProgressChange(100)} disabled={task.status === "completed"}>
-                    100%
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="border-t pt-3">
-                <h3 className="text-sm font-medium mb-2">Update Status</h3>
-                <div className="flex flex-wrap gap-2">
-                  {task.status !== "pending" && (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => handleStatusChange("pending")}
-                      className="text-amber-600 border-amber-200 hover:bg-amber-50"
-                      disabled={loading}
-                    >
-                      <Clock size={14} className="mr-1" /> Pending
-                    </Button>
-                  )}
-                  
-                  {task.status !== "in_progress" && (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => handleStatusChange("in_progress")}
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                      disabled={loading}
-                    >
-                      <ListTodo size={14} className="mr-1" /> In Progress
-                    </Button>
-                  )}
-                  
-                  {task.status !== "completed" && (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => handleStatusChange("completed")}
-                      className="text-green-600 border-green-200 hover:bg-green-50"
-                      disabled={loading}
-                    >
-                      <Check size={14} className="mr-1" /> Completed
-                    </Button>
-                  )}
-                  
-                  {task.status !== "blocked" && (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => handleStatusChange("blocked")}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                      disabled={loading}
-                    >
-                      <AlertTriangle size={14} className="mr-1" /> Blocked
-                    </Button>
-                  )}
-                </div>
-              </div>
-              
-              <DialogFooter className="flex flex-col sm:flex-row gap-2 justify-between">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                  onClick={handleDeleteTask}
-                >
-                  <Trash2 size={14} className="mr-1" /> Delete Task
-                </Button>
-                
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => onAddToCalendar(task)}
-                  >
-                    <CalendarIcon size={14} className="mr-1" /> Add to Calendar
-                  </Button>
-                  
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    Close
-                  </Button>
-                </div>
-              </DialogFooter>
             </div>
           )}
-        </DialogContent>
-      )}
+        </div>
+        
+        <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-2">
+          {editMode ? (
+            <>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setEditedTask({...task});
+                  setEditMode(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSaveChanges}>Save Changes</Button>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col sm:flex-row gap-2 sm:order-2">
+                <Button 
+                  variant="destructive" 
+                  className="flex items-center gap-1" 
+                  onClick={() => {
+                    onDelete(task.id);
+                    onOpenChange(false);
+                  }}
+                >
+                  <Trash className="h-4 w-4" />
+                  Delete
+                </Button>
+                
+                <Button 
+                  variant="default" 
+                  className="flex items-center gap-1" 
+                  onClick={() => setEditMode(true)}
+                >
+                  <FileText className="h-4 w-4" />
+                  Edit
+                </Button>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-2 sm:order-1">
+                {!task.isReminder ? (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-1"
+                      onClick={() => {
+                        onAddToCalendar(task);
+                        toast.success("Task added to calendar");
+                      }}
+                    >
+                      <Calendar className="h-4 w-4" />
+                      Add to Calendar
+                    </Button>
+                    
+                    {task.status !== "completed" && (
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                        onClick={() => {
+                          onUpdateStatus(task.id, "completed");
+                          onOpenChange(false);
+                          toast.success("Task marked as completed");
+                        }}
+                      >
+                        <Check className="h-4 w-4" />
+                        Mark Complete
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                    onClick={() => {
+                      onUpdateStatus(task.id, "completed");
+                      onOpenChange(false);
+                      toast.success("Reminder marked as done");
+                    }}
+                  >
+                    <Check className="h-4 w-4" />
+                    Mark as Done
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default TaskDetailDialog;

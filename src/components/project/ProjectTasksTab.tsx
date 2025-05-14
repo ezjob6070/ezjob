@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { 
   AlertTriangle, 
   CalendarIcon, 
@@ -20,7 +21,9 @@ import {
   CheckCircle,
   XCircle,
   Clock4,
-  Search
+  Search,
+  BellRing,
+  Bell
 } from "lucide-react";
 import { Project, ProjectTask, ProjectTaskInspection } from "@/types/project";
 import { format } from "date-fns";
@@ -45,16 +48,32 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
     dueDate: "",
     assignedTo: "",
     progress: 0,
+    isReminder: false,
+    reminderTime: "",
   });
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"priority" | "dueDate" | "progress">("priority");
-  const [activeTasksTab, setActiveTasksTab] = useState<"all" | "pending" | "in_progress" | "completed" | "blocked">("all");
+  const [activeTasksTab, setActiveTasksTab] = useState<"all" | "pending" | "in_progress" | "completed" | "blocked" | "reminders">("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleAddTask = () => {
     if (!newTask.title) {
-      toast.error("Task title is required");
+      toast.error("Title is required");
       return;
+    }
+    
+    // If it's a reminder, set default values for reminder-specific fields
+    if (newTask.isReminder) {
+      // Default status for reminders is "pending"
+      newTask.status = "pending";
+      
+      // If no specific reminder time is set, use the due date with default time
+      if (newTask.dueDate && !newTask.reminderTime) {
+        newTask.reminderTime = `${newTask.dueDate}T09:00:00`;
+      }
+      
+      // Reminders start at 0% progress
+      newTask.progress = 0;
     }
     
     const task: ProjectTask = {
@@ -70,7 +89,10 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
       lastUpdatedAt: new Date().toISOString(),
       inspections: [],
       comments: [],
-      attachments: []
+      attachments: [],
+      isReminder: newTask.isReminder,
+      reminderTime: newTask.reminderTime,
+      reminderSent: false
     };
     
     setTasks([...tasks, task]);
@@ -83,9 +105,11 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
       dueDate: "",
       assignedTo: "",
       progress: 0,
+      isReminder: false,
+      reminderTime: "",
     });
     
-    toast.success("Task added successfully");
+    toast.success(newTask.isReminder ? "Reminder added successfully" : "Task added successfully");
   };
 
   const handleUpdateTask = (taskId: string, updates: Partial<ProjectTask>) => {
@@ -194,8 +218,10 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
     let filtered = [...tasks];
     
     // Apply status filter from tab selection
-    if (activeTasksTab !== "all") {
-      filtered = filtered.filter(task => task.status === activeTasksTab);
+    if (activeTasksTab === "reminders") {
+      filtered = filtered.filter(task => task.isReminder === true);
+    } else if (activeTasksTab !== "all") {
+      filtered = filtered.filter(task => task.status === activeTasksTab && task.isReminder !== true);
     }
     
     // Apply search filter
@@ -227,10 +253,11 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
   };
 
   const filteredTasks = getFilteredTasks();
-  const completedTasksCount = tasks.filter(task => task.status === "completed").length;
-  const pendingTasksCount = tasks.filter(task => task.status === "pending").length;
-  const inProgressTasksCount = tasks.filter(task => task.status === "in_progress").length;
-  const blockedTasksCount = tasks.filter(task => task.status === "blocked").length;
+  const completedTasksCount = tasks.filter(task => task.status === "completed" && !task.isReminder).length;
+  const pendingTasksCount = tasks.filter(task => task.status === "pending" && !task.isReminder).length;
+  const inProgressTasksCount = tasks.filter(task => task.status === "in_progress" && !task.isReminder).length;
+  const blockedTasksCount = tasks.filter(task => task.status === "blocked" && !task.isReminder).length;
+  const remindersCount = tasks.filter(task => task.isReminder === true).length;
 
   return (
     <div className="space-y-6">
@@ -244,70 +271,46 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[525px]">
             <DialogHeader>
-              <DialogTitle>Add New Task</DialogTitle>
+              <DialogTitle>Add New Task or Reminder</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isReminder" className="font-medium text-base">Create as Reminder</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isReminder" className={`text-sm ${newTask.isReminder ? 'text-blue-500 font-medium' : 'text-gray-500'}`}>
+                    {newTask.isReminder ? 'Reminder' : 'Task'}
+                  </Label>
+                  <Switch
+                    id="isReminder"
+                    checked={newTask.isReminder}
+                    onCheckedChange={(checked) => setNewTask({...newTask, isReminder: checked})}
+                  />
+                </div>
+              </div>
+              
               <div className="grid gap-2">
-                <Label htmlFor="title">Task Title</Label>
+                <Label htmlFor="title">{newTask.isReminder ? "Reminder Title" : "Task Title"}</Label>
                 <Input 
                   id="title" 
                   value={newTask.title} 
                   onChange={(e) => setNewTask({...newTask, title: e.target.value})} 
-                  placeholder="Enter task title" 
+                  placeholder={newTask.isReminder ? "Enter reminder title" : "Enter task title"}
                 />
               </div>
+              
               <div className="grid gap-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea 
                   id="description" 
                   value={newTask.description} 
                   onChange={(e) => setNewTask({...newTask, description: e.target.value})} 
-                  placeholder="Enter task description" 
+                  placeholder="Enter description" 
                 />
               </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select 
-                    defaultValue={newTask.status} 
-                    onValueChange={(value) => setNewTask({...newTask, status: value as any})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="blocked">Blocked</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="priority">Priority</Label>
-                  <Select 
-                    defaultValue={newTask.priority} 
-                    onValueChange={(value) => setNewTask({...newTask, priority: value as any})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="dueDate">Due Date</Label>
+                  <Label htmlFor="dueDate">{newTask.isReminder ? "Reminder Date" : "Due Date"}</Label>
                   <Input 
                     id="dueDate" 
                     type="date" 
@@ -315,47 +318,120 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                     onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})} 
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="assignedTo">Assigned To</Label>
-                  <Input 
-                    id="assignedTo" 
-                    value={newTask.assignedTo} 
-                    onChange={(e) => setNewTask({...newTask, assignedTo: e.target.value})} 
-                    placeholder="Enter name" 
-                  />
-                </div>
+                
+                {newTask.isReminder && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="reminderTime">Reminder Time</Label>
+                    <Input 
+                      id="reminderTime" 
+                      type="time" 
+                      value={newTask.reminderTime?.split('T')[1]?.substring(0, 5) || ""} 
+                      onChange={(e) => {
+                        if (newTask.dueDate) {
+                          setNewTask({
+                            ...newTask, 
+                            reminderTime: `${newTask.dueDate}T${e.target.value}:00`
+                          });
+                        } else {
+                          toast.error("Please select a date first");
+                        }
+                      }} 
+                    />
+                  </div>
+                )}
+                
+                {!newTask.isReminder && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="assignedTo">Assigned To</Label>
+                    <Input 
+                      id="assignedTo" 
+                      value={newTask.assignedTo} 
+                      onChange={(e) => setNewTask({...newTask, assignedTo: e.target.value})} 
+                      placeholder="Enter name" 
+                    />
+                  </div>
+                )}
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="progress">Initial Progress ({newTask.progress}%)</Label>
-                <Input 
-                  id="progress" 
-                  type="range" 
-                  min="0" 
-                  max="100" 
-                  value={newTask.progress} 
-                  onChange={(e) => setNewTask({...newTask, progress: parseInt(e.target.value)})} 
-                />
-              </div>
+              
+              {!newTask.isReminder && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="status">Status</Label>
+                      <Select 
+                        defaultValue={newTask.status} 
+                        onValueChange={(value) => setNewTask({...newTask, status: value as any})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="in_progress">In Progress</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="blocked">Blocked</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="priority">Priority</Label>
+                      <Select 
+                        defaultValue={newTask.priority} 
+                        onValueChange={(value) => setNewTask({...newTask, priority: value as any})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="urgent">Urgent</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="progress">Initial Progress ({newTask.progress}%)</Label>
+                    <Input 
+                      id="progress" 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      value={newTask.progress} 
+                      onChange={(e) => setNewTask({...newTask, progress: parseInt(e.target.value)})} 
+                    />
+                  </div>
+                </>
+              )}
             </div>
+            
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button onClick={handleAddTask}>Add Task</Button>
+              <Button onClick={handleAddTask}>
+                {newTask.isReminder ? "Add Reminder" : "Add Task"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
       {/* Task Status Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 overflow-hidden">
           <div className="bg-blue-600 h-1"></div>
           <CardContent className="pt-6">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-blue-700">Total Tasks</p>
-                <p className="text-3xl font-bold">{tasks.length}</p>
+                <p className="text-3xl font-bold">{tasks.filter(t => !t.isReminder).length}</p>
               </div>
               <div className="bg-blue-100 p-3 rounded-full">
                 <ClipboardCheck className="h-6 w-6 text-blue-600" />
@@ -393,7 +469,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                 className="text-green-700 hover:text-green-800 hover:bg-green-200 p-0 h-auto"
                 onClick={() => setActiveTasksTab("completed")}
               >
-                View Completed Tasks
+                View Completed
               </Button>
             </div>
           </CardContent>
@@ -418,7 +494,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                 className="text-yellow-700 hover:text-yellow-800 hover:bg-yellow-200 p-0 h-auto"
                 onClick={() => setActiveTasksTab("in_progress")}
               >
-                View In-Progress Tasks
+                View In-Progress
               </Button>
             </div>
           </CardContent>
@@ -443,7 +519,32 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                 className="text-gray-700 hover:text-gray-800 hover:bg-gray-200 p-0 h-auto"
                 onClick={() => setActiveTasksTab("pending")}
               >
-                View Pending Tasks
+                View Pending
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 overflow-hidden">
+          <div className="bg-purple-600 h-1"></div>
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-purple-700">Reminders</p>
+                <p className="text-3xl font-bold">{remindersCount}</p>
+              </div>
+              <div className="bg-purple-100 p-3 rounded-full">
+                <BellRing className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-purple-700 hover:text-purple-800 hover:bg-purple-200 p-0 h-auto"
+                onClick={() => setActiveTasksTab("reminders")}
+              >
+                View Reminders
               </Button>
             </div>
           </CardContent>
@@ -491,7 +592,7 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
               <div className="text-xs text-gray-500 mb-1">Tasks Status</div>
               <div className="flex items-center gap-2">
                 <div className="text-2xl font-bold text-purple-600">
-                  {completedTasksCount}/{tasks.length}
+                  {completedTasksCount}/{tasks.filter(t => !t.isReminder).length}
                 </div>
                 <div className="text-sm text-gray-600">Complete</div>
               </div>
@@ -506,22 +607,22 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                 <>
                   <div 
                     className="bg-green-500 rounded-l"
-                    style={{ width: `${(completedTasksCount / tasks.length) * 100}%` }}
+                    style={{ width: `${(completedTasksCount / tasks.filter(t => !t.isReminder).length) * 100}%` }}
                     title={`Completed: ${completedTasksCount} tasks`}
                   ></div>
                   <div 
                     className="bg-blue-500"
-                    style={{ width: `${(inProgressTasksCount / tasks.length) * 100}%` }}
+                    style={{ width: `${(inProgressTasksCount / tasks.filter(t => !t.isReminder).length) * 100}%` }}
                     title={`In Progress: ${inProgressTasksCount} tasks`}
                   ></div>
                   <div 
                     className="bg-gray-400"
-                    style={{ width: `${(pendingTasksCount / tasks.length) * 100}%` }}
+                    style={{ width: `${(pendingTasksCount / tasks.filter(t => !t.isReminder).length) * 100}%` }}
                     title={`Pending: ${pendingTasksCount} tasks`}
                   ></div>
                   <div 
                     className="bg-red-500 rounded-r"
-                    style={{ width: `${(blockedTasksCount / tasks.length) * 100}%` }}
+                    style={{ width: `${(blockedTasksCount / tasks.filter(t => !t.isReminder).length) * 100}%` }}
                     title={`Blocked: ${blockedTasksCount} tasks`}
                   ></div>
                 </>
@@ -558,14 +659,15 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
              activeTasksTab === "completed" ? "Completed Tasks" :
              activeTasksTab === "in_progress" ? "In Progress Tasks" :
              activeTasksTab === "pending" ? "Pending Tasks" :
-             activeTasksTab === "blocked" ? "Blocked Tasks" : "Tasks"}
+             activeTasksTab === "blocked" ? "Blocked Tasks" :
+             activeTasksTab === "reminders" ? "Reminders" : "Tasks"}
           </h3>
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input 
                 className="pl-9 w-full"
-                placeholder="Search tasks..." 
+                placeholder="Search..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -583,15 +685,15 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
           </div>
         </div>
 
-        {/* Task Status Tabs */}
+        {/* Task Status Tabs - Added Reminders Tab */}
         <div className="bg-gray-50 p-1 rounded-lg">
           <Tabs value={activeTasksTab} onValueChange={(value) => setActiveTasksTab(value as any)} className="w-full">
-            <TabsList className="grid grid-cols-5 w-full bg-transparent">
+            <TabsList className="grid grid-cols-6 w-full bg-transparent">
               <TabsTrigger 
                 value="all" 
                 className={`${activeTasksTab === 'all' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'} rounded-lg`}
               >
-                All ({tasks.length})
+                All ({tasks.filter(t => !t.isReminder).length})
               </TabsTrigger>
               <TabsTrigger 
                 value="pending" 
@@ -617,6 +719,15 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
               >
                 Blocked ({blockedTasksCount})
               </TabsTrigger>
+              <TabsTrigger 
+                value="reminders" 
+                className={`${activeTasksTab === 'reminders' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'} rounded-lg`}
+              >
+                <div className="flex items-center gap-1">
+                  <Bell className="h-3.5 w-3.5" />
+                  Reminders ({remindersCount})
+                </div>
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -627,6 +738,8 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
             <div className="mb-3">
               {searchQuery ? (
                 <Search className="h-12 w-12 text-gray-400 mx-auto" />
+              ) : activeTasksTab === "reminders" ? (
+                <Bell className="h-12 w-12 text-gray-400 mx-auto" />
               ) : activeTasksTab === "completed" ? (
                 <CheckCircle className="h-12 w-12 text-gray-400 mx-auto" />
               ) : activeTasksTab === "pending" ? (
@@ -641,24 +754,33 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
             </div>
             <h3 className="text-lg font-medium mb-1">
               {searchQuery 
-                ? "No matching tasks found" 
-                : `No ${activeTasksTab !== "all" ? activeTasksTab.replace("_", " ") : ""} tasks yet`}
+                ? "No matching results found" 
+                : activeTasksTab === "reminders"
+                  ? "No reminders yet"
+                  : `No ${activeTasksTab !== "all" ? activeTasksTab.replace("_", " ") : ""} tasks yet`}
             </h3>
             <p className="text-gray-500 mb-4">
               {searchQuery 
                 ? "Try adjusting your search query"
-                : activeTasksTab === "all" 
-                  ? "Create your first task to start tracking project progress"
-                  : `No ${activeTasksTab.replace("_", " ")} tasks available`}
+                : activeTasksTab === "reminders"
+                  ? "Add your first reminder to get started"
+                  : activeTasksTab === "all" 
+                    ? "Create your first task to start tracking project progress"
+                    : `No ${activeTasksTab.replace("_", " ")} tasks available`}
             </p>
             <Button 
               onClick={() => {
                 setSearchQuery("");
+                setNewTask(prev => ({
+                  ...prev,
+                  isReminder: activeTasksTab === "reminders"
+                }));
                 setNewTaskOpen(true);
               }} 
               className="mx-auto flex items-center gap-2"
             >
-              <PlusIcon size={16} /> Add Task
+              <PlusIcon size={16} /> 
+              {activeTasksTab === "reminders" ? "Add Reminder" : "Add Task"}
             </Button>
           </Card>
         )}
@@ -667,8 +789,9 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         {filteredTasks.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredTasks.map((task) => (
-              <Card key={task.id} className="overflow-hidden hover:shadow-md transition-shadow duration-200">
+              <Card key={task.id} className={`overflow-hidden hover:shadow-md transition-shadow duration-200 ${task.isReminder ? 'border-purple-200' : ''}`}>
                 <div className={`h-1.5 ${
+                  task.isReminder ? "bg-purple-500" :
                   task.status === "completed" ? "bg-green-500" : 
                   task.status === "in_progress" ? "bg-blue-500" :
                   task.status === "blocked" ? "bg-red-500" :
@@ -677,10 +800,18 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                 <CardContent className="p-5 space-y-4">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
+                      {task.isReminder ? (
+                        <BellRing className="h-5 w-5 text-purple-500" />
+                      ) : (
+                        <ClipboardCheck className="h-5 w-5 text-blue-500" />
+                      )}
                       <h3 className="font-medium line-clamp-1">{task.title}</h3>
-                      {getInspectionStatusIcon(task.inspections)}
                     </div>
-                    <Badge className={getStatusColor(task.status)}>{task.status.replace('_', ' ')}</Badge>
+                    {task.isReminder ? (
+                      <Badge className="bg-purple-100 text-purple-800">Reminder</Badge>
+                    ) : (
+                      <Badge className={getStatusColor(task.status)}>{task.status.replace('_', ' ')}</Badge>
+                    )}
                   </div>
                   
                   {task.description && (
@@ -695,99 +826,107 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
                       </div>
                     )}
                     
-                    {task.assignedTo && (
+                    {task.reminderTime && (
+                      <div className="flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-1 rounded">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{format(new Date(task.reminderTime), "h:mm a")}</span>
+                      </div>
+                    )}
+                    
+                    {task.assignedTo && !task.isReminder && (
                       <div className="flex items-center gap-1 text-gray-600 bg-gray-50 px-2 py-1 rounded">
                         <span>{task.assignedTo}</span>
                       </div>
                     )}
                     
-                    <Badge className={getPriorityColor(task.priority)}>
-                      {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                    </Badge>
+                    {!task.isReminder && (
+                      <Badge className={getPriorityColor(task.priority)}>
+                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                      </Badge>
+                    )}
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Progress</span>
-                      <span className="font-medium">{task.progress}%</span>
+                  {!task.isReminder && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">Progress</span>
+                        <span className="font-medium">{task.progress}%</span>
+                      </div>
+                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full ${
+                            task.progress === 100 ? "bg-green-500" : "bg-blue-500"
+                          }`}
+                          style={{ width: `${task.progress}%` }}
+                        ></div>
+                      </div>
                     </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full ${
-                          task.progress === 100 ? "bg-green-500" : "bg-blue-500"
-                        }`}
-                        style={{ width: `${task.progress}%` }}
-                      ></div>
-                    </div>
-                  </div>
+                  )}
                   
                   <div className="flex justify-between pt-2">
-                    <div>
-                      {task.status !== "completed" && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">Update Progress</Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Update Task Progress</DialogTitle>
-                            </DialogHeader>
-                            <div className="py-4">
-                              <div className="space-y-2">
-                                <Label>Current Progress: {task.progress}%</Label>
-                                <Input 
-                                  type="range" 
-                                  min="0" 
-                                  max="100" 
-                                  step="5"
-                                  defaultValue={task.progress}
-                                  onChange={(e) => handleUpdateTaskProgress(task.id, parseInt(e.target.value))} 
-                                />
-                                <div className="flex justify-between text-xs text-gray-500">
-                                  <span>0%</span>
-                                  <span>50%</span>
-                                  <span>100%</span>
+                    {task.isReminder ? (
+                      <div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex items-center gap-1"
+                          onClick={() => {
+                            handleUpdateTaskStatus(task.id, "completed");
+                            toast.success("Reminder marked as completed");
+                          }}
+                        >
+                          <CheckCircle className="h-3.5 w-3.5" /> Mark as Done
+                        </Button>
+                      </div>
+                    ) : (
+                      task.status !== "completed" && (
+                        <div>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm">Update Progress</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Update Task Progress</DialogTitle>
+                              </DialogHeader>
+                              <div className="py-4">
+                                <div className="space-y-2">
+                                  <Label>Current Progress: {task.progress}%</Label>
+                                  <Input 
+                                    type="range" 
+                                    min="0" 
+                                    max="100" 
+                                    step="5"
+                                    defaultValue={task.progress}
+                                    onChange={(e) => handleUpdateTaskProgress(task.id, parseInt(e.target.value))} 
+                                  />
+                                  <div className="flex justify-between text-xs text-gray-500">
+                                    <span>0%</span>
+                                    <span>50%</span>
+                                    <span>100%</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      )}
-                    </div>
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button variant="outline">Close</Button>
+                                </DialogClose>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      )
+                    )}
                     
-                    <div className="space-x-2">
+                    <div>
                       <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="flex items-center gap-1"
+                        variant="ghost" 
+                        size="sm" 
+                        className="flex items-center gap-1" 
                         onClick={() => handleOpenTaskDetail(task)}
                       >
-                        <Eye className="h-4 w-4" />
-                        Details
+                        <Eye className="h-3.5 w-3.5" /> View Details
                       </Button>
-                      
-                      {task.status === "pending" && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                          onClick={() => handleUpdateTaskStatus(task.id, "in_progress")}
-                        >
-                          Start Task
-                        </Button>
-                      )}
-                      
-                      {task.status === "in_progress" && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                          onClick={() => handleUpdateTaskStatus(task.id, "completed")}
-                        >
-                          <CheckIcon className="h-4 w-4 mr-1" />
-                          Complete
-                        </Button>
-                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -797,13 +936,17 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
         )}
       </div>
 
-      {/* Task Detail Dialog */}
+      {/* TaskDetailDialog component for selected task */}
       {selectedTask && (
         <TaskDetailDialog 
           task={selectedTask}
           open={taskDetailOpen}
           onOpenChange={setTaskDetailOpen}
           onTaskUpdate={handleUpdateTask}
+          onUpdateStatus={(taskId, status) => handleUpdateTaskStatus(taskId, status)}
+          onDelete={() => {}}
+          onAddToCalendar={() => {}}
+          projectStaff={project.staff || []}
         />
       )}
     </div>
