@@ -2,78 +2,71 @@
 import { Technician } from "@/types/technician";
 
 /**
- * Calculate total financial metrics for all technicians
+ * Helper function to safely access technician roles
+ * @param technician The technician object
+ * @returns The role value or "technician" as default
  */
-export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) => {
-  // Default values if no technicians or empty array
-  if (!displayedTechnicians || displayedTechnicians.length === 0) {
-    return { 
-      totalRevenue: 0, 
-      technicianEarnings: 0, 
-      totalExpenses: 0, 
-      companyProfit: 0 
-    };
+export function getTechnicianRole(technician: Technician): string {
+  return technician.role || "technician";
+}
+
+/**
+ * Helper function to safely access technician sub-roles
+ * @param technician The technician object
+ * @returns The subRole value or an empty string
+ */
+export function getTechnicianSubRole(technician: Technician): string {
+  return technician.subRole || "";
+}
+
+/**
+ * Calculate the monthly salary for a technician based on their payment structure
+ * @param technician The technician object
+ * @returns The calculated monthly salary
+ */
+export function calculateMonthlySalary(technician: Technician): number {
+  let monthlySalary = 0;
+  
+  if (technician.salaryBasis === "hourly" && technician.hourlyRate) {
+    // Assuming 160 hours per month for full-time employees
+    monthlySalary = technician.hourlyRate * 160;
+  } else if (technician.salaryBasis === "weekly" && technician.paymentRate) {
+    monthlySalary = technician.paymentRate * 4.33; // Average weeks in a month
+  } else if ((technician.salaryBasis === "bi-weekly" || technician.salaryBasis === "biweekly") && technician.paymentRate) {
+    monthlySalary = technician.paymentRate * 2.17; // Average bi-weekly periods in a month
+  } else if (technician.salaryBasis === "monthly" && technician.paymentRate) {
+    monthlySalary = technician.paymentRate;
+  } else if ((technician.salaryBasis === "annually" || technician.salaryBasis === "yearly") && technician.paymentRate) {
+    monthlySalary = technician.paymentRate / 12;
   }
   
-  // Calculate total revenue from technicians
-  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech?.totalRevenue || 0), 0);
-  
-  // Calculate total technician payments
-  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => {
-    if (!tech) return sum;
-    const rate = tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1;
-    return sum + (tech.totalRevenue || 0) * rate;
-  }, 0);
-  
-  // Estimate expenses as 33% of revenue
-  const totalExpenses = totalRevenue * 0.33;
-  
-  // Calculate net profit
-  const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
-  
-  return { 
-    totalRevenue, 
-    technicianEarnings, 
-    totalExpenses, 
-    companyProfit 
-  };
-};
+  return monthlySalary;
+}
 
 /**
- * Calculate financial metrics for a single technician
+ * Calculate commission or payment for a technician based on revenue and job count
+ * @param technician The technician object
+ * @param totalRevenue Total revenue amount
+ * @param completedJobs Number of completed jobs
+ * @returns The calculated payment amount
  */
-export const calculateTechnicianMetrics = (technician: Technician | null) => {
-  if (!technician) return null;
+export function calculateTechnicianPayment(
+  technician: Technician, 
+  totalRevenue: number, 
+  completedJobs: number
+): number {
+  let payment = 0;
   
-  const revenue = technician.totalRevenue || 0;
-  const earnings = revenue * (technician.paymentType === "percentage" 
-    ? technician.paymentRate / 100 
-    : 1);
-  const expenses = revenue * 0.33;
-  const profit = revenue - earnings - expenses;
-  const partsValue = revenue * 0.2; // Assuming parts are 20% of total revenue
+  if (technician.paymentType === "percentage" && technician.paymentRate) {
+    payment = totalRevenue * (technician.paymentRate / 100);
+  } else if (technician.paymentType === "flat" && technician.paymentRate) {
+    payment = completedJobs * technician.paymentRate;
+  } else if (technician.paymentType === "hourly" && technician.hourlyRate) {
+    // Assuming average 2 hours per job for calculation purposes
+    payment = completedJobs * 2 * technician.hourlyRate;
+  } else if (technician.incentiveType === "commission" && technician.incentiveAmount) {
+    payment = totalRevenue * (technician.incentiveAmount / 100);
+  }
   
-  return { revenue, earnings, expenses, profit, partsValue };
-};
-
-/**
- * Format date range for display
- */
-export const formatDateRangeText = (from?: Date, to?: Date) => {
-  if (!from) return "";
-  
-  return to
-    ? `${formatDate(from)} - ${formatDate(to)}`
-    : formatDate(from);
-};
-
-/**
- * Format date for display
- */
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-};
+  return payment;
+}
