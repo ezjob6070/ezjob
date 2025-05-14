@@ -1,16 +1,14 @@
 
-import { Toast, toast as sonnerToast } from "sonner";
+import { toast as sonnerToast, Toast } from "sonner";
 
 export const toast = sonnerToast;
 
-export type ToastProps = typeof toast;
-
-export interface UseToastReturn {
-  toast: ToastProps;
+export interface UseToastProps {
+  toast: typeof sonnerToast;
 }
 
-export const useToast = (): UseToastReturn => {
+export const useToast = (): UseToastProps => {
   return {
-    toast,
+    toast: sonnerToast,
   };
 };
