@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, FileText, Image, MapPin, Users, Truck, DollarSign, ListTodo, Edit, User, Package, Clock } from "lucide-react";
 import { initialProjects } from "@/data/projects";
-import { Project, ProjectContractor, ProjectTask } from "@/types/project";
+import { Project, ProjectContractor } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -15,8 +15,7 @@ import ProjectFinanceTab from "@/components/project/ProjectFinanceTab";
 import ProjectTasksTab from "@/components/project/ProjectTasksTab";
 import ProjectStaffTab from "@/components/project/ProjectStaffTab";
 import ProjectEquipmentTab from "@/components/project/ProjectEquipmentTab";
-import ProjectTimeScheduleTab, { ScheduleEvent } from "@/components/project/ProjectTimeScheduleTab";
-import { convertTaskToEvent, generateId } from "@/components/project/utils/scheduleTaskIntegration";
+import ProjectTimeScheduleTab from "@/components/project/ProjectTimeScheduleTab";
 
 interface ProjectFile {
   id: string;
@@ -31,102 +30,48 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [showEditDialog, setShowEditDialog] = useState(false);
-  
-  // Find project by ID
-  const [project, setProject] = useState<Project>(() => {
-    return (
-      initialProjects.find(p => p.id === Number(id)) || {
-        id: 0,
-        name: "Project Not Found",
-        type: "Unknown",
-        description: "Project details not available",
-        location: "Unknown",
-        completion: 0,
-        workers: 0,
-        vehicles: 0,
-        status: "Not Started" as const,
-        startDate: "",
-        expectedEndDate: "",
-        budget: 0,
-        actualSpent: 0,
-        clientName: "Unknown",
-        revenue: 0,
-        contractors: [],
-        tasks: []
-      }
-    );
-  });
-
-  // State for managing tasks and schedule events
-  const [tasks, setTasks] = useState<ProjectTask[]>(project.tasks || []);
-  const [events, setEvents] = useState<ScheduleEvent[]>([]);
-
-  // Initialize project tasks and schedule events
-  useEffect(() => {
-    setTasks(project.tasks || []);
-  }, [project.tasks]);
-
-  const handleTaskCreate = (task: ProjectTask) => {
-    setTasks(prevTasks => [...prevTasks, task]);
-    
-    // Update project
-    setProject(prev => ({
-      ...prev,
-      tasks: [...(prev.tasks || []), task]
-    }));
-    
-    toast.success("Task created successfully");
-  };
-
-  const handleTaskUpdate = (taskId: string, updates: Partial<ProjectTask>) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, ...updates } : task
-    );
-    
-    setTasks(updatedTasks);
-    
-    // Update project
-    setProject(prev => ({
-      ...prev,
-      tasks: updatedTasks
-    }));
-    
-    toast.success("Task updated successfully");
-  };
-
-  const handleTaskDelete = (taskId: string) => {
-    const filteredTasks = tasks.filter(task => task.id !== taskId);
-    
-    setTasks(filteredTasks);
-    
-    // Update project
-    setProject(prev => ({
-      ...prev,
-      tasks: filteredTasks
-    }));
-    
-    toast.success("Task deleted successfully");
-  };
-
-  const handleAddTaskToCalendar = (task: ProjectTask) => {
-    const eventBase = convertTaskToEvent(task);
-    const newEvent: ScheduleEvent = {
-      ...eventBase,
-      id: `task-event-${task.id}`
-    };
-    
-    // Check if event already exists
-    if (!events.some(e => e.id === newEvent.id)) {
-      setEvents(prev => [...prev, newEvent]);
-      toast.success("Task added to calendar");
-    } else {
-      toast.info("Task is already on the calendar");
+  const [files, setFiles] = useState<ProjectFile[]>([
+    {
+      id: "file-1",
+      name: "Project Blueprint.pdf",
+      type: "document",
+      date: new Date(2024, 3, 15),
+      url: "#"
+    },
+    {
+      id: "file-2",
+      name: "Site Photo 1.jpg",
+      type: "image",
+      date: new Date(2024, 3, 20),
+      url: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=870&auto=format&fit=crop"
+    },
+    {
+      id: "file-3",
+      name: "Contract.pdf",
+      type: "document",
+      date: new Date(2024, 3, 10),
+      url: "#"
     }
-  };
+  ]);
 
-  const handleEventCreate = (event: ScheduleEvent) => {
-    setEvents(prev => [...prev, event]);
-    toast.success("Event created successfully");
+  // Find project by ID
+  const project = initialProjects.find(p => p.id === Number(id)) || {
+    id: 0,
+    name: "Project Not Found",
+    type: "Unknown",
+    description: "Project details not available",
+    location: "Unknown",
+    completion: 0,
+    workers: 0,
+    vehicles: 0,
+    status: "Not Started" as const,
+    startDate: "",
+    expectedEndDate: "",
+    budget: 0,
+    actualSpent: 0,
+    clientName: "Unknown",
+    revenue: 0,
+    contractors: []
   };
 
   const handleFileUpload = (type: "document" | "image") => {
@@ -390,23 +335,11 @@ export default function ProjectDetail() {
         </TabsContent>
         
         <TabsContent value="time-schedule" className="py-4">
-          <ProjectTimeScheduleTab 
-            projectId={project.id} 
-            projectStaff={project.staff}
-            projectTasks={tasks}
-            onTaskCreate={handleTaskCreate}
-            onTaskUpdate={handleTaskUpdate}
-          />
+          <ProjectTimeScheduleTab projectId={project.id} projectStaff={project.staff} />
         </TabsContent>
         
         <TabsContent value="tasks" className="py-4">
-          <ProjectTasksTab 
-            project={project} 
-            onTaskCreate={handleTaskCreate}
-            onTaskUpdate={handleTaskUpdate}
-            onTaskDelete={handleTaskDelete}
-            onAddToCalendar={handleAddTaskToCalendar}
-          />
+          <ProjectTasksTab project={project} />
         </TabsContent>
         
         <TabsContent value="staff" className="py-4">

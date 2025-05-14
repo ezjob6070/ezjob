@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -11,28 +12,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertTriangle, Calendar, CheckCircle, Circle, Clock, FileText, Image, Paperclip, Plus, User, XCircle } from "lucide-react";
 import { ProjectTask, ProjectTaskComment, ProjectTaskInspection, ProjectTaskAttachment } from "@/types/project";
 import { toast } from "sonner";
-import { ProjectStaff } from "@/types/project";
 
-export interface TaskDetailDialogProps {
+interface TaskDetailDialogProps {
   task: ProjectTask;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTaskUpdate: (taskId: string, updates: Partial<ProjectTask>) => void;
-  onUpdateStatus?: (taskId: string, status: "completed" | "pending" | "in_progress" | "blocked") => void;
-  onDelete?: (taskId: string) => void;
-  onAddToCalendar?: (task: ProjectTask) => void;
-  projectStaff?: ProjectStaff[];
 }
 
 const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({ 
   task, 
   open, 
   onOpenChange,
-  onTaskUpdate,
-  onUpdateStatus,
-  onDelete,
-  onAddToCalendar,
-  projectStaff = []
+  onTaskUpdate
 }) => {
   const [activeTab, setActiveTab] = useState("details");
   const [newComment, setNewComment] = useState("");
@@ -50,11 +42,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
   };
 
   const handleUpdateStatus = (status: "pending" | "in_progress" | "completed" | "blocked") => {
-    if (onUpdateStatus) {
-      onUpdateStatus(task.id, status);
-      return;
-    }
-    
     const updates: Partial<ProjectTask> = { 
       status,
       lastUpdatedAt: new Date().toISOString()
@@ -125,13 +112,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
     toast.success("Inspection added");
   };
 
-  const handleAddToCalendar = () => {
-    if (onAddToCalendar) {
-      onAddToCalendar(task);
-      toast.success("Task added to calendar");
-    }
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "passed": return <CheckCircle className="text-green-500 h-5 w-5" />;
@@ -191,7 +171,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
           </TabsList>
           
           <TabsContent value="details" className="mt-4 space-y-4">
-            {/* Status and Priority section */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Status</p>
@@ -219,7 +198,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
               </div>
             </div>
             
-            {/* Description section */}
             {task.description && (
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Description</p>
@@ -227,7 +205,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
               </div>
             )}
             
-            {/* Assignment and Date section */}
             <div className="grid grid-cols-2 gap-4">
               {task.assignedTo && (
                 <div className="flex items-center gap-2">
@@ -244,7 +221,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
               )}
             </div>
             
-            {/* Progress section */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Progress</span>
@@ -268,7 +244,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
               </div>
             </div>
             
-            {/* Activity log section */}
             <div className="pt-4 space-y-2">
               <p className="text-sm text-muted-foreground">Activity</p>
               <div className="space-y-3">
@@ -303,19 +278,6 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                 )}
               </div>
             </div>
-            
-            {/* Calendar integration */}
-            {onAddToCalendar && (
-              <div className="pt-4">
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-2" 
-                  onClick={handleAddToCalendar}
-                >
-                  <Calendar className="h-4 w-4" /> Add to Calendar
-                </Button>
-              </div>
-            )}
           </TabsContent>
           
           <TabsContent value="inspections" className="mt-4 space-y-4">
@@ -475,18 +437,8 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
           </TabsContent>
         </Tabs>
         
-        {/* Dialog footer with action buttons */}
-        <DialogFooter className="gap-2 sm:gap-0">
-          {onDelete && (
-            <Button 
-              variant="destructive"
-              onClick={() => onDelete(task.id)}
-            >
-              Delete Task
-            </Button>
-          )}
-          
-          <Button onClick={() => onOpenChange(false)}>Close</Button>
+        <DialogFooter className="mt-6">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
