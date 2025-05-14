@@ -24,7 +24,7 @@ const SubRoleFilter: React.FC<SubRoleFilterProps> = ({
       <SelectContent>
         <SelectItem value="all-roles">All Roles</SelectItem>
         {subRoles.map((role) => (
-          <SelectItem key={role} value={role}>
+          <SelectItem key={role} value={role || "unknown-role"}>
             {role}
           </SelectItem>
         ))}
