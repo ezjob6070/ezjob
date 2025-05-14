@@ -1,448 +1,491 @@
 
 import React, { useState } from "react";
-import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  CalendarDays, 
+  Check, 
+  Clock, 
+  FileText, 
+  AlertTriangle,
+  Calendar as CalendarIcon,
+  ListTodo,
+  User,
+  Edit,
+  Trash2,
+  X
+} from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle, Calendar, CheckCircle, Circle, Clock, FileText, Image, Paperclip, Plus, User, XCircle } from "lucide-react";
-import { ProjectTask, ProjectTaskComment, ProjectTaskInspection, ProjectTaskAttachment } from "@/types/project";
+import { format } from "date-fns";
 import { toast } from "sonner";
+import { ProjectTask, ProjectStaff } from "@/types/project";
+import { cn } from "@/lib/utils";
 
-interface TaskDetailDialogProps {
-  task: ProjectTask;
+export interface TaskDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  task: ProjectTask;
   onTaskUpdate: (taskId: string, updates: Partial<ProjectTask>) => void;
+  onUpdateStatus: (taskId: string, status: ProjectTask["status"]) => void;
+  onDelete: (taskId: string) => void;
+  onAddToCalendar: (task: ProjectTask) => void;
+  projectStaff: ProjectStaff[];
 }
 
-const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({ 
-  task, 
-  open, 
+export default function TaskDetailDialog({
+  open,
   onOpenChange,
-  onTaskUpdate
-}) => {
-  const [activeTab, setActiveTab] = useState("details");
-  const [newComment, setNewComment] = useState("");
-  const [newInspection, setNewInspection] = useState<Partial<ProjectTaskInspection>>({
-    title: "",
-    status: "pending"
-  });
+  task,
+  onTaskUpdate,
+  onUpdateStatus,
+  onDelete,
+  onAddToCalendar,
+  projectStaff
+}: TaskDetailDialogProps) {
+  const [editMode, setEditMode] = useState(false);
+  const [editedTask, setEditedTask] = useState<ProjectTask>(task);
+  const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    setEditedTask(task);
+    setEditMode(false);
+  }, [task]);
+
+  const handleStatusChange = (newStatus: ProjectTask["status"]) => {
+    setLoading(true);
+    setTimeout(() => {
+      onUpdateStatus(task.id, newStatus);
+      setLoading(false);
+    }, 500);
+  };
   
-  const handleUpdateProgress = (progress: number) => {
-    onTaskUpdate(task.id, { 
-      progress,
-      lastUpdatedAt: new Date().toISOString()
-    });
-    toast.success("Task progress updated");
+  const handlePriorityChange = (newPriority: ProjectTask["priority"]) => {
+    onTaskUpdate(task.id, { priority: newPriority });
+    toast.success(`Task priority updated to ${newPriority}`);
   };
 
-  const handleUpdateStatus = (status: "pending" | "in_progress" | "completed" | "blocked") => {
-    const updates: Partial<ProjectTask> = { 
-      status,
-      lastUpdatedAt: new Date().toISOString()
-    };
-    
-    // If task is being completed, set progress to 100% and record completion date
-    if (status === "completed") {
-      updates.progress = 100;
-      updates.completedAt = new Date().toISOString();
-    }
-    
-    onTaskUpdate(task.id, updates);
-    toast.success("Task status updated");
+  const handleAssigneeChange = (staffId: string) => {
+    onTaskUpdate(task.id, { assignedTo: staffId });
+    toast.success("Task assignee updated");
   };
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) {
-      toast.error("Comment cannot be empty");
-      return;
-    }
-    
-    const comment: ProjectTaskComment = {
-      id: `comment-${Date.now()}`,
-      text: newComment,
-      author: "Current User", // In a real app, get this from auth context
-      date: new Date().toISOString()
-    };
-    
-    const comments = [...(task.comments || []), comment];
-    
-    onTaskUpdate(task.id, { 
-      comments,
-      lastUpdatedAt: new Date().toISOString()
-    });
-    
-    setNewComment("");
-    toast.success("Comment added");
+  const handleProgressChange = (progress: number) => {
+    onTaskUpdate(task.id, { progress });
+    toast.success(`Progress updated to ${progress}%`);
   };
 
-  const handleAddInspection = () => {
-    if (!newInspection.title?.trim()) {
-      toast.error("Inspection title cannot be empty");
-      return;
-    }
-    
-    const inspection: ProjectTaskInspection = {
-      id: `inspection-${Date.now()}`,
-      title: newInspection.title,
-      status: newInspection.status as "pending" | "passed" | "failed" | "not_applicable",
-      date: new Date().toISOString(),
-      inspector: "Current User", // In a real app, get this from auth context
-      notes: newInspection.notes
-    };
-    
-    const inspections = [...(task.inspections || []), inspection];
-    
-    onTaskUpdate(task.id, { 
-      inspections,
-      lastUpdatedAt: new Date().toISOString()
-    });
-    
-    setNewInspection({
-      title: "",
-      status: "pending",
-      notes: ""
-    });
-    
-    toast.success("Inspection added");
+  const handleSaveChanges = () => {
+    onTaskUpdate(task.id, editedTask);
+    setEditMode(false);
+    toast.success("Task updated successfully");
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "passed": return <CheckCircle className="text-green-500 h-5 w-5" />;
-      case "failed": return <XCircle className="text-red-500 h-5 w-5" />;
-      case "pending": return <Clock className="text-amber-500 h-5 w-5" />;
-      case "not_applicable": return <Circle className="text-gray-400 h-5 w-5" />;
-      default: return <Circle className="h-5 w-5" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending": return "bg-gray-100 text-gray-800";
-      case "in_progress": return "bg-blue-100 text-blue-800";
-      case "completed": return "bg-green-100 text-green-800";
-      case "blocked": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "low": return "bg-gray-100 text-gray-800";
-      case "medium": return "bg-blue-100 text-blue-800";
-      case "high": return "bg-amber-100 text-amber-800";
-      case "urgent": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getInspectionStatusColor = (status: string) => {
-    switch (status) {
-      case "passed": return "bg-green-100 text-green-800";
-      case "failed": return "bg-red-100 text-red-800";
-      case "pending": return "bg-amber-100 text-amber-800";
-      case "not_applicable": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+  const handleDeleteTask = () => {
+    if (confirm("Are you sure you want to delete this task?")) {
+      onDelete(task.id);
+      onOpenChange(false);
+      toast.success("Task deleted successfully");
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex justify-between items-center">
-            <span>{task.title}</span>
-            <Badge className={getStatusColor(task.status)}>{task.status.replace("_", " ")}</Badge>
-          </DialogTitle>
-        </DialogHeader>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid grid-cols-4">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="inspections">Inspections</TabsTrigger>
-            <TabsTrigger value="comments">Comments</TabsTrigger>
-            <TabsTrigger value="attachments">Attachments</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="details" className="mt-4 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Status</p>
-                <Select 
-                  value={task.status} 
-                  onValueChange={(value) => handleUpdateStatus(value as any)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="blocked">Blocked</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Priority</p>
-                <Badge className={getPriorityColor(task.priority)}>
-                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                </Badge>
-              </div>
-            </div>
-            
-            {task.description && (
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Description</p>
-                <p className="p-3 bg-gray-50 rounded-md">{task.description}</p>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-2 gap-4">
-              {task.assignedTo && (
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span>Assigned to: {task.assignedTo}</span>
-                </div>
-              )}
-              
-              {task.dueDate && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span>Due: {format(new Date(task.dueDate), "MMM d, yyyy")}</span>
-                </div>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Progress</span>
-                <span className="font-medium">{task.progress}%</span>
-              </div>
-              
-              <div>
-                <Input 
-                  type="range" 
-                  min="0" 
-                  max="100" 
-                  step="5"
-                  value={task.progress}
-                  onChange={(e) => handleUpdateProgress(parseInt(e.target.value))} 
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>0%</span>
-                  <span>50%</span>
-                  <span>100%</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="pt-4 space-y-2">
-              <p className="text-sm text-muted-foreground">Activity</p>
-              <div className="space-y-3">
-                {task.createdAt && (
-                  <div className="flex gap-3 text-sm">
-                    <div className="w-1 h-1 rounded-full bg-gray-400 mt-2"></div>
-                    <div>
-                      <p>Task created</p>
-                      <p className="text-gray-500">{format(new Date(task.createdAt), "MMM d, yyyy 'at' h:mm a")}</p>
-                    </div>
-                  </div>
-                )}
-                
-                {task.lastUpdatedAt && (
-                  <div className="flex gap-3 text-sm">
-                    <div className="w-1 h-1 rounded-full bg-gray-400 mt-2"></div>
-                    <div>
-                      <p>Task updated</p>
-                      <p className="text-gray-500">{format(new Date(task.lastUpdatedAt), "MMM d, yyyy 'at' h:mm a")}</p>
-                    </div>
-                  </div>
-                )}
-                
-                {task.completedAt && (
-                  <div className="flex gap-3 text-sm">
-                    <div className="w-1 h-1 rounded-full bg-green-500 mt-2"></div>
-                    <div>
-                      <p>Task completed</p>
-                      <p className="text-gray-500">{format(new Date(task.completedAt), "MMM d, yyyy 'at' h:mm a")}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="inspections" className="mt-4 space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-              <h3 className="font-medium">Add New Inspection</h3>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="inspection-title">Inspection Title</Label>
-                  <Input 
-                    id="inspection-title"
-                    value={newInspection.title || ''} 
-                    onChange={(e) => setNewInspection({...newInspection, title: e.target.value})}
-                    placeholder="Enter inspection title"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="inspection-status">Status</Label>
-                  <Select 
-                    value={newInspection.status} 
-                    onValueChange={(value) => setNewInspection({...newInspection, status: value as any})}
+      {task && (
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex justify-between items-center">
+              <span>{editMode ? "Edit Task" : "Task Details"}</span>
+              <div className="flex items-center gap-2">
+                {!editMode && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0" 
+                    onClick={() => setEditMode(true)}
                   >
-                    <SelectTrigger id="inspection-status">
-                      <SelectValue placeholder="Select status" />
+                    <Edit size={16} />
+                  </Button>
+                )}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {editMode ? (
+            <div className="space-y-4 py-2">
+              <div className="grid gap-2">
+                <label htmlFor="task-title" className="text-sm font-medium">
+                  Task Title
+                </label>
+                <input
+                  type="text"
+                  id="task-title"
+                  className="w-full border rounded-md p-2"
+                  value={editedTask.title}
+                  onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="task-description" className="text-sm font-medium">
+                  Description
+                </label>
+                <Textarea
+                  id="task-description"
+                  value={editedTask.description || ""}
+                  onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <label htmlFor="task-priority" className="text-sm font-medium">
+                    Priority
+                  </label>
+                  <Select 
+                    value={editedTask.priority} 
+                    onValueChange={(value) => setEditedTask({ 
+                      ...editedTask, 
+                      priority: value as ProjectTask["priority"] 
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="passed">Passed</SelectItem>
-                      <SelectItem value="failed">Failed</SelectItem>
-                      <SelectItem value="not_applicable">Not Applicable</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
-                <div>
-                  <Label htmlFor="inspection-notes">Notes (optional)</Label>
-                  <Textarea 
-                    id="inspection-notes"
-                    value={newInspection.notes || ''} 
-                    onChange={(e) => setNewInspection({...newInspection, notes: e.target.value})}
-                    placeholder="Add inspection notes..."
-                    rows={3}
-                  />
+                <div className="grid gap-2">
+                  <label htmlFor="task-status" className="text-sm font-medium">
+                    Status
+                  </label>
+                  <Select 
+                    value={editedTask.status} 
+                    onValueChange={(value) => setEditedTask({
+                      ...editedTask,
+                      status: value as ProjectTask["status"]
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="blocked">Blocked</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <label htmlFor="task-assigned" className="text-sm font-medium">
+                    Assign To
+                  </label>
+                  <Select 
+                    value={editedTask.assignedTo || ""} 
+                    onValueChange={(value) => setEditedTask({
+                      ...editedTask,
+                      assignedTo: value
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Unassigned" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Unassigned</SelectItem>
+                      {projectStaff.map(staff => (
+                        <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
-                <Button onClick={handleAddInspection} className="w-full">
-                  <Plus className="h-4 w-4 mr-2" /> Add Inspection
-                </Button>
+                <div className="grid gap-2">
+                  <label htmlFor="task-progress" className="text-sm font-medium">
+                    Progress
+                  </label>
+                  <Select 
+                    value={String(editedTask.progress)} 
+                    onValueChange={(value) => setEditedTask({
+                      ...editedTask,
+                      progress: Number(value)
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Not Started (0%)</SelectItem>
+                      <SelectItem value="25">Initial Work (25%)</SelectItem>
+                      <SelectItem value="50">Half Complete (50%)</SelectItem>
+                      <SelectItem value="75">Almost Complete (75%)</SelectItem>
+                      <SelectItem value="100">Complete (100%)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
-            
-            <div className="space-y-3">
-              <h3 className="font-medium">Inspections List</h3>
               
-              {(!task.inspections || task.inspections.length === 0) ? (
-                <div className="text-center p-6 bg-gray-50 rounded-md">
-                  <AlertTriangle className="h-8 w-8 mx-auto text-amber-500 mb-2" />
-                  <p className="text-gray-600">No inspections recorded yet</p>
+              <div className="grid gap-2">
+                <label htmlFor="task-due-date" className="text-sm font-medium">
+                  Due Date
+                </label>
+                <input
+                  type="date"
+                  id="task-due-date"
+                  className="w-full border rounded-md p-2"
+                  value={editedTask.dueDate}
+                  onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value })}
+                />
+              </div>
+              
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setEditMode(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveChanges}>
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <div>
+                <h2 className="text-xl font-semibold mb-2">{task.title}</h2>
+                <div className="flex flex-wrap gap-2">
+                  <Badge className={cn(
+                    task.status === "completed" ? "bg-green-100 text-green-800" : 
+                    task.status === "in_progress" ? "bg-blue-100 text-blue-800" : 
+                    task.status === "blocked" ? "bg-red-100 text-red-800" : 
+                    "bg-amber-100 text-amber-800"
+                  )}>
+                    {task.status.replace('_', ' ')}
+                  </Badge>
+                  
+                  <Badge variant="outline" className="capitalize">
+                    {task.priority} priority
+                  </Badge>
                 </div>
-              ) : (
-                task.inspections.map((inspection) => (
-                  <div key={inspection.id} className="border rounded-md p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(inspection.status)}
-                        <h4 className="font-medium">{inspection.title}</h4>
-                      </div>
-                      <Badge className={getInspectionStatusColor(inspection.status)}>
-                        {inspection.status.replace("_", " ")}
-                      </Badge>
-                    </div>
-                    
-                    {inspection.notes && (
-                      <p className="text-sm text-gray-600 mb-3">{inspection.notes}</p>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <CalendarDays className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Due Date</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(new Date(task.dueDate), "PPP")}
+                  </p>
+                </div>
+              </div>
+              
+              {task.description && (
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <FileText className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Description</p>
+                    <p className="text-sm text-muted-foreground">{task.description}</p>
+                  </div>
+                </div>
+              )}
+              
+              {task.assignedTo && (
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <User className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Assigned To</p>
+                    <p className="text-sm text-muted-foreground">
+                      {projectStaff.find(staff => staff.id === task.assignedTo)?.name || "Unassigned"}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {task.createdAt && (
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <Clock className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Created</p>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(task.createdAt), "PPP")}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Progress bar */}
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Progress</span>
+                  <span>{task.progress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={cn(
+                      "h-2 rounded-full",
+                      task.progress >= 100 ? "bg-green-500" :
+                      task.progress >= 70 ? "bg-blue-500" :
+                      task.progress >= 30 ? "bg-yellow-500" :
+                      "bg-red-500"
                     )}
-                    
-                    <div className="text-xs text-gray-500 flex justify-between">
-                      <span>
-                        {inspection.inspector && `Inspector: ${inspection.inspector}`}
-                      </span>
-                      <span>
-                        {inspection.date && format(new Date(inspection.date), "MMM d, yyyy")}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="comments" className="mt-4 space-y-4">
-            <div className="space-y-3">
-              <Textarea 
-                value={newComment} 
-                onChange={(e) => setNewComment(e.target.value)} 
-                placeholder="Add a comment..."
-                rows={3}
-              />
-              <Button onClick={handleAddComment}>Add Comment</Button>
-            </div>
-            
-            <div className="space-y-3">
-              {(!task.comments || task.comments.length === 0) ? (
-                <p className="text-center p-6 text-gray-500">No comments yet</p>
-              ) : (
-                task.comments.map((comment) => (
-                  <div key={comment.id} className="bg-gray-50 p-3 rounded-md">
-                    <div className="flex justify-between mb-2">
-                      <p className="font-medium">{comment.author}</p>
-                      <p className="text-xs text-gray-500">
-                        {format(new Date(comment.date), "MMM d, yyyy 'at' h:mm a")}
-                      </p>
-                    </div>
-                    <p className="text-gray-700">{comment.text}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="attachments" className="mt-4 space-y-4">
-            <div className="bg-gray-50 border-dashed border-2 border-gray-300 rounded-md p-8 text-center">
-              <Paperclip className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-              <p className="text-gray-600 mb-2">Drag & drop files here or click to browse</p>
-              <Button>Upload Files</Button>
-              <p className="text-xs text-gray-500 mt-2">Supported formats: PDF, DOC, JPG, PNG (Max size: 10MB)</p>
-            </div>
-            
-            <div className="space-y-3">
-              <h3 className="font-medium">Attachments</h3>
+                    style={{ width: `${task.progress}%` }}
+                  ></div>
+                </div>
+              </div>
               
-              {(!task.attachments || task.attachments.length === 0) ? (
-                <p className="text-center p-6 text-gray-500">No attachments yet</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {task.attachments.map((attachment) => (
-                    <div key={attachment.id} className="border rounded-md p-3 flex items-center gap-3">
-                      {attachment.type.includes("image") ? (
-                        <Image className="h-6 w-6 text-blue-500" />
-                      ) : (
-                        <FileText className="h-6 w-6 text-blue-500" />
-                      )}
-                      
-                      <div className="flex-1">
-                        <p className="font-medium truncate">{attachment.name}</p>
-                        <p className="text-xs text-gray-500">
-                          {format(new Date(attachment.uploadedAt), "MMM d, yyyy")}
-                        </p>
+              {/* Task inspections if any */}
+              {task.inspections && task.inspections.length > 0 && (
+                <div className="border-t pt-3">
+                  <h3 className="text-sm font-medium mb-2">Inspections</h3>
+                  <div className="space-y-2">
+                    {task.inspections.map(inspection => (
+                      <div key={inspection.id} className="bg-gray-50 p-2 rounded-md text-sm">
+                        <div className="flex justify-between">
+                          <span className="font-medium">{inspection.title}</span>
+                          <Badge className={
+                            inspection.status === "passed" ? "bg-green-100 text-green-800" :
+                            inspection.status === "failed" ? "bg-red-100 text-red-800" :
+                            "bg-gray-100 text-gray-800"
+                          }>
+                            {inspection.status}
+                          </Badge>
+                        </div>
+                        {inspection.notes && (
+                          <p className="text-xs text-gray-600 mt-1">{inspection.notes}</p>
+                        )}
                       </div>
-                      
-                      <Button variant="ghost" size="sm">View</Button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
+
+              {/* Quick actions */}
+              <div className="border-t pt-3">
+                <h3 className="text-sm font-medium mb-2">Update Progress</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" onClick={() => handleProgressChange(25)} disabled={task.status === "completed"}>
+                    25%
+                  </Button>
+                  <Button size="sm" onClick={() => handleProgressChange(50)} disabled={task.status === "completed"}>
+                    50%
+                  </Button>
+                  <Button size="sm" onClick={() => handleProgressChange(75)} disabled={task.status === "completed"}>
+                    75%
+                  </Button>
+                  <Button size="sm" onClick={() => handleProgressChange(100)} disabled={task.status === "completed"}>
+                    100%
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="border-t pt-3">
+                <h3 className="text-sm font-medium mb-2">Update Status</h3>
+                <div className="flex flex-wrap gap-2">
+                  {task.status !== "pending" && (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleStatusChange("pending")}
+                      className="text-amber-600 border-amber-200 hover:bg-amber-50"
+                      disabled={loading}
+                    >
+                      <Clock size={14} className="mr-1" /> Pending
+                    </Button>
+                  )}
+                  
+                  {task.status !== "in_progress" && (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleStatusChange("in_progress")}
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                      disabled={loading}
+                    >
+                      <ListTodo size={14} className="mr-1" /> In Progress
+                    </Button>
+                  )}
+                  
+                  {task.status !== "completed" && (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleStatusChange("completed")}
+                      className="text-green-600 border-green-200 hover:bg-green-50"
+                      disabled={loading}
+                    >
+                      <Check size={14} className="mr-1" /> Completed
+                    </Button>
+                  )}
+                  
+                  {task.status !== "blocked" && (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleStatusChange("blocked")}
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      disabled={loading}
+                    >
+                      <AlertTriangle size={14} className="mr-1" /> Blocked
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              <DialogFooter className="flex flex-col sm:flex-row gap-2 justify-between">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                  onClick={handleDeleteTask}
+                >
+                  <Trash2 size={14} className="mr-1" /> Delete Task
+                </Button>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => onAddToCalendar(task)}
+                  >
+                    <CalendarIcon size={14} className="mr-1" /> Add to Calendar
+                  </Button>
+                  
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </DialogFooter>
             </div>
-          </TabsContent>
-        </Tabs>
-        
-        <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button>
-        </DialogFooter>
-      </DialogContent>
+          )}
+        </DialogContent>
+      )}
     </Dialog>
   );
-};
-
-export default TaskDetailDialog;
+}

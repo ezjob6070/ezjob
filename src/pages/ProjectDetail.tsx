@@ -16,6 +16,7 @@ import ProjectTasksTab from "@/components/project/ProjectTasksTab";
 import ProjectStaffTab from "@/components/project/ProjectStaffTab";
 import ProjectEquipmentTab from "@/components/project/ProjectEquipmentTab";
 import ProjectTimeScheduleTab from "@/components/project/ProjectTimeScheduleTab";
+import ProjectScheduleAndTasksTab from "@/components/project/ProjectScheduleAndTasksTab";
 
 interface ProjectFile {
   id: string;
@@ -130,16 +131,10 @@ export default function ProjectDetail() {
       <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="bg-muted/50">
           <TabsTrigger value="overview" variant="blue">Overview</TabsTrigger>
-          <TabsTrigger value="time-schedule" variant="blue">
+          <TabsTrigger value="schedule-tasks" variant="blue">
             <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              Time & Schedule
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="tasks" variant="blue">
-            <span className="flex items-center gap-1">
-              <ListTodo className="h-4 w-4" />
-              Tasks & Progress
+              <Calendar className="h-4 w-4" />
+              Schedule & Tasks
             </span>
           </TabsTrigger>
           <TabsTrigger value="staff" variant="blue">
@@ -164,12 +159,6 @@ export default function ProjectDetail() {
             <span className="flex items-center gap-1">
               <DollarSign className="h-4 w-4" />
               Finance
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="timeline" variant="blue">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              Timeline
             </span>
           </TabsTrigger>
         </TabsList>
@@ -334,12 +323,8 @@ export default function ProjectDetail() {
           </div>
         </TabsContent>
         
-        <TabsContent value="time-schedule" className="py-4">
-          <ProjectTimeScheduleTab projectId={project.id} projectStaff={project.staff} />
-        </TabsContent>
-        
-        <TabsContent value="tasks" className="py-4">
-          <ProjectTasksTab project={project} />
+        <TabsContent value="schedule-tasks" className="py-4">
+          <ProjectScheduleAndTasksTab project={project} projectStaff={project.staff} />
         </TabsContent>
         
         <TabsContent value="staff" className="py-4">
@@ -441,69 +426,6 @@ export default function ProjectDetail() {
         
         <TabsContent value="finance" className="py-4">
           <ProjectFinanceTab project={project} />
-        </TabsContent>
-        
-        <TabsContent value="timeline" className="py-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Timeline</CardTitle>
-              <CardDescription>Key milestones and timeline for this project</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs">
-                      ✓
-                    </div>
-                    <div className="w-0.5 h-full bg-gray-200 mt-2"></div>
-                  </div>
-                  <div>
-                    <p className="font-medium">Project Start</p>
-                    <p className="text-sm text-gray-500">{project.startDate}</p>
-                    <p className="mt-1 text-gray-600">Initial planning and resource allocation completed</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className={`h-6 w-6 rounded-full ${project.completion >= 50 ? 'bg-blue-600 text-white' : 'bg-gray-200'} flex items-center justify-center text-xs`}>
-                      {project.completion >= 50 ? '✓' : ''}
-                    </div>
-                    <div className="w-0.5 h-full bg-gray-200 mt-2"></div>
-                  </div>
-                  <div>
-                    <p className="font-medium">Midpoint Review</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(new Date(project.startDate).getTime() + (new Date(project.expectedEndDate).getTime() - new Date(project.startDate).getTime()) / 2).toLocaleDateString()}
-                    </p>
-                    <p className="mt-1 text-gray-600">
-                      {project.completion >= 50 
-                        ? "Midpoint review completed. Project on track." 
-                        : "Scheduled midpoint review to assess progress"}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className={`h-6 w-6 rounded-full ${project.completion === 100 ? 'bg-green-600 text-white' : 'bg-gray-200'} flex items-center justify-center text-xs`}>
-                      {project.completion === 100 ? '✓' : ''}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="font-medium">Project Completion</p>
-                    <p className="text-sm text-gray-500">{project.expectedEndDate}</p>
-                    <p className="mt-1 text-gray-600">
-                      {project.completion === 100 
-                        ? "Project successfully completed" 
-                        : "Target completion date"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
       
