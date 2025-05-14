@@ -1,95 +1,79 @@
 
 import { Technician } from "@/types/technician";
-import { Job } from "@/types/job";
 
-// Calculate payment for a contractor based on their payment type
-export const calculateContractorPayment = (
-  contractor: Technician,
-  contractorJobs: Job[],
-  completedJobsOnly = true
-): number => {
-  const filteredJobs = completedJobsOnly 
-    ? contractorJobs.filter(job => job.status === "completed")
-    : contractorJobs;
-  
-  const totalRevenue = filteredJobs.reduce(
-    (sum, job) => sum + (job.actualAmount || job.amount), 0
-  );
-  
-  const completedJobs = filteredJobs.length;
-  
-  // Calculate payment based on contractor's payment type
-  let payment = 0;
-  if (contractor.paymentType === "percentage") {
-    payment = totalRevenue * (contractor.paymentRate / 100);
-  } else if (contractor.paymentType === "flat") {
-    payment = completedJobs * contractor.paymentRate;
-  } else if (contractor.paymentType === "hourly") {
-    // Assuming average 2 hours per job for calculation purposes
-    payment = completedJobs * 2 * contractor.hourlyRate;
+/**
+ * Calculate total financial metrics for all technicians
+ */
+export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) => {
+  // Default values if no technicians or empty array
+  if (!displayedTechnicians || displayedTechnicians.length === 0) {
+    return { 
+      totalRevenue: 0, 
+      technicianEarnings: 0, 
+      totalExpenses: 0, 
+      companyProfit: 0 
+    };
   }
   
-  return payment;
+  // Calculate total revenue from technicians
+  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech?.totalRevenue || 0), 0);
+  
+  // Calculate total technician payments
+  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => {
+    if (!tech) return sum;
+    const rate = tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1;
+    return sum + (tech.totalRevenue || 0) * rate;
+  }, 0);
+  
+  // Estimate expenses as 33% of revenue
+  const totalExpenses = totalRevenue * 0.33;
+  
+  // Calculate net profit
+  const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
+  
+  return { 
+    totalRevenue, 
+    technicianEarnings, 
+    totalExpenses, 
+    companyProfit 
+  };
 };
 
-// Calculate an employee's salary based on their salary basis
-export const calculateEmployeeSalary = (
-  employee: Technician,
-  dateRange?: { from: Date; to: Date }
-): { monthlySalary: number; periodPayment: number } => {
-  let monthlySalary = 0;
+/**
+ * Calculate financial metrics for a single technician
+ */
+export const calculateTechnicianMetrics = (technician: Technician | null) => {
+  if (!technician) return null;
   
-  if (employee.salaryBasis === "hourly") {
-    // Assuming 160 hours per month for full-time employees
-    monthlySalary = employee.hourlyRate * 160;
-  } else if (employee.salaryBasis === "weekly") {
-    monthlySalary = employee.paymentRate * 4.33; // Average weeks in a month
-  } else if (employee.salaryBasis === "bi-weekly" || employee.salaryBasis === "biweekly") {
-    monthlySalary = employee.paymentRate * 2.17; // Average bi-weekly periods in a month
-  } else if (employee.salaryBasis === "monthly") {
-    monthlySalary = employee.paymentRate;
-  } else if (employee.salaryBasis === "annually" || employee.salaryBasis === "yearly") {
-    monthlySalary = employee.paymentRate / 12;
-  }
+  const revenue = technician.totalRevenue || 0;
+  const earnings = revenue * (technician.paymentType === "percentage" 
+    ? technician.paymentRate / 100 
+    : 1);
+  const expenses = revenue * 0.33;
+  const profit = revenue - earnings - expenses;
+  const partsValue = revenue * 0.2; // Assuming parts are 20% of total revenue
   
-  // Calculate period payment based on date range
-  let periodPayment = monthlySalary;
-  if (dateRange?.from && dateRange?.to) {
-    const days = (dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 3600 * 24);
-    periodPayment = (monthlySalary / 30) * days; // Approximate daily rate
-  }
-  
-  // Add incentives if applicable
-  if (employee.incentiveType && employee.incentiveAmount) {
-    if (employee.incentiveType === "monthly") {
-      periodPayment += employee.incentiveAmount;
-    } else if (employee.incentiveType === "yearly") {
-      periodPayment += employee.incentiveAmount / 12;
-    }
-  }
-  
-  return { monthlySalary, periodPayment };
+  return { revenue, earnings, expenses, profit, partsValue };
 };
 
-// Calculate commission for salespeople
-export const calculateSalesCommission = (
-  salesperson: Technician,
-  salesJobs: Job[]
-): { totalRevenue: number; commission: number; salesCount: number; averageSaleValue: number } => {
-  const totalRevenue = salesJobs.reduce(
-    (sum, job) => sum + (job.actualAmount || job.amount), 0
-  );
+/**
+ * Format date range for display
+ */
+export const formatDateRangeText = (from?: Date, to?: Date) => {
+  if (!from) return "";
   
-  const salesCount = salesJobs.length;
-  const averageSaleValue = salesCount > 0 ? totalRevenue / salesCount : 0;
-  
-  // Calculate commission based on salesperson's payment type
-  let commission = 0;
-  if (salesperson.paymentType === "percentage") {
-    commission = totalRevenue * (salesperson.paymentRate / 100);
-  } else if (salesperson.paymentType === "flat") {
-    commission = salesCount * salesperson.paymentRate;
-  }
-  
-  return { totalRevenue, commission, salesCount, averageSaleValue };
+  return to
+    ? `${formatDate(from)} - ${formatDate(to)}`
+    : formatDate(from);
+};
+
+/**
+ * Format date for display
+ */
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
 };
