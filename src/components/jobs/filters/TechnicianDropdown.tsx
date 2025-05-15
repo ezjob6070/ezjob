@@ -29,7 +29,7 @@ const TechnicianDropdown = ({
         {/* Make sure we have a valid value for each technician */}
         {technicians.map((tech) => (
           <SelectItem key={tech} value={tech || "unknown-tech"}>
-            {tech}
+            {tech || "Unknown Technician"}
           </SelectItem>
         ))}
       </SelectContent>
