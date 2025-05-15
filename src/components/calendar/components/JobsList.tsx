@@ -2,13 +2,21 @@
 import { format, isSameDay } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Job } from "@/types/job";
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface JobsListProps {
   selectedDate: Date;
@@ -28,10 +36,13 @@ const JobsList = ({
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobsForSelectedDate);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   // Update filtered jobs when selected date changes
   useEffect(() => {
     setFilteredJobs(initialJobsForSelectedDate);
+    setCurrentPage(1);
   }, [initialJobsForSelectedDate]);
 
   const getStatusBadgeColor = (status: string) => {
@@ -68,6 +79,7 @@ const JobsList = ({
     }
     
     setFilteredJobs(jobs);
+    setCurrentPage(1);
   };
 
   // Effect for filtering whenever search term or status filter changes
@@ -75,31 +87,33 @@ const JobsList = ({
     handleFilter();
   }, [searchTerm, statusFilter, initialJobsForSelectedDate]);
 
+  // Calculate pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+
+  // Generate page numbers
+  const pageNumbers = [];
+  const maxPagesToShow = 3;
+  
+  let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+  let endPage = startPage + maxPagesToShow - 1;
+  
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - maxPagesToShow + 1);
+  }
+  
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
+
   return (
     <div className="mb-6 animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onPreviousDay}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        
-        <h3 className="text-lg font-medium">
-          {format(selectedDate, "EEEE, MMMM d, yyyy")}
-        </h3>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onNextDay}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      <h3 className="text-lg font-medium text-center mb-4">
+        {format(selectedDate, "EEEE, MMMM d, yyyy")}
+      </h3>
       
       <div className="flex gap-2 mb-4">
         <Input 
@@ -152,7 +166,7 @@ const JobsList = ({
           </div>
         ) : (
           <div className="space-y-3">
-            {filteredJobs.map((job) => (
+            {currentJobs.map((job) => (
               <Card key={job.id} className="overflow-hidden shadow-sm border-muted">
                 <CardHeader className="p-3 pb-0">
                   <div className="flex justify-between items-start">
@@ -182,6 +196,91 @@ const JobsList = ({
                 </CardContent>
               </Card>
             ))}
+            
+            {totalPages > 1 && (
+              <Pagination className="mt-4">
+                <PaginationContent>
+                  {currentPage > 1 && (
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(prev => Math.max(1, prev - 1));
+                        }} 
+                      />
+                    </PaginationItem>
+                  )}
+                  
+                  {startPage > 1 && (
+                    <PaginationItem>
+                      <PaginationLink 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(1);
+                        }}
+                      >
+                        1
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+                  
+                  {startPage > 2 && (
+                    <PaginationItem>
+                      <PaginationLink disabled>...</PaginationLink>
+                    </PaginationItem>
+                  )}
+                  
+                  {pageNumbers.map(number => (
+                    <PaginationItem key={number}>
+                      <PaginationLink 
+                        href="#" 
+                        isActive={currentPage === number}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(number);
+                        }}
+                      >
+                        {number}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  {endPage < totalPages - 1 && (
+                    <PaginationItem>
+                      <PaginationLink disabled>...</PaginationLink>
+                    </PaginationItem>
+                  )}
+                  
+                  {endPage < totalPages && (
+                    <PaginationItem>
+                      <PaginationLink 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(totalPages);
+                        }}
+                      >
+                        {totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+                  
+                  {currentPage < totalPages && (
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                        }} 
+                      />
+                    </PaginationItem>
+                  )}
+                </PaginationContent>
+              </Pagination>
+            )}
           </div>
         )}
       </div>
