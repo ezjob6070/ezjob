@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Project } from "@/types/project";
+import { Project, ProjectStaff } from "@/types/project";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,45 +8,71 @@ import { Plus, Users, Download, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProjectStaff } from "@/types/finance";
 
 interface ProjectStaffTabProps {
-  project: Project;
-  onUpdateProject: (updatedProject: Project) => void;
+  projectId: number;
+  projectStaff?: ProjectStaff[];
+  onUpdateProject?: (updatedProject: Project) => void;
 }
 
-const ProjectStaffTab = ({ project, onUpdateProject }: ProjectStaffTabProps) => {
-  const [staff, setStaff] = useState<ProjectStaff[]>(project.staff || []);
+const ProjectStaffTab = ({ projectId, projectStaff = [], onUpdateProject }: ProjectStaffTabProps) => {
+  const [staff, setStaff] = useState<ProjectStaff[]>(projectStaff);
   const [newStaff, setNewStaff] = useState<ProjectStaff>({
     id: `staff-${Date.now()}`,
     name: "",
     role: "",
+    email: "",
+    phone: "",
     hourlyRate: 0,
-    totalHours: 0,
-    totalCost: 0,
     startDate: new Date().toISOString().split('T')[0],
-    status: "active"
+    endDate: "",
+    status: "active",
+    notes: "",
+    specialty: "",
+    assignedTasks: []
   });
   const [isAddingStaff, setIsAddingStaff] = useState(false);
 
   useEffect(() => {
-    setStaff(project.staff || []);
-  }, [project.staff]);
+    setStaff(projectStaff || []);
+  }, [projectStaff]);
 
   const handleAddStaff = () => {
     if (newStaff.name && newStaff.role) {
       const updatedStaffList = [...staff, newStaff];
-      onUpdateProject({ ...project, staff: updatedStaffList });
+      if (onUpdateProject) {
+        onUpdateProject({
+          id: projectId,
+          name: "",  // These are placeholder values since we don't have the full project
+          type: "",
+          description: "",
+          location: "",
+          completion: 0,
+          workers: 0,
+          vehicles: 0,
+          status: "In Progress",
+          startDate: "",
+          expectedEndDate: "",
+          budget: 0,
+          actualSpent: 0,
+          clientName: "",
+          staff: updatedStaffList
+        });
+      }
       setStaff(updatedStaffList);
       setNewStaff({
         id: `staff-${Date.now()}`,
         name: "",
         role: "",
+        email: "",
+        phone: "",
         hourlyRate: 0,
-        totalHours: 0,
-        totalCost: 0,
         startDate: new Date().toISOString().split('T')[0],
-        status: "active"
+        endDate: "",
+        status: "active",
+        notes: "",
+        specialty: "",
+        assignedTasks: []
       });
       setIsAddingStaff(false);
     }
@@ -58,7 +84,8 @@ const ProjectStaffTab = ({ project, onUpdateProject }: ProjectStaffTabProps) => 
   };
 
   const calculateTotalCost = (staffMember: ProjectStaff) => {
-    return (staffMember.hourlyRate || 0) * (staffMember.totalHours || 0);
+    const hourlyRate = staffMember.hourlyRate || 0;
+    return hourlyRate;
   };
 
   return (
@@ -79,20 +106,40 @@ const ProjectStaffTab = ({ project, onUpdateProject }: ProjectStaffTabProps) => 
                   <TableHead>Name</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Hourly Rate</TableHead>
-                  <TableHead>Total Hours</TableHead>
-                  <TableHead>Total Cost</TableHead>
+                  <TableHead>Specialty</TableHead>
+                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {staff.map((staffMember) => (
-                  <TableRow key={staffMember.id}>
-                    <TableCell>{staffMember.name}</TableCell>
-                    <TableCell>{staffMember.role}</TableCell>
-                    <TableCell>{formatCurrency(staffMember.hourlyRate || 0)}</TableCell>
-                    <TableCell>{staffMember.totalHours || 0}</TableCell>
-                    <TableCell>{formatCurrency(calculateTotalCost(staffMember))}</TableCell>
+                {staff.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                      No staff members assigned to this project
+                    </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  staff.map((staffMember) => (
+                    <TableRow key={staffMember.id}>
+                      <TableCell>{staffMember.name}</TableCell>
+                      <TableCell>{staffMember.role}</TableCell>
+                      <TableCell>{formatCurrency(staffMember.hourlyRate || 0)}</TableCell>
+                      <TableCell>{staffMember.specialty || "-"}</TableCell>
+                      <TableCell>
+                        <Badge
+                          className={
+                            staffMember.status === "active"
+                              ? "bg-green-100 text-green-800 hover:bg-green-200"
+                              : staffMember.status === "completed"
+                              ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                              : "bg-red-100 text-red-800 hover:bg-red-200"
+                          }
+                        >
+                          {staffMember.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -147,15 +194,15 @@ const ProjectStaffTab = ({ project, onUpdateProject }: ProjectStaffTabProps) => 
                 />
               </div>
               <div>
-                <label htmlFor="totalHours" className="block text-sm font-medium text-gray-700">
-                  Total Hours
+                <label htmlFor="specialty" className="block text-sm font-medium text-gray-700">
+                  Specialty
                 </label>
                 <input
-                  type="number"
-                  name="totalHours"
-                  id="totalHours"
+                  type="text"
+                  name="specialty"
+                  id="specialty"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  value={newStaff.totalHours}
+                  value={newStaff.specialty || ""}
                   onChange={handleInputChange}
                 />
               </div>
