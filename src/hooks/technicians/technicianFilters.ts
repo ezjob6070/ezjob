@@ -1,47 +1,51 @@
 
 import { Technician } from "@/types/technician";
 
-/**
- * Filter technicians based on payment type and selected names
- */
-export const filterTechnicians = (
+export const filterTechniciansByRole = (
   technicians: Technician[],
-  paymentTypeFilter: string,
-  selectedTechnicianNames: string[]
-) => {
-  // Ensure technicians is not null or undefined
-  if (!technicians || technicians.length === 0) {
-    return [];
-  }
+  roleFilter: string
+): Technician[] => {
+  if (roleFilter === "all") return technicians;
+  return technicians.filter(tech => (tech.role || "technician") === roleFilter);
+};
 
+export const filterTechniciansBySubRole = (
+  technicians: Technician[],
+  subRoleFilter: string | null
+): Technician[] => {
+  if (!subRoleFilter) return technicians;
+  return technicians.filter(tech => tech.subRole === subRoleFilter);
+};
+
+export const filterTechniciansByStatus = (
+  technicians: Technician[],
+  statusFilter: string
+): Technician[] => {
+  if (statusFilter === "all") return technicians;
+  return technicians.filter(tech => tech.status === statusFilter);
+};
+
+export const filterTechniciansBySearch = (
+  technicians: Technician[],
+  searchQuery: string
+): Technician[] => {
+  if (!searchQuery) return technicians;
+  
+  const query = searchQuery.toLowerCase();
   return technicians.filter(tech => {
-    // Ensure tech is not null before accessing properties
-    if (!tech) return false;
-    
-    // Filter by payment type
-    const matchesPaymentType = 
-      paymentTypeFilter === "all" || 
-      tech.paymentType === paymentTypeFilter;
-    
-    // Filter by selected technicians
-    const matchesTechnician = 
-      selectedTechnicianNames.length === 0 || 
-      selectedTechnicianNames.includes(tech.name);
-    
-    return matchesPaymentType && matchesTechnician;
+    return (
+      tech.name.toLowerCase().includes(query) ||
+      (tech.email && tech.email.toLowerCase().includes(query)) ||
+      (tech.phone && tech.phone.toLowerCase().includes(query)) ||
+      (tech.specialty && tech.specialty.toLowerCase().includes(query))
+    );
   });
 };
 
-/**
- * Toggle technician selection in filter
- */
-export const toggleTechnicianInFilter = (
-  techName: string,
-  selectedTechnicianNames: string[]
-) => {
-  if (!techName) return selectedTechnicianNames;
+export const getUniqueSubRoles = (technicians: Technician[]): string[] => {
+  const subRoles = technicians
+    .map(tech => tech.subRole)
+    .filter(Boolean) as string[];
   
-  return selectedTechnicianNames.includes(techName) 
-    ? selectedTechnicianNames.filter(t => t !== techName)
-    : [...selectedTechnicianNames, techName];
+  return [...new Set(subRoles)];
 };

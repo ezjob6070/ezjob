@@ -1,79 +1,57 @@
 
 import { Technician } from "@/types/technician";
 
-/**
- * Calculate total financial metrics for all technicians
- */
-export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) => {
-  // Default values if no technicians or empty array
-  if (!displayedTechnicians || displayedTechnicians.length === 0) {
-    return { 
-      totalRevenue: 0, 
-      technicianEarnings: 0, 
-      totalExpenses: 0, 
-      companyProfit: 0 
-    };
-  }
+export interface FinancialSummary {
+  totalRevenue: number;
+  totalJobs: number;
+  averageJobValue: number;
+  paymentsDue: number;
+  technicianEarnings?: number;
+  companyProfit?: number;
+}
+
+export const calculateFinancialMetrics = (technicians: Technician[]): FinancialSummary => {
+  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
+  const totalJobs = technicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0);
   
-  // Calculate total revenue from technicians
-  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech?.totalRevenue || 0), 0);
-  
-  // Calculate total technician payments
-  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => {
-    if (!tech) return sum;
-    const rate = tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1;
-    return sum + (tech.totalRevenue || 0) * rate;
+  // Calculate earnings based on payment type
+  const technicianEarnings = technicians.reduce((sum, tech) => {
+    if (!tech.totalRevenue) return sum;
+    
+    if (tech.paymentType === "percentage") {
+      return sum + tech.totalRevenue * (tech.paymentRate / 100);
+    } else if (tech.paymentType === "flat" && tech.completedJobs) {
+      return sum + tech.completedJobs * tech.paymentRate;
+    } else if (tech.paymentType === "hourly" && tech.completedJobs) {
+      // Estimate hours per job (assuming 2 hours per job as a default)
+      const estimatedHours = tech.completedJobs * 2;
+      return sum + estimatedHours * tech.paymentRate;
+    } else if (tech.paymentType === "salary") {
+      // For salaried workers, no additional earnings per job
+      return sum;
+    }
+    
+    return sum;
   }, 0);
   
-  // Estimate expenses as 33% of revenue
-  const totalExpenses = totalRevenue * 0.33;
+  // Approximate company profit (revenue - technician earnings)
+  const companyProfit = totalRevenue - technicianEarnings;
   
-  // Calculate net profit
-  const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
-  
-  return { 
-    totalRevenue, 
-    technicianEarnings, 
-    totalExpenses, 
-    companyProfit 
+  return {
+    totalRevenue,
+    totalJobs,
+    averageJobValue: totalJobs > 0 ? totalRevenue / totalJobs : 0,
+    paymentsDue: totalRevenue * 0.2, // Rough estimate of outstanding payments
+    technicianEarnings,
+    companyProfit
   };
 };
 
-/**
- * Calculate financial metrics for a single technician
- */
-export const calculateTechnicianMetrics = (technician: Technician | null) => {
-  if (!technician) return null;
-  
-  const revenue = technician.totalRevenue || 0;
-  const earnings = revenue * (technician.paymentType === "percentage" 
-    ? technician.paymentRate / 100 
-    : 1);
-  const expenses = revenue * 0.33;
-  const profit = revenue - earnings - expenses;
-  const partsValue = revenue * 0.2; // Assuming parts are 20% of total revenue
-  
-  return { revenue, earnings, expenses, profit, partsValue };
-};
-
-/**
- * Format date range for display
- */
-export const formatDateRangeText = (from?: Date, to?: Date) => {
-  if (!from) return "";
-  
-  return to
-    ? `${formatDate(from)} - ${formatDate(to)}`
-    : formatDate(from);
-};
-
-/**
- * Format date for display
- */
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
+export const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
 };
