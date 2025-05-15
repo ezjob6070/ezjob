@@ -21,15 +21,13 @@ export interface Technician {
   category?: string;
   totalRevenue?: number;
   
-  // Add missing properties that caused errors
+  // Add missing properties
   role?: string;
   subRole?: string;
   incentiveType?: string;
   incentiveAmount?: number;
   salaryBasis?: string;
   documents?: any[];
-  
-  // Add properties used in technician components
   initials?: string;
   completedJobs?: number;
   cancelledJobs?: number;

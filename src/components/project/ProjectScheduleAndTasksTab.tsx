@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Project, ProjectTask } from "@/types/project";
 import TaskDetailDialog from "./TaskDetailDialog";
+import { Plus } from "lucide-react";
 
 // ScheduleEvent type definition
 interface ScheduleEvent {
@@ -354,8 +355,8 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
       start: taskDueDate,
       end: endDate,
       description: task.description || "",
-      status: task.status === "completed" ? "completed" : 
-             task.status === "blocked" ? "cancelled" : "scheduled",
+      status: newTask.status === "completed" ? "completed" : 
+             newTask.status === "blocked" ? "cancelled" : "scheduled",
       type: "task",
       assignedTo: task.assignedTo ? [task.assignedTo] : [],
       relatedTaskId: task.id

@@ -1,6 +1,6 @@
 
 import { DateRange } from "react-day-picker";
-import { JobSource } from "./jobSource";
+import { JobSource as OriginalJobSource } from "./jobSource";
 import { Technician } from "./technician";
 
 export type TransactionType = "income" | "expense" | "refund" | "payment";
@@ -80,7 +80,7 @@ export interface FinancialReport {
 }
 
 // Define the JobSource interface with all financial properties
-export interface JobSource extends Omit<import('./jobSource').JobSource, 'totalRevenue' | 'expenses' | 'companyProfit'> {
+export interface JobSource extends Omit<OriginalJobSource, 'totalRevenue' | 'expenses' | 'companyProfit'> {
   totalRevenue: number;
   expenses: number;
   companyProfit: number;
