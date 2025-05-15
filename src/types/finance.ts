@@ -5,7 +5,7 @@ import { Technician } from "./technician";
 
 export type TransactionType = "income" | "expense" | "refund" | "payment";
 
-export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+export type PaymentStatus = "pending" | "completed" | "failed" | "refunded" | "cancelled";
 
 export type TransactionCategory = 
   | "job_payment" 
@@ -53,13 +53,19 @@ export interface FinancialTransaction {
   paymentMethod?: string;
   createdAt: Date;
   updatedAt?: Date;
+  clientName?: string;
+  jobTitle?: string;
 }
 
 export interface ExpenseCategory {
+  id: string;
   name: string;
   amount: number;
   percentage: number;
   color: string;
+  icon?: React.ReactNode;
+  budget?: number;
+  currentSpend?: number;
 }
 
 export interface FinancialReport {
@@ -80,4 +86,21 @@ export interface JobSource extends Omit<import('./jobSource').JobSource, 'totalR
   companyProfit: number;
   totalJobs: number;
   category?: string;
+}
+
+export interface OfficeExpense {
+  id: string;
+  date: Date | string;
+  category: string;
+  description: string;
+  amount: number;
+  vendor: string;
+  paymentMethod: string;
+  status: "paid" | "pending" | "overdue";
+}
+
+export interface SearchBarProps {
+  searchTerm: string;
+  updateFilter?: <K extends keyof FinancialFilters>(key: K, value: FinancialFilters[K]) => void;
+  hidden?: boolean;
 }
