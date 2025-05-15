@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -189,26 +188,24 @@ const TasksView = ({
             </TabsList>
           </Tabs>
           
-          {/* Search bar moved under the tabs */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search tasks & reminders..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10"
-            />
-          </div>
-
-          {/* Filter options row */}
-          <div className="flex items-center justify-end gap-2">
+          {/* Search and filter bar in a single row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search tasks & reminders..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 h-8 text-xs"
+              />
+            </div>
+            
             {/* Status Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
                   <Filter className="h-3.5 w-3.5" />
                   Status
-                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
@@ -240,7 +237,6 @@ const TasksView = ({
                     )
                   )}
                   Sort
-                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
