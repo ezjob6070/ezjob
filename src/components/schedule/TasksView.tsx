@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { Calendar, Bell, Search } from "lucide-react";
+import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -16,6 +16,21 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "@/components/ui/dropdown-menu";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 interface TasksViewProps {
   selectedDate: Date;
@@ -33,9 +48,10 @@ const TasksView = ({
   onTasksChange
 }: TasksViewProps) => {
   const [filterType, setFilterType] = useState<string>("all");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "a-z" | "z-a">("newest");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"all" | "tasks" | "reminders">("all");
+  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
     if (!onTasksChange) return;
@@ -105,8 +121,22 @@ const TasksView = ({
       filtered = filtered.filter(task => task.status === filterType);
     }
 
+    // Apply date filter
+    if (dateFilter) {
+      filtered = filtered.filter(task => {
+        const taskDate = new Date(task.dueDate);
+        return taskDate.toDateString() === dateFilter.toDateString();
+      });
+    }
+
     // Apply sort order
     filtered.sort((a, b) => {
+      if (sortOrder === "a-z") {
+        return a.title.localeCompare(b.title);
+      } else if (sortOrder === "z-a") {
+        return b.title.localeCompare(a.title);
+      }
+      
       const dateA = new Date(a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate));
       const dateB = new Date(b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate));
       
@@ -118,6 +148,11 @@ const TasksView = ({
     });
 
     return filtered;
+  };
+
+  const clearDateFilter = () => {
+    setDateFilter(undefined);
+    toast.success("Date filter cleared");
   };
 
   const filteredTasks = filterTasks();
@@ -163,6 +198,98 @@ const TasksView = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10"
             />
+          </div>
+
+          {/* Filter options row */}
+          <div className="flex items-center justify-end gap-2">
+            {/* Status Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  <Filter className="h-3.5 w-3.5" />
+                  Status
+                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuRadioGroup value={filterType} onValueChange={setFilterType}>
+                  <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="scheduled">Scheduled</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="in progress">In Progress</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="completed">Completed</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="overdue">Overdue</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Sort Order */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  {sortOrder === "newest" || sortOrder === "oldest" ? (
+                    sortOrder === "newest" ? (
+                      <SortDesc className="h-3.5 w-3.5" />
+                    ) : (
+                      <SortAsc className="h-3.5 w-3.5" />
+                    )
+                  ) : (
+                    sortOrder === "a-z" ? (
+                      <span className="text-xs font-bold">A→Z</span>
+                    ) : (
+                      <span className="text-xs font-bold">Z→A</span>
+                    )
+                  )}
+                  Sort
+                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuRadioGroup 
+                  value={sortOrder} 
+                  onValueChange={(value) => setSortOrder(value as "newest" | "oldest" | "a-z" | "z-a")}
+                >
+                  <DropdownMenuRadioItem value="newest">
+                    <SortDesc className="h-3.5 w-3.5 mr-2" /> Newest First
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="oldest">
+                    <SortAsc className="h-3.5 w-3.5 mr-2" /> Oldest First
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="a-z">A to Z</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="z-a">Z to A</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Date Filter */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {dateFilter ? format(dateFilter, "MMM d") : "Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-auto p-0">
+                <CalendarComponent
+                  mode="single"
+                  selected={dateFilter}
+                  onSelect={setDateFilter}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+                {dateFilter && (
+                  <div className="p-3 border-t border-border flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={clearDateFilter}
+                      className="text-xs"
+                    >
+                      Clear Filter
+                    </Button>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>
