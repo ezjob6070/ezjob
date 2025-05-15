@@ -33,4 +33,10 @@ export interface Technician {
   cancelledJobs?: number;
   earnings?: number;
   jobCount?: number;
+  rating?: number;
+  imageUrl?: string;
+  profileImage?: string;
+  ssn?: string;
+  driverLicense?: any;
+  idNumber?: string;
 }
