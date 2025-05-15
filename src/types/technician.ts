@@ -67,7 +67,7 @@ export interface Technician {
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
   
-  // Add properties referenced in the errors
+  // Properties to fix type errors
   role?: TechnicianRole;
   earnings?: number;
   jobCount?: number;
@@ -76,6 +76,7 @@ export interface Technician {
   category?: string;
   workContract?: string;
   payRate?: number;
+  yearsExperience?: number;
   
   // Document handling
   documents?: Document[];
@@ -84,7 +85,7 @@ export interface Technician {
   idNumber?: string;
   driverLicense?: DriverLicense | string;
   
-  // Skills and certifications referenced in the errors
+  // Skills and certifications
   skills?: string[];
   certifications?: string[];
   jobCategories?: string[];
@@ -102,36 +103,5 @@ export interface Job {
   technicianId?: string;
   description?: string;
 }
-
-// Export TechnicianFinancialsHookReturn to fix the missing export error
-export type TechnicianFinancialsHookReturn = {
-  paymentTypeFilter: string;
-  setPaymentTypeFilter: (filter: string) => void;
-  selectedTechnicianNames: string[];
-  setSelectedTechnicianNames: (names: string[]) => void;
-  selectedTechnician: Technician | null;
-  localDateRange: DateRange | undefined;
-  setLocalDateRange: (range: DateRange | undefined) => void;
-  displayedTechnicians: Technician[];
-  financialMetrics: any;
-  selectedTechnicianMetrics: any;
-  dateRangeText: string;
-  toggleTechnician: (name: string) => void;
-  clearFilters: () => void;
-  applyFilters: () => void;
-  handleTechnicianSelect: (technician: Technician) => void;
-  technicians: Technician[];
-  techniciansByRole: Record<string, Technician[]>;
-  financialSummary: {
-    totalRevenue: number;
-    totalEarnings: number;
-    totalJobs: number;
-    totalCompletedJobs: number;
-    companyProfit: number;
-    averageJobValue: number;
-  };
-  isLoading: boolean;
-  dateRange: DateRange | undefined;
-};
 
 import { DateRange } from "react-day-picker";

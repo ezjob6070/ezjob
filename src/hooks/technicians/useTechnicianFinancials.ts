@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { DateRange } from "react-day-picker";
 import { useGlobalState } from '@/components/providers/GlobalStateProvider';
 import { calculateTechnicianFinancials, ensureCompleteDateRange } from './financialUtils';
-import { Technician, TechnicianFinancialsHookReturn } from '@/types/technician';
+import { Technician } from '@/types/technician';
 import { format } from "date-fns";
 
 export interface TechnicianFinancialsHookReturn {
