@@ -1,4 +1,3 @@
-
 import { Technician } from "@/types/technician";
 
 export const filterTechniciansByRole = (
@@ -48,4 +47,39 @@ export const getUniqueSubRoles = (technicians: Technician[]): string[] => {
     .filter(Boolean) as string[];
   
   return [...new Set(subRoles)];
+};
+
+// Add the missing filterTechnicians function
+export const filterTechnicians = (
+  technicians: Technician[],
+  paymentTypeFilter: string,
+  selectedTechnicianNames: string[]
+): Technician[] => {
+  let filtered = [...technicians];
+  
+  // Filter by payment type if not "all"
+  if (paymentTypeFilter !== "all") {
+    filtered = filtered.filter(tech => tech.paymentType === paymentTypeFilter);
+  }
+  
+  // Filter by selected technician names if any are selected
+  if (selectedTechnicianNames.length > 0) {
+    filtered = filtered.filter(tech => selectedTechnicianNames.includes(tech.name));
+  }
+  
+  return filtered;
+};
+
+// Add the missing toggleTechnicianInFilter function
+export const toggleTechnicianInFilter = (
+  techName: string,
+  selectedTechnicianNames: string[]
+): string[] => {
+  // If the technician is already selected, remove them
+  if (selectedTechnicianNames.includes(techName)) {
+    return selectedTechnicianNames.filter(name => name !== techName);
+  }
+  
+  // Otherwise add them to the selected list
+  return [...selectedTechnicianNames, techName];
 };
