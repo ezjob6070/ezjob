@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
@@ -51,7 +50,7 @@ const Schedule = () => {
 
   // Sync with global jobs
   useEffect(() => {
-    setJobs(globalJobs);
+    setJobs(globalJobs as Job[]);
   }, [globalJobs]);
 
   // Update jobs for selected date whenever jobs or date changes
@@ -92,6 +91,9 @@ const Schedule = () => {
   };
 
   const handleAddTask = () => {
+    const taskDueDate = newTask.dueDate || new Date();
+    const isoString = taskDueDate instanceof Date ? taskDueDate.toISOString() : taskDueDate;
+    
     const task: Task = {
       id: uuid(),
       title: newTask.title || "New Task",
@@ -100,8 +102,8 @@ const Schedule = () => {
       status: newTask.status || "scheduled",
       client: { name: newTask.client?.name || "No Client" },
       description: newTask.description || "",
-      start: newTask.dueDate?.toISOString() || new Date().toISOString(),
-      end: newTask.dueDate?.toISOString() || new Date().toISOString()
+      start: isoString,
+      end: isoString
     };
     
     setTasks(prevTasks => [...prevTasks, task]);
@@ -119,6 +121,9 @@ const Schedule = () => {
   };
 
   const handleAddReminder = () => {
+    const reminderDueDate = newReminder.dueDate || new Date();
+    const isoString = reminderDueDate instanceof Date ? reminderDueDate.toISOString() : reminderDueDate;
+    
     const reminder: Task = {
       id: uuid(),
       title: newReminder.title || "New Reminder",
@@ -126,8 +131,8 @@ const Schedule = () => {
       status: newReminder.status || "scheduled",
       client: { name: newReminder.client?.name || "No Client" },
       description: newReminder.description || "",
-      start: newReminder.dueDate?.toISOString() || new Date().toISOString(),
-      end: newReminder.dueDate?.toISOString() || new Date().toISOString(),
+      start: isoString,
+      end: isoString,
       isReminder: true
     };
     

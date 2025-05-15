@@ -21,7 +21,7 @@ export interface Job {
   technicianId?: string;
   technicianName?: string;
   scheduledDate: string | Date;
-  date?: string | Date;
+  date: string | Date;
   time?: string;
   expectedDuration?: number;
   serviceCategory?: string;
@@ -46,4 +46,16 @@ export interface Job {
   createdAt?: string;
   updatedAt?: string;
   paymentStatus?: string;
+  // Additional fields from JobTypes.ts
+  jobNumber?: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  details?: string;
+  category?: string;
+  estimateId?: string;
+  isAllDay?: boolean;
+  source?: string;
+  signature?: string;
+  hasImages?: boolean;
+  imageCount?: number;
 }
