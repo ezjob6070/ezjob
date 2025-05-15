@@ -54,7 +54,7 @@ export interface FinancialTransaction {
   updatedAt?: Date;
   clientName?: string;
   jobTitle?: string;
-  quoteStatus?: string; // Add this property
+  quoteStatus?: string;
 }
 
 export interface ExpenseCategory {
@@ -104,7 +104,6 @@ export interface OfficeExpense {
   vendor: string;
   paymentMethod: string;
   status: "paid" | "pending" | "overdue";
-  // Add missing properties
   recurring?: boolean;
   receipt?: string;
 }
@@ -128,6 +127,6 @@ export interface ProjectStaff {
   hourlyRate?: number;
   totalHours?: number;
   totalCost?: number;
-  startDate: string; // Add required properties to match the project.ProjectStaff
+  startDate: string;
   status: string;
 }

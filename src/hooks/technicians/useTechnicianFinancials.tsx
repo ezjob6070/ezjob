@@ -35,28 +35,65 @@ export interface TechnicianFinancialsHookReturn {
   dateRange: DateRange | undefined;
 }
 
-export const useTechnicianFinancials = (
-  filteredTechnicians: Technician[],
-  initialDateRange?: DateRange
-): TechnicianFinancialsHookReturn => {
+const useTechnicianFinancials = (initialDateRange?: DateRange): TechnicianFinancialsHookReturn => {
+  const { technicians, jobs } = useGlobalState();
+  const [isLoading, setIsLoading] = useState(true);
   const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>("all");
   const [selectedTechnicianNames, setSelectedTechnicianNames] = useState<string[]>([]);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [localDateRange, setLocalDateRange] = useState<DateRange | undefined>(initialDateRange);
   
+  // Process technicians with financial data
+  const processedTechnicians = useMemo(() => {
+    setIsLoading(true);
+    try {
+      return calculateTechnicianFinancials(technicians, jobs, localDateRange);
+    } catch (error) {
+      console.error('Error calculating technician financials:', error);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  }, [technicians, jobs, localDateRange]);
+
   // Apply filters to get displayed technicians
   const displayedTechnicians = useMemo(() => {
-    return filterTechnicians(filteredTechnicians, paymentTypeFilter, selectedTechnicianNames);
-  }, [filteredTechnicians, paymentTypeFilter, selectedTechnicianNames]);
+    return processedTechnicians.filter(tech => {
+      // Filter by payment type
+      const matchesPaymentType = paymentTypeFilter === "all" || 
+        tech.paymentType === paymentTypeFilter;
+      
+      // Filter by technician name  
+      const matchesName = selectedTechnicianNames.length === 0 || 
+        selectedTechnicianNames.includes(tech.name);
+      
+      return matchesPaymentType && matchesName;
+    });
+  }, [processedTechnicians, paymentTypeFilter, selectedTechnicianNames]);
   
   // Calculate total metrics for all displayed technicians
   const financialMetrics = useMemo(() => {
-    return calculateFinancialMetrics(displayedTechnicians);
+    const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
+    const technicianEarnings = displayedTechnicians.reduce((sum, tech) => sum + (tech.earnings || 0), 0);
+    
+    return {
+      totalRevenue,
+      technicianEarnings,
+      companyProfit: totalRevenue - technicianEarnings
+    };
   }, [displayedTechnicians]);
   
   // Get selected technician metrics
   const selectedTechnicianMetrics = useMemo(() => {
-    return calculateTechnicianMetrics(selectedTechnician);
+    if (!selectedTechnician) return null;
+    
+    return {
+      revenue: selectedTechnician.totalRevenue || 0,
+      earnings: selectedTechnician.earnings || 0,
+      completedJobs: selectedTechnician.completedJobs || 0,
+      cancelledJobs: selectedTechnician.cancelledJobs || 0,
+      totalJobs: selectedTechnician.jobCount || 0
+    };
   }, [selectedTechnician]);
   
   // Format date range for display - using compact format similar to job source page
@@ -76,7 +113,13 @@ export const useTechnicianFinancials = (
   
   // Handle technician selection in filters
   const toggleTechnician = (techName: string) => {
-    setSelectedTechnicianNames(prev => toggleTechnicianInFilter(techName, prev));
+    setSelectedTechnicianNames(prev => {
+      if (prev.includes(techName)) {
+        return prev.filter(name => name !== techName);
+      } else {
+        return [...prev, techName];
+      }
+    });
   };
 
   // Clear all filters
@@ -95,19 +138,20 @@ export const useTechnicianFinancials = (
     setSelectedTechnician(selectedTechnician?.id === tech.id ? null : tech);
   };
   
-  // Additional properties needed by components
+  // Group technicians by role
   const techniciansByRole = useMemo(() => {
     const grouped: Record<string, Technician[]> = {};
     
-    filteredTechnicians.forEach(tech => {
+    processedTechnicians.forEach(tech => {
       const role = tech.role || 'other';
       if (!grouped[role]) grouped[role] = [];
       grouped[role].push(tech);
     });
     
     return grouped;
-  }, [filteredTechnicians]);
+  }, [processedTechnicians]);
 
+  // Calculate overall financial summary
   const financialSummary = useMemo(() => {
     const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
     const totalEarnings = displayedTechnicians.reduce((sum, tech) => sum + (tech.earnings || 0), 0);
@@ -140,71 +184,15 @@ export const useTechnicianFinancials = (
     clearFilters,
     applyFilters,
     handleTechnicianSelect,
-    
-    // Additional properties needed by other components
-    technicians: filteredTechnicians,
+    technicians: processedTechnicians,
     techniciansByRole,
     financialSummary,
-    isLoading: false,
+    isLoading,
     dateRange: localDateRange
-  };
-};
-
-// Helper functions for filtering technicians
-export const filterTechnicians = (
-  technicians: Technician[], 
-  paymentTypeFilter: string, 
-  selectedTechnicianNames: string[]
-): Technician[] => {
-  return technicians.filter(tech => {
-    // Filter by payment type
-    const matchesPaymentType = paymentTypeFilter === "all" || 
-      tech.paymentType === paymentTypeFilter;
-    
-    // Filter by technician name  
-    const matchesName = selectedTechnicianNames.length === 0 || 
-      selectedTechnicianNames.includes(tech.name);
-    
-    return matchesPaymentType && matchesName;
-  });
-};
-
-export const toggleTechnicianInFilter = (
-  technicianName: string, 
-  currentList: string[]
-): string[] => {
-  if (currentList.includes(technicianName)) {
-    return currentList.filter(name => name !== technicianName);
-  } else {
-    return [...currentList, technicianName];
-  }
-};
-
-export const calculateFinancialMetrics = (technicians: Technician[]) => {
-  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
-  const technicianEarnings = technicians.reduce((sum, tech) => sum + (tech.earnings || 0), 0);
-  
-  return {
-    totalRevenue,
-    technicianEarnings,
-    companyProfit: totalRevenue - technicianEarnings
-  };
-};
-
-export const calculateTechnicianMetrics = (technician: Technician | null) => {
-  if (!technician) return null;
-  
-  return {
-    revenue: technician.totalRevenue || 0,
-    earnings: technician.earnings || 0,
-    completedJobs: technician.completedJobs || 0,
-    cancelledJobs: technician.cancelledJobs || 0,
-    totalJobs: technician.jobCount || 0
   };
 };
 
 // Add date-fns import for format function
 import { format } from "date-fns";
 
-// Make sure we export both as a named export and as default
 export default useTechnicianFinancials;

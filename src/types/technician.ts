@@ -28,7 +28,7 @@ export interface Technician {
   incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
   incentiveAmount?: number;
   salaryBasis?: "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "annually" | "commission" | "yearly";
-  documents?: any[];
+  documents?: Document[];
   workContract?: string;
   initials?: string;
   completedJobs?: number;
@@ -41,6 +41,8 @@ export interface Technician {
   ssn?: string;
   driverLicense?: any;
   idNumber?: string;
+  date?: string;
+  technicianId?: string;
 }
 
 // Add additional types needed by components

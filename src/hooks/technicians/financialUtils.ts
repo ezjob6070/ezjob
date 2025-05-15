@@ -1,85 +1,61 @@
 
-import { DateRange } from "react-day-picker";
 import { Technician } from "@/types/technician";
-import { Job } from "@/components/jobs/JobTypes";
+import { Job } from "@/types/job";
+import { DateRange } from "react-day-picker";
 
-// Ensure that a date range has both 'from' and 'to' defined
-export const ensureCompleteDateRange = (range?: DateRange): DateRange => {
-  if (!range) {
-    const today = new Date();
-    return {
-      from: today,
-      to: today
-    };
-  }
-  
-  if (!range.from) {
-    range.from = new Date();
-  }
-  
-  if (!range.to) {
-    range.to = range.from;
-  }
-  
-  return range;
-};
-
-// Calculate financial metrics for technicians based on their jobs
 export const calculateTechnicianFinancials = (
   technicians: Technician[],
   jobs: Job[],
   dateRange?: DateRange
 ): Technician[] => {
-  // Ensure we have a complete date range
-  const filteredDateRange = ensureCompleteDateRange(dateRange);
-  
-  // Make a copy of technicians to add financial data
-  return technicians.map(technician => {
-    // Get all jobs for this technician in the date range
-    const technicianJobs = jobs.filter(job => {
-      // Match technician
-      const isForTechnician = job.technicianId === technician.id;
+  return technicians.map(tech => {
+    // Filter jobs assigned to this technician within date range
+    const techJobs = jobs.filter(job => {
+      const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date as string);
+      const isInDateRange = 
+        (!dateRange?.from || jobDate >= dateRange.from) && 
+        (!dateRange?.to || jobDate <= dateRange.to);
       
-      // Check date range
-      const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : 
-                    job.date ? new Date(job.date) : null;
-      
-      if (!jobDate) return false;
-      
-      const isInDateRange = (!filteredDateRange.from || jobDate >= filteredDateRange.from) && 
-                          (!filteredDateRange.to || jobDate <= filteredDateRange.to);
-                          
-      return isForTechnician && isInDateRange;
+      return isInDateRange && job.technicianId === tech.id;
     });
     
-    // Calculate technician metrics
-    const completedJobs = technicianJobs.filter(job => job.status === "completed");
-    const cancelledJobs = technicianJobs.filter(job => 
-      job.status === "cancelled" || job.status === "canceled");
-    
-    const totalRevenue = completedJobs.reduce((sum, job) => 
-      sum + (job.actualAmount || job.amount), 0);
+    // Calculate metrics
+    const totalRevenue = techJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount), 0);
+    const completedJobs = techJobs.filter(job => job.status === "completed").length;
+    const cancelledJobs = techJobs.filter(job => job.status === "cancelled").length;
     
     // Calculate earnings based on payment type
     let earnings = 0;
-    
-    if (technician.paymentType === "percentage") {
-      earnings = totalRevenue * (technician.paymentRate / 100);
-    } else if (technician.paymentType === "flat") {
-      earnings = completedJobs.length * technician.paymentRate;
-    } else if (technician.paymentType === "hourly") {
-      // Assume average 2 hours per job for calculation
-      earnings = completedJobs.length * 2 * (technician.hourlyRate || 0);
+    if (tech.paymentType === "percentage") {
+      earnings = totalRevenue * (tech.paymentRate / 100);
+    } else if (tech.paymentType === "flat") {
+      earnings = completedJobs * tech.paymentRate;
+    } else if (tech.paymentType === "hourly" && tech.hourlyRate) {
+      // Assuming average 2 hours per job for simplicity
+      earnings = completedJobs * 2 * tech.hourlyRate;
     }
     
-    // Return the technician with added metrics
     return {
-      ...technician,
+      ...tech,
       totalRevenue,
+      completedJobs,
+      cancelledJobs,
       earnings,
-      completedJobs: completedJobs.length,
-      cancelledJobs: cancelledJobs.length,
-      jobCount: technicianJobs.length
+      jobCount: techJobs.length
     };
   });
+};
+
+export const ensureCompleteDateRange = (dateRange?: DateRange): DateRange | undefined => {
+  if (!dateRange) return undefined;
+  
+  // If only from is specified, set to to today
+  if (dateRange.from && !dateRange.to) {
+    return {
+      from: dateRange.from,
+      to: new Date()
+    };
+  }
+  
+  return dateRange;
 };

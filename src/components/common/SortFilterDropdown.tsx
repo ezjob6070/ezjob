@@ -35,6 +35,8 @@ const SortFilterDropdown: React.FC<SortFilterDropdownProps> = ({
       case "profit-low": return "Profit (Low-High)";
       case "jobs-high": return "Jobs (High-Low)";
       case "jobs-low": return "Jobs (Low-High)";
+      case "amount-high": return "Amount (High-Low)";
+      case "amount-low": return "Amount (Low-High)";
       case "date-asc": return "Date (Oldest First)";
       case "date-desc": return "Date (Newest First)";
       case "amount-asc": return "Amount (Low-High)";
