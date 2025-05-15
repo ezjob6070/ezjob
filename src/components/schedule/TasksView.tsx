@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { Calendar, Bell } from "lucide-react";
+import { Calendar, Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -134,33 +134,35 @@ const TasksView = ({
       
       <div className="mb-4">
         <div className="flex flex-col gap-3">
-          <Input 
-            placeholder="Search tasks & reminders..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+          <Tabs 
+            value={viewMode} 
+            onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
             className="w-full"
-          />
+          >
+            <TabsList className="grid grid-cols-3 w-full">
+              <TabsTrigger value="all" className="text-xs">
+                All ({tasksCount + remindersCount})
+              </TabsTrigger>
+              <TabsTrigger value="tasks" className="text-xs">
+                <Calendar className="h-3.5 w-3.5 mr-1" />
+                Tasks ({tasksCount})
+              </TabsTrigger>
+              <TabsTrigger value="reminders" className="text-xs">
+                <Bell className="h-3.5 w-3.5 mr-1" />
+                Reminders ({remindersCount})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           
-          <div className="flex gap-2">
-            <Tabs 
-              value={viewMode} 
-              onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
-              className="w-full"
-            >
-              <TabsList className="grid grid-cols-3 w-full">
-                <TabsTrigger value="all" className="text-xs">
-                  All ({tasksCount + remindersCount})
-                </TabsTrigger>
-                <TabsTrigger value="tasks" className="text-xs">
-                  <Calendar className="h-3.5 w-3.5 mr-1" />
-                  Tasks ({tasksCount})
-                </TabsTrigger>
-                <TabsTrigger value="reminders" className="text-xs">
-                  <Bell className="h-3.5 w-3.5 mr-1" />
-                  Reminders ({remindersCount})
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+          {/* Search bar moved under the tabs */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search tasks & reminders..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10"
+            />
           </div>
         </div>
       </div>
