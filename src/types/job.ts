@@ -17,8 +17,10 @@ export interface Job {
     name: string;
   };
   technicianId?: string;
+  technicianName?: string;
+  clientName?: string;
   scheduledDate: string;
-  date?: string;
+  date?: string | Date;
   time?: string;
   expectedDuration: number;
   serviceCategory: string;
@@ -31,4 +33,5 @@ export interface Job {
   paymentMethod?: string;
   attachments?: any[];
   images?: any[];
+  allDay?: boolean;
 }

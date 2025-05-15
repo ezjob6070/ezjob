@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Job } from "@/components/jobs/JobTypes";
+import { Job } from "@/types/job";
 import { isSameDay } from "date-fns";
 import JobsList from "@/components/calendar/components/JobsList";
 import { Task } from "@/components/calendar/types";
@@ -9,10 +9,16 @@ import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
 import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, ListChecks } from "lucide-react";
 import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { v4 as uuid } from "uuid";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -23,6 +29,26 @@ const Schedule = () => {
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState("calendar");
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
+  const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
+  const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
+  const [newTask, setNewTask] = useState<Partial<Task>>({
+    id: "",
+    title: "",
+    dueDate: new Date(),
+    priority: "medium",
+    status: "scheduled",
+    client: { name: "" },
+    description: "",
+  });
+  const [newReminder, setNewReminder] = useState<Partial<Task>>({
+    id: "",
+    title: "",
+    dueDate: new Date(),
+    status: "scheduled",
+    client: { name: "" },
+    description: "",
+    isReminder: true
+  });
 
   // Sync with global jobs
   useEffect(() => {
@@ -66,6 +92,71 @@ const Schedule = () => {
     }
   };
 
+  const handleAddTask = () => {
+    const task: Task = {
+      id: uuid(),
+      title: newTask.title || "New Task",
+      dueDate: newTask.dueDate || new Date(),
+      priority: newTask.priority as "high" | "medium" | "low" | "urgent",
+      status: newTask.status || "scheduled",
+      client: { name: newTask.client?.name || "No Client" },
+      description: newTask.description || "",
+      start: newTask.dueDate?.toISOString() || new Date().toISOString(),
+      end: newTask.dueDate?.toISOString() || new Date().toISOString()
+    };
+    
+    setTasks(prevTasks => [...prevTasks, task]);
+    setShowAddTaskDialog(false);
+    setNewTask({
+      id: "",
+      title: "",
+      dueDate: new Date(),
+      priority: "medium",
+      status: "scheduled",
+      client: { name: "" },
+      description: "",
+    });
+    toast.success("Task added successfully");
+  };
+
+  const handleAddReminder = () => {
+    const reminder: Task = {
+      id: uuid(),
+      title: newReminder.title || "New Reminder",
+      dueDate: newReminder.dueDate || new Date(),
+      status: newReminder.status || "scheduled",
+      client: { name: newReminder.client?.name || "No Client" },
+      description: newReminder.description || "",
+      start: newReminder.dueDate?.toISOString() || new Date().toISOString(),
+      end: newReminder.dueDate?.toISOString() || new Date().toISOString(),
+      isReminder: true
+    };
+    
+    setTasks(prevTasks => [...prevTasks, reminder]);
+    setShowAddReminderDialog(false);
+    setNewReminder({
+      id: "",
+      title: "",
+      dueDate: new Date(),
+      status: "scheduled",
+      client: { name: "" },
+      description: "",
+      isReminder: true
+    });
+    toast.success("Reminder added successfully");
+  };
+
+  const handleTasksChange = (updatedTasks: Task[]) => {
+    setTasks(prevTasks => {
+      // Update only the tasks from the selected date
+      const tasksForOtherDates = prevTasks.filter(task => 
+        !isSameDay(task.dueDate, selectedDate)
+      );
+      return [...tasksForOtherDates, ...updatedTasks];
+    });
+    toast.success("Tasks updated successfully");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -75,15 +166,23 @@ const Schedule = () => {
             Manage your appointments, jobs, and tasks in one place.
           </p>
         </div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2 h-9"
-          onClick={() => setActiveTab("calendar")}
-        >
-          <CalendarIcon className="h-4 w-4" />
-          Show Calendar
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-1"
+            onClick={() => setShowAddReminderDialog(true)}
+          >
+            <CalendarIcon className="h-4 w-4" />
+            Add Reminder
+          </Button>
+          <Button 
+            className="gap-1" 
+            onClick={() => setShowAddTaskDialog(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Add Task
+          </Button>
+        </div>
       </div>
 
       <CalendarViewOptions 
@@ -100,7 +199,10 @@ const Schedule = () => {
         <TabsList className="mb-4">
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="jobs">Jobs</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsTrigger value="tasks" className="flex items-center gap-1">
+            <ListChecks className="h-4 w-4" />
+            Tasks & Reminders
+          </TabsTrigger>
         </TabsList>
         
         {(activeTab === "jobs" || activeTab === "tasks") && (
@@ -139,9 +241,183 @@ const Schedule = () => {
             tasksForSelectedDate={tasksForSelectedDate}
             onPreviousDay={handlePreviousDay}
             onNextDay={handleNextDay}
+            onTasksChange={handleTasksChange}
           />
         </TabsContent>
       </Tabs>
+
+      {/* Add Task Dialog */}
+      <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Task</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="task-title" className="text-sm font-medium">
+                Task Title
+              </label>
+              <Input
+                id="task-title"
+                value={newTask.title}
+                onChange={e => setNewTask({ ...newTask, title: e.target.value })}
+                placeholder="Enter task title"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="task-client" className="text-sm font-medium">
+                Client Name
+              </label>
+              <Input
+                id="task-client"
+                value={newTask.client?.name}
+                onChange={e => setNewTask({ ...newTask, client: { name: e.target.value } })}
+                placeholder="Enter client name"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="task-priority" className="text-sm font-medium">
+                  Priority
+                </label>
+                <Select
+                  value={newTask.priority}
+                  onValueChange={(value) => 
+                    setNewTask({ 
+                      ...newTask, 
+                      priority: value as "high" | "medium" | "low" | "urgent" 
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <label htmlFor="task-status" className="text-sm font-medium">
+                  Status
+                </label>
+                <Select
+                  value={newTask.status}
+                  onValueChange={(value) => setNewTask({ ...newTask, status: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="in progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="overdue">Overdue</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="task-date" className="text-sm font-medium">
+                Due Date
+              </label>
+              <Input
+                id="task-date"
+                type="datetime-local"
+                value={newTask.dueDate ? new Date(newTask.dueDate).toISOString().slice(0, 16) : ''}
+                onChange={e => setNewTask({ ...newTask, dueDate: new Date(e.target.value) })}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="task-description" className="text-sm font-medium">
+                Description
+              </label>
+              <Textarea
+                id="task-description"
+                value={newTask.description}
+                onChange={e => setNewTask({ ...newTask, description: e.target.value })}
+                placeholder="Enter task details"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddTaskDialog(false)}>Cancel</Button>
+            <Button onClick={handleAddTask}>Add Task</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Reminder Dialog */}
+      <Dialog open={showAddReminderDialog} onOpenChange={setShowAddReminderDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Reminder</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="reminder-title" className="text-sm font-medium">
+                Reminder Title
+              </label>
+              <Input
+                id="reminder-title"
+                value={newReminder.title}
+                onChange={e => setNewReminder({ ...newReminder, title: e.target.value })}
+                placeholder="Enter reminder title"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="reminder-client" className="text-sm font-medium">
+                Client Name (Optional)
+              </label>
+              <Input
+                id="reminder-client"
+                value={newReminder.client?.name}
+                onChange={e => setNewReminder({ ...newReminder, client: { name: e.target.value } })}
+                placeholder="Enter client name"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="reminder-date" className="text-sm font-medium">
+                Reminder Date & Time
+              </label>
+              <Input
+                id="reminder-date"
+                type="datetime-local"
+                value={newReminder.dueDate ? new Date(newReminder.dueDate).toISOString().slice(0, 16) : ''}
+                onChange={e => setNewReminder({ ...newReminder, dueDate: new Date(e.target.value) })}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="reminder-description" className="text-sm font-medium">
+                Description
+              </label>
+              <Textarea
+                id="reminder-description"
+                value={newReminder.description}
+                onChange={e => setNewReminder({ ...newReminder, description: e.target.value })}
+                placeholder="Enter reminder details"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddReminderDialog(false)}>Cancel</Button>
+            <Button onClick={handleAddReminder}>Add Reminder</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

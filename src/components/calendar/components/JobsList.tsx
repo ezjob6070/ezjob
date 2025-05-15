@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Job } from "@/components/jobs/JobTypes";
+import { Job } from "@/types/job";
 import { useState, useEffect } from "react";
 import JobFilterBar from "@/components/jobs/JobFilterBar";
 
@@ -35,6 +35,7 @@ const JobsList = ({
       case "scheduled":
         return "bg-blue-500 hover:bg-blue-600";
       case "in_progress":
+      case "in-progress":
         return "bg-yellow-500 hover:bg-yellow-600";
       case "completed":
         return "bg-green-500 hover:bg-green-600";
@@ -47,7 +48,10 @@ const JobsList = ({
 
   const handleFilterChange = (jobs: Job[]) => {
     // Filter jobs for the selected date
-    const jobsForDate = jobs.filter(job => isSameDay(job.date, selectedDate));
+    const jobsForDate = jobs.filter(job => {
+      const jobDate = job.date instanceof Date ? job.date : new Date(job.date || job.scheduledDate);
+      return isSameDay(jobDate, selectedDate);
+    });
     setFilteredJobs(jobsForDate);
   };
 
@@ -99,12 +103,12 @@ const JobsList = ({
                 <div className="text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Client:</span>
-                    <span className="font-medium">{job.clientName}</span>
+                    <span className="font-medium">{job.clientName || job.client?.name}</span>
                   </div>
-                  {job.technicianName && (
+                  {(job.technicianName || job.technician?.name) && (
                     <div className="flex justify-between mt-1">
                       <span className="text-muted-foreground">Technician:</span>
-                      <span className="font-medium">{job.technicianName}</span>
+                      <span className="font-medium">{job.technicianName || job.technician?.name}</span>
                     </div>
                   )}
                   <div className="flex justify-between mt-1">
