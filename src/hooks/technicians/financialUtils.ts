@@ -1,90 +1,93 @@
 
-import { DateRange } from "react-day-picker";
 import { Technician } from "@/types/technician";
 import { Job } from "@/components/jobs/JobTypes";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
-export const ensureCompleteDateRange = (dateRange?: DateRange): DateRange | undefined => {
-  if (!dateRange) {
-    return undefined;
-  }
-  
-  // If no end date, use the start date as the end date
-  if (dateRange.from && !dateRange.to) {
-    return {
-      from: dateRange.from,
-      to: dateRange.from
-    };
-  }
-  
-  return dateRange;
-};
-
-export const calculateTechnicianFinancials = (
-  technicians: Technician[],
-  jobs: Job[],
-  dateRange?: DateRange
-): Technician[] => {
-  const range = ensureCompleteDateRange(dateRange);
-  
-  return technicians.map(tech => {
-    // Filter jobs for this technician
-    const techJobs = jobs.filter(job => {
-      // Match by technician ID
-      const belongsToTechnician = job.technicianId === tech.id;
-      
-      // Check if job is within date range
-      let inDateRange = true;
-      if (range?.from && range?.to && job.scheduledDate) {
-        const jobDate = new Date(job.scheduledDate);
-        inDateRange = jobDate >= range.from && jobDate <= range.to;
-      }
-      
-      return belongsToTechnician && inDateRange;
-    });
-    
-    // Count jobs by status
-    const completedJobs = techJobs.filter(job => job.status === "completed").length;
-    const cancelledJobs = techJobs.filter(job => job.status === "cancelled" || job.status === "canceled").length;
-    
-    // Calculate revenue from completed jobs
-    const totalRevenue = techJobs
-      .filter(job => job.status === "completed")
-      .reduce((sum, job) => sum + (job.actualAmount || job.amount), 0);
-    
-    // Calculate earnings based on payment type
-    let earnings = 0;
-    if (tech.paymentType === "percentage") {
-      earnings = totalRevenue * (tech.paymentRate / 100);
-    } else if (tech.paymentType === "flat") {
-      earnings = completedJobs * tech.paymentRate;
-    } else if (tech.paymentType === "hourly") {
-      // Assume 2 hours per job for estimation
-      earnings = completedJobs * 2 * (tech.hourlyRate || 0);
-    }
-    
-    return {
-      ...tech,
-      totalRevenue,
-      earnings,
-      jobCount: techJobs.length,
-      completedJobs,
-      cancelledJobs
-    };
-  });
-};
-
-export const getTechnicianFinancialMetrics = (technicians: Technician[]) => {
+/**
+ * Calculate financial metrics for a list of technicians
+ */
+export const calculateFinancialMetrics = (technicians: Technician[]) => {
   const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
-  const totalEarnings = technicians.reduce((sum, tech) => sum + (tech.earnings || 0), 0);
-  const totalJobs = technicians.reduce((sum, tech) => sum + (tech.jobCount || 0), 0);
-  const completedJobs = technicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0);
+  const technicianEarnings = technicians.reduce((sum, tech) => {
+    if (tech.paymentType === "percentage") {
+      return sum + ((tech.totalRevenue || 0) * tech.paymentRate / 100);
+    } else if (tech.paymentType === "flat") {
+      return sum + ((tech.completedJobs || 0) * tech.paymentRate);
+    }
+    return sum;
+  }, 0);
+  
+  const companyProfit = totalRevenue - technicianEarnings;
   
   return {
     totalRevenue,
-    totalEarnings,
-    companyProfit: totalRevenue - totalEarnings,
-    totalJobs,
-    completedJobs,
-    averageJobValue: totalJobs > 0 ? totalRevenue / totalJobs : 0
+    technicianEarnings,
+    companyProfit,
+    totalJobs: technicians.reduce((sum, tech) => sum + ((tech.completedJobs || 0) + (tech.cancelledJobs || 0)), 0),
+    completedJobs: technicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0),
+    pendingJobs: 0,
+    cancelledJobs: technicians.reduce((sum, tech) => sum + (tech.cancelledJobs || 0), 0),
+    averageJobValue: calculateAverageJobValue(technicians)
   };
+};
+
+/**
+ * Calculate average job value
+ */
+export const calculateAverageJobValue = (technicians: Technician[]) => {
+  const totalJobs = technicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0);
+  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
+  
+  if (totalJobs === 0) return 0;
+  return totalRevenue / totalJobs;
+};
+
+/**
+ * Calculate technician-specific metrics
+ */
+export const calculateTechnicianMetrics = (technician: Technician | null) => {
+  if (!technician) return null;
+  
+  return {
+    revenue: technician.totalRevenue || 0,
+    earnings: calculateTechnicianEarnings(technician),
+    expenses: (technician.totalRevenue || 0) * 0.2, // Estimated expenses as 20% of revenue
+    profit: (technician.totalRevenue || 0) - calculateTechnicianEarnings(technician) - ((technician.totalRevenue || 0) * 0.2),
+    totalJobs: (technician.completedJobs || 0) + (technician.cancelledJobs || 0),
+    completedJobs: technician.completedJobs || 0,
+    cancelledJobs: technician.cancelledJobs || 0
+  };
+};
+
+/**
+ * Calculate technician earnings based on payment type
+ */
+export const calculateTechnicianEarnings = (technician: Technician) => {
+  if (technician.paymentType === "percentage") {
+    return (technician.totalRevenue || 0) * (technician.paymentRate / 100);
+  } else if (technician.paymentType === "flat") {
+    return (technician.completedJobs || 0) * technician.paymentRate;
+  } else if (technician.paymentType === "hourly") {
+    // Estimate 4 hours per job for hourly rate
+    return (technician.completedJobs || 0) * 4 * technician.hourlyRate;
+  }
+  return 0;
+};
+
+/**
+ * Format date range for display
+ */
+export const formatDateRangeText = (dateRange?: DateRange) => {
+  if (!dateRange?.from) return "";
+  
+  if (dateRange.to) {
+    if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
+      // Same day
+      return format(dateRange.from, "MMM d, yyyy");
+    }
+    return `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
+  }
+  
+  return format(dateRange.from, "MMM d, yyyy");
 };

@@ -26,9 +26,6 @@ interface UpdateJobStatusModalProps {
   onSendToEstimate?: (job: Job) => void;
 }
 
-// Define the possible status types to match the state
-type JobStatusType = "completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled" | "estimate";
-
 const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   open,
   onOpenChange,
@@ -38,7 +35,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   onReschedule,
   onSendToEstimate,
 }) => {
-  const [status, setStatus] = useState<JobStatusType>("completed");
+  const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled" | "estimate">("completed");
   const [actualAmount, setActualAmount] = useState<number>(job?.amount || 0);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>(
     job?.scheduledDate ? new Date(job.scheduledDate as string) : new Date()
@@ -53,13 +50,8 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   useEffect(() => {
     // Set initial status based on current job status
     if (job) {
-      // Convert potential "canceled" to "cancelled" to match our type
-      const normalizedStatus = job.status === "canceled" ? "cancelled" : 
-                             job.status === "in_progress" ? "completed" : 
-                             job.status === "rescheduled" ? "reschedule" : 
-                             (job.status as JobStatusType);
-
-      setStatus(normalizedStatus);
+      setStatus(job.status === "in_progress" ? "completed" : 
+               job.status === "rescheduled" ? "reschedule" : job.status);
       setActualAmount(job.amount || 0);
       setParts(job.parts ? job.parts.join(", ") : "");
       setCancellationReason(job.cancellationReason || "");
@@ -135,7 +127,7 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
 
             <StatusSelection 
               status={status} 
-              onStatusChange={(value) => setStatus(value as JobStatusType)}
+              onStatusChange={(value) => setStatus(value as "completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled" | "estimate")}
               job={job}
             />
 

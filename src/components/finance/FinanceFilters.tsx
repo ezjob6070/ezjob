@@ -33,10 +33,10 @@ const FinanceFilters = ({ filters, setFilters, jobSources, resetFilters }: Finan
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap md:flex-nowrap">
-        {/* Search bar hidden - removed updateFilter prop that's causing errors */}
+        {/* Search bar hidden */}
         <SearchBar 
           searchTerm={filters.searchTerm}
-          onChange={(value) => updateFilter("searchTerm", value)}
+          updateFilter={updateFilter}
           hidden={true}
         />
         

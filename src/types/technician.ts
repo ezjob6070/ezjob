@@ -1,21 +1,9 @@
 
-// Define document types
-export interface Document {
-  id: string;
-  name: string;
-  title: string;
-  type: string;
-  size?: number;
-  uploadDate: string;
-  url: string;
-}
-
-// Define types for payment handling
-export type PaymentType = "percentage" | "flat" | "hourly" | "salary";
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
-export type IncentiveType = "none" | "bonus" | "commission" | "profit-sharing" | "other" | "hourly" | "weekly" | "monthly";
-export type TechnicianStatus = "active" | "inactive" | "onLeave";
-export type TechnicianRole = "technician" | "contractor" | "salesman" | "employed";
+
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
+
+export type IncentiveType = "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
 
 export interface TechnicianSubRoles {
   technician: string[];
@@ -25,19 +13,22 @@ export interface TechnicianSubRoles {
 }
 
 export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
-  technician: ["HVAC", "Plumbing", "Electrical", "General"],
-  salesman: ["Field Agent", "Inside Sales", "Account Manager", "Consultant"],
-  employed: ["Office Staff", "Manager", "Customer Service", "Administrator"],
-  contractor: ["Specialist", "On-Call", "Regular", "Project-based"]
+  technician: ["HVAC", "Plumbing", "Electrical", "General", "Carpentry"],
+  salesman: ["Inside Sales", "Outside Sales", "Account Manager", "Sales Support"],
+  employed: ["Secretary", "Management", "HR", "Finance", "Administration", "Operations"],
+  contractor: ["Independent", "Agency", "Specialized", "Consultant"]
 };
 
-export interface DriverLicense {
-  number: string;
-  state: string;
-  expirationDate: string;
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  uploadDate: string;
+  size?: number;
+  title?: string;
 }
 
-// Main Technician interface
 export interface Technician {
   id: string;
   name: string;
@@ -48,62 +39,57 @@ export interface Technician {
   department?: string;
   hireDate: string;
   startDate?: string;
-  endDate?: string;
-  status: TechnicianStatus;
-  paymentType: PaymentType;
-  paymentRate: number;
-  hourlyRate: number;
-  specialty: string;
-  subRole?: string;
-  rating: number;
-  availability?: string[];
-  completedJobs: number;
-  cancelledJobs: number;
-  totalRevenue: number;
-  profileImage?: string;
-  imageUrl?: string;
-  initials?: string;
-  salaryBasis?: SalaryBasis;
-  incentiveType?: IncentiveType;
-  incentiveAmount?: number;
-  
-  // Properties to fix type errors
-  role?: TechnicianRole;
-  earnings?: number;
-  jobCount?: number;
-  technicianId?: string;
-  date?: string;
-  category?: string;
-  workContract?: string;
+  status: "active" | "inactive" | "onLeave";
   payRate?: number;
-  yearsExperience?: number;
-  
-  // Document handling
-  documents?: Document[];
-  notes?: string;
-  ssn?: string;
-  idNumber?: string;
-  driverLicense?: DriverLicense | string;
-  
-  // Skills and certifications
+  paymentType: "percentage" | "flat" | "hourly" | "salary";
+  salaryBasis?: SalaryBasis;
+  monthlySalary?: number;
+  rating?: number;
+  imageUrl?: string;
+  specialty: string;
   skills?: string[];
   certifications?: string[];
+  notes?: string;
+  category?: string;
+  
+  // Required properties
+  role: TechnicianRole;
+  subRole?: string;
+  initials?: string;
+  ssn?: string;
+  driverLicense?: string | { number: string; state: string; expirationDate: string; };
+  idNumber?: string;
+  documents?: Document[];
+  profileImage?: string;
+  yearsExperience?: number;
+  workContract?: string;
   jobCategories?: string[];
+  
+  // Finance and performance related properties
+  paymentRate: number;
+  hourlyRate: number;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  incentiveType?: IncentiveType;
+  incentiveAmount?: number;
+  date?: string; // For compatibility with existing code
 }
 
-// Job interface - minimal version to resolve errors
-export interface Job {
-  id: string;
-  title: string;
-  status: string;
-  scheduledDate?: string;
-  date?: string;
-  amount: number;
-  actualAmount?: number;
-  technicianId?: string;
-  description?: string;
-  jobSourceId?: string;
-  jobSourceName?: string;
+export interface TechnicianFilters {
+  search: string;
+  paymentTypes: string[];
+  status: string[];
+  categories: string[];
+  dateRange?: {
+    from: Date;
+    to: Date;
+  };
 }
 
-import { DateRange } from "react-day-picker";
+export interface FinancialSummary {
+  totalRevenue: number;
+  totalJobs: number;
+  averageJobValue: number;
+  paymentsDue: number;
+}

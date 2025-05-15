@@ -1,6 +1,7 @@
 
 import { DateRange } from "react-day-picker";
-import { Technician } from './technician';
+import { JobSource } from "./jobSource";
+import { Technician } from "./technician";
 
 export type TransactionType = "income" | "expense" | "refund" | "payment";
 
@@ -49,24 +50,22 @@ export interface FinancialTransaction {
   technicianRate?: number;
   technicianRateIsPercentage?: boolean;
   jobSourceId?: string;
-  jobSourceName?: string;
   paymentMethod?: string;
   createdAt: Date;
   updatedAt?: Date;
   clientName?: string;
   jobTitle?: string;
-  quoteStatus?: string;
 }
 
 export interface ExpenseCategory {
   id: string;
   name: string;
-  icon?: React.ReactNode;
-  color: string;
-  budget?: number;
-  currentSpend?: number;
   amount: number;
   percentage: number;
+  color: string;
+  icon?: React.ReactNode;
+  budget?: number;
+  currentSpend?: number;
 }
 
 export interface FinancialReport {
@@ -80,21 +79,13 @@ export interface FinancialReport {
   transactions: FinancialTransaction[];
 }
 
-// Define the JobSource interface
-export interface JobSource {
-  id: string;
-  name: string;
-  type?: string;
-  paymentType?: string;
-  paymentValue?: number;
-  isActive?: boolean;
-  totalJobs?: number;
+// Define the JobSource interface with all financial properties
+export interface JobSource extends Omit<import('./jobSource').JobSource, 'totalRevenue' | 'expenses' | 'companyProfit'> {
   totalRevenue: number;
   expenses: number;
   companyProfit: number;
-  createdAt?: string;
+  totalJobs: number;
   category?: string;
-  website?: string;
 }
 
 export interface OfficeExpense {
@@ -106,38 +97,10 @@ export interface OfficeExpense {
   vendor: string;
   paymentMethod: string;
   status: "paid" | "pending" | "overdue";
-  recurring?: boolean;
-  receipt?: string;
 }
 
 export interface SearchBarProps {
   searchTerm: string;
   updateFilter?: <K extends keyof FinancialFilters>(key: K, value: FinancialFilters[K]) => void;
   hidden?: boolean;
-  onSearchChange?: (value: string) => void;
-  placeholder?: string;
-  className?: string;
-  onChange?: (value: any) => void;
-  showIcons?: boolean;
 }
-
-// Align ProjectStaff with project.ts definition - using the proper status type
-export interface ProjectStaff {
-  id: string;
-  name: string;
-  role: string;
-  hourlyRate?: number;
-  totalHours?: number;
-  totalCost?: number;
-  startDate: string;
-  status: "active" | "completed" | "terminated";
-  endDate?: string;
-  notes?: string;
-  specialty?: string;
-  assignedTasks?: string[];
-  email?: string;
-  phone?: string;
-}
-
-// Add OfficeTimeFrame type to fix OfficeDashboard error
-export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter";

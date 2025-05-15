@@ -2,33 +2,18 @@
 export interface Job {
   id: string;
   title: string;
-  description: string;
-  status: string;
-  priority: string;
-  client: {
-    id: string;
-    name: string;
-    phone: string;
-    email: string;
-    address: string;
-  };
-  technician?: {
-    id: string;
-    name: string;
-  };
-  technicianId?: string;
-  scheduledDate: string;
-  date?: string;
-  time?: string;
-  expectedDuration: number;
-  serviceCategory: string;
-  serviceType: string;
+  description?: string;
+  status: "pending" | "scheduled" | "in-progress" | "completed" | "cancelled";
+  priority?: "low" | "medium" | "high" | "urgent";
+  date: string;
+  scheduledDate?: string;
   amount: number;
   actualAmount?: number;
-  jobSource?: string;
+  technicianId?: string;  // Reference to the technician assigned to the job
+  clientId?: string;
+  source?: string;
+  projectId?: string;
+  category?: string;
+  type?: string;
   notes?: string;
-  address?: string;
-  paymentMethod?: string;
-  attachments?: any[];
-  images?: any[];
 }

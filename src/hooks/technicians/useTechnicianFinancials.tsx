@@ -1,21 +1,19 @@
 
-import { useState, useEffect, useMemo } from 'react';
-import { useGlobalState } from '@/components/providers/GlobalStateProvider';
-import { DateRange } from 'react-day-picker';
-import { Technician } from '@/types/technician';
-import { Job } from '@/components/jobs/JobTypes';
-import { calculateFinancialMetrics, formatDateRangeText } from './financialUtils';
-import { filterTechnicians, toggleTechnicianInFilter } from './technicianFilters';
+import { useState, useMemo } from "react";
+import { Technician } from "@/types/technician";
+import { DateRange } from "react-day-picker";
+import { 
+  calculateFinancialMetrics, 
+  calculateTechnicianMetrics, 
+  formatDateRangeText 
+} from "./financialUtils";
+import { filterTechnicians, toggleTechnicianInFilter } from "./technicianFilters";
+import { format } from "date-fns";
 
-export interface TechnicianFinancialsOptions {
-  dateRange?: DateRange;
-}
-
-const useTechnicianFinancials = (
+export const useTechnicianFinancials = (
   filteredTechnicians: Technician[],
   initialDateRange?: DateRange
 ) => {
-  const { jobs } = useGlobalState();
   const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>("all");
   const [selectedTechnicianNames, setSelectedTechnicianNames] = useState<string[]>([]);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
@@ -33,22 +31,22 @@ const useTechnicianFinancials = (
   
   // Get selected technician metrics
   const selectedTechnicianMetrics = useMemo(() => {
-    if (!selectedTechnician) return null;
-    
-    return {
-      revenue: selectedTechnician.totalRevenue || 0,
-      earnings: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
-      expenses: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.20 : 0,
-      profit: selectedTechnician.totalRevenue ? selectedTechnician.totalRevenue * 0.40 : 0,
-      totalJobs: 42,
-      completedJobs: 38,
-      cancelledJobs: 4,
-    };
+    return calculateTechnicianMetrics(selectedTechnician);
   }, [selectedTechnician]);
   
   // Format date range for display - using compact format similar to job source page
   const dateRangeText = useMemo(() => {
-    return formatDateRangeText(localDateRange);
+    if (!localDateRange?.from) return "";
+    
+    if (localDateRange.to) {
+      if (localDateRange.from.toDateString() === localDateRange.to.toDateString()) {
+        // Same day
+        return format(localDateRange.from, "MMM d, yyyy");
+      }
+      return `${format(localDateRange.from, "MMM d")} - ${format(localDateRange.to, "MMM d, yyyy")}`;
+    }
+    
+    return format(localDateRange.from, "MMM d, yyyy");
   }, [localDateRange]);
   
   // Handle technician selection in filters
@@ -65,7 +63,6 @@ const useTechnicianFinancials = (
   // Apply filters (currently applied instantly)
   const applyFilters = () => {
     // Filters are applied instantly
-    console.log("Filters applied");
   };
   
   // Handle technician selection for details
@@ -92,4 +89,5 @@ const useTechnicianFinancials = (
   };
 };
 
+// Make sure we export both as a named export and as default
 export default useTechnicianFinancials;

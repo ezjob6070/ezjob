@@ -1,57 +1,45 @@
 
+import React from "react";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
-import { SearchBarProps } from "@/types/finance";
+import { Search, User, Mail, Phone } from "lucide-react";
 
-const SearchBar = ({ 
-  searchTerm = "", 
-  updateFilter, 
-  onSearchChange, 
-  onChange,
-  placeholder = "Search...", 
-  className = "",
-  hidden = false 
-}: SearchBarProps) => {
-  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
-  
-  // Update local state when prop changes
-  useEffect(() => {
-    setLocalSearchTerm(searchTerm);
-  }, [searchTerm]);
-  
-  // Handle change and update parent component
-  const handleChange = (value: string) => {
-    setLocalSearchTerm(value);
-    
-    // Support different callback patterns
-    if (updateFilter) {
-      updateFilter("searchTerm", value);
-    }
-    
-    if (onSearchChange) {
-      onSearchChange(value);
-    }
-    
-    if (onChange) {
-      onChange(value);
-    }
-  };
-  
-  if (hidden) {
-    return null;
-  }
+interface SearchBarProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  showIcons?: boolean;
+  hidden?: boolean;
+  placeholder?: string;
+  className?: string;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({
+  searchTerm,
+  onSearchChange,
+  showIcons = true,
+  hidden = false,
+  placeholder = "Search by name, phone, email...",
+  className = ""
+}) => {
+  if (hidden) return null;
   
   return (
     <div className={`relative ${className}`}>
-      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <Search className="h-4 w-4 text-muted-foreground" />
+      </div>
       <Input
-        type="text"
         placeholder={placeholder}
-        value={localSearchTerm}
-        onChange={(e) => handleChange(e.target.value)}
-        className="pl-8"
+        className={`w-full pl-10 ${showIcons ? 'pr-10' : 'pr-4'}`}
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
       />
+      {showIcons && (
+        <div className="absolute inset-y-0 right-3 flex items-center space-x-2 text-muted-foreground">
+          <User className="h-3.5 w-3.5" />
+          <Phone className="h-3.5 w-3.5" />
+          <Mail className="h-3.5 w-3.5" />
+        </div>
+      )}
     </div>
   );
 };
