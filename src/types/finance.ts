@@ -1,6 +1,6 @@
 
 import { DateRange } from "react-day-picker";
-import { Technician } from "./technician";
+import { Technician } from './technician';
 
 export type TransactionType = "income" | "expense" | "refund" | "payment";
 
@@ -120,7 +120,7 @@ export interface SearchBarProps {
   showIcons?: boolean;
 }
 
-// Add ProjectStaff interface
+// Align ProjectStaff with project.ts definition 
 export interface ProjectStaff {
   id: string;
   name: string;
@@ -129,5 +129,11 @@ export interface ProjectStaff {
   totalHours?: number;
   totalCost?: number;
   startDate: string;
-  status: string;
+  status: "active" | "completed" | "terminated";
+  endDate?: string;
+  notes?: string;
+  specialty?: string;
+  assignedTasks?: string[];
+  email?: string;
+  phone?: string;
 }

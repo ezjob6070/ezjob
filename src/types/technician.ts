@@ -1,4 +1,42 @@
 
+// Define document types
+export interface Document {
+  id: string;
+  name: string;
+  title: string;
+  type: string;
+  size?: number;
+  uploadDate: string;
+  url: string;
+}
+
+// Define types for payment handling
+export type PaymentType = "percentage" | "flat" | "hourly" | "salary";
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
+export type IncentiveType = "none" | "bonus" | "commission" | "profit-sharing" | "other";
+export type TechnicianStatus = "active" | "inactive" | "onLeave";
+
+export interface TechnicianSubRoles {
+  technician: string[];
+  salesman: string[];
+  employed: string[];
+  contractor: string[];
+}
+
+export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
+  technician: ["HVAC", "Plumbing", "Electrical", "General"],
+  salesman: ["Field Agent", "Inside Sales", "Account Manager", "Consultant"],
+  employed: ["Office Staff", "Manager", "Customer Service", "Administrator"],
+  contractor: ["Specialist", "On-Call", "Regular", "Project-based"]
+};
+
+export interface DriverLicense {
+  number: string;
+  state: string;
+  expirationDate: string;
+}
+
+// Main Technician interface
 export interface Technician {
   id: string;
   name: string;
@@ -10,60 +48,53 @@ export interface Technician {
   hireDate: string;
   startDate?: string;
   endDate?: string;
-  status: "active" | "inactive" | "onLeave";
-  specialty?: string;
-  notes?: string;
-  salary?: number;
-  paymentType: "percentage" | "flat" | "hourly" | "salary";
+  status: TechnicianStatus;
+  paymentType: PaymentType;
   paymentRate: number;
-  hourlyRate?: number;
-  payRate?: number;
-  employmentType?: string;
-  category?: string;
-  totalRevenue?: number;
-  
-  // Adding missing properties
-  role?: "technician" | "salesman" | "employed" | "contractor";
+  hourlyRate: number;
+  specialty: string;
   subRole?: string;
-  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
-  incentiveAmount?: number;
-  salaryBasis?: "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "annually" | "commission" | "yearly";
-  documents?: Document[];
-  workContract?: string;
+  rating: number;
+  availability?: string[];
+  completedJobs: number;
+  cancelledJobs: number;
+  totalRevenue: number;
+  profileImage?: string;
+  imageUrl?: string;
   initials?: string;
-  completedJobs?: number;
-  cancelledJobs?: number;
+  salaryBasis?: SalaryBasis;
+  incentiveType?: IncentiveType;
+  incentiveAmount?: number;
+  
+  // Add properties referenced in the errors
+  role?: string;
   earnings?: number;
   jobCount?: number;
-  rating?: number;
-  imageUrl?: string;
-  profileImage?: string;
-  ssn?: string;
-  driverLicense?: any;
-  idNumber?: string;
-  date?: string;
   technicianId?: string;
+  date?: string;
+  
+  // Document handling
+  documents?: Document[];
+  notes?: string;
+  ssn?: string;
+  idNumber?: string;
+  driverLicense?: DriverLicense | string;
+  
+  // Skills and certifications referenced in the errors
+  skills?: string[];
+  certifications?: string[];
+  jobCategories?: string[];
 }
 
-// Add additional types needed by components
-export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "annually" | "commission" | "yearly";
-export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
-
-export interface TechnicianSubRoles {
-  [key: string]: string[];
-}
-
-export interface Document {
+// Job interface - minimal version to resolve errors
+export interface Job {
   id: string;
-  name: string;
-  type: string;
-  url: string;
-  uploadDate: string;
+  title: string;
+  status: string;
+  scheduledDate?: string;
+  date?: string;
+  amount: number;
+  actualAmount?: number;
+  technicianId?: string;
+  description?: string;
 }
-
-export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
-  technician: ["HVAC Technician", "Plumbing Technician", "Electrical Technician", "General Technician"],
-  salesman: ["Field Sales", "Office Sales", "Lead Generator", "Account Manager"],
-  employed: ["Office Manager", "Admin Assistant", "Accountant", "Customer Service"],
-  contractor: ["External Contractor", "Independent Technician", "Specialist", "Consultant"]
-};
