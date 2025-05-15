@@ -127,11 +127,13 @@ const useTechnicianFinancials = (initialDateRange?: DateRange): TechnicianFinanc
   const clearFilters = () => {
     setSelectedTechnicianNames([]);
     setPaymentTypeFilter("all");
+    setLocalDateRange(undefined);
   };
 
   // Apply filters (currently applied instantly)
   const applyFilters = () => {
     // Filters are applied instantly
+    console.log("Applying filters");
   };
   
   // Handle technician selection for details

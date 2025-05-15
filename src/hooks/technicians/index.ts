@@ -1,5 +1,8 @@
 
-export { default as useTechnicianFinancials } from './useTechnicianFinancials';
-export * from './useTechnicianFinancials';
-export * from './financialUtils';
-export * from './technicianFilters';
+import useTechnicianFinancials from './useTechnicianFinancials';
+import { TechnicianFinancialsHookReturn } from './useTechnicianFinancials';
+
+export {
+  useTechnicianFinancials,
+  TechnicianFinancialsHookReturn
+};
