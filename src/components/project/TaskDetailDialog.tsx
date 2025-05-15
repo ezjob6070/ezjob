@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { format, isValid, parseISO } from "date-fns";
 import { ProjectTask, ProjectStaff } from "@/types/project";
+import { Calendar, Clock, MapPin, User, Building, ArrowRight } from "lucide-react";
 
 // Props for component
 export interface TaskDetailDialogProps {
@@ -37,7 +38,7 @@ const TaskDetailDialog = ({
   const [editableTask, setEditableTask] = useState<ProjectTask | null>(null);
 
   // Update editable task when task changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (task) {
       setEditableTask({ ...task });
     }
@@ -105,6 +106,41 @@ const TaskDetailDialog = ({
     return staff ? staff.name : "Unknown";
   };
 
+  // Get status badge color
+  const getStatusBadgeColor = (status: ProjectTask["status"]) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "blocked":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-amber-100 text-amber-800";
+    }
+  };
+
+  // Get priority badge color
+  const getPriorityBadgeColor = (priority: ProjectTask["priority"]) => {
+    switch (priority) {
+      case "high":
+      case "urgent":
+        return "bg-red-100 text-red-800";
+      case "medium":
+        return "bg-amber-100 text-amber-800";
+      default:
+        return "bg-blue-100 text-blue-800";
+    }
+  };
+
+  // Format display status
+  const formatStatus = (status: ProjectTask["status"]) => {
+    switch (status) {
+      case "in_progress": return "In Progress";
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+
   // If no task is selected, don't render dialog content
   if (!task) return null;
 
@@ -112,7 +148,7 @@ const TaskDetailDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-xl font-bold">
             {editMode ? "Edit Task" : task.title}
           </DialogTitle>
         </DialogHeader>
@@ -143,6 +179,24 @@ const TaskDetailDialog = ({
                     value={editableTask?.description || ""}
                     onChange={(e) => setEditableTask(prev => prev ? { ...prev, description: e.target.value } : null)}
                     rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="edit-client" className="text-sm font-medium">Client</label>
+                  <Input
+                    id="edit-client"
+                    value={editableTask?.client || ""}
+                    onChange={(e) => setEditableTask(prev => prev ? { ...prev, client: e.target.value } : null)}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="edit-location" className="text-sm font-medium">Location</label>
+                  <Input
+                    id="edit-location"
+                    value={editableTask?.location || ""}
+                    onChange={(e) => setEditableTask(prev => prev ? { ...prev, location: e.target.value } : null)}
                   />
                 </div>
 
@@ -185,68 +239,90 @@ const TaskDetailDialog = ({
                     </Select>
                   </div>
                 </div>
+
+                <div>
+                  <label htmlFor="edit-due-date" className="text-sm font-medium">Due Date</label>
+                  <Input
+                    id="edit-due-date"
+                    type="datetime-local"
+                    value={editableTask?.dueDate ? new Date(editableTask.dueDate).toISOString().slice(0, 16) : ''}
+                    onChange={(e) => setEditableTask(prev => prev ? { ...prev, dueDate: e.target.value } : null)}
+                  />
+                </div>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium mb-1">Description</h3>
-                  <p className="text-gray-700">{task.description || "No description provided."}</p>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <Badge className={getStatusBadgeColor(task.status)}>
+                    {formatStatus(task.status)}
+                  </Badge>
+                  <Badge className={getPriorityBadgeColor(task.priority)}>
+                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+                  </Badge>
+                </div>
+                
+                {task.client && (
+                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-md">
+                    <div className="p-1.5 rounded-md bg-blue-50">
+                      <Building className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 mb-0.5">Client</p>
+                      <p className="font-medium">{task.client}</p>
+                    </div>
+                  </div>
+                )}
+
+                {task.description && (
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-medium text-gray-500">Description</h3>
+                    <p className="text-gray-700 text-sm">{task.description}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {task.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm">{task.location}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm">Due: {safeFormatDate(task.dueDate)}</span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium mb-1">Priority</h3>
-                    <Badge className={
-                      task.priority === "high" || task.priority === "urgent" ? 
-                      "bg-red-100 text-red-800" : 
-                      task.priority === "medium" ? 
-                      "bg-amber-100 text-amber-800" : 
-                      "bg-blue-100 text-blue-800"
-                    }>
-                      {task.priority}
-                    </Badge>
+                <div className="flex flex-col space-y-4 border-t border-gray-100 pt-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm font-medium">Assigned to</span>
+                    </div>
+                    <span className="text-sm">{getAssignedStaffName(task.assignedTo)}</span>
                   </div>
 
-                  <div>
-                    <h3 className="text-sm font-medium mb-1">Status</h3>
-                    <Badge className={
-                      task.status === "completed" ? "bg-green-100 text-green-800" : 
-                      task.status === "in_progress" ? "bg-blue-100 text-blue-800" : 
-                      task.status === "blocked" ? "bg-red-100 text-red-800" : 
-                      "bg-amber-100 text-amber-800"
-                    }>
-                      {task.status}
-                    </Badge>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-medium mb-1">Due Date</h3>
-                    <p>{safeFormatDate(task.dueDate)}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-medium mb-1">Assigned To</h3>
-                    <p>{getAssignedStaffName(task.assignedTo)}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-medium mb-1">Created On</h3>
-                    <p>{safeFormatDate(task.createdAt)}</p>
-                  </div>
-
+                  {task.createdAt && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-500">Created on</span>
+                      <span className="text-sm">{safeFormatDate(task.createdAt)}</span>
+                    </div>
+                  )}
+                  
                   {task.completedAt && (
-                    <div>
-                      <h3 className="text-sm font-medium mb-1">Completed On</h3>
-                      <p>{safeFormatDate(task.completedAt)}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-500">Completed on</span>
+                      <span className="text-sm">{safeFormatDate(task.completedAt)}</span>
                     </div>
                   )}
                 </div>
 
-                {task.progress !== undefined && (
-                  <div>
+                {(task.progress !== undefined && task.progress !== null) && (
+                  <div className="border-t border-gray-100 pt-4">
                     <div className="flex justify-between items-center mb-1">
-                      <h3 className="text-sm font-medium">Progress</h3>
-                      <span className="text-sm">{task.progress}%</span>
+                      <h3 className="text-sm font-medium text-gray-500">Progress</h3>
+                      <span className="text-sm font-medium">{task.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
@@ -259,7 +335,7 @@ const TaskDetailDialog = ({
               </div>
             )}
 
-            <div className="flex flex-wrap justify-between gap-2 pt-4">
+            <div className="flex flex-wrap justify-between gap-2 pt-4 border-t border-gray-100">
               {editMode ? (
                 <>
                   <Button variant="outline" onClick={handleCancelEdit}>
@@ -333,14 +409,74 @@ const TaskDetailDialog = ({
           </TabsContent>
 
           <TabsContent value="history" className="space-y-4 py-4">
-            <div className="text-center py-6 text-gray-500">
-              <p>Task history will be displayed here.</p>
+            <div className="border rounded-md">
+              <div className="p-4 border-b">
+                <div className="flex justify-between items-center mb-1">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-blue-100 rounded-full p-1.5">
+                      <Clock className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <span className="font-medium">Task created</span>
+                  </div>
+                  <span className="text-sm text-gray-500">{safeFormatDate(task.createdAt)}</span>
+                </div>
+                <p className="text-sm text-gray-500 ml-9">Task was created by Admin</p>
+              </div>
+
+              {task.status === "in_progress" && (
+                <div className="p-4 border-b">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-blue-100 rounded-full p-1.5">
+                        <ArrowRight className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <span className="font-medium">Status changed</span>
+                    </div>
+                    <span className="text-sm text-gray-500">Today</span>
+                  </div>
+                  <p className="text-sm text-gray-500 ml-9">Status changed from Pending to In Progress</p>
+                </div>
+              )}
+              
+              {task.status === "completed" && task.completedAt && (
+                <div className="p-4">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-green-100 rounded-full p-1.5">
+                        <Clock className="h-4 w-4 text-green-600" />
+                      </div>
+                      <span className="font-medium">Task completed</span>
+                    </div>
+                    <span className="text-sm text-gray-500">{safeFormatDate(task.completedAt)}</span>
+                  </div>
+                  <p className="text-sm text-gray-500 ml-9">Task was marked as completed</p>
+                </div>
+              )}
+              
+              {task.history && task.history.length > 0 ? (
+                task.history.map((entry, index) => (
+                  <div key={index} className="p-4 border-b last:border-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium">{entry.title}</span>
+                      <span className="text-sm text-gray-500">{safeFormatDate(entry.date)}</span>
+                    </div>
+                    <p className="text-sm text-gray-500">{entry.description}</p>
+                  </div>
+                ))
+              ) : task.status !== "in_progress" && task.status !== "completed" && (
+                <div className="p-6 text-center text-gray-500">
+                  <p>No additional history entries</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="files" className="space-y-4 py-4">
-            <div className="text-center py-6 text-gray-500">
-              <p>Related files will be displayed here.</p>
+            <div className="text-center p-8 border rounded-md">
+              <p className="text-gray-500 mb-4">No files attached to this task</p>
+              <Button variant="outline" size="sm">
+                Attach File
+              </Button>
             </div>
           </TabsContent>
         </Tabs>
