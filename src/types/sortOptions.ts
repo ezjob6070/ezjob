@@ -13,4 +13,10 @@ export type SortOption =
   | "amount-asc"
   | "amount-desc"
   | "status-asc"
-  | "status-desc";
+  | "status-desc"
+  | "profit-high"
+  | "profit-low"
+  | "amount-high"
+  | "amount-low"
+  | "rating-high"
+  | "rating-low";

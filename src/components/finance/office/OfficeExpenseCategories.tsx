@@ -49,10 +49,22 @@ const officeExpenseCategories: ExpenseCategory[] = [
 
 interface OfficeExpenseCategoriesProps {
   categories?: ExpenseCategory[];
+  activeCategory?: string;
+  setActiveCategory?: (id: string) => void;
+  selectedTimeFrame?: "all" | "week" | "month" | "quarter" | "year";
+  setSelectedTimeFrame?: (timeframe: "all" | "week" | "month" | "quarter" | "year") => void;
+  onAddCategory?: (category: ExpenseCategory) => void;
+  onUpdateBudget?: (categoryId: string, budget: number) => void;
 }
 
 const OfficeExpenseCategories: React.FC<OfficeExpenseCategoriesProps> = ({ 
-  categories = officeExpenseCategories 
+  categories = officeExpenseCategories,
+  activeCategory,
+  setActiveCategory,
+  selectedTimeFrame,
+  setSelectedTimeFrame,
+  onAddCategory,
+  onUpdateBudget
 }) => {
   // Function to format currency
   const formatCurrency = (amount: number) => {
@@ -62,6 +74,12 @@ const OfficeExpenseCategories: React.FC<OfficeExpenseCategoriesProps> = ({
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
+  };
+
+  const handleCardClick = (categoryId: string) => {
+    if (setActiveCategory) {
+      setActiveCategory(categoryId);
+    }
   };
 
   return (
@@ -80,7 +98,11 @@ const OfficeExpenseCategories: React.FC<OfficeExpenseCategoriesProps> = ({
         };
         
         return (
-          <Card key={enrichedCategory.id}>
+          <Card 
+            key={enrichedCategory.id} 
+            className={activeCategory === enrichedCategory.id ? "ring-2 ring-blue-500" : ""}
+            onClick={() => handleCardClick(enrichedCategory.id)}
+          >
             <CardContent className="p-4">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-medium">{enrichedCategory.name}</h3>
