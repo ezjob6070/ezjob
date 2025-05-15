@@ -2,29 +2,30 @@
 export interface Job {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   status: string;
-  priority: string;
+  priority?: string;
+  clientId?: string;
   client?: {
     id: string;
     name: string;
-    phone: string;
-    email: string;
-    address: string;
+    phone?: string;
+    email?: string;
+    address?: string;
   };
+  clientName?: string;
   technician?: {
     id: string;
     name: string;
   };
   technicianId?: string;
   technicianName?: string;
-  clientName?: string;
-  scheduledDate: string;
+  scheduledDate: string | Date;
   date?: string | Date;
   time?: string;
-  expectedDuration: number;
-  serviceCategory: string;
-  serviceType: string;
+  expectedDuration?: number;
+  serviceCategory?: string;
+  serviceType?: string;
   amount: number;
   actualAmount?: number;
   jobSource?: string;
@@ -34,4 +35,15 @@ export interface Job {
   attachments?: any[];
   images?: any[];
   allDay?: boolean;
+  contactName?: string;
+  contactPhone?: string;
+  contractorId?: string;
+  contractorName?: string;
+  jobSourceId?: string;
+  jobSourceName?: string;
+  parts?: string[];
+  cancellationReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  paymentStatus?: string;
 }

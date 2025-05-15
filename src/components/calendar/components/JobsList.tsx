@@ -16,6 +16,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationEllipsis
 } from "@/components/ui/pagination";
 
 interface JobsListProps {
@@ -92,22 +93,6 @@ const JobsList = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentJobs = filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
-
-  // Generate page numbers
-  const pageNumbers = [];
-  const maxPagesToShow = 3;
-  
-  let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-  let endPage = startPage + maxPagesToShow - 1;
-  
-  if (endPage > totalPages) {
-    endPage = totalPages;
-    startPage = Math.max(1, endPage - maxPagesToShow + 1);
-  }
-  
-  for (let i = startPage; i <= endPage; i++) {
-    pageNumbers.push(i);
-  }
 
   return (
     <div className="mb-6 animate-fade-in">
@@ -212,7 +197,7 @@ const JobsList = ({
                     </PaginationItem>
                   )}
                   
-                  {startPage > 1 && (
+                  {currentPage > 2 && (
                     <PaginationItem>
                       <PaginationLink 
                         href="#" 
@@ -226,34 +211,56 @@ const JobsList = ({
                     </PaginationItem>
                   )}
                   
-                  {startPage > 2 && (
+                  {currentPage > 3 && (
                     <PaginationItem>
-                      <PaginationLink disabled>...</PaginationLink>
+                      <PaginationEllipsis />
                     </PaginationItem>
                   )}
                   
-                  {pageNumbers.map(number => (
-                    <PaginationItem key={number}>
+                  {currentPage > 1 && (
+                    <PaginationItem>
                       <PaginationLink 
                         href="#" 
-                        isActive={currentPage === number}
                         onClick={(e) => {
                           e.preventDefault();
-                          setCurrentPage(number);
+                          setCurrentPage(currentPage - 1);
                         }}
                       >
-                        {number}
+                        {currentPage - 1}
                       </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  
-                  {endPage < totalPages - 1 && (
-                    <PaginationItem>
-                      <PaginationLink disabled>...</PaginationLink>
                     </PaginationItem>
                   )}
                   
-                  {endPage < totalPages && (
+                  <PaginationItem>
+                    <PaginationLink 
+                      href="#" 
+                      isActive
+                    >
+                      {currentPage}
+                    </PaginationLink>
+                  </PaginationItem>
+                  
+                  {currentPage < totalPages && (
+                    <PaginationItem>
+                      <PaginationLink 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(currentPage + 1);
+                        }}
+                      >
+                        {currentPage + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+                  
+                  {currentPage < totalPages - 2 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                  
+                  {currentPage < totalPages - 1 && (
                     <PaginationItem>
                       <PaginationLink 
                         href="#" 
