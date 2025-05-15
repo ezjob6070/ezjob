@@ -2,7 +2,11 @@
 import { useState, useMemo } from "react";
 import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
-import { calculateFinancialMetrics, calculateTechnicianMetrics, formatDateRangeText } from "./financialUtils";
+import { 
+  calculateFinancialMetrics, 
+  calculateTechnicianMetrics, 
+  formatDateRangeText 
+} from "./financialUtils";
 import { filterTechnicians, toggleTechnicianInFilter } from "./technicianFilters";
 import { format } from "date-fns";
 
