@@ -48,7 +48,7 @@ const TechniciansDashboard: React.FC<TechniciansDashboardProps> = ({
     clearFilters,
     applyFilters,
     handleTechnicianSelect
-  } = useTechnicianFinancials(filteredTechnicians, dateRange);
+  } = useTechnicianFinancials(dateRange);
 
   useEffect(() => {
     const filtered = activeTechnicians;

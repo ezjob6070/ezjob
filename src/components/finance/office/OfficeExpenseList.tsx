@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { 
@@ -49,6 +48,8 @@ const OfficeExpenseList = ({
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Update the type to include recurring and receipt fields
   const [newExpense, setNewExpense] = useState<Partial<OfficeExpense>>({
     date: new Date().toISOString().split('T')[0],
     category: activeCategory || "",
@@ -57,7 +58,8 @@ const OfficeExpenseList = ({
     paymentMethod: "credit",
     vendor: "",
     status: "paid",
-    recurring: false
+    recurring: false,
+    receipt: ""
   });
   
   const filteredExpenses = expenses.filter(expense => {
@@ -83,8 +85,9 @@ const OfficeExpenseList = ({
       amount: Number(newExpense.amount),
       paymentMethod: newExpense.paymentMethod || "credit",
       vendor: newExpense.vendor || "",
-      recurring: newExpense.recurring || false,
-      status: newExpense.status || "paid"
+      status: newExpense.status || "paid" as "paid" | "pending" | "overdue",
+      recurring: newExpense.recurring,
+      receipt: newExpense.receipt
     } as OfficeExpense;
 
     if (selectedExpense) {
@@ -103,7 +106,8 @@ const OfficeExpenseList = ({
       paymentMethod: "credit",
       vendor: "",
       status: "paid",
-      recurring: false
+      recurring: false,
+      receipt: ""
     });
   };
 
@@ -195,10 +199,25 @@ const OfficeExpenseList = ({
       paymentMethod: "credit",
       vendor: "",
       status: "paid",
-      recurring: false
+      recurring: false,
+      receipt: ""
     });
     setIsAddEditDialogOpen(true);
   };
+
+  // Fix Input type to handle Date objects for 'date' field
+  const renderDateInput = () => (
+    <div className="flex">
+      <Calendar className="h-4 w-4 absolute mt-3 ml-3 text-muted-foreground" />
+      <Input
+        id="date"
+        type="date"
+        value={typeof newExpense.date === 'string' ? newExpense.date : newExpense.date?.toISOString().split('T')[0] || ''}
+        onChange={(e) => setNewExpense({...newExpense, date: e.target.value})}
+        className="pl-10"
+      />
+    </div>
+  );
 
   return (
     <div>
@@ -397,17 +416,7 @@ const OfficeExpenseList = ({
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="date">Date</Label>
-                <div className="flex">
-                  <Calendar className="h-4 w-4 absolute mt-3 ml-3 text-muted-foreground" />
-                  <Input
-                    id="date"
-                    type="date"
-                    value={newExpense.date}
-                    onChange={(e) => setNewExpense({...newExpense, date: e.target.value})}
-                    className="pl-10"
-                  />
-                </div>
+                {renderDateInput()}
               </div>
               
               <div className="flex flex-col gap-2">

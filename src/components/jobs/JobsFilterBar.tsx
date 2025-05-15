@@ -28,6 +28,7 @@ import { AmountFilter } from "./AmountFilter";
 import PaymentMethodFilter from "./PaymentMethodFilter";
 import JobSortFilter from "./filters/JobSortFilter";
 import CustomFilterDialogContent from "./filters/CustomFilterDialogContent";
+import { SortOption } from "./types/JobSortTypes";
 
 const JobsFilterBar = () => {
   const { 
@@ -93,12 +94,18 @@ const JobsFilterBar = () => {
     return [...new Set(contractors)].sort();
   }, [jobs]);
 
+  // Ensure sortBy is a valid SortOption
+  const typedSortBy = (sortBy || "date-desc") as SortOption;
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 bg-gray-50 p-3 rounded-md border border-gray-100">
       <div className="flex flex-wrap items-center gap-2">
         {/* Sort Filter */}
         <div className="mr-1">
-          <JobSortFilter sortBy={sortBy} setSortBy={setSortBy} />
+          <JobSortFilter 
+            sortBy={typedSortBy} 
+            setSortBy={(value) => setSortBy(value)}
+          />
         </div>
         
         {/* Technician Filter */}

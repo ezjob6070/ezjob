@@ -2,31 +2,33 @@
 export interface Job {
   id: string;
   title: string;
-  description?: string;
-  status: "pending" | "scheduled" | "in-progress" | "completed" | "cancelled" | "in_progress" | "canceled" | "rescheduled" | "estimate";
-  priority?: "low" | "medium" | "high" | "urgent";
-  date: string | Date;
-  scheduledDate?: string | Date;
+  description: string;
+  status: string;
+  priority: string;
+  client: {
+    id: string;
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+  };
+  technician?: {
+    id: string;
+    name: string;
+  };
+  technicianId?: string;
+  scheduledDate: string;
+  date?: string;
+  time?: string;
+  expectedDuration: number;
+  serviceCategory: string;
+  serviceType: string;
   amount: number;
   actualAmount?: number;
-  technicianId?: string;  // Reference to the technician assigned to the job
-  clientId?: string;
-  source?: string;
-  projectId?: string;
-  category?: string;
-  type?: string;
+  jobSource?: string;
   notes?: string;
-  clientName?: string;
-  location?: string;
-  color?: string;
-  
-  // Additional properties needed by other components
-  jobSourceId?: string;
-  jobSourceName?: string;
-  technicianName?: string;
-  isAllDay?: boolean;
-  paymentStatus?: "paid" | "unpaid" | "partial";
-  cancellationReason?: string;
-  contractorName?: string;
-  contractorId?: string;
+  address?: string;
+  paymentMethod?: string;
+  attachments?: any[];
+  images?: any[];
 }

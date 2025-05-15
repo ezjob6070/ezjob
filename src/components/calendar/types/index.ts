@@ -22,7 +22,8 @@ export interface Task {
   isReminder?: boolean;
   reminderTime?: string; // Specific time for the reminder
   reminderSent?: boolean;
-  technicianId?: string; // Add this to align with Job type
-  role?: string;
-  subRole?: string;
+  
+  // Additional props for day component
+  day?: any;
+  className?: string;
 }

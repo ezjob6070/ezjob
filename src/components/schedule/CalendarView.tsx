@@ -1,3 +1,4 @@
+
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -287,8 +288,11 @@ const CalendarView = ({
                 });
                 
                 const tasksAtHour = currentViewEvents.tasks.filter(task => {
-                  return task.dueDate.getHours() === hour && 
-                    isSameDay(task.dueDate, selectedDate);
+                  // Fix: Use our helper function to safely get hours from task.dueDate
+                  const taskDate = ensureValidDate(task.dueDate);
+                  return taskDate && 
+                    getHoursFromDate(task.dueDate) === hour && 
+                    isSameDay(taskDate, selectedDate);
                 });
                 
                 const hasItems = jobsAtHour.length > 0 || tasksAtHour.length > 0;
@@ -719,7 +723,7 @@ const CalendarView = ({
                             <p className="text-muted-foreground capitalize">{task.priority} priority</p>
                             {viewMode !== 'day' && (
                               <p className="text-xs text-muted-foreground mt-1">
-                                {format(task.dueDate, "MMM d")}
+                                {format(task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate), "MMM d")}
                               </p>
                             )}
                           </div>

@@ -1,71 +1,55 @@
 
-import { format } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Job } from '@/types/job';
-import JobCard from './JobCard';
-import { useState } from 'react';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+import { format, isSameDay } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Job } from "@/components/jobs/JobTypes";
+import { useState, useEffect } from "react";
+import JobFilterBar from "@/components/jobs/JobFilterBar";
 
 interface JobsListProps {
   selectedDate: Date;
   jobsForSelectedDate: Job[];
   onPreviousDay: () => void;
   onNextDay: () => void;
-  onJobUpdate?: (jobId: string, updates: Partial<Job>) => void;
-  allJobs?: Job[];
+  allJobs: Job[];
 }
 
-const JobsList = ({
-  selectedDate,
-  jobsForSelectedDate,
-  onPreviousDay,
+const JobsList = ({ 
+  selectedDate, 
+  jobsForSelectedDate: initialJobsForSelectedDate, 
+  onPreviousDay, 
   onNextDay,
-  onJobUpdate,
   allJobs
 }: JobsListProps) => {
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobsForSelectedDate);
 
-  const filterJobs = () => {
-    let filtered = [...jobsForSelectedDate];
-    
-    // Filter by search
-    if (searchQuery) {
-      filtered = filtered.filter(job => 
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        (job.clientName && job.clientName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (job.description && job.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
+  // Update filtered jobs when selected date changes
+  useEffect(() => {
+    setFilteredJobs(initialJobsForSelectedDate);
+  }, [initialJobsForSelectedDate]);
+
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case "scheduled":
+        return "bg-blue-500 hover:bg-blue-600";
+      case "in_progress":
+        return "bg-yellow-500 hover:bg-yellow-600";
+      case "completed":
+        return "bg-green-500 hover:bg-green-600";
+      case "cancelled":
+        return "bg-red-500 hover:bg-red-600";
+      default:
+        return "bg-gray-500 hover:bg-gray-600";
     }
-    
-    // Filter by status
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(job => job.status === filterStatus);
-    }
-    
-    // Sort by date
-    filtered.sort((a, b) => {
-      const dateA = a.date instanceof Date ? a.date : new Date(a.date);
-      const dateB = b.date instanceof Date ? b.date : new Date(b.date);
-      
-      return sortOrder === 'newest' 
-        ? dateB.getTime() - dateA.getTime() 
-        : dateA.getTime() - dateB.getTime();
-    });
-    
-    return filtered;
   };
 
-  const filteredJobs = filterJobs();
+  const handleFilterChange = (jobs: Job[]) => {
+    // Filter jobs for the selected date
+    const jobsForDate = jobs.filter(job => isSameDay(job.date, selectedDate));
+    setFilteredJobs(jobsForDate);
+  };
 
   return (
     <div className="mb-6">
@@ -79,7 +63,7 @@ const JobsList = ({
         </Button>
         
         <h3 className="text-lg font-medium">
-          {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+          {format(selectedDate, "EEEE, MMMM d, yyyy")}
         </h3>
         
         <Button 
@@ -91,83 +75,46 @@ const JobsList = ({
         </Button>
       </div>
       
-      <div className="mb-4">
-        <div className="flex flex-col gap-3">
-          <Input 
-            placeholder="Search jobs..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
-          />
-          
-          <div className="flex gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex-1">
-                  {filterStatus === 'all' ? 'All Status' : filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setFilterStatus('all')}>
-                  All Status
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setFilterStatus('pending')}>
-                  Pending
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus('scheduled')}>
-                  Scheduled
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus('in-progress')}>
-                  In Progress
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus('completed')}>
-                  Completed
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus('cancelled')}>
-                  Cancelled
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex-1">
-                  {sortOrder === 'newest' ? (
-                    <><ArrowDown className="h-4 w-4 mr-1" /> Newest</>
-                  ) : (
-                    <><ArrowUp className="h-4 w-4 mr-1" /> Oldest</>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setSortOrder('newest')}>
-                  <ArrowDown className="h-4 w-4 mr-2" /> Newest First
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortOrder('oldest')}>
-                  <ArrowUp className="h-4 w-4 mr-2" /> Oldest First
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </div>
+      <JobFilterBar onFilterChange={handleFilterChange} allJobs={allJobs} />
       
       <div className="space-y-4">
-        <h3 className="font-medium">Jobs ({filteredJobs.length})</h3>
+        <h3 className="font-medium">
+          Jobs ({filteredJobs.length})
+        </h3>
         
         {filteredJobs.length === 0 ? (
           <p className="text-sm text-muted-foreground">No jobs scheduled for this day.</p>
         ) : (
-          <div className="space-y-2">
-            {filteredJobs.map((job) => (
-              <JobCard 
-                key={job.id} 
-                job={job} 
-                onJobUpdate={onJobUpdate}
-              />
-            ))}
-          </div>
+          filteredJobs.map((job) => (
+            <Card key={job.id} className="overflow-hidden">
+              <CardHeader className="p-4 pb-2">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-md">{job.title}</CardTitle>
+                  <Badge className={getStatusBadgeColor(job.status)}>
+                    {job.status.replace('_', ' ')}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <div className="text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Client:</span>
+                    <span className="font-medium">{job.clientName}</span>
+                  </div>
+                  {job.technicianName && (
+                    <div className="flex justify-between mt-1">
+                      <span className="text-muted-foreground">Technician:</span>
+                      <span className="font-medium">{job.technicianName}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between mt-1">
+                    <span className="text-muted-foreground">Amount:</span>
+                    <span className="font-medium">${job.amount}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
         )}
       </div>
     </div>
