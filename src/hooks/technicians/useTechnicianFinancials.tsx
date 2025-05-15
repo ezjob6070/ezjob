@@ -89,7 +89,5 @@ export const useTechnicianFinancials = (
   };
 };
 
-// Fix the missing export that's causing the error in TechniciansDashboard.tsx
-export { useTechnicianFinancials };
-
+// Make sure we export both as a named export and as default
 export default useTechnicianFinancials;
