@@ -12,7 +12,7 @@ import { Calendar as CalendarIcon, ListFilter } from "lucide-react";
 import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
-import UnifiedSidebar from "@/components/unified/UnifiedSidebar";
+import TaskAndScheduleSidebar from "@/components/schedule/TaskAndScheduleSidebar";
 import { toast } from "sonner";
 import JobsList from "@/components/calendar/components/JobsList";
 
@@ -209,8 +209,8 @@ const Schedule = () => {
         </TabsContent>
       </Tabs>
       
-      {/* Unified Sidebar */}
-      <UnifiedSidebar
+      {/* Tasks & Schedule Sidebar */}
+      <TaskAndScheduleSidebar
         jobs={jobs}
         tasks={tasks}
         isOpen={showSidebar}
