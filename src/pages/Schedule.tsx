@@ -14,6 +14,7 @@ import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import UnifiedSidebar from "@/components/unified/UnifiedSidebar";
 import { toast } from "sonner";
+import JobsList from "@/components/calendar/components/JobsList";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();

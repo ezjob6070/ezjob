@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { isSameDay } from "date-fns";
-import { Job } from "@/components/jobs/JobTypes";
+import { Job } from "@/types/job";
 import { initialJobs } from "@/data/jobs";
 import RightSidebarHeader from "./components/RightSidebarHeader";
 import RightCalendarWidget from "./components/RightCalendarWidget";
@@ -17,9 +17,10 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
 
   useEffect(() => {
-    const filtered = jobs.filter(job => 
-      isSameDay(job.date, selectedDate)
-    );
+    const filtered = jobs.filter(job => {
+      const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+      return isSameDay(jobDate, selectedDate);
+    });
     setJobsForSelectedDate(filtered);
   }, [selectedDate, jobs]);
 

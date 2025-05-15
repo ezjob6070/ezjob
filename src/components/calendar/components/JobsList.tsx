@@ -54,8 +54,8 @@ const JobsList = ({
     
     // Sort by date
     filtered.sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
+      const dateA = a.date instanceof Date ? a.date : new Date(a.date);
+      const dateB = b.date instanceof Date ? b.date : new Date(b.date);
       
       return sortOrder === 'newest' 
         ? dateB.getTime() - dateA.getTime() 

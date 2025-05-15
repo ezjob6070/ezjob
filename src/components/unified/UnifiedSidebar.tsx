@@ -1,432 +1,321 @@
-
 import { useState, useEffect } from "react";
-import { isSameDay, addMonths, subMonths, format } from "date-fns";
-import { Calendar as CalendarIcon, List, CheckSquare, LayoutGrid, ChevronDown, ChevronUp, Filter } from "lucide-react";
-import { Task } from "@/components/calendar/types";
-import { Job } from "@/types/job";
-import { cn } from "@/lib/utils";
-
-// Components
-import SidebarHeader from "@/components/calendar/components/SidebarHeader";
-import CalendarWidget from "@/components/calendar/components/CalendarWidget";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon, Search, Filter, ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Job } from "@/types/job";
+import { Task } from "@/components/calendar/types";
 import JobCard from "@/components/calendar/components/JobCard";
 import TaskCard from "@/components/calendar/components/TaskCard";
 import ReminderCard from "@/components/schedule/ReminderCard";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger
+} from "@/components/ui/tabs";
 
-export interface UnifiedSidebarProps {
+interface UnifiedSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
   jobs: Job[];
   tasks: Task[];
-  isOpen: boolean;
-  onClose?: () => void;
   onJobUpdate?: (jobId: string, updates: Partial<Job>) => void;
   onTaskUpdate?: (taskId: string, updates: Partial<Task>) => void;
   onCreateFollowUp?: (task: Task) => void;
 }
 
-const UnifiedSidebar = ({ 
-  jobs, 
-  tasks, 
-  isOpen, 
+const UnifiedSidebar = ({
+  isOpen,
   onClose,
+  jobs,
+  tasks,
   onJobUpdate,
   onTaskUpdate,
   onCreateFollowUp
 }: UnifiedSidebarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
-  const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
-  const [activeTab, setActiveTab] = useState<"all" | "jobs" | "tasks">("all");
+  const [selectedView, setSelectedView] = useState<"all" | "jobs" | "tasks" | "reminders">("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterPriority, setFilterPriority] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [showFilters, setShowFilters] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-
+  
+  const [filteredItems, setFilteredItems] = useState<Array<Job | Task>>([]);
+  
+  // Filter and sort items when dependencies change
   useEffect(() => {
-    // Filter jobs for the selected date
-    const filteredJobs = jobs.filter(job => {
-      if (!job.date) return false;
+    // Get jobs for selected date
+    const jobsForDate = jobs.filter(job => {
       const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
-      return isSameDay(jobDate, selectedDate);
+      return jobDate.toDateString() === selectedDate.toDateString();
     });
-    setJobsForSelectedDate(filteredJobs);
     
-    // Filter tasks for the selected date
-    const filteredTasks = tasks.filter(task => {
-      if (!task.dueDate) return false;
+    // Get tasks for selected date
+    const tasksForDate = tasks.filter(task => {
       const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-      return isSameDay(taskDate, selectedDate);
+      return taskDate.toDateString() === selectedDate.toDateString();
     });
-    setTasksForSelectedDate(filteredTasks);
-  }, [selectedDate, jobs, tasks]);
-
-  const handlePrevMonth = () => {
-    setCurrentMonth(prev => subMonths(prev, 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentMonth(prev => addMonths(prev, 1));
-  };
-
-  const handlePreviousDay = () => {
-    const prevDay = new Date(selectedDate);
-    prevDay.setDate(prevDay.getDate() - 1);
-    setSelectedDate(prevDay);
-  };
-
-  const handleNextDay = () => {
-    const nextDay = new Date(selectedDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    setSelectedDate(nextDay);
-  };
-
-  const filterItems = () => {
-    let filteredJobs: Job[] = [...jobsForSelectedDate];
-    let filteredTasks: Task[] = [...tasksForSelectedDate];
+    
+    // Apply view filter
+    let filtered: Array<Job | Task> = [];
+    if (selectedView === "all") {
+      filtered = [...jobsForDate, ...tasksForDate];
+    } else if (selectedView === "jobs") {
+      filtered = [...jobsForDate];
+    } else if (selectedView === "tasks") {
+      filtered = tasksForDate.filter(task => !task.isReminder);
+    } else if (selectedView === "reminders") {
+      filtered = tasksForDate.filter(task => task.isReminder);
+    }
     
     // Apply search filter
     if (searchQuery) {
-      filteredJobs = filteredJobs.filter(job => 
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (job.description && job.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (job.clientName && job.clientName.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-      
-      filteredTasks = filteredTasks.filter(task => 
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        task.client.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Apply priority filter
-    if (filterPriority !== "all") {
-      filteredJobs = filteredJobs.filter(job => job.priority === filterPriority);
-      filteredTasks = filteredTasks.filter(task => task.priority === filterPriority);
+      filtered = filtered.filter(item => {
+        const title = 'title' in item ? item.title.toLowerCase() : '';
+        const description = 'description' in item ? item.description?.toLowerCase() || '' : '';
+        const clientName = 'client' in item ? item.client.name.toLowerCase() : 
+                          'clientName' in item ? item.clientName?.toLowerCase() || '' : '';
+        
+        return (
+          title.includes(searchQuery.toLowerCase()) ||
+          description.includes(searchQuery.toLowerCase()) ||
+          clientName.includes(searchQuery.toLowerCase())
+        );
+      });
     }
     
     // Apply status filter
     if (filterStatus !== "all") {
-      filteredJobs = filteredJobs.filter(job => job.status === filterStatus);
-      filteredTasks = filteredTasks.filter(task => task.status === filterStatus);
+      filtered = filtered.filter(item => item.status === filterStatus);
+    }
+    
+    // Apply priority filter
+    if (filterPriority !== "all") {
+      filtered = filtered.filter(item => item.priority === filterPriority);
     }
     
     // Apply sort
-    const sortItems = (a: any, b: any) => {
-      const dateA = new Date(a.date || a.dueDate);
-      const dateB = new Date(b.date || b.dueDate);
-      return sortOrder === "newest" 
-        ? dateB.getTime() - dateA.getTime() 
-        : dateA.getTime() - dateB.getTime();
-    };
+    filtered.sort((a, b) => {
+      const dateA = 'date' in a ? a.date instanceof Date ? a.date : new Date(a.date) : 
+                  'dueDate' in a ? a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate as string) : new Date();
+                  
+      const dateB = 'date' in b ? b.date instanceof Date ? b.date : new Date(b.date) : 
+                  'dueDate' in b ? b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate as string) : new Date();
+                  
+      return sortOrder === "newest" ? 
+        dateB.getTime() - dateA.getTime() : 
+        dateA.getTime() - dateB.getTime();
+    });
     
-    filteredJobs.sort(sortItems);
-    filteredTasks.sort(sortItems);
-    
-    return { filteredJobs, filteredTasks };
-  };
+    setFilteredItems(filtered);
+  }, [jobs, tasks, selectedDate, selectedView, searchQuery, filterStatus, filterPriority, sortOrder]);
   
-  const { filteredJobs, filteredTasks } = filterItems();
-  
-  const jobsCount = jobsForSelectedDate.length;
-  const tasksCount = tasksForSelectedDate.filter(t => !t.isReminder).length;
-  const remindersCount = tasksForSelectedDate.filter(t => t.isReminder).length;
-  const totalCount = jobsCount + tasksCount + remindersCount;
-
   if (!isOpen) return null;
+  
+  const jobsCount = jobs.filter(job => {
+    const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+    return jobDate.toDateString() === selectedDate.toDateString();
+  }).length;
+  
+  const tasksCount = tasks.filter(task => {
+    const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+    return taskDate.toDateString() === selectedDate.toDateString() && !task.isReminder;
+  }).length;
+  
+  const remindersCount = tasks.filter(task => {
+    const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+    return taskDate.toDateString() === selectedDate.toDateString() && task.isReminder;
+  }).length;
 
   return (
-    <aside className="fixed top-0 right-0 z-20 h-screen w-80 flex flex-col bg-card text-card-foreground border-l border-border shadow-lg transition-all duration-300 ease-in-out pt-16">
-      <SidebarHeader 
-        currentMonth={currentMonth}
-        onPrevMonth={handlePrevMonth}
-        onNextMonth={handleNextMonth}
-      />
+    <aside className="fixed top-0 right-0 z-30 h-screen w-80 flex flex-col bg-card text-card-foreground border-l border-border transition-all duration-300 ease-in-out">
+      {/* Header */}
+      <div className="py-4 px-4 border-b flex items-center justify-between">
+        <h2 className="font-semibold text-lg flex items-center gap-2">
+          <CalendarIcon className="h-5 w-5" />
+          Schedule
+        </h2>
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          ×
+        </Button>
+      </div>
       
-      <div className="flex-1 py-4 px-4 overflow-auto">
-        <CalendarWidget 
-          selectedDate={selectedDate} 
-          setSelectedDate={setSelectedDate} 
-          jobs={jobs}
-          tasks={tasks}
-          currentMonth={currentMonth}
+      {/* Calendar */}
+      <div className="p-4 border-b">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={(date) => date && setSelectedDate(date)}
+          className="w-full"
+        />
+      </div>
+      
+      {/* Filters */}
+      <div className="p-4 space-y-3 border-b">
+        <Input
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full"
+          prefix={<Search className="h-4 w-4" />}
         />
         
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium">
-              {format(selectedDate, "MMMM d, yyyy")}
-            </h3>
-            
-            <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={handlePreviousDay}
-              >
-                <ChevronDown className="h-4 w-4" />
+        <Tabs 
+          value={selectedView} 
+          onValueChange={(value) => setSelectedView(value as any)}
+          className="w-full"
+        >
+          <TabsList className="grid grid-cols-4 w-full">
+            <TabsTrigger value="all" className="text-xs">
+              All ({jobsCount + tasksCount + remindersCount})
+            </TabsTrigger>
+            <TabsTrigger value="jobs" className="text-xs">
+              Jobs ({jobsCount})
+            </TabsTrigger>
+            <TabsTrigger value="tasks" className="text-xs">
+              Tasks ({tasksCount})
+            </TabsTrigger>
+            <TabsTrigger value="reminders" className="text-xs">
+              Reminders ({remindersCount})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="flex-1">
+                {filterStatus === "all" ? "All Status" : filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
               </Button>
-              
-              <Button 
-                variant="outline"
-                size="icon" 
-                onClick={handleNextDay}
-              >
-                <ChevronUp className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setFilterStatus("all")}>
+                All Status
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setFilterStatus("pending")}>
+                Pending
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterStatus("scheduled")}>
+                Scheduled
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterStatus("in-progress")}>
+                In Progress
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterStatus("completed")}>
+                Completed
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterStatus("cancelled")}>
+                Cancelled
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="flex-1">
+                {sortOrder === "newest" ? (
+                  <><ArrowDown className="h-4 w-4 mr-1" /> Newest</>
+                ) : (
+                  <><ArrowUp className="h-4 w-4 mr-1" /> Oldest</>
+                )}
               </Button>
-            </div>
-          </div>
-          
-          <Input 
-            placeholder="Search..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-4"
-          />
-          
-          <div className="flex justify-between items-center mb-4">
-            <Tabs
-              value={activeTab}
-              onValueChange={(value) => setActiveTab(value as "all" | "jobs" | "tasks")}
-              className="w-auto"
-            >
-              <TabsList>
-                <TabsTrigger value="all" className="text-xs">
-                  All ({totalCount})
-                </TabsTrigger>
-                <TabsTrigger value="jobs" className="text-xs">
-                  <CalendarIcon className="h-3.5 w-3.5 mr-1" />
-                  Jobs ({jobsCount})
-                </TabsTrigger>
-                <TabsTrigger value="tasks" className="text-xs">
-                  <CheckSquare className="h-3.5 w-3.5 mr-1" />
-                  Tasks ({tasksCount + remindersCount})
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className="h-8 px-2"
-            >
-              <Filter className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setSortOrder("newest")}>
+                <ArrowDown className="h-4 w-4 mr-2" /> Newest First
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
+                <ArrowUp className="h-4 w-4 mr-2" /> Oldest First
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="w-full">
+              <Filter className="h-4 w-4 mr-2" />
+              {filterPriority === "all" ? "All Priorities" : filterPriority.charAt(0).toUpperCase() + filterPriority.slice(1) + " Priority"}
             </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => setFilterPriority("all")}>
+              All Priorities
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setFilterPriority("low")}>
+              Low Priority
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilterPriority("medium")}>
+              Medium Priority
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilterPriority("high")}>
+              High Priority
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilterPriority("urgent")}>
+              Urgent Priority
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
+      {/* Items List */}
+      <div className="flex-1 p-4 overflow-y-auto">
+        <h3 className="font-medium mb-3">
+          {format(selectedDate, "MMMM d, yyyy")} • {filteredItems.length} items
+        </h3>
+        
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No items scheduled for this day.
           </div>
-          
-          {showFilters && (
-            <div className="flex flex-col gap-2 mb-4 p-2 border rounded-md">
-              <div className="grid grid-cols-2 gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full justify-between">
-                      {filterPriority === "all" ? "Priority" : filterPriority}
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setFilterPriority("all")}>
-                      All Priorities
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setFilterPriority("low")}>
-                      Low
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterPriority("medium")}>
-                      Medium
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterPriority("high")}>
-                      High
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterPriority("urgent")}>
-                      Urgent
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full justify-between">
-                      {filterStatus === "all" ? "Status" : filterStatus}
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setFilterStatus("all")}>
-                      All Status
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setFilterStatus("pending")}>
-                      Pending
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("scheduled")}>
-                      Scheduled
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("in-progress")}>
-                      In Progress
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("completed")}>
-                      Completed
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("cancelled")}>
-                      Cancelled
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full justify-between">
-                    Sort: {sortOrder === "newest" ? "Newest First" : "Oldest First"}
-                    <ChevronDown className="h-4 w-4 ml-1" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setSortOrder("newest")}>
-                    Newest First
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
-                    Oldest First
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
-
-          {/* Content based on active tab */}
-          <TabsContent value="all" className="mt-0 space-y-4">
-            {filteredJobs.length === 0 && filteredTasks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No items scheduled for this day.</p>
-            ) : (
-              <>
-                {filteredJobs.length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex items-center mb-2">
-                      <CalendarIcon className="h-4 w-4 mr-2 text-primary" />
-                      <h3 className="font-medium">Jobs ({filteredJobs.length})</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {filteredJobs.map((job) => (
-                        <JobCard 
-                          key={job.id}
-                          job={job}
-                          onJobUpdate={onJobUpdate}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {filteredTasks.filter(t => !t.isReminder).length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex items-center mb-2">
-                      <CheckSquare className="h-4 w-4 mr-2 text-primary" />
-                      <h3 className="font-medium">Tasks ({filteredTasks.filter(t => !t.isReminder).length})</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {filteredTasks.filter(t => !t.isReminder).map((task) => (
-                        <TaskCard 
-                          key={task.id}
-                          task={task}
-                          onTaskUpdate={onTaskUpdate}
-                          onCreateFollowUp={onCreateFollowUp}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {filteredTasks.filter(t => t.isReminder).length > 0 && (
-                  <div>
-                    <div className="flex items-center mb-2">
-                      <CalendarIcon className="h-4 w-4 mr-2 text-primary" />
-                      <h3 className="font-medium">Reminders ({filteredTasks.filter(t => t.isReminder).length})</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {filteredTasks.filter(t => t.isReminder).map((reminder) => (
-                        <ReminderCard 
-                          key={reminder.id}
-                          reminder={reminder}
-                          onReminderUpdate={onTaskUpdate}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </TabsContent>
-
-          <TabsContent value="jobs" className="mt-0">
-            {filteredJobs.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No jobs scheduled for this day.</p>
-            ) : (
-              <div className="space-y-2">
-                {filteredJobs.map((job) => (
+        ) : (
+          <div className="space-y-3">
+            {filteredItems.map((item) => {
+              // Check if item is a Job
+              if ('clientName' in item) {
+                return (
                   <JobCard 
-                    key={job.id}
-                    job={job}
+                    key={`job-${item.id}`} 
+                    job={item as Job} 
                     onJobUpdate={onJobUpdate}
                   />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="tasks" className="mt-0">
-            {filteredTasks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No tasks scheduled for this day.</p>
-            ) : (
-              <div className="space-y-4">
-                {filteredTasks.filter(t => !t.isReminder).length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Tasks ({filteredTasks.filter(t => !t.isReminder).length})</h3>
-                    <div className="space-y-2">
-                      {filteredTasks.filter(t => !t.isReminder).map((task) => (
-                        <TaskCard 
-                          key={task.id}
-                          task={task}
-                          onTaskUpdate={onTaskUpdate}
-                          onCreateFollowUp={onCreateFollowUp}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {filteredTasks.filter(t => t.isReminder).length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Reminders ({filteredTasks.filter(t => t.isReminder).length})</h3>
-                    <div className="space-y-2">
-                      {filteredTasks.filter(t => t.isReminder).map((reminder) => (
-                        <ReminderCard 
-                          key={reminder.id}
-                          reminder={reminder}
-                          onReminderUpdate={onTaskUpdate}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </TabsContent>
-        </div>
+                );
+              } 
+              // Check if item is a Reminder
+              else if ('isReminder' in item && item.isReminder) {
+                return (
+                  <ReminderCard 
+                    key={`reminder-${item.id}`} 
+                    reminder={item as Task} 
+                    onReminderUpdate={onTaskUpdate}
+                  />
+                );
+              } 
+              // Otherwise it's a Task
+              else {
+                return (
+                  <TaskCard 
+                    key={`task-${item.id}`} 
+                    task={item as Task} 
+                    onTaskUpdate={onTaskUpdate}
+                    onCreateFollowUp={onCreateFollowUp ? () => onCreateFollowUp(item as Task) : undefined}
+                  />
+                );
+              }
+            })}
+          </div>
+        )}
       </div>
     </aside>
   );

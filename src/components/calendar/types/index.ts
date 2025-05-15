@@ -23,4 +23,6 @@ export interface Task {
   reminderTime?: string; // Specific time for the reminder
   reminderSent?: boolean;
   technicianId?: string; // Add this to align with Job type
+  role?: string;
+  subRole?: string;
 }
