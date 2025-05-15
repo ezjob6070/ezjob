@@ -10,24 +10,26 @@ export interface Technician {
   hireDate: string;
   startDate?: string;
   endDate?: string;
-  status?: string;
+  status: "active" | "inactive" | "onLeave";
   specialty?: string;
   notes?: string;
   salary?: number;
-  paymentType?: string;
-  paymentRate?: number;
+  paymentType: "percentage" | "flat" | "hourly" | "salary";
+  paymentRate: number;
   hourlyRate?: number;
+  payRate?: number;
   employmentType?: string;
   category?: string;
   totalRevenue?: number;
   
-  // Add missing properties
-  role?: string;
+  // Additional properties
+  role?: "technician" | "salesman" | "employed" | "contractor";
   subRole?: string;
-  incentiveType?: string;
+  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";
   incentiveAmount?: number;
-  salaryBasis?: string;
+  salaryBasis?: "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "annually" | "commission" | "yearly";
   documents?: any[];
+  workContract?: string;
   initials?: string;
   completedJobs?: number;
   cancelledJobs?: number;
@@ -40,3 +42,26 @@ export interface Technician {
   driverLicense?: any;
   idNumber?: string;
 }
+
+// Add additional types needed by components
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "annually" | "commission" | "yearly";
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
+
+export interface TechnicianSubRoles {
+  [key: string]: string[];
+}
+
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  uploadDate: string;
+}
+
+export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
+  technician: ["HVAC Technician", "Plumbing Technician", "Electrical Technician", "General Technician"],
+  salesman: ["Field Sales", "Office Sales", "Lead Generator", "Account Manager"],
+  employed: ["Office Manager", "Admin Assistant", "Accountant", "Customer Service"],
+  contractor: ["External Contractor", "Independent Technician", "Specialist", "Consultant"]
+};

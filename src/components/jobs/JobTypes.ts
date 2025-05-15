@@ -13,7 +13,7 @@ export interface Job {
   amount: number;
   status: JobStatus;
   actualAmount?: number;
-  technicianId: string;  // Changed from optional to required
+  technicianId: string;  // Required property
   technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;

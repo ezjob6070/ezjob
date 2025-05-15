@@ -1,6 +1,5 @@
 
 import { DateRange } from "react-day-picker";
-import { JobSource as OriginalJobSource } from "./jobSource";
 import { Technician } from "./technician";
 
 export type TransactionType = "income" | "expense" | "refund" | "payment";
@@ -55,6 +54,7 @@ export interface FinancialTransaction {
   updatedAt?: Date;
   clientName?: string;
   jobTitle?: string;
+  quoteStatus?: string; // Add this property
 }
 
 export interface ExpenseCategory {
@@ -79,12 +79,19 @@ export interface FinancialReport {
   transactions: FinancialTransaction[];
 }
 
-// Define the JobSource interface with all financial properties
-export interface JobSource extends Omit<OriginalJobSource, 'totalRevenue' | 'expenses' | 'companyProfit'> {
+// Define the JobSource interface
+export interface JobSource {
+  id: string;
+  name: string;
+  type?: string;
+  paymentType?: string;
+  paymentValue?: number;
+  isActive?: boolean;
+  totalJobs?: number;
   totalRevenue: number;
   expenses: number;
   companyProfit: number;
-  totalJobs: number;
+  createdAt?: string;
   category?: string;
 }
 
@@ -110,6 +117,7 @@ export interface SearchBarProps {
   placeholder?: string;
   className?: string;
   onChange?: (value: any) => void;
+  showIcons?: boolean;
 }
 
 // Add ProjectStaff interface
@@ -120,4 +128,6 @@ export interface ProjectStaff {
   hourlyRate?: number;
   totalHours?: number;
   totalCost?: number;
+  startDate: string; // Add required properties to match the project.ProjectStaff
+  status: string;
 }

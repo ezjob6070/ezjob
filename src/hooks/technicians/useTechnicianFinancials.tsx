@@ -1,14 +1,9 @@
 
 import { useState, useMemo } from "react";
-import { Technician } from "@/types/technician";
 import { DateRange } from "react-day-picker";
-import { 
-  calculateFinancialMetrics, 
-  calculateTechnicianMetrics, 
-  formatDateRangeText 
-} from "./financialUtils";
-import { filterTechnicians, toggleTechnicianInFilter } from "./technicianFilters";
-import { format } from "date-fns";
+import { useGlobalState } from '@/components/providers/GlobalStateProvider';
+import { calculateTechnicianFinancials, ensureCompleteDateRange } from './financialUtils';
+import { Technician } from '@/types/technician';
 
 export interface TechnicianFinancialsHookReturn {
   paymentTypeFilter: string;
@@ -154,6 +149,62 @@ export const useTechnicianFinancials = (
     dateRange: localDateRange
   };
 };
+
+// Helper functions for filtering technicians
+export const filterTechnicians = (
+  technicians: Technician[], 
+  paymentTypeFilter: string, 
+  selectedTechnicianNames: string[]
+): Technician[] => {
+  return technicians.filter(tech => {
+    // Filter by payment type
+    const matchesPaymentType = paymentTypeFilter === "all" || 
+      tech.paymentType === paymentTypeFilter;
+    
+    // Filter by technician name  
+    const matchesName = selectedTechnicianNames.length === 0 || 
+      selectedTechnicianNames.includes(tech.name);
+    
+    return matchesPaymentType && matchesName;
+  });
+};
+
+export const toggleTechnicianInFilter = (
+  technicianName: string, 
+  currentList: string[]
+): string[] => {
+  if (currentList.includes(technicianName)) {
+    return currentList.filter(name => name !== technicianName);
+  } else {
+    return [...currentList, technicianName];
+  }
+};
+
+export const calculateFinancialMetrics = (technicians: Technician[]) => {
+  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
+  const technicianEarnings = technicians.reduce((sum, tech) => sum + (tech.earnings || 0), 0);
+  
+  return {
+    totalRevenue,
+    technicianEarnings,
+    companyProfit: totalRevenue - technicianEarnings
+  };
+};
+
+export const calculateTechnicianMetrics = (technician: Technician | null) => {
+  if (!technician) return null;
+  
+  return {
+    revenue: technician.totalRevenue || 0,
+    earnings: technician.earnings || 0,
+    completedJobs: technician.completedJobs || 0,
+    cancelledJobs: technician.cancelledJobs || 0,
+    totalJobs: technician.jobCount || 0
+  };
+};
+
+// Add date-fns import for format function
+import { format } from "date-fns";
 
 // Make sure we export both as a named export and as default
 export default useTechnicianFinancials;
