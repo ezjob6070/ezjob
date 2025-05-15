@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useTechnicianFinancials, TechnicianFinancialsHookReturn } from "@/hooks/technicians";
+import { useTechnicianFinancials } from "@/hooks/technicians";
 import TechnicianFinancialTable from "@/components/technicians/charts/TechnicianFinancialTable";
 import { DateRange } from "react-day-picker";
 import DashboardMetrics from "./dashboard/MetricsCards";

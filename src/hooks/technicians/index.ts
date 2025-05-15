@@ -1,6 +1,5 @@
 
-import useTechnicianFinancials from './useTechnicianFinancials';
-import { TechnicianFinancialsHookReturn } from './useTechnicianFinancials';
+import useTechnicianFinancials, { TechnicianFinancialsHookReturn } from './useTechnicianFinancials';
 
 export {
   useTechnicianFinancials,
