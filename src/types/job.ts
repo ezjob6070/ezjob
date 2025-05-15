@@ -16,4 +16,7 @@ export interface Job {
   category?: string;
   type?: string;
   notes?: string;
+  clientName?: string;
+  location?: string;
+  color?: string;
 }
