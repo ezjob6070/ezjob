@@ -5,7 +5,7 @@ export interface Job {
   description: string;
   status: string;
   priority: string;
-  client: {
+  client?: {
     id: string;
     name: string;
     phone: string;

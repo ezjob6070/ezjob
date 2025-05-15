@@ -10,7 +10,6 @@ import CalendarView from "@/components/schedule/CalendarView";
 import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Plus, ListChecks } from "lucide-react";
-import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -161,8 +160,8 @@ const Schedule = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Schedule</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight mb-1">Schedule</h1>
+          <p className="text-muted-foreground text-sm">
             Manage your appointments, jobs, and tasks in one place.
           </p>
         </div>
@@ -171,12 +170,14 @@ const Schedule = () => {
             variant="outline" 
             className="gap-1"
             onClick={() => setShowAddReminderDialog(true)}
+            size="sm"
           >
             <CalendarIcon className="h-4 w-4" />
             Add Reminder
           </Button>
           <Button 
-            className="gap-1" 
+            className="gap-1"
+            size="sm"
             onClick={() => setShowAddTaskDialog(true)}
           >
             <Plus className="h-4 w-4" />
@@ -196,7 +197,7 @@ const Schedule = () => {
         value={activeTab}
         onValueChange={setActiveTab}
       >
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 w-full justify-start">
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="jobs">Jobs</TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-1">
@@ -205,15 +206,7 @@ const Schedule = () => {
           </TabsTrigger>
         </TabsList>
         
-        {(activeTab === "jobs" || activeTab === "tasks") && (
-          <CompactFilterBar 
-            jobs={jobs} 
-            tasks={tasks} 
-            selectedTabValue={activeTab} 
-          />
-        )}
-        
-        <TabsContent value="calendar" className="space-y-6">
+        <TabsContent value="calendar" className="space-y-6 mt-2">
           <CalendarView 
             jobs={jobs}
             tasks={tasks}
@@ -225,7 +218,7 @@ const Schedule = () => {
           />
         </TabsContent>
         
-        <TabsContent value="jobs">
+        <TabsContent value="jobs" className="mt-2">
           <JobsList 
             selectedDate={selectedDate}
             jobsForSelectedDate={jobsForSelectedDate}
@@ -235,7 +228,7 @@ const Schedule = () => {
           />
         </TabsContent>
         
-        <TabsContent value="tasks">
+        <TabsContent value="tasks" className="mt-2">
           <TasksView 
             selectedDate={selectedDate}
             tasksForSelectedDate={tasksForSelectedDate}
@@ -248,12 +241,12 @@ const Schedule = () => {
 
       {/* Add Task Dialog */}
       <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add New Task</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
+          <div className="grid gap-3 py-3">
+            <div className="grid gap-1">
               <label htmlFor="task-title" className="text-sm font-medium">
                 Task Title
               </label>
@@ -262,10 +255,11 @@ const Schedule = () => {
                 value={newTask.title}
                 onChange={e => setNewTask({ ...newTask, title: e.target.value })}
                 placeholder="Enter task title"
+                className="h-9"
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1">
               <label htmlFor="task-client" className="text-sm font-medium">
                 Client Name
               </label>
@@ -274,11 +268,12 @@ const Schedule = () => {
                 value={newTask.client?.name}
                 onChange={e => setNewTask({ ...newTask, client: { name: e.target.value } })}
                 placeholder="Enter client name"
+                className="h-9"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-1">
                 <label htmlFor="task-priority" className="text-sm font-medium">
                   Priority
                 </label>
@@ -291,7 +286,7 @@ const Schedule = () => {
                     })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                   <SelectContent>
@@ -303,7 +298,7 @@ const Schedule = () => {
                 </Select>
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-1">
                 <label htmlFor="task-status" className="text-sm font-medium">
                   Status
                 </label>
@@ -311,7 +306,7 @@ const Schedule = () => {
                   value={newTask.status}
                   onValueChange={(value) => setNewTask({ ...newTask, status: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -324,7 +319,7 @@ const Schedule = () => {
               </div>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1">
               <label htmlFor="task-date" className="text-sm font-medium">
                 Due Date
               </label>
@@ -333,10 +328,11 @@ const Schedule = () => {
                 type="datetime-local"
                 value={newTask.dueDate ? new Date(newTask.dueDate).toISOString().slice(0, 16) : ''}
                 onChange={e => setNewTask({ ...newTask, dueDate: new Date(e.target.value) })}
+                className="h-9"
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1">
               <label htmlFor="task-description" className="text-sm font-medium">
                 Description
               </label>
@@ -346,24 +342,25 @@ const Schedule = () => {
                 onChange={e => setNewTask({ ...newTask, description: e.target.value })}
                 placeholder="Enter task details"
                 rows={3}
+                className="resize-none"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddTaskDialog(false)}>Cancel</Button>
-            <Button onClick={handleAddTask}>Add Task</Button>
+          <DialogFooter className="sm:justify-end">
+            <Button variant="outline" onClick={() => setShowAddTaskDialog(false)} size="sm">Cancel</Button>
+            <Button onClick={handleAddTask} size="sm">Add Task</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Add Reminder Dialog */}
       <Dialog open={showAddReminderDialog} onOpenChange={setShowAddReminderDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add New Reminder</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
+          <div className="grid gap-3 py-3">
+            <div className="grid gap-1">
               <label htmlFor="reminder-title" className="text-sm font-medium">
                 Reminder Title
               </label>
@@ -372,10 +369,11 @@ const Schedule = () => {
                 value={newReminder.title}
                 onChange={e => setNewReminder({ ...newReminder, title: e.target.value })}
                 placeholder="Enter reminder title"
+                className="h-9"
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1">
               <label htmlFor="reminder-client" className="text-sm font-medium">
                 Client Name (Optional)
               </label>
@@ -384,10 +382,11 @@ const Schedule = () => {
                 value={newReminder.client?.name}
                 onChange={e => setNewReminder({ ...newReminder, client: { name: e.target.value } })}
                 placeholder="Enter client name"
+                className="h-9"
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1">
               <label htmlFor="reminder-date" className="text-sm font-medium">
                 Reminder Date & Time
               </label>
@@ -396,10 +395,11 @@ const Schedule = () => {
                 type="datetime-local"
                 value={newReminder.dueDate ? new Date(newReminder.dueDate).toISOString().slice(0, 16) : ''}
                 onChange={e => setNewReminder({ ...newReminder, dueDate: new Date(e.target.value) })}
+                className="h-9"
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1">
               <label htmlFor="reminder-description" className="text-sm font-medium">
                 Description
               </label>
@@ -409,12 +409,13 @@ const Schedule = () => {
                 onChange={e => setNewReminder({ ...newReminder, description: e.target.value })}
                 placeholder="Enter reminder details"
                 rows={3}
+                className="resize-none"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddReminderDialog(false)}>Cancel</Button>
-            <Button onClick={handleAddReminder}>Add Reminder</Button>
+          <DialogFooter className="sm:justify-end">
+            <Button variant="outline" onClick={() => setShowAddReminderDialog(false)} size="sm">Cancel</Button>
+            <Button onClick={handleAddReminder} size="sm">Add Reminder</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
