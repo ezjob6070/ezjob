@@ -64,7 +64,6 @@ export interface ExpenseCategory {
   color: string;
   budget?: number;
   currentSpend?: number;
-  // Add required properties to fix errors
   amount: number;
   percentage: number;
 }
@@ -107,13 +106,13 @@ export interface SearchBarProps {
   searchTerm: string;
   updateFilter?: <K extends keyof FinancialFilters>(key: K, value: FinancialFilters[K]) => void;
   hidden?: boolean;
-  // Add missing property used in components
   onSearchChange?: (value: string) => void;
   placeholder?: string;
   className?: string;
+  onChange?: (value: any) => void;
 }
 
-// Add missing ProjectStaff interface
+// Add ProjectStaff interface
 export interface ProjectStaff {
   id: string;
   name: string;

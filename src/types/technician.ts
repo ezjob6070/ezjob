@@ -28,4 +28,11 @@ export interface Technician {
   incentiveAmount?: number;
   salaryBasis?: string;
   documents?: any[];
+  
+  // Add properties used in technician components
+  initials?: string;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  earnings?: number;
+  jobCount?: number;
 }

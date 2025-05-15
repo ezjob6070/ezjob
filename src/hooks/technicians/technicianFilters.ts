@@ -1,60 +1,38 @@
 
 import { Technician } from "@/types/technician";
 
-// Filter technicians by a search query
+// Filter technicians based on payment type and selected names
 export const filterTechnicians = (
   technicians: Technician[],
-  searchQuery: string,
-  selectedTechnicians: string[] = [],
-  roleFilter: string = "all",
-  statusFilter: string = "all",
-  subRoleFilter: string | null = null,
-) => {
-  // Start with the role filter
-  const filteredByRole = roleFilter === "all" 
-    ? technicians 
-    : technicians.filter(tech => tech.role === roleFilter);
-
-  // Then filter by status if applicable
-  const filteredByStatus = statusFilter === "all"
-    ? filteredByRole
-    : filteredByRole.filter(tech => tech.status === statusFilter);
-
-  // Then filter by selected technicians if any are selected
-  const filteredBySelection = selectedTechnicians.length > 0
-    ? filteredByStatus.filter(tech => selectedTechnicians.includes(tech.id))
-    : filteredByStatus;
-
-  // Then filter by sub-role if applicable
-  const filteredBySubRole = subRoleFilter
-    ? filteredBySelection.filter(tech => tech.subRole === subRoleFilter)
-    : filteredBySelection;
-
-  // Finally filter by search query
-  if (!searchQuery) return filteredBySubRole;
-
-  const query = searchQuery.toLowerCase().trim();
-  return filteredBySubRole.filter(tech => {
-    const name = tech.name?.toLowerCase() || "";
-    const email = tech.email?.toLowerCase() || "";
-    const phone = tech.phone?.toLowerCase() || "";
-    const specialty = tech.specialty?.toLowerCase() || "";
-    
-    return name.includes(query) || 
-           email.includes(query) || 
-           phone.includes(query) || 
-           specialty.includes(query);
-  });
+  paymentTypeFilter: string,
+  selectedTechnicianNames: string[]
+): Technician[] => {
+  // First filter by payment type
+  let filteredByType = technicians;
+  if (paymentTypeFilter !== "all") {
+    filteredByType = technicians.filter(tech => 
+      tech.paymentType === paymentTypeFilter
+    );
+  }
+  
+  // Then filter by selected names if any
+  if (selectedTechnicianNames.length > 0) {
+    return filteredByType.filter(tech => 
+      selectedTechnicianNames.includes(tech.name)
+    );
+  }
+  
+  return filteredByType;
 };
 
-// Toggle selection of a technician in a selected technicians array
+// Toggle a technician in the filter list
 export const toggleTechnicianInFilter = (
-  technicianId: string,
-  selectedTechnicians: string[],
+  techName: string,
+  currentSelected: string[]
 ): string[] => {
-  if (selectedTechnicians.includes(technicianId)) {
-    return selectedTechnicians.filter(id => id !== technicianId);
+  if (currentSelected.includes(techName)) {
+    return currentSelected.filter(name => name !== techName);
   } else {
-    return [...selectedTechnicians, technicianId];
+    return [...currentSelected, techName];
   }
 };

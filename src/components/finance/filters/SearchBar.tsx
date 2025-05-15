@@ -8,6 +8,7 @@ const SearchBar = ({
   searchTerm = "", 
   updateFilter, 
   onSearchChange, 
+  onChange,
   placeholder = "Search...", 
   className = "",
   hidden = false 
@@ -23,13 +24,17 @@ const SearchBar = ({
   const handleChange = (value: string) => {
     setLocalSearchTerm(value);
     
-    // Support both callback patterns
+    // Support different callback patterns
     if (updateFilter) {
       updateFilter("searchTerm", value);
     }
     
     if (onSearchChange) {
       onSearchChange(value);
+    }
+    
+    if (onChange) {
+      onChange(value);
     }
   };
   

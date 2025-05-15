@@ -1,119 +1,128 @@
 
-import { DateRange } from "react-day-picker";
-import { Job } from "@/types/job";
 import { Technician } from "@/types/technician";
+import { Job } from "@/types/job";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
-/**
- * Safely handles DateRange by ensuring both from and to properties exist
- * @param dateRange Optional DateRange object
- * @returns Object with from and to dates, or undefined if not complete
- */
-export const ensureCompleteDateRange = (dateRange?: DateRange): { from: Date; to: Date } | undefined => {
-  if (!dateRange?.from || !dateRange?.to) return undefined;
-  return { from: dateRange.from, to: dateRange.to };
+// Calculate financial metrics for all technicians
+export const calculateFinancialMetrics = (technicians: Technician[]) => {
+  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
+  const technicianEarnings = technicians.reduce((sum, tech) => {
+    // Calculate technician earnings based on payment type
+    let earnings = 0;
+    if (tech.paymentType === "percentage" && tech.paymentRate) {
+      earnings = (tech.totalRevenue || 0) * (tech.paymentRate / 100);
+    } else if (tech.paymentType === "flat" && tech.paymentRate) {
+      earnings = (tech.completedJobs || 0) * tech.paymentRate;
+    } else if (tech.paymentType === "hourly" && tech.hourlyRate) {
+      // Estimate 2 hours per job for hourly calculations
+      earnings = (tech.completedJobs || 0) * 2 * tech.hourlyRate;
+    }
+    return sum + earnings;
+  }, 0);
+  
+  return {
+    totalRevenue,
+    technicianEarnings,
+    companyProfit: totalRevenue - technicianEarnings
+  };
 };
 
-/**
- * Converts a date string or Date object to a Date object
- * @param date Date string or Date object
- * @returns Date object or undefined if input is invalid
- */
-export const toDateObject = (date: string | Date | undefined): Date | undefined => {
-  if (!date) return undefined;
-  return typeof date === 'string' ? new Date(date) : date;
+// Calculate metrics for a single technician
+export const calculateTechnicianMetrics = (technician: Technician | null) => {
+  if (!technician) return null;
+  
+  // Calculate earnings based on payment type
+  let earnings = 0;
+  if (technician.paymentType === "percentage" && technician.paymentRate) {
+    earnings = (technician.totalRevenue || 0) * (technician.paymentRate / 100);
+  } else if (technician.paymentType === "flat" && technician.paymentRate) {
+    earnings = (technician.completedJobs || 0) * technician.paymentRate;
+  } else if (technician.paymentType === "hourly" && technician.hourlyRate) {
+    // Estimate 2 hours per job for hourly calculations
+    earnings = (technician.completedJobs || 0) * 2 * technician.hourlyRate;
+  }
+  
+  return {
+    revenue: technician.totalRevenue || 0,
+    earnings: earnings,
+    companyProfit: (technician.totalRevenue || 0) - earnings,
+    completedJobs: technician.completedJobs || 0,
+    cancelledJobs: technician.cancelledJobs || 0,
+    totalJobs: (technician.completedJobs || 0) + (technician.cancelledJobs || 0)
+  };
 };
 
-/**
- * Calculates financial metrics for technicians based on jobs
- * @param technicians Array of technicians
- * @param jobs Array of jobs
- * @param dateRange Optional date range to filter jobs
- * @returns Technicians with financial metrics
- */
+// Calculate financial data for technicians based on jobs
 export const calculateTechnicianFinancials = (
   technicians: Technician[],
   jobs: Job[],
   dateRange?: DateRange
-): Technician[] => {
-  return technicians.map(technician => {
-    // Filter jobs for this technician within date range
+) => {
+  return technicians.map(tech => {
+    // Filter jobs assigned to this technician
     const techJobs = jobs.filter(job => {
-      const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
-      const isInDateRange = 
-        (!dateRange?.from || jobDate >= dateRange.from) && 
-        (!dateRange?.to || jobDate <= dateRange.to);
+      // Check if job is assigned to this technician
+      const isAssigned = job.technicianId === tech.id;
       
-      return isInDateRange && job.technicianId === technician.id;
+      // Filter by date range if provided
+      const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : 
+                      job.date ? new Date(job.date) : null;
+      
+      const isInDateRange = !dateRange?.from || !jobDate ? true :
+                           (jobDate >= dateRange.from && 
+                           (!dateRange.to || jobDate <= dateRange.to));
+      
+      return isAssigned && isInDateRange;
     });
     
-    // Calculate financial metrics based on technician's role and payment structure
-    const totalRevenue = techJobs.reduce((sum, job) => sum + (job.actualAmount || job.amount), 0);
+    // Calculate completed and cancelled jobs
     const completedJobs = techJobs.filter(job => job.status === "completed").length;
+    const cancelledJobs = techJobs.filter(job => 
+      job.status === "cancelled" || job.status === "canceled"
+    ).length;
     
-    let earnings = 0;
-    if (technician.role === "contractor") {
-      if (technician.paymentType === "percentage" && technician.paymentRate) {
-        earnings = totalRevenue * (technician.paymentRate / 100);
-      } else if (technician.paymentType === "flat" && technician.paymentRate) {
-        earnings = completedJobs * technician.paymentRate;
-      } else if (technician.paymentType === "hourly" && technician.hourlyRate) {
-        // Assuming average 2 hours per job for calculation purposes
-        earnings = completedJobs * 2 * technician.hourlyRate;
-      }
-    } else if (technician.role === "salesman") {
-      if (technician.incentiveType === "commission" && technician.incentiveAmount) {
-        earnings = totalRevenue * (technician.incentiveAmount / 100);
-      } else if (technician.paymentType === "percentage" && technician.paymentRate) {
-        earnings = totalRevenue * (technician.paymentRate / 100);
-      } else if (technician.paymentType === "flat" && technician.paymentRate) {
-        earnings = completedJobs * technician.paymentRate;
-      }
-    }
+    // Calculate revenue from completed jobs
+    const totalRevenue = techJobs
+      .filter(job => job.status === "completed")
+      .reduce((sum, job) => sum + (job.actualAmount || job.amount), 0);
     
+    // Return technician with calculated financial metrics
     return {
-      ...technician,
+      ...tech,
+      completedJobs,
+      cancelledJobs,
       totalRevenue,
-      earnings,
-      jobCount: techJobs.length,
-      completedJobs
+      jobCount: techJobs.length
     };
   });
 };
 
-/**
- * Formats job types for filtering
- * @param jobs Array of jobs
- * @returns Array of unique job types with counts
- */
-export const getJobTypeFilters = (jobs: Job[]) => {
-  const types: { [key: string]: number } = {};
+// Format date range as text
+export const formatDateRangeText = (dateRange?: DateRange) => {
+  if (!dateRange?.from) return "All time";
   
-  jobs.forEach(job => {
-    const type = job.serviceType || 'Unknown';
-    types[type] = (types[type] || 0) + 1;
-  });
+  if (dateRange.to) {
+    if (dateRange.from.toDateString() === dateRange.to.toDateString()) {
+      return format(dateRange.from, "MMM d, yyyy");
+    }
+    return `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
+  }
   
-  return Object.keys(types).map(key => ({
-    name: key,
-    count: types[key]
-  }));
+  return format(dateRange.from, "MMM d, yyyy");
 };
 
-/**
- * Formats sources for filtering
- * @param jobs Array of jobs
- * @returns Array of unique sources with counts
- */
-export const getJobSourceFilters = (jobs: Job[]) => {
-  const sources: { [key: string]: number } = {};
+// Ensure complete date range
+export const ensureCompleteDateRange = (dateRange?: DateRange) => {
+  if (!dateRange?.from) {
+    const today = new Date();
+    const monthAgo = new Date();
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    return { from: monthAgo, to: today };
+  }
   
-  jobs.forEach(job => {
-    const source = job.source || job.jobSourceName || 'Unknown';
-    sources[source] = (sources[source] || 0) + 1;
-  });
-  
-  return Object.keys(sources).map(key => ({
-    name: key,
-    count: sources[key]
-  }));
+  return {
+    from: dateRange.from,
+    to: dateRange.to || dateRange.from
+  };
 };

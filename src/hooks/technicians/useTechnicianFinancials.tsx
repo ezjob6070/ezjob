@@ -70,7 +70,37 @@ export const useTechnicianFinancials = (
     setSelectedTechnician(selectedTechnician?.id === tech.id ? null : tech);
   };
   
+  // Additional properties needed by components
+  const techniciansByRole = useMemo(() => {
+    const grouped: Record<string, Technician[]> = {};
+    
+    filteredTechnicians.forEach(tech => {
+      const role = tech.role || 'other';
+      if (!grouped[role]) grouped[role] = [];
+      grouped[role].push(tech);
+    });
+    
+    return grouped;
+  }, [filteredTechnicians]);
+
+  const financialSummary = useMemo(() => {
+    const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
+    const totalEarnings = displayedTechnicians.reduce((sum, tech) => sum + (tech.earnings || 0), 0);
+    const totalJobs = displayedTechnicians.reduce((sum, tech) => sum + (tech.jobCount || 0), 0);
+    const totalCompletedJobs = displayedTechnicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0);
+    
+    return {
+      totalRevenue,
+      totalEarnings,
+      totalJobs,
+      totalCompletedJobs,
+      companyProfit: totalRevenue - totalEarnings,
+      averageJobValue: totalJobs > 0 ? totalRevenue / totalJobs : 0
+    };
+  }, [displayedTechnicians]);
+  
   return {
+    // Original hook properties
     paymentTypeFilter,
     setPaymentTypeFilter,
     selectedTechnicianNames,
@@ -85,7 +115,14 @@ export const useTechnicianFinancials = (
     toggleTechnician,
     clearFilters,
     applyFilters,
-    handleTechnicianSelect
+    handleTechnicianSelect,
+    
+    // Additional properties needed by other components
+    technicians: filteredTechnicians,
+    techniciansByRole,
+    financialSummary,
+    isLoading: false,
+    dateRange: localDateRange
   };
 };
 
