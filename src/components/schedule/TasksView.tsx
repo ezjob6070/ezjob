@@ -1,23 +1,21 @@
 
 import { format } from "date-fns";
-import { Calendar, ArrowDown, ArrowUp, Bell } from "lucide-react";
+import { Calendar, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
 import ReminderCard from "@/components/schedule/ReminderCard";
 import { useState } from "react";
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 
 interface TasksViewProps {
   selectedDate: Date;
@@ -163,53 +161,6 @@ const TasksView = ({
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-          </div>
-          
-          <div className="flex gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex-1">
-                  {filterType === "all" ? "All Status" : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setFilterType("all")}>
-                  All Status
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterType("scheduled")}>
-                  Scheduled
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterType("in progress")}>
-                  In Progress
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterType("completed")}>
-                  Completed
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterType("overdue")}>
-                  Overdue
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex-1">
-                  {sortOrder === "newest" ? (
-                    <><ArrowDown className="h-4 w-4 mr-1" /> Newest</>
-                  ) : (
-                    <><ArrowUp className="h-4 w-4 mr-1" /> Oldest</>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setSortOrder("newest")}>
-                  <ArrowDown className="h-4 w-4 mr-2" /> Newest First
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
-                  <ArrowUp className="h-4 w-4 mr-2" /> Oldest First
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>
