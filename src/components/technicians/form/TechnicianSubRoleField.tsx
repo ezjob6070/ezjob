@@ -26,7 +26,7 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
   // Reset sub-role when role changes
   useEffect(() => {
     if (!defaultValue) {
-      setValue("subRole", "");
+      setValue("subRole", "none");
     }
   }, [role, setValue, defaultValue]);
 
@@ -45,7 +45,7 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
         <FormItem className="flex-1">
           <FormLabel>Specialty/Sub-Role</FormLabel>
           <Select
-            value={field.value || ""}
+            value={field.value || "none"}
             onValueChange={field.onChange}
           >
             <FormControl>
@@ -54,7 +54,7 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {subRoles.map((subRole) => (
                 <SelectItem key={subRole} value={subRole}>
                   {subRole}
