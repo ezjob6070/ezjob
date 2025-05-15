@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { DateRange } from "react-day-picker";
 import { useGlobalState } from '@/components/providers/GlobalStateProvider';
