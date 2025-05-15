@@ -1,29 +1,19 @@
 
-import { DateRange } from "react-day-picker";
-
 export interface Job {
   id: string;
-  clientName: string;
-  clientPhone?: string;
-  clientEmail?: string;
-  address: string;
-  status: "scheduled" | "in progress" | "completed" | "canceled" | "rescheduled" | string;
-  scheduledDate: string;
-  amount: number;
+  title: string;
   description?: string;
-  technician?: string;
-  technicianName?: string;
-  paymentMethod?: string;
+  status: "pending" | "scheduled" | "in-progress" | "completed" | "cancelled";
+  priority?: "low" | "medium" | "high" | "urgent";
+  date: string;
+  scheduledDate?: string;
+  amount: number;
+  actualAmount?: number;
+  technicianId?: string;  // Reference to the technician assigned to the job
+  clientId?: string;
+  source?: string;
+  projectId?: string;
+  category?: string;
+  type?: string;
   notes?: string;
-  
-  // Properties needed by components
-  date?: string | Date;
-  technicianId?: string;
 }
-
-export interface AmountRange {
-  min: number;
-  max: number;
-}
-
-export type PaymentMethod = "cash" | "credit" | "check" | "invoice" | "other" | "";

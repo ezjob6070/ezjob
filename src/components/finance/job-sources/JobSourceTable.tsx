@@ -1,4 +1,3 @@
-
 import React from "react";
 import { 
   Table, 
@@ -48,6 +47,10 @@ const JobSourceTable: React.FC<JobSourceTableProps> = ({
     );
   }
 
+  const handleSortChange = (option: SortOption) => {
+    onSortChange(option);
+  };
+
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow border-t-0 rounded-t-none">
       <CardContent className="p-3 sm:p-4">
@@ -73,7 +76,7 @@ const JobSourceTable: React.FC<JobSourceTableProps> = ({
                   variant={sortOption === "revenue-high" ? "default" : "ghost"}
                   size="sm"
                   className="w-full justify-start text-left"
-                  onClick={() => onSortChange("revenue-high")}
+                  onClick={() => handleSortChange("revenue-high")}
                 >
                   Highest first
                 </Button>
@@ -81,7 +84,7 @@ const JobSourceTable: React.FC<JobSourceTableProps> = ({
                   variant={sortOption === "revenue-low" ? "default" : "ghost"}
                   size="sm"
                   className="w-full justify-start text-left"
-                  onClick={() => onSortChange("revenue-low")}
+                  onClick={() => handleSortChange("revenue-low")}
                 >
                   Lowest first
                 </Button>
@@ -93,7 +96,7 @@ const JobSourceTable: React.FC<JobSourceTableProps> = ({
                   variant={sortOption === "profit-high" ? "default" : "ghost"}
                   size="sm"
                   className="w-full justify-start text-left"
-                  onClick={() => onSortChange("profit-high")}
+                  onClick={() => handleSortChange("profit-high")}
                 >
                   Highest first
                 </Button>
@@ -101,7 +104,7 @@ const JobSourceTable: React.FC<JobSourceTableProps> = ({
                   variant={sortOption === "profit-low" ? "default" : "ghost"}
                   size="sm"
                   className="w-full justify-start text-left"
-                  onClick={() => onSortChange("profit-low")}
+                  onClick={() => handleSortChange("profit-low")}
                 >
                   Lowest first
                 </Button>
@@ -113,7 +116,7 @@ const JobSourceTable: React.FC<JobSourceTableProps> = ({
                   variant={sortOption === "jobs-high" ? "default" : "ghost"}
                   size="sm"
                   className="w-full justify-start text-left"
-                  onClick={() => onSortChange("jobs-high")}
+                  onClick={() => handleSortChange("jobs-high")}
                 >
                   Highest first
                 </Button>
@@ -121,7 +124,7 @@ const JobSourceTable: React.FC<JobSourceTableProps> = ({
                   variant={sortOption === "jobs-low" ? "default" : "ghost"}
                   size="sm"
                   className="w-full justify-start text-left"
-                  onClick={() => onSortChange("jobs-low")}
+                  onClick={() => handleSortChange("jobs-low")}
                 >
                   Lowest first
                 </Button>

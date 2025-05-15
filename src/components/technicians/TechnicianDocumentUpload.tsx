@@ -48,6 +48,7 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     // Here we're just simulating the addition to the documents list
     const newDocuments: Document[] = Array.from(files).map(file => ({
       id: `doc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      name: file.name,
       title: file.name,
       type: file.type,
       size: file.size,
@@ -83,6 +84,7 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     setTimeout(() => {
       const newDocument: Document = {
         id: `doc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name: file.name,
         title: documentTitle || file.name,
         type: documentType,
         size: file.size,
@@ -220,6 +222,17 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
   const otherDocuments = documents.filter(doc => 
     !['id', 'ssn', 'license', 'contract', 'passport', 'visa'].includes(doc.type)
   );
+
+  // Handle driver license display correctly
+  const getDriverLicenseProperty = (property: 'number' | 'state' | 'expirationDate'): string => {
+    if (!technician.driverLicense) return 'Not provided';
+    
+    if (typeof technician.driverLicense === 'string') {
+      return property === 'number' ? technician.driverLicense : 'Not provided';
+    }
+    
+    return technician.driverLicense[property];
+  };
 
   return (
     <div className="space-y-6">

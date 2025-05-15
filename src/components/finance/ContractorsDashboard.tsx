@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { Technician } from "@/types/technician";
+import { Job } from "@/types/job";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface ContractorsDashboardProps {
