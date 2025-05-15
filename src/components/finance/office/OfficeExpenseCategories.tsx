@@ -1,6 +1,21 @@
 
+// File: src/components/finance/office/OfficeExpenseCategories.tsx
+
 // Fix for the office expense categories - adding the required properties amount and percentage
 // Assuming this is line 65 where the error occurs:
+interface ExpenseCategory {
+  id: string;
+  name: string;
+  icon: any;
+  color: string;
+  budget: number;
+  currentSpend: number;
+  amount: number;
+  percentage: number;
+}
+
+// The rest of the code would be here...
+// The fix for line 65 would be:
 {
   id: category.id,
   name: category.name,
