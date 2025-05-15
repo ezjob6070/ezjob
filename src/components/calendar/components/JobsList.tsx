@@ -2,7 +2,7 @@
 import { format, isSameDay } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Filter } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Job } from "@/types/job";
 import { useState, useEffect } from "react";
@@ -143,6 +143,17 @@ const JobsList = ({
           <h3 className="text-sm font-medium text-muted-foreground">
             Jobs ({filteredJobs.length})
           </h3>
+        </div>
+        
+        {/* New Search Bar added directly below the filter section and above the job items */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input 
+            placeholder="Quick search within results..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 h-9 bg-muted/30"
+          />
         </div>
         
         {filteredJobs.length === 0 ? (
