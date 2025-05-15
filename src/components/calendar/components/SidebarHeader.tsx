@@ -1,7 +1,6 @@
-
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface SidebarHeaderProps {
   currentMonth: Date;

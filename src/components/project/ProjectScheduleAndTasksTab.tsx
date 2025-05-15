@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Project, ProjectTask } from "@/types/project";
 import TaskDetailDialog from "./TaskDetailDialog";
 import { Plus } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 // ScheduleEvent type definition
 interface ScheduleEvent {
