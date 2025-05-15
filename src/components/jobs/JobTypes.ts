@@ -1,7 +1,7 @@
 
 import { DateRange } from "react-day-picker";
 
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "canceled" | "rescheduled" | "estimate" | "pending";
 export type JobPriority = "low" | "medium" | "high" | "urgent";
 export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile" | "credit_card" | "zelle" | "venmo" | "paypal";
 

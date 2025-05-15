@@ -1,17 +1,25 @@
 
 export type SortOption = 
-  | "name-asc" 
-  | "name-desc" 
-  | "revenue-high" 
-  | "revenue-low" 
-  | "rating-high" 
-  | "rating-low" 
   | "newest" 
-  | "oldest" 
-  | "profit-high" 
+  | "oldest"
+  | "name-asc" 
+  | "name-desc"
+  | "revenue-high"
+  | "revenue-low" 
+  | "profit-high"
   | "profit-low"
   | "jobs-high"
   | "jobs-low"
+  | "status"
   | "budget-high"
   | "budget-low"
-  | "default"; 
+  | "priority"
+  | "date-asc"
+  | "date-desc"
+  | "rating-high"
+  | "rating-low"
+  | "payRate-high"
+  | "payRate-low"
+  | "default";
+
+export type SortDirection = "asc" | "desc";

@@ -7,12 +7,21 @@ export interface JobSource {
   updatedAt?: string;
   description?: string;
   status?: "active" | "inactive";
-  jobCount?: number;
-  revenue?: number;
-  // Additional properties that are being accessed
   website?: string;
   phone?: string;
   email?: string;
   logoUrl?: string;
   notes?: string;
+  
+  // Financial properties
+  totalRevenue?: number;
+  expenses?: number;
+  companyProfit?: number;
+  totalJobs?: number;
+  profit?: number;
+  paymentType?: "fixed" | "percentage";
+  paymentValue?: number;
+  isActive?: boolean;
+  category?: string;
+  revenue?: number;
 }

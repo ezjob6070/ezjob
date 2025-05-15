@@ -1,58 +1,87 @@
 
-import { Technician, TechnicianFilters } from "@/types/technician";
-import { isSameMonth, isAfter, isBefore, isWithinInterval } from "date-fns";
+import { Technician } from "@/types/technician";
+import { DateRange } from "react-day-picker";
 
-export const filterTechnicians = (
+export interface TechnicianFilters {
+  search: string;
+  paymentTypes: string[];
+  status: string[];
+  categories: string[];
+  role?: string;
+  dateRange?: DateRange;
+}
+
+export const filterTechniciansByRole = (technicians: Technician[], role: string): Technician[] => {
+  if (role === "all") return technicians;
+  return technicians.filter(tech => tech.role === role);
+};
+
+export const filterTechniciansBySearch = (technicians: Technician[], searchTerm: string): Technician[] => {
+  if (!searchTerm) return technicians;
+  
+  const lowerCaseSearch = searchTerm.toLowerCase();
+  return technicians.filter(tech => 
+    tech.name.toLowerCase().includes(lowerCaseSearch) ||
+    tech.email.toLowerCase().includes(lowerCaseSearch) ||
+    tech.specialty?.toLowerCase().includes(lowerCaseSearch) ||
+    tech.position?.toLowerCase().includes(lowerCaseSearch) ||
+    tech.subRole?.toLowerCase().includes(lowerCaseSearch) ||
+    tech.phone?.toLowerCase().includes(lowerCaseSearch)
+  );
+};
+
+export const filterTechniciansByStatus = (technicians: Technician[], statusFilter: string[]): Technician[] => {
+  if (!statusFilter.length) return technicians;
+  return technicians.filter(tech => statusFilter.includes(tech.status));
+};
+
+export const filterTechniciansByPaymentType = (technicians: Technician[], paymentTypes: string[]): Technician[] => {
+  if (!paymentTypes.length) return technicians;
+  return technicians.filter(tech => paymentTypes.includes(tech.paymentType));
+};
+
+export const filterTechniciansByDateRange = (
   technicians: Technician[], 
-  filters: TechnicianFilters
+  dateRange?: DateRange
 ): Technician[] => {
-  return technicians.filter(technician => {
-    // Search filter
-    if (filters.search && !technician.name.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !technician.email.toLowerCase().includes(filters.search.toLowerCase()) && 
-        !technician.phone?.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !technician.specialty?.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
+  if (!dateRange || !dateRange.from) return technicians;
+  
+  return technicians.filter(tech => {
+    const hireDate = new Date(tech.hireDate);
+    
+    if (dateRange.to) {
+      return hireDate >= dateRange.from && hireDate <= dateRange.to;
     }
     
-    // Payment type filter
-    if (filters.paymentTypes.length > 0 && !filters.paymentTypes.includes(technician.paymentType)) {
-      return false;
-    }
-    
-    // Status filter
-    if (filters.status.length > 0 && !filters.status.includes(technician.status)) {
-      return false;
-    }
-    
-    // Categories filter
-    if (filters.categories.length > 0 && 
-        (!technician.category || !filters.categories.includes(technician.category))) {
-      return false;
-    }
-    
-    // Date range filter
-    if (filters.dateRange?.from && filters.dateRange?.to) {
-      const hireDate = new Date(technician.hireDate);
-      if (!isWithinInterval(hireDate, { 
-        start: filters.dateRange.from, 
-        end: filters.dateRange.to 
-      })) {
-        return false;
-      }
-    }
-    
-    return true;
+    return hireDate >= dateRange.from;
   });
 };
 
-export const toggleTechnicianInFilter = (
-  technicianId: string, 
-  selectedTechnicians: string[]
-): string[] => {
-  if (selectedTechnicians.includes(technicianId)) {
-    return selectedTechnicians.filter(id => id !== technicianId);
-  } else {
-    return [...selectedTechnicians, technicianId];
+export const applyTechnicianFilters = (
+  technicians: Technician[],
+  filters: TechnicianFilters
+): Technician[] => {
+  let filteredTechs = [...technicians];
+  
+  if (filters.search) {
+    filteredTechs = filterTechniciansBySearch(filteredTechs, filters.search);
   }
+  
+  if (filters.paymentTypes && filters.paymentTypes.length > 0) {
+    filteredTechs = filterTechniciansByPaymentType(filteredTechs, filters.paymentTypes);
+  }
+  
+  if (filters.status && filters.status.length > 0) {
+    filteredTechs = filterTechniciansByStatus(filteredTechs, filters.status);
+  }
+  
+  if (filters.role && filters.role !== 'all') {
+    filteredTechs = filterTechniciansByRole(filteredTechs, filters.role);
+  }
+  
+  if (filters.dateRange) {
+    filteredTechs = filterTechniciansByDateRange(filteredTechs, filters.dateRange);
+  }
+  
+  return filteredTechs;
 };
