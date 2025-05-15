@@ -1,44 +1,35 @@
 
-import React from "react";
 import { Input } from "@/components/ui/input";
-import { Search, User, Mail, Phone } from "lucide-react";
+import { Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-interface SearchBarProps {
+export interface SearchBarProps {
   searchTerm: string;
-  onSearchChange: (value: string) => void;
-  showIcons?: boolean;
+  onChange: (value: string) => void;
   hidden?: boolean;
-  placeholder?: string;
-  className?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({
-  searchTerm,
-  onSearchChange,
-  showIcons = true,
-  hidden = false,
-  placeholder = "Search by name, phone, email...",
-  className = ""
-}) => {
+const SearchBar = ({ searchTerm, onChange, hidden = false }: SearchBarProps) => {
   if (hidden) return null;
   
   return (
-    <div className={`relative ${className}`}>
-      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-        <Search className="h-4 w-4 text-muted-foreground" />
-      </div>
+    <div className="relative flex-1">
+      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
       <Input
-        placeholder={placeholder}
-        className={`w-full pl-10 ${showIcons ? 'pr-10' : 'pr-4'}`}
+        placeholder="Search..."
+        className="pl-8 pr-10"
         value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
       />
-      {showIcons && (
-        <div className="absolute inset-y-0 right-3 flex items-center space-x-2 text-muted-foreground">
-          <User className="h-3.5 w-3.5" />
-          <Phone className="h-3.5 w-3.5" />
-          <Mail className="h-3.5 w-3.5" />
-        </div>
+      {searchTerm && (
+        <Button
+          variant="ghost"
+          className="absolute right-0 top-0 h-9 w-9 p-0"
+          onClick={() => onChange("")}
+        >
+          <X className="h-4 w-4 text-muted-foreground" />
+          <span className="sr-only">Clear search</span>
+        </Button>
       )}
     </div>
   );
