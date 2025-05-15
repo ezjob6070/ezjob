@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { Technician, SalaryBasis } from "@/types/technician";
+import { Technician } from "@/types/project";
 import { initialTechnicians } from "@/data/technicians";
 import { TechnicianEditFormValues } from "@/lib/validations/technicianEdit";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
@@ -42,11 +42,11 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         email: techData.email || 'no-email@example.com',
         specialty: techData.specialty || '',
         status: techData.status || 'active',
-        paymentType: (techData.paymentType as "percentage" | "flat" | "hourly" | "salary") || 'hourly',
+        paymentType: (techData.paymentType as Technician["paymentType"]) || 'hourly',
         paymentRate: techData.paymentRate || 0,
         hourlyRate: techData.hourlyRate || 0,
-        // Ensure salaryBasis is a valid SalaryBasis type
-        salaryBasis: (techData.salaryBasis as SalaryBasis) || 'hourly',
+        // Ensure salaryBasis is a valid type
+        salaryBasis: techData.salaryBasis || 'hourly',
         completedJobs: techData.completedJobs || 0,
         cancelledJobs: techData.cancelledJobs || 0,
         totalRevenue: techData.totalRevenue || 0,
@@ -57,9 +57,9 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         profileImage: techData.profileImage || techData.imageUrl,
         imageUrl: techData.imageUrl || techData.profileImage,
         // Ensure incentiveType is a valid enum value if provided
-        incentiveType: techData.incentiveType as "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly" | undefined,
+        incentiveType: techData.incentiveType as Technician["incentiveType"],
         // Role is optional but should be valid if provided
-        role: techData.role as "technician" | "salesman" | "employed" | "contractor" | undefined,
+        role: techData.role as Technician["role"],
         // Add sensitive information if it exists
         ssn: techData.ssn,
         driverLicense: techData.driverLicense,

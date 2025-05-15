@@ -84,3 +84,9 @@ export interface AmountRange {
   min?: number;
   max?: number;
 }
+
+// Add safe date range type
+export interface SafeDateRange {
+  from: Date;
+  to?: Date;
+}

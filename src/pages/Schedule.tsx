@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Job } from "@/types/job";
+import { Job } from "@/types/project"; // Change to import from project.ts instead of JobTypes
 import { isSameDay } from "date-fns";
 import JobsList from "@/components/calendar/components/JobsList";
 import { Task } from "@/components/calendar/types";
@@ -48,16 +49,22 @@ const Schedule = () => {
     isReminder: true
   });
 
-  // Sync with global jobs
+  // Sync with global jobs - use type cast to ensure compatibility
   useEffect(() => {
-    setJobs(globalJobs as Job[]);
+    // Convert global jobs to the expected Job format
+    const compatibleJobs: Job[] = (globalJobs || []).map(job => ({
+      ...job,
+      clientName: job.clientName || "Unknown Client", // Ensure required fields are present
+      technicianId: job.technicianId || ""
+    })) as Job[];
+    
+    setJobs(compatibleJobs);
   }, [globalJobs]);
 
   // Update jobs for selected date whenever jobs or date changes
   useEffect(() => {
     const filteredJobs = jobs.filter(job => {
-      if (!job.date) return false;
-      const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+      const jobDate = typeof job.date === 'string' ? new Date(job.date) : job.date;
       return isSameDay(jobDate, selectedDate);
     });
     setJobsForSelectedDate(filteredJobs);
