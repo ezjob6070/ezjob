@@ -13,7 +13,7 @@ export interface Document {
 // Define types for payment handling
 export type PaymentType = "percentage" | "flat" | "hourly" | "salary";
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
-export type IncentiveType = "none" | "bonus" | "commission" | "profit-sharing" | "other";
+export type IncentiveType = "none" | "bonus" | "commission" | "profit-sharing" | "other" | "hourly" | "weekly" | "monthly";
 export type TechnicianStatus = "active" | "inactive" | "onLeave";
 export type TechnicianRole = "technician" | "contractor" | "salesman" | "employed";
 
@@ -102,6 +102,8 @@ export interface Job {
   actualAmount?: number;
   technicianId?: string;
   description?: string;
+  jobSourceId?: string;
+  jobSourceName?: string;
 }
 
 import { DateRange } from "react-day-picker";

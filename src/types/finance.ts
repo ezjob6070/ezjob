@@ -49,6 +49,7 @@ export interface FinancialTransaction {
   technicianRate?: number;
   technicianRateIsPercentage?: boolean;
   jobSourceId?: string;
+  jobSourceName?: string;
   paymentMethod?: string;
   createdAt: Date;
   updatedAt?: Date;
@@ -137,3 +138,6 @@ export interface ProjectStaff {
   email?: string;
   phone?: string;
 }
+
+// Add OfficeTimeFrame type to fix OfficeDashboard error
+export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter";

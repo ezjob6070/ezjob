@@ -22,4 +22,8 @@ export interface Task {
   isReminder?: boolean;
   reminderTime?: string; // Specific time for the reminder
   reminderSent?: boolean;
+  
+  // Additional props for day component
+  day?: any;
+  className?: string;
 }

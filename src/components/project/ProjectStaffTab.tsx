@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Project } from "@/types/project";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ const ProjectStaffTab = ({ project, onUpdateProject }: ProjectStaffTabProps) => 
     hourlyRate: 0,
     totalHours: 0,
     totalCost: 0,
+    startDate: new Date().toISOString().split('T')[0],
+    status: "active"
   });
   const [isAddingStaff, setIsAddingStaff] = useState(false);
 
@@ -42,6 +45,8 @@ const ProjectStaffTab = ({ project, onUpdateProject }: ProjectStaffTabProps) => 
         hourlyRate: 0,
         totalHours: 0,
         totalCost: 0,
+        startDate: new Date().toISOString().split('T')[0],
+        status: "active"
       });
       setIsAddingStaff(false);
     }
