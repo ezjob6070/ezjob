@@ -85,3 +85,36 @@ export const applyTechnicianFilters = (
   
   return filteredTechs;
 };
+
+// Add the missing function that's being imported in useTechnicianFinancials.tsx
+export const filterTechnicians = (
+  technicians: Technician[],
+  paymentTypeFilter: string,
+  selectedTechnicianNames: string[]
+): Technician[] => {
+  // Start with filtering by payment type
+  let filtered = technicians;
+  
+  if (paymentTypeFilter && paymentTypeFilter !== "all") {
+    filtered = filtered.filter(tech => tech.paymentType === paymentTypeFilter);
+  }
+  
+  // Then filter by selected technician names if any are selected
+  if (selectedTechnicianNames.length > 0) {
+    filtered = filtered.filter(tech => selectedTechnicianNames.includes(tech.name));
+  }
+  
+  return filtered;
+};
+
+// Add the function for toggling technicians in filters
+export const toggleTechnicianInFilter = (
+  techName: string,
+  selectedTechnicianNames: string[]
+): string[] => {
+  if (selectedTechnicianNames.includes(techName)) {
+    return selectedTechnicianNames.filter(name => name !== techName);
+  } else {
+    return [...selectedTechnicianNames, techName];
+  }
+};
