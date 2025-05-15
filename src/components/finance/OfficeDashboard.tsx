@@ -22,17 +22,17 @@ const OfficeDashboard = ({ date, setDate }: OfficeDashboardProps) => {
   const [timeFrame, setTimeFrame] = useState<"day" | "week" | "month" | "quarter" | "year" | "all">("month");
   const [isExporting, setIsExporting] = useState(false);
   
-  // Initialize expense categories
+  // Initialize expense categories with the additional required properties
   const [categories, setCategories] = useState<ExpenseCategory[]>([
-    { id: "rent", name: "Rent", icon: <Building className="h-4 w-4" />, color: "#3b82f6", budget: 34200, currentSpend: 30600 },
-    { id: "secretary", name: "Secretary", icon: <Briefcase className="h-4 w-4" />, color: "#ec4899", budget: 21600, currentSpend: 18400 },
-    { id: "equipment", name: "Equipment", icon: <Printer className="h-4 w-4" />, color: "#f59e0b", budget: 6000, currentSpend: 5500 },
-    { id: "inventory", name: "Inventory", icon: <Package className="h-4 w-4" />, color: "#10b981", budget: 5000, currentSpend: 4200 },
-    { id: "warehouse", name: "Warehouse", icon: <Warehouse className="h-4 w-4" />, color: "#6366f1", budget: 14400, currentSpend: 14400 },
-    { id: "utilities", name: "Utilities", icon: <Coffee className="h-4 w-4" />, color: "#ef4444", budget: 3600, currentSpend: 3400 },
-    { id: "insurance", name: "Insurance", icon: <FileText className="h-4 w-4" />, color: "#a855f7", budget: 9000, currentSpend: 7500 },
-    { id: "staff", name: "Staff", icon: <Users className="h-4 w-4" />, color: "#06b6d4", budget: 10200, currentSpend: 8700 },
-    { id: "other", name: "Other", icon: <PenTool className="h-4 w-4" />, color: "#6b7280", budget: 2400, currentSpend: 1800 },
+    { id: "rent", name: "Rent", icon: <Building className="h-4 w-4" />, color: "#3b82f6", budget: 34200, currentSpend: 30600, amount: 30600, percentage: 32 },
+    { id: "secretary", name: "Secretary", icon: <Briefcase className="h-4 w-4" />, color: "#ec4899", budget: 21600, currentSpend: 18400, amount: 18400, percentage: 19 },
+    { id: "equipment", name: "Equipment", icon: <Printer className="h-4 w-4" />, color: "#f59e0b", budget: 6000, currentSpend: 5500, amount: 5500, percentage: 6 },
+    { id: "inventory", name: "Inventory", icon: <Package className="h-4 w-4" />, color: "#10b981", budget: 5000, currentSpend: 4200, amount: 4200, percentage: 4 },
+    { id: "warehouse", name: "Warehouse", icon: <Warehouse className="h-4 w-4" />, color: "#6366f1", budget: 14400, currentSpend: 14400, amount: 14400, percentage: 15 },
+    { id: "utilities", name: "Utilities", icon: <Coffee className="h-4 w-4" />, color: "#ef4444", budget: 3600, currentSpend: 3400, amount: 3400, percentage: 4 },
+    { id: "insurance", name: "Insurance", icon: <FileText className="h-4 w-4" />, color: "#a855f7", budget: 9000, currentSpend: 7500, amount: 7500, percentage: 8 },
+    { id: "staff", name: "Staff", icon: <Users className="h-4 w-4" />, color: "#06b6d4", budget: 10200, currentSpend: 8700, amount: 8700, percentage: 9 },
+    { id: "other", name: "Other", icon: <PenTool className="h-4 w-4" />, color: "#6b7280", budget: 2400, currentSpend: 1800, amount: 1800, percentage: 2 },
   ]);
 
   // Initialize expenses data

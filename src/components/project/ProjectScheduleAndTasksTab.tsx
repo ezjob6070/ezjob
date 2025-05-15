@@ -39,7 +39,12 @@ interface UnifiedViewProps {
   projectStaff?: ProjectStaff[];
 }
 
-export default function ProjectScheduleAndTasksTab({ project, projectStaff = [] }: UnifiedViewProps) {
+interface ProjectScheduleAndTasksTabProps {
+  project: Project;
+  onUpdateProject: (updatedProject: Project) => void;
+}
+
+export default function ProjectScheduleAndTasksTab({ project, projectStaff = [], onUpdateProject }: UnifiedViewProps) {
   const [activeTab, setActiveTab] = useState("calendar");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -332,20 +337,14 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [] 
 
   // Handle deleting a task
   const handleDeleteTask = (id: string) => {
-    const eventForTask = events.find(event => event.relatedTaskId === id);
+    // Fix by referencing tasks correctly
+    const taskToDelete = (project.tasks || []).find(t => t.id === id);
+    if (!taskToDelete) return;
     
-    // If there's a related event, ask if that should be deleted too
-    if (eventForTask) {
-      // For simplicity, we'll just delete both
-      setEvents(prev => prev.filter(event => event.relatedTaskId !== id));
-      setTasks(prev => prev.filter(task => task.id !== id));
-      toast.success("Task and related event deleted successfully");
-    } else {
-      setTasks(prev => prev.filter(task => task.id !== id));
-      toast.success("Task deleted successfully");
-    }
-    
-    setTaskForDetailView(null);
+    onUpdateProject({
+      ...project,
+      tasks: (project.tasks || []).filter(t => t.id !== id)
+    });
   };
 
   // Add task to calendar by creating a new event
@@ -420,6 +419,15 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [] 
   const handleViewTaskDetails = (task: ProjectTask) => {
     setTaskForDetailView(task);
     setTaskDetailDialogOpen(true);
+  };
+
+  const handleCompleteTask = (id: string) => {
+    onUpdateProject({
+      ...project,
+      tasks: (project.tasks || []).map(t => 
+        t.id === id ? { ...t, status: "completed" } : t
+      )
+    });
   };
 
   return (
@@ -1572,3 +1580,5 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [] 
     </div>
   );
 }
+
+export default ProjectScheduleAndTasksTab;

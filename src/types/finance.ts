@@ -60,12 +60,13 @@ export interface FinancialTransaction {
 export interface ExpenseCategory {
   id: string;
   name: string;
-  amount: number;
-  percentage: number;
-  color: string;
   icon?: React.ReactNode;
+  color: string;
   budget?: number;
   currentSpend?: number;
+  // Add required properties to fix errors
+  amount: number;
+  percentage: number;
 }
 
 export interface FinancialReport {
@@ -97,10 +98,27 @@ export interface OfficeExpense {
   vendor: string;
   paymentMethod: string;
   status: "paid" | "pending" | "overdue";
+  // Add missing properties
+  recurring?: boolean;
+  receipt?: string;
 }
 
 export interface SearchBarProps {
   searchTerm: string;
   updateFilter?: <K extends keyof FinancialFilters>(key: K, value: FinancialFilters[K]) => void;
   hidden?: boolean;
+  // Add missing property used in components
+  onSearchChange?: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+// Add missing ProjectStaff interface
+export interface ProjectStaff {
+  id: string;
+  name: string;
+  role: string;
+  hourlyRate?: number;
+  totalHours?: number;
+  totalCost?: number;
 }

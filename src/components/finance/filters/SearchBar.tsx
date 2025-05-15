@@ -1,36 +1,52 @@
 
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { SearchBarProps } from "@/types/finance";
 
-export interface SearchBarProps {
-  searchTerm: string;
-  onChange: (value: string) => void;
-  hidden?: boolean;
-}
-
-const SearchBar = ({ searchTerm, onChange, hidden = false }: SearchBarProps) => {
-  if (hidden) return null;
+const SearchBar = ({ 
+  searchTerm = "", 
+  updateFilter, 
+  onSearchChange, 
+  placeholder = "Search...", 
+  className = "",
+  hidden = false 
+}: SearchBarProps) => {
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+  
+  // Update local state when prop changes
+  useEffect(() => {
+    setLocalSearchTerm(searchTerm);
+  }, [searchTerm]);
+  
+  // Handle change and update parent component
+  const handleChange = (value: string) => {
+    setLocalSearchTerm(value);
+    
+    // Support both callback patterns
+    if (updateFilter) {
+      updateFilter("searchTerm", value);
+    }
+    
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
+  
+  if (hidden) {
+    return null;
+  }
   
   return (
-    <div className="relative flex-1">
+    <div className={`relative ${className}`}>
       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
       <Input
-        placeholder="Search..."
-        className="pl-8 pr-10"
-        value={searchTerm}
-        onChange={(e) => onChange(e.target.value)}
+        type="text"
+        placeholder={placeholder}
+        value={localSearchTerm}
+        onChange={(e) => handleChange(e.target.value)}
+        className="pl-8"
       />
-      {searchTerm && (
-        <Button
-          variant="ghost"
-          className="absolute right-0 top-0 h-9 w-9 p-0"
-          onClick={() => onChange("")}
-        >
-          <X className="h-4 w-4 text-muted-foreground" />
-          <span className="sr-only">Clear search</span>
-        </Button>
-      )}
     </div>
   );
 };

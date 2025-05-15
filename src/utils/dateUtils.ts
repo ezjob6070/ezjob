@@ -1,45 +1,58 @@
 
 /**
- * Ensures that a date value is a valid Date object
- * @param date Date value which could be a string or Date object
- * @returns Valid Date object or undefined if invalid
+ * Safely converts a string or Date to a JavaScript Date object
+ * @param date String date or Date object
+ * @returns Date object or undefined if invalid
  */
-export function ensureValidDate(date: string | Date | undefined): Date | undefined {
+export const toDate = (date: string | Date | undefined): Date | undefined => {
   if (!date) return undefined;
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return isNaN(dateObj.getTime()) ? undefined : dateObj;
-}
-
-/**
- * Safely gets hours from a date value which could be a string or Date object
- * @param date Date value which could be a string or Date object
- * @returns Hour value or undefined if the date is invalid
- */
-export function getHoursFromDate(date: string | Date | undefined): number | undefined {
-  const validDate = ensureValidDate(date);
-  return validDate ? validDate.getHours() : undefined;
-}
-
-/**
- * Safely gets minutes from a date value which could be a string or Date object
- * @param date Date value which could be a string or Date object
- * @returns Minutes value or undefined if the date is invalid
- */
-export function getMinutesFromDate(date: string | Date | undefined): number | undefined {
-  const validDate = ensureValidDate(date);
-  return validDate ? validDate.getMinutes() : undefined;
-}
-
-/**
- * Handles date ranges that might have optional 'to' property
- * @param dateRange DateRange object which might have optional 'to' property
- * @returns Object with both 'from' and 'to' dates, setting 'to' to current date if undefined
- */
-export function ensureDateRange(dateRange?: { from?: Date, to?: Date }): { from: Date, to: Date } | undefined {
-  if (!dateRange?.from) return undefined;
+  if (date instanceof Date) return date;
   
-  return {
-    from: dateRange.from,
-    to: dateRange.to || new Date()
-  };
-}
+  const parsedDate = new Date(date);
+  return isNaN(parsedDate.getTime()) ? undefined : parsedDate;
+};
+
+/**
+ * Safely gets the hours from a date string or Date object
+ * @param date String date or Date object
+ * @returns Hour as number or 0 if invalid
+ */
+export const getHoursFromDate = (date: string | Date | undefined): number => {
+  const dateObj = toDate(date);
+  return dateObj ? dateObj.getHours() : 0;
+};
+
+/**
+ * Safely formats a date string or Date object to a string
+ * @param date String date or Date object
+ * @param format Format string (optional)
+ * @returns Formatted date string or empty string if invalid
+ */
+export const formatDate = (date: string | Date | undefined, format = "yyyy-MM-dd"): string => {
+  const dateObj = toDate(date);
+  if (!dateObj) return '';
+  
+  // Simple formatter (replace with date-fns if available)
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  
+  switch (format) {
+    case "yyyy-MM-dd":
+      return `${year}-${month}-${day}`;
+    case "MM/dd/yyyy":
+      return `${month}/${day}/${year}`;
+    default:
+      return `${year}-${month}-${day}`;
+  }
+};
+
+/**
+ * Creates a helper function for DateRange to ensure both from and to are present
+ * @param range DateRange object
+ * @returns Object with from and to dates, or undefined
+ */
+export const completeDateRange = (range?: { from?: Date; to?: Date }): { from: Date; to: Date } | undefined => {
+  if (!range?.from || !range?.to) return undefined;
+  return { from: range.from, to: range.to };
+};

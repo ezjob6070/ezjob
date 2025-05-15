@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -91,7 +90,11 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
     discountAmount: existingQuote?.discountAmount || 0
   });
   
-  const [status, setStatus] = useState(existingQuote?.status || "draft");
+  // Fix the status state to use the correct type
+  const [status, setStatus] = useState<"draft" | "sent" | "accepted" | "rejected" | "expired">(
+    (existingQuote?.status as "draft" | "sent" | "accepted" | "rejected" | "expired") || "draft"
+  );
+  
   const [minPriceFilter, setMinPriceFilter] = useState<number>(0);
   const [maxPriceFilter, setMaxPriceFilter] = useState<number>(Number.MAX_SAFE_INTEGER);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -158,12 +161,13 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
     });
   };
   
+  // Update the handleSubmit function to ensure correct types
   const handleSubmit = () => {
     const quote: ProjectQuote = {
       id: existingQuote?.id || uuidv4(),
       createdAt: existingQuote?.createdAt || format(new Date(), 'yyyy-MM-dd'),
       validUntil: format(validUntil, 'yyyy-MM-dd'),
-      status: status as ProjectQuote["status"],
+      status: status,
       totalAmount: total,
       items: quoteData.items,
       clientName: quoteData.clientName,
