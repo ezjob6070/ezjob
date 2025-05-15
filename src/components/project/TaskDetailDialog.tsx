@@ -10,7 +10,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { format, isValid, parseISO } from "date-fns";
 import { ProjectTask, ProjectStaff } from "@/types/project";
-import { Calendar, Clock, MapPin, User, Building, ArrowRight } from "lucide-react";
+import { 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  User, 
+  Building, 
+  ArrowRight, 
+  AlertCircle,
+  Bell,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle
+} from "lucide-react";
 
 // Props for component
 export interface TaskDetailDialogProps {
@@ -53,6 +65,18 @@ const TaskDetailDialog = ({
       return format(parsedDate, "MMM d, yyyy");
     } catch (e) {
       return "Invalid date";
+    }
+  };
+
+  // Safely format time
+  const safeFormatTime = (dateTime: string | undefined) => {
+    if (!dateTime) return null;
+    try {
+      const parsedDate = parseISO(dateTime);
+      if (!isValid(parsedDate)) return null;
+      return format(parsedDate, "h:mm a");
+    } catch (e) {
+      return null;
     }
   };
 
@@ -133,6 +157,11 @@ const TaskDetailDialog = ({
     }
   };
 
+  // Get reminder badge style
+  const getReminderBadgeStyle = () => {
+    return "bg-purple-100 text-purple-800";
+  };
+
   // Format display status
   const formatStatus = (status: ProjectTask["status"]) => {
     switch (status) {
@@ -180,6 +209,19 @@ const TaskDetailDialog = ({
                     onChange={(e) => setEditableTask(prev => prev ? { ...prev, description: e.target.value } : null)}
                     rows={3}
                   />
+                </div>
+
+                <div className="flex items-center space-x-2 mb-4">
+                  <input
+                    type="checkbox"
+                    id="edit-is-reminder"
+                    checked={editableTask?.isReminder || false}
+                    onChange={(e) => setEditableTask(prev => prev ? { ...prev, isReminder: e.target.checked } : null)}
+                    className="rounded border-gray-300"
+                  />
+                  <label htmlFor="edit-is-reminder" className="text-sm font-medium">
+                    Set as Reminder
+                  </label>
                 </div>
 
                 <div>
@@ -249,13 +291,42 @@ const TaskDetailDialog = ({
                     onChange={(e) => setEditableTask(prev => prev ? { ...prev, dueDate: e.target.value } : null)}
                   />
                 </div>
+
+                {editableTask?.isReminder && (
+                  <div>
+                    <label htmlFor="edit-reminder-time" className="text-sm font-medium">Reminder Time</label>
+                    <Input
+                      id="edit-reminder-time"
+                      type="time"
+                      value={editableTask?.reminderTime?.split('T')[1]?.substring(0, 5) || "09:00"}
+                      onChange={(e) => {
+                        if (editableTask?.dueDate) {
+                          const datePart = editableTask.dueDate.split('T')[0];
+                          setEditableTask(prev => prev ? { 
+                            ...prev, 
+                            reminderTime: `${datePart}T${e.target.value}:00` 
+                          } : null);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <Badge className={getStatusBadgeColor(task.status)}>
-                    {formatStatus(task.status)}
-                  </Badge>
+                  {task.isReminder ? (
+                    <Badge className={getReminderBadgeStyle()}>
+                      <span className="flex items-center gap-1">
+                        <Bell className="h-3 w-3" />
+                        Reminder
+                      </span>
+                    </Badge>
+                  ) : (
+                    <Badge className={getStatusBadgeColor(task.status)}>
+                      {formatStatus(task.status)}
+                    </Badge>
+                  )}
                   <Badge className={getPriorityBadgeColor(task.priority)}>
                     {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
                   </Badge>
@@ -293,6 +364,23 @@ const TaskDetailDialog = ({
                     <span className="text-sm">Due: {safeFormatDate(task.dueDate)}</span>
                   </div>
                 </div>
+
+                {task.isReminder && task.reminderTime && (
+                  <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-md">
+                    <div className="p-1.5 rounded-md bg-purple-100">
+                      <Bell className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-purple-600 mb-0.5">Reminder Time</p>
+                      <p className="font-medium">
+                        {safeFormatTime(task.reminderTime) || "Time not set"} 
+                        {task.reminderSent && 
+                          <span className="ml-2 text-green-600 text-xs font-semibold">(Sent)</span>
+                        }
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex flex-col space-y-4 border-t border-gray-100 pt-4">
                   <div className="flex justify-between items-center">
@@ -438,6 +526,21 @@ const TaskDetailDialog = ({
                 </div>
               )}
               
+              {task.isReminder && task.reminderSent && (
+                <div className="p-4 border-b">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-purple-100 rounded-full p-1.5">
+                        <Bell className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <span className="font-medium">Reminder sent</span>
+                    </div>
+                    <span className="text-sm text-gray-500">Today</span>
+                  </div>
+                  <p className="text-sm text-gray-500 ml-9">Reminder notification was sent</p>
+                </div>
+              )}
+              
               {task.status === "completed" && task.completedAt && (
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-1">
@@ -463,7 +566,7 @@ const TaskDetailDialog = ({
                     <p className="text-sm text-gray-500">{entry.description}</p>
                   </div>
                 ))
-              ) : task.status !== "in_progress" && task.status !== "completed" && (
+              ) : task.status !== "in_progress" && task.status !== "completed" && !task.isReminder && (
                 <div className="p-6 text-center text-gray-500">
                   <p>No additional history entries</p>
                 </div>
