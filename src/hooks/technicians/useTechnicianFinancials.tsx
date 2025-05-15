@@ -130,7 +130,6 @@ export const useTechnicianFinancials = (
   }, [displayedTechnicians]);
   
   return {
-    // Original hook properties
     paymentTypeFilter,
     setPaymentTypeFilter,
     selectedTechnicianNames,
