@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { format, isSameDay } from "date-fns";
+import { format, isSameDay, isValid, parseISO } from "date-fns";
 import { v4 as uuid } from "uuid";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -386,6 +386,26 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
     .filter(task => task.dueDate)
     .map(task => new Date(task.dueDate));
 
+  // Helper function to safely format dates
+  const safeFormatDate = (date: Date | string | undefined, formatStr: string): string => {
+    if (!date) return 'Invalid date';
+    
+    if (typeof date === 'string') {
+      // Try to parse the string to a Date object
+      try {
+        const parsedDate = parseISO(date);
+        if (!isValid(parsedDate)) return 'Invalid date';
+        return format(parsedDate, formatStr);
+      } catch (e) {
+        return 'Invalid date';
+      }
+    }
+    
+    // Check if the date is valid before formatting
+    if (!isValid(date)) return 'Invalid date';
+    return format(date, formatStr);
+  };
+
   // Color coding for calendar days
   const getDayColor = (day: Date) => {
     const dayEvents = events.filter(event => isSameDay(event.start, day));
@@ -471,8 +491,8 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                     task: "border-red-400 border-2"
                   }}
                   components={{
-                    Day: ({ day, ...props }) => {
-                      const colorClass = getDayColor(day);
+                    Day: (props) => {
+                      const colorClass = getDayColor(props.date);
                       return (
                         <button
                           {...props}
@@ -481,7 +501,7 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                             colorClass
                           )}
                         >
-                          {format(day, "d")}
+                          {isValid(props.date) ? format(props.date, "d") : "?"}
                         </button>
                       );
                     }
@@ -493,7 +513,7 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
             <Card>
               <CardHeader>
                 <CardTitle>
-                  {format(selectedDate, "MMMM d, yyyy")}
+                  {safeFormatDate(selectedDate, "MMMM d, yyyy")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -508,7 +528,7 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                               <div>
                                 <p className="font-medium">{event.title}</p>
                                 <p className="text-sm text-muted-foreground">
-                                  {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
+                                  {safeFormatDate(event.start, "h:mm a")} - {safeFormatDate(event.end, "h:mm a")}
                                 </p>
                               </div>
                               <Badge className={
@@ -1091,11 +1111,11 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
         onOpenChange={setTaskDetailDialogOpen}
         task={taskForDetailView}
         projectStaff={projectStaff}
-        onUpdateTask={(updatedTask) => {
+        onUpdateStatus={(id, status) => {
           onUpdateProject({
             ...project,
             tasks: (project.tasks || []).map(t => 
-              t.id === updatedTask.id ? updatedTask : t
+              t.id === id ? { ...t, status } : t
             )
           });
         }}
