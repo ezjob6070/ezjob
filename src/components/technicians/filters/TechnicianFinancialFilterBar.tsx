@@ -59,6 +59,7 @@ const TechnicianFinancialFilterBar: React.FC<TechnicianFinancialFilterBarProps> 
             <SelectItem value="all">All Payment Types</SelectItem>
             <SelectItem value="percentage">Percentage Based</SelectItem>
             <SelectItem value="flat">Flat Rate</SelectItem>
+            <SelectItem value="hourly">Hourly</SelectItem>
           </SelectContent>
         </Select>
       </div>

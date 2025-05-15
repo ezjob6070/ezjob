@@ -2,28 +2,30 @@
 import { Technician } from "@/types/technician";
 
 /**
- * Filters technicians based on payment type and name selection
+ * Filter technicians based on payment type and selected names
  */
 export const filterTechnicians = (
   technicians: Technician[],
   paymentTypeFilter: string,
   selectedTechnicianNames: string[]
 ): Technician[] => {
-  return technicians.filter(technician => {
-    // Filter by payment type
-    const matchesPaymentType = paymentTypeFilter === "all" || 
-      technician.paymentType === paymentTypeFilter;
-      
-    // Filter by technician name if any are selected
-    const matchesTechnicianFilter = selectedTechnicianNames.length === 0 || 
-      selectedTechnicianNames.includes(technician.name);
-      
-    return matchesPaymentType && matchesTechnicianFilter;
-  });
+  let filtered = [...technicians];
+  
+  // Apply payment type filter
+  if (paymentTypeFilter !== "all") {
+    filtered = filtered.filter(tech => tech.paymentType === paymentTypeFilter);
+  }
+  
+  // Apply technician name filter
+  if (selectedTechnicianNames.length > 0) {
+    filtered = filtered.filter(tech => selectedTechnicianNames.includes(tech.name));
+  }
+  
+  return filtered;
 };
 
 /**
- * Toggles a technician name in the filter array
+ * Toggle a technician in the filter array
  */
 export const toggleTechnicianInFilter = (
   techName: string,
