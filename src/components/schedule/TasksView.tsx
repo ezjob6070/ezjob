@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell } from "lucide-react";
+import { Calendar, ArrowDown, ArrowUp, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -128,26 +128,10 @@ const TasksView = ({
 
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onPreviousDay}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        
+      <div className="flex items-center justify-center mb-4">
         <h3 className="text-lg font-medium">
           {format(selectedDate, "EEEE, MMMM d, yyyy")}
         </h3>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onNextDay}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
       </div>
       
       <div className="mb-4">
