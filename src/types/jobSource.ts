@@ -3,20 +3,16 @@ export interface JobSource {
   id: string;
   name: string;
   type: string;
-  paymentType: "fixed" | "percentage";
-  paymentValue: number;
-  isActive: boolean;
-  profit: number;
-  createdAt: string;
-  totalJobs: number;
-  totalRevenue: number;
-  // Add missing properties
+  createdAt?: string;
+  updatedAt?: string;
+  description?: string;
+  status?: "active" | "inactive";
+  jobCount?: number;
+  revenue?: number;
+  // Additional properties that are being accessed
   website?: string;
   phone?: string;
   email?: string;
   logoUrl?: string;
   notes?: string;
-  expenses?: number;
-  companyProfit?: number;
-  category?: string;
 }

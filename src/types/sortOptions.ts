@@ -11,4 +11,7 @@ export type SortOption =
   | "profit-high" 
   | "profit-low"
   | "jobs-high"
-  | "jobs-low"; 
+  | "jobs-low"
+  | "budget-high"
+  | "budget-low"
+  | "default"; 

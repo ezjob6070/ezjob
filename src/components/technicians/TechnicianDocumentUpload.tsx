@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Technician, Document } from "@/types/technician";
 import { Button } from "@/components/ui/button";
@@ -224,14 +223,22 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
   );
 
   // Handle driver license display correctly
-  const getDriverLicenseProperty = (property: 'number' | 'state' | 'expirationDate'): string => {
-    if (!technician.driverLicense) return 'Not provided';
-    
-    if (typeof technician.driverLicense === 'string') {
-      return property === 'number' ? technician.driverLicense : 'Not provided';
-    }
-    
-    return technician.driverLicense[property];
+  const getLicenseNumber = (license: string | { number: string; state: string; expirationDate: string; } | undefined): string => {
+    if (!license) return '';
+    if (typeof license === 'string') return license;
+    return license.number || '';
+  };
+
+  const getLicenseState = (license: string | { number: string; state: string; expirationDate: string; } | undefined): string => {
+    if (!license) return '';
+    if (typeof license === 'string') return '';
+    return license.state || '';
+  };
+
+  const getLicenseExpiration = (license: string | { number: string; state: string; expirationDate: string; } | undefined): string => {
+    if (!license) return '';
+    if (typeof license === 'string') return '';
+    return license.expirationDate || '';
   };
 
   return (
@@ -509,19 +516,19 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Number</p>
                         <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-                          {maskData(technician.driverLicense.number, showDriverLicense)}
+                          {maskData(getLicenseNumber(technician.driverLicense), showDriverLicense)}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">State</p>
                         <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-                          {showDriverLicense ? technician.driverLicense.state : "••"}
+                          {showDriverLicense ? getLicenseState(technician.driverLicense) : "••"}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Expiration</p>
                         <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-                          {showDriverLicense ? technician.driverLicense.expirationDate : "••/••/••••"}
+                          {showDriverLicense ? getLicenseExpiration(technician.driverLicense) : "••/••/••••"}
                         </p>
                       </div>
                     </div>

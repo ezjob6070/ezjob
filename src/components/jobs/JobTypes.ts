@@ -13,12 +13,12 @@ export interface Job {
   amount: number;
   status: JobStatus;
   actualAmount?: number;
-  technicianId?: string;  // Added for the TS errors
+  technicianId?: string;  // Essential property
   technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  date: Date | string;  // Updated to accept Date or string
-  scheduledDate?: Date | string;  // Updated to accept Date or string
+  date: Date | string;  // Essential property
+  scheduledDate?: Date | string;
   createdAt?: string;
   priority?: JobPriority;
   details?: string;

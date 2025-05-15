@@ -55,15 +55,12 @@ const ensureValidDate = (date: any): Date | null => {
 };
 
 // Helper function to safely get hours from date that could be string or Date
-function getHoursFromDate(date: Date | string): number {
-  if (date instanceof Date) {
-    return date.getHours();
-  }
+const getHoursFromDate = (date: string | Date): number => {
   if (typeof date === 'string') {
     return new Date(date).getHours();
   }
-  return 0;
-}
+  return date.getHours();
+};
 
 // Helper function to safely check if a date is the same day
 function isSameDayHelper(dateA: Date | string | undefined, dateB: Date | string | undefined): boolean {

@@ -1,85 +1,58 @@
-import { Technician } from "@/types/technician";
 
-export const filterTechniciansByRole = (
-  technicians: Technician[],
-  roleFilter: string
-): Technician[] => {
-  if (roleFilter === "all") return technicians;
-  return technicians.filter(tech => (tech.role || "technician") === roleFilter);
-};
+import { Technician, TechnicianFilters } from "@/types/technician";
+import { isSameMonth, isAfter, isBefore, isWithinInterval } from "date-fns";
 
-export const filterTechniciansBySubRole = (
-  technicians: Technician[],
-  subRoleFilter: string | null
+export const filterTechnicians = (
+  technicians: Technician[], 
+  filters: TechnicianFilters
 ): Technician[] => {
-  if (!subRoleFilter) return technicians;
-  return technicians.filter(tech => tech.subRole === subRoleFilter);
-};
-
-export const filterTechniciansByStatus = (
-  technicians: Technician[],
-  statusFilter: string
-): Technician[] => {
-  if (statusFilter === "all") return technicians;
-  return technicians.filter(tech => tech.status === statusFilter);
-};
-
-export const filterTechniciansBySearch = (
-  technicians: Technician[],
-  searchQuery: string
-): Technician[] => {
-  if (!searchQuery) return technicians;
-  
-  const query = searchQuery.toLowerCase();
-  return technicians.filter(tech => {
-    return (
-      tech.name.toLowerCase().includes(query) ||
-      (tech.email && tech.email.toLowerCase().includes(query)) ||
-      (tech.phone && tech.phone.toLowerCase().includes(query)) ||
-      (tech.specialty && tech.specialty.toLowerCase().includes(query))
-    );
+  return technicians.filter(technician => {
+    // Search filter
+    if (filters.search && !technician.name.toLowerCase().includes(filters.search.toLowerCase()) &&
+        !technician.email.toLowerCase().includes(filters.search.toLowerCase()) && 
+        !technician.phone?.toLowerCase().includes(filters.search.toLowerCase()) &&
+        !technician.specialty?.toLowerCase().includes(filters.search.toLowerCase())) {
+      return false;
+    }
+    
+    // Payment type filter
+    if (filters.paymentTypes.length > 0 && !filters.paymentTypes.includes(technician.paymentType)) {
+      return false;
+    }
+    
+    // Status filter
+    if (filters.status.length > 0 && !filters.status.includes(technician.status)) {
+      return false;
+    }
+    
+    // Categories filter
+    if (filters.categories.length > 0 && 
+        (!technician.category || !filters.categories.includes(technician.category))) {
+      return false;
+    }
+    
+    // Date range filter
+    if (filters.dateRange?.from && filters.dateRange?.to) {
+      const hireDate = new Date(technician.hireDate);
+      if (!isWithinInterval(hireDate, { 
+        start: filters.dateRange.from, 
+        end: filters.dateRange.to 
+      })) {
+        return false;
+      }
+    }
+    
+    return true;
   });
 };
 
-export const getUniqueSubRoles = (technicians: Technician[]): string[] => {
-  const subRoles = technicians
-    .map(tech => tech.subRole)
-    .filter(Boolean) as string[];
-  
-  return [...new Set(subRoles)];
-};
-
-// Add the missing filterTechnicians function
-export const filterTechnicians = (
-  technicians: Technician[],
-  paymentTypeFilter: string,
-  selectedTechnicianNames: string[]
-): Technician[] => {
-  let filtered = [...technicians];
-  
-  // Filter by payment type if not "all"
-  if (paymentTypeFilter !== "all") {
-    filtered = filtered.filter(tech => tech.paymentType === paymentTypeFilter);
-  }
-  
-  // Filter by selected technician names if any are selected
-  if (selectedTechnicianNames.length > 0) {
-    filtered = filtered.filter(tech => selectedTechnicianNames.includes(tech.name));
-  }
-  
-  return filtered;
-};
-
-// Add the missing toggleTechnicianInFilter function
 export const toggleTechnicianInFilter = (
-  techName: string,
-  selectedTechnicianNames: string[]
+  technicianId: string, 
+  selectedTechnicians: string[]
 ): string[] => {
-  // If the technician is already selected, remove them
-  if (selectedTechnicianNames.includes(techName)) {
-    return selectedTechnicianNames.filter(name => name !== techName);
+  if (selectedTechnicians.includes(technicianId)) {
+    return selectedTechnicians.filter(id => id !== technicianId);
+  } else {
+    return [...selectedTechnicians, technicianId];
   }
-  
-  // Otherwise add them to the selected list
-  return [...selectedTechnicianNames, techName];
 };
