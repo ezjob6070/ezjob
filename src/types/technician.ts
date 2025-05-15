@@ -22,7 +22,7 @@ export interface Technician {
   category?: string;
   totalRevenue?: number;
   
-  // Additional properties
+  // Adding missing properties
   role?: "technician" | "salesman" | "employed" | "contractor";
   subRole?: string;
   incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly";

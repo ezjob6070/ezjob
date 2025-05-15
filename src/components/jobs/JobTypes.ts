@@ -13,11 +13,11 @@ export interface Job {
   amount: number;
   status: JobStatus;
   actualAmount?: number;
-  technicianId: string;  // Required property
+  technicianId: string;  
   technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  date: Date | string;  // Required property
+  date: Date | string;  
   scheduledDate?: Date | string;
   createdAt?: string;
   priority?: JobPriority;
@@ -38,7 +38,6 @@ export interface Job {
   contractorName?: string;
   contractorId?: string;
   clientId?: string;
-  // Add missing properties that are being used in various components
   parts?: string[];
   signature?: string;
   hasImages?: boolean;

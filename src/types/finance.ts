@@ -93,6 +93,7 @@ export interface JobSource {
   companyProfit: number;
   createdAt?: string;
   category?: string;
+  website?: string;
 }
 
 export interface OfficeExpense {

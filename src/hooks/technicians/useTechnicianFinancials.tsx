@@ -4,6 +4,7 @@ import { DateRange } from "react-day-picker";
 import { useGlobalState } from '@/components/providers/GlobalStateProvider';
 import { calculateTechnicianFinancials, ensureCompleteDateRange } from './financialUtils';
 import { Technician } from '@/types/technician';
+import { format } from "date-fns";
 
 export interface TechnicianFinancialsHookReturn {
   paymentTypeFilter: string;
@@ -191,8 +192,5 @@ const useTechnicianFinancials = (initialDateRange?: DateRange): TechnicianFinanc
     dateRange: localDateRange
   };
 };
-
-// Add date-fns import for format function
-import { format } from "date-fns";
 
 export default useTechnicianFinancials;
