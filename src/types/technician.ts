@@ -11,7 +11,7 @@ export interface Document {
 }
 
 // Define types for payment handling
-export type PaymentType = "percentage" | "flat" | "hourly" | "salary";
+export type PaymentType = "percentage" | "flat" | "hourly" | "salary" | "commission";
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
 export type IncentiveType = "none" | "bonus" | "commission" | "profit-sharing" | "other" | "hourly" | "weekly" | "monthly";
 export type TechnicianStatus = "active" | "inactive" | "onLeave";

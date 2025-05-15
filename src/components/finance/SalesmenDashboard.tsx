@@ -34,7 +34,7 @@ const SalesmenDashboard: React.FC<SalesmenDashboardProps> = ({ dateRange, setDat
 
   // Get jobs assigned to salesmen within the date range
   const salesJobs = jobs.filter(job => {
-    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date as string);
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);
