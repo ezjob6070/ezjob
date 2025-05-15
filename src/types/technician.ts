@@ -15,6 +15,7 @@ export type PaymentType = "percentage" | "flat" | "hourly" | "salary";
 export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "commission" | "annually" | "yearly";
 export type IncentiveType = "none" | "bonus" | "commission" | "profit-sharing" | "other";
 export type TechnicianStatus = "active" | "inactive" | "onLeave";
+export type TechnicianRole = "technician" | "contractor" | "salesman" | "employed";
 
 export interface TechnicianSubRoles {
   technician: string[];
@@ -67,11 +68,14 @@ export interface Technician {
   incentiveAmount?: number;
   
   // Add properties referenced in the errors
-  role?: string;
+  role?: TechnicianRole;
   earnings?: number;
   jobCount?: number;
   technicianId?: string;
   date?: string;
+  category?: string;
+  workContract?: string;
+  payRate?: number;
   
   // Document handling
   documents?: Document[];
@@ -98,3 +102,36 @@ export interface Job {
   technicianId?: string;
   description?: string;
 }
+
+// Export TechnicianFinancialsHookReturn to fix the missing export error
+export type TechnicianFinancialsHookReturn = {
+  paymentTypeFilter: string;
+  setPaymentTypeFilter: (filter: string) => void;
+  selectedTechnicianNames: string[];
+  setSelectedTechnicianNames: (names: string[]) => void;
+  selectedTechnician: Technician | null;
+  localDateRange: DateRange | undefined;
+  setLocalDateRange: (range: DateRange | undefined) => void;
+  displayedTechnicians: Technician[];
+  financialMetrics: any;
+  selectedTechnicianMetrics: any;
+  dateRangeText: string;
+  toggleTechnician: (name: string) => void;
+  clearFilters: () => void;
+  applyFilters: () => void;
+  handleTechnicianSelect: (technician: Technician) => void;
+  technicians: Technician[];
+  techniciansByRole: Record<string, Technician[]>;
+  financialSummary: {
+    totalRevenue: number;
+    totalEarnings: number;
+    totalJobs: number;
+    totalCompletedJobs: number;
+    companyProfit: number;
+    averageJobValue: number;
+  };
+  isLoading: boolean;
+  dateRange: DateRange | undefined;
+};
+
+import { DateRange } from "react-day-picker";

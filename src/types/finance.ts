@@ -120,7 +120,7 @@ export interface SearchBarProps {
   showIcons?: boolean;
 }
 
-// Align ProjectStaff with project.ts definition 
+// Align ProjectStaff with project.ts definition - using the proper status type
 export interface ProjectStaff {
   id: string;
   name: string;
