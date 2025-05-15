@@ -1,3 +1,4 @@
+
 // Define Project types
 
 export interface Project {
@@ -109,7 +110,6 @@ export interface ProjectEquipment {
 
 export interface ProjectMaterial {
   id: string;
-  name: string;
   quantity: number;
   unit: string;
   cost: number;
@@ -117,6 +117,7 @@ export interface ProjectMaterial {
   deliveryDate?: string;
   status: "ordered" | "delivered" | "used" | "surplus";
   notes?: string;
+  name: string;
 }
 
 export interface ProjectContractor {

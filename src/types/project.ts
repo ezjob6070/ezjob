@@ -134,13 +134,27 @@ export interface ProjectTask {
   reminderTime?: string; // Specific time for the reminder
   reminderSent?: boolean;
   
-  // Inspection fields
-  inspections?: ProjectTaskInspection[];
+  // Client and location fields
+  client?: string;
+  location?: string;
   
-  // Additional fields for tracking
+  // History entries and tracking
+  history?: ProjectTaskHistoryEntry[];
   lastUpdatedAt?: string;
   comments?: ProjectTaskComment[];
   attachments?: ProjectTaskAttachment[];
+  
+  // Inspection fields
+  inspections?: ProjectTaskInspection[];
+}
+
+export interface ProjectTaskHistoryEntry {
+  id?: string;
+  title: string;
+  description: string;
+  date: string;
+  userId?: string;
+  userName?: string;
 }
 
 export interface ProjectTaskInspection {
