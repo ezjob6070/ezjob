@@ -1,8 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
 import { isSameDay } from "date-fns";
-import JobsList from "@/components/calendar/components/JobsList";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
@@ -191,11 +191,6 @@ const Schedule = () => {
         </div>
       </div>
 
-      <CalendarViewOptions 
-        currentView={viewMode} 
-        onViewChange={handleViewChange} 
-      />
-
       <Tabs 
         defaultValue="calendar" 
         className="w-full"
@@ -204,7 +199,6 @@ const Schedule = () => {
       >
         <TabsList className="mb-4 w-full justify-start">
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="jobs">Jobs</TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-1">
             <ListChecks className="h-4 w-4" />
             Tasks & Reminders
@@ -212,6 +206,14 @@ const Schedule = () => {
         </TabsList>
         
         <TabsContent value="calendar" className="space-y-6 mt-2">
+          {/* Move CalendarViewOptions inside the calendar tab */}
+          <div className="flex items-center justify-between mb-4">
+            <CalendarViewOptions 
+              currentView={viewMode} 
+              onViewChange={handleViewChange} 
+            />
+          </div>
+          
           <CalendarView 
             jobs={jobs}
             tasks={tasks}
@@ -220,16 +222,6 @@ const Schedule = () => {
             tasksForSelectedDate={tasksForSelectedDate}
             updateSelectedDateItems={updateSelectedDateItems}
             viewMode={viewMode}
-          />
-        </TabsContent>
-        
-        <TabsContent value="jobs" className="mt-2">
-          <JobsList 
-            selectedDate={selectedDate}
-            jobsForSelectedDate={jobsForSelectedDate}
-            onPreviousDay={handlePreviousDay}
-            onNextDay={handleNextDay}
-            allJobs={jobs}
           />
         </TabsContent>
         
