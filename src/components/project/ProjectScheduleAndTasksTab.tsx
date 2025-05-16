@@ -4,9 +4,33 @@ import { Project, ProjectTask } from "@/types/project";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar as CalendarIcon, Clock, ListTodo, CheckSquare, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  Calendar as CalendarIcon, 
+  Clock, 
+  ListTodo, 
+  CheckSquare, 
+  Calendar, 
+  ChevronLeft, 
+  ChevronRight,
+  Timeline,
+  Check,
+  AlertCircle 
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { format, isSameDay, addDays, subDays, startOfWeek, endOfWeek, addWeeks, subWeeks, addMonths, subMonths, eachDayOfInterval } from "date-fns";
+import { 
+  format, 
+  isSameDay, 
+  addDays, 
+  subDays, 
+  startOfWeek, 
+  endOfWeek, 
+  addWeeks, 
+  subWeeks, 
+  addMonths, 
+  subMonths, 
+  eachDayOfInterval,
+  parseISO 
+} from "date-fns";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { Task } from "@/components/calendar/types";
@@ -28,7 +52,7 @@ export default function ProjectScheduleAndTasksTab({
 }: ProjectScheduleAndTasksTabProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
-  const [activeTab, setActiveTab] = useState<"calendar" | "list">("calendar");
+  const [activeTab, setActiveTab] = useState<"calendar" | "list" | "timeline">("calendar");
   const [displayMode, setDisplayMode] = useState<"all" | "tasks" | "reminders">("all");
   
   // Convert project tasks to calendar tasks
@@ -106,6 +130,41 @@ export default function ProjectScheduleAndTasksTab({
     toast.success(isReminder ? "New reminder created" : "New task created");
   };
   
+  const handleCreateTimelineEvent = () => {
+    const newTaskId = uuidv4();
+    const now = new Date();
+    
+    const newTask: ProjectTask = {
+      id: newTaskId,
+      title: "Timeline Event",
+      description: "New timeline event",
+      status: "pending",
+      priority: "medium",
+      progress: 0,
+      createdAt: now.toISOString(),
+      dueDate: now.toISOString(),
+      isReminder: false,
+      reminderSent: false,
+      history: [
+        {
+          title: "Timeline Event Created",
+          description: "Timeline event was created",
+          date: now.toISOString()
+        }
+      ]
+    };
+    
+    const updatedTasks = [...(project.tasks || []), newTask];
+    
+    const updatedProject = {
+      ...project,
+      tasks: updatedTasks,
+    };
+    
+    onUpdateProject(updatedProject);
+    toast.success("New timeline event created");
+  };
+  
   // Filter tasks/reminders for the selected date
   const getTasksForSelectedDate = () => {
     if (!project.tasks) return [];
@@ -130,6 +189,10 @@ export default function ProjectScheduleAndTasksTab({
     if (displayMode === "tasks") return onlyTasksForSelectedDate;
     return remindersForSelectedDate;
   };
+
+  // Sort tasks by due date for timeline
+  const sortedTimelineTasks = [...calendarTasks]
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
   // Handle navigation for different view modes
   const handlePrev = () => {
@@ -259,6 +322,9 @@ export default function ProjectScheduleAndTasksTab({
             
             const hasReminders = dayTasks.some(task => task.isReminder);
             const hasTasks = dayTasks.some(task => !task.isReminder);
+            const remindersCount = dayTasks.filter(task => task.isReminder).length;
+            const tasksCount = dayTasks.filter(task => !task.isReminder).length;
+            const highPriorityCount = dayTasks.filter(task => task.priority === "high" || task.priority === "urgent").length;
             
             return (
               <div
@@ -269,8 +335,9 @@ export default function ProjectScheduleAndTasksTab({
                   isSelected 
                     ? "ring-2 ring-primary bg-primary/10" 
                     : "hover:bg-gray-50",
+                  highPriorityCount > 0 ? "bg-red-50" :
                   (hasReminders && hasTasks) ? "bg-purple-50" :
-                  hasReminders ? "bg-red-50" :
+                  hasReminders ? "bg-pink-50" :
                   hasTasks ? "bg-blue-50" : ""
                 )}
               >
@@ -282,20 +349,18 @@ export default function ProjectScheduleAndTasksTab({
                 </div>
                 <div className="text-xs font-medium text-center">{format(day, "EEE")}</div>
                 
-                {dayTasks.length > 0 && (
-                  <div className="mt-auto">
-                    <div className="flex items-center justify-center gap-1 mt-2">
-                      {hasTasks && (
-                        <Badge variant="secondary" className="text-xs py-0 px-2">
-                          {dayTasks.filter(t => !t.isReminder).length} tasks
-                        </Badge>
-                      )}
-                      {hasReminders && (
-                        <Badge variant="destructive" className="text-xs py-0 px-2">
-                          {dayTasks.filter(t => t.isReminder).length} reminders
-                        </Badge>
-                      )}
-                    </div>
+                {(tasksCount > 0 || remindersCount > 0) && (
+                  <div className="mt-auto flex flex-col gap-1">
+                    {tasksCount > 0 && (
+                      <div className="flex items-center justify-center bg-blue-200 text-blue-800 rounded-full px-2 py-0.5 text-xs">
+                        {tasksCount} {tasksCount === 1 ? "task" : "tasks"}
+                      </div>
+                    )}
+                    {remindersCount > 0 && (
+                      <div className="flex items-center justify-center bg-red-200 text-red-800 rounded-full px-2 py-0.5 text-xs">
+                        {remindersCount} {remindersCount === 1 ? "reminder" : "reminders"}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -342,8 +407,8 @@ export default function ProjectScheduleAndTasksTab({
               return isSameDay(new Date(task.dueDate), day);
             });
             
-            const hasReminders = dayTasks.some(task => task.isReminder);
-            const hasTasks = dayTasks.some(task => !task.isReminder);
+            const remindersCount = dayTasks.filter(task => task.isReminder).length;
+            const tasksCount = dayTasks.filter(task => !task.isReminder).length;
             const hasHighPriorityTasks = dayTasks.some(task => task.priority === "high" || task.priority === "urgent");
             
             return (
@@ -356,9 +421,9 @@ export default function ProjectScheduleAndTasksTab({
                   isSelected && "ring-2 ring-primary",
                   isToday && !isSelected && "ring-1 ring-primary",
                   hasHighPriorityTasks ? "bg-red-50" :
-                  (hasReminders && hasTasks) ? "bg-purple-50" :
-                  hasReminders ? "bg-pink-50" :
-                  hasTasks ? "bg-blue-50" : 
+                  (remindersCount > 0 && tasksCount > 0) ? "bg-purple-50" :
+                  remindersCount > 0 ? "bg-pink-50" :
+                  tasksCount > 0 ? "bg-blue-50" : 
                   isCurrentMonth ? "bg-white" : "bg-gray-50"
                 )}
               >
@@ -367,22 +432,30 @@ export default function ProjectScheduleAndTasksTab({
                   isToday && "font-bold text-primary"
                 )}>
                   <span className={cn(
+                    "text-sm",
                     isSelected && "bg-primary text-primary-foreground rounded-full w-6 h-6 inline-flex items-center justify-center"
                   )}>
                     {day.getDate()}
                   </span>
                 </div>
                 
-                {dayTasks.length > 0 && isCurrentMonth && (
-                  <div className="mt-auto flex flex-wrap gap-1 justify-center">
-                    {hasTasks && (
-                      <div className="w-2 h-2 rounded-full bg-blue-500" title={`${dayTasks.filter(t => !t.isReminder).length} tasks`}></div>
+                {/* Task and reminder count indicators */}
+                {(tasksCount > 0 || remindersCount > 0) && isCurrentMonth && (
+                  <div className="mt-auto flex flex-wrap gap-1 p-1">
+                    {tasksCount > 0 && (
+                      <div className="bg-blue-500 text-white text-xs rounded-full px-1.5 py-0.5 flex items-center justify-center">
+                        {tasksCount}
+                      </div>
                     )}
-                    {hasReminders && (
-                      <div className="w-2 h-2 rounded-full bg-red-500" title={`${dayTasks.filter(t => t.isReminder).length} reminders`}></div>
+                    {remindersCount > 0 && (
+                      <div className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 flex items-center justify-center">
+                        {remindersCount}
+                      </div>
                     )}
                     {hasHighPriorityTasks && (
-                      <div className="w-2 h-2 rounded-full bg-amber-500" title="High priority items"></div>
+                      <div className="bg-amber-500 text-white text-xs rounded-full px-1.5 py-0.5 flex items-center justify-center">
+                        !
+                      </div>
                     )}
                   </div>
                 )}
@@ -390,6 +463,110 @@ export default function ProjectScheduleAndTasksTab({
             );
           })}
         </div>
+      </div>
+    );
+  };
+  
+  // Timeline rendering
+  const renderTimelineView = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium">Project Timeline</h3>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={handleCreateTimelineEvent}
+            className="gap-1"
+          >
+            <Timeline className="h-4 w-4" />
+            Add Timeline Event
+          </Button>
+        </div>
+        
+        {sortedTimelineTasks.length === 0 ? (
+          <div className="p-12 text-center border rounded-lg bg-gray-50">
+            <p className="text-muted-foreground">No timeline events found</p>
+            <p className="text-sm text-muted-foreground">Add tasks or timeline events to see them here</p>
+          </div>
+        ) : (
+          <div className="relative pl-8 border-l-2 border-gray-200 ml-4">
+            {sortedTimelineTasks.map((task, index) => {
+              // Calculate if the task is past, current or future
+              const now = new Date();
+              const taskDate = new Date(task.dueDate);
+              const isPast = taskDate < now;
+              const isCurrent = isSameDay(taskDate, now);
+              
+              return (
+                <div 
+                  key={task.id} 
+                  className={cn(
+                    "relative mb-8 pl-6",
+                    index === sortedTimelineTasks.length - 1 ? "" : ""
+                  )}
+                >
+                  <div className={cn(
+                    "absolute -left-[2.5rem] p-1 rounded-full border-4 border-white",
+                    task.isReminder ? "bg-red-500" : 
+                    task.status === "completed" ? "bg-green-500" :
+                    isCurrent ? "bg-blue-500" :
+                    isPast ? "bg-amber-500" : "bg-gray-300"
+                  )}>
+                    {task.isReminder ? (
+                      <Clock className="h-4 w-4 text-white" />
+                    ) : task.status === "completed" ? (
+                      <Check className="h-4 w-4 text-white" />
+                    ) : (
+                      <div className="h-4 w-4" />
+                    )}
+                  </div>
+                  
+                  <div className={cn(
+                    "p-4 border rounded-lg shadow-sm",
+                    task.isReminder ? "bg-red-50 border-red-200" : 
+                    task.status === "completed" ? "bg-green-50 border-green-200" :
+                    isCurrent ? "bg-blue-50 border-blue-200" :
+                    isPast ? "bg-amber-50 border-amber-200" : "bg-white"
+                  )}>
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-lg">{task.title}</h4>
+                      <Badge variant={
+                        task.isReminder ? "destructive" : 
+                        task.status === "completed" ? "outline" : "secondary"
+                      }>
+                        {task.isReminder ? "Reminder" : task.status}
+                      </Badge>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground mb-2">{task.description}</p>
+                    
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <CalendarIcon className="h-3 w-3" />
+                        {format(taskDate, "PPP")}
+                      </span>
+                      
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {format(taskDate, "p")}
+                      </span>
+                      
+                      {task.priority && (
+                        <Badge variant={
+                          task.priority === "high" || task.priority === "urgent" ? "destructive" :
+                          task.priority === "medium" ? "secondary" : "outline"
+                        } className="text-xs">
+                          {task.priority}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   };
@@ -420,8 +597,8 @@ export default function ProjectScheduleAndTasksTab({
         </div>
       </div>
       
-      <Tabs defaultValue="calendar" onValueChange={(value) => setActiveTab(value as "calendar" | "list")}>
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="calendar" onValueChange={(value) => setActiveTab(value as "calendar" | "list" | "timeline")}>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="calendar" className="gap-1">
             <Calendar className="h-4 w-4" />
             Calendar
@@ -429,6 +606,10 @@ export default function ProjectScheduleAndTasksTab({
           <TabsTrigger value="list" className="gap-1">
             <ListTodo className="h-4 w-4" />
             Tasks & Reminders
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="gap-1">
+            <Timeline className="h-4 w-4" />
+            Timeline
           </TabsTrigger>
         </TabsList>
         
@@ -593,6 +774,10 @@ export default function ProjectScheduleAndTasksTab({
               )
             ))}
           </div>
+        </TabsContent>
+        
+        <TabsContent value="timeline" className="space-y-4 pt-4">
+          {renderTimelineView()}
         </TabsContent>
       </Tabs>
     </div>
