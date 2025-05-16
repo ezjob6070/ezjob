@@ -33,10 +33,7 @@ const ReminderCard = ({ reminder, onReminderUpdate }: ReminderCardProps) => {
   };
 
   return (
-    <div className={cn(
-      "border rounded-lg p-3 relative",
-      reminder.status === "completed" ? "opacity-80" : ""
-    )}>
+    <div className="p-3 border rounded-lg bg-red-50">
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-1">
           <Checkbox
