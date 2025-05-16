@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval,
   addDays, startOfMonth, endOfMonth, isToday, getDay
@@ -7,13 +7,14 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Job } from '@/types/job';
 import { Task } from '@/components/calendar/types';
 import { Badge } from '@/components/ui/badge';
 import { CalendarViewMode } from './CalendarViewOptions';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import DayDetailDialog from './DayDetailDialog';
 
 type CalendarViewProps = {
   jobs: Job[];
@@ -36,6 +37,8 @@ const CalendarView = ({
   viewMode,
   onViewChange,
 }) => {
+  const [dayDetailOpen, setDayDetailOpen] = useState(false);
+  
   // Generate week dates for week view
   const weekDates = React.useMemo(() => {
     const start = startOfWeek(selectedDate);
@@ -139,6 +142,11 @@ const CalendarView = ({
     );
   };
 
+  const handleViewDay = (date: Date) => {
+    updateSelectedDateItems(date);
+    setDayDetailOpen(true);
+  };
+
   const renderMonthView = () => {
     const handleSelectDate = (newDate: Date | undefined) => {
       if (newDate) {
@@ -193,6 +201,22 @@ const CalendarView = ({
                         {dayTasks.filter(t => t.isReminder).length} reminders
                       </div>
                     )}
+                  </div>
+                  
+                  {/* View button */}
+                  <div className="flex justify-end mt-auto">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 p-0 px-1 text-[0.65rem] ml-auto hover:bg-gray-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewDay(date);
+                      }}
+                    >
+                      <Eye className="h-3 w-3 mr-1" />
+                      View
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -296,6 +320,15 @@ const CalendarView = ({
           </div>
         </div>
       </CardContent>
+
+      {/* Day detail dialog */}
+      <DayDetailDialog
+        open={dayDetailOpen}
+        onOpenChange={setDayDetailOpen}
+        date={selectedDate}
+        jobs={jobsForSelectedDate}
+        tasks={tasksForSelectedDate}
+      />
     </Card>
   );
 };
