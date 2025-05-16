@@ -160,10 +160,14 @@ const TasksView = ({
 
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-center mb-4">
+      <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium">
           {format(selectedDate, "EEEE, MMMM d, yyyy")}
         </h3>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={onPreviousDay}>Previous</Button>
+          <Button variant="outline" size="sm" onClick={onNextDay}>Next</Button>
+        </div>
       </div>
       
       <div className="mb-4">
