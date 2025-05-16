@@ -1,9 +1,9 @@
 
-import { Calendar, CalendarDays, CalendarRange } from "lucide-react";
+import { Calendar, CalendarDays, LayoutGrid, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export type CalendarViewMode = "day" | "week" | "month";
+export type CalendarViewMode = "day" | "week" | "month" | "home";
 
 interface CalendarViewOptionsProps {
   currentView: CalendarViewMode;
@@ -12,27 +12,28 @@ interface CalendarViewOptionsProps {
 
 const CalendarViewOptions = ({ currentView, onViewChange }: CalendarViewOptionsProps) => {
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-2">
-        <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)} className="bg-muted/20 border rounded-md p-1">
-          <ToggleGroupItem value="day" aria-label="Day View" className="gap-1 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+        <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)}>
+          <ToggleGroupItem value="day" aria-label="Daily View" className="gap-1">
             <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline text-sm">Day</span>
+            <span className="hidden sm:inline">Day</span>
           </ToggleGroupItem>
-          <ToggleGroupItem value="week" aria-label="Week View" className="gap-1 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm">
-            <CalendarRange className="h-4 w-4" />
-            <span className="hidden sm:inline text-sm">Week</span>
+          <ToggleGroupItem value="week" aria-label="Weekly View" className="gap-1">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">Week</span>
           </ToggleGroupItem>
-          <ToggleGroupItem value="month" aria-label="Month View" className="gap-1 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+          <ToggleGroupItem value="month" aria-label="Monthly View" className="gap-1">
             <CalendarDays className="h-4 w-4" />
-            <span className="hidden sm:inline text-sm">Month</span>
+            <span className="hidden sm:inline">Month</span>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="home" aria-label="Home View" className="gap-1">
+            <Home className="h-4 w-4" />
+            <span className="hidden sm:inline">Home</span>
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      <Button variant="outline" size="sm" onClick={() => {
-        const today = new Date();
-        onViewChange(currentView); // This will trigger a re-render with today's date
-      }} className="h-8 bg-white">
+      <Button variant="outline" size="sm" onClick={() => onViewChange("day")}>
         Today
       </Button>
     </div>

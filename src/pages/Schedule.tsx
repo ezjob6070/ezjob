@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
 import { isSameDay } from "date-fns";
+import JobsList from "@/components/calendar/components/JobsList";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
@@ -166,7 +167,7 @@ const Schedule = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Schedule</h1>
           <p className="text-muted-foreground text-sm">
-            Manage your appointments, tasks, and reminders in one place.
+            Manage your appointments, jobs, and tasks in one place.
           </p>
         </div>
         <div className="flex gap-2">
@@ -190,40 +191,58 @@ const Schedule = () => {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="w-full lg:w-3/4">
-          <div className="bg-white p-4 rounded-md shadow-sm border mb-4">
-            <CalendarViewOptions 
-              currentView={viewMode} 
-              onViewChange={handleViewChange} 
-            />
-          </div>
-          
-          <div className="bg-white p-4 rounded-md shadow-sm border">
-            <CalendarView 
-              jobs={jobs}
-              tasks={tasks}
-              selectedDate={selectedDate}
-              jobsForSelectedDate={jobsForSelectedDate}
-              tasksForSelectedDate={tasksForSelectedDate}
-              updateSelectedDateItems={updateSelectedDateItems}
-              viewMode={viewMode}
-            />
-          </div>
-        </div>
+      <CalendarViewOptions 
+        currentView={viewMode} 
+        onViewChange={handleViewChange} 
+      />
 
-        <div className="w-full lg:w-1/4">
-          <div className="bg-white p-4 rounded-md shadow-sm border">
-            <TasksView 
-              selectedDate={selectedDate}
-              tasksForSelectedDate={tasksForSelectedDate}
-              onPreviousDay={handlePreviousDay}
-              onNextDay={handleNextDay}
-              onTasksChange={handleTasksChange}
-            />
-          </div>
-        </div>
-      </div>
+      <Tabs 
+        defaultValue="calendar" 
+        className="w-full"
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
+        <TabsList className="mb-4 w-full justify-start">
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="jobs">Jobs</TabsTrigger>
+          <TabsTrigger value="tasks" className="flex items-center gap-1">
+            <ListChecks className="h-4 w-4" />
+            Tasks & Reminders
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="calendar" className="space-y-6 mt-2">
+          <CalendarView 
+            jobs={jobs}
+            tasks={tasks}
+            selectedDate={selectedDate}
+            jobsForSelectedDate={jobsForSelectedDate}
+            tasksForSelectedDate={tasksForSelectedDate}
+            updateSelectedDateItems={updateSelectedDateItems}
+            viewMode={viewMode}
+          />
+        </TabsContent>
+        
+        <TabsContent value="jobs" className="mt-2">
+          <JobsList 
+            selectedDate={selectedDate}
+            jobsForSelectedDate={jobsForSelectedDate}
+            onPreviousDay={handlePreviousDay}
+            onNextDay={handleNextDay}
+            allJobs={jobs}
+          />
+        </TabsContent>
+        
+        <TabsContent value="tasks" className="mt-2">
+          <TasksView 
+            selectedDate={selectedDate}
+            tasksForSelectedDate={tasksForSelectedDate}
+            onPreviousDay={handlePreviousDay}
+            onNextDay={handleNextDay}
+            onTasksChange={handleTasksChange}
+          />
+        </TabsContent>
+      </Tabs>
 
       {/* Add Task Dialog */}
       <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>
