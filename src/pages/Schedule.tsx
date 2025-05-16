@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Job } from "@/types/job";
 import { 
@@ -8,7 +9,7 @@ import {
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Plus } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Clock, AlarmClock, Bell } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -17,7 +18,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
-import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -577,6 +577,13 @@ const Schedule = () => {
     }
   };
 
+  // Group tasks by status for the selected date
+  const overdueCount = tasksForSelectedDate.filter(t => t.status === 'overdue').length;
+  const scheduledCount = tasksForSelectedDate.filter(t => t.status === 'scheduled').length;
+  const inProgressCount = tasksForSelectedDate.filter(t => t.status === 'in progress').length;
+  const completedCount = tasksForSelectedDate.filter(t => t.status === 'completed').length;
+  const reminderCount = tasksForSelectedDate.filter(t => t.isReminder).length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -593,7 +600,7 @@ const Schedule = () => {
             onClick={() => setShowAddReminderDialog(true)}
             size="sm"
           >
-            <CalendarIcon className="h-4 w-4" />
+            <Bell className="h-4 w-4" />
             Add Reminder
           </Button>
           <Button 
@@ -607,52 +614,120 @@ const Schedule = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
-        {/* Calendar Section */}
-        <div className="space-y-2">
-          <CalendarViewOptions 
-            currentView={viewMode} 
-            onViewChange={handleViewChange} 
-            selectedDate={selectedDate}
-            onViewAllTasks={handleViewAllTasks}
-          />
-          
-          <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
-            {renderCurrentView()}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Calendar Section - 2/3 width on large screens */}
+        <div className="lg:col-span-2">
+          <div className="space-y-3">
+            <CalendarViewOptions 
+              currentView={viewMode} 
+              onViewChange={handleViewChange} 
+              selectedDate={selectedDate}
+              onViewAllTasks={handleViewAllTasks}
+            />
+            
+            <div className="bg-white border rounded-lg shadow-sm">
+              {renderCurrentView()}
+            </div>
           </div>
         </div>
         
-        {/* Jobs and Tasks Section - moved down below calendar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Jobs List */}
-          <Card className="shadow-sm h-[500px] overflow-hidden flex flex-col">
+        {/* Sidebar Section - 1/3 width on large screens */}
+        <div className="space-y-4">
+          {/* Date header */}
+          <Card className="border shadow-sm">
+            <CardHeader className="pb-2 bg-muted/10">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg">
+                  {format(selectedDate, "MMMM d, yyyy")}
+                </CardTitle>
+                <Badge variant={isToday(selectedDate) ? "default" : "outline"} className="h-6">
+                  {isToday(selectedDate) ? "Today" : format(selectedDate, "EEEE")}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-3">
+              <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                <div>
+                  <div className="text-muted-foreground">Tasks</div>
+                  <div className="text-xl font-bold">{tasksForSelectedDate.filter(t => !t.isReminder).length}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">Jobs</div>
+                  <div className="text-xl font-bold">{jobsForSelectedDate.length}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">Reminders</div>
+                  <div className="text-xl font-bold">{reminderCount}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tasks Status Overview */}
+          <Card className="border shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Task Status</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-3">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span>Overdue</span>
+                  </div>
+                  <Badge variant="outline" className="bg-red-50 text-red-700">{overdueCount}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span>Scheduled</span>
+                  </div>
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700">{scheduledCount}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                    <span>In Progress</span>
+                  </div>
+                  <Badge variant="outline" className="bg-amber-50 text-amber-700">{inProgressCount}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span>Completed</span>
+                  </div>
+                  <Badge variant="outline" className="bg-green-50 text-green-700">{completedCount}</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Jobs for Today */}
+          <Card className="border shadow-sm">
             <CardHeader className="pb-2 bg-blue-50">
-              <CardTitle className="text-lg flex items-center justify-between text-blue-800">
-                Jobs for {format(selectedDate, "MMM d")}
+              <CardTitle className="text-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Jobs
+                </div>
                 <Badge variant="outline" className="bg-blue-100">{jobsForSelectedDate.length}</Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto">
+            <CardContent className="pt-3 max-h-[200px] overflow-y-auto">
               {jobsForSelectedDate.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {jobsForSelectedDate.map(job => (
                     <div 
                       key={job.id} 
-                      className="p-3 rounded-md border border-blue-100 bg-blue-50 hover:bg-blue-100 transition-colors"
+                      className="p-2 rounded-md border border-blue-100 bg-blue-50"
                     >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-blue-900">{job.title}</p>
-                          <p className="text-sm text-blue-700">{job.clientName}</p>
+                      <div className="flex justify-between">
+                        <div className="font-medium">{job.title || "Untitled Job"}</div>
+                        <div className="text-xs text-blue-800 px-1.5 py-0.5 bg-blue-100 rounded-full">
+                          ${job.amount}
                         </div>
-                        <Badge variant="outline" className="bg-blue-200 text-blue-800">
-                          {job.status}
-                        </Badge>
                       </div>
-                      <div className="mt-1 flex justify-between text-xs text-blue-600">
-                        <span>${job.amount}</span>
-                        <span>{job.technicianName || "Unassigned"}</span>
-                      </div>
+                      <div className="text-sm text-muted-foreground">{job.clientName}</div>
                     </div>
                   ))}
                 </div>
@@ -661,64 +736,74 @@ const Schedule = () => {
               )}
             </CardContent>
           </Card>
-
-          {/* Tasks List */}
-          <Card className="shadow-sm h-[500px] overflow-hidden flex flex-col">
+          
+          {/* Tasks for Today */}
+          <Card className="border shadow-sm">
             <CardHeader className="pb-2 bg-amber-50">
-              <CardTitle className="text-lg flex items-center justify-between text-amber-800">
-                Tasks & Reminders
-                <Badge variant="outline" className="bg-amber-100">{tasksForSelectedDate.length}</Badge>
+              <CardTitle className="text-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlarmClock className="h-4 w-4" />
+                  Tasks
+                </div>
+                <Badge variant="outline" className="bg-amber-100">{tasksForSelectedDate.filter(t => !t.isReminder).length}</Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto">
-              {tasksForSelectedDate.length > 0 ? (
-                <div className="space-y-2">
-                  {tasksForSelectedDate.map(task => (
-                    <div 
-                      key={task.id} 
-                      className={cn(
-                        "p-3 rounded-md border hover:opacity-90 transition-colors",
-                        task.isReminder 
-                          ? "bg-purple-50 border-purple-100" 
-                          : "bg-amber-50 border-amber-100"
-                      )}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className={cn(
-                            "font-medium",
-                            task.isReminder ? "text-purple-900" : "text-amber-900"
-                          )}>
-                            {task.title}
-                          </p>
-                          <p className={cn(
-                            "text-sm",
-                            task.isReminder ? "text-purple-700" : "text-amber-700"
-                          )}>
-                            {task.client?.name}
-                          </p>
-                        </div>
-                        <Badge variant={task.isReminder 
-                          ? "outline" 
-                          : "outline"} 
-                          className={task.isReminder 
-                            ? "bg-purple-100 text-purple-800" 
-                            : "bg-amber-100 text-amber-800"}
-                        >
-                          {task.isReminder ? "Reminder" : "Task"}
+            <CardContent className="pt-3 max-h-[200px] overflow-y-auto">
+              {tasksForSelectedDate.filter(t => !t.isReminder).length > 0 ? (
+                <div className="space-y-3">
+                  {tasksForSelectedDate.filter(t => !t.isReminder).map(task => (
+                    <div key={task.id} className="p-2 rounded-md border border-amber-100 bg-amber-50">
+                      <div className="flex justify-between">
+                        <div className="font-medium">{task.title}</div>
+                        <Badge variant="outline" className={cn(
+                          "text-xs",
+                          task.priority === "high" && "bg-red-100 text-red-800 border-red-200",
+                          task.priority === "medium" && "bg-amber-100 text-amber-800 border-amber-200",
+                          task.priority === "low" && "bg-green-100 text-green-800 border-green-200",
+                          task.priority === "urgent" && "bg-purple-100 text-purple-800 border-purple-200"
+                        )}>
+                          {task.priority}
                         </Badge>
                       </div>
-                      <div className={cn(
-                        "mt-1 text-xs",
-                        task.isReminder ? "text-purple-600" : "text-amber-600"
-                      )}>
+                      <div className="text-sm text-muted-foreground">{task.client.name}</div>
+                      <div className="text-xs text-amber-700 mt-1">
                         {format(new Date(task.dueDate), "h:mm a")}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">No tasks or reminders for this day</p>
+                <p className="text-sm text-muted-foreground text-center py-4">No tasks due for this day</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Reminders for Today */}
+          <Card className="border shadow-sm">
+            <CardHeader className="pb-2 bg-purple-50">
+              <CardTitle className="text-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  Reminders
+                </div>
+                <Badge variant="outline" className="bg-purple-100">{reminderCount}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-3 max-h-[200px] overflow-y-auto">
+              {tasksForSelectedDate.filter(t => t.isReminder).length > 0 ? (
+                <div className="space-y-3">
+                  {tasksForSelectedDate.filter(t => t.isReminder).map(reminder => (
+                    <div key={reminder.id} className="p-2 rounded-md border border-purple-100 bg-purple-50">
+                      <div className="font-medium">{reminder.title}</div>
+                      <div className="text-sm text-muted-foreground">{reminder.client.name}</div>
+                      <div className="text-xs text-purple-700 mt-1">
+                        {format(new Date(reminder.dueDate), "h:mm a")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No reminders due for this day</p>
               )}
             </CardContent>
           </Card>
