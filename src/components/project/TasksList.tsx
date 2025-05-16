@@ -1,12 +1,13 @@
 
 import React from "react";
 import { ProjectTask } from "@/types/project";
-import { Bell, Calendar, Clock, Check, User, AlertCircle } from "lucide-react";
+import { Bell, Calendar, Clock, User, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 interface TasksListProps {
   tasks: ProjectTask[];
@@ -214,3 +215,4 @@ const TasksList = ({
 };
 
 export default TasksList;
+
