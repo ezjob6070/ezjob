@@ -34,7 +34,7 @@ const CalendarViewOptions = ({
         </h2>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 ml-auto">
         <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)} className="bg-muted/20 border rounded-md p-1">
           <ToggleGroupItem value="day" aria-label="Day View" className="gap-1 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm">
             <Calendar className="h-4 w-4" />

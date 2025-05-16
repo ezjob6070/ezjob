@@ -1,5 +1,6 @@
+
 import { format } from "date-fns";
-import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
+import { Calendar, Bell, Search, Filter, SortAsc, SortDesc } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -11,7 +12,6 @@ import {
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
@@ -159,60 +159,65 @@ const TasksView = ({
   const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium">
-          {format(selectedDate, "EEEE, MMMM d, yyyy")}
+    <div className="mb-6 bg-white border rounded-md shadow-sm p-3">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-medium truncate">
+          {format(selectedDate, "MMM d, yyyy")}
         </h3>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={onPreviousDay}>Previous</Button>
-          <Button variant="outline" size="sm" onClick={onNextDay}>Next</Button>
+        <div className="flex gap-1">
+          <Button variant="ghost" size="icon" onClick={onPreviousDay} className="h-7 w-7">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onNextDay} className="h-7 w-7">
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       </div>
       
-      <div className="mb-4">
-        <div className="flex flex-col gap-3">
+      <div className="mb-3">
+        <div className="flex flex-col gap-2">
           <Tabs 
             value={viewMode} 
             onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-3 w-full">
+            <TabsList className="grid grid-cols-3 w-full h-8">
               <TabsTrigger value="all" className="text-xs">
                 All ({tasksCount + remindersCount})
               </TabsTrigger>
               <TabsTrigger value="tasks" className="text-xs">
                 <Calendar className="h-3.5 w-3.5 mr-1" />
-                Tasks ({tasksCount})
+                Tasks
               </TabsTrigger>
               <TabsTrigger value="reminders" className="text-xs">
                 <Bell className="h-3.5 w-3.5 mr-1" />
-                Reminders ({remindersCount})
+                Reminders
               </TabsTrigger>
             </TabsList>
           </Tabs>
           
-          {/* Search and filter bar in a single row */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search tasks & reminders..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 h-8 text-xs"
-              />
-            </div>
-            
+          {/* Search input */}
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input 
+              placeholder="Search..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-7 h-8 text-xs"
+            />
+          </div>
+          
+          {/* Filter and sort buttons in one row */}
+          <div className="flex items-center justify-between gap-1">
             {/* Status Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 flex-1">
                   <Filter className="h-3.5 w-3.5" />
-                  Status
+                  Filter
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="start" className="w-36">
                 <DropdownMenuRadioGroup value={filterType} onValueChange={setFilterType}>
                   <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="scheduled">Scheduled</DropdownMenuRadioItem>
@@ -226,7 +231,7 @@ const TasksView = ({
             {/* Sort Order */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 flex-1">
                   {sortOrder === "newest" || sortOrder === "oldest" ? (
                     sortOrder === "newest" ? (
                       <SortDesc className="h-3.5 w-3.5" />
@@ -235,24 +240,24 @@ const TasksView = ({
                     )
                   ) : (
                     sortOrder === "a-z" ? (
-                      <span className="text-xs font-bold">A→Z</span>
+                      <span className="text-xs">A→Z</span>
                     ) : (
-                      <span className="text-xs font-bold">Z→A</span>
+                      <span className="text-xs">Z→A</span>
                     )
                   )}
                   Sort
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="end" className="w-36">
                 <DropdownMenuRadioGroup 
                   value={sortOrder} 
                   onValueChange={(value) => setSortOrder(value as "newest" | "oldest" | "a-z" | "z-a")}
                 >
                   <DropdownMenuRadioItem value="newest">
-                    <SortDesc className="h-3.5 w-3.5 mr-2" /> Newest First
+                    <SortDesc className="h-3.5 w-3.5 mr-2" /> Newest
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="oldest">
-                    <SortAsc className="h-3.5 w-3.5 mr-2" /> Oldest First
+                    <SortAsc className="h-3.5 w-3.5 mr-2" /> Oldest
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="a-z">A to Z</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="z-a">Z to A</DropdownMenuRadioItem>
@@ -263,9 +268,8 @@ const TasksView = ({
             {/* Date Filter */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                <Button variant="outline" size="sm" className="h-7 text-xs flex-1">
                   <Calendar className="h-3.5 w-3.5" />
-                  {dateFilter ? format(dateFilter, "MMM d") : "Date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-auto p-0">
@@ -274,17 +278,17 @@ const TasksView = ({
                   selected={dateFilter}
                   onSelect={setDateFilter}
                   initialFocus
-                  className={cn("p-3 pointer-events-auto")}
+                  className={cn("p-2 pointer-events-auto")}
                 />
                 {dateFilter && (
-                  <div className="p-3 border-t border-border flex justify-end">
+                  <div className="p-2 border-t border-border flex justify-end">
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={clearDateFilter}
-                      className="text-xs"
+                      className="text-xs h-7"
                     >
-                      Clear Filter
+                      Clear
                     </Button>
                   </div>
                 )}
@@ -294,22 +298,22 @@ const TasksView = ({
         </div>
       </div>
       
-      <div className="space-y-4">
-        <h3 className="font-medium">
+      <div className="space-y-2">
+        <h3 className="text-xs font-medium">
           {viewMode === "all" ? "Items" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
         </h3>
         
         {filteredTasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground py-2">
             {viewMode === "all" 
-              ? "No tasks or reminders scheduled for this day." 
+              ? "No items for this date" 
               : viewMode === "tasks" 
-                ? "No tasks scheduled for this day."
-                : "No reminders scheduled for this day."
+                ? "No tasks for this date"
+                : "No reminders for this date"
             }
           </p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
             {filteredTasks.map((task) => (
               task.isReminder ? (
                 <ReminderCard 

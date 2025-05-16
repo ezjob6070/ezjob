@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
@@ -264,15 +263,28 @@ const Schedule = () => {
             onTodayClick={handleTodayClick}
           />
           
-          <CalendarView 
-            jobs={jobs}
-            tasks={tasks}
-            selectedDate={selectedDate}
-            jobsForSelectedDate={jobsForSelectedDate}
-            tasksForSelectedDate={tasksForSelectedDate}
-            updateSelectedDateItems={setSelectedDate}
-            viewMode={viewMode}
-          />
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-3">
+              <CalendarView 
+                jobs={jobs}
+                tasks={tasks}
+                selectedDate={selectedDate}
+                jobsForSelectedDate={jobsForSelectedDate}
+                tasksForSelectedDate={tasksForSelectedDate}
+                updateSelectedDateItems={setSelectedDate}
+                viewMode={viewMode}
+              />
+            </div>
+            <div className="col-span-1">
+              <TasksView 
+                selectedDate={selectedDate}
+                tasksForSelectedDate={tasksForSelectedDate}
+                onPreviousDay={handlePreviousDate}
+                onNextDay={handleNextDate}
+                onTasksChange={handleTasksChange}
+              />
+            </div>
+          </div>
         </TabsContent>
         
         <TabsContent value="tasks" className="mt-4 p-4 bg-white border rounded-md shadow-sm">
