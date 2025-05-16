@@ -1,7 +1,6 @@
 
 import React from "react";
 import { ProjectTask } from "@/types/project";
-import { format } from "date-fns";
 import { Bell, Calendar, Clock, Check, User, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

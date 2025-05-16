@@ -4,19 +4,12 @@ import { Project, ProjectTask } from "@/types/project";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, ListTodo, Clock, Bell, Search, Plus, ChevronDown } from "lucide-react";
+import { Calendar, ListTodo, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import TasksList from "./TasksList";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { CalendarIcon } from "@/components/ui/calendar";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,37 +23,16 @@ interface ProjectScheduleAndTasksTabProps {
   onUpdateProject: (updatedProject: Project) => void;
 }
 
+type CalendarViewType = "day" | "week" | "month";
+
 export default function ProjectScheduleAndTasksTab({
   project,
   projectStaff,
   onUpdateProject,
 }: ProjectScheduleAndTasksTabProps) {
-  const [view, setView] = useState<"calendar" | "list" | "kanban">("list");
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [showCreateTaskDialog, setShowCreateTaskDialog] = useState(false);
-  const [showCreateReminderDialog, setShowCreateReminderDialog] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  
-  const [newTask, setNewTask] = useState<Partial<ProjectTask>>({
-    title: "",
-    description: "",
-    status: "pending",
-    priority: "medium",
-    progress: 0,
-    createdAt: new Date().toISOString(),
-    dueDate: new Date().toISOString()
-  });
-  
-  const [newReminder, setNewReminder] = useState<Partial<ProjectTask>>({
-    title: "",
-    description: "",
-    status: "pending",
-    priority: "medium",
-    progress: 0,
-    createdAt: new Date().toISOString(),
-    dueDate: new Date().toISOString(),
-    isReminder: true
-  });
+  const [activeTab, setActiveTab] = useState<"calendar" | "tasks">("calendar");
+  const [calendarView, setCalendarView] = useState<CalendarViewType>("month");
   
   const handleUpdateTask = (taskId: string, updates: Partial<ProjectTask>) => {
     const updatedTasks = project.tasks?.map(task =>
@@ -76,45 +48,36 @@ export default function ProjectScheduleAndTasksTab({
   };
   
   const handleCreateTask = () => {
+    // Create a new task
     const task: ProjectTask = {
       id: uuidv4(),
-      title: newTask.title || "New Task",
-      description: newTask.description || "",
-      status: newTask.status as "pending" | "in_progress" | "completed" | "blocked",
-      priority: newTask.priority as "low" | "medium" | "high" | "urgent",
-      dueDate: newTask.dueDate,
-      createdAt: new Date().toISOString(),
-      progress: 0,
-      assignedTo: newTask.assignedTo
-    };
-    
-    const updatedTasks = [...(project.tasks || []), task];
-    const updatedProject = { ...project, tasks: updatedTasks };
-    
-    onUpdateProject(updatedProject);
-    setShowCreateTaskDialog(false);
-    setNewTask({
-      title: "",
+      title: "New Task",
       description: "",
       status: "pending",
       priority: "medium",
       progress: 0,
       createdAt: new Date().toISOString(),
       dueDate: new Date().toISOString()
-    });
+    };
+    
+    const updatedTasks = [...(project.tasks || []), task];
+    const updatedProject = { ...project, tasks: updatedTasks };
+    
+    onUpdateProject(updatedProject);
     toast.success("Task created successfully!");
   };
   
   const handleCreateReminder = () => {
+    // Create a new reminder
     const reminder: ProjectTask = {
       id: uuidv4(),
-      title: newReminder.title || "New Reminder",
-      description: newReminder.description || "",
-      status: newReminder.status as "pending" | "in_progress" | "completed" | "blocked",
-      priority: newReminder.priority as "low" | "medium" | "high" | "urgent",
-      dueDate: newReminder.dueDate,
-      createdAt: new Date().toISOString(),
+      title: "New Reminder",
+      description: "",
+      status: "pending",
+      priority: "medium",
       progress: 0,
+      createdAt: new Date().toISOString(),
+      dueDate: new Date().toISOString(),
       isReminder: true,
       reminderSent: false
     };
@@ -123,17 +86,6 @@ export default function ProjectScheduleAndTasksTab({
     const updatedProject = { ...project, tasks: updatedTasks };
     
     onUpdateProject(updatedProject);
-    setShowCreateReminderDialog(false);
-    setNewReminder({
-      title: "",
-      description: "",
-      status: "pending",
-      priority: "medium",
-      progress: 0,
-      createdAt: new Date().toISOString(),
-      dueDate: new Date().toISOString(),
-      isReminder: true
-    });
     toast.success("Reminder created successfully!");
   };
   
@@ -157,327 +109,276 @@ export default function ProjectScheduleAndTasksTab({
 
   return (
     <div className="space-y-4">
-      {/* Simplified header with stats and actions */}
-      <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
-        <Card className="w-full md:w-auto">
-          <CardContent className="p-4 flex items-center gap-6">
-            <div>
-              <div className="text-sm text-muted-foreground">Completion</div>
-              <div className="text-2xl font-semibold">{completionRate}%</div>
-              <Progress value={completionRate} className="h-2 w-24 mt-1" />
-            </div>
-            <div className="border-l h-12 pl-6">
-              <div className="text-sm text-muted-foreground">Tasks</div>
-              <div className="text-2xl font-semibold">{totalTasks}</div>
-            </div>
-            <div className="border-l h-12 pl-6">
-              <div className="text-sm text-muted-foreground">Completed</div>
-              <div className="text-2xl font-semibold">{completedTasks}</div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-medium">Schedule & Tasks</h3>
+          <p className="text-sm text-muted-foreground">
+            {totalTasks} Tasks • {completedTasks} Completed ({completionRate}% complete)
+          </p>
+        </div>
         
         <div className="flex gap-2">
           <Button 
-            variant="outline"
-            size="sm"
-            onClick={() => setShowCreateReminderDialog(true)}
+            variant="outline" 
             className="gap-1"
+            onClick={handleCreateReminder}
+            size="sm"
           >
-            <Bell className="h-4 w-4" />
+            <Clock className="h-4 w-4" />
             Add Reminder
           </Button>
           <Button 
             size="sm"
-            onClick={() => setShowCreateTaskDialog(true)}
+            onClick={handleCreateTask}
             className="gap-1"
           >
-            <Plus className="h-4 w-4" />
+            <ListTodo className="h-4 w-4" />
             Add Task
           </Button>
         </div>
       </div>
       
-      <div className="flex items-center justify-between">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search tasks..."
-            className="pl-8 h-9"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        <Tabs value={view} onValueChange={(v) => setView(v as any)} className="ml-4">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "calendar" | "tasks")}>
+        <div className="flex justify-between items-center">
           <TabsList>
-            <TabsTrigger value="list" className="flex items-center gap-1">
-              <ListTodo className="h-4 w-4" />
-              List
-            </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
               Calendar
             </TabsTrigger>
+            <TabsTrigger value="tasks" className="flex items-center gap-1">
+              <ListTodo className="h-4 w-4" />
+              Tasks & Reminders
+            </TabsTrigger>
           </TabsList>
-        </Tabs>
-      </div>
-      
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="w-full grid grid-cols-3">
-          <TabsTrigger value="all">All Tasks</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="reminders">Reminders</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all" className="mt-4">
-          {view === "list" ? (
-            <TasksList
-              tasks={tasks}
-              onTaskUpdate={handleUpdateTask}
-              onTaskCreate={() => setShowCreateTaskDialog(true)}
-              onTaskDelete={handleDeleteTask}
-              projectStaff={projectStaff}
-              selectedTaskId={selectedTaskId}
-              onTaskSelect={(taskId) => setSelectedTaskId(taskId)}
-              filterQuery={searchQuery}
-            />
-          ) : (
-            <Card>
-              <CardContent className="p-0">
-                <div className="border rounded-lg">
-                  <div className="flex items-center justify-between border-b p-4">
-                    <div className="text-lg font-medium">Calendar View</div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-1">
-                          Month <ChevronDown className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem>Day</DropdownMenuItem>
-                        <DropdownMenuItem>Week</DropdownMenuItem>
-                        <DropdownMenuItem>Month</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  <div className="p-6 min-h-[400px] flex items-center justify-center">
-                    <div className="text-center">
-                      <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-                      <h3 className="mt-2 text-lg font-medium text-gray-900">Calendar View</h3>
-                      <p className="mt-1 text-gray-500">
-                        This feature will be available soon.
-                      </p>
-                      <Button className="mt-4" onClick={() => toast.success("Coming soon!")}>
-                        Notify me when available
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          
+          {activeTab === "calendar" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1">
+                  {calendarView.charAt(0).toUpperCase() + calendarView.slice(1)} View
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setCalendarView("day")}>Day</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setCalendarView("week")}>Week</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setCalendarView("month")}>Month</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
+        </div>
+        
+        <TabsContent value="calendar" className="mt-4">
+          <ProjectCalendarView 
+            tasks={tasks} 
+            view={calendarView} 
+            onUpdateTask={handleUpdateTask} 
+          />
         </TabsContent>
         
         <TabsContent value="tasks" className="mt-4">
-          <TasksList
-            tasks={tasks.filter(task => !task.isReminder)}
-            onTaskUpdate={handleUpdateTask}
-            onTaskCreate={() => setShowCreateTaskDialog(true)}
-            onTaskDelete={handleDeleteTask}
-            projectStaff={projectStaff}
-            selectedTaskId={selectedTaskId}
-            onTaskSelect={(taskId) => setSelectedTaskId(taskId)}
-            filterQuery={searchQuery}
-          />
-        </TabsContent>
-        
-        <TabsContent value="reminders" className="mt-4">
-          <TasksList
-            tasks={tasks.filter(task => task.isReminder)}
-            onTaskUpdate={handleUpdateTask}
-            onTaskCreate={() => setShowCreateReminderDialog(true)}
-            onTaskDelete={handleDeleteTask}
-            projectStaff={projectStaff}
-            selectedTaskId={selectedTaskId}
-            onTaskSelect={(taskId) => setSelectedTaskId(taskId)}
-            filterQuery={searchQuery}
-          />
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="w-full grid grid-cols-3">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="reminders">Reminders</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="all" className="mt-4">
+              <TasksList
+                tasks={tasks}
+                onTaskUpdate={handleUpdateTask}
+                onTaskCreate={handleCreateTask}
+                onTaskDelete={handleDeleteTask}
+                projectStaff={projectStaff}
+                selectedTaskId={selectedTaskId}
+                onTaskSelect={(taskId) => setSelectedTaskId(taskId)}
+                filterQuery=""
+              />
+            </TabsContent>
+            
+            <TabsContent value="tasks" className="mt-4">
+              <TasksList
+                tasks={tasks.filter(task => !task.isReminder)}
+                onTaskUpdate={handleUpdateTask}
+                onTaskCreate={handleCreateTask}
+                onTaskDelete={handleDeleteTask}
+                projectStaff={projectStaff}
+                selectedTaskId={selectedTaskId}
+                onTaskSelect={(taskId) => setSelectedTaskId(taskId)}
+                filterQuery=""
+              />
+            </TabsContent>
+            
+            <TabsContent value="reminders" className="mt-4">
+              <TasksList
+                tasks={tasks.filter(task => task.isReminder)}
+                onTaskUpdate={handleUpdateTask}
+                onTaskCreate={handleCreateReminder}
+                onTaskDelete={handleDeleteTask}
+                projectStaff={projectStaff}
+                selectedTaskId={selectedTaskId}
+                onTaskSelect={(taskId) => setSelectedTaskId(taskId)}
+                filterQuery=""
+              />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// New component for Calendar View
+function ProjectCalendarView({ 
+  tasks, 
+  view, 
+  onUpdateTask 
+}: { 
+  tasks: ProjectTask[]; 
+  view: CalendarViewType; 
+  onUpdateTask: (taskId: string, updates: Partial<ProjectTask>) => void; 
+}) {
+  const viewDisplayMap = {
+    day: "Daily View",
+    week: "Weekly View",
+    month: "Monthly View"
+  };
+
+  // Group tasks by date for better organization
+  const tasksByDate = tasks.reduce<Record<string, ProjectTask[]>>((acc, task) => {
+    if (!task.dueDate) return acc;
+    
+    const dateKey = format(new Date(task.dueDate), 'yyyy-MM-dd');
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
+    }
+    acc[dateKey].push(task);
+    return acc;
+  }, {});
+
+  // For simplicity, just render a calendar-like view with tasks
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      <div className="bg-gray-50 border-b p-4 font-medium">
+        {viewDisplayMap[view]} - {format(new Date(), 'MMMM yyyy')}
+      </div>
       
-      {/* Create Task Dialog */}
-      <Dialog open={showCreateTaskDialog} onOpenChange={setShowCreateTaskDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create New Task</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 py-4">
-            <div>
-              <label htmlFor="task-title" className="block text-sm font-medium mb-1">Task Title</label>
-              <Input
-                id="task-title"
-                value={newTask.title}
-                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                placeholder="Enter task title"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="task-priority" className="block text-sm font-medium mb-1">Priority</label>
-                <Select
-                  value={newTask.priority as string}
-                  onValueChange={(value) => setNewTask({ 
-                    ...newTask, 
-                    priority: value as "low" | "medium" | "high" | "urgent" 
-                  })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
-                  </SelectContent>
-                </Select>
+      <div className="p-4">
+        {view === "month" && (
+          <div className="grid grid-cols-7 gap-1">
+            {/* Display calendar header (day names) */}
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="text-center p-2 font-medium text-sm">
+                {day}
               </div>
+            ))}
+            
+            {/* Display calendar days */}
+            {Array.from({ length: 35 }).map((_, i) => {
+              const day = i + 1;
+              const hasEvents = Math.random() > 0.7; // Simulate some days having events
               
-              <div>
-                <label htmlFor="task-status" className="block text-sm font-medium mb-1">Status</label>
-                <Select
-                  value={newTask.status as string}
-                  onValueChange={(value) => setNewTask({ 
-                    ...newTask, 
-                    status: value as "pending" | "in_progress" | "completed" | "blocked" 
-                  })}
+              return (
+                <div 
+                  key={i} 
+                  className={`border rounded min-h-[100px] p-2 ${day === 15 ? 'bg-blue-50' : ''}`}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="blocked">Blocked</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div className="font-medium text-sm">{day}</div>
+                  {hasEvents && (
+                    <div className="mt-2">
+                      <div className="bg-green-100 text-green-800 text-xs p-1 rounded mb-1">
+                        Task Example
+                      </div>
+                      {Math.random() > 0.5 && (
+                        <div className="bg-red-100 text-red-800 text-xs p-1 rounded">
+                          Reminder
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        
+        {view === "week" && (
+          <div className="space-y-4">
+            {/* Week view - show 7 days with tasks */}
+            {Array.from({ length: 7 }).map((_, i) => {
+              const date = new Date();
+              date.setDate(date.getDate() - date.getDay() + i);
+              const dateStr = format(date, 'yyyy-MM-dd');
+              const dayTasks = tasksByDate[dateStr] || [];
+              
+              return (
+                <div key={i} className="border rounded overflow-hidden">
+                  <div className={`p-3 ${i === 3 ? 'bg-blue-50' : 'bg-gray-50'}`}>
+                    <h4 className="font-medium">{format(date, 'EEEE, MMMM d')}</h4>
+                  </div>
+                  
+                  <div className="p-2 space-y-2">
+                    {dayTasks.length > 0 ? (
+                      dayTasks.map(task => (
+                        <div 
+                          key={task.id} 
+                          className={`p-2 rounded text-sm ${task.isReminder ? 'bg-red-50' : 'bg-gray-50'}`}
+                        >
+                          <div className="font-medium">{task.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {format(new Date(task.dueDate!), 'h:mm a')}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-sm text-center text-muted-foreground py-4">
+                        No tasks scheduled
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        
+        {view === "day" && (
+          <div className="space-y-4">
+            <div className="text-center p-4 border-b">
+              <h3 className="font-medium">{format(new Date(), 'EEEE, MMMM d, yyyy')}</h3>
             </div>
             
-            <div>
-              <label htmlFor="task-due" className="block text-sm font-medium mb-1">Due Date</label>
-              <Input
-                id="task-due"
-                type="datetime-local"
-                value={newTask.dueDate ? new Date(newTask.dueDate).toISOString().slice(0, 16) : ''}
-                onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="task-assignee" className="block text-sm font-medium mb-1">Assigned To</label>
-              <Select
-                value={newTask.assignedTo}
-                onValueChange={(value) => setNewTask({ ...newTask, assignedTo: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Assign to someone" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Unassigned</SelectItem>
-                  {projectStaff.map((staff) => (
-                    <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label htmlFor="task-description" className="block text-sm font-medium mb-1">Description</label>
-              <Textarea
-                id="task-description"
-                value={newTask.description}
-                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                placeholder="Enter task description"
-                rows={3}
-              />
+            <div className="space-y-2">
+              {/* Show tasks for today in hourly slots */}
+              {Array.from({ length: 12 }).map((_, i) => {
+                const hour = i + 8; // Start at 8 AM
+                const hasTask = Math.random() > 0.7; // Simulate some hours having tasks
+                
+                return (
+                  <div key={i} className="flex border-b pb-2 last:border-b-0">
+                    <div className="w-20 text-sm text-muted-foreground">
+                      {hour % 12 || 12}{hour >= 12 ? 'pm' : 'am'}
+                    </div>
+                    <div className="flex-1">
+                      {hasTask ? (
+                        <div className={`p-2 rounded ${Math.random() > 0.7 ? 'bg-red-50' : 'bg-gray-50'}`}>
+                          <div className="font-medium text-sm">
+                            {Math.random() > 0.7 ? 'Reminder: ' : ''}
+                            Sample Task {i + 1}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {Math.random() > 0.5 ? 'High priority' : 'Medium priority'}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateTaskDialog(false)}>Cancel</Button>
-            <Button onClick={handleCreateTask}>Create Task</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Create Reminder Dialog */}
-      <Dialog open={showCreateReminderDialog} onOpenChange={setShowCreateReminderDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create New Reminder</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 py-4">
-            <div>
-              <label htmlFor="reminder-title" className="block text-sm font-medium mb-1">Reminder Title</label>
-              <Input
-                id="reminder-title"
-                value={newReminder.title}
-                onChange={(e) => setNewReminder({ ...newReminder, title: e.target.value })}
-                placeholder="Enter reminder title"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="reminder-due" className="block text-sm font-medium mb-1">Due Date</label>
-              <Input
-                id="reminder-due"
-                type="datetime-local"
-                value={newReminder.dueDate ? new Date(newReminder.dueDate).toISOString().slice(0, 16) : ''}
-                onChange={(e) => setNewReminder({ ...newReminder, dueDate: e.target.value })}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="reminder-priority" className="block text-sm font-medium mb-1">Priority</label>
-              <Select
-                value={newReminder.priority as string}
-                onValueChange={(value) => setNewReminder({ 
-                  ...newReminder, 
-                  priority: value as "low" | "medium" | "high" | "urgent" 
-                })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label htmlFor="reminder-description" className="block text-sm font-medium mb-1">Description</label>
-              <Textarea
-                id="reminder-description"
-                value={newReminder.description}
-                onChange={(e) => setNewReminder({ ...newReminder, description: e.target.value })}
-                placeholder="Enter reminder description"
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateReminderDialog(false)}>Cancel</Button>
-            <Button onClick={handleCreateReminder}>Create Reminder</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        )}
+      </div>
     </div>
   );
 }
