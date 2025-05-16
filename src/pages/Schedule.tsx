@@ -1,8 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
 import { isSameDay } from "date-fns";
-import JobsList from "@/components/calendar/components/JobsList";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
@@ -10,7 +10,7 @@ import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Plus, ListChecks } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,7 +26,7 @@ const Schedule = () => {
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState("calendar");
-  const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("home");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
   const [newTask, setNewTask] = useState<Partial<Task>>({
@@ -167,7 +167,7 @@ const Schedule = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Schedule</h1>
           <p className="text-muted-foreground text-sm">
-            Manage your appointments, jobs, and tasks in one place.
+            Manage your appointments, tasks, and reminders in one place.
           </p>
         </div>
         <div className="flex gap-2">
@@ -197,16 +197,24 @@ const Schedule = () => {
         value={activeTab}
         onValueChange={setActiveTab}
       >
-        <TabsList className="mb-4 w-full justify-start">
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="jobs">Jobs</TabsTrigger>
-          <TabsTrigger value="tasks" className="flex items-center gap-1">
+        <TabsList className="mb-4 w-full justify-start bg-background border-b border-border rounded-none px-0">
+          <TabsTrigger value="calendar" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4">
+            Calendar View
+          </TabsTrigger>
+          <TabsTrigger value="tasks" className="flex items-center gap-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4">
             <ListChecks className="h-4 w-4" />
             Tasks & Reminders
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="calendar" className="space-y-6 mt-2">
+        <TabsContent value="calendar" className="space-y-6 mt-4 p-0">
+          <div className="flex items-center justify-between mb-4">
+            <CalendarViewOptions 
+              currentView={viewMode} 
+              onViewChange={handleViewChange} 
+            />
+          </div>
+          
           <CalendarView 
             jobs={jobs}
             tasks={tasks}
@@ -218,17 +226,7 @@ const Schedule = () => {
           />
         </TabsContent>
         
-        <TabsContent value="jobs" className="mt-2">
-          <JobsList 
-            selectedDate={selectedDate}
-            jobsForSelectedDate={jobsForSelectedDate}
-            onPreviousDay={handlePreviousDay}
-            onNextDay={handleNextDay}
-            allJobs={jobs}
-          />
-        </TabsContent>
-        
-        <TabsContent value="tasks" className="mt-2">
+        <TabsContent value="tasks" className="mt-4 p-4 bg-white border rounded-md shadow-sm">
           <TasksView 
             selectedDate={selectedDate}
             tasksForSelectedDate={tasksForSelectedDate}

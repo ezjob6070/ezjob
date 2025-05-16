@@ -1,8 +1,9 @@
 
-import { Calendar, CalendarDays } from "lucide-react";
+import { Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export type CalendarViewMode = "day" | "week" | "month" | "home";
+export type CalendarViewMode = "home";
 
 interface CalendarViewOptionsProps {
   currentView: CalendarViewMode;
@@ -11,21 +12,18 @@ interface CalendarViewOptionsProps {
 
 const CalendarViewOptions = ({ currentView, onViewChange }: CalendarViewOptionsProps) => {
   return (
-    <div className="flex items-center justify-end gap-2">
-      <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)}>
-        <ToggleGroupItem value="day" aria-label="Daily View" className="gap-1">
-          <Calendar className="h-4 w-4" />
-          <span className="hidden sm:inline">Day</span>
-        </ToggleGroupItem>
-        <ToggleGroupItem value="week" aria-label="Weekly View" className="gap-1">
-          <Calendar className="h-4 w-4" />
-          <span className="hidden sm:inline">Week</span>
-        </ToggleGroupItem>
-        <ToggleGroupItem value="month" aria-label="Monthly View" className="gap-1">
-          <CalendarDays className="h-4 w-4" />
-          <span className="hidden sm:inline">Month</span>
-        </ToggleGroupItem>
-      </ToggleGroup>
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center space-x-2">
+        <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)} className="bg-muted/20 border rounded-md p-1">
+          <ToggleGroupItem value="home" aria-label="Home View" className="gap-1 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+            <Home className="h-4 w-4" />
+            <span className="hidden sm:inline text-sm">Home</span>
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+      <Button variant="outline" size="sm" onClick={() => onViewChange("home")} className="h-8 bg-white">
+        Today
+      </Button>
     </div>
   );
 };
