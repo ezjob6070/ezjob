@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
@@ -25,7 +26,7 @@ const Schedule = () => {
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState("calendar");
-  const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("home");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
   const [newTask, setNewTask] = useState<Partial<Task>>({
@@ -166,7 +167,7 @@ const Schedule = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Schedule</h1>
           <p className="text-muted-foreground text-sm">
-            Manage your appointments, jobs, and tasks in one place.
+            Manage your appointments, tasks, and reminders in one place.
           </p>
         </div>
         <div className="flex gap-2">
@@ -206,8 +207,8 @@ const Schedule = () => {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="calendar" className="space-y-6 mt-4 bg-white border rounded-md p-4 shadow-sm">
-          <div className="flex items-center justify-between">
+        <TabsContent value="calendar" className="space-y-6 mt-4 p-0">
+          <div className="flex items-center justify-between mb-4">
             <CalendarViewOptions 
               currentView={viewMode} 
               onViewChange={handleViewChange} 
@@ -225,7 +226,7 @@ const Schedule = () => {
           />
         </TabsContent>
         
-        <TabsContent value="tasks" className="mt-4 bg-white border rounded-md p-4 shadow-sm">
+        <TabsContent value="tasks" className="mt-4 p-4 bg-white border rounded-md shadow-sm">
           <TasksView 
             selectedDate={selectedDate}
             tasksForSelectedDate={tasksForSelectedDate}
