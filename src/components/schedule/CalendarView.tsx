@@ -1,4 +1,3 @@
-
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
   addDays, startOfMonth, endOfMonth, addMonths, subMonths,
@@ -225,9 +224,10 @@ const CalendarView = ({
             hasEvents: "font-bold",
           }}
           components={{
-            Day: ({ date, displayMonth, ...props }) => {
+            Day: (props) => {
+              const { date, displayMonth } = props;
               const isSelected = isSameDay(date, selectedDate);
-              const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+              const isOutsideMonth = displayMonth && date.getMonth() !== displayMonth.getMonth();
               
               // Get jobs and tasks for this date
               const { jobsForDate, tasksForDate } = getItemsForDate(date, jobs, tasks);
@@ -238,7 +238,8 @@ const CalendarView = ({
                     "h-20 min-w-[5rem] p-1 rounded-md relative",
                     getDayClassName(date),
                     isSelected && "ring-2 ring-primary",
-                    isOutsideMonth && "opacity-40"
+                    isOutsideMonth && "opacity-40",
+                    props.className
                   )}
                 >
                   <button 
@@ -250,7 +251,6 @@ const CalendarView = ({
                     )}
                     onClick={() => handleDateSelect(date)}
                     disabled={isOutsideMonth}
-                    {...props}
                   >
                     {format(date, "d")}
                   </button>
@@ -362,7 +362,7 @@ const CalendarView = ({
                       <div 
                         key={task.id}
                         className={cn(
-                          "mb-1 p-1.5 rounded border text-sm",
+                          "mb-1 p-1.5 bg-amber-100 text-amber-800 rounded border border-amber-200 text-sm",
                           task.isReminder 
                             ? "bg-purple-100 text-purple-800 border-purple-200" 
                             : "bg-amber-100 text-amber-800 border-amber-200"
