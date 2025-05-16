@@ -225,8 +225,7 @@ const CalendarView = ({
             hasEvents: "font-bold",
           }}
           components={{
-            Day: (props) => {
-              const { date, displayMonth } = props;
+            Day: ({ date, displayMonth, day, ...props }) => {
               const isSelected = isSameDay(date, selectedDate);
               const isOutsideMonth = displayMonth && date.getMonth() !== displayMonth.getMonth();
               
