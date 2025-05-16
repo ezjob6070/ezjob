@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import { Job } from "@/types/job";
 import { 
   isSameDay, format, isToday, startOfWeek, endOfWeek,
-  startOfMonth, endOfMonth, addMonths, subMonths,
-  addWeeks, subWeeks, addDays, subDays
+  startOfMonth, endOfMonth, addDays
 } from "date-fns";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
@@ -14,7 +13,8 @@ import {
   Bell, 
   Briefcase, 
   ListTodo, 
-  ClipboardList
+  ClipboardList,
+  Calendar
 } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
@@ -220,13 +220,32 @@ const Schedule = () => {
         </div>
       </div>
 
-      <div className="mb-2">
+      <div className="mb-4">
         <h2 className="text-lg font-medium mb-4">Calendar Overview</h2>
-        <CalendarViewOptions 
-          currentView={viewMode} 
-          onViewChange={setViewMode} 
-          selectedDate={selectedDate}
-        />
+        
+        {/* New calendar navigation section with view toggles, tasks and reminders buttons */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <CalendarViewOptions 
+            currentView={viewMode} 
+            onViewChange={setViewMode} 
+            selectedDate={selectedDate}
+          />
+          
+          <div className="flex items-center gap-2">
+            <Link to="/tasks">
+              <Button variant="outline" size="sm" className="text-xs h-8 gap-1">
+                <ListTodo className="h-4 w-4" />
+                Tasks
+              </Button>
+            </Link>
+            <Link to="/tasks">
+              <Button variant="outline" size="sm" className="text-xs h-8 gap-1">
+                <Bell className="h-4 w-4" />
+                Reminders
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -240,6 +259,7 @@ const Schedule = () => {
             tasksForSelectedDate={tasksForSelectedDate}
             updateSelectedDateItems={updateSelectedDateItems}
             viewMode={viewMode}
+            onViewChange={setViewMode}
           />
         </div>
 
