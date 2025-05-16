@@ -13,12 +13,12 @@ export interface Job {
     email?: string;
     address?: string;
   };
-  clientName?: string;
+  clientName: string;
   technician?: {
     id: string;
     name: string;
   };
-  technicianId?: string;
+  technicianId: string;
   technicianName?: string;
   scheduledDate: string | Date;
   date: string | Date;

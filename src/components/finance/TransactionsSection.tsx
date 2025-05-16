@@ -6,10 +6,11 @@ import { FinancialTransaction, PaymentStatus } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import FinancialTransactionsTable from "./FinancialTransactionsTable";
 import { Badge } from "@/components/ui/badge";
+import { DateRange } from "react-day-picker";
 
 interface TransactionsSectionProps {
   filteredTransactions: FinancialTransaction[];
-  dateRange?: { from: Date | undefined; to: Date | undefined };
+  dateRange?: DateRange;
 }
 
 const TransactionsSection: React.FC<TransactionsSectionProps> = ({

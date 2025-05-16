@@ -95,6 +95,10 @@ export interface JobSource {
   createdAt?: string;
   category?: string;
   website?: string;
+  phone?: string;
+  email?: string;
+  logoUrl?: string;
+  notes?: string;
 }
 
 export interface OfficeExpense {

@@ -42,7 +42,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         email: techData.email || 'no-email@example.com',
         specialty: techData.specialty || '',
         status: techData.status || 'active',
-        paymentType: (techData.paymentType as "percentage" | "flat" | "hourly" | "salary") || 'hourly',
+        paymentType: (techData.paymentType as "percentage" | "flat" | "hourly" | "salary" | "commission") || 'hourly',
         paymentRate: techData.paymentRate || 0,
         hourlyRate: techData.hourlyRate || 0,
         // Ensure salaryBasis is a valid SalaryBasis type
@@ -64,6 +64,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         ssn: techData.ssn,
         driverLicense: techData.driverLicense,
         idNumber: techData.idNumber,
+        documents: techData.documents || []
       };
       
       setTechnician(completeTechData);
@@ -93,6 +94,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
       profileImage: values.profileImage || technician.profileImage,
       imageUrl: values.profileImage || technician.imageUrl,
       notes: values.notes || technician.notes,
+      documents: technician.documents || [],
       // Update sensitive information
       ssn: values.ssn || technician.ssn,
       driverLicense: values.driverLicenseNumber ? {

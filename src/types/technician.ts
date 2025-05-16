@@ -62,12 +62,10 @@ export interface Technician {
   totalRevenue: number;
   profileImage?: string;
   imageUrl?: string;
-  initials?: string;
+  initials: string;
   salaryBasis?: SalaryBasis;
   incentiveType?: IncentiveType;
   incentiveAmount?: number;
-  
-  // Properties to fix type errors
   role?: TechnicianRole;
   earnings?: number;
   jobCount?: number;
@@ -96,14 +94,13 @@ export interface Job {
   id: string;
   title: string;
   status: string;
-  scheduledDate?: string;
-  date?: string;
+  scheduledDate?: string | Date;
+  date?: string | Date;
   amount: number;
   actualAmount?: number;
   technicianId?: string;
   description?: string;
   jobSourceId?: string;
   jobSourceName?: string;
+  clientName?: string;
 }
-
-import { DateRange } from "react-day-picker";
