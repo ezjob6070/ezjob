@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar as CalendarIcon, Clock, ListTodo, CheckSquare, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import TasksList from "./TasksList";
+import { format, isSameDay } from "date-fns";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { Task } from "@/components/calendar/types";
+import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import ReminderCard from "@/components/schedule/ReminderCard";
+import TaskCard from "@/components/calendar/components/TaskCard";
 
 interface ProjectScheduleAndTasksTabProps {
   project: Project;
@@ -22,12 +25,49 @@ export default function ProjectScheduleAndTasksTab({
   projectStaff,
   onUpdateProject,
 }: ProjectScheduleAndTasksTabProps) {
-  const [view, setView] = useState<"calendar" | "list">("list");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
+  const [activeTab, setActiveTab] = useState<"calendar" | "list">("calendar");
+  const [displayMode, setDisplayMode] = useState<"all" | "tasks" | "reminders">("all");
   
-  const handleUpdateTask = (taskId: string, updates: Partial<ProjectTask>) => {
-    const updatedTasks = project.tasks?.map(task =>
-      task.id === taskId ? { ...task, ...updates } : task
-    ) || [];
+  // Convert project tasks to calendar tasks
+  const convertToCalendarTasks = (projectTasks: ProjectTask[] = []): Task[] => {
+    return projectTasks.map(task => ({
+      id: task.id,
+      title: task.title,
+      description: task.description || "",
+      start: task.createdAt,
+      end: task.dueDate || task.createdAt,
+      client: { id: "project", name: project.clientName },
+      dueDate: task.dueDate ? new Date(task.dueDate) : new Date(),
+      status: task.status === "completed" ? "completed" : 
+              task.status === "in_progress" ? "in progress" : "scheduled",
+      priority: task.priority || "medium",
+      color: task.isReminder ? "#ea384c" : "#4f46e5",
+      isReminder: task.isReminder || false,
+      hasFollowUp: false,
+      technician: task.assignedTo || "",
+      type: task.isReminder ? "reminder" : "task"
+    }));
+  };
+  
+  const calendarTasks = convertToCalendarTasks(project.tasks);
+  
+  const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
+    const updatedTasks = project.tasks?.map(task => {
+      if (task.id === taskId) {
+        // Map back from Task type to ProjectTask type
+        return {
+          ...task,
+          status: updates.status === "completed" ? "completed" : 
+                  updates.status === "in progress" ? "in_progress" : "pending",
+          priority: updates.priority as "low" | "medium" | "high" | "urgent",
+          dueDate: updates.dueDate ? updates.dueDate.toISOString() : task.dueDate,
+          isReminder: updates.isReminder || task.isReminder
+        };
+      }
+      return task;
+    }) || [];
     
     const updatedProject = {
       ...project,
@@ -37,7 +77,23 @@ export default function ProjectScheduleAndTasksTab({
     onUpdateProject(updatedProject);
   };
   
-  const handleCreateTask = (newTask: ProjectTask) => {
+  const handleCreateTask = (isReminder: boolean) => {
+    const newTaskId = uuidv4();
+    const now = new Date();
+    
+    const newTask: ProjectTask = {
+      id: newTaskId,
+      title: isReminder ? "New Reminder" : "New Task",
+      description: "",
+      status: "pending",
+      priority: "medium",
+      progress: 0,
+      createdAt: now.toISOString(),
+      dueDate: now.toISOString(),
+      isReminder: isReminder,
+      reminderSent: false
+    };
+    
     const updatedTasks = [...(project.tasks || []), newTask];
     
     const updatedProject = {
@@ -46,292 +102,242 @@ export default function ProjectScheduleAndTasksTab({
     };
     
     onUpdateProject(updatedProject);
+    toast.success(isReminder ? "New reminder created" : "New task created");
   };
   
-  const handleDeleteTask = (taskId: string) => {
-    const updatedTasks = project.tasks?.filter(task => task.id !== taskId) || [];
+  // Filter tasks/reminders for the selected date
+  const getTasksForSelectedDate = () => {
+    if (!project.tasks) return [];
     
-    const updatedProject = {
-      ...project,
-      tasks: updatedTasks,
-    };
-    
-    onUpdateProject(updatedProject);
+    return calendarTasks.filter(task => {
+      if (!task.dueDate) return false;
+      const taskDate = new Date(task.dueDate);
+      return isSameDay(taskDate, selectedDate);
+    });
   };
   
-  // Calculate task statistics
-  const tasks = project.tasks || [];
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(task => task.status === "completed").length;
-  const pendingTasks = tasks.filter(task => task.status === "pending").length;
-  const inProgressTasks = tasks.filter(task => task.status === "in_progress").length;
-  const blockedTasks = tasks.filter(task => task.status === "blocked").length;
-  const reminders = tasks.filter(task => task.isReminder).length;
+  const tasksForSelectedDate = getTasksForSelectedDate();
+  const remindersForSelectedDate = tasksForSelectedDate.filter(task => task.isReminder);
+  const onlyTasksForSelectedDate = tasksForSelectedDate.filter(task => !task.isReminder);
+
+  // Functions to get counts for display
+  const getTotalTasksCount = () => calendarTasks.filter(task => !task.isReminder).length;
+  const getTotalRemindersCount = () => calendarTasks.filter(task => task.isReminder).length;
   
-  // Function to check if a task has an upcoming deadline (within next 3 days)
-  const isUpcomingDeadline = (task: ProjectTask) => {
-    if (!task.dueDate) return false;
-    
-    const dueDate = new Date(task.dueDate);
-    const now = new Date();
-    const threeDaysLater = new Date();
-    threeDaysLater.setDate(now.getDate() + 3);
-    
-    return dueDate > now && dueDate <= threeDaysLater;
+  const getDisplayTasks = () => {
+    if (displayMode === "all") return tasksForSelectedDate;
+    if (displayMode === "tasks") return onlyTasksForSelectedDate;
+    return remindersForSelectedDate;
   };
-  
-  const upcomingDeadlines = tasks.filter(isUpcomingDeadline);
-  
-  // Get overdue tasks (due date passed but not completed)
-  const overdueTasks = tasks.filter(task => {
-    if (!task.dueDate || task.status === "completed") return false;
-    
-    const dueDate = new Date(task.dueDate);
-    const now = new Date();
-    
-    return dueDate < now;
-  });
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Task Stats */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ListTodo className="h-5 w-5 text-blue-500" />
-              Tasks Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-semibold text-blue-700">{totalTasks}</div>
-                <div className="text-sm text-muted-foreground">Total Tasks</div>
-              </div>
-              <div className="text-center p-3 bg-green-50 rounded-lg">
-                <div className="text-2xl font-semibold text-green-700">{completedTasks}</div>
-                <div className="text-sm text-muted-foreground">Completed</div>
-              </div>
-              <div className="text-center p-3 bg-purple-50 rounded-lg">
-                <div className="text-2xl font-semibold text-purple-700">{inProgressTasks}</div>
-                <div className="text-sm text-muted-foreground">In Progress</div>
-              </div>
-              <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                <div className="text-2xl font-semibold text-yellow-700">{pendingTasks}</div>
-                <div className="text-sm text-muted-foreground">Pending</div>
-              </div>
-            </div>
-            
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Completion Rate</span>
-                <span className="font-medium">
-                  {totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0}%
-                </span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full">
-                <div
-                  className="h-full bg-green-500 rounded-full"
-                  style={{
-                    width: `${totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0}%`,
-                  }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Upcoming Deadlines */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Clock className="h-5 w-5 text-orange-500" />
-              Upcoming Deadlines
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {upcomingDeadlines.length === 0 ? (
-              <div className="text-center py-6 border-dashed border-2 rounded-md">
-                <p className="text-muted-foreground">No upcoming deadlines</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {upcomingDeadlines.slice(0, 3).map((task) => (
-                  <div key={task.id} className="flex items-center justify-between border-b pb-2 last:border-b-0">
-                    <div>
-                      <p className="text-sm font-medium">{task.title}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <CalendarIcon className="h-3 w-3" />
-                        <span>Due {format(new Date(task.dueDate!), "MMM d")}</span>
-                        <Badge 
-                          className={`
-                            ${task.priority === "high" ? "bg-orange-100 text-orange-800" : 
-                              task.priority === "urgent" ? "bg-red-100 text-red-800" : 
-                              task.priority === "medium" ? "bg-yellow-100 text-yellow-800" : 
-                              "bg-blue-100 text-blue-800"}
-                          `}
-                          variant="outline"
-                        >
-                          {task.priority}
-                        </Badge>
-                      </div>
-                    </div>
-                    <Badge variant={task.status === "in_progress" ? "secondary" : "outline"}>
-                      {task.status === "in_progress" ? "In Progress" : 
-                       task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-                    </Badge>
-                  </div>
-                ))}
-                
-                {upcomingDeadlines.length > 3 && (
-                  <div className="text-center text-xs text-muted-foreground pt-2">
-                    + {upcomingDeadlines.length - 3} more upcoming deadlines
-                  </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* Reminders & Overdue Tasks */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <CalendarIcon className="h-5 w-5 text-red-500" />
-              Alerts
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium flex items-center gap-1 mb-2">
-                  <Clock className="h-4 w-4 text-red-500" />
-                  Overdue Tasks
-                </h4>
-                
-                {overdueTasks.length === 0 ? (
-                  <div className="text-center py-3 border-dashed border-2 rounded-md">
-                    <p className="text-xs text-muted-foreground">No overdue tasks</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {overdueTasks.slice(0, 2).map((task) => (
-                      <div key={task.id} className="border-l-2 border-red-500 pl-3 py-1">
-                        <p className="text-sm font-medium">{task.title}</p>
-                        <div className="flex items-center gap-2 text-xs text-red-600">
-                          <CalendarIcon className="h-3 w-3" />
-                          <span>
-                            Due {format(new Date(task.dueDate!), "MMM d")} 
-                            ({formatDaysOverdue(new Date(task.dueDate!))})
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {overdueTasks.length > 2 && (
-                      <div className="text-center text-xs text-muted-foreground pt-1">
-                        + {overdueTasks.length - 2} more overdue tasks
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium flex items-center gap-1 mb-2">
-                  <Clock className="h-4 w-4 text-purple-500" />
-                  Active Reminders
-                </h4>
-                
-                {reminders === 0 ? (
-                  <div className="text-center py-3 border-dashed border-2 rounded-md">
-                    <p className="text-xs text-muted-foreground">No active reminders</p>
-                  </div>
-                ) : (
-                  <div className="text-center py-3 bg-purple-50 rounded-md">
-                    <p className="text-lg font-semibold text-purple-700">{reminders}</p>
-                    <p className="text-xs text-purple-700">Active reminders</p>
-                  </div>
-                )}
-              </div>
-              
-              <Button 
-                variant="outline"
-                className="w-full flex items-center justify-center gap-1"
-                onClick={() => {
-                  // Create a new reminder task
-                  const reminderTask: ProjectTask = {
-                    id: uuidv4(),
-                    title: "New Reminder",
-                    description: "",
-                    status: "pending",
-                    priority: "medium",
-                    progress: 0,
-                    createdAt: new Date().toISOString(),
-                    dueDate: new Date().toISOString(),
-                    isReminder: true,
-                    reminderSent: false
-                  };
-                  
-                  handleCreateTask(reminderTask);
-                  toast.success("New reminder created");
-                }}
-              >
-                <Clock className="h-4 w-4" />
-                Create Reminder
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Schedule & Tasks</h2>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1"
+            onClick={() => handleCreateTask(false)}
+          >
+            <ListTodo className="h-4 w-4" />
+            Add Task
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1"
+            onClick={() => handleCreateTask(true)}
+          >
+            <Clock className="h-4 w-4" />
+            Add Reminder
+          </Button>
+        </div>
       </div>
       
-      <Tabs defaultValue="tasks" className="mt-8">
-        <TabsList>
-          <TabsTrigger value="tasks" className="flex items-center gap-2">
-            <CheckSquare className="h-4 w-4" />
-            Tasks & Reminders
-          </TabsTrigger>
-          <TabsTrigger value="calendar" className="flex items-center gap-2">
+      <Tabs defaultValue="calendar" onValueChange={(value) => setActiveTab(value as "calendar" | "list")}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="calendar" className="gap-1">
             <Calendar className="h-4 w-4" />
             Calendar
           </TabsTrigger>
+          <TabsTrigger value="list" className="gap-1">
+            <ListTodo className="h-4 w-4" />
+            Tasks & Reminders
+          </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="tasks" className="mt-4">
-          <TasksList
-            tasks={project.tasks || []}
-            onTaskUpdate={handleUpdateTask}
-            onTaskCreate={handleCreateTask}
-            onTaskDelete={handleDeleteTask}
-            projectStaff={projectStaff}
-          />
+        <TabsContent value="calendar" className="space-y-4 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="col-span-1 md:col-span-3">
+              <CardHeader>
+                <CardTitle>Calendar</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-4">
+                  <Button variant="outline" size="sm" onClick={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setMonth(newDate.getMonth() - 1);
+                    setSelectedDate(newDate);
+                  }}>
+                    Previous
+                  </Button>
+                  <h3 className="text-lg font-medium">{format(selectedDate, "MMMM yyyy")}</h3>
+                  <Button variant="outline" size="sm" onClick={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setMonth(newDate.getMonth() + 1);
+                    setSelectedDate(newDate);
+                  }}>
+                    Next
+                  </Button>
+                </div>
+
+                <div className="calendar-grid grid grid-cols-7 gap-1 mb-4">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                    <div key={day} className="text-center font-medium text-sm py-2">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {Array.from({ length: 42 }).map((_, i) => {
+                    const dayDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i - new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).getDay() + 2);
+                    const isCurrentMonth = dayDate.getMonth() === selectedDate.getMonth();
+                    const isSelected = isSameDay(dayDate, selectedDate);
+                    
+                    const dayTasks = calendarTasks.filter(task => {
+                      if (!task.dueDate) return false;
+                      const taskDate = new Date(task.dueDate);
+                      return isSameDay(taskDate, dayDate);
+                    });
+                    
+                    const hasTasks = dayTasks.some(task => !task.isReminder);
+                    const hasReminders = dayTasks.some(task => task.isReminder);
+                    
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => isCurrentMonth && setSelectedDate(dayDate)}
+                        className={`
+                          cursor-pointer h-12 flex flex-col items-center justify-center rounded-md relative
+                          ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'} 
+                          ${isSelected ? 'ring-2 ring-primary' : 'hover:bg-gray-50'}
+                          ${isCurrentMonth && 'border'}
+                        `}
+                      >
+                        <span className={`text-sm ${isSelected ? 'font-bold' : ''}`}>
+                          {dayDate.getDate()}
+                        </span>
+                        
+                        {(hasTasks || hasReminders) && (
+                          <div className="absolute bottom-1 flex gap-1">
+                            {hasTasks && <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>}
+                            {hasReminders && <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="col-span-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">{format(selectedDate, "MMM d, yyyy")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={displayMode} onValueChange={(v) => setDisplayMode(v as "all" | "tasks" | "reminders")}>
+                  <TabsList className="grid grid-cols-3 mb-4">
+                    <TabsTrigger value="all" className="text-xs">
+                      All ({tasksForSelectedDate.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="tasks" className="text-xs">
+                      Tasks ({onlyTasksForSelectedDate.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="reminders" className="text-xs">
+                      Reminders ({remindersForSelectedDate.length})
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                
+                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                  {getDisplayTasks().length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">
+                      No {displayMode === "all" ? "items" : displayMode} for this day
+                    </p>
+                  ) : (
+                    getDisplayTasks().map((task) => (
+                      task.isReminder ? (
+                        <ReminderCard
+                          key={task.id}
+                          reminder={task}
+                          onReminderUpdate={handleUpdateTask}
+                        />
+                      ) : (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          onTaskUpdate={handleUpdateTask}
+                        />
+                      )
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
         
-        <TabsContent value="calendar" className="mt-4">
-          <div className="border rounded-lg p-6 bg-gray-50">
-            <div className="text-center p-8">
-              <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-lg font-medium text-gray-900">Calendar View</h3>
-              <p className="mt-1 text-gray-500">
-                This feature will be available in an upcoming update.
-              </p>
-              <Button className="mt-4" onClick={() => toast.success("Coming soon!")}>
-                Notify me when available
-              </Button>
-            </div>
+        <TabsContent value="list" className="space-y-4 pt-4">
+          <Tabs value={displayMode} onValueChange={(v) => setDisplayMode(v as "all" | "tasks" | "reminders")}>
+            <TabsList className="grid grid-cols-3 mb-4">
+              <TabsTrigger value="all" className="text-xs">
+                All ({calendarTasks.length})
+              </TabsTrigger>
+              <TabsTrigger value="tasks" className="text-xs">
+                Tasks ({getTotalTasksCount()})
+              </TabsTrigger>
+              <TabsTrigger value="reminders" className="text-xs">
+                Reminders ({getTotalRemindersCount()})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
+          <div className="space-y-4">
+            {displayMode === "all" && calendarTasks.length === 0 && (
+              <p className="text-center text-muted-foreground py-4">No tasks or reminders found</p>
+            )}
+            
+            {displayMode === "tasks" && getTotalTasksCount() === 0 && (
+              <p className="text-center text-muted-foreground py-4">No tasks found</p>
+            )}
+            
+            {displayMode === "reminders" && getTotalRemindersCount() === 0 && (
+              <p className="text-center text-muted-foreground py-4">No reminders found</p>
+            )}
+            
+            {(displayMode === "all" ? calendarTasks : 
+              displayMode === "tasks" ? calendarTasks.filter(t => !t.isReminder) : 
+              calendarTasks.filter(t => t.isReminder)
+            ).map((task) => (
+              task.isReminder ? (
+                <ReminderCard
+                  key={task.id}
+                  reminder={task}
+                  onReminderUpdate={handleUpdateTask}
+                />
+              ) : (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onTaskUpdate={handleUpdateTask}
+                />
+              )
+            ))}
           </div>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
-
-// Helper function to format days overdue
-function formatDaysOverdue(dueDate: Date): string {
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - dueDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return diffDays === 1 ? "1 day overdue" : `${diffDays} days overdue`;
 }
