@@ -11,7 +11,7 @@ export interface Job {
   jobNumber?: string;
   clientName: string;
   amount: number;
-  status: JobStatus;
+  status: JobStatus | string;
   actualAmount?: number;
   technicianId: string;  
   technicianName?: string;

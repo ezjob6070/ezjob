@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -34,7 +33,7 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
 
   // Get jobs assigned to contractors within the date range
   const contractorJobs = jobs.filter(job => {
-    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date as string);
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);

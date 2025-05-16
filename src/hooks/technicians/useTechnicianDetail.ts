@@ -59,7 +59,7 @@ export const useTechnicianDetail = (technicianId: string | undefined) => {
         // Ensure incentiveType is a valid enum value if provided
         incentiveType: techData.incentiveType as "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly" | undefined,
         // Role is optional but should be valid if provided
-        role: techData.role as "technician" | "salesman" | "employed" | "contractor" | undefined,
+        role: techData.role as "technician" | "contractor" | "salesman" | "employed" | undefined,
         // Add sensitive information if it exists
         ssn: techData.ssn,
         driverLicense: techData.driverLicense,

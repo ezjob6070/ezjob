@@ -144,4 +144,4 @@ export interface ProjectStaff {
 }
 
 // Add OfficeTimeFrame type to fix OfficeDashboard error
-export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter";
+export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter" | "day";
