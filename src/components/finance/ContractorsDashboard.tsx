@@ -8,8 +8,8 @@ import { ArrowUpDown, Download, Filter, FileText, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { Technician } from "@/types/project";
-import { Job } from "@/types/project";
+import { Technician } from "@/types/technician";
+import { Job } from "@/types/job";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface ContractorsDashboardProps {
@@ -34,11 +34,7 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
 
   // Get jobs assigned to contractors within the date range
   const contractorJobs = jobs.filter(job => {
-    // Safely handle date property which might be a Date or string
-    const jobDate = typeof job.scheduledDate !== 'undefined' 
-      ? (job.scheduledDate instanceof Date ? job.scheduledDate : new Date(job.scheduledDate)) 
-      : (job.date instanceof Date ? job.date : new Date(job.date));
-    
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date as string);
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);

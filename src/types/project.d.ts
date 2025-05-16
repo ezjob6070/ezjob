@@ -1,3 +1,4 @@
+
 // Define Project types
 
 export interface Project {
@@ -48,7 +49,6 @@ export interface ProjectTask {
 }
 
 export interface ProjectTaskHistoryEntry {
-  id?: string;
   title: string;
   description: string;
   date: string;
@@ -59,7 +59,7 @@ export interface ProjectTaskHistoryEntry {
 export interface ProjectTaskInspection {
   id: string;
   title: string;
-  status: "pending" | "passed" | "failed" | "not_applicable";
+  status: "pending" | "passed" | "failed";
   comments?: string;
   date?: string;
   inspector?: string;
@@ -94,8 +94,6 @@ export interface ProjectStaff {
   endDate?: string;
   status: "active" | "inactive";
   avatar?: string;
-  position?: string;
-  subRole?: string;
   // Other staff-related fields
 }
 
@@ -112,7 +110,6 @@ export interface ProjectEquipment {
 
 export interface ProjectMaterial {
   id: string;
-  name: string;
   quantity: number;
   unit: string;
   cost: number;
@@ -120,6 +117,7 @@ export interface ProjectMaterial {
   deliveryDate?: string;
   status: "ordered" | "delivered" | "used" | "surplus";
   notes?: string;
+  name: string;
 }
 
 export interface ProjectContractor {
@@ -137,61 +135,4 @@ export interface ProjectContractor {
     phone?: string;
     email?: string;
   };
-}
-
-// Extended Technician interface to match what's used in the components
-export interface Technician {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  position?: string;
-  department?: string;
-  hireDate: string;
-  startDate?: string;
-  endDate?: string;
-  status: "active" | "inactive" | "on_leave" | "terminated";
-  paymentType: "percentage" | "flat" | "hourly" | "salary" | "commission";
-  paymentRate: number;
-  hourlyRate: number;
-  role?: "technician" | "salesman" | "employed" | "contractor";
-  completedJobs?: number;
-  cancelledJobs?: number;
-  totalRevenue?: number;
-  rating?: number;
-  specialty?: string;
-  initials?: string;
-  profileImage?: string;
-  imageUrl?: string;
-  salaryBasis?: "hourly" | "daily" | "weekly" | "bi-weekly" | "monthly" | "annually";
-  incentiveType?: "bonus" | "commission" | "none" | "hourly" | "weekly" | "monthly" | "profit-sharing";
-  incentiveAmount?: number;
-  ssn?: string;
-  driverLicense?: {
-    number: string;
-    state: string;
-    expirationDate: string;
-  };
-  idNumber?: string;
-  subRole?: string;
-  documents?: any[];
-}
-
-// Extended job interface to match what's used in the components
-export interface Job {
-  id: string;
-  title: string;
-  jobNumber?: string;
-  clientName: string;
-  amount: number;
-  status: "scheduled" | "in_progress" | "completed" | "cancelled" | "canceled" | "rescheduled" | "estimate" | "pending";
-  actualAmount?: number;
-  technicianId: string;  
-  technicianName?: string;
-  jobSourceId?: string;
-  jobSourceName?: string;
-  date: Date | string;
-  scheduledDate?: Date | string;
-  createdAt?: string;
 }

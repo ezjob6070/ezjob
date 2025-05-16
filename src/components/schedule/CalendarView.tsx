@@ -12,9 +12,8 @@ import { cn } from "@/lib/utils";
 import UpcomingEvents from "@/components/UpcomingEvents";
 import { CalendarViewMode } from "./CalendarViewOptions";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, Calendar as CalendarIcon, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CalendarViewProps {
   jobs: Job[];
@@ -84,7 +83,6 @@ const CalendarView = ({
   viewMode,
 }: CalendarViewProps) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const [timelineFilter, setTimelineFilter] = useState<"all" | "tasks" | "jobs">("all");
   
   // Process jobs and tasks to create upcoming events with validated dates
   const jobEvents = jobs
@@ -228,42 +226,6 @@ const CalendarView = ({
   };
 
   const currentViewEvents = getEventsForCurrentView();
-  
-  // Filter timeline events based on selection
-  const getFilteredTimelineEvents = () => {
-    if (timelineFilter === "jobs") {
-      return currentViewEvents.jobs;
-    } else if (timelineFilter === "tasks") {
-      return currentViewEvents.tasks;
-    } else {
-      // Combine jobs and tasks for timeline view
-      const combinedEvents = [
-        ...currentViewEvents.jobs.map(job => ({
-          id: job.id,
-          title: job.title,
-          date: job.date,
-          type: "job" as const,
-          clientName: job.clientName,
-          status: job.status
-        })),
-        ...currentViewEvents.tasks.map(task => ({
-          id: task.id,
-          title: task.title,
-          date: task.dueDate,
-          type: "task" as const,
-          clientName: task.client?.name || "",
-          status: task.status
-        }))
-      ];
-      
-      // Sort by date
-      return combinedEvents.sort((a, b) => {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        return dateA.getTime() - dateB.getTime();
-      });
-    }
-  };
 
   const handlePrevPeriod = () => {
     switch (viewMode) {
@@ -297,112 +259,6 @@ const CalendarView = ({
       default:
         break;
     }
-  };
-  
-  // Timeline view rendering
-  const renderTimelineView = () => {
-    const timelineEvents = getFilteredTimelineEvents();
-    
-    return (
-      <div className="space-y-4 mt-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-medium">Timeline</h3>
-          <Tabs defaultValue="all" onValueChange={(value) => setTimelineFilter(value as "all" | "tasks" | "jobs")}>
-            <TabsList>
-              <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
-              <TabsTrigger value="tasks" className="text-xs">Tasks</TabsTrigger>
-              <TabsTrigger value="jobs" className="text-xs">Jobs</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        
-        <div className="relative pl-8 border-l-2 border-gray-200 ml-4">
-          {timelineEvents && timelineEvents.length > 0 ? (
-            timelineEvents.map((event, index) => {
-              const eventDate = ensureValidDate(event.date);
-              const now = new Date();
-              const isPast = eventDate ? eventDate < now : false;
-              const isCurrent = eventDate ? isSameDay(eventDate, now) : false;
-              
-              return (
-                <div 
-                  key={event.id} 
-                  className="relative mb-6 pl-6"
-                >
-                  <div className={cn(
-                    "absolute -left-[2.5rem] p-1 rounded-full border-4 border-white",
-                    event.type === "job" ? "bg-blue-500" : 
-                    event.status === "completed" ? "bg-green-500" :
-                    isCurrent ? "bg-indigo-500" :
-                    isPast ? "bg-amber-500" : "bg-gray-300"
-                  )}>
-                    {event.type === "job" ? (
-                      <CalendarIcon className="h-4 w-4 text-white" />
-                    ) : (
-                      <Clock className="h-4 w-4 text-white" />
-                    )}
-                  </div>
-                  
-                  <div className={cn(
-                    "p-4 border rounded-lg shadow-sm",
-                    event.type === "job" ? "bg-blue-50 border-blue-200" : 
-                    event.status === "completed" ? "bg-green-50 border-green-200" :
-                    isCurrent ? "bg-indigo-50 border-indigo-200" :
-                    isPast ? "bg-amber-50 border-amber-200" : "bg-white"
-                  )}>
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium text-lg">{event.title}</h4>
-                      <span className={cn(
-                        "px-2 py-1 rounded text-xs font-medium",
-                        event.type === "job" ? "bg-blue-100 text-blue-800" : "bg-indigo-100 text-indigo-800"
-                      )}>
-                        {event.type === "job" ? "Job" : "Task"}
-                      </span>
-                    </div>
-                    
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {event.clientName}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      {eventDate && (
-                        <span className="flex items-center gap-1">
-                          <CalendarIcon className="h-3 w-3" />
-                          {format(eventDate, "PPP")}
-                        </span>
-                      )}
-                      
-                      {eventDate && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {format(eventDate, "p")}
-                        </span>
-                      )}
-                      
-                      {event.status && (
-                        <span className={cn(
-                          "px-1.5 py-0.5 rounded-full text-xs",
-                          event.status === "completed" ? "bg-green-100 text-green-800" :
-                          event.status === "in_progress" || event.status === "in progress" ? "bg-blue-100 text-blue-800" :
-                          event.status === "canceled" || event.status === "cancelled" ? "bg-red-100 text-red-800" :
-                          "bg-gray-100 text-gray-800"
-                        )}>
-                          {event.status}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="p-12 text-center mt-4">
-              <p className="text-muted-foreground">No timeline events found for the selected filter</p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
   };
 
   // Render different calendar views based on viewMode
@@ -482,9 +338,6 @@ const CalendarView = ({
                 );
               })}
             </div>
-            
-            {/* Add Timeline View */}
-            {renderTimelineView()}
           </div>
         );
         
@@ -580,9 +433,6 @@ const CalendarView = ({
                 );
               })}
             </div>
-            
-            {/* Add Timeline View */}
-            {renderTimelineView()}
           </div>
         );
         
@@ -686,9 +536,6 @@ const CalendarView = ({
                 <span className="text-sm">High Priority</span>
               </div>
             </div>
-            
-            {/* Add Timeline View */}
-            {renderTimelineView()}
           </div>
         );
 
@@ -801,9 +648,6 @@ const CalendarView = ({
                 );
               })}
             </div>
-            
-            {/* Add Timeline View */}
-            {renderTimelineView()}
           </div>
         );
 
