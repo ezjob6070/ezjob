@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +13,7 @@ interface TransactionsSectionProps {
 }
 
 const TransactionsSection: React.FC<TransactionsSectionProps> = ({
-  filteredTransactions,
+  filteredTransactions = [], // Set default empty array to prevent undefined errors
   dateRange
 }) => {
   const [activeTab, setActiveTab] = useState<PaymentStatus>("completed");

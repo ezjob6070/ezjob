@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { Calendar, Bell, Search, Filter, SortAsc, SortDesc } from "lucide-react";
+import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";

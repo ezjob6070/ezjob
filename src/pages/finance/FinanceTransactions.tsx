@@ -19,7 +19,7 @@ const FinanceTransactions = () => {
     to: new Date(),
   });
   
-  const [transactions, setTransactions] = useState<FinancialTransaction[]>(sampleTransactions);
+  const [transactions, setTransactions] = useState<FinancialTransaction[]>(sampleTransactions || []);
   const [filteredTransactions, setFilteredTransactions] = useState<FinancialTransaction[]>([]);
   const [activeTechnicians, setActiveTechnicians] = useState(initialTechnicians.filter(tech => tech.status === "active"));
   const [selectedTechnician, setSelectedTechnician] = useState<string>("all");
@@ -112,7 +112,7 @@ const FinanceTransactions = () => {
 
       {/* Transactions Section */}
       <TransactionsSection 
-        transactions={filteredTransactions} 
+        filteredTransactions={filteredTransactions} 
         dateRange={date}
       />
     </div>
