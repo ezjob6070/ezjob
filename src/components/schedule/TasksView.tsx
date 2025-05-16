@@ -1,3 +1,4 @@
+
 import { format } from "date-fns";
 import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ const TasksView = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"all" | "tasks" | "reminders">("all");
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
     if (!onTasksChange) return;
@@ -157,6 +159,10 @@ const TasksView = ({
   const filteredTasks = filterTasks();
   const tasksCount = tasksForSelectedDate.filter(task => !task.isReminder).length;
   const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
+
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(selectedTaskId === taskId ? null : taskId);
+  };
 
   return (
     <div className="mb-6">
@@ -306,22 +312,41 @@ const TasksView = ({
           </p>
         ) : (
           <div className="space-y-4">
-            {filteredTasks.map((task) => (
-              task.isReminder ? (
-                <ReminderCard 
+            {filteredTasks.map((task) => {
+              // Apply the requested color styles
+              let bgColor = "bg-gray-50"; // Default light gray background for tasks
+              
+              if (selectedTaskId === task.id) {
+                bgColor = "bg-amber-50"; // Light yellow when selected
+              } else if (task.isReminder) {
+                bgColor = "bg-red-50"; // Light red for reminders
+              }
+              
+              return task.isReminder ? (
+                <div 
                   key={task.id} 
-                  reminder={task} 
-                  onReminderUpdate={handleUpdateTask}
-                />
+                  className={`${bgColor} cursor-pointer`}
+                  onClick={() => handleTaskClick(task.id)}
+                >
+                  <ReminderCard 
+                    reminder={task} 
+                    onReminderUpdate={handleUpdateTask}
+                  />
+                </div>
               ) : (
-                <TaskCard 
+                <div 
                   key={task.id} 
-                  task={task} 
-                  onTaskUpdate={handleUpdateTask}
-                  onCreateFollowUp={handleCreateFollowUp}
-                />
-              )
-            ))}
+                  className={`${bgColor} cursor-pointer`}
+                  onClick={() => handleTaskClick(task.id)}
+                >
+                  <TaskCard 
+                    task={task} 
+                    onTaskUpdate={handleUpdateTask}
+                    onCreateFollowUp={handleCreateFollowUp}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
