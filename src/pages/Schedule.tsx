@@ -240,13 +240,13 @@ const Schedule = () => {
           }}
           components={{
             Day: ({ date, displayMonth, ...props }) => {
-              // Check if date has jobs or tasks
-              const hasJobs = jobs.some(job => {
+              // Get jobs and tasks for this day
+              const dayJobs = jobs.filter(job => {
                 const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
                 return isSameDay(jobDate, date);
               });
               
-              const hasTasks = tasks.some(task => {
+              const dayTasks = tasks.filter(task => {
                 const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
                 return isSameDay(taskDate, date);
               });
@@ -257,24 +257,64 @@ const Schedule = () => {
               return (
                 <div 
                   className={cn(
-                    "h-10 w-10 p-0 font-normal flex flex-col items-center justify-center relative",
-                    isToday(date) && "border border-primary rounded-full",
-                    isSelectedDay && "bg-primary text-primary-foreground rounded-full",
+                    "h-24 w-full p-1 font-normal flex flex-col relative",
+                    isToday(date) && "border border-primary rounded-md",
+                    isSelectedDay && "bg-primary/10 rounded-md",
                     !isCurrentMonth && "text-muted-foreground opacity-50",
-                    (hasJobs || hasTasks) && !isSelectedDay && "bg-blue-50 text-blue-700 font-semibold",
+                    (dayJobs.length > 0 || dayTasks.length > 0) && !isSelectedDay && "bg-blue-50"
                   )}
                   onClick={() => setSelectedDate(date)}
                   {...props}
                 >
-                  {format(date, "d")}
-                  {(hasJobs || hasTasks) && (
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-center">
-                      <div className={cn(
-                        "w-1 h-1 rounded-full",
-                        isSelectedDay ? "bg-primary-foreground" : "bg-blue-500"
-                      )}></div>
-                    </div>
-                  )}
+                  <div className="flex justify-between items-center mb-1">
+                    <span className={cn(
+                      "text-lg font-medium",
+                      isToday(date) && "text-primary",
+                      isSelectedDay && "font-bold"
+                    )}>
+                      {format(date, "d")}
+                    </span>
+                    {(dayJobs.length > 0 || dayTasks.length > 0) && (
+                      <div className="flex gap-1">
+                        {dayJobs.length > 0 && (
+                          <Badge variant="outline" className="bg-blue-100 text-xs py-0 px-1 h-4">
+                            {dayJobs.length}
+                          </Badge>
+                        )}
+                        {dayTasks.length > 0 && (
+                          <Badge variant="outline" className="bg-amber-100 text-xs py-0 px-1 h-4">
+                            {dayTasks.length}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Show mini previews of events */}
+                  <div className="space-y-1 overflow-hidden text-xs">
+                    {dayJobs.slice(0, 2).map(job => (
+                      <div key={job.id} className="truncate text-blue-800 bg-blue-100 px-1 py-0.5 rounded">
+                        {job.title || "Job"}
+                      </div>
+                    ))}
+                    {dayTasks.filter(t => !t.isReminder).slice(0, 2).map(task => (
+                      <div key={task.id} className="truncate text-amber-800 bg-amber-100 px-1 py-0.5 rounded">
+                        {task.title}
+                      </div>
+                    ))}
+                    {dayTasks.filter(t => t.isReminder).slice(0, 1).map(reminder => (
+                      <div key={reminder.id} className="truncate text-purple-800 bg-purple-100 px-1 py-0.5 rounded">
+                        {reminder.title}
+                      </div>
+                    ))}
+                    
+                    {/* Show indicator for more events if needed */}
+                    {(dayJobs.length + dayTasks.length) > 5 && (
+                      <div className="text-muted-foreground text-center">
+                        +{(dayJobs.length + dayTasks.length - 5)} more
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             }
@@ -338,7 +378,7 @@ const Schedule = () => {
                 <div className="space-y-1">
                   {dayJobs.slice(0, 3).map(job => (
                     <div key={job.id} className="text-xs p-1 bg-blue-100 text-blue-800 rounded truncate">
-                      {job.title || "Job"}: {job.clientName}
+                      {job.title || "Untitled Job"}
                     </div>
                   ))}
                   
@@ -870,7 +910,6 @@ const Schedule = () => {
       <Dialog 
         open={showTasksManagerDialog} 
         onOpenChange={setShowTasksManagerDialog}
-        className="w-full max-w-4xl"
       >
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
