@@ -14,6 +14,7 @@ import { Task } from '@/components/calendar/types';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { CalendarViewMode } from './CalendarViewOptions';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type CalendarViewProps = {
   jobs: Job[];
@@ -34,6 +35,7 @@ const CalendarView = ({
   tasksForSelectedDate,
   updateSelectedDateItems,
   viewMode,
+  onViewChange,
 }) => {
   // Generate week dates for week view
   const weekDates = React.useMemo(() => {
@@ -110,10 +112,7 @@ const CalendarView = ({
         onSelect={handleSelectDate}
         className="rounded-md border"
         components={{
-          Day: (props) => {
-            // Get date from day props
-            const date = props.date;
-            
+          Day: ({ date, ...props }) => {
             const dayJobs = getJobsForDate(date);
             const dayTasks = getTasksForDate(date);
             
@@ -216,6 +215,21 @@ const CalendarView = ({
         </div>
       </CardHeader>
       <CardContent>
+        {/* View toggle inside calendar */}
+        <div className="mb-4 flex justify-center">
+          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)} className="bg-muted/20 border rounded-md p-1">
+            <ToggleGroupItem value="day" aria-label="Day View" className="gap-1 h-8 px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+              <span className="text-sm">Day</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="week" aria-label="Week View" className="gap-1 h-8 px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+              <span className="text-sm">Week</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="month" aria-label="Month View" className="gap-1 h-8 px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+              <span className="text-sm">Month</span>
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        
         {renderCalendarView()}
         
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">

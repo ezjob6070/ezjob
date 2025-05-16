@@ -17,7 +17,7 @@ import {
   Calendar
 } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +29,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import CalendarView from "@/components/schedule/CalendarView";
 import { Link } from "react-router-dom";
+import TasksView from "@/components/schedule/TasksView";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -40,6 +42,7 @@ const Schedule = () => {
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("calendar"); // "calendar", "tasks", "reminders"
   const [newTask, setNewTask] = useState<Partial<Task>>({
     id: "",
     title: "",
@@ -181,6 +184,15 @@ const Schedule = () => {
     setSelectedDate(date);
   };
 
+  // Navigation for days
+  const goToPreviousDay = () => {
+    setSelectedDate(prev => addDays(prev, -1));
+  };
+
+  const goToNextDay = () => {
+    setSelectedDate(prev => addDays(prev, 1));
+  };
+
   // Count summaries for selected date
   const reminderCount = tasksForSelectedDate.filter(t => t.isReminder).length;
   const jobsCount = jobsForSelectedDate.length;
@@ -220,201 +232,245 @@ const Schedule = () => {
         </div>
       </div>
 
-      <div className="mb-4">
-        <h2 className="text-lg font-medium mb-4">Calendar Overview</h2>
-        
-        {/* New calendar navigation section with view toggles, tasks and reminders buttons */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <CalendarViewOptions 
-            currentView={viewMode} 
-            onViewChange={setViewMode} 
-            selectedDate={selectedDate}
-          />
-          
-          <div className="flex items-center gap-2">
-            <Link to="/tasks">
-              <Button variant="outline" size="sm" className="text-xs h-8 gap-1">
-                <ListTodo className="h-4 w-4" />
-                Tasks
-              </Button>
-            </Link>
-            <Link to="/tasks">
-              <Button variant="outline" size="sm" className="text-xs h-8 gap-1">
-                <Bell className="h-4 w-4" />
-                Reminders
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Calendar Column */}
-        <div className="md:col-span-2">
-          <CalendarView
-            jobs={jobs}
-            tasks={tasks}
-            selectedDate={selectedDate}
-            jobsForSelectedDate={jobsForSelectedDate}
-            tasksForSelectedDate={tasksForSelectedDate}
-            updateSelectedDateItems={updateSelectedDateItems}
-            viewMode={viewMode}
-            onViewChange={setViewMode}
-          />
-        </div>
-
-        {/* Schedule Overview Card */}
-        <div>
+      {/* Main Content Area with Tabs Navigation */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {/* Left Navigation Sidebar */}
+        <div className="md:col-span-1">
           <Card className="border shadow-sm">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-medium">Overview</CardTitle>
-                <Link to="/tasks">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 text-xs"
-                  >
-                    <ClipboardList className="h-4 w-4 mr-1" />
-                    All Tasks
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-
-            <CardContent>
-              <div className="space-y-5">
-                {/* Jobs Section */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Briefcase className="h-4 w-4 text-gray-500 mr-2" />
-                      <h3 className="text-sm font-medium">Jobs</h3>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {jobsCount}
-                    </Badge>
-                  </div>
-                  
-                  {jobsForSelectedDate.length > 0 ? (
-                    <div className="space-y-2">
-                      {jobsForSelectedDate.map(job => (
-                        <div key={job.id} className="p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center justify-between mb-1">
-                            <h4 className="font-medium text-sm">{job.title || job.description || "Untitled Job"}</h4>
-                            <Badge variant="outline" className="text-xs">
-                              {job.status}
-                            </Badge>
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            {job.clientName || "No client"}
-                          </div>
-                          <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-                            <div>${job.amount}</div>
-                            <div>{job.time || "No time specified"}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="py-3 text-center text-sm text-gray-500">
-                      No jobs scheduled
-                    </div>
-                  )}
-                </div>
-
-                {/* Tasks Section */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <ListTodo className="h-4 w-4 text-gray-500 mr-2" />
-                      <h3 className="text-sm font-medium">Tasks</h3>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {tasksCount}
-                    </Badge>
-                  </div>
-                  
-                  {tasksForSelectedDate.filter(task => !task.isReminder).length > 0 ? (
-                    <div className="space-y-2">
-                      {tasksForSelectedDate
-                        .filter(task => !task.isReminder)
-                        .map(task => (
-                          <div 
-                            key={task.id} 
-                            className={cn(
-                              "p-3 rounded-lg",
-                              task.status === "completed" ? "bg-gray-50" : "bg-gray-50"
-                            )}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <h4 className="font-medium text-sm">{task.title}</h4>
-                              <Badge 
-                                variant={
-                                  task.status === "completed" ? "outline" :
-                                  task.status === "overdue" ? "destructive" :
-                                  task.status === "in progress" ? "secondary" : 
-                                  "default"
-                                }
-                                className="text-xs"
-                              >
-                                {task.status}
-                              </Badge>
-                            </div>
-                            {task.description && (
-                              <p className="mt-1 text-xs text-gray-500">{task.description}</p>
-                            )}
-                          </div>
-                        ))
-                      }
-                    </div>
-                  ) : (
-                    <div className="py-3 text-center text-sm text-gray-500">
-                      No tasks scheduled
-                    </div>
-                  )}
-                </div>
-                
-                {/* Reminders Section */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Bell className="h-4 w-4 text-gray-500 mr-2" />
-                      <h3 className="text-sm font-medium">Reminders</h3>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {reminderCount}
-                    </Badge>
-                  </div>
-                  
-                  {tasksForSelectedDate.filter(task => task.isReminder).length > 0 ? (
-                    <div className="space-y-2">
-                      {tasksForSelectedDate
-                        .filter(task => task.isReminder)
-                        .map(reminder => (
-                          <div key={reminder.id} className="p-3 bg-gray-50 rounded-lg">
-                            <div className="flex items-center justify-between mb-1">
-                              <h4 className="font-medium text-sm">{reminder.title}</h4>
-                              <div className="text-xs text-gray-500">
-                                {new Date(reminder.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </div>
-                            </div>
-                            {reminder.description && (
-                              <p className="mt-1 text-xs text-gray-500">{reminder.description}</p>
-                            )}
-                          </div>
-                        ))
-                      }
-                    </div>
-                  ) : (
-                    <div className="py-3 text-center text-sm text-gray-500">
-                      No reminders set
-                    </div>
-                  )}
-                </div>
+            <CardContent className="p-4">
+              <div className="flex flex-col space-y-2">
+                <Button 
+                  variant={activeTab === "calendar" ? "default" : "outline"} 
+                  className="justify-start text-left gap-2"
+                  onClick={() => setActiveTab("calendar")}
+                >
+                  <Calendar className="h-4 w-4" />
+                  Calendar Overview
+                </Button>
+                <Button 
+                  variant={activeTab === "tasks" ? "default" : "outline"} 
+                  className="justify-start text-left gap-2"
+                  onClick={() => setActiveTab("tasks")}
+                >
+                  <ListTodo className="h-4 w-4" />
+                  Tasks
+                </Button>
+                <Button 
+                  variant={activeTab === "reminders" ? "default" : "outline"} 
+                  className="justify-start text-left gap-2"
+                  onClick={() => setActiveTab("reminders")}
+                >
+                  <Bell className="h-4 w-4" />
+                  Reminders
+                </Button>
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Right Content Area */}
+        <div className="md:col-span-4">
+          {/* Calendar view */}
+          {activeTab === "calendar" && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <CalendarView
+                  jobs={jobs}
+                  tasks={tasks}
+                  selectedDate={selectedDate}
+                  jobsForSelectedDate={jobsForSelectedDate}
+                  tasksForSelectedDate={tasksForSelectedDate}
+                  updateSelectedDateItems={updateSelectedDateItems}
+                  viewMode={viewMode}
+                  onViewChange={setViewMode}
+                />
+              </div>
+
+              {/* Schedule Overview Card */}
+              <div>
+                <Card className="border shadow-sm">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-medium">Overview</CardTitle>
+                      <Link to="/tasks">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 text-xs"
+                        >
+                          <ClipboardList className="h-4 w-4 mr-1" />
+                          All Tasks
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="space-y-5">
+                      {/* Jobs Section */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Briefcase className="h-4 w-4 text-gray-500 mr-2" />
+                            <h3 className="text-sm font-medium">Jobs</h3>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {jobsCount}
+                          </Badge>
+                        </div>
+                        
+                        {jobsForSelectedDate.length > 0 ? (
+                          <div className="space-y-2">
+                            {jobsForSelectedDate.map(job => (
+                              <div key={job.id} className="p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center justify-between mb-1">
+                                  <h4 className="font-medium text-sm">{job.title || job.description || "Untitled Job"}</h4>
+                                  <Badge variant="outline" className="text-xs">
+                                    {job.status}
+                                  </Badge>
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  {job.clientName || "No client"}
+                                </div>
+                                <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                                  <div>${job.amount}</div>
+                                  <div>{job.time || "No time specified"}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-3 text-center text-sm text-gray-500">
+                            No jobs scheduled
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Tasks Section */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <ListTodo className="h-4 w-4 text-gray-500 mr-2" />
+                            <h3 className="text-sm font-medium">Tasks</h3>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {tasksCount}
+                          </Badge>
+                        </div>
+                        
+                        {tasksForSelectedDate.filter(task => !task.isReminder).length > 0 ? (
+                          <div className="space-y-2">
+                            {tasksForSelectedDate
+                              .filter(task => !task.isReminder)
+                              .map(task => (
+                                <div 
+                                  key={task.id} 
+                                  className={cn(
+                                    "p-3 rounded-lg",
+                                    task.status === "completed" ? "bg-gray-50" : "bg-gray-50"
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h4 className="font-medium text-sm">{task.title}</h4>
+                                    <Badge 
+                                      variant={
+                                        task.status === "completed" ? "outline" :
+                                        task.status === "overdue" ? "destructive" :
+                                        task.status === "in progress" ? "secondary" : 
+                                        "default"
+                                      }
+                                      className="text-xs"
+                                    >
+                                      {task.status}
+                                    </Badge>
+                                  </div>
+                                  {task.description && (
+                                    <p className="mt-1 text-xs text-gray-500">{task.description}</p>
+                                  )}
+                                </div>
+                              ))
+                            }
+                          </div>
+                        ) : (
+                          <div className="py-3 text-center text-sm text-gray-500">
+                            No tasks scheduled
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Reminders Section */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Bell className="h-4 w-4 text-gray-500 mr-2" />
+                            <h3 className="text-sm font-medium">Reminders</h3>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {reminderCount}
+                          </Badge>
+                        </div>
+                        
+                        {tasksForSelectedDate.filter(task => task.isReminder).length > 0 ? (
+                          <div className="space-y-2">
+                            {tasksForSelectedDate
+                              .filter(task => task.isReminder)
+                              .map(reminder => (
+                                <div key={reminder.id} className="p-3 bg-gray-50 rounded-lg">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h4 className="font-medium text-sm">{reminder.title}</h4>
+                                    <div className="text-xs text-gray-500">
+                                      {new Date(reminder.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                  </div>
+                                  {reminder.description && (
+                                    <p className="mt-1 text-xs text-gray-500">{reminder.description}</p>
+                                  )}
+                                </div>
+                              ))
+                            }
+                          </div>
+                        ) : (
+                          <div className="py-3 text-center text-sm text-gray-500">
+                            No reminders set
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Tasks view */}
+          {activeTab === "tasks" && (
+            <TasksView
+              selectedDate={selectedDate}
+              tasksForSelectedDate={tasksForSelectedDate.filter(task => !task.isReminder)}
+              onPreviousDay={goToPreviousDay}
+              onNextDay={goToNextDay}
+              onTasksChange={(updatedTasks) => {
+                // Update only the non-reminder tasks while preserving reminders
+                const reminders = tasks.filter(task => task.isReminder);
+                setTasks([...updatedTasks, ...reminders]);
+              }}
+            />
+          )}
+
+          {/* Reminders view */}
+          {activeTab === "reminders" && (
+            <TasksView
+              selectedDate={selectedDate}
+              tasksForSelectedDate={tasksForSelectedDate.filter(task => task.isReminder)}
+              onPreviousDay={goToPreviousDay}
+              onNextDay={goToNextDay}
+              onTasksChange={(updatedTasks) => {
+                // Update only the reminder tasks while preserving non-reminders
+                const nonReminders = tasks.filter(task => !task.isReminder);
+                setTasks([...nonReminders, ...updatedTasks]);
+              }}
+            />
+          )}
         </div>
       </div>
 
