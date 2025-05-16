@@ -1,6 +1,5 @@
 
 import { Calendar, CalendarDays } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export type CalendarViewMode = "day" | "week" | "month";
@@ -12,7 +11,7 @@ interface CalendarViewOptionsProps {
 
 const CalendarViewOptions = ({ currentView, onViewChange }: CalendarViewOptionsProps) => {
   return (
-    <div className="flex items-center justify-end gap-2 mb-4">
+    <div className="flex items-center justify-end gap-2">
       <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)}>
         <ToggleGroupItem value="day" aria-label="Daily View" className="gap-1">
           <Calendar className="h-4 w-4" />
@@ -27,9 +26,6 @@ const CalendarViewOptions = ({ currentView, onViewChange }: CalendarViewOptionsP
           <span className="hidden sm:inline">Month</span>
         </ToggleGroupItem>
       </ToggleGroup>
-      <Button variant="outline" size="sm" onClick={() => onViewChange("day")}>
-        Today
-      </Button>
     </div>
   );
 };

@@ -9,7 +9,7 @@ import { Job } from "@/components/jobs/JobTypes";
 import { Task } from "@/components/calendar/types";
 import { cn } from "@/lib/utils";
 import UpcomingEvents from "@/components/UpcomingEvents";
-import { CalendarViewMode } from "./CalendarViewOptions";
+import CalendarViewOptions, { CalendarViewMode } from "./CalendarViewOptions";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -660,18 +660,13 @@ const CalendarView = ({
           <CardHeader className="pb-0">
             <div className="flex items-center justify-between">
               <CardTitle>Calendar</CardTitle>
+              <CalendarViewOptions
+                currentView={viewMode}
+                onViewChange={(view) => updateSelectedDateItems(selectedDate)}
+              />
             </div>
           </CardHeader>
           <CardContent className="pb-8">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
             {renderCalendarView()}
           </CardContent>
         </Card>
