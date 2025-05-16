@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,6 @@ const TasksView = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"all" | "tasks" | "reminders">("all");
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
     if (!onTasksChange) return;
@@ -160,10 +158,6 @@ const TasksView = ({
   const tasksCount = tasksForSelectedDate.filter(task => !task.isReminder).length;
   const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
 
-  const handleTaskClick = (taskId: string) => {
-    setSelectedTaskId(selectedTaskId === taskId ? null : taskId);
-  };
-
   return (
     <div className="mb-6">
       <div className="flex items-center justify-center mb-4">
@@ -194,12 +188,12 @@ const TasksView = ({
             </TabsList>
           </Tabs>
           
-          {/* Simplified search and filter bar */}
-          <div className="flex items-center gap-2">
+          {/* Search and filter bar in a single row */}
+          <div className="flex items-center justify-between gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Search..." 
+                placeholder="Search tasks & reminders..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 h-8 text-xs"
@@ -211,6 +205,7 @@ const TasksView = ({
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
                   <Filter className="h-3.5 w-3.5" />
+                  Status
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
@@ -223,6 +218,74 @@ const TasksView = ({
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Sort Order */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  {sortOrder === "newest" || sortOrder === "oldest" ? (
+                    sortOrder === "newest" ? (
+                      <SortDesc className="h-3.5 w-3.5" />
+                    ) : (
+                      <SortAsc className="h-3.5 w-3.5" />
+                    )
+                  ) : (
+                    sortOrder === "a-z" ? (
+                      <span className="text-xs font-bold">A→Z</span>
+                    ) : (
+                      <span className="text-xs font-bold">Z→A</span>
+                    )
+                  )}
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuRadioGroup 
+                  value={sortOrder} 
+                  onValueChange={(value) => setSortOrder(value as "newest" | "oldest" | "a-z" | "z-a")}
+                >
+                  <DropdownMenuRadioItem value="newest">
+                    <SortDesc className="h-3.5 w-3.5 mr-2" /> Newest First
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="oldest">
+                    <SortAsc className="h-3.5 w-3.5 mr-2" /> Oldest First
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="a-z">A to Z</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="z-a">Z to A</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Date Filter */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {dateFilter ? format(dateFilter, "MMM d") : "Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-auto p-0">
+                <CalendarComponent
+                  mode="single"
+                  selected={dateFilter}
+                  onSelect={setDateFilter}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+                {dateFilter && (
+                  <div className="p-3 border-t border-border flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={clearDateFilter}
+                      className="text-xs"
+                    >
+                      Clear Filter
+                    </Button>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>
@@ -242,40 +305,23 @@ const TasksView = ({
             }
           </p>
         ) : (
-          <div className="space-y-3">
-            {filteredTasks.map((task) => {
-              // Determine background color based on task type and selection state
-              let bgColor = ""; // This will be applied in the components
-              
-              if (selectedTaskId === task.id) {
-                bgColor = "bg-amber-50"; // Light yellow when selected
-              }
-              
-              return task.isReminder ? (
-                <div 
+          <div className="space-y-4">
+            {filteredTasks.map((task) => (
+              task.isReminder ? (
+                <ReminderCard 
                   key={task.id} 
-                  className={`${bgColor} cursor-pointer hover:shadow-sm`}
-                  onClick={() => handleTaskClick(task.id)}
-                >
-                  <ReminderCard 
-                    reminder={task} 
-                    onReminderUpdate={handleUpdateTask}
-                  />
-                </div>
+                  reminder={task} 
+                  onReminderUpdate={handleUpdateTask}
+                />
               ) : (
-                <div 
+                <TaskCard 
                   key={task.id} 
-                  className={`${bgColor} cursor-pointer hover:shadow-sm`}
-                  onClick={() => handleTaskClick(task.id)}
-                >
-                  <TaskCard 
-                    task={task} 
-                    onTaskUpdate={handleUpdateTask}
-                    onCreateFollowUp={handleCreateFollowUp}
-                  />
-                </div>
-              );
-            })}
+                  task={task} 
+                  onTaskUpdate={handleUpdateTask}
+                  onCreateFollowUp={handleCreateFollowUp}
+                />
+              )
+            ))}
           </div>
         )}
       </div>
