@@ -1,4 +1,3 @@
-
 import { DateRange } from "react-day-picker";
 import { Job } from "@/types/job";
 

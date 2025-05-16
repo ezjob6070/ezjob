@@ -1,11 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
-import { isSameDay, addDays, subDays, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { 
+  isSameDay, addDays, subDays, addWeeks, subWeeks, 
+  addMonths, subMonths, startOfWeek, endOfWeek, 
+  startOfMonth, endOfMonth, format, isToday 
+} from "date-fns";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
-import CalendarView from "@/components/schedule/CalendarView";
-import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Plus, ListChecks } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
@@ -16,6 +19,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -24,7 +31,6 @@ const Schedule = () => {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
-  const [activeTab, setActiveTab] = useState("calendar");
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
@@ -130,10 +136,6 @@ const Schedule = () => {
 
   const handleViewChange = (newView: CalendarViewMode) => {
     setViewMode(newView);
-    // If switching to calendar view from another tab
-    if (activeTab !== "calendar") {
-      setActiveTab("calendar");
-    }
   };
 
   const handleAddTask = () => {
@@ -207,6 +209,330 @@ const Schedule = () => {
     toast.success("Tasks updated successfully");
   };
 
+  // Render the Month View
+  const renderMonthView = () => {
+    return (
+      <div className="border rounded-md p-4 bg-white">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={(date) => date && setSelectedDate(date)}
+          className="pointer-events-auto w-full"
+          modifiers={{
+            hasEvents: (date) => 
+              jobs.some(job => {
+                const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
+                return isSameDay(jobDate, date);
+              }) || 
+              tasks.some(task => {
+                const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                return isSameDay(taskDate, date);
+              }),
+          }}
+          modifiersClassNames={{
+            hasEvents: "font-bold bg-blue-50 text-blue-700",
+            today: "border border-primary",
+            selected: "bg-primary text-primary-foreground"
+          }}
+          components={{
+            Day: ({ date, displayMonth, ...props }) => {
+              // Check if date has jobs or tasks
+              const hasJobs = jobs.some(job => {
+                const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
+                return isSameDay(jobDate, date);
+              });
+              
+              const hasTasks = tasks.some(task => {
+                const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                return isSameDay(taskDate, date);
+              });
+              
+              const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
+              const isSelectedDay = isSameDay(date, selectedDate);
+              
+              return (
+                <div 
+                  className={cn(
+                    "h-10 w-10 p-0 font-normal flex flex-col items-center justify-center relative",
+                    isToday(date) && "border border-primary rounded-full",
+                    isSelectedDay && "bg-primary text-primary-foreground rounded-full",
+                    !isCurrentMonth && "text-muted-foreground opacity-50",
+                    (hasJobs || hasTasks) && !isSelectedDay && "bg-blue-50 text-blue-700 font-semibold",
+                  )}
+                  onClick={() => setSelectedDate(date)}
+                  {...props}
+                >
+                  {format(date, "d")}
+                  {(hasJobs || hasTasks) && (
+                    <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+                      <div className={cn(
+                        "w-1 h-1 rounded-full",
+                        isSelectedDay ? "bg-primary-foreground" : "bg-blue-500"
+                      )}></div>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+          }}
+        />
+      </div>
+    );
+  };
+
+  // Render the Week View
+  const renderWeekView = () => {
+    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+    const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+    
+    return (
+      <div className="border rounded-md overflow-hidden bg-white">
+        {/* Week header */}
+        <div className="grid grid-cols-7 bg-muted/20 border-b">
+          {weekDays.map((day, i) => (
+            <div 
+              key={i} 
+              className={cn(
+                "p-2 text-center",
+                isSameDay(day, selectedDate) && "bg-primary/10"
+              )}
+              onClick={() => setSelectedDate(day)}
+            >
+              <div className="text-xs text-muted-foreground">{format(day, "EEE")}</div>
+              <div className={cn(
+                "text-lg font-medium",
+                isToday(day) && "text-primary"
+              )}>
+                {format(day, "d")}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Simplified events for the week */}
+        <div className="grid grid-cols-7 divide-x">
+          {weekDays.map((day, i) => {
+            const dayJobs = jobs.filter(job => {
+              const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
+              return isSameDay(jobDate, day);
+            });
+            
+            const dayTasks = tasks.filter(task => {
+              const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+              return isSameDay(taskDate, day);
+            });
+            
+            return (
+              <div 
+                key={i} 
+                className={cn(
+                  "min-h-[200px] p-2",
+                  isSameDay(day, selectedDate) && "bg-primary/5"
+                )}
+                onClick={() => setSelectedDate(day)}
+              >
+                <div className="space-y-1">
+                  {dayJobs.slice(0, 3).map(job => (
+                    <div key={job.id} className="text-xs p-1 bg-blue-100 text-blue-800 rounded truncate">
+                      {job.title || "Job"}: {job.clientName}
+                    </div>
+                  ))}
+                  
+                  {dayJobs.length > 3 && (
+                    <div className="text-xs text-blue-600">+{dayJobs.length - 3} more jobs</div>
+                  )}
+                  
+                  {dayTasks.slice(0, 3).map(task => (
+                    <div 
+                      key={task.id} 
+                      className={task.isReminder 
+                        ? "text-xs p-1 bg-purple-100 text-purple-800 rounded truncate" 
+                        : "text-xs p-1 bg-amber-100 text-amber-800 rounded truncate"
+                      }
+                    >
+                      {task.title}
+                    </div>
+                  ))}
+                  
+                  {dayTasks.length > 3 && (
+                    <div className="text-xs text-amber-600">+{dayTasks.length - 3} more tasks</div>
+                  )}
+                  
+                  {dayJobs.length === 0 && dayTasks.length === 0 && (
+                    <div className="text-xs text-muted-foreground py-1">No events</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // Render the Day View
+  const renderDayView = () => {
+    return (
+      <div className="border rounded-md overflow-hidden bg-white">
+        <div className="bg-muted/20 p-3 border-b">
+          <h3 className="font-medium">{format(selectedDate, "EEEE, MMMM d, yyyy")}</h3>
+          {isToday(selectedDate) && (
+            <Badge variant="outline" className="bg-primary/10 text-primary mt-1">Today</Badge>
+          )}
+        </div>
+        
+        <div className="p-4 space-y-4">
+          <div>
+            <h4 className="font-medium mb-2 text-sm">Morning</h4>
+            <div className="space-y-1 pl-2">
+              {jobsForSelectedDate
+                .filter(job => {
+                  const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
+                  const hours = jobDate.getHours();
+                  return hours < 12;
+                })
+                .map(job => (
+                  <div key={job.id} className="p-2 bg-blue-50 border border-blue-100 rounded-md mb-1">
+                    <div className="font-medium">{job.title}</div>
+                    <div className="text-sm text-muted-foreground">{job.clientName}</div>
+                    <div className="text-xs text-blue-600">
+                      {job.date instanceof Date 
+                        ? format(job.date, "h:mm a") 
+                        : format(new Date(job.date as string), "h:mm a")}
+                    </div>
+                  </div>
+                ))}
+              
+              {tasksForSelectedDate
+                .filter(task => {
+                  const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                  const hours = taskDate.getHours();
+                  return hours < 12;
+                })
+                .map(task => (
+                  <div 
+                    key={task.id} 
+                    className={cn(
+                      "p-2 border rounded-md mb-1",
+                      task.isReminder ? "bg-purple-50 border-purple-100" : "bg-amber-50 border-amber-100"
+                    )}
+                  >
+                    <div className="font-medium">{task.title}</div>
+                    <div className="text-sm text-muted-foreground">{task.client?.name}</div>
+                    <div className="text-xs text-amber-600">
+                      {format(new Date(task.dueDate), "h:mm a")}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-medium mb-2 text-sm">Afternoon</h4>
+            <div className="space-y-1 pl-2">
+              {jobsForSelectedDate
+                .filter(job => {
+                  const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
+                  const hours = jobDate.getHours();
+                  return hours >= 12 && hours < 17;
+                })
+                .map(job => (
+                  <div key={job.id} className="p-2 bg-blue-50 border border-blue-100 rounded-md mb-1">
+                    <div className="font-medium">{job.title}</div>
+                    <div className="text-sm text-muted-foreground">{job.clientName}</div>
+                    <div className="text-xs text-blue-600">
+                      {job.date instanceof Date 
+                        ? format(job.date, "h:mm a") 
+                        : format(new Date(job.date as string), "h:mm a")}
+                    </div>
+                  </div>
+                ))}
+              
+              {tasksForSelectedDate
+                .filter(task => {
+                  const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                  const hours = taskDate.getHours();
+                  return hours >= 12 && hours < 17;
+                })
+                .map(task => (
+                  <div 
+                    key={task.id} 
+                    className={cn(
+                      "p-2 border rounded-md mb-1",
+                      task.isReminder ? "bg-purple-50 border-purple-100" : "bg-amber-50 border-amber-100"
+                    )}
+                  >
+                    <div className="font-medium">{task.title}</div>
+                    <div className="text-sm text-muted-foreground">{task.client?.name}</div>
+                    <div className="text-xs text-amber-600">
+                      {format(new Date(task.dueDate), "h:mm a")}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-medium mb-2 text-sm">Evening</h4>
+            <div className="space-y-1 pl-2">
+              {jobsForSelectedDate
+                .filter(job => {
+                  const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
+                  const hours = jobDate.getHours();
+                  return hours >= 17;
+                })
+                .map(job => (
+                  <div key={job.id} className="p-2 bg-blue-50 border border-blue-100 rounded-md mb-1">
+                    <div className="font-medium">{job.title}</div>
+                    <div className="text-sm text-muted-foreground">{job.clientName}</div>
+                    <div className="text-xs text-blue-600">
+                      {job.date instanceof Date 
+                        ? format(job.date, "h:mm a") 
+                        : format(new Date(job.date as string), "h:mm a")}
+                    </div>
+                  </div>
+                ))}
+              
+              {tasksForSelectedDate
+                .filter(task => {
+                  const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                  const hours = taskDate.getHours();
+                  return hours >= 17;
+                })
+                .map(task => (
+                  <div 
+                    key={task.id} 
+                    className={cn(
+                      "p-2 border rounded-md mb-1",
+                      task.isReminder ? "bg-purple-50 border-purple-100" : "bg-amber-50 border-amber-100"
+                    )}
+                  >
+                    <div className="font-medium">{task.title}</div>
+                    <div className="text-sm text-muted-foreground">{task.client?.name}</div>
+                    <div className="text-xs text-amber-600">
+                      {format(new Date(task.dueDate), "h:mm a")}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCurrentView = () => {
+    switch (viewMode) {
+      case "day":
+        return renderDayView();
+      case "week":
+        return renderWeekView();
+      case "month":
+      default:
+        return renderMonthView();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -237,66 +563,126 @@ const Schedule = () => {
         </div>
       </div>
 
-      <Tabs 
-        defaultValue="calendar" 
-        className="w-full"
-        value={activeTab}
-        onValueChange={setActiveTab}
-      >
-        <TabsList className="mb-4 w-full justify-start bg-background border-b border-border rounded-none px-0">
-          <TabsTrigger value="calendar" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4">
-            Calendar View
-          </TabsTrigger>
-          <TabsTrigger value="tasks" className="flex items-center gap-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4">
-            <ListChecks className="h-4 w-4" />
-            Tasks & Reminders
-          </TabsTrigger>
-        </TabsList>
+      <div>
+        <CalendarViewOptions 
+          currentView={viewMode} 
+          onViewChange={handleViewChange} 
+          selectedDate={selectedDate}
+          onPreviousDate={handlePreviousDate}
+          onNextDate={handleNextDate}
+          onTodayClick={handleTodayClick}
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          {renderCurrentView()}
+        </div>
         
-        <TabsContent value="calendar" className="space-y-6 mt-4 p-0">
-          <CalendarViewOptions 
-            currentView={viewMode} 
-            onViewChange={handleViewChange} 
-            selectedDate={selectedDate}
-            onPreviousDate={handlePreviousDate}
-            onNextDate={handleNextDate}
-            onTodayClick={handleTodayClick}
-          />
+        <div className="space-y-6">
+          {/* Jobs List */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center justify-between">
+                Jobs for {format(selectedDate, "MMM d")}
+                <Badge>{jobsForSelectedDate.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="max-h-[300px] overflow-y-auto">
+              {jobsForSelectedDate.length > 0 ? (
+                <div className="space-y-2">
+                  {jobsForSelectedDate.map(job => (
+                    <div 
+                      key={job.id} 
+                      className="p-2 rounded-md border bg-card hover:bg-accent/10 transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium">{job.title}</p>
+                          <p className="text-sm text-muted-foreground">{job.clientName}</p>
+                        </div>
+                        <Badge variant={
+                          job.status === "scheduled" ? "outline" :
+                          job.status === "completed" ? "success" : 
+                          job.status === "in_progress" ? "default" : "secondary"
+                        }>
+                          {job.status}
+                        </Badge>
+                      </div>
+                      <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+                        <span>${job.amount}</span>
+                        <span>{job.technicianName || "Unassigned"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No jobs scheduled for this day</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tasks List */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center justify-between">
+                Tasks & Reminders
+                <Badge>{tasksForSelectedDate.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="max-h-[300px] overflow-y-auto">
+              {tasksForSelectedDate.length > 0 ? (
+                <div className="space-y-2">
+                  {tasksForSelectedDate.map(task => (
+                    <div 
+                      key={task.id} 
+                      className={cn(
+                        "p-2 rounded-md border hover:bg-accent/10 transition-colors",
+                        task.isReminder ? "bg-purple-50" : "bg-amber-50"
+                      )}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium">{task.title}</p>
+                          <p className="text-sm text-muted-foreground">{task.client?.name}</p>
+                        </div>
+                        <Badge variant={task.isReminder ? "secondary" : "outline"}>
+                          {task.isReminder ? "Reminder" : "Task"}
+                        </Badge>
+                      </div>
+                      {task.description && (
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                          {task.description}
+                        </p>
+                      )}
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {format(new Date(task.dueDate), "h:mm a")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No tasks or reminders for this day</p>
+              )}
+            </CardContent>
+          </Card>
           
-          <div className="grid grid-cols-4 gap-4">
-            <div className="col-span-3">
-              <CalendarView 
-                jobs={jobs}
-                tasks={tasks}
-                selectedDate={selectedDate}
-                jobsForSelectedDate={jobsForSelectedDate}
-                tasksForSelectedDate={tasksForSelectedDate}
-                updateSelectedDateItems={setSelectedDate}
-                viewMode={viewMode}
-              />
+          <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-500"></div>
+              <span className="text-sm">Tasks</span>
             </div>
-            <div className="col-span-1">
-              <TasksView 
-                selectedDate={selectedDate}
-                tasksForSelectedDate={tasksForSelectedDate}
-                onPreviousDay={handlePreviousDate}
-                onNextDay={handleNextDate}
-                onTasksChange={handleTasksChange}
-              />
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
+              <span className="text-sm">Jobs</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-500"></div>
+              <span className="text-sm">Reminders</span>
             </div>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="tasks" className="mt-4 p-4 bg-white border rounded-md shadow-sm">
-          <TasksView 
-            selectedDate={selectedDate}
-            tasksForSelectedDate={tasksForSelectedDate}
-            onPreviousDay={handlePreviousDate}
-            onNextDay={handleNextDate}
-            onTasksChange={handleTasksChange}
-          />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
 
       {/* Add Task Dialog */}
       <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>

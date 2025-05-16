@@ -1,4 +1,3 @@
-
 import { DateRange } from "react-day-picker";
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "canceled" | "rescheduled" | "estimate" | "pending";
@@ -20,7 +19,7 @@ export interface Job {
   date: Date | string;  
   scheduledDate?: Date | string;
   createdAt?: string;
-  priority?: JobPriority;
+  priority?: JobPriority | string;
   details?: string;
   address?: string;
   clientPhone?: string;
