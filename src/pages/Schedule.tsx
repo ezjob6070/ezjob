@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
@@ -26,7 +25,7 @@ const Schedule = () => {
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState("calendar");
-  const [viewMode, setViewMode] = useState<CalendarViewMode>("home");
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
   const [newTask, setNewTask] = useState<Partial<Task>>({
