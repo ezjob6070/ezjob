@@ -7,13 +7,13 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, CalendarIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarIcon, ListTodo, Bell } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Job } from '@/types/job';
 import { Task } from '@/components/calendar/types';
 import { Badge } from '@/components/ui/badge';
-
-type CalendarViewMode = 'day' | 'week' | 'month';
+import CalendarViewOptions, { CalendarViewMode } from './CalendarViewOptions';
+import { Link } from 'react-router-dom';
 
 type CalendarViewProps = {
   jobs: Job[];
@@ -23,6 +23,7 @@ type CalendarViewProps = {
   tasksForSelectedDate: Task[];
   updateSelectedDateItems: (date: Date) => void;
   viewMode: CalendarViewMode;
+  onViewChange: (view: CalendarViewMode) => void;
 };
 
 const CalendarView = ({
@@ -33,6 +34,7 @@ const CalendarView = ({
   tasksForSelectedDate,
   updateSelectedDateItems,
   viewMode,
+  onViewChange,
 }: CalendarViewProps) => {
   // Generate week dates for week view
   const weekDates = React.useMemo(() => {
@@ -121,7 +123,7 @@ const CalendarView = ({
             
             return (
               <div 
-                {...props}
+                onClick={props.onClick}
                 className={cn(
                   props.className,
                   "relative h-12 w-12 p-0 font-normal aria-selected:opacity-100"
@@ -171,6 +173,30 @@ const CalendarView = ({
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-medium">Calendar</CardTitle>
+          
+          <div className="flex items-center gap-2">
+            <Link to="/tasks" className="flex">
+              <Button variant="outline" size="sm" className="text-xs h-8 gap-1">
+                <ListTodo className="h-4 w-4" />
+                Tasks
+              </Button>
+            </Link>
+            <Link to="/tasks" className="flex">
+              <Button variant="outline" size="sm" className="text-xs h-8 gap-1">
+                <Bell className="h-4 w-4" />
+                Reminders
+              </Button>
+            </Link>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between mt-2">
+          <CalendarViewOptions 
+            currentView={viewMode} 
+            onViewChange={onViewChange} 
+            selectedDate={selectedDate}
+          />
+          
           <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
