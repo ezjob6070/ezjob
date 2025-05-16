@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Job } from "@/types/job";
 import { 
@@ -9,13 +10,11 @@ import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import { Button } from "@/components/ui/button";
 import { 
-  Calendar as CalendarIcon, 
   Plus, 
-  Clock, 
   Bell, 
   Briefcase, 
   ListTodo, 
-  Eye
+  ClipboardList
 } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
@@ -28,9 +27,8 @@ import { v4 as uuid } from "uuid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import TasksView from "@/components/schedule/TasksView";
 import CalendarView from "@/components/schedule/CalendarView";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -42,7 +40,6 @@ const Schedule = () => {
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
-  const [showTasksManagerDialog, setShowTasksManagerDialog] = useState(false);
   const [newTask, setNewTask] = useState<Partial<Task>>({
     id: "",
     title: "",
@@ -179,21 +176,6 @@ const Schedule = () => {
     toast.success("Reminder added successfully");
   };
 
-  const handleTasksChange = (updatedTasks: Task[]) => {
-    setTasks(prevTasks => {
-      // Update only the tasks from the selected date
-      const tasksForOtherDates = prevTasks.filter(task => 
-        !isSameDay(task.dueDate, selectedDate)
-      );
-      return [...tasksForOtherDates, ...updatedTasks];
-    });
-    toast.success("Tasks updated successfully");
-  };
-
-  const handleViewAllTasks = () => {
-    setShowTasksManagerDialog(true);
-  };
-
   // Update selected date and items
   const updateSelectedDateItems = (date: Date) => {
     setSelectedDate(date);
@@ -238,12 +220,12 @@ const Schedule = () => {
         </div>
       </div>
 
-      <div>
+      <div className="mb-2">
+        <h2 className="text-lg font-medium mb-4">Calendar Overview</h2>
         <CalendarViewOptions 
           currentView={viewMode} 
           onViewChange={setViewMode} 
           selectedDate={selectedDate}
-          onViewAllTasks={handleViewAllTasks}
         />
       </div>
 
@@ -267,15 +249,16 @@ const Schedule = () => {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-medium">Overview</CardTitle>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 text-xs"
-                  onClick={handleViewAllTasks}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View All
-                </Button>
+                <Link to="/tasks">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 text-xs"
+                  >
+                    <ClipboardList className="h-4 w-4 mr-1" />
+                    All Tasks
+                  </Button>
+                </Link>
               </div>
             </CardHeader>
 
@@ -592,30 +575,6 @@ const Schedule = () => {
           <DialogFooter className="sm:justify-end">
             <Button variant="outline" onClick={() => setShowAddReminderDialog(false)} size="sm">Cancel</Button>
             <Button onClick={handleAddReminder} size="sm">Add Reminder</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Tasks Manager Dialog */}
-      <Dialog 
-        open={showTasksManagerDialog} 
-        onOpenChange={setShowTasksManagerDialog}
-      >
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Tasks & Reminders Manager</DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto py-2">
-            <TasksView
-              selectedDate={selectedDate}
-              tasksForSelectedDate={tasks} // Show all tasks, not just for selected date
-              onPreviousDay={() => {}}
-              onNextDay={() => {}}
-              onTasksChange={handleTasksChange}
-            />
-          </div>
-          <DialogFooter className="sm:justify-end">
-            <Button variant="outline" onClick={() => setShowTasksManagerDialog(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

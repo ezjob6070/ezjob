@@ -109,7 +109,9 @@ const CalendarView = ({
         onSelect={handleSelectDate}
         className="rounded-md border"
         components={{
-          Day: ({ date, ...props }) => {
+          Day: (props) => {
+            // Make sure we have access to the date
+            const date = props.date;
             const dayJobs = getJobsForDate(date);
             const dayTasks = getTasksForDate(date);
             
