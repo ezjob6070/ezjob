@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
-import { isSameDay } from "date-fns";
+import { isSameDay, addDays, subDays, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
@@ -52,33 +53,80 @@ const Schedule = () => {
     setJobs(globalJobs as Job[]);
   }, [globalJobs]);
 
-  // Update jobs for selected date whenever jobs or date changes
+  // Update filtered items based on view mode and selected date
   useEffect(() => {
-    const filteredJobs = jobs.filter(job => {
-      if (!job.date) return false;
-      const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
-      return isSameDay(jobDate, selectedDate);
-    });
-    setJobsForSelectedDate(filteredJobs);
+    let relevantJobs: Job[] = [];
+    let relevantTasks: Task[] = [];
+
+    if (viewMode === "day") {
+      // Filter for the selected day only
+      relevantJobs = jobs.filter(job => {
+        if (!job.date) return false;
+        const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+        return isSameDay(jobDate, selectedDate);
+      });
+      
+      relevantTasks = tasks.filter(task => isSameDay(task.dueDate, selectedDate));
+    } 
+    else if (viewMode === "week") {
+      // Filter for the selected week
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+      const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 0 });
+      
+      relevantJobs = jobs.filter(job => {
+        if (!job.date) return false;
+        const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+        return jobDate >= weekStart && jobDate <= weekEnd;
+      });
+      
+      relevantTasks = tasks.filter(task => {
+        const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        return taskDate >= weekStart && taskDate <= weekEnd;
+      });
+    } 
+    else if (viewMode === "month") {
+      // Filter for the selected month
+      const monthStart = startOfMonth(selectedDate);
+      const monthEnd = endOfMonth(selectedDate);
+      
+      relevantJobs = jobs.filter(job => {
+        if (!job.date) return false;
+        const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+        return jobDate >= monthStart && jobDate <= monthEnd;
+      });
+      
+      relevantTasks = tasks.filter(task => {
+        const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        return taskDate >= monthStart && taskDate <= monthEnd;
+      });
+    }
     
-    const filteredTasks = tasks.filter(task => isSameDay(task.dueDate, selectedDate));
-    setTasksForSelectedDate(filteredTasks);
-  }, [jobs, tasks, selectedDate]);
+    setJobsForSelectedDate(relevantJobs);
+    setTasksForSelectedDate(relevantTasks);
+  }, [jobs, tasks, selectedDate, viewMode]);
 
-  const updateSelectedDateItems = (date: Date) => {
-    setSelectedDate(date);
+  const handlePreviousDate = () => {
+    if (viewMode === "day") {
+      setSelectedDate(prev => subDays(prev, 1));
+    } else if (viewMode === "week") {
+      setSelectedDate(prev => subWeeks(prev, 1));
+    } else if (viewMode === "month") {
+      setSelectedDate(prev => subMonths(prev, 1));
+    }
   };
 
-  const handlePreviousDay = () => {
-    const prevDay = new Date(selectedDate);
-    prevDay.setDate(prevDay.getDate() - 1);
-    updateSelectedDateItems(prevDay);
+  const handleNextDate = () => {
+    if (viewMode === "day") {
+      setSelectedDate(prev => addDays(prev, 1));
+    } else if (viewMode === "week") {
+      setSelectedDate(prev => addWeeks(prev, 1));
+    } else if (viewMode === "month") {
+      setSelectedDate(prev => addMonths(prev, 1));
+    }
   };
 
-  const handleNextDay = () => {
-    const nextDay = new Date(selectedDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    updateSelectedDateItems(nextDay);
+  const handleTodayClick = () => {
+    setSelectedDate(new Date());
   };
 
   const handleViewChange = (newView: CalendarViewMode) => {
@@ -207,12 +255,14 @@ const Schedule = () => {
         </TabsList>
         
         <TabsContent value="calendar" className="space-y-6 mt-4 p-0">
-          <div className="flex items-center justify-between mb-4">
-            <CalendarViewOptions 
-              currentView={viewMode} 
-              onViewChange={handleViewChange} 
-            />
-          </div>
+          <CalendarViewOptions 
+            currentView={viewMode} 
+            onViewChange={handleViewChange} 
+            selectedDate={selectedDate}
+            onPreviousDate={handlePreviousDate}
+            onNextDate={handleNextDate}
+            onTodayClick={handleTodayClick}
+          />
           
           <CalendarView 
             jobs={jobs}
@@ -220,7 +270,7 @@ const Schedule = () => {
             selectedDate={selectedDate}
             jobsForSelectedDate={jobsForSelectedDate}
             tasksForSelectedDate={tasksForSelectedDate}
-            updateSelectedDateItems={updateSelectedDateItems}
+            updateSelectedDateItems={setSelectedDate}
             viewMode={viewMode}
           />
         </TabsContent>
@@ -229,8 +279,8 @@ const Schedule = () => {
           <TasksView 
             selectedDate={selectedDate}
             tasksForSelectedDate={tasksForSelectedDate}
-            onPreviousDay={handlePreviousDay}
-            onNextDay={handleNextDay}
+            onPreviousDay={handlePreviousDate}
+            onNextDay={handleNextDate}
             onTasksChange={handleTasksChange}
           />
         </TabsContent>
