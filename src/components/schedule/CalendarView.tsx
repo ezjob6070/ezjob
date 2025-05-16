@@ -59,6 +59,7 @@ const CalendarView = ({
   const renderDayView = () => {
     const dayJobs = jobsForSelectedDate;
     const dayTasks = tasksForSelectedDate;
+    const hours = Array.from({ length: 24 }, (_, i) => i);
     
     return (
       <div className="space-y-4">
@@ -70,19 +71,38 @@ const CalendarView = ({
             )}
           </h3>
         </div>
+        
+        <div className="border rounded-md overflow-hidden">
+          <div className="min-h-[600px] flex flex-col">
+            {/* Time slots */}
+            {hours.map(hour => (
+              <div key={hour} className="grid grid-cols-12 border-b last:border-b-0">
+                <div className="col-span-1 py-2 px-2 text-xs text-muted-foreground border-r">
+                  {format(new Date().setHours(hour, 0, 0, 0), 'h a')}
+                </div>
+                <div className="col-span-11 py-2 min-h-[60px]">
+                  {/* Events could be rendered here based on their start time */}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   };
 
   const renderWeekView = () => {
+    const hours = Array.from({ length: 24 }, (_, i) => i);
+    
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-7 text-center">
+      <div className="space-y-4 overflow-x-auto">
+        <div className="grid grid-cols-8 text-center border-b">
+          <div className="py-3 text-xs text-muted-foreground"></div>
           {weekDates.map((date, i) => (
             <div 
               key={i}
               className={cn(
-                "py-2 cursor-pointer",
+                "py-3 cursor-pointer",
                 isSameDay(date, selectedDate) && "bg-primary/10 font-bold",
                 isToday(date) && "text-primary"
               )}
@@ -90,6 +110,28 @@ const CalendarView = ({
             >
               <p className="text-xs text-muted-foreground">{format(date, 'EEE')}</p>
               <p>{format(date, 'd')}</p>
+            </div>
+          ))}
+        </div>
+        
+        <div className="min-h-[600px] border rounded-md overflow-hidden">
+          {hours.map(hour => (
+            <div key={hour} className="grid grid-cols-8 border-b last:border-b-0">
+              <div className="py-2 px-2 text-xs text-muted-foreground border-r">
+                {format(new Date().setHours(hour, 0, 0, 0), 'h a')}
+              </div>
+              {weekDates.map((date, i) => (
+                <div 
+                  key={i}
+                  className={cn(
+                    "py-2 min-h-[40px]",
+                    isSameDay(date, selectedDate) && "bg-primary/5"
+                  )}
+                  onClick={() => updateSelectedDateItems(date)}
+                >
+                  {/* Events could be rendered here based on their start time */}
+                </div>
+              ))}
             </div>
           ))}
         </div>
