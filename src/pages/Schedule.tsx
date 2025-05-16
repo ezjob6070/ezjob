@@ -1,16 +1,13 @@
-
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
 import { 
-  isSameDay, addDays, subDays, addWeeks, subWeeks, 
-  addMonths, subMonths, startOfWeek, endOfWeek, 
-  startOfMonth, endOfMonth, format, isToday 
+  isSameDay, format, isToday, startOfWeek, endOfWeek,
+  startOfMonth, endOfMonth
 } from "date-fns";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Plus, ListChecks } from "lucide-react";
+import { Calendar as CalendarIcon, Plus } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -523,11 +520,11 @@ const Schedule = () => {
 
   const renderCurrentView = () => {
     switch (viewMode) {
-      case "day":
+      case 'day':
         return renderDayView();
-      case "week":
+      case 'week':
         return renderWeekView();
-      case "month":
+      case 'month':
       default:
         return renderMonthView();
     }
@@ -568,9 +565,6 @@ const Schedule = () => {
           currentView={viewMode} 
           onViewChange={handleViewChange} 
           selectedDate={selectedDate}
-          onPreviousDate={handlePreviousDate}
-          onNextDate={handleNextDate}
-          onTodayClick={handleTodayClick}
         />
       </div>
       

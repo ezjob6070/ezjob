@@ -1,4 +1,3 @@
-
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
   addDays, startOfMonth, endOfMonth, addMonths, subMonths,
@@ -172,52 +171,6 @@ const CalendarView = ({
     }
   };
 
-  // Function to navigate to previous period based on current view
-  const navigatePrevious = () => {
-    switch(viewMode) {
-      case "day":
-        updateSelectedDateItems(addDays(selectedDate, -1));
-        break;
-      case "week":
-        const prevWeek = subWeeks(weekStartDate, 1);
-        setWeekStartDate(prevWeek);
-        updateSelectedDateItems(prevWeek);
-        break;
-      case "month":
-        const prevMonth = subMonths(currentMonth, 1);
-        setCurrentMonth(prevMonth);
-        updateSelectedDateItems(new Date(prevMonth.getFullYear(), prevMonth.getMonth(), 1));
-        break;
-    }
-  };
-
-  // Function to navigate to next period based on current view
-  const navigateNext = () => {
-    switch(viewMode) {
-      case "day":
-        updateSelectedDateItems(addDays(selectedDate, 1));
-        break;
-      case "week":
-        const nextWeek = addWeeks(weekStartDate, 1);
-        setWeekStartDate(nextWeek);
-        updateSelectedDateItems(nextWeek);
-        break;
-      case "month":
-        const nextMonth = addMonths(currentMonth, 1);
-        setCurrentMonth(nextMonth);
-        updateSelectedDateItems(new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 1));
-        break;
-    }
-  };
-
-  // Go to today
-  const goToToday = () => {
-    const today = new Date();
-    updateSelectedDateItems(today);
-    setCurrentMonth(today);
-    setWeekStartDate(startOfWeek(today, { weekStartsOn: 1 }));
-  };
-
   // Function to render day view
   const renderDayView = () => {
     const hoursOfDay = Array.from({ length: 14 }, (_, i) => i + 7); // 7 AM to 8 PM
@@ -225,13 +178,7 @@ const CalendarView = ({
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center mb-4">
-          <Button variant="ghost" size="sm" onClick={navigatePrevious}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
           <h2 className="text-lg font-medium">{format(selectedDate, "EEEE, MMMM d, yyyy")}</h2>
-          <Button variant="ghost" size="sm" onClick={navigateNext}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
         </div>
         
         <div className="border rounded-md overflow-hidden">
@@ -312,15 +259,9 @@ const CalendarView = ({
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center mb-4">
-          <Button variant="ghost" size="sm" onClick={navigatePrevious}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
           <h2 className="text-lg font-medium">
             {format(weekStartDate, "MMM d")} - {format(addDays(weekStartDate, 6), "MMM d, yyyy")}
           </h2>
-          <Button variant="ghost" size="sm" onClick={navigateNext}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
         </div>
         
         <div className="border rounded-md overflow-hidden">
@@ -413,13 +354,7 @@ const CalendarView = ({
         <div className="grid grid-cols-1 gap-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" size="sm" onClick={navigatePrevious}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
               <h2 className="text-lg font-medium">{format(currentMonth, "MMMM yyyy")}</h2>
-              <Button variant="ghost" size="sm" onClick={navigateNext}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
             </div>
             
             <Calendar
@@ -427,7 +362,7 @@ const CalendarView = ({
               selected={selectedDate}
               onSelect={handleDateSelect}
               month={currentMonth}
-              className="rounded-md w-full max-w-4xl mx-auto border-none"
+              className="rounded-md w-full max-w-4xl mx-auto border-none pointer-events-auto"
               modifiers={{
                 hasEvents: (date) => 
                   jobs.some(job => {
