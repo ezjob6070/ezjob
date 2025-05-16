@@ -7,12 +7,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, CalendarIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Job } from '@/types/job';
 import { Task } from '@/components/calendar/types';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
 import { CalendarViewMode } from './CalendarViewOptions';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 

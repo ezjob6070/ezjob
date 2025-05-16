@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Job } from "@/types/job";
 import { 
@@ -232,44 +231,42 @@ const Schedule = () => {
         </div>
       </div>
 
-      {/* Main Content Area with Tabs Navigation */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {/* Left Navigation Sidebar */}
-        <div className="md:col-span-1">
-          <Card className="border shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex flex-col space-y-2">
-                <Button 
-                  variant={activeTab === "calendar" ? "default" : "outline"} 
-                  className="justify-start text-left gap-2"
-                  onClick={() => setActiveTab("calendar")}
-                >
-                  <Calendar className="h-4 w-4" />
-                  Calendar Overview
-                </Button>
-                <Button 
-                  variant={activeTab === "tasks" ? "default" : "outline"} 
-                  className="justify-start text-left gap-2"
-                  onClick={() => setActiveTab("tasks")}
-                >
-                  <ListTodo className="h-4 w-4" />
-                  Tasks
-                </Button>
-                <Button 
-                  variant={activeTab === "reminders" ? "default" : "outline"} 
-                  className="justify-start text-left gap-2"
-                  onClick={() => setActiveTab("reminders")}
-                >
-                  <Bell className="h-4 w-4" />
-                  Reminders
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Top Navigation Tabs */}
+      <div className="w-full">
+        <div className="flex justify-center mb-6">
+          <div className="flex gap-2 border-b w-full">
+            <Button 
+              variant={activeTab === "calendar" ? "default" : "ghost"} 
+              onClick={() => setActiveTab("calendar")}
+              className="gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+              data-state={activeTab === "calendar" ? "active" : "inactive"}
+            >
+              <Calendar className="h-4 w-4" />
+              Calendar Overview
+            </Button>
+            <Button 
+              variant={activeTab === "tasks" ? "default" : "ghost"} 
+              onClick={() => setActiveTab("tasks")}
+              className="gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+              data-state={activeTab === "tasks" ? "active" : "inactive"}
+            >
+              <ListTodo className="h-4 w-4" />
+              Tasks
+            </Button>
+            <Button 
+              variant={activeTab === "reminders" ? "default" : "ghost"} 
+              onClick={() => setActiveTab("reminders")}
+              className="gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+              data-state={activeTab === "reminders" ? "active" : "inactive"}
+            >
+              <Bell className="h-4 w-4" />
+              Reminders
+            </Button>
+          </div>
         </div>
 
-        {/* Right Content Area */}
-        <div className="md:col-span-4">
+        {/* Main Content Area */}
+        <div className="w-full">
           {/* Calendar view */}
           {activeTab === "calendar" && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
