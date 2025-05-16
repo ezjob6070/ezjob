@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/types/job";
@@ -26,7 +25,7 @@ const Schedule = () => {
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState("calendar");
-  const [viewMode, setViewMode] = useState<CalendarViewMode>("home");
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
   const [newTask, setNewTask] = useState<Partial<Task>>({
@@ -191,51 +190,40 @@ const Schedule = () => {
         </div>
       </div>
 
-      <Tabs 
-        defaultValue="calendar" 
-        className="w-full"
-        value={activeTab}
-        onValueChange={setActiveTab}
-      >
-        <TabsList className="mb-4 w-full justify-start bg-background border-b border-border rounded-none px-0">
-          <TabsTrigger value="calendar" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4">
-            Calendar View
-          </TabsTrigger>
-          <TabsTrigger value="tasks" className="flex items-center gap-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4">
-            <ListChecks className="h-4 w-4" />
-            Tasks & Reminders
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="calendar" className="space-y-6 mt-4 p-0">
-          <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="w-full lg:w-3/4">
+          <div className="bg-white p-4 rounded-md shadow-sm border mb-4">
             <CalendarViewOptions 
               currentView={viewMode} 
               onViewChange={handleViewChange} 
             />
           </div>
           
-          <CalendarView 
-            jobs={jobs}
-            tasks={tasks}
-            selectedDate={selectedDate}
-            jobsForSelectedDate={jobsForSelectedDate}
-            tasksForSelectedDate={tasksForSelectedDate}
-            updateSelectedDateItems={updateSelectedDateItems}
-            viewMode={viewMode}
-          />
-        </TabsContent>
-        
-        <TabsContent value="tasks" className="mt-4 p-4 bg-white border rounded-md shadow-sm">
-          <TasksView 
-            selectedDate={selectedDate}
-            tasksForSelectedDate={tasksForSelectedDate}
-            onPreviousDay={handlePreviousDay}
-            onNextDay={handleNextDay}
-            onTasksChange={handleTasksChange}
-          />
-        </TabsContent>
-      </Tabs>
+          <div className="bg-white p-4 rounded-md shadow-sm border">
+            <CalendarView 
+              jobs={jobs}
+              tasks={tasks}
+              selectedDate={selectedDate}
+              jobsForSelectedDate={jobsForSelectedDate}
+              tasksForSelectedDate={tasksForSelectedDate}
+              updateSelectedDateItems={updateSelectedDateItems}
+              viewMode={viewMode}
+            />
+          </div>
+        </div>
+
+        <div className="w-full lg:w-1/4">
+          <div className="bg-white p-4 rounded-md shadow-sm border">
+            <TasksView 
+              selectedDate={selectedDate}
+              tasksForSelectedDate={tasksForSelectedDate}
+              onPreviousDay={handlePreviousDay}
+              onNextDay={handleNextDay}
+              onTasksChange={handleTasksChange}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Add Task Dialog */}
       <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>
