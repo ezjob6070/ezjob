@@ -1,3 +1,4 @@
+
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -358,7 +359,10 @@ const CalendarView = ({
                 <h2 className="text-lg font-medium">{getViewTitle()}</h2>
                 <CalendarViewOptions
                   currentView={viewMode}
-                  onViewChange={(view) => updateSelectedDateItems(selectedDate)}
+                  onViewChange={(view) => {
+                    // This will update the parent component with the new view mode
+                    updateSelectedDateItems(selectedDate);
+                  }}
                 />
               </div>
               <Button variant="ghost" size="sm" onClick={handleNextPeriod}>
@@ -456,7 +460,10 @@ const CalendarView = ({
                 <h2 className="text-lg font-medium">{getViewTitle()}</h2>
                 <CalendarViewOptions
                   currentView={viewMode}
-                  onViewChange={(view) => updateSelectedDateItems(selectedDate)}
+                  onViewChange={(view) => {
+                    // This will update the parent component with the new view mode
+                    updateSelectedDateItems(selectedDate);
+                  }}
                 />
               </div>
               <Button variant="ghost" size="sm" onClick={handleNextPeriod}>

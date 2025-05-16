@@ -2,7 +2,7 @@
 import { Calendar, CalendarDays } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export type CalendarViewMode = "day" | "week" | "month";
+export type CalendarViewMode = "day" | "week" | "month" | "home";
 
 interface CalendarViewOptionsProps {
   currentView: CalendarViewMode;
