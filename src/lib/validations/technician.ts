@@ -41,4 +41,5 @@ export const technicianSchema = z.object({
   driverLicenseExpiration: z.string().optional(),
   idNumber: z.string().optional(),
   workContract: z.string().optional(),
+  documents: z.array(z.any()).optional(),
 });

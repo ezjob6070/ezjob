@@ -8,7 +8,7 @@ export interface Task {
   allDay?: boolean;
   priority?: "high" | "medium" | "low" | "urgent";
   status: string;
-  client: { name: string };
+  client: { name: string; id?: string };
   location?: string;
   description?: string;
   technician?: string;

@@ -1,6 +1,6 @@
 
 import { DateRange } from "react-day-picker";
-import { Job } from "./JobTypes";
+import { Job } from "@/types/job";
 
 export type DateFilterType = 
   | "today" 
