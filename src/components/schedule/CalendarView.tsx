@@ -54,34 +54,6 @@ const CalendarView = ({
     });
   };
 
-  const getDayContent = (day: Date) => {
-    const dayJobs = getJobsForDate(day);
-    const dayTasks = getTasksForDate(day);
-    
-    const hasJobs = dayJobs.length > 0;
-    const hasTasks = dayTasks.length > 0;
-    const hasReminders = dayTasks.filter(task => task.isReminder).length > 0;
-    
-    return (
-      <div className="absolute inset-0 flex flex-col justify-between p-1">
-        <div className="flex justify-center items-center rounded-full h-6 w-6">
-          {format(day, 'd')}
-        </div>
-        <div className="flex justify-center gap-1 mt-auto">
-          {hasTasks && (
-            <div className="h-2 w-2 rounded-full bg-amber-500" />
-          )}
-          {hasJobs && (
-            <div className="h-2 w-2 rounded-full bg-blue-500" />
-          )}
-          {hasReminders && (
-            <div className="h-2 w-2 rounded-full bg-purple-500" />
-          )}
-        </div>
-      </div>
-    );
-  };
-
   const renderDayView = () => {
     const dayJobs = jobsForSelectedDate;
     const dayTasks = tasksForSelectedDate;
@@ -92,7 +64,7 @@ const CalendarView = ({
           <h3 className="text-lg font-medium">
             {format(selectedDate, 'MMMM d, yyyy')}
             {isToday(selectedDate) && (
-              <Badge className="ml-2 bg-blue-100 text-blue-800">Today</Badge>
+              <Badge className="ml-2 bg-blue-50 text-blue-800">Today</Badge>
             )}
           </h3>
         </div>
@@ -130,45 +102,6 @@ const CalendarView = ({
       }
     };
 
-    const renderDay = (day: Date, otherProps: React.HTMLAttributes<HTMLDivElement>) => {
-      const dayJobs = getJobsForDate(day);
-      const dayTasks = getTasksForDate(day);
-      
-      const hasJobs = dayJobs.length > 0;
-      const hasTasks = dayTasks.length > 0;
-      const hasReminders = dayTasks.filter(task => task.isReminder).length > 0;
-      
-      return (
-        <div 
-          {...otherProps}
-          className={cn(
-            otherProps.className,
-            "relative h-12 w-12 p-0 font-normal aria-selected:opacity-100"
-          )}
-        >
-          <div className="absolute inset-0 flex flex-col justify-between p-1">
-            <div className={cn(
-              "flex justify-center items-center rounded-full h-6 w-6",
-              isSameDay(day, selectedDate) && "bg-primary text-primary-foreground"
-            )}>
-              {format(day, 'd')}
-            </div>
-            <div className="flex justify-center gap-1 mt-auto">
-              {hasTasks && (
-                <div className="h-2 w-2 rounded-full bg-amber-500" />
-              )}
-              {hasJobs && (
-                <div className="h-2 w-2 rounded-full bg-blue-500" />
-              )}
-              {hasReminders && (
-                <div className="h-2 w-2 rounded-full bg-purple-500" />
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    };
-
     return (
       <Calendar
         mode="single"
@@ -176,7 +109,44 @@ const CalendarView = ({
         onSelect={handleSelectDate}
         className="rounded-md border"
         components={{
-          Day: ({ date, ...props }) => renderDay(date, props)
+          Day: ({ date, ...props }) => {
+            const dayJobs = getJobsForDate(date);
+            const dayTasks = getTasksForDate(date);
+            
+            const hasJobs = dayJobs.length > 0;
+            const hasTasks = dayTasks.length > 0;
+            const hasReminders = dayTasks.filter(task => task.isReminder).length > 0;
+            
+            return (
+              <div 
+                {...props}
+                className={cn(
+                  props.className,
+                  "relative h-12 w-12 p-0 font-normal aria-selected:opacity-100"
+                )}
+              >
+                <div className="absolute inset-0 flex flex-col justify-between p-1">
+                  <div className={cn(
+                    "flex justify-center items-center rounded-full h-6 w-6",
+                    isSameDay(date, selectedDate) && "bg-primary text-primary-foreground"
+                  )}>
+                    {format(date, 'd')}
+                  </div>
+                  <div className="flex justify-center gap-1 mt-auto">
+                    {hasTasks && (
+                      <div className="h-1 w-1 rounded-full bg-amber-500 opacity-70" />
+                    )}
+                    {hasJobs && (
+                      <div className="h-1 w-1 rounded-full bg-blue-500 opacity-70" />
+                    )}
+                    {hasReminders && (
+                      <div className="h-1 w-1 rounded-full bg-purple-500 opacity-70" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          }
         }}
       />
     );
@@ -195,14 +165,15 @@ const CalendarView = ({
   };
 
   return (
-    <Card>
+    <Card className="border shadow-sm">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle>Calendar</CardTitle>
+          <CardTitle className="text-lg font-medium">Calendar</CardTitle>
           <div className="flex items-center space-x-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
+              className="h-8 w-8"
               onClick={() => {
                 const newDate = viewMode === 'day' 
                   ? addDays(selectedDate, -1) 
@@ -215,15 +186,17 @@ const CalendarView = ({
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
+              className="h-8 px-2 text-xs"
               onClick={() => updateSelectedDateItems(new Date())}
             >
               Today
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
+              className="h-8 w-8"
               onClick={() => {
                 const newDate = viewMode === 'day' 
                   ? addDays(selectedDate, 1) 
@@ -243,16 +216,16 @@ const CalendarView = ({
         
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span className="text-xs">Jobs</span>
+            <div className="w-2 h-2 rounded-full bg-blue-500 opacity-70"></div>
+            <span className="text-xs text-muted-foreground">Jobs</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-            <span className="text-xs">Tasks</span>
+            <div className="w-2 h-2 rounded-full bg-amber-500 opacity-70"></div>
+            <span className="text-xs text-muted-foreground">Tasks</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-            <span className="text-xs">Reminders</span>
+            <div className="w-2 h-2 rounded-full bg-purple-500 opacity-70"></div>
+            <span className="text-xs text-muted-foreground">Reminders</span>
           </div>
         </div>
       </CardContent>
