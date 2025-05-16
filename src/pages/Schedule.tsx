@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import TasksView from "@/components/schedule/TasksView";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -32,6 +33,7 @@ const Schedule = () => {
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
+  const [showTasksManagerDialog, setShowTasksManagerDialog] = useState(false);
   const [newTask, setNewTask] = useState<Partial<Task>>({
     id: "",
     title: "",
@@ -205,6 +207,10 @@ const Schedule = () => {
       return [...tasksForOtherDates, ...updatedTasks];
     });
     toast.success("Tasks updated successfully");
+  };
+
+  const handleViewAllTasks = () => {
+    setShowTasksManagerDialog(true);
   };
 
   // Render the Month View
@@ -568,6 +574,7 @@ const Schedule = () => {
             currentView={viewMode} 
             onViewChange={handleViewChange} 
             selectedDate={selectedDate}
+            onViewAllTasks={handleViewAllTasks}
           />
           
           <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
@@ -575,8 +582,8 @@ const Schedule = () => {
           </div>
         </div>
         
-        {/* Jobs and Tasks Section - moved down to align with calendar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        {/* Jobs and Tasks Section - moved down below calendar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Jobs List */}
           <Card className="shadow-sm h-[500px] overflow-hidden flex flex-col">
             <CardHeader className="pb-2 bg-blue-50">
@@ -855,6 +862,31 @@ const Schedule = () => {
           <DialogFooter className="sm:justify-end">
             <Button variant="outline" onClick={() => setShowAddReminderDialog(false)} size="sm">Cancel</Button>
             <Button onClick={handleAddReminder} size="sm">Add Reminder</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tasks Manager Dialog */}
+      <Dialog 
+        open={showTasksManagerDialog} 
+        onOpenChange={setShowTasksManagerDialog}
+        className="w-full max-w-4xl"
+      >
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Tasks & Reminders Manager</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto py-2">
+            <TasksView
+              selectedDate={selectedDate}
+              tasksForSelectedDate={tasks} // Show all tasks, not just for selected date
+              onPreviousDay={handlePreviousDate}
+              onNextDay={handleNextDate}
+              onTasksChange={handleTasksChange}
+            />
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button variant="outline" onClick={() => setShowTasksManagerDialog(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
