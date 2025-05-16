@@ -16,7 +16,7 @@ const CalendarViewOptions = ({
   selectedDate,
 }: CalendarViewOptionsProps) => {
   return (
-    <div className="flex items-center justify-center w-full mb-4">
+    <div className="flex items-center mb-4">
       <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)} className="bg-muted/20 border rounded-md p-1">
         <ToggleGroupItem value="day" aria-label="Day View" className="gap-1 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm">
           <Calendar className="h-4 w-4" />

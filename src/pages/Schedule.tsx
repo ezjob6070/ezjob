@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Job } from "@/types/job";
 import { 
   isSameDay, format, isToday, startOfWeek, endOfWeek,
-  startOfMonth, endOfMonth
+  startOfMonth, endOfMonth, addMonths, subMonths,
+  addWeeks, subWeeks, addDays, subDays
 } from "date-fns";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
@@ -64,7 +65,7 @@ const Schedule = () => {
       // Filter for the selected day only
       relevantJobs = jobs.filter(job => {
         if (!job.date) return false;
-        const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+        const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
         return isSameDay(jobDate, selectedDate);
       });
       
@@ -77,7 +78,7 @@ const Schedule = () => {
       
       relevantJobs = jobs.filter(job => {
         if (!job.date) return false;
-        const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+        const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
         return jobDate >= weekStart && jobDate <= weekEnd;
       });
       
@@ -93,7 +94,7 @@ const Schedule = () => {
       
       relevantJobs = jobs.filter(job => {
         if (!job.date) return false;
-        const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+        const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
         return jobDate >= monthStart && jobDate <= monthEnd;
       });
       
@@ -560,106 +561,15 @@ const Schedule = () => {
         </div>
       </div>
 
-      <div>
-        <CalendarViewOptions 
-          currentView={viewMode} 
-          onViewChange={handleViewChange} 
-          selectedDate={selectedDate}
-        />
-      </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 space-y-4">
+          <CalendarViewOptions 
+            currentView={viewMode} 
+            onViewChange={handleViewChange} 
+            selectedDate={selectedDate}
+          />
+          
           {renderCurrentView()}
-        </div>
-        
-        <div className="space-y-6">
-          {/* Jobs List */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center justify-between">
-                Jobs for {format(selectedDate, "MMM d")}
-                <Badge>{jobsForSelectedDate.length}</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="max-h-[300px] overflow-y-auto">
-              {jobsForSelectedDate.length > 0 ? (
-                <div className="space-y-2">
-                  {jobsForSelectedDate.map(job => (
-                    <div 
-                      key={job.id} 
-                      className="p-2 rounded-md border bg-card hover:bg-accent/10 transition-colors"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{job.title}</p>
-                          <p className="text-sm text-muted-foreground">{job.clientName}</p>
-                        </div>
-                        <Badge variant={
-                          job.status === "scheduled" ? "outline" :
-                          job.status === "completed" ? "success" : 
-                          job.status === "in_progress" ? "default" : "secondary"
-                        }>
-                          {job.status}
-                        </Badge>
-                      </div>
-                      <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-                        <span>${job.amount}</span>
-                        <span>{job.technicianName || "Unassigned"}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">No jobs scheduled for this day</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Tasks List */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center justify-between">
-                Tasks & Reminders
-                <Badge>{tasksForSelectedDate.length}</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="max-h-[300px] overflow-y-auto">
-              {tasksForSelectedDate.length > 0 ? (
-                <div className="space-y-2">
-                  {tasksForSelectedDate.map(task => (
-                    <div 
-                      key={task.id} 
-                      className={cn(
-                        "p-2 rounded-md border hover:bg-accent/10 transition-colors",
-                        task.isReminder ? "bg-purple-50" : "bg-amber-50"
-                      )}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{task.title}</p>
-                          <p className="text-sm text-muted-foreground">{task.client?.name}</p>
-                        </div>
-                        <Badge variant={task.isReminder ? "secondary" : "outline"}>
-                          {task.isReminder ? "Reminder" : "Task"}
-                        </Badge>
-                      </div>
-                      {task.description && (
-                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                          {task.description}
-                        </p>
-                      )}
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        {format(new Date(task.dueDate), "h:mm a")}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">No tasks or reminders for this day</p>
-              )}
-            </CardContent>
-          </Card>
           
           <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
             <div className="flex items-center gap-2">
@@ -675,6 +585,115 @@ const Schedule = () => {
               <span className="text-sm">Reminders</span>
             </div>
           </div>
+        </div>
+        
+        <div className="space-y-6">
+          {/* Jobs List */}
+          <Card className="shadow-sm">
+            <CardHeader className="pb-2 bg-blue-50">
+              <CardTitle className="text-lg flex items-center justify-between text-blue-800">
+                Jobs for {format(selectedDate, "MMM d")}
+                <Badge variant="outline" className="bg-blue-100">{jobsForSelectedDate.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="max-h-[300px] overflow-y-auto">
+              {jobsForSelectedDate.length > 0 ? (
+                <div className="space-y-2">
+                  {jobsForSelectedDate.map(job => (
+                    <div 
+                      key={job.id} 
+                      className="p-2 rounded-md border border-blue-100 bg-blue-50 hover:bg-blue-100 transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-blue-900">{job.title}</p>
+                          <p className="text-sm text-blue-700">{job.clientName}</p>
+                        </div>
+                        <Badge variant="outline" className="bg-blue-200 text-blue-800">
+                          {job.status}
+                        </Badge>
+                      </div>
+                      <div className="mt-1 flex justify-between text-xs text-blue-600">
+                        <span>${job.amount}</span>
+                        <span>{job.technicianName || "Unassigned"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No jobs scheduled for this day</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tasks List */}
+          <Card className="shadow-sm">
+            <CardHeader className="pb-2 bg-amber-50">
+              <CardTitle className="text-lg flex items-center justify-between text-amber-800">
+                Tasks & Reminders
+                <Badge variant="outline" className="bg-amber-100">{tasksForSelectedDate.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="max-h-[300px] overflow-y-auto">
+              {tasksForSelectedDate.length > 0 ? (
+                <div className="space-y-2">
+                  {tasksForSelectedDate.map(task => (
+                    <div 
+                      key={task.id} 
+                      className={cn(
+                        "p-2 rounded-md border hover:opacity-90 transition-colors",
+                        task.isReminder 
+                          ? "bg-purple-50 border-purple-100" 
+                          : "bg-amber-50 border-amber-100"
+                      )}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className={cn(
+                            "font-medium",
+                            task.isReminder ? "text-purple-900" : "text-amber-900"
+                          )}>
+                            {task.title}
+                          </p>
+                          <p className={cn(
+                            "text-sm",
+                            task.isReminder ? "text-purple-700" : "text-amber-700"
+                          )}>
+                            {task.client?.name}
+                          </p>
+                        </div>
+                        <Badge variant={task.isReminder 
+                          ? "outline" 
+                          : "outline"} 
+                          className={task.isReminder 
+                            ? "bg-purple-100 text-purple-800" 
+                            : "bg-amber-100 text-amber-800"}
+                        >
+                          {task.isReminder ? "Reminder" : "Task"}
+                        </Badge>
+                      </div>
+                      {task.description && (
+                        <p className={cn(
+                          "mt-1 text-xs line-clamp-2",
+                          task.isReminder ? "text-purple-600" : "text-amber-600"
+                        )}>
+                          {task.description}
+                        </p>
+                      )}
+                      <div className={cn(
+                        "mt-1 text-xs",
+                        task.isReminder ? "text-purple-600" : "text-amber-600"
+                      )}>
+                        {format(new Date(task.dueDate), "h:mm a")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No tasks or reminders for this day</p>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
