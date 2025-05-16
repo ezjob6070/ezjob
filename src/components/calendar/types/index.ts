@@ -37,3 +37,6 @@ export interface DayProps {
   outside?: boolean;
   today?: boolean;
 }
+
+// Calendar view mode type for consistent usage across components
+export type CalendarViewMode = "day" | "week" | "month" | "home";
