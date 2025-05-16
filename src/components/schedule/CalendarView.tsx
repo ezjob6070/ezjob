@@ -1,3 +1,4 @@
+
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
   addDays, startOfMonth, endOfMonth, addMonths, subMonths,
@@ -142,6 +143,22 @@ const CalendarView = ({
     .sort((a, b) => a.datetime.getTime() - b.datetime.getTime())
     .slice(0, 5);
 
+  const handlePreviousMonth = () => {
+    setCurrentMonth(prev => subMonths(prev, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => addMonths(prev, 1));
+  };
+
+  const handlePreviousWeek = () => {
+    setWeekStartDate(prev => subWeeks(prev, 1));
+  };
+
+  const handleNextWeek = () => {
+    setWeekStartDate(prev => addWeeks(prev, 1));
+  };
+
   const getDayClassName = (date: Date) => {
     const hasJobs = jobs.some(job => {
       const jobDate = ensureValidDate(job.date);
@@ -171,6 +188,113 @@ const CalendarView = ({
     }
   };
 
+  // Function to render month view
+  const renderMonthView = () => {
+    return (
+      <div className="grid grid-cols-1 gap-6">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-medium">{format(currentMonth, "MMMM yyyy")}</h2>
+          <div className="flex gap-1">
+            <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleNextMonth}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={handleDateSelect}
+          month={currentMonth}
+          className="rounded-md w-full border-none pointer-events-auto"
+          modifiers={{
+            hasEvents: (date) => 
+              jobs.some(job => {
+                const jobDate = ensureValidDate(job.date);
+                return jobDate && isSameDay(jobDate, date);
+              }) || 
+              tasks.some(task => {
+                const taskDate = ensureValidDate(task.dueDate);
+                return taskDate && isSameDay(taskDate, date);
+              }),
+          }}
+          modifiersClassNames={{
+            hasEvents: "font-bold",
+          }}
+          components={{
+            Day: ({ date, displayMonth, ...props }) => {
+              const isSelected = isSameDay(date, selectedDate);
+              const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+              
+              // Get jobs and tasks for this date
+              const { jobsForDate, tasksForDate } = getItemsForDate(date, jobs, tasks);
+              
+              return (
+                <div 
+                  className={cn(
+                    "h-20 min-w-[5rem] p-1 rounded-md relative",
+                    getDayClassName(date),
+                    isSelected && "ring-2 ring-primary",
+                    isOutsideMonth && "opacity-40"
+                  )}
+                >
+                  <button 
+                    type="button"
+                    className={cn(
+                      "absolute top-1 right-1 h-6 w-6 flex items-center justify-center rounded-full text-sm",
+                      isToday(date) && "bg-primary text-primary-foreground",
+                      isSelected && !isToday(date) && "font-bold"
+                    )}
+                    onClick={() => handleDateSelect(date)}
+                    disabled={isOutsideMonth}
+                    {...props}
+                  >
+                    {format(date, "d")}
+                  </button>
+                  
+                  <div className="mt-6 overflow-hidden max-h-[calc(100%-1.5rem)]">
+                    {jobsForDate.length > 0 && (
+                      <div className="text-xs mb-1 line-clamp-1">
+                        <div className="bg-blue-100 rounded px-1 py-0.5 text-blue-800 mb-0.5 truncate">
+                          {jobsForDate.length > 1 
+                            ? `${jobsForDate.length} jobs` 
+                            : jobsForDate[0].title || "Job"}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {tasksForDate.filter(t => !t.isReminder).length > 0 && (
+                      <div className="text-xs mb-1 line-clamp-1">
+                        <div className="bg-amber-100 rounded px-1 py-0.5 text-amber-800 mb-0.5 truncate">
+                          {tasksForDate.filter(t => !t.isReminder).length > 1 
+                            ? `${tasksForDate.filter(t => !t.isReminder).length} tasks` 
+                            : tasksForDate.filter(t => !t.isReminder)[0].title}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {tasksForDate.filter(t => t.isReminder).length > 0 && (
+                      <div className="text-xs line-clamp-1">
+                        <div className="bg-purple-100 rounded px-1 py-0.5 text-purple-800 truncate">
+                          {tasksForDate.filter(t => t.isReminder).length > 1 
+                            ? `${tasksForDate.filter(t => t.isReminder).length} reminders` 
+                            : tasksForDate.filter(t => t.isReminder)[0].title}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            }
+          }}
+        />
+      </div>
+    );
+  };
+  
   // Function to render day view
   const renderDayView = () => {
     const hoursOfDay = Array.from({ length: 14 }, (_, i) => i + 7); // 7 AM to 8 PM
@@ -179,6 +303,22 @@ const CalendarView = ({
       <div className="space-y-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-medium">{format(selectedDate, "EEEE, MMMM d, yyyy")}</h2>
+          <div className="flex gap-1">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => updateSelectedDateItems(addDays(selectedDate, -1))}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" /> Previous Day
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => updateSelectedDateItems(addDays(selectedDate, 1))}
+            >
+              Next Day <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
         </div>
         
         <div className="border rounded-md overflow-hidden">
@@ -254,14 +394,20 @@ const CalendarView = ({
       end: addDays(weekStartDate, 6)
     });
     
-    const hoursOfDay = [9, 12, 15, 18]; // Show 9am, 12pm, 3pm, 6pm time slots
-    
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-medium">
             {format(weekStartDate, "MMM d")} - {format(addDays(weekStartDate, 6), "MMM d, yyyy")}
           </h2>
+          <div className="flex gap-1">
+            <Button variant="outline" size="sm" onClick={handlePreviousWeek}>
+              <ChevronLeft className="h-4 w-4 mr-1" /> Previous Week
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleNextWeek}>
+              Next Week <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
         </div>
         
         <div className="border rounded-md overflow-hidden">
@@ -294,189 +440,40 @@ const CalendarView = ({
               
               return (
                 <div key={dayIndex} className={cn(
-                  "min-h-[250px] divide-y",
+                  "min-h-[250px] divide-y p-1",
                   isSameDay(day, selectedDate) && "bg-primary/5"
                 )}>
-                  {/* Simplified hours display */}
-                  {hoursOfDay.map((hour, i) => (
-                    <div key={i} className="p-1 min-h-16">
-                      <div className="text-xs text-muted-foreground mb-1">{format(setHours(day, hour), "h a")}</div>
-                      
-                      {/* Show events for this time slot */}
-                      <div className="space-y-1">
-                        {jobsForDate
-                          .filter(job => {
-                            const jobDate = ensureValidDate(job.date);
-                            return jobDate && Math.abs(jobDate.getHours() - hour) <= 1;
-                          })
-                          .map(job => (
-                            <div key={job.id} className="text-xs p-1 bg-blue-100 text-blue-800 rounded truncate border border-blue-200">
-                              {job.title || "Untitled Job"}
-                            </div>
-                          ))
-                        }
-                        
-                        {tasksForDate
-                          .filter(task => {
-                            const taskDate = new Date(task.start || task.dueDate);
-                            return Math.abs(taskDate.getHours() - hour) <= 1;
-                          })
-                          .map(task => (
-                            <div 
-                              key={task.id} 
-                              className={cn(
-                                "text-xs p-1 rounded truncate border",
-                                task.isReminder 
-                                  ? "bg-purple-100 text-purple-800 border-purple-200" 
-                                  : "bg-amber-100 text-amber-800 border-amber-200"
-                              )}
-                            >
-                              {task.title}
-                            </div>
-                          ))
-                        }
+                  {/* Show events for this day */}
+                  <div className="space-y-1 pt-1">
+                    {jobsForDate.map(job => (
+                      <div key={job.id} className="text-xs p-1 bg-blue-100 text-blue-800 rounded truncate border border-blue-200">
+                        {job.title || "Untitled Job"}
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                    
+                    {tasksForDate.filter(t => !t.isReminder).map(task => (
+                      <div 
+                        key={task.id} 
+                        className="text-xs p-1 bg-amber-100 text-amber-800 rounded truncate border border-amber-200"
+                      >
+                        {task.title}
+                      </div>
+                    ))}
+                    
+                    {tasksForDate.filter(t => t.isReminder).map(reminder => (
+                      <div 
+                        key={reminder.id} 
+                        className="text-xs p-1 bg-purple-100 text-purple-800 rounded truncate border border-purple-200"
+                      >
+                        {reminder.title}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
-      </div>
-    );
-  };
-  
-  // Function to render month view
-  const renderMonthView = () => {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">{format(currentMonth, "MMMM yyyy")}</h2>
-            </div>
-            
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={handleDateSelect}
-              month={currentMonth}
-              className="rounded-md w-full max-w-4xl mx-auto border-none pointer-events-auto"
-              modifiers={{
-                hasEvents: (date) => 
-                  jobs.some(job => {
-                    const jobDate = ensureValidDate(job.date);
-                    return jobDate && isSameDay(jobDate, date);
-                  }) || 
-                  tasks.some(task => {
-                    const taskDate = ensureValidDate(task.dueDate);
-                    return taskDate && isSameDay(taskDate, date);
-                  }),
-              }}
-              modifiersClassNames={{
-                hasEvents: "font-bold",
-              }}
-              components={{
-                Day: ({ date, displayMonth, ...props }) => {
-                  const isSelected = isSameDay(date, selectedDate);
-                  const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
-                  
-                  return (
-                    <button 
-                      type="button"
-                      className={cn(
-                        "h-12 w-12 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center",
-                        getDayClassName(date),
-                        isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                        isOutsideMonth && "text-muted-foreground opacity-50"
-                      )}
-                      disabled={isOutsideMonth}
-                      onClick={() => handleDateSelect(date)}
-                      {...props}
-                    >
-                      <span className="text-base">{format(date, "d")}</span>
-                      {(jobs.some(job => {
-                        const jobDate = ensureValidDate(job.date);
-                        return jobDate && isSameDay(jobDate, date);
-                      }) || 
-                        tasks.some(task => {
-                          const taskDate = ensureValidDate(task.dueDate);
-                          return taskDate && isSameDay(taskDate, date);
-                        })) && 
-                        !isSelected && (
-                        <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
-                          {tasks.some(task => {
-                            const taskDate = ensureValidDate(task.dueDate);
-                            return taskDate && isSameDay(taskDate, date) && !task.isReminder;
-                          }) && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
-                          )}
-                          {tasks.some(task => {
-                            const taskDate = ensureValidDate(task.dueDate);
-                            return taskDate && isSameDay(taskDate, date) && task.isReminder;
-                          }) && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                          )}
-                        </div>
-                      )}
-                    </button>
-                  );
-                }
-              }}
-            />
-          </div>
-        </div>
-        
-        {/* Daily Overview Section */}
-        <Card className="border shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex justify-between items-center">
-              {format(selectedDate, "MMMM d, yyyy")} - Overview
-              <Badge variant={isToday(selectedDate) ? "default" : "outline"}>{isToday(selectedDate) ? "Today" : format(selectedDate, "EEEE")}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-medium mb-2">Tasks</h4>
-                {tasksForSelectedDate.filter(t => !t.isReminder).length > 0 ? (
-                  <div className="space-y-2">
-                    {tasksForSelectedDate.filter(t => !t.isReminder).slice(0, 3).map(task => (
-                      <div key={task.id} className="bg-amber-50 p-2 rounded border border-amber-100">
-                        <p className="font-medium">{task.title}</p>
-                        <p className="text-sm">{task.client?.name}</p>
-                      </div>
-                    ))}
-                    {tasksForSelectedDate.filter(t => !t.isReminder).length > 3 && (
-                      <p className="text-sm text-amber-600">+{tasksForSelectedDate.filter(t => !t.isReminder).length - 3} more</p>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No tasks due</p>
-                )}
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Reminders</h4>
-                {tasksForSelectedDate.filter(t => t.isReminder).length > 0 ? (
-                  <div className="space-y-2">
-                    {tasksForSelectedDate.filter(t => t.isReminder).slice(0, 3).map(reminder => (
-                      <div key={reminder.id} className="bg-blue-50 p-2 rounded border border-blue-100">
-                        <p className="font-medium">{reminder.title}</p>
-                        <p className="text-sm">{reminder.client?.name}</p>
-                      </div>
-                    ))}
-                    {tasksForSelectedDate.filter(t => t.isReminder).length > 3 && (
-                      <p className="text-sm text-blue-600">+{tasksForSelectedDate.filter(t => t.isReminder).length - 3} more</p>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No reminders due</p>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     );
   };
@@ -496,25 +493,99 @@ const CalendarView = ({
   };
 
   return (
-    <div className="space-y-6">
-      {renderView()}
-      
-      <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-500"></div>
-          <span className="text-sm">Tasks</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
-          <span className="text-sm">Jobs</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-500"></div>
-          <span className="text-sm">Reminders</span>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2">
+        {renderView()}
+        
+        <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-500"></div>
+            <span className="text-sm">Tasks</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
+            <span className="text-sm">Jobs</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-500"></div>
+            <span className="text-sm">Reminders</span>
+          </div>
         </div>
       </div>
       
-      <UpcomingEvents events={upcomingEvents} />
+      <div className="space-y-6">
+        {/* Daily Overview Section */}
+        <Card className="border shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex justify-between items-center">
+              {format(selectedDate, "MMMM d, yyyy")} - Overview
+              <Badge variant={isToday(selectedDate) ? "default" : "outline"}>{isToday(selectedDate) ? "Today" : format(selectedDate, "EEEE")}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">Jobs</h4>
+                {jobsForSelectedDate.length > 0 ? (
+                  <div className="space-y-2">
+                    {jobsForSelectedDate.slice(0, 3).map(job => (
+                      <div key={job.id} className="bg-blue-50 p-2 rounded border border-blue-100">
+                        <p className="font-medium">{job.title || "Untitled Job"}</p>
+                        <p className="text-sm">{job.clientName}</p>
+                      </div>
+                    ))}
+                    {jobsForSelectedDate.length > 3 && (
+                      <p className="text-sm text-blue-600">+{jobsForSelectedDate.length - 3} more jobs</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No jobs scheduled</p>
+                )}
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-2">Tasks</h4>
+                {tasksForSelectedDate.filter(t => !t.isReminder).length > 0 ? (
+                  <div className="space-y-2">
+                    {tasksForSelectedDate.filter(t => !t.isReminder).slice(0, 3).map(task => (
+                      <div key={task.id} className="bg-amber-50 p-2 rounded border border-amber-100">
+                        <p className="font-medium">{task.title}</p>
+                        <p className="text-sm">{task.client?.name}</p>
+                      </div>
+                    ))}
+                    {tasksForSelectedDate.filter(t => !t.isReminder).length > 3 && (
+                      <p className="text-sm text-amber-600">+{tasksForSelectedDate.filter(t => !t.isReminder).length - 3} more tasks</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No tasks due</p>
+                )}
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-2">Reminders</h4>
+                {tasksForSelectedDate.filter(t => t.isReminder).length > 0 ? (
+                  <div className="space-y-2">
+                    {tasksForSelectedDate.filter(t => t.isReminder).slice(0, 3).map(reminder => (
+                      <div key={reminder.id} className="bg-purple-50 p-2 rounded border border-purple-100">
+                        <p className="font-medium">{reminder.title}</p>
+                        <p className="text-sm">{reminder.client?.name}</p>
+                      </div>
+                    ))}
+                    {tasksForSelectedDate.filter(t => t.isReminder).length > 3 && (
+                      <p className="text-sm text-purple-600">+{tasksForSelectedDate.filter(t => t.isReminder).length - 3} more reminders</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No reminders due</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <UpcomingEvents events={upcomingEvents} />
+      </div>
     </div>
   );
 };
