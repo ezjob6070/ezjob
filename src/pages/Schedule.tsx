@@ -561,48 +561,37 @@ const Schedule = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 gap-8">
+        {/* Calendar Section */}
+        <div className="space-y-2">
           <CalendarViewOptions 
             currentView={viewMode} 
             onViewChange={handleViewChange} 
             selectedDate={selectedDate}
           />
           
-          {renderCurrentView()}
-          
-          <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-500"></div>
-              <span className="text-sm">Tasks</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
-              <span className="text-sm">Jobs</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-500"></div>
-              <span className="text-sm">Reminders</span>
-            </div>
+          <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
+            {renderCurrentView()}
           </div>
         </div>
         
-        <div className="space-y-6">
+        {/* Jobs and Tasks Section - moved down to align with calendar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {/* Jobs List */}
-          <Card className="shadow-sm">
+          <Card className="shadow-sm h-[500px] overflow-hidden flex flex-col">
             <CardHeader className="pb-2 bg-blue-50">
               <CardTitle className="text-lg flex items-center justify-between text-blue-800">
                 Jobs for {format(selectedDate, "MMM d")}
                 <Badge variant="outline" className="bg-blue-100">{jobsForSelectedDate.length}</Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent className="max-h-[300px] overflow-y-auto">
+            <CardContent className="flex-1 overflow-y-auto">
               {jobsForSelectedDate.length > 0 ? (
                 <div className="space-y-2">
                   {jobsForSelectedDate.map(job => (
                     <div 
                       key={job.id} 
-                      className="p-2 rounded-md border border-blue-100 bg-blue-50 hover:bg-blue-100 transition-colors"
+                      className="p-3 rounded-md border border-blue-100 bg-blue-50 hover:bg-blue-100 transition-colors"
                     >
                       <div className="flex justify-between items-start">
                         <div>
@@ -627,21 +616,21 @@ const Schedule = () => {
           </Card>
 
           {/* Tasks List */}
-          <Card className="shadow-sm">
+          <Card className="shadow-sm h-[500px] overflow-hidden flex flex-col">
             <CardHeader className="pb-2 bg-amber-50">
               <CardTitle className="text-lg flex items-center justify-between text-amber-800">
                 Tasks & Reminders
                 <Badge variant="outline" className="bg-amber-100">{tasksForSelectedDate.length}</Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent className="max-h-[300px] overflow-y-auto">
+            <CardContent className="flex-1 overflow-y-auto">
               {tasksForSelectedDate.length > 0 ? (
                 <div className="space-y-2">
                   {tasksForSelectedDate.map(task => (
                     <div 
                       key={task.id} 
                       className={cn(
-                        "p-2 rounded-md border hover:opacity-90 transition-colors",
+                        "p-3 rounded-md border hover:opacity-90 transition-colors",
                         task.isReminder 
                           ? "bg-purple-50 border-purple-100" 
                           : "bg-amber-50 border-amber-100"
@@ -672,14 +661,6 @@ const Schedule = () => {
                           {task.isReminder ? "Reminder" : "Task"}
                         </Badge>
                       </div>
-                      {task.description && (
-                        <p className={cn(
-                          "mt-1 text-xs line-clamp-2",
-                          task.isReminder ? "text-purple-600" : "text-amber-600"
-                        )}>
-                          {task.description}
-                        </p>
-                      )}
                       <div className={cn(
                         "mt-1 text-xs",
                         task.isReminder ? "text-purple-600" : "text-amber-600"
