@@ -151,7 +151,7 @@ const CalendarView = ({
         mode="single"
         selected={selectedDate}
         onSelect={handleSelectDate}
-        className="rounded-md border"
+        className="rounded-md border w-full max-w-none"
         components={{
           Day: ({ date, ...props }) => {
             const dayJobs = getJobsForDate(date);
@@ -165,25 +165,33 @@ const CalendarView = ({
               <div 
                 className={cn(
                   props.className,
-                  "relative h-12 w-12 p-0 font-normal aria-selected:opacity-100"
+                  "relative h-16 w-full p-0 font-normal aria-selected:opacity-100 border border-gray-100 hover:bg-gray-50 rounded-sm"
                 )}
               >
-                <div className="absolute inset-0 flex flex-col justify-between p-1">
+                <div className="absolute inset-0 flex flex-col h-full w-full p-1">
                   <div className={cn(
-                    "flex justify-center items-center rounded-full h-6 w-6",
-                    isSameDay(date, selectedDate) && "bg-primary text-primary-foreground"
+                    "flex justify-center items-center h-6 w-6 rounded-full",
+                    isSameDay(date, selectedDate) && "bg-primary text-primary-foreground",
+                    isToday(date) && !isSameDay(date, selectedDate) && "border-2 border-primary"
                   )}>
                     {format(date, 'd')}
                   </div>
-                  <div className="flex justify-center gap-1 mt-auto">
-                    {hasTasks && (
-                      <div className="h-1 w-1 rounded-full bg-amber-500 opacity-70" />
-                    )}
+                  
+                  <div className="flex justify-start gap-1 mt-1 overflow-hidden flex-wrap">
                     {hasJobs && (
-                      <div className="h-1 w-1 rounded-full bg-blue-500 opacity-70" />
+                      <div className="text-[0.65rem] px-1 bg-blue-100 text-blue-800 rounded truncate">
+                        {dayJobs.length} {dayJobs.length === 1 ? 'job' : 'jobs'}
+                      </div>
+                    )}
+                    {hasTasks && !hasReminders && (
+                      <div className="text-[0.65rem] px-1 bg-amber-100 text-amber-800 rounded truncate">
+                        {dayTasks.filter(t => !t.isReminder).length} tasks
+                      </div>
                     )}
                     {hasReminders && (
-                      <div className="h-1 w-1 rounded-full bg-purple-500 opacity-70" />
+                      <div className="text-[0.65rem] px-1 bg-purple-100 text-purple-800 rounded truncate">
+                        {dayTasks.filter(t => t.isReminder).length} reminders
+                      </div>
                     )}
                   </div>
                 </div>
