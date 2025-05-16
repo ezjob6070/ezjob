@@ -3,6 +3,7 @@ import { Task } from "@/components/calendar/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { CalendarClock, Clock, User, ArrowRightCircle, Calendar } from "lucide-react";
 import { toast } from "sonner";
@@ -56,7 +57,7 @@ const TaskCard = ({ task, onTaskUpdate, onCreateFollowUp }: TaskCardProps) => {
   };
 
   return (
-    <div className="p-3">
+    <div className="p-3 border rounded-lg bg-gray-50">
       <div className="flex items-start gap-3">
         <Checkbox
           checked={task.status === "completed"}

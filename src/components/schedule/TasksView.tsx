@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { Calendar, Bell, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
+import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -13,6 +13,7 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import {
@@ -48,6 +49,7 @@ const TasksView = ({
 }: TasksViewProps) => {
   const [filterType, setFilterType] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "a-z" | "z-a">("newest");
+  const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"all" | "tasks" | "reminders">("all");
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -104,6 +106,15 @@ const TasksView = ({
       filtered = filtered.filter(task => !task.isReminder);
     } else if (viewMode === "reminders") {
       filtered = filtered.filter(task => task.isReminder);
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(task => 
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
     }
 
     // Apply status filter
@@ -183,14 +194,23 @@ const TasksView = ({
             </TabsList>
           </Tabs>
           
-          {/* Simplified filter bar */}
-          <div className="flex items-center justify-end gap-2">
+          {/* Simplified search and filter bar */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 h-8 text-xs"
+              />
+            </div>
+            
             {/* Status Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
                   <Filter className="h-3.5 w-3.5" />
-                  Filter
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
@@ -225,7 +245,7 @@ const TasksView = ({
           <div className="space-y-3">
             {filteredTasks.map((task) => {
               // Determine background color based on task type and selection state
-              let bgColor = task.isReminder ? "bg-red-50" : "bg-gray-50"; // Default colors
+              let bgColor = ""; // This will be applied in the components
               
               if (selectedTaskId === task.id) {
                 bgColor = "bg-amber-50"; // Light yellow when selected
@@ -234,7 +254,7 @@ const TasksView = ({
               return task.isReminder ? (
                 <div 
                   key={task.id} 
-                  className={`${bgColor} cursor-pointer hover:shadow-sm border rounded-lg`}
+                  className={`${bgColor} cursor-pointer hover:shadow-sm`}
                   onClick={() => handleTaskClick(task.id)}
                 >
                   <ReminderCard 
@@ -245,7 +265,7 @@ const TasksView = ({
               ) : (
                 <div 
                   key={task.id} 
-                  className={`${bgColor} cursor-pointer hover:shadow-sm border rounded-lg`}
+                  className={`${bgColor} cursor-pointer hover:shadow-sm`}
                   onClick={() => handleTaskClick(task.id)}
                 >
                   <TaskCard 

@@ -17,7 +17,7 @@ import {
   endOfWeek,
   getDay,
 } from "date-fns";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Task as TaskIcon } from "lucide-react";
 import { Task } from "@/components/calendar/types";
 import { Job } from "@/types/project";
 import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
@@ -83,8 +83,8 @@ const CalendarView = ({
       case "month":
         setCurrentDate(subMonths(currentDate, 1));
         break;
-      default:
-        // Handle other view modes if needed
+      case "year":
+        setCurrentDate(new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDate()));
         break;
     }
   };
@@ -100,8 +100,8 @@ const CalendarView = ({
       case "month":
         setCurrentDate(addMonths(currentDate, 1));
         break;
-      default:
-        // Handle other view modes if needed
+      case "year":
+        setCurrentDate(new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), currentDate.getDate()));
         break;
     }
   };
@@ -127,8 +127,6 @@ const CalendarView = ({
     const handleDayClick = (day: Date) => {
       updateSelectedDateItems(day);
       setCurrentDate(day);
-      // Ensure sidebar is visible when a day is clicked
-      setSidebarVisible(true);
     };
 
     return (
@@ -200,8 +198,8 @@ const CalendarView = ({
       case "month":
         dateRangeText = format(currentDate, "MMMM yyyy");
         break;
-      default:
-        // Handle other view modes if needed
+      case "year":
+        dateRangeText = format(currentDate, "yyyy");
         break;
     }
 
@@ -221,16 +219,6 @@ const CalendarView = ({
     );
   };
 
-  // Function to handle task updates
-  const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
-    // This is just a placeholder. In a real application, this would be connected to your global state management
-    console.log("Task update requested:", taskId, updates);
-  };
-
-  // Separate tasks and reminders
-  const remindersForSelectedDate = tasksForSelectedDate.filter(task => task.isReminder);
-  const regularTasksForSelectedDate = tasksForSelectedDate.filter(task => !task.isReminder);
-
   return (
     <div className="flex h-full">
       {/* Calendar View */}
@@ -243,7 +231,7 @@ const CalendarView = ({
 
       {/* Side Panel for Tasks & Events */}
       {sidebarVisible && (
-        <div className="w-[320px] ml-4 p-4 border rounded-lg shadow-sm bg-white overflow-auto flex flex-col gap-2">
+        <div className="w-[300px] ml-4 p-4 border rounded-lg shadow-sm bg-white overflow-auto flex flex-col gap-2">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-medium text-sm">{format(selectedDate, "MMMM d, yyyy")}</h3>
             <Button 
@@ -258,51 +246,27 @@ const CalendarView = ({
 
           {tasksForSelectedDate.length === 0 ? (
             <div className="text-center py-6 text-sm text-muted-foreground">
-              <ListChecks className="mx-auto h-8 w-8 text-gray-300 mb-2" />
+              <TaskIcon className="mx-auto h-8 w-8 text-gray-300 mb-2" />
               No tasks scheduled
             </div>
           ) : (
-            <div className="space-y-4">
-              {/* Tasks section */}
-              {regularTasksForSelectedDate.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold text-gray-500 mb-1">TASKS ({regularTasksForSelectedDate.length})</h4>
-                  <div className="space-y-2">
-                    {regularTasksForSelectedDate.map(task => (
-                      <div 
-                        key={task.id} 
-                        className="border rounded-lg bg-gray-50 hover:shadow-sm transition-shadow"
-                      >
-                        <TaskCard 
-                          task={task} 
-                          onTaskUpdate={handleTaskUpdate}
-                          onCreateFollowUp={(task) => console.log("Create follow-up for", task.id)}
-                        />
-                      </div>
-                    ))}
-                  </div>
+            <div className="space-y-2">
+              <h4 className="text-xs font-semibold text-gray-500 mb-1">TASKS & REMINDERS</h4>
+              {tasksForSelectedDate.map(task => (
+                <div key={task.id} className="text-sm">
+                  {task.isReminder ? (
+                    <ReminderCard 
+                      reminder={task} 
+                      onReminderUpdate={() => {}} 
+                    />
+                  ) : (
+                    <TaskCard 
+                      task={task} 
+                      onTaskUpdate={() => {}} 
+                    />
+                  )}
                 </div>
-              )}
-              
-              {/* Reminders section */}
-              {remindersForSelectedDate.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold text-gray-500 mb-1">REMINDERS ({remindersForSelectedDate.length})</h4>
-                  <div className="space-y-2">
-                    {remindersForSelectedDate.map(reminder => (
-                      <div 
-                        key={reminder.id} 
-                        className="border rounded-lg bg-red-50 hover:shadow-sm transition-shadow"
-                      >
-                        <ReminderCard 
-                          reminder={reminder} 
-                          onReminderUpdate={handleTaskUpdate}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              ))}
             </div>
           )}
         </div>
@@ -323,4 +287,3 @@ const CalendarView = ({
 };
 
 export default CalendarView;
-
