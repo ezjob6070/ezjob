@@ -18,7 +18,7 @@ export interface JobFilters {
   searchTerm: string;
   technicianFilter: string;
   dateFilter: DateFilterType;
-  customDateRange: {
+  customDateRange: DateRange | {
     from: Date | undefined;
     to: Date | undefined;
   };

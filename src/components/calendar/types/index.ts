@@ -27,3 +27,13 @@ export interface Task {
   day?: any;
   className?: string;
 }
+
+export interface DayProps {
+  date?: Date;
+  displayMonth?: Date;
+  className?: string;
+  selected?: boolean;
+  disabled?: boolean;
+  outside?: boolean;
+  today?: boolean;
+}
