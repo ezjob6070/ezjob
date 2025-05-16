@@ -1,4 +1,3 @@
-
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -161,8 +160,6 @@ const CalendarView = ({
       }
       case 'month':
         return format(selectedDate, "MMMM yyyy");
-      case 'home':
-        return "Schedule Overview";
       default:
         return format(selectedDate, "MMMM d, yyyy");
     }
@@ -660,10 +657,21 @@ const CalendarView = ({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Calendar</CardTitle>
+          <CardHeader className="pb-0">
+            <div className="flex items-center justify-between">
+              <CardTitle>Calendar</CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="pb-8">
+            <div className="flex items-center justify-between mb-4">
+              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
+              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
             {renderCalendarView()}
           </CardContent>
         </Card>

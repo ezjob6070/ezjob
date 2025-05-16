@@ -10,7 +10,7 @@ import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Plus, ListChecks } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -190,11 +190,6 @@ const Schedule = () => {
           </Button>
         </div>
       </div>
-
-      <CalendarViewOptions 
-        currentView={viewMode} 
-        onViewChange={handleViewChange} 
-      />
 
       <Tabs 
         defaultValue="calendar" 
