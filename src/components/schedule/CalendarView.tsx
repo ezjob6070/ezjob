@@ -265,11 +265,17 @@ const CalendarView = ({
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
+              <Button variant="ghost" size="sm" onClick={handlePrevPeriod}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
+              <div className="flex items-center gap-4">
+                <h2 className="text-lg font-medium">{getViewTitle()}</h2>
+                <CalendarViewOptions
+                  currentView={viewMode}
+                  onViewChange={(view) => updateSelectedDateItems(selectedDate)}
+                />
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleNextPeriod}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -345,11 +351,17 @@ const CalendarView = ({
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
+              <Button variant="ghost" size="sm" onClick={handlePrevPeriod}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
+              <div className="flex items-center gap-4">
+                <h2 className="text-lg font-medium">{getViewTitle()}</h2>
+                <CalendarViewOptions
+                  currentView={viewMode}
+                  onViewChange={(view) => updateSelectedDateItems(selectedDate)}
+                />
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleNextPeriod}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -437,11 +449,17 @@ const CalendarView = ({
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
+              <Button variant="ghost" size="sm" onClick={handlePrevPeriod}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
+              <div className="flex items-center gap-4">
+                <h2 className="text-lg font-medium">{getViewTitle()}</h2>
+                <CalendarViewOptions
+                  currentView={viewMode}
+                  onViewChange={(view) => updateSelectedDateItems(selectedDate)}
+                />
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleNextPeriod}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -451,7 +469,7 @@ const CalendarView = ({
               selected={selectedDate}
               onSelect={handleDateSelect}
               month={currentMonth}
-              className="border rounded-md shadow-sm w-full max-w-4xl mx-auto"
+              className="border rounded-md shadow-sm w-full max-w-4xl mx-auto bg-white"
               modifiers={{
                 hasEvents: (date) => 
                   jobs.some(job => {
@@ -475,7 +493,7 @@ const CalendarView = ({
                     <button 
                       type="button"
                       className={cn(
-                        "h-12 w-12 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center",
+                        "h-12 w-12 p-0 font-normal aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center",
                         getDayClassName(date),
                         isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                         isOutsideMonth && "text-muted-foreground opacity-50"
@@ -658,13 +676,7 @@ const CalendarView = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
           <CardHeader className="pb-0">
-            <div className="flex items-center justify-between">
-              <CardTitle>Calendar</CardTitle>
-              <CalendarViewOptions
-                currentView={viewMode}
-                onViewChange={(view) => updateSelectedDateItems(selectedDate)}
-              />
-            </div>
+            <CardTitle>Calendar</CardTitle>
           </CardHeader>
           <CardContent className="pb-8">
             {renderCalendarView()}
