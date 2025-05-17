@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +18,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'calendar' | 'tasks' | 'reminders' | 'timeline' | 'analytics'>('calendar');
 
-  // Sample tasks for the project
+  // Sample tasks for the project with proper client data
   const tasks: Task[] = [
     {
       id: "task-1",
@@ -32,6 +31,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       createdAt: format(addDays(new Date(), -5), "yyyy-MM-dd"),
       progress: 100,
       isReminder: false,
+      client: { name: `${project.clientName || 'Client'}` },
     },
     {
       id: "task-2",
@@ -44,6 +44,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       createdAt: format(addDays(new Date(), -3), "yyyy-MM-dd"),
       progress: 50,
       isReminder: false,
+      client: { name: `${project.clientName || 'Client'}` },
     },
     {
       id: "task-3",
@@ -56,6 +57,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       createdAt: format(addDays(new Date(), -2), "yyyy-MM-dd"),
       progress: 0,
       isReminder: true,
+      client: { name: `${project.clientName || 'Client'}` },
     },
     {
       id: "task-4",
@@ -68,6 +70,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       createdAt: format(addDays(new Date(), -1), "yyyy-MM-dd"),
       progress: 0,
       isReminder: false,
+      client: { name: `${project.clientName || 'Client'}` },
     },
     {
       id: "task-5",
@@ -80,6 +83,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       createdAt: format(new Date(), "yyyy-MM-dd"),
       progress: 0,
       isReminder: false,
+      client: { name: `${project.clientName || 'Client'}` },
     }
   ];
   
@@ -220,7 +224,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
                       </Badge>
                     </div>
                     
-                    {task.progress > 0 && (
+                    {task.progress !== undefined && task.progress > 0 && (
                       <div className="mt-3">
                         <div className="flex justify-between text-xs mb-1">
                           <span>Progress</span>
