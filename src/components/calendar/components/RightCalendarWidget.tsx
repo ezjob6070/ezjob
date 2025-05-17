@@ -113,9 +113,6 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
 
     return (
       <div className="bg-white border rounded-md p-2 mb-4">
-        <div className="text-center font-medium mb-2">
-          {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d, yyyy")}
-        </div>
         <div className="grid grid-cols-7 gap-1">
           {days.map((day) => (
             <div 
