@@ -14,13 +14,13 @@ interface CalendarSidebarProps {
 
 const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [jobs, setJobs] = useState<Job[]>(initialJobs as Job[]);
+  const [jobs, setJobs] = useState<Job[]>(initialJobs);
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
 
   useEffect(() => {
     const filtered = jobs.filter(job => 
-      isSameDay(new Date(job.date), selectedDate)
+      isSameDay(job.date, selectedDate)
     );
     setJobsForSelectedDate(filtered);
   }, [selectedDate, jobs]);
