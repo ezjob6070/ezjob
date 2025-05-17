@@ -78,7 +78,7 @@ const TechnicianQuickSelector: React.FC<TechnicianQuickSelectorProps> = ({
                   selectedTechnicians={[]}
                   setSelectedTechnicians={() => {}}
                   technicianNames={[]}
-                  paymentTypeFilter=""
+                  paymentTypeFilter="all" 
                   setPaymentTypeFilter={() => {}}
                   appliedFilters={false}
                   setAppliedFilters={() => {}}
