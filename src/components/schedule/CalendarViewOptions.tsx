@@ -29,8 +29,8 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
         className="data-[state=on]:bg-white data-[state=on]:text-primary"
         aria-label="Day view"
       >
-        <Calendar className={`h-3.5 w-3.5 ${currentView === "day" ? `text-[${iconColor}]` : ""}`} />
-        <span className={`ml-1 text-xs font-medium ${currentView === "day" ? `text-[${iconColor}]` : ""}`}>Day</span>
+        <Calendar className={currentView === "day" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
+        <span className={currentView === "day" ? `ml-1 text-xs font-medium text-[${iconColor}]` : "ml-1 text-xs font-medium"}>Day</span>
       </ToggleGroupItem>
       
       <ToggleGroupItem 
@@ -39,8 +39,8 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
         className="data-[state=on]:bg-white data-[state=on]:text-primary"
         aria-label="Week view"
       >
-        <CalendarCheck className={`h-3.5 w-3.5 ${currentView === "week" ? `text-[${iconColor}]` : ""}`} />
-        <span className={`ml-1 text-xs font-medium ${currentView === "week" ? `text-[${iconColor}]` : ""}`}>Week</span>
+        <CalendarCheck className={currentView === "week" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
+        <span className={currentView === "week" ? `ml-1 text-xs font-medium text-[${iconColor}]` : "ml-1 text-xs font-medium"}>Week</span>
       </ToggleGroupItem>
       
       <ToggleGroupItem 
@@ -49,8 +49,8 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
         className="data-[state=on]:bg-white data-[state=on]:text-primary"
         aria-label="Month view"
       >
-        <ListTodo className={`h-3.5 w-3.5 ${currentView === "month" ? `text-[${iconColor}]` : ""}`} />
-        <span className={`ml-1 text-xs font-medium ${currentView === "month" ? `text-[${iconColor}]` : ""}`}>Month</span>
+        <ListTodo className={currentView === "month" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
+        <span className={currentView === "month" ? `ml-1 text-xs font-medium text-[${iconColor}]` : "ml-1 text-xs font-medium"}>Month</span>
       </ToggleGroupItem>
     </ToggleGroup>
   );

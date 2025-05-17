@@ -81,7 +81,7 @@ const Schedule = () => {
           className="gap-2 h-9"
           onClick={() => setActiveTab("calendar")}
         >
-          <CalendarIcon className="h-4 w-4 text-[#1EAEDB]" />
+          <CalendarIcon className="h-4 w-4" />
           Show Calendar
         </Button>
       </div>
@@ -94,15 +94,15 @@ const Schedule = () => {
       >
         <TabsList className="mb-4">
           <TabsTrigger value="calendar" variant="blue" className="flex items-center gap-2">
-            <CalendarIcon className={`h-4 w-4 ${activeTab === "calendar" ? "text-[#1EAEDB]" : ""}`} />
+            <CalendarIcon className={activeTab === "calendar" ? "h-4 w-4 text-[#0077CC]" : "h-4 w-4"} />
             Calendar Overview
           </TabsTrigger>
           <TabsTrigger value="jobs" className="flex items-center gap-2">
-            <CalendarIcon className={`h-4 w-4 ${activeTab === "jobs" ? "text-[#1EAEDB]" : ""}`} />
+            <CalendarIcon className={activeTab === "jobs" ? "h-4 w-4 text-[#0077CC]" : "h-4 w-4"} />
             Jobs
           </TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-2">
-            <ListTodo className={`h-4 w-4 ${activeTab === "tasks" ? "text-[#1EAEDB]" : ""}`} />
+            <ListTodo className={activeTab === "tasks" ? "h-4 w-4 text-[#0077CC]" : "h-4 w-4"} />
             Tasks & Reminders
           </TabsTrigger>
         </TabsList>
