@@ -44,6 +44,7 @@ import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import StatCard from "@/components/StatCard";
 import { Badge } from "@/components/ui/badge";
 import JobStatusDialog from "@/components/JobStatusDialog";
+import ProjectsDashboardSection from "@/components/dashboard/ProjectsDashboardSection";
 
 import {
   dashboardTaskCounts,
@@ -600,6 +601,9 @@ const Dashboard = () => {
                 </Card>
               </div>
             </div>
+
+            {/* Projects Section - Add the ProjectsDashboardSection component here */}
+            <ProjectsDashboardSection />
             
             <JobStatusDialog 
               open={statusDialog.open}
