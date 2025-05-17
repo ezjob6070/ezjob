@@ -145,7 +145,7 @@ const EditRolesModal: React.FC<EditRolesModalProps> = ({
             {Object.entries(roles).map(([roleType, roleNames]) => (
               <Collapsible 
                 key={roleType} 
-                open={openRoles[roleType]} 
+                open={openRoles[roleType as TechnicianRole]} 
                 onOpenChange={() => toggleRoleSection(roleType as TechnicianRole)}
                 className="border rounded-md overflow-hidden"
               >
@@ -156,7 +156,7 @@ const EditRolesModal: React.FC<EditRolesModalProps> = ({
                       {getRoleCount(roleType as TechnicianRole)}
                     </Badge>
                   </div>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${openRoles[roleType] ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-4 w-4 transition-transform ${openRoles[roleType as TechnicianRole] ? 'rotate-180' : ''}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <div className="border-t divide-y">

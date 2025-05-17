@@ -1,85 +1,62 @@
 
-import { useState } from "react";
+import React from "react";
+import { DateFilterType, FinanceFilters, FinanceFilterProps } from "./FinanceFilterTypes";
+import { SearchBar } from "./filters/SearchBar";
+import { DateFilterTabs } from "./filters/DateFilterTabs";
+import { JobSourceFilter } from "./filters/JobSourceFilter";
 import { Button } from "@/components/ui/button";
-import { Filter, X } from "lucide-react";
-import { 
-  FinanceFilterProps, 
-  DateFilterType, 
-  DateFilterCategory 
-} from "./FinanceFilterTypes";
-import SearchBar from "./filters/SearchBar";
-import JobSourceFilter from "./filters/JobSourceFilter";
-import DateFilterTabs from "./filters/DateFilterTabs";
+import { RotateCcw } from "lucide-react";
 
-const FinanceFilters = ({ filters, setFilters, jobSources, resetFilters }: FinanceFilterProps) => {
-  const [showFilters, setShowFilters] = useState(false);
-  const [dateCategory, setDateCategory] = useState<DateFilterCategory>("current");
-
-  const updateFilter = <K extends keyof typeof filters>(
-    key: K,
-    value: typeof filters[K]
-  ) => {
-    setFilters({ ...filters, [key]: value });
-  };
-
-  const handleDateFilterChange = (value: DateFilterType) => {
-    updateFilter("dateFilter", value);
-    // Reset custom date range if not using custom filter
-    if (value !== "custom") {
-      updateFilter("customDateRange", { from: undefined, to: undefined });
-    }
+export const FinanceFilters: React.FC<FinanceFilterProps> = ({
+  filters,
+  setFilters,
+  jobSources,
+  resetFilters
+}) => {
+  // Handler for updating filter values
+  const updateFilter = <K extends keyof FinanceFilters>(key: K, value: FinanceFilters[K]) => {
+    setFilters({
+      ...filters,
+      [key]: value
+    });
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 flex-wrap md:flex-nowrap">
-        {/* Search bar hidden */}
-        <SearchBar 
-          searchTerm={filters.searchTerm}
-          updateFilter={updateFilter}
-          hidden={true}
-        />
-        
-        <JobSourceFilter 
-          jobSourceFilter={filters.jobSourceFilter}
-          jobSources={jobSources}
-          updateFilter={updateFilter}
+    <div className="flex flex-col gap-4 md:gap-0 md:flex-row items-start md:items-center justify-between">
+      <div className="w-full md:w-auto flex flex-col md:flex-row gap-4">
+        <div className="flex-grow">
+          <SearchBar 
+            searchTerm={filters.searchTerm} 
+            updateFilter={(value) => updateFilter('searchTerm', value)}
+            hidden={false}
+          />
+        </div>
+        <div className="flex-grow md:flex-grow-0 md:w-48">
+          <JobSourceFilter 
+            value={filters.jobSourceFilter} 
+            onChange={(value) => updateFilter('jobSourceFilter', value)} 
+            jobSources={jobSources} 
+          />
+        </div>
+      </div>
+      
+      <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+        <DateFilterTabs 
+          selectedFilter={filters.dateFilter}
+          onFilterChange={(filter: DateFilterType) => updateFilter('dateFilter', filter)}
+          customDateRange={filters.customDateRange}
+          onCustomDateChange={(range) => updateFilter('customDateRange', range)}
         />
         
         <Button 
           variant="outline" 
-          onClick={() => setShowFilters(!showFilters)}
-          className="gap-2"
+          size="sm" 
+          onClick={resetFilters}
+          className="flex gap-2 items-center mt-4 md:mt-0"
         >
-          <Filter className="h-4 w-4" />
-          Filters
+          <RotateCcw className="h-4 w-4" /> Reset
         </Button>
-        <Button variant="outline">Export</Button>
       </div>
-      
-      {showFilters && (
-        <div className="p-4 border rounded-md space-y-4">
-          <div className="space-y-4">
-            <DateFilterTabs 
-              dateCategory={dateCategory}
-              setDateCategory={setDateCategory}
-              dateFilter={filters.dateFilter}
-              customDateRange={filters.customDateRange}
-              handleDateFilterChange={handleDateFilterChange}
-              updateFilter={updateFilter}
-            />
-          </div>
-          
-          <div className="flex justify-end">
-            <Button variant="outline" size="sm" onClick={resetFilters} className="gap-2">
-              <X className="h-4 w-4" />
-              Reset Filters
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
-
-export default FinanceFilters;

@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Control, useWatch, UseFormSetValue } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DEFAULT_SUB_ROLES } from "@/types/technician";
+import { DEFAULT_SUB_ROLES, TechnicianRole } from "@/types/technician";
 
 export interface TechnicianSubRoleFieldProps {
   control: Control<any>;
@@ -21,7 +21,7 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
     control,
     name: "role",
     defaultValue: "technician"
-  });
+  }) as TechnicianRole;
 
   // Reset sub-role when role changes
   useEffect(() => {
@@ -31,8 +31,8 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
   }, [role, setValue, defaultValue]);
 
   // Get available sub-roles based on selected role
-  const getSubRolesForRole = (selectedRole: string) => {
-    return DEFAULT_SUB_ROLES[selectedRole as keyof typeof DEFAULT_SUB_ROLES] || [];
+  const getSubRolesForRole = (selectedRole: TechnicianRole) => {
+    return DEFAULT_SUB_ROLES[selectedRole] || [];
   };
 
   const subRoles = getSubRolesForRole(role);

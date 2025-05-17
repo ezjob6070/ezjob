@@ -3,6 +3,47 @@ export type SalaryBasis = "hourly" | "weekly" | "biweekly" | "monthly" | "yearly
 
 export type TechnicianStatus = "active" | "inactive" | "on_leave" | "training";
 
+export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
+
+// Define sub-roles for each technician role
+export interface TechnicianSubRoles {
+  technician: string[];
+  salesman: string[];
+  employed: string[];
+  contractor: string[];
+}
+
+// Default sub-roles for each technician role
+export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
+  technician: [
+    "HVAC Specialist", 
+    "Plumber", 
+    "Electrician", 
+    "General Technician", 
+    "Solar Technician",
+    "Integration Specialist"
+  ],
+  salesman: [
+    "Inside Sales", 
+    "Field Sales", 
+    "Lead Generator", 
+    "Sales Manager"
+  ],
+  employed: [
+    "Management", 
+    "Office Staff", 
+    "Support", 
+    "HR",
+    "Customer Service"
+  ],
+  contractor: [
+    "Lighting Designer",
+    "Project Manager",
+    "Specialist",
+    "Consultant"
+  ]
+};
+
 export interface Technician {
   id: string;
   name: string;
@@ -31,10 +72,11 @@ export interface Technician {
   terminationDate?: string;
   birthday?: string;
   employeeId?: string;
+  payRate?: number;
   
   // Add fields that were missing but referenced in finance components
   initials?: string;
-  role?: "technician" | "salesman" | "employed" | "contractor";
+  role?: TechnicianRole;
   subRole?: string;
   ssn?: string;
   driverLicense?: {
@@ -45,6 +87,8 @@ export interface Technician {
   idNumber?: string;
   documents?: Document[];
   category?: string;
+  workContract?: string;
+  profit?: number;
 }
 
 export interface Document {

@@ -20,7 +20,13 @@ export interface JobSource {
   totalJobs?: number;
   expenses?: number;
   companyProfit?: number;
-  createdAt?: Date;
+  createdAt?: Date | string;
+  
+  // Fields used in JobSourceCard and other components
+  isActive?: boolean;
+  paymentType?: string;
+  paymentValue?: number;
+  profit?: number;
 }
 
 export interface JobSourceTableProps {
