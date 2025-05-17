@@ -107,23 +107,16 @@ const Schedule = () => {
         )}
         
         <TabsContent value="calendar" className="space-y-6">
-          {/* Display calendar without frames */}
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2">
-                <CalendarView 
-                  jobs={jobs}
-                  tasks={tasks}
-                  selectedDate={selectedDate}
-                  jobsForSelectedDate={jobsForSelectedDate}
-                  tasksForSelectedDate={tasksForSelectedDate}
-                  updateSelectedDateItems={updateSelectedDateItems}
-                  viewMode={viewMode}
-                  onViewChange={handleViewChange}
-                />
-              </div>
-            </div>
-          </div>
+          <CalendarView 
+            jobs={jobs}
+            tasks={tasks}
+            selectedDate={selectedDate}
+            jobsForSelectedDate={jobsForSelectedDate}
+            tasksForSelectedDate={tasksForSelectedDate}
+            updateSelectedDateItems={updateSelectedDateItems}
+            viewMode={viewMode}
+            onViewChange={handleViewChange}
+          />
         </TabsContent>
         
         <TabsContent value="jobs">

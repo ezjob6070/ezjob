@@ -1,82 +1,71 @@
+
 import { Task } from "@/components/calendar/types";
 import { TasksFilterType, TasksSortOrder, TasksViewMode } from "./TasksTypes";
-import { compareDesc, parseISO } from "date-fns";
 
-// Filter and sort tasks based on filter type, sort order, search query, and view mode
-export const filterAndSortTasks = (
-  tasks: Task[], 
-  filterType: TasksFilterType,
-  sortOrder: TasksSortOrder,
+export const filterTasks = (
+  tasks: Task[],
+  viewMode: TasksViewMode,
   searchQuery: string,
-  viewMode: TasksViewMode
+  filterType: TasksFilterType,
+  sortOrder: TasksSortOrder
 ): Task[] => {
-  // First filter by view mode (tasks vs reminders)
-  let filteredTasks = tasks;
-  if (viewMode !== "all") {
-    filteredTasks = tasks.filter(task => 
-      viewMode === "tasks" ? !task.isReminder : task.isReminder
+  let filtered = [...tasks];
+
+  // Apply view mode filter
+  if (viewMode === "tasks") {
+    filtered = filtered.filter(task => !task.isReminder);
+  } else if (viewMode === "reminders") {
+    filtered = filtered.filter(task => task.isReminder);
+  }
+
+  // Apply search filter
+  if (searchQuery) {
+    filtered = filtered.filter(task => 
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }
-  
-  // Then filter by status
-  switch (filterType) {
-    case "scheduled":
-      filteredTasks = filteredTasks.filter(task => task.status === "scheduled");
-      break;
-    case "in progress":
-      filteredTasks = filteredTasks.filter(task => task.status === "in progress");
-      break;
-    case "completed":
-      filteredTasks = filteredTasks.filter(task => task.status === "completed");
-      break;
-    case "overdue":
-      filteredTasks = filteredTasks.filter(task => task.status === "overdue");
-      break;
-    case "all":
-    default:
-      // Keep all tasks
-      break;
+
+  // Apply status filter
+  if (filterType !== "all") {
+    filtered = filtered.filter(task => task.status === filterType);
   }
-  
-  // Apply search filter if search query is not empty
-  if (searchQuery.trim()) {
-    const query = searchQuery.toLowerCase();
-    filteredTasks = filteredTasks.filter(task => 
-      task.title.toLowerCase().includes(query) || 
-      task.description?.toLowerCase().includes(query) ||
-      task.client?.name.toLowerCase().includes(query)
-    );
-  }
-  
-  // Sort the tasks
-  return filteredTasks.sort((a, b) => {
+
+  // Apply sort order
+  filtered.sort((a, b) => {
+    const dateA = new Date(a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate));
+    const dateB = new Date(b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate));
+    
     if (sortOrder === "newest") {
-      return compareDesc(
-        a.dueDate instanceof Date ? a.dueDate : parseISO(a.dueDate as unknown as string),
-        b.dueDate instanceof Date ? b.dueDate : parseISO(b.dueDate as unknown as string)
-      );
+      return dateB.getTime() - dateA.getTime();
     } else {
-      return compareDesc(
-        b.dueDate instanceof Date ? b.dueDate : parseISO(b.dueDate as unknown as string),
-        a.dueDate instanceof Date ? a.dueDate : parseISO(a.dueDate as unknown as string)
-      );
+      return dateA.getTime() - dateB.getTime();
     }
   });
+
+  return filtered;
 };
 
-// Create a dummy task with default values
-export const createDummyTask = (): Task => {
+export const createDefaultReminder = (selectedDate: Date, id: string): Task => {
+  const reminderTime = new Date(selectedDate);
+  // Default to 9:00 AM for new reminders
+  reminderTime.setHours(9, 0, 0, 0);
+  
   return {
-    id: crypto.randomUUID(),
-    title: "New Task",
-    description: "Task description",
-    dueDate: new Date(),
+    id: id,
+    title: "New Reminder",
+    dueDate: reminderTime,
+    start: reminderTime.toISOString(),
+    end: new Date(reminderTime.getTime() + 30 * 60 * 1000).toISOString(),
     status: "scheduled",
     priority: "medium",
-    client: {
-      name: "Client Name",
-    },
-    isReminder: false,
-    createdAt: new Date(),
+    client: { name: "", id: "" },
+    description: "",
+    technician: { name: "", id: "" },
+    color: "#9b87f5", // Purple for reminders
+    type: "reminder",
+    isReminder: true,
+    hasFollowUp: false
   };
 };

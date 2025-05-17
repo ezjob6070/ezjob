@@ -13,22 +13,24 @@ const CalendarWeekView = ({ selectedDate, onDateClick }: CalendarWeekViewProps) 
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
   return (
-    <div className="grid grid-cols-7 gap-1">
-      {days.map((day) => (
-        <div 
-          key={day.toString()} 
-          onClick={() => onDateClick(day)}
-          className={cn(
-            "flex flex-col items-center justify-center p-1 rounded-md cursor-pointer text-xs sm:text-sm",
-            isSameDay(day, selectedDate) 
-              ? "bg-primary text-primary-foreground" 
-              : "hover:bg-gray-100"
-          )}
-        >
-          <div className="text-xs">{format(day, "E")}</div>
-          <div className="font-semibold">{format(day, "d")}</div>
-        </div>
-      ))}
+    <div className="bg-white border rounded-md p-1 sm:p-2 mb-4">
+      <div className="grid grid-cols-7 gap-0 sm:gap-1">
+        {days.map((day) => (
+          <div 
+            key={day.toString()} 
+            onClick={() => onDateClick(day)}
+            className={cn(
+              "flex flex-col items-center justify-center p-1 rounded-md cursor-pointer text-xs sm:text-sm",
+              isSameDay(day, selectedDate) 
+                ? "bg-primary text-primary-foreground" 
+                : "hover:bg-gray-100"
+            )}
+          >
+            <div className="text-xs">{format(day, "E")}</div>
+            <div className="font-semibold">{format(day, "d")}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
