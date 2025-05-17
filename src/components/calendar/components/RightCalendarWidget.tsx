@@ -79,22 +79,6 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
     }
   };
 
-  const getViewTitle = () => {
-    switch (viewMode) {
-      case 'day':
-        return format(selectedDate, "EEEE, MMMM d, yyyy");
-      case 'week': {
-        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
-        return `${format(weekStart, "MMM d")} - ${format(weekEnd, "MMM d, yyyy")}`;
-      }
-      case 'month':
-        return format(currentMonth, "MMMM yyyy");
-      default:
-        return format(selectedDate, "MMMM d, yyyy");
-    }
-  };
-
   const renderDayView = () => (
     <div className="bg-white border rounded-md p-3 mb-4">
       <div className="text-center font-medium mb-2">
@@ -182,21 +166,22 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
   return (
     <div className="mb-6">
       <div className="flex flex-col space-y-2 mb-3">
-        <div className="flex items-center justify-between">
-          <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <h2 className="text-sm font-medium">{getViewTitle()}</h2>
-          <Button variant="outline" size="icon" onClick={handleNextPeriod}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        <div className="flex justify-center">
-          <CalendarViewOptions 
-            currentView={viewMode}
-            onViewChange={onViewChange}
-          />
+        <div className="flex items-center">
+          <div className="flex space-x-1 mr-2">
+            <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleNextPeriod}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="flex flex-grow justify-center">
+            <CalendarViewOptions 
+              currentView={viewMode}
+              onViewChange={onViewChange}
+            />
+          </div>
         </div>
       </div>
 
