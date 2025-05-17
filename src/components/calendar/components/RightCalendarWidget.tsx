@@ -168,19 +168,19 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
       <div className="flex flex-col space-y-2 mb-3">
         <div className="flex items-center">
           <div className="flex space-x-1 mr-2">
+            <CalendarViewOptions 
+              currentView={viewMode}
+              onViewChange={onViewChange}
+            />
+          </div>
+          
+          <div className="flex flex-grow justify-end space-x-1">
             <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="icon" onClick={handleNextPeriod}>
               <ChevronRight className="h-4 w-4" />
             </Button>
-          </div>
-          
-          <div className="flex flex-grow justify-center">
-            <CalendarViewOptions 
-              currentView={viewMode}
-              onViewChange={onViewChange}
-            />
           </div>
         </div>
       </div>
