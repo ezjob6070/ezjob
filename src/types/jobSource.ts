@@ -11,12 +11,16 @@ export interface JobSource {
   totalRevenue?: number;
   avgJobValue?: number;
   
-  // Add fields that were missing but referenced
+  // Add fields that were missing but referenced in finance components
   website?: string;
   phone?: string;
   email?: string;
   logoUrl?: string;
   notes?: string;
+  totalJobs?: number;
+  expenses?: number;
+  companyProfit?: number;
+  createdAt?: Date;
 }
 
 export interface JobSourceTableProps {

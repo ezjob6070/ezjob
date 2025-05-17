@@ -86,7 +86,7 @@ export interface AmountRange {
   max?: number;
 }
 
-// Add SortOption type that was missing but used in various components
+// Update SortOption type to include all values used in components
 export type SortOption = 
   | "default" 
   | "name-asc" 
@@ -100,4 +100,6 @@ export type SortOption =
   | "completed-high"
   | "completed-low"
   | "jobs-high"
-  | "jobs-low";
+  | "jobs-low"
+  | "profit-high"
+  | "profit-low";

@@ -31,3 +31,9 @@ export type FinanceFilterProps = {
 };
 
 export type FilteredTransactionsResult = FinancialTransaction[];
+
+export interface SearchBarProps {
+  searchTerm: string;
+  updateFilter?: <K extends keyof FinanceFilters>(key: K, value: FinanceFilters[K]) => void;
+  hidden?: boolean;
+}

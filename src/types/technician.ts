@@ -32,7 +32,7 @@ export interface Technician {
   birthday?: string;
   employeeId?: string;
   
-  // Add fields that were missing but referenced in code
+  // Add fields that were missing but referenced in finance components
   initials?: string;
   role?: "technician" | "salesman" | "employed" | "contractor";
   subRole?: string;
@@ -44,6 +44,7 @@ export interface Technician {
   } | string;
   idNumber?: string;
   documents?: Document[];
+  category?: string;
 }
 
 export interface Document {
