@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
@@ -186,9 +185,6 @@ const Index = () => {
       default: // Dashboard tab
         return (
           <>
-            {/* Display Projects Dashboard Section */}
-            <ProjectsDashboardSection />
-            
             <MetricsOverview 
               financialMetrics={dashboardFinancialMetrics}
               formatCurrency={formatCurrency}
