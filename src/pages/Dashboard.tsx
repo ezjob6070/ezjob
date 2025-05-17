@@ -518,8 +518,8 @@ const Dashboard = () => {
             
             {/* Modular Card System Layout */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {/* Left Block - Jobs Status Section - First two columns */}
-              <div className="md:col-span-2">
+              {/* Left Block - Jobs Status Section - occupies all columns now */}
+              <div className="md:col-span-3">
                 <Card className="bg-white border-0 shadow-sm mb-4">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
@@ -597,66 +597,6 @@ const Dashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-                
-                {/* Revenue Summary section REMOVED as requested */}
-              </div>
-
-              {/* Right Block Content - Call Stats only (Today's Appointments removed) */}
-              <div className="md:col-span-1">
-                {/* Call Stats Card with improved colors */}
-                <Card className="bg-white border-0 shadow-md">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-medium">Call Tracking</CardTitle>
-                    <CardDescription>Client communications overview</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-4">
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium text-blue-700">Total</span>
-                          <div className="p-1.5 bg-blue-100 rounded-full">
-                            <PhoneIcon className="h-3.5 w-3.5 text-blue-600" />
-                          </div>
-                        </div>
-                        <div className="text-xl font-bold text-blue-800">{callsData.total}</div>
-                      </div>
-                      
-                      <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium text-green-700">Converted</span>
-                          <div className="p-1.5 bg-green-100 rounded-full">
-                            <UserIcon className="h-3.5 w-3.5 text-green-600" />
-                          </div>
-                        </div>
-                        <div className="text-xl font-bold text-green-800">{callsData.converted}</div>
-                      </div>
-                    </div>
-                    
-                    {/* Conversion Rate Indicator */}
-                    <div className="bg-gradient-to-r from-blue-50 to-green-50 p-3 rounded-lg border border-blue-100">
-                      <div className="flex justify-between items-center mb-1">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-800">Conversion Rate</h3>
-                          <p className="text-xs text-gray-600">Calls to customer</p>
-                        </div>
-                        <div className="text-xl font-bold text-blue-700">{callsData.conversionRate}%</div>
-                      </div>
-                      <div className="w-full h-2.5 bg-gray-200 rounded-full mt-1.5">
-                        <div 
-                          className="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-green-500" 
-                          style={{ width: `${callsData.conversionRate}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between mt-1">
-                        <span className="text-xs text-gray-500">0%</span>
-                        <span className="text-xs text-gray-500">Target: 70%</span>
-                        <span className="text-xs text-gray-500">100%</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Today's Appointments section removed as requested */}
               </div>
             </div>
             
