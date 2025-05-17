@@ -20,7 +20,7 @@ const ProjectsDashboardSection = () => {
     .slice(0, 3);
 
   return (
-    <Card className="bg-white shadow-sm border-gray-100 mb-4">
+    <Card className="bg-white shadow-sm">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <div>
@@ -28,7 +28,11 @@ const ProjectsDashboardSection = () => {
             <CardDescription>Current projects status and progress</CardDescription>
           </div>
           <Link to="/projects">
-            <Button variant="outline" size="sm" className="h-8 text-xs">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-8 text-xs bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
+            >
               View All Projects
             </Button>
           </Link>
@@ -36,7 +40,7 @@ const ProjectsDashboardSection = () => {
       </CardHeader>
       <CardContent className="pt-0 pb-4">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
+          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-3 border border-purple-100 shadow-sm">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-medium text-purple-700">Total Projects</span>
               <div className="p-1.5 bg-purple-100 rounded-full">
@@ -46,7 +50,7 @@ const ProjectsDashboardSection = () => {
             <div className="text-xl font-bold text-purple-800">{totalProjects}</div>
           </div>
           
-          <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-3 border border-blue-100 shadow-sm">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-medium text-blue-700">In Progress</span>
               <div className="p-1.5 bg-blue-100 rounded-full">
@@ -56,7 +60,7 @@ const ProjectsDashboardSection = () => {
             <div className="text-xl font-bold text-blue-800">{inProgressProjects}</div>
           </div>
           
-          <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
+          <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-lg p-3 border border-emerald-100 shadow-sm">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-medium text-emerald-700">Avg. Completion</span>
               <div className="p-1.5 bg-emerald-100 rounded-full">
@@ -71,7 +75,7 @@ const ProjectsDashboardSection = () => {
           <h3 className="text-sm font-medium text-gray-700">Recent Projects</h3>
           {recentProjects.map((project) => (
             <Link key={project.id} to={`/projects/${project.id}`} className="block">
-              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors">
+              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gradient-to-r from-gray-50 to-white hover:from-blue-50 hover:to-indigo-50 transition-colors shadow-sm">
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <h4 className="font-medium text-sm">{project.name}</h4>
@@ -95,7 +99,11 @@ const ProjectsDashboardSection = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1.5">
                     <div
-                      className="bg-blue-600 h-1.5 rounded-full"
+                      className={`h-1.5 rounded-full ${
+                        project.status === "In Progress" ? "bg-blue-600" :
+                        project.status === "Completed" ? "bg-green-600" :
+                        project.status === "On Hold" ? "bg-amber-500" : "bg-gray-400"
+                      }`}
                       style={{ width: `${project.completion}%` }}
                     ></div>
                   </div>
