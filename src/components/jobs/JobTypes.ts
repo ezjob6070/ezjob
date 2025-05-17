@@ -13,12 +13,12 @@ export interface Job {
   amount: number;
   status: JobStatus;
   actualAmount?: number;
-  technicianId?: string;  // Added for the TS errors
+  technicianId?: string;
   technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  date: Date | string;  // Updated to accept Date or string
-  scheduledDate?: Date | string;  // Updated to accept Date or string
+  date: Date | string;  // Ensure date is required
+  scheduledDate?: Date | string;
   createdAt?: string;
   priority?: JobPriority;
   details?: string;
@@ -85,3 +85,19 @@ export interface AmountRange {
   min?: number;
   max?: number;
 }
+
+// Add SortOption type that was missing but used in various components
+export type SortOption = 
+  | "default" 
+  | "name-asc" 
+  | "name-desc" 
+  | "date-asc" 
+  | "date-desc" 
+  | "amount-high" 
+  | "amount-low" 
+  | "revenue-high" 
+  | "revenue-low"
+  | "completed-high"
+  | "completed-low"
+  | "jobs-high"
+  | "jobs-low";

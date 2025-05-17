@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Job } from "@/components/jobs/JobTypes";
 import { DayProps } from "react-day-picker";
 import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
-import { ChevronLeft, ChevronRight, Dose } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import CalendarViewOptions from "@/components/schedule/CalendarViewOptions";
@@ -27,10 +27,14 @@ interface CalendarWidgetProps {
 
 const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, onViewChange }: CalendarWidgetProps) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const [doseFilter, setDoseFilter] = useState<string>("all"); // New dose filter state
+  const [doseFilter, setDoseFilter] = useState<string>("all"); // Kept for backward compatibility
 
   const getDayColor = (day: Date) => {
-    const dayJobs = jobs.filter(job => isSameDay(job.date, day));
+    const dayJobs = jobs.filter(job => {
+      if (!job.date) return false;
+      const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+      return isSameDay(jobDate, day);
+    });
     
     if (!dayJobs.length) return "";
     
@@ -136,7 +140,11 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
         month={currentMonth}
         onMonthChange={setCurrentMonth}
         modifiers={{
-          hasJobs: (date) => jobs.some(job => isSameDay(job.date, date)),
+          hasJobs: (date) => jobs.some(job => {
+            if (!job.date) return false;
+            const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+            return isSameDay(jobDate, date);
+          }),
         }}
         modifiersClassNames={{
           hasJobs: "font-bold",
@@ -160,7 +168,11 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
                 {...props}
               >
                 {format(date, "d")}
-                {jobs.some(job => isSameDay(job.date, date)) && (
+                {jobs.some(job => {
+                  if (!job.date) return false;
+                  const jobDate = job.date instanceof Date ? job.date : new Date(job.date);
+                  return isSameDay(jobDate, date);
+                }) && (
                   <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div>
                 )}
               </button>
@@ -193,7 +205,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
           </div>
         </div>
 
-        {/* Dose filter dropdown */}
+        {/* Filter dropdown (replaced Dose with Filter icon) */}
         <div className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -202,11 +214,11 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
                 size="sm" 
                 className="flex items-center gap-2 h-8"
               >
-                <Dose className="h-4 w-4 text-[#1EAEDB]" />
+                <Filter className="h-4 w-4 text-[#1EAEDB]" />
                 <span className="text-xs font-medium">
-                  {doseFilter === "all" ? "All Doses" : 
-                   doseFilter === "low" ? "Low Dose" : 
-                   doseFilter === "medium" ? "Medium Dose" : "High Dose"}
+                  {doseFilter === "all" ? "All Filters" : 
+                   doseFilter === "low" ? "Low Priority" : 
+                   doseFilter === "medium" ? "Medium Priority" : "High Priority"}
                 </span>
               </Button>
             </DropdownMenuTrigger>
@@ -215,26 +227,26 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
                 onClick={() => setDoseFilter("all")}
                 className={doseFilter === "all" ? "bg-muted" : ""}
               >
-                All Doses
+                All Filters
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={() => setDoseFilter("low")}
                 className={doseFilter === "low" ? "bg-muted" : ""}
               >
-                Low Dose
+                Low Priority
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setDoseFilter("medium")}
                 className={doseFilter === "medium" ? "bg-muted" : ""}
               >
-                Medium Dose
+                Medium Priority
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setDoseFilter("high")}
                 className={doseFilter === "high" ? "bg-muted" : ""}
               >
-                High Dose
+                High Priority
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

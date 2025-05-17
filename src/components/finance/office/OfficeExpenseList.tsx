@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { 
@@ -77,7 +76,11 @@ const OfficeExpenseList = ({
 
     const expenseData = {
       id: selectedExpense?.id || `expense-${Date.now()}`,
-      date: newExpense.date || new Date().toISOString().split('T')[0],
+      date: typeof newExpense.date === 'string' 
+        ? newExpense.date 
+        : (newExpense.date instanceof Date 
+            ? newExpense.date.toISOString().split('T')[0] 
+            : new Date().toISOString().split('T')[0]),
       category: newExpense.category || "",
       description: newExpense.description || "",
       amount: Number(newExpense.amount),

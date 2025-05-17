@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -76,7 +75,7 @@ const CreateJobSourceModal: React.FC<CreateJobSourceModalProps> = ({
       totalJobs: 0,
       totalRevenue: 0,
       profit: 0,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString().split('T')[0], // Fixed line
     };
 
     onAddJobSource(newJobSource);
