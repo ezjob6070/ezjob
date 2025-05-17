@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
@@ -14,6 +13,7 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import CalendarViewOptions from "./CalendarViewOptions";
 
 interface CalendarViewProps {
   jobs: Job[];
@@ -23,6 +23,7 @@ interface CalendarViewProps {
   tasksForSelectedDate: Task[];
   updateSelectedDateItems: (date: Date) => void;
   viewMode: CalendarViewMode;
+  onViewChange: (view: CalendarViewMode) => void;
 }
 
 // Define the event types more specifically
@@ -84,6 +85,7 @@ const CalendarView = ({
   tasksForSelectedDate,
   updateSelectedDateItems,
   viewMode,
+  onViewChange,
 }: CalendarViewProps) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   
@@ -530,8 +532,12 @@ const CalendarView = ({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle>Calendar</CardTitle>
+            <CalendarViewOptions 
+              currentView={viewMode}
+              onViewChange={onViewChange}
+            />
           </CardHeader>
           <CardContent className="pb-8">
             {renderCalendarView()}

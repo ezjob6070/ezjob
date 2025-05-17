@@ -8,15 +8,17 @@ import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import CalendarViewOptions from "@/components/schedule/CalendarViewOptions";
 
 interface CalendarWidgetProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
   jobs: Job[];
   viewMode: CalendarViewMode;
+  onViewChange: (view: CalendarViewMode) => void;
 }
 
-const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode }: CalendarWidgetProps) => {
+const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, onViewChange }: CalendarWidgetProps) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   const getDayColor = (day: Date) => {
@@ -179,14 +181,23 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode }: 
 
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-2">
-        <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <h2 className="text-sm font-medium">{getViewTitle()}</h2>
-        <Button variant="outline" size="icon" onClick={handleNextPeriod}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+      <div className="flex flex-col space-y-2 mb-3">
+        <div className="flex items-center justify-between">
+          <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="text-sm font-medium">{getViewTitle()}</h2>
+          <Button variant="outline" size="icon" onClick={handleNextPeriod}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="flex justify-center">
+          <CalendarViewOptions 
+            currentView={viewMode}
+            onViewChange={onViewChange}
+          />
+        </div>
       </div>
 
       {viewMode === 'day' && renderDayView()}

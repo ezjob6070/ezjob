@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon } from "lucide-react";
 import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -86,11 +86,6 @@ const Schedule = () => {
         </Button>
       </div>
 
-      <CalendarViewOptions 
-        currentView={viewMode} 
-        onViewChange={handleViewChange} 
-      />
-
       <Tabs 
         defaultValue="calendar" 
         className="w-full"
@@ -120,6 +115,7 @@ const Schedule = () => {
             tasksForSelectedDate={tasksForSelectedDate}
             updateSelectedDateItems={updateSelectedDateItems}
             viewMode={viewMode}
+            onViewChange={handleViewChange}
           />
         </TabsContent>
         

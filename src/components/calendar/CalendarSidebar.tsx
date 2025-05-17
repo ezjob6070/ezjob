@@ -6,7 +6,7 @@ import { initialJobs } from "@/data/jobs";
 import RightSidebarHeader from "./components/RightSidebarHeader";
 import RightCalendarWidget from "./components/RightCalendarWidget";
 import JobsList from "./components/JobsList";
-import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 
 interface CalendarSidebarProps {
   isOpen: boolean;
@@ -31,15 +31,12 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
     <aside className="fixed top-0 right-0 z-20 h-screen w-80 flex flex-col bg-card text-card-foreground border-l border-border shadow-lg transition-all duration-300 ease-in-out">
       <RightSidebarHeader />
       <div className="flex-1 py-6 px-4 overflow-auto">
-        <CalendarViewOptions 
-          currentView={viewMode}
-          onViewChange={setViewMode}
-        />
         <RightCalendarWidget 
           selectedDate={selectedDate} 
           setSelectedDate={setSelectedDate} 
           jobs={jobs}
           viewMode={viewMode}
+          onViewChange={setViewMode}
         />
         <JobsList 
           selectedDate={selectedDate}
