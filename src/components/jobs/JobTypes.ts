@@ -1,4 +1,3 @@
-
 import { DateRange } from "react-day-picker";
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
@@ -43,6 +42,7 @@ export interface Job {
   signature?: string;
   hasImages?: boolean;
   imageCount?: number;
+  images?: string[];
 }
 
 export interface JobTab {
