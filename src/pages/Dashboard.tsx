@@ -598,44 +598,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Revenue Summary (new layout) */}
-                <Card className="bg-white border-0 shadow-sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-medium">Revenue Summary</CardTitle>
-                    <CardDescription>Monthly performance trends</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-4">
-                    <div className="flex flex-col">
-                      <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="bg-blue-50 p-3 rounded-lg">
-                          <div className="text-xs text-blue-600 mb-1">Monthly Average</div>
-                          <div className="text-lg font-bold">{formatCurrency(totalRevenue / 12)}</div>
-                        </div>
-                        <div className="bg-green-50 p-3 rounded-lg">
-                          <div className="text-xs text-green-600 mb-1">Top Month</div>
-                          <div className="text-lg font-bold">{formatCurrency(totalRevenue / 6)}</div>
-                        </div>
-                        <div className="bg-amber-50 p-3 rounded-lg">
-                          <div className="text-xs text-amber-600 mb-1">Growth</div>
-                          <div className="text-lg font-bold">+{monthlyGrowth}%</div>
-                        </div>
-                      </div>
-                      <div className="space-y-2 mt-2">
-                        {performanceData.slice(6).map((month, i) => (
-                          <div key={i} className="flex items-center">
-                            <div className="w-16 text-xs text-gray-500">{month.month}</div>
-                            <div className="flex-1">
-                              <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="bg-blue-500 h-full" style={{width: `${(month.revenue / 200000) * 100}%`}}></div>
-                              </div>
-                            </div>
-                            <div className="w-20 text-xs font-medium text-right">{formatCurrency(month.revenue)}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Revenue Summary section REMOVED as requested */}
               </div>
 
               {/* Right Block Content - Call Stats and Today's Appointments */}
