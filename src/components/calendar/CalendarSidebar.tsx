@@ -38,7 +38,8 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
         <RightCalendarWidget 
           selectedDate={selectedDate} 
           setSelectedDate={setSelectedDate} 
-          jobs={jobs} 
+          jobs={jobs}
+          viewMode={viewMode}
         />
         <JobsList 
           selectedDate={selectedDate}
