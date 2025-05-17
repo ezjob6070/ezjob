@@ -428,7 +428,7 @@ const Dashboard = () => {
         return (
           <>            
             {/* Search Bar */}
-            <div className="mb-4">
+            <div className="mb-2">
               <SearchBar 
                 searchTerm={searchTerm} 
                 onSearchChange={handleSearchChange} 
@@ -439,7 +439,7 @@ const Dashboard = () => {
             </div>
             
             {/* Professional Metric Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
               {/* Revenue Card */}
               <Card className="bg-white border-0 shadow-sm">
                 <CardContent className="p-4">
