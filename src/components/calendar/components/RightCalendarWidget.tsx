@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Job } from "@/components/jobs/JobTypes";
 import { DayProps } from "react-day-picker";
 import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, Dose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import CalendarViewOptions from "@/components/schedule/CalendarViewOptions";
@@ -88,7 +88,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
   };
 
   const renderDayView = () => (
-    <div className="mb-4">
+    <div className="bg-white border rounded-md p-3 mb-4">
       <div className="text-center font-medium mb-2">
         {format(selectedDate, "EEEE, MMMM d")}
       </div>
@@ -104,7 +104,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
     return (
-      <div className="mb-4">
+      <div className="bg-white border rounded-md p-2 mb-4">
         <div className="grid grid-cols-7 gap-1">
           {days.map((day) => (
             <div 
@@ -113,7 +113,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
               className={cn(
                 "flex flex-col items-center justify-center p-1 rounded-md cursor-pointer",
                 isSameDay(day, selectedDate) 
-                  ? "text-primary font-bold" 
+                  ? "bg-primary text-primary-foreground" 
                   : "hover:bg-gray-100"
               )}
             >
@@ -132,7 +132,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
         mode="single"
         selected={selectedDate}
         onSelect={(date) => date && setSelectedDate(date)}
-        className={cn("p-2 pointer-events-auto w-full")}
+        className={cn("p-3 pointer-events-auto border rounded-md w-full")}
         month={currentMonth}
         onMonthChange={setCurrentMonth}
         modifiers={{
@@ -153,7 +153,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
                 className={cn(
                   "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
                   dayColor,
-                  isSelected && "text-primary font-bold",
+                  isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                   "relative"
                 )}
                 disabled={isOutsideMonth}
@@ -174,18 +174,20 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
   return (
     <div className="mb-6">
       <div className="flex flex-col space-y-2 mb-3">
-        <div className="flex items-center justify-between">
-          <CalendarViewOptions 
-            currentView={viewMode}
-            onViewChange={onViewChange}
-            blueIconColor="#1EAEDB"
-          />
+        <div className="flex items-center">
+          <div className="flex space-x-1 mr-2">
+            <CalendarViewOptions 
+              currentView={viewMode}
+              onViewChange={onViewChange}
+              blueIconColor="#1EAEDB"
+            />
+          </div>
           
-          <div className="flex space-x-1">
-            <Button variant="ghost" size="icon" onClick={handlePrevPeriod} className="h-8 w-8">
+          <div className="flex flex-grow justify-end space-x-1">
+            <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleNextPeriod} className="h-8 w-8">
+            <Button variant="outline" size="icon" onClick={handleNextPeriod}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -200,7 +202,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
                 size="sm" 
                 className="flex items-center gap-2 h-8"
               >
-                <CalendarDays className="h-4 w-4 text-[#1EAEDB]" />
+                <Dose className="h-4 w-4 text-[#1EAEDB]" />
                 <span className="text-xs font-medium">
                   {doseFilter === "all" ? "All Doses" : 
                    doseFilter === "low" ? "Low Dose" : 
