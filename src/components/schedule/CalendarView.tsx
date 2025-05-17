@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
@@ -256,13 +255,15 @@ const CalendarView = ({
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
+              <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <CardTitle>{getViewTitle()}</CardTitle>
+                <Button variant="outline" size="icon" onClick={handleNextPeriod}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             
             <div className="grid grid-cols-1 gap-4">
@@ -335,13 +336,15 @@ const CalendarView = ({
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
+              <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <CardTitle>{getViewTitle()}</CardTitle>
+                <Button variant="outline" size="icon" onClick={handleNextPeriod}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             
             <div className="grid grid-cols-7 gap-2">
@@ -426,21 +429,12 @@ const CalendarView = ({
       case 'month':
         return (
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-              <Button variant="outline" size="sm" onClick={handleNextPeriod}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={handleDateSelect}
               month={currentMonth}
+              onMonthChange={setCurrentMonth}
               className="border rounded-md shadow-sm w-full max-w-4xl mx-auto"
               modifiers={{
                 hasEvents: (date) => 
@@ -536,7 +530,15 @@ const CalendarView = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle>Calendar</CardTitle>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <CardTitle>{getViewTitle()}</CardTitle>
+              <Button variant="outline" size="icon" onClick={handleNextPeriod}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
             <CalendarViewOptions 
               currentView={viewMode}
               onViewChange={onViewChange}

@@ -144,6 +144,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
       onSelect={(date) => date && setSelectedDate(date)}
       className={cn("p-3 pointer-events-auto border rounded-md")}
       month={currentMonth}
+      onMonthChange={setCurrentMonth}
       modifiers={{
         hasJobs: (date) => jobs.some(job => isSameDay(job.date, date)),
       }}
