@@ -10,7 +10,6 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { toast } from "sonner";
 
 interface DashboardHeaderProps {
   onTabChange?: (tab: string) => void;
@@ -138,10 +137,6 @@ const DashboardDateFilter = () => {
   useEffect(() => {
     if (date) {
       setDateFilter(date);
-      const dateText = date.to 
-        ? `${format(date.from, "MMM d")} - ${format(date.to, "MMM d")}`
-        : format(date.from, "MMM d, yyyy");
-      toast.success(`Dashboard updated for ${dateText}`);
     }
   }, [date, setDateFilter]);
 
@@ -187,12 +182,6 @@ const DashboardDateFilter = () => {
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     
     setDate({ from: startOfMonth, to: endOfMonth });
-  };
-  
-  const clearFilter = () => {
-    setDate(undefined);
-    setDateFilter(undefined);
-    toast.info("Date filter cleared");
   };
   
   return (
@@ -242,7 +231,7 @@ const DashboardDateFilter = () => {
           size="sm" 
           variant="outline" 
           className="text-xs h-8"
-          onClick={clearFilter}
+          onClick={() => setDate(undefined)}
         >
           Reset
         </Button>
@@ -255,7 +244,7 @@ const DashboardDateFilter = () => {
         selected={date}
         onSelect={setDate}
         numberOfMonths={1}
-        className={cn("p-3 pointer-events-auto rounded border")}
+        className="pointer-events-auto rounded border"
       />
     </div>
   );

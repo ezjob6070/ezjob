@@ -43,7 +43,6 @@ export interface Job {
   signature?: string;
   hasImages?: boolean;
   imageCount?: number;
-  phoneNumber?: string;
 }
 
 export interface JobTab {
