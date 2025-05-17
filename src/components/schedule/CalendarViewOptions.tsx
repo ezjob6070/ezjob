@@ -11,7 +11,8 @@ interface CalendarViewOptionsProps {
 }
 
 const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: CalendarViewOptionsProps) => {
-  const iconColor = blueIconColor || "currentColor";
+  // Stronger blue color for icons and text (using a deeper shade)
+  const iconColor = blueIconColor || "#0077CC"; // Using a stronger blue color
   
   return (
     <ToggleGroup 
@@ -29,7 +30,7 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
         aria-label="Day view"
       >
         <Calendar className={`h-3.5 w-3.5 ${currentView === "day" ? `text-[${iconColor}]` : ""}`} />
-        <span className="ml-1 text-xs">Day</span>
+        <span className={`ml-1 text-xs font-medium ${currentView === "day" ? `text-[${iconColor}]` : ""}`}>Day</span>
       </ToggleGroupItem>
       
       <ToggleGroupItem 
@@ -39,7 +40,7 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
         aria-label="Week view"
       >
         <CalendarCheck className={`h-3.5 w-3.5 ${currentView === "week" ? `text-[${iconColor}]` : ""}`} />
-        <span className="ml-1 text-xs">Week</span>
+        <span className={`ml-1 text-xs font-medium ${currentView === "week" ? `text-[${iconColor}]` : ""}`}>Week</span>
       </ToggleGroupItem>
       
       <ToggleGroupItem 
@@ -49,7 +50,7 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
         aria-label="Month view"
       >
         <ListTodo className={`h-3.5 w-3.5 ${currentView === "month" ? `text-[${iconColor}]` : ""}`} />
-        <span className="ml-1 text-xs">Month</span>
+        <span className={`ml-1 text-xs font-medium ${currentView === "month" ? `text-[${iconColor}]` : ""}`}>Month</span>
       </ToggleGroupItem>
     </ToggleGroup>
   );

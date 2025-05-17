@@ -93,9 +93,9 @@ const Schedule = () => {
         onValueChange={setActiveTab}
       >
         <TabsList className="mb-4">
-          <TabsTrigger value="calendar" className="flex items-center gap-2">
+          <TabsTrigger value="calendar" variant="blue" className="flex items-center gap-2">
             <CalendarIcon className={`h-4 w-4 ${activeTab === "calendar" ? "text-[#1EAEDB]" : ""}`} />
-            Calendar
+            Calendar Overview
           </TabsTrigger>
           <TabsTrigger value="jobs" className="flex items-center gap-2">
             <CalendarIcon className={`h-4 w-4 ${activeTab === "jobs" ? "text-[#1EAEDB]" : ""}`} />
@@ -103,7 +103,7 @@ const Schedule = () => {
           </TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-2">
             <ListTodo className={`h-4 w-4 ${activeTab === "tasks" ? "text-[#1EAEDB]" : ""}`} />
-            Tasks
+            Tasks & Reminders
           </TabsTrigger>
         </TabsList>
         
