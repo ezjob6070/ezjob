@@ -11,8 +11,8 @@ interface CalendarViewOptionsProps {
 }
 
 const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: CalendarViewOptionsProps) => {
-  // Stronger blue color for icons and text (using a deeper shade)
-  const iconColor = blueIconColor || "#0077CC"; // Using a stronger blue color
+  // Stronger blue color for icons and text
+  const iconColor = blueIconColor || "#0077CC";
   
   return (
     <ToggleGroup 
@@ -21,12 +21,12 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
       onValueChange={(value) => {
         if (value) onViewChange(value as CalendarViewMode);
       }}
-      className="bg-muted rounded-md p-1 border"
+      className="flex rounded-md p-1"
     >
       <ToggleGroupItem 
         value="day" 
         size="sm"
-        className="data-[state=on]:bg-white data-[state=on]:text-primary"
+        className="data-[state=on]:bg-transparent"
         aria-label="Day view"
       >
         <Calendar className={currentView === "day" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
@@ -36,7 +36,7 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
       <ToggleGroupItem 
         value="week" 
         size="sm"
-        className="data-[state=on]:bg-white data-[state=on]:text-primary"
+        className="data-[state=on]:bg-transparent"
         aria-label="Week view"
       >
         <CalendarCheck className={currentView === "week" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
@@ -46,7 +46,7 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
       <ToggleGroupItem 
         value="month" 
         size="sm"
-        className="data-[state=on]:bg-white data-[state=on]:text-primary"
+        className="data-[state=on]:bg-transparent"
         aria-label="Month view"
       >
         <ListTodo className={currentView === "month" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />

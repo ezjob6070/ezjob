@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Job } from "@/components/jobs/JobTypes";
@@ -66,6 +65,9 @@ const Schedule = () => {
     }
   };
 
+  // Use a consistent blue color for active tabs
+  const activeBlueColor = "#0077CC";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -94,15 +96,15 @@ const Schedule = () => {
       >
         <TabsList className="mb-4">
           <TabsTrigger value="calendar" variant="blue" className="flex items-center gap-2">
-            <CalendarIcon className={activeTab === "calendar" ? "h-4 w-4 text-[#0077CC]" : "h-4 w-4"} />
+            <CalendarIcon className={activeTab === "calendar" ? `h-4 w-4 text-[${activeBlueColor}]` : "h-4 w-4"} />
             Calendar Overview
           </TabsTrigger>
           <TabsTrigger value="jobs" className="flex items-center gap-2">
-            <CalendarIcon className={activeTab === "jobs" ? "h-4 w-4 text-[#0077CC]" : "h-4 w-4"} />
+            <CalendarIcon className={activeTab === "jobs" ? `h-4 w-4 text-[${activeBlueColor}]` : "h-4 w-4"} />
             Jobs
           </TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-2">
-            <ListTodo className={activeTab === "tasks" ? "h-4 w-4 text-[#0077CC]" : "h-4 w-4"} />
+            <ListTodo className={activeTab === "tasks" ? `h-4 w-4 text-[${activeBlueColor}]` : "h-4 w-4"} />
             Tasks & Reminders
           </TabsTrigger>
         </TabsList>
