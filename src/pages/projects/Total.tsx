@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart, BarChartIcon, CircleCheck, ListIcon, PlusIcon } from "lucide-react";
+import { BarChart, BarChartIcon, Building, CircleCheck, Clock, ListIcon, PlusIcon, TrendingUp } from "lucide-react";
 import { initialProjects } from "@/data/projects";
 import { Project } from "@/types/project";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
@@ -14,6 +15,12 @@ export default function ProjectsTotal() {
   const handleCreateProject = () => {
     toast.info("Create project functionality will be implemented soon");
   };
+
+  // Calculate project stats
+  const totalProjects = projects.length;
+  const completedProjects = projects.filter(p => p.status === "Completed").length;
+  const inProgressProjects = projects.filter(p => p.status === "In Progress").length;
+  const completionRate = totalProjects ? Math.round((projects.reduce((sum, p) => sum + p.completion, 0) / totalProjects)) : 0;
 
   return (
     <div className="space-y-6">
@@ -50,47 +57,46 @@ export default function ProjectsTotal() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-lg">Total Projects</h3>
-            <CircleCheck className="h-6 w-6 text-blue-600" />
+        {/* Updated to match ProjectsDashboardSection styling */}
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-3 border border-purple-100 shadow-sm">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-medium text-purple-700">Total Projects</span>
+            <div className="p-1.5 bg-purple-100 rounded-full">
+              <Building className="h-3.5 w-3.5 text-purple-600" />
+            </div>
           </div>
-          <p className="text-3xl font-bold">{projects.length}</p>
-          <p className="text-muted-foreground text-sm mt-1">All-time project count</p>
-        </Card>
-
-        <Card className="bg-white shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-lg">Completed</h3>
-            <CircleCheck className="h-6 w-6 text-green-600" />
+          <div className="text-xl font-bold text-purple-800">{totalProjects}</div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-3 border border-green-100 shadow-sm">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-medium text-green-700">Completed</span>
+            <div className="p-1.5 bg-green-100 rounded-full">
+              <CircleCheck className="h-3.5 w-3.5 text-green-600" />
+            </div>
           </div>
-          <p className="text-3xl font-bold">
-            {projects.filter(p => p.status === "Completed").length}
-          </p>
-          <p className="text-muted-foreground text-sm mt-1">Successfully delivered</p>
-        </Card>
-
-        <Card className="bg-white shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-lg">In Progress</h3>
-            <CircleCheck className="h-6 w-6 text-yellow-600" />
+          <div className="text-xl font-bold text-green-800">{completedProjects}</div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-3 border border-blue-100 shadow-sm">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-medium text-blue-700">In Progress</span>
+            <div className="p-1.5 bg-blue-100 rounded-full">
+              <Clock className="h-3.5 w-3.5 text-blue-600" />
+            </div>
           </div>
-          <p className="text-3xl font-bold">
-            {projects.filter(p => p.status === "In Progress").length}
-          </p>
-          <p className="text-muted-foreground text-sm mt-1">Currently active</p>
-        </Card>
-
-        <Card className="bg-white shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-lg">Total Value</h3>
-            <CircleCheck className="h-6 w-6 text-purple-600" />
+          <div className="text-xl font-bold text-blue-800">{inProgressProjects}</div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg p-3 border border-amber-100 shadow-sm">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-medium text-amber-700">Total Value</span>
+            <div className="p-1.5 bg-amber-100 rounded-full">
+              <TrendingUp className="h-3.5 w-3.5 text-amber-600" />
+            </div>
           </div>
-          <p className="text-3xl font-bold">
-            {formatCurrency(projects.reduce((acc, p) => acc + p.budget, 0))}
-          </p>
-          <p className="text-muted-foreground text-sm mt-1">Cumulative project value</p>
-        </Card>
+          <div className="text-xl font-bold text-amber-800">{formatCurrency(projects.reduce((acc, p) => acc + p.budget, 0))}</div>
+        </div>
       </div>
       
       {view === 'list' ? (
