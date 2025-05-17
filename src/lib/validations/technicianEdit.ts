@@ -14,7 +14,7 @@ export const technicianEditSchema = z.object({
     message: "Specialty must be at least 2 characters.",
   }),
   status: z.enum(["active", "inactive", "onLeave"]),
-  paymentType: z.enum(["percentage", "flat", "hourly", "salary", "commission"]),
+  paymentType: z.enum(["percentage", "flat", "hourly", "salary"]),
   paymentRate: z.string().refine((value) => {
     try {
       const num = parseFloat(value);
@@ -32,7 +32,7 @@ export const technicianEditSchema = z.object({
   position: z.string().optional(),
   salaryBasis: z.enum(["hourly", "weekly", "bi-weekly", "biweekly", "monthly", "annually", "commission", "yearly"] as const).optional(),
   hourlyRate: z.string().optional(),
-  incentiveType: z.enum(["hourly", "weekly", "monthly", "bonus", "commission", "none", "profit-sharing", "other"] as const).optional(),
+  incentiveType: z.enum(["hourly", "weekly", "monthly", "bonus", "commission", "none"] as const).optional(),
   incentiveAmount: z.string().optional(),
   profileImage: z.string().nullable().optional(),
   contractType: z.string().optional(),

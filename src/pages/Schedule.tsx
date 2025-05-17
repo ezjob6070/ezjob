@@ -1,29 +1,23 @@
+
 import { useState, useEffect } from "react";
-import { Job } from "@/types/job";
-import { 
-  isSameDay, format, isToday, startOfWeek, endOfWeek,
-  startOfMonth, endOfMonth, addDays
-} from "date-fns";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Job } from "@/types/project"; // Change to import from project.ts instead of JobTypes
+import { isSameDay } from "date-fns";
+import JobsList from "@/components/calendar/components/JobsList";
 import { Task } from "@/components/calendar/types";
 import { mockTasks } from "@/components/calendar/data/mockTasks";
+import CalendarView from "@/components/schedule/CalendarView";
+import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
-import { 
-  Plus, 
-  Bell, 
-  Calendar as CalendarIcon
-} from "lucide-react";
+import { Calendar as CalendarIcon, Plus, ListChecks } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import CalendarViewOptions, { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
-import CalendarView from "@/components/schedule/CalendarView";
-import TasksView from "@/components/schedule/TasksView";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -32,10 +26,10 @@ const Schedule = () => {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<Task[]>([]);
+  const [activeTab, setActiveTab] = useState("calendar");
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showAddReminderDialog, setShowAddReminderDialog] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("calendar"); // "calendar", "tasks", "reminders"
   const [newTask, setNewTask] = useState<Partial<Task>>({
     id: "",
     title: "",
@@ -55,62 +49,53 @@ const Schedule = () => {
     isReminder: true
   });
 
-  // Sync with global jobs
+  // Sync with global jobs - use type cast to ensure compatibility
   useEffect(() => {
-    setJobs(globalJobs as Job[]);
+    // Convert global jobs to the expected Job format
+    const compatibleJobs: Job[] = (globalJobs || []).map(job => ({
+      ...job,
+      clientName: job.clientName || "Unknown Client", // Ensure required fields are present
+      technicianId: job.technicianId || ""
+    })) as Job[];
+    
+    setJobs(compatibleJobs);
   }, [globalJobs]);
 
-  // Update filtered items based on view mode and selected date
+  // Update jobs for selected date whenever jobs or date changes
   useEffect(() => {
-    let relevantJobs: Job[] = [];
-    let relevantTasks: Task[] = [];
-
-    if (viewMode === "day") {
-      // Filter for the selected day only
-      relevantJobs = jobs.filter(job => {
-        if (!job.date) return false;
-        const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
-        return isSameDay(jobDate, selectedDate);
-      });
-      
-      relevantTasks = tasks.filter(task => isSameDay(task.dueDate, selectedDate));
-    } 
-    else if (viewMode === "week") {
-      // Filter for the selected week
-      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
-      const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 0 });
-      
-      relevantJobs = jobs.filter(job => {
-        if (!job.date) return false;
-        const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
-        return jobDate >= weekStart && jobDate <= weekEnd;
-      });
-      
-      relevantTasks = tasks.filter(task => {
-        const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-        return taskDate >= weekStart && taskDate <= weekEnd;
-      });
-    } 
-    else if (viewMode === "month") {
-      // Filter for the selected month
-      const monthStart = startOfMonth(selectedDate);
-      const monthEnd = endOfMonth(selectedDate);
-      
-      relevantJobs = jobs.filter(job => {
-        if (!job.date) return false;
-        const jobDate = job.date instanceof Date ? job.date : new Date(job.date as string);
-        return jobDate >= monthStart && jobDate <= monthEnd;
-      });
-      
-      relevantTasks = tasks.filter(task => {
-        const taskDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-        return taskDate >= monthStart && taskDate <= monthEnd;
-      });
-    }
+    const filteredJobs = jobs.filter(job => {
+      const jobDate = typeof job.date === 'string' ? new Date(job.date) : job.date;
+      return isSameDay(jobDate, selectedDate);
+    });
+    setJobsForSelectedDate(filteredJobs);
     
-    setJobsForSelectedDate(relevantJobs);
-    setTasksForSelectedDate(relevantTasks);
-  }, [jobs, tasks, selectedDate, viewMode]);
+    const filteredTasks = tasks.filter(task => isSameDay(task.dueDate, selectedDate));
+    setTasksForSelectedDate(filteredTasks);
+  }, [jobs, tasks, selectedDate]);
+
+  const updateSelectedDateItems = (date: Date) => {
+    setSelectedDate(date);
+  };
+
+  const handlePreviousDay = () => {
+    const prevDay = new Date(selectedDate);
+    prevDay.setDate(prevDay.getDate() - 1);
+    updateSelectedDateItems(prevDay);
+  };
+
+  const handleNextDay = () => {
+    const nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    updateSelectedDateItems(nextDay);
+  };
+
+  const handleViewChange = (newView: CalendarViewMode) => {
+    setViewMode(newView);
+    // If switching to calendar view from another tab
+    if (activeTab !== "calendar") {
+      setActiveTab("calendar");
+    }
+  };
 
   const handleAddTask = () => {
     const taskDueDate = newTask.dueDate || new Date();
@@ -172,47 +157,35 @@ const Schedule = () => {
     toast.success("Reminder added successfully");
   };
 
-  // Update selected date and items
-  const updateSelectedDateItems = (date: Date) => {
-    setSelectedDate(date);
+  const handleTasksChange = (updatedTasks: Task[]) => {
+    setTasks(prevTasks => {
+      // Update only the tasks from the selected date
+      const tasksForOtherDates = prevTasks.filter(task => 
+        !isSameDay(task.dueDate, selectedDate)
+      );
+      return [...tasksForOtherDates, ...updatedTasks];
+    });
+    toast.success("Tasks updated successfully");
   };
-
-  // Navigation for days
-  const goToPreviousDay = () => {
-    setSelectedDate(prev => addDays(prev, -1));
-  };
-
-  const goToNextDay = () => {
-    setSelectedDate(prev => addDays(prev, 1));
-  };
-
-  // Count summaries for selected date
-  const reminderCount = tasksForSelectedDate.filter(t => t.isReminder).length;
-  const jobsCount = jobsForSelectedDate.length;
-  const tasksCount = tasksForSelectedDate.filter(t => !t.isReminder).length;
-
-  // Format the selected date for display
-  const formattedDate = format(selectedDate, "MMMM d, yyyy");
-  const isSelectedDateToday = isToday(selectedDate);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-medium tracking-tight mb-1">Schedule</h1>
-          <p className="text-sm text-muted-foreground">
-            {isSelectedDateToday ? "Today's Schedule" : formattedDate}
+          <h1 className="text-3xl font-bold tracking-tight mb-1">Schedule</h1>
+          <p className="text-muted-foreground text-sm">
+            Manage your appointments, jobs, and tasks in one place.
           </p>
         </div>
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            className="gap-1 border-gray-200"
+            className="gap-1"
             onClick={() => setShowAddReminderDialog(true)}
             size="sm"
           >
-            <Bell className="h-4 w-4" />
-            Reminder
+            <CalendarIcon className="h-4 w-4" />
+            Add Reminder
           </Button>
           <Button 
             className="gap-1"
@@ -220,88 +193,62 @@ const Schedule = () => {
             onClick={() => setShowAddTaskDialog(true)}
           >
             <Plus className="h-4 w-4" />
-            Task
+            Add Task
           </Button>
         </div>
       </div>
 
-      <Separator />
+      <CalendarViewOptions 
+        currentView={viewMode} 
+        onViewChange={handleViewChange} 
+      />
 
-      {/* Top Navigation Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="mb-4">
-          <TabsList className="grid w-full grid-cols-3 bg-transparent p-0">
-            <TabsTrigger 
-              value="calendar" 
-              className="rounded-md py-2 px-4 data-[state=active]:bg-background border border-gray-200 
-              data-[state=active]:border-gray-300 data-[state=active]:shadow-sm"
-            >
-              <CalendarIcon className="h-4 w-4 mr-2" />
-              Calendar Overview
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tasks"
-              className="rounded-md py-2 px-4 data-[state=active]:bg-background border border-gray-200 
-              data-[state=active]:border-gray-300 data-[state=active]:shadow-sm"
-            >
-              Tasks
-            </TabsTrigger>
-            <TabsTrigger 
-              value="reminders"
-              className="rounded-md py-2 px-4 data-[state=active]:bg-background border border-gray-200 
-              data-[state=active]:border-gray-300 data-[state=active]:shadow-sm"
-            >
-              Reminders
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="w-full">
-          {/* Calendar view */}
-          <TabsContent value="calendar" className="m-0">
-            <CalendarView
-              jobs={jobs}
-              tasks={tasks}
-              selectedDate={selectedDate}
-              jobsForSelectedDate={jobsForSelectedDate}
-              tasksForSelectedDate={tasksForSelectedDate}
-              updateSelectedDateItems={updateSelectedDateItems}
-              viewMode={viewMode}
-              onViewChange={setViewMode}
-            />
-          </TabsContent>
-
-          {/* Tasks view */}
-          <TabsContent value="tasks" className="m-0">
-            <TasksView
-              selectedDate={selectedDate}
-              tasksForSelectedDate={tasksForSelectedDate.filter(task => !task.isReminder)}
-              onPreviousDay={goToPreviousDay}
-              onNextDay={goToNextDay}
-              onTasksChange={(updatedTasks) => {
-                // Update only the non-reminder tasks while preserving reminders
-                const reminders = tasks.filter(task => task.isReminder);
-                setTasks([...updatedTasks, ...reminders]);
-              }}
-            />
-          </TabsContent>
-
-          {/* Reminders view */}
-          <TabsContent value="reminders" className="m-0">
-            <TasksView
-              selectedDate={selectedDate}
-              tasksForSelectedDate={tasksForSelectedDate.filter(task => task.isReminder)}
-              onPreviousDay={goToPreviousDay}
-              onNextDay={goToNextDay}
-              onTasksChange={(updatedTasks) => {
-                // Update only the reminder tasks while preserving non-reminders
-                const nonReminders = tasks.filter(task => !task.isReminder);
-                setTasks([...nonReminders, ...updatedTasks]);
-              }}
-            />
-          </TabsContent>
-        </div>
+      <Tabs 
+        defaultValue="calendar" 
+        className="w-full"
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
+        <TabsList className="mb-4 w-full justify-start">
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="jobs">Jobs</TabsTrigger>
+          <TabsTrigger value="tasks" className="flex items-center gap-1">
+            <ListChecks className="h-4 w-4" />
+            Tasks & Reminders
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="calendar" className="space-y-6 mt-2">
+          <CalendarView 
+            jobs={jobs}
+            tasks={tasks}
+            selectedDate={selectedDate}
+            jobsForSelectedDate={jobsForSelectedDate}
+            tasksForSelectedDate={tasksForSelectedDate}
+            updateSelectedDateItems={updateSelectedDateItems}
+            viewMode={viewMode}
+          />
+        </TabsContent>
+        
+        <TabsContent value="jobs" className="mt-2">
+          <JobsList 
+            selectedDate={selectedDate}
+            jobsForSelectedDate={jobsForSelectedDate}
+            onPreviousDay={handlePreviousDay}
+            onNextDay={handleNextDay}
+            allJobs={jobs}
+          />
+        </TabsContent>
+        
+        <TabsContent value="tasks" className="mt-2">
+          <TasksView 
+            selectedDate={selectedDate}
+            tasksForSelectedDate={tasksForSelectedDate}
+            onPreviousDay={handlePreviousDay}
+            onNextDay={handleNextDay}
+            onTasksChange={handleTasksChange}
+          />
+        </TabsContent>
       </Tabs>
 
       {/* Add Task Dialog */}

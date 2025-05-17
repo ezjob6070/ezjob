@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { format, isSameDay, isValid, parseISO, startOfWeek, endOfWeek, eachDayOfInterval, addDays, startOfMonth, endOfMonth, addMonths, subMonths } from "date-fns";
+import { format, isSameDay, isValid, parseISO } from "date-fns";
 import { v4 as uuid } from "uuid";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Project, ProjectTask } from "@/types/project";
 import TaskDetailDialog from "./TaskDetailDialog";
-import { Plus, Calendar as CalendarIcon, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { CalendarViewMode } from "@/components/calendar/types";
+import { Plus } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 // ScheduleEvent type definition
 interface ScheduleEvent {
@@ -45,7 +44,6 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
   const [activeTab, setActiveTab] = useState("calendar");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>("month");
   const [events, setEvents] = useState<ScheduleEvent[]>([
     {
       id: "event-1",
@@ -150,54 +148,6 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
   // Task detail dialog management
   const [taskForDetailView, setTaskForDetailView] = useState<ProjectTask | null>(null);
   const [taskDetailDialogOpen, setTaskDetailDialogOpen] = useState(false);
-
-  // Navigation functions for different calendar views
-  const handlePrevPeriod = () => {
-    switch (calendarViewMode) {
-      case 'day':
-        setSelectedDate(addDays(selectedDate, -1));
-        break;
-      case 'week':
-        setSelectedDate(addDays(selectedDate, -7));
-        break;
-      case 'month':
-        setCurrentMonth(subMonths(currentMonth, 1));
-        setSelectedDate(subMonths(selectedDate, 1));
-        break;
-    }
-  };
-
-  const handleNextPeriod = () => {
-    switch (calendarViewMode) {
-      case 'day':
-        setSelectedDate(addDays(selectedDate, 1));
-        break;
-      case 'week':
-        setSelectedDate(addDays(selectedDate, 7));
-        break;
-      case 'month':
-        setCurrentMonth(addMonths(currentMonth, 1));
-        setSelectedDate(addMonths(selectedDate, 1));
-        break;
-    }
-  };
-
-  // Function to get the title for the current view
-  const getViewTitle = () => {
-    switch (calendarViewMode) {
-      case 'day':
-        return format(selectedDate, "EEEE, MMMM d, yyyy");
-      case 'week': {
-        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
-        return `${format(weekStart, "MMM d")} - ${format(weekEnd, "MMM d, yyyy")}`;
-      }
-      case 'month':
-        return format(selectedDate, "MMMM yyyy");
-      default:
-        return format(selectedDate, "MMMM d, yyyy");
-    }
-  };
 
   // Add a new event and optionally create a related task
   const handleAddEvent = () => {
@@ -417,66 +367,6 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
     toast.success("Task added to calendar");
   };
 
-  // Get events for the selected date or period based on view mode
-  const getEventsForView = () => {
-    switch (calendarViewMode) {
-      case 'day':
-        return events.filter(event => isSameDay(event.start, selectedDate));
-      case 'week': {
-        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
-        return events.filter(event => 
-          weekDays.some(day => isSameDay(event.start, day))
-        );
-      }
-      case 'month': {
-        const monthStart = startOfMonth(selectedDate);
-        const monthEnd = endOfMonth(selectedDate);
-        const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-        return events.filter(event => 
-          monthDays.some(day => isSameDay(event.start, day))
-        );
-      }
-      default:
-        return events.filter(event => isSameDay(event.start, selectedDate));
-    }
-  };
-
-  // Get tasks for the selected date or period based on view mode
-  const getTasksForView = () => {
-    switch (calendarViewMode) {
-      case 'day':
-        return tasks.filter(task => {
-          const dueDate = new Date(task.dueDate);
-          return isSameDay(dueDate, selectedDate);
-        });
-      case 'week': {
-        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
-        return tasks.filter(task => {
-          const dueDate = new Date(task.dueDate);
-          return weekDays.some(day => isSameDay(dueDate, day));
-        });
-      }
-      case 'month': {
-        const monthStart = startOfMonth(selectedDate);
-        const monthEnd = endOfMonth(selectedDate);
-        const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-        return tasks.filter(task => {
-          const dueDate = new Date(task.dueDate);
-          return monthDays.some(day => isSameDay(dueDate, day));
-        });
-      }
-      default:
-        return tasks.filter(task => {
-          const dueDate = new Date(task.dueDate);
-          return isSameDay(dueDate, selectedDate);
-        });
-    }
-  };
-
   // Get events for the selected date
   const getEventsForSelectedDate = () => {
     return events.filter(event => isSameDay(event.start, selectedDate));
@@ -556,213 +446,6 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
     });
   };
 
-  // Render the calendar based on the selected view mode
-  const renderCalendarView = () => {
-    switch (calendarViewMode) {
-      case 'day':
-        return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
-              {Array.from({ length: 12 }).map((_, hour) => {
-                const timeSlot = new Date(selectedDate);
-                timeSlot.setHours(hour + 7, 0, 0); // Start at 7 AM
-                
-                const eventsAtHour = events.filter(event => 
-                  isSameDay(event.start, selectedDate) && 
-                  event.start.getHours() === timeSlot.getHours()
-                );
-                
-                return (
-                  <div 
-                    key={hour} 
-                    className={cn(
-                      "p-3 border rounded-md", 
-                      eventsAtHour.length > 0 ? "border-blue-300 bg-blue-50" : "border-gray-200"
-                    )}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-20 text-sm font-medium">
-                        {format(timeSlot, "h:mm a")}
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        {eventsAtHour.map(event => (
-                          <div 
-                            key={event.id} 
-                            className={cn(
-                              "p-2 rounded-md",
-                              event.type === "meeting" ? "bg-blue-100 border border-blue-200" :
-                              event.type === "deadline" ? "bg-red-100 border border-red-200" :
-                              event.type === "milestone" ? "bg-green-100 border border-green-200" :
-                              event.type === "inspection" ? "bg-amber-100 border border-amber-200" :
-                              "bg-purple-100 border border-purple-200"
-                            )}
-                          >
-                            <div className="flex justify-between">
-                              <p className="font-medium">{event.title}</p>
-                              <Badge className={
-                                event.status === "completed" ? "bg-green-100 text-green-800" : 
-                                event.status === "cancelled" ? "bg-red-100 text-red-800" : 
-                                "bg-blue-100 text-blue-800"
-                              }>
-                                {event.status}
-                              </Badge>
-                            </div>
-                            {event.description && (
-                              <p className="text-sm text-muted-foreground mt-1">{event.description}</p>
-                            )}
-                            <p className="text-xs text-muted-foreground mt-2">
-                              {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
-                            </p>
-                          </div>
-                        ))}
-                        {eventsAtHour.length === 0 && (
-                          <p className="text-sm text-muted-foreground italic">No events scheduled</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-        
-      case 'week':
-        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
-        
-        return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-7 gap-2">
-              {weekDays.map(day => (
-                <div 
-                  key={day.toString()} 
-                  className={cn(
-                    "p-2 rounded-md border text-center cursor-pointer transition-colors",
-                    isSameDay(day, selectedDate) 
-                      ? "bg-primary text-primary-foreground font-medium" 
-                      : "hover:bg-gray-100"
-                  )}
-                  onClick={() => setSelectedDate(day)}
-                >
-                  <div className="font-medium text-xs sm:text-sm">{format(day, 'EEE')}</div>
-                  <div className="text-lg">{format(day, 'd')}</div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-7 gap-2 h-[500px] overflow-y-auto">
-              {weekDays.map(day => {
-                const dayEvents = events.filter(event => isSameDay(event.start, day));
-                const dayTasks = tasks.filter(task => {
-                  const dueDate = new Date(task.dueDate);
-                  return isSameDay(dueDate, day);
-                });
-                
-                const isSelected = isSameDay(day, selectedDate);
-                
-                return (
-                  <div 
-                    key={day.toString()} 
-                    className={cn(
-                      "p-2 rounded-md border max-h-full overflow-y-auto",
-                      isSelected ? "border-primary" : "border-gray-200"
-                    )}
-                  >
-                    <div className="space-y-2">
-                      {dayEvents.map(event => (
-                        <div 
-                          key={event.id} 
-                          className={cn(
-                            "p-2 rounded text-xs sm:text-sm",
-                            event.type === "meeting" ? "bg-blue-100 border border-blue-200" :
-                            event.type === "deadline" ? "bg-red-100 border border-red-200" :
-                            event.type === "milestone" ? "bg-green-100 border border-green-200" :
-                            event.type === "inspection" ? "bg-amber-100 border border-amber-200" :
-                            "bg-purple-100 border border-purple-200"
-                          )}
-                        >
-                          <p className="font-medium truncate">{event.title}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {format(event.start, "h:mm a")}
-                          </p>
-                        </div>
-                      ))}
-                      
-                      {dayTasks.map(task => (
-                        <div 
-                          key={task.id} 
-                          className={cn(
-                            "p-2 rounded text-xs sm:text-sm",
-                            task.priority === "high" || task.priority === "urgent" ? 
-                            "bg-red-100 border border-red-200" : 
-                            task.priority === "medium" ? 
-                            "bg-amber-100 border border-amber-200" : 
-                            "bg-blue-100 border border-blue-200"
-                          )}
-                          onClick={() => handleViewTaskDetails(task)}
-                        >
-                          <p className="font-medium truncate">{task.title}</p>
-                          <Badge className={
-                            task.status === "completed" ? "bg-green-100 text-green-800" : 
-                            task.status === "in_progress" ? "bg-blue-100 text-blue-800" : 
-                            task.status === "blocked" ? "bg-red-100 text-red-800" : 
-                            "bg-amber-100 text-amber-800"
-                          }>
-                            {task.status}
-                          </Badge>
-                        </div>
-                      ))}
-                      
-                      {dayEvents.length === 0 && dayTasks.length === 0 && (
-                        <p className="text-xs text-gray-400 py-2 text-center">No events</p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-        
-      case 'month':
-      default:
-        return (
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => date && setSelectedDate(date)}
-            className="rounded-md border"
-            month={currentMonth}
-            modifiers={{
-              event: daysWithEvents,
-              task: daysWithTasks
-            }}
-            modifiersClassNames={{
-              event: "bg-blue-100",
-              task: "border-red-400 border-2"
-            }}
-            components={{
-              Day: ({ date, ...props }) => {
-                const colorClass = getDayColor(date);
-                return (
-                  <button
-                    {...props}
-                    className={cn(
-                      props.className,
-                      colorClass
-                    )}
-                  >
-                    {isValid(date) ? format(date, "d") : "?"}
-                  </button>
-                );
-              }
-            }}
-          />
-        );
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -790,44 +473,40 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
         <TabsContent value="calendar" className="py-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="md:col-span-2">
-              <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
-                <div className="flex items-center space-x-2">
-                  <CardTitle>Project Calendar</CardTitle>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <ToggleGroup 
-                    type="single" 
-                    value={calendarViewMode} 
-                    onValueChange={(value) => value && setCalendarViewMode(value as CalendarViewMode)}
-                  >
-                    <ToggleGroupItem value="day" aria-label="Daily View" className="gap-1">
-                      <CalendarIcon className="h-4 w-4" />
-                      <span className="hidden sm:inline">Day</span>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="week" aria-label="Weekly View" className="gap-1">
-                      <CalendarIcon className="h-4 w-4" />
-                      <span className="hidden sm:inline">Week</span>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="month" aria-label="Monthly View" className="gap-1">
-                      <CalendarDays className="h-4 w-4" />
-                      <span className="hidden sm:inline">Month</span>
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </div>
+              <CardHeader>
+                <CardTitle>Project Calendar</CardTitle>
               </CardHeader>
-
               <CardContent>
-                <div className="flex items-center justify-between mb-4">
-                  <Button variant="outline" size="sm" onClick={handlePrevPeriod}>
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <h2 className="text-lg font-medium">{getViewTitle()}</h2>
-                  <Button variant="outline" size="sm" onClick={handleNextPeriod}>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-                {renderCalendarView()}
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  className="rounded-md border"
+                  modifiers={{
+                    event: daysWithEvents,
+                    task: daysWithTasks
+                  }}
+                  modifiersClassNames={{
+                    event: "bg-blue-100",
+                    task: "border-red-400 border-2"
+                  }}
+                  components={{
+                    Day: (props) => {
+                      const colorClass = getDayColor(props.date);
+                      return (
+                        <button
+                          {...props}
+                          className={cn(
+                            props.className,
+                            colorClass
+                          )}
+                        >
+                          {isValid(props.date) ? format(props.date, "d") : "?"}
+                        </button>
+                      );
+                    }
+                  }}
+                />
               </CardContent>
             </Card>
 

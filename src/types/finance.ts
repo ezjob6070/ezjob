@@ -1,3 +1,4 @@
+
 import { DateRange } from "react-day-picker";
 import { Technician } from './technician';
 
@@ -94,10 +95,6 @@ export interface JobSource {
   createdAt?: string;
   category?: string;
   website?: string;
-  phone?: string;
-  email?: string;
-  logoUrl?: string;
-  notes?: string;
 }
 
 export interface OfficeExpense {
@@ -143,4 +140,4 @@ export interface ProjectStaff {
 }
 
 // Add OfficeTimeFrame type to fix OfficeDashboard error
-export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter" | "day";
+export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter";

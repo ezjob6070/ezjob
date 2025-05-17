@@ -1,3 +1,4 @@
+
 import { DateRange } from "react-day-picker";
 
 export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "canceled" | "rescheduled" | "estimate" | "pending";
@@ -10,7 +11,7 @@ export interface Job {
   jobNumber?: string;
   clientName: string;
   amount: number;
-  status: JobStatus | string;
+  status: JobStatus;
   actualAmount?: number;
   technicianId: string;  
   technicianName?: string;
@@ -19,7 +20,7 @@ export interface Job {
   date: Date | string;  
   scheduledDate?: Date | string;
   createdAt?: string;
-  priority?: JobPriority | string;
+  priority?: JobPriority;
   details?: string;
   address?: string;
   clientPhone?: string;
@@ -82,4 +83,10 @@ export interface JobFilters {
 export interface AmountRange {
   min?: number;
   max?: number;
+}
+
+// Add safe date range type
+export interface SafeDateRange {
+  from: Date;
+  to?: Date;
 }

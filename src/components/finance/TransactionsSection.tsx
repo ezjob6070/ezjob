@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,15 +5,14 @@ import { FinancialTransaction, PaymentStatus } from "@/types/finance";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import FinancialTransactionsTable from "./FinancialTransactionsTable";
 import { Badge } from "@/components/ui/badge";
-import { DateRange } from "react-day-picker";
 
 interface TransactionsSectionProps {
   filteredTransactions: FinancialTransaction[];
-  dateRange?: DateRange;
+  dateRange?: { from: Date | undefined; to: Date | undefined };
 }
 
 const TransactionsSection: React.FC<TransactionsSectionProps> = ({
-  filteredTransactions = [], // Set default empty array to prevent undefined errors
+  filteredTransactions,
   dateRange
 }) => {
   const [activeTab, setActiveTab] = useState<PaymentStatus>("completed");

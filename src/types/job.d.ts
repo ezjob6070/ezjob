@@ -1,11 +1,11 @@
 
 export interface Job {
   id: string;
-  clientId?: string;
+  clientId: string;
   clientName: string;
   scheduledDate: string | Date;
   date: string | Date;
-  technicianId: string;
+  technicianId?: string;
   technicianName?: string;
   serviceId?: string;
   serviceName?: string;
@@ -28,6 +28,4 @@ export interface Job {
   paymentMethod?: string;
   paymentStatus?: string;
   priority?: string;
-  title?: string;
-  description?: string;
 }

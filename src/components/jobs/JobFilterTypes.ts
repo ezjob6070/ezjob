@@ -1,5 +1,6 @@
+
 import { DateRange } from "react-day-picker";
-import { Job } from "@/types/job";
+import { Job } from "./JobTypes";
 
 export type DateFilterType = 
   | "today" 
@@ -17,7 +18,10 @@ export interface JobFilters {
   searchTerm: string;
   technicianFilter: string;
   dateFilter: DateFilterType;
-  customDateRange: DateRange | null;
+  customDateRange: {
+    from: Date | undefined;
+    to: Date | undefined;
+  };
 }
 
 export interface JobFilterProps {

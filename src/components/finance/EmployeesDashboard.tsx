@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { ArrowUpDown, Download, Filter, FileText, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
-import { Technician } from "@/types/technician";
+import { Technician } from "@/types/project";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface EmployeesDashboardProps {
@@ -66,8 +67,7 @@ const EmployeesDashboard: React.FC<EmployeesDashboardProps> = ({ dateRange, setD
     return {
       ...employee,
       periodPayment,
-      monthlySalary,
-      subRole: employee.subRole || ''
+      monthlySalary
     };
   });
 

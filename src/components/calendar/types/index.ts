@@ -8,7 +8,7 @@ export interface Task {
   allDay?: boolean;
   priority?: "high" | "medium" | "low" | "urgent";
   status: string;
-  client: { name: string; id?: string };
+  client: { name: string };
   location?: string;
   description?: string;
   technician?: string;
@@ -27,16 +27,3 @@ export interface Task {
   day?: any;
   className?: string;
 }
-
-export interface DayProps {
-  date?: Date;
-  displayMonth?: Date;
-  className?: string;
-  selected?: boolean;
-  disabled?: boolean;
-  outside?: boolean;
-  today?: boolean;
-}
-
-// Calendar view mode type for consistent usage across components
-export type CalendarViewMode = "day" | "week" | "month" | "home";

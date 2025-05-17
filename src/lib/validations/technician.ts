@@ -16,7 +16,7 @@ export const technicianSchema = z.object({
     message: "Please enter a valid specialty.",
   }),
   status: z.enum(["active", "inactive", "onLeave"]).default("active"),
-  paymentType: z.enum(["percentage", "flat", "hourly", "salary", "commission"]).default("percentage"),
+  paymentType: z.enum(["percentage", "flat", "hourly", "salary"]).default("percentage"),
   paymentRate: z.string().min(1, {
     message: "Please enter a valid payment rate.",
   }),
@@ -29,7 +29,7 @@ export const technicianSchema = z.object({
   department: z.string().optional(),
   salaryBasis: z.enum(["hourly", "weekly", "bi-weekly", "monthly", "annually", "commission", "yearly"]).optional(),
   hourlyRate: z.string().optional(),
-  incentiveType: z.enum(["bonus", "commission", "none", "hourly", "weekly", "monthly", "profit-sharing", "other"]).optional(),
+  incentiveType: z.enum(["bonus", "commission", "none", "hourly", "weekly", "monthly"]).optional(),
   incentiveAmount: z.string().optional(),
   profileImage: z.string().optional(),
   role: z.enum(["technician", "salesman", "employed", "contractor"]).default("technician"),
@@ -41,5 +41,4 @@ export const technicianSchema = z.object({
   driverLicenseExpiration: z.string().optional(),
   idNumber: z.string().optional(),
   workContract: z.string().optional(),
-  documents: z.array(z.any()).optional(),
 });

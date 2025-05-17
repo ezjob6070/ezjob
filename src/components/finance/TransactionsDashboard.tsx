@@ -12,7 +12,7 @@ interface TransactionsDashboardProps {
 }
 
 const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
-  filteredTransactions: initialTransactions = [] // Add default empty array
+  filteredTransactions: initialTransactions
 }) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   
@@ -86,7 +86,7 @@ const TransactionsDashboard: React.FC<TransactionsDashboardProps> = ({
             </Card>
           </div>
           
-          <TransactionsSection filteredTransactions={filteredTransactions} dateRange={dateRange} />
+          <TransactionsSection transactions={filteredTransactions} dateRange={dateRange} />
         </CardContent>
       </Card>
     </div>

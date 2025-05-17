@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,8 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
-import { format, addDays, isToday, isSameDay } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Plus, X, Check, FileText, MapPin, Bell, BellRing, CalendarDays, ArrowLeft, ArrowRight } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon, Clock, Plus, X, Check, FileText, MapPin, Bell, BellRing } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -35,8 +34,6 @@ interface ScheduleEvent {
   status: "scheduled" | "completed" | "cancelled";
   type: "meeting" | "deadline" | "milestone" | "task" | "inspection" | "reminder";
 }
-
-type CalendarViewMode = "day" | "week" | "month";
 
 export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }: ProjectTimeScheduleTabProps) {
   const navigate = useNavigate();
@@ -136,10 +133,6 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [showReminders, setShowReminders] = useState(true);
-  
-  // New state for calendar view mode
-  const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>("month");
-  const [currentViewDate, setCurrentViewDate] = useState(new Date());
 
   const handleAddEvent = () => {
     const newEventWithId: ScheduleEvent = {
@@ -232,349 +225,13 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
         return "bg-gray-100 text-gray-800";
     }
   };
-  
-  // Navigate to previous period based on current view
-  const goToPrevious = () => {
-    const newDate = new Date(currentViewDate);
-    switch (calendarViewMode) {
-      case "day":
-        newDate.setDate(newDate.getDate() - 1);
-        break;
-      case "week":
-        newDate.setDate(newDate.getDate() - 7);
-        break;
-      case "month":
-        newDate.setMonth(newDate.getMonth() - 1);
-        break;
-    }
-    setCurrentViewDate(newDate);
-    setDate(newDate);
-  };
-  
-  // Navigate to next period based on current view
-  const goToNext = () => {
-    const newDate = new Date(currentViewDate);
-    switch (calendarViewMode) {
-      case "day":
-        newDate.setDate(newDate.getDate() + 1);
-        break;
-      case "week":
-        newDate.setDate(newDate.getDate() + 7);
-        break;
-      case "month":
-        newDate.setMonth(newDate.getMonth() + 1);
-        break;
-    }
-    setCurrentViewDate(newDate);
-    setDate(newDate);
-  };
-  
-  // Reset to today
-  const goToToday = () => {
-    setCurrentViewDate(new Date());
-    setDate(new Date());
-  };
 
   // Filter events based on showReminders toggle
   const filteredEvents = showReminders 
     ? events 
     : events.filter(event => event.type !== "reminder");
     
-  // Count for display in tabs and sidebar
   const remindersCount = events.filter(event => event.type === "reminder").length;
-  const todayRemindersCount = events.filter(event => 
-    event.type === "reminder" && isToday(event.start)
-  ).length;
-  
-  const upcomingReminders = events
-    .filter(event => event.type === "reminder" && event.status === "scheduled")
-    .sort((a, b) => a.start.getTime() - b.start.getTime())
-    .slice(0, 5);
-  
-  // Filter events for the day view
-  const getDayEvents = (date: Date) => {
-    return filteredEvents.filter(event => 
-      isSameDay(event.start, date)
-    );
-  };
-  
-  // Get week dates for week view
-  const getWeekDates = (date: Date) => {
-    const week = [];
-    const start = new Date(date);
-    start.setDate(start.getDate() - start.getDay() + (start.getDay() === 0 ? -6 : 1)); // Start with Monday
-    
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(start);
-      day.setDate(day.getDate() + i);
-      week.push(day);
-    }
-    
-    return week;
-  };
-  
-  // Format date range for display in header
-  const getViewDateTitle = () => {
-    switch (calendarViewMode) {
-      case "day":
-        return format(currentViewDate, "MMMM d, yyyy");
-      case "week": {
-        const weekDates = getWeekDates(currentViewDate);
-        return `${format(weekDates[0], "MMM d")} - ${format(weekDates[6], "MMM d, yyyy")}`;
-      }
-      case "month":
-        return format(currentViewDate, "MMMM yyyy");
-    }
-  };
-  
-  // Render the calendar view based on selected mode
-  const renderCalendarView = () => {
-    switch (calendarViewMode) {
-      case "day":
-        return renderDayView();
-      case "week":
-        return renderWeekView();
-      case "month":
-        return renderMonthView();
-    }
-  };
-  
-  // Render day view with hourly slots
-  const renderDayView = () => {
-    const dayEvents = getDayEvents(currentViewDate);
-    const hours = Array.from({ length: 24 }, (_, i) => i);
-    
-    return (
-      <div className="space-y-4">
-        <div className="grid gap-2">
-          {hours.map(hour => {
-            const timeLabel = `${hour === 0 ? '12' : hour > 12 ? hour - 12 : hour}${hour >= 12 ? 'pm' : 'am'}`;
-            const hourEvents = dayEvents.filter(event => event.start.getHours() === hour);
-            
-            return (
-              <div key={hour} className={cn(
-                "grid grid-cols-[80px_1fr] gap-2 py-1 pl-1 border-l-4",
-                hourEvents.length ? "border-l-primary" : "border-l-gray-200"
-              )}>
-                <div className="text-sm text-muted-foreground font-medium pt-1.5">
-                  {timeLabel}
-                </div>
-                <div className="space-y-1">
-                  {hourEvents.map(event => (
-                    <div 
-                      key={event.id}
-                      className={cn(
-                        "p-2 rounded-md text-sm",
-                        event.type === "reminder" ? "bg-purple-100 border border-purple-200" : "bg-blue-100 border border-blue-200"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {getEventTypeIcon(event.type)}
-                          <span className="font-medium">{event.title}</span>
-                        </div>
-                        <Badge variant="outline" className={getEventTypeBadgeColor(event.type)}>
-                          {event.type}
-                        </Badge>
-                      </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
-                      </div>
-                      {event.location && (
-                        <div className="text-xs flex items-center gap-1 mt-1">
-                          <MapPin className="h-3 w-3" />
-                          {event.location}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-  
-  // Render week view with days as columns
-  const renderWeekView = () => {
-    const weekDates = getWeekDates(currentViewDate);
-    
-    return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-7 gap-2">
-          {weekDates.map((day, index) => (
-            <div 
-              key={index} 
-              className={cn(
-                "text-center p-2 font-medium border-b-2",
-                isToday(day) ? "border-primary" : "border-transparent"
-              )}
-            >
-              <div className="text-sm">{format(day, "EEE")}</div>
-              <div className={cn(
-                "inline-flex items-center justify-center w-8 h-8 rounded-full text-sm",
-                isToday(day) ? "bg-primary text-primary-foreground" : ""
-              )}>
-                {format(day, "d")}
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="grid grid-cols-7 gap-2 min-h-[400px]">
-          {weekDates.map((day, index) => {
-            const dayEvents = getDayEvents(day);
-            const reminderCount = dayEvents.filter(e => e.type === "reminder").length;
-            const otherCount = dayEvents.length - reminderCount;
-            
-            return (
-              <div 
-                key={index} 
-                className={cn(
-                  "border rounded-md p-2 h-full",
-                  isToday(day) ? "bg-blue-50 border-primary" : ""
-                )}
-              >
-                <div className="space-y-2">
-                  {dayEvents.length > 0 ? (
-                    <>
-                      {dayEvents.map(event => (
-                        <div 
-                          key={event.id} 
-                          className={cn(
-                            "p-1.5 rounded text-xs cursor-pointer hover:opacity-80",
-                            event.type === "reminder" ? "bg-purple-100 border border-purple-200" : 
-                            event.type === "meeting" ? "bg-blue-100 border border-blue-200" :
-                            event.type === "deadline" ? "bg-red-100 border border-red-200" : 
-                            event.type === "milestone" ? "bg-green-100 border border-green-200" : 
-                            "bg-gray-100 border border-gray-200"
-                          )}
-                          onClick={() => setSelectedEvent(event)}
-                        >
-                          <div className="flex items-center gap-1 mb-0.5">
-                            {getEventTypeIcon(event.type)}
-                            <span className="font-medium truncate">{event.title}</span>
-                          </div>
-                          <div className="text-[10px] text-gray-500">
-                            {format(event.start, "h:mm a")}
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  ) : (
-                    <div className="text-center text-xs text-muted-foreground py-2">
-                      No events
-                    </div>
-                  )}
-                </div>
-                
-                {(reminderCount > 0 || otherCount > 0) && (
-                  <div className="flex justify-between text-xs mt-2 pt-2 border-t">
-                    {reminderCount > 0 && (
-                      <span className="flex items-center gap-1 text-purple-600">
-                        <BellRing className="h-3 w-3" />
-                        {reminderCount}
-                      </span>
-                    )}
-                    {otherCount > 0 && (
-                      <span className="flex items-center gap-1 text-blue-600">
-                        <CalendarIcon className="h-3 w-3" />
-                        {otherCount}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-  
-  // Render month view with calendar
-  const renderMonthView = () => {
-    return (
-      <div>
-        <Calendar
-          mode="single"
-          selected={date || undefined}
-          onSelect={setDate}
-          month={currentViewDate}
-          className={cn("border rounded-md bg-white p-1 w-full", "pointer-events-auto")}
-          modifiers={{
-            hasEvent: (day) => filteredEvents.some(event => isSameDay(event.start, day))
-          }}
-          modifiersClassNames={{
-            hasEvent: "font-bold"
-          }}
-          components={{
-            Day: ({ date: dayDate, ...props }) => {
-              const dayEvents = getDayEvents(dayDate);
-              const hasEvents = dayEvents.length > 0;
-              const reminderCount = dayEvents.filter(e => e.type === "reminder").length;
-              const otherCount = dayEvents.length - reminderCount;
-              
-              return (
-                <div className="relative">
-                  <button 
-                    type="button" 
-                    {...props} 
-                    className={cn(
-                      props.className,
-                      "h-12 w-12 p-0 font-normal relative",
-                      isToday(dayDate) && "bg-blue-50",
-                      hasEvents && "font-medium"
-                    )}
-                  >
-                    <time dateTime={format(dayDate, "yyyy-MM-dd")}>
-                      {format(dayDate, "d")}
-                    </time>
-                    
-                    {hasEvents && (
-                      <div className="absolute bottom-1 left-0 right-0 flex justify-center items-center gap-1 text-[10px]">
-                        {reminderCount > 0 && (
-                          <span className="flex items-center text-xs bg-purple-100 text-purple-800 px-1 rounded">
-                            {reminderCount}
-                          </span>
-                        )}
-                        {otherCount > 0 && (
-                          <span className="flex items-center text-xs bg-blue-100 text-blue-800 px-1 rounded">
-                            {otherCount}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </button>
-                </div>
-              );
-            }
-          }}
-        />
-        
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-800"></div>
-            <span className="text-xs">Reminders</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-800"></div>
-            <span className="text-xs">Meetings</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-red-100 border border-red-800"></div>
-            <span className="text-xs">Deadlines</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-green-100 border border-green-800"></div>
-            <span className="text-xs">Milestones</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
   
   return (
     <div className="space-y-6">
@@ -616,168 +273,67 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
         </TabsList>
 
         <TabsContent value="calendar" className="py-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="md:col-span-3">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle>Project Calendar</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-card border rounded-md flex p-0.5">
-                      <Button 
-                        variant={calendarViewMode === "day" ? "default" : "ghost"} 
-                        size="sm"
-                        onClick={() => setCalendarViewMode("day")}
-                        className="rounded-r-none text-xs h-8"
-                      >
-                        Day
-                      </Button>
-                      <Button 
-                        variant={calendarViewMode === "week" ? "default" : "ghost"} 
-                        size="sm"
-                        onClick={() => setCalendarViewMode("week")}
-                        className="rounded-none text-xs h-8"
-                      >
-                        Week
-                      </Button>
-                      <Button 
-                        variant={calendarViewMode === "month" ? "default" : "ghost"} 
-                        size="sm"
-                        onClick={() => setCalendarViewMode("month")}
-                        className="rounded-l-none text-xs h-8"
-                      >
-                        Month
-                      </Button>
-                    </div>
-                    <Button variant="outline" size="sm" className="h-8" onClick={goToToday}>Today</Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="flex items-center justify-between px-4">
-                  <Button variant="ghost" size="sm" className="p-1 h-8 w-8" onClick={goToPrevious}>
-                    <ArrowLeft className="h-5 w-5" />
+          <Card>
+            <CardHeader>
+              <CardTitle>Project Calendar</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
                   </Button>
-                  <h3 className="text-lg font-medium">{getViewDateTitle()}</h3>
-                  <Button variant="ghost" size="sm" className="p-1 h-8 w-8" onClick={goToNext}>
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </div>
-                
-                {renderCalendarView()}
-              </CardContent>
-            </Card>
-            
-            {/* Right sidebar with reminders */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <BellRing className="h-5 w-5 text-purple-600" />
-                  Today's Reminders
-                  {todayRemindersCount > 0 && (
-                    <Badge className="ml-2 bg-purple-100 text-purple-800 hover:bg-purple-200">
-                      {todayRemindersCount}
-                    </Badge>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {upcomingReminders.filter(event => isToday(event.start)).length > 0 ? (
-                    upcomingReminders
-                      .filter(event => isToday(event.start))
-                      .map(reminder => (
-                        <Card key={reminder.id} className="border-purple-200 shadow-sm">
-                          <CardContent className="p-3 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <BellRing className="h-4 w-4 text-purple-600" />
-                                <span className="font-medium">{reminder.title}</span>
-                              </div>
-                              <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-200 border-purple-200">
-                                {format(reminder.start, "h:mm a")}
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    className="rounded-md border"
+                    style={{width: "300px"}}
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              {/* Display Events for Selected Date */}
+              <div className="mt-4">
+                {filteredEvents.filter(event => format(event.start, "yyyy-MM-dd") === format(date || new Date(), "yyyy-MM-dd")).length > 0 ? (
+                  filteredEvents
+                    .filter(event => format(event.start, "yyyy-MM-dd") === format(date || new Date(), "yyyy-MM-dd"))
+                    .map(event => (
+                      <Card key={event.id} className={`mb-2 ${event.type === "reminder" ? "border-purple-200" : ""}`}>
+                        <CardContent className="p-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {getEventTypeIcon(event.type)}
+                              <p className="font-medium">{event.title}</p>
+                              <Badge className={getEventTypeBadgeColor(event.type)}>
+                                {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
                               </Badge>
                             </div>
-                            {reminder.description && (
-                              <p className="text-sm text-gray-600">{reminder.description}</p>
-                            )}
-                            <div className="flex justify-end gap-2 pt-1">
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 text-xs"
-                                onClick={() => setSelectedEvent(reminder)}
-                              >
-                                View
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
-                                onClick={() => handleUpdateEventStatus(reminder.id, "completed")}
-                              >
-                                <Check className="h-3 w-3 mr-1" /> Done
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))
-                  ) : (
-                    <div className="text-center py-6 text-muted-foreground">
-                      <BellRing className="h-8 w-8 text-muted-foreground/50 mx-auto mb-2" />
-                      <p>No reminders for today</p>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-6 mb-2">
-                  <h4 className="text-sm font-medium mb-3 flex items-center">
-                    <Clock className="h-4 w-4 mr-2" />
-                    Upcoming Reminders
-                  </h4>
-                  {upcomingReminders.filter(event => !isToday(event.start)).length > 0 ? (
-                    <div className="space-y-2">
-                      {upcomingReminders
-                        .filter(event => !isToday(event.start))
-                        .map(reminder => (
-                          <div 
-                            key={reminder.id} 
-                            className="flex items-center justify-between p-2 rounded-md bg-gray-50 border cursor-pointer hover:bg-gray-100"
-                            onClick={() => setSelectedEvent(reminder)}
-                          >
-                            <div className="flex items-center gap-2">
-                              <BellRing className="h-3 w-3 text-purple-600" />
-                              <span className="text-sm truncate max-w-[140px]">{reminder.title}</span>
-                            </div>
-                            <span className="text-xs text-muted-foreground">{format(reminder.start, "MMM d")}</span>
+                            <Button variant="secondary" size="sm" onClick={() => setSelectedEvent(event)}>
+                              View Details
+                            </Button>
                           </div>
-                        ))
-                      }
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full mt-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                        onClick={() => setActiveTab("reminders")}
-                      >
-                        View all reminders
-                      </Button>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-center py-2 text-muted-foreground">No upcoming reminders</p>
-                  )}
-                </div>
-                
-                <div className="pt-4 border-t">
-                  <Button 
-                    className="w-full bg-purple-600 hover:bg-purple-700" 
-                    onClick={() => setShowAddReminderDialog(true)}
-                  >
-                    <Bell className="h-4 w-4 mr-2" />
-                    Add New Reminder
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {format(event.start, "p")} - {format(event.end, "p")}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))
+                ) : (
+                  <p className="text-muted-foreground">No events scheduled for this day.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="list" className="py-4">

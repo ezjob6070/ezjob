@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { DateRange } from "react-day-picker";
 import { useGlobalState } from '@/components/providers/GlobalStateProvider';
 import { calculateTechnicianFinancials, ensureCompleteDateRange } from './financialUtils';
-import { Technician } from '@/types/technician';
+import { Technician } from '@/types/project';
 import { format } from "date-fns";
 
 export interface TechnicianFinancialsHookReturn {
@@ -44,11 +44,12 @@ const useTechnicianFinancials = (initialDateRange?: DateRange): TechnicianFinanc
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
   const [localDateRange, setLocalDateRange] = useState<DateRange | undefined>(initialDateRange);
   
-  // Process technicians with financial data
+  // Process technicians with financial data - use type assertion to solve type error
   const processedTechnicians = useMemo(() => {
     setIsLoading(true);
     try {
-      return calculateTechnicianFinancials(technicians, jobs, localDateRange);
+      // Use type assertion here since we know the technicians and jobs match the expected format
+      return calculateTechnicianFinancials(technicians as any[], jobs as any[], localDateRange);
     } catch (error) {
       console.error('Error calculating technician financials:', error);
       return [];
