@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { v4 as uuid } from "uuid";
+import { filterTasks, createReminder, createFollowUp } from "../schedule/tasks/TasksUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
@@ -51,106 +51,26 @@ const TasksView = ({
 
   const handleCreateReminder = () => {
     if (!onTasksChange) return;
-    
-    const reminderTime = new Date(selectedDate);
-    // Default to 9:00 AM for new reminders
-    reminderTime.setHours(9, 0, 0, 0);
-    
-    const newReminder: Task = {
-      id: uuid(),
-      title: "New Reminder",
-      dueDate: reminderTime,
-      start: reminderTime.toISOString(),
-      end: new Date(reminderTime.getTime() + 30 * 60 * 1000).toISOString(),
-      status: "scheduled",
-      priority: "medium",
-      client: { name: "", id: "" },
-      description: "",
-      technician: { name: "", id: "" },
-      color: "#9b87f5", // Purple for reminders
-      type: "reminder",
-      isReminder: true,
-      hasFollowUp: false
-    };
-    
+    const newReminder = createReminder(selectedDate, tasksForSelectedDate);
     onTasksChange([...tasksForSelectedDate, newReminder]);
-    toast.success("Reminder created");
   };
 
   const handleCreateFollowUp = (task: Task) => {
     if (!onTasksChange) return;
     
-    // Create a follow-up task that's scheduled a day after the original task
-    const followUpDate = new Date(task.dueDate);
-    followUpDate.setDate(followUpDate.getDate() + 1);
-    
-    const followUpTask: Task = {
-      id: uuid(),
-      title: `Follow-up: ${task.title}`,
-      dueDate: followUpDate,
-      followUpDate: undefined,
-      start: followUpDate.toISOString(),
-      end: new Date(followUpDate.getTime() + 2 * 60 * 60 * 1000).toISOString(),
-      status: "scheduled",
-      priority: task.priority,
-      client: task.client,
-      description: `Follow-up for task: ${task.title}`,
-      technician: task.technician,
-      color: "#4f46e5", // indigo color for follow-up
-      type: "follow-up",
-      hasFollowUp: false,
-      parentTaskId: task.id
-    };
+    // Create a follow-up task
+    const followUpTask = createFollowUp(task);
     
     // Mark the original task as having a follow-up
     const updatedTasks = tasksForSelectedDate.map(t => 
-      t.id === task.id ? { ...t, hasFollowUp: true, followUpDate } : t
+      t.id === task.id ? { ...t, hasFollowUp: true, followUpDate: followUpTask.dueDate } : t
     );
     
     // Add the new follow-up task to the list
     onTasksChange([...updatedTasks, followUpTask]);
   };
 
-  const filterTasks = () => {
-    let filtered = [...tasksForSelectedDate];
-
-    // Apply view mode filter
-    if (viewMode === "tasks") {
-      filtered = filtered.filter(task => !task.isReminder);
-    } else if (viewMode === "reminders") {
-      filtered = filtered.filter(task => task.isReminder);
-    }
-
-    // Apply search filter
-    if (searchQuery) {
-      filtered = filtered.filter(task => 
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    }
-
-    // Apply status filter
-    if (filterType !== "all") {
-      filtered = filtered.filter(task => task.status === filterType);
-    }
-
-    // Apply sort order
-    filtered.sort((a, b) => {
-      const dateA = new Date(a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate));
-      const dateB = new Date(b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate));
-      
-      if (sortOrder === "newest") {
-        return dateB.getTime() - dateA.getTime();
-      } else {
-        return dateA.getTime() - dateB.getTime();
-      }
-    });
-
-    return filtered;
-  };
-
-  const filteredTasks = filterTasks();
+  const filteredTasks = filterTasks(tasksForSelectedDate, viewMode, searchQuery, filterType, sortOrder);
   const tasksCount = tasksForSelectedDate.filter(task => !task.isReminder).length;
   const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
 
@@ -213,13 +133,13 @@ const TasksView = ({
                 <TabsTrigger value="all" className="text-xs">
                   All ({tasksCount + remindersCount})
                 </TabsTrigger>
-                <TabsTrigger value="tasks" className="text-xs">
-                  <Calendar className="h-3.5 w-3.5 mr-1" />
+                <TabsTrigger value="tasks" className="text-xs flex items-center">
+                  <Calendar className="h-3.5 w-3.5 mr-1 text-[#1EAEDB]" />
                   Tasks ({tasksCount})
                 </TabsTrigger>
-                <TabsTrigger value="reminders" className="text-xs">
-                  <Bell className="h-3.5 w-3.5 mr-1" />
-                  Reminders ({remindersCount})
+                <TabsTrigger value="reminders" className="text-xs flex items-center">
+                  <Bell className="h-3.5 w-3.5 mr-1 text-[#1EAEDB]" />
+                  Tasks ({remindersCount})
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -276,7 +196,7 @@ const TasksView = ({
       
       <div className="space-y-4">
         <h3 className="font-medium">
-          {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
+          {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Tasks"} ({filteredTasks.length})
         </h3>
         
         {filteredTasks.length === 0 ? (

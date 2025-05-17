@@ -171,6 +171,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
             <CalendarViewOptions 
               currentView={viewMode}
               onViewChange={onViewChange}
+              blueIconColor="#1EAEDB"
             />
           </div>
           

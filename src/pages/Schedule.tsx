@@ -9,7 +9,7 @@ import { mockTasks } from "@/components/calendar/data/mockTasks";
 import CalendarView from "@/components/schedule/CalendarView";
 import TasksView from "@/components/schedule/TasksView";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, ListTodo } from "lucide-react";
 import CompactFilterBar from "@/components/schedule/CompactFilterBar";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
@@ -81,7 +81,7 @@ const Schedule = () => {
           className="gap-2 h-9"
           onClick={() => setActiveTab("calendar")}
         >
-          <CalendarIcon className="h-4 w-4" />
+          <CalendarIcon className="h-4 w-4 text-[#1EAEDB]" />
           Show Calendar
         </Button>
       </div>
@@ -93,9 +93,18 @@ const Schedule = () => {
         onValueChange={setActiveTab}
       >
         <TabsList className="mb-4">
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="jobs">Jobs</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsTrigger value="calendar" className="flex items-center gap-2">
+            <CalendarIcon className={`h-4 w-4 ${activeTab === "calendar" ? "text-[#1EAEDB]" : ""}`} />
+            Calendar
+          </TabsTrigger>
+          <TabsTrigger value="jobs" className="flex items-center gap-2">
+            <CalendarIcon className={`h-4 w-4 ${activeTab === "jobs" ? "text-[#1EAEDB]" : ""}`} />
+            Jobs
+          </TabsTrigger>
+          <TabsTrigger value="tasks" className="flex items-center gap-2">
+            <ListTodo className={`h-4 w-4 ${activeTab === "tasks" ? "text-[#1EAEDB]" : ""}`} />
+            Tasks
+          </TabsTrigger>
         </TabsList>
         
         {(activeTab === "jobs" || activeTab === "tasks") && (

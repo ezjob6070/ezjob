@@ -1,5 +1,5 @@
 
-import { Calendar, CalendarDays, LayoutGrid } from "lucide-react";
+import { Calendar, CalendarCheck, ListTodo } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export type CalendarViewMode = "day" | "week" | "month";
@@ -7,26 +7,51 @@ export type CalendarViewMode = "day" | "week" | "month";
 interface CalendarViewOptionsProps {
   currentView: CalendarViewMode;
   onViewChange: (view: CalendarViewMode) => void;
+  blueIconColor?: string;
 }
 
-const CalendarViewOptions = ({ currentView, onViewChange }: CalendarViewOptionsProps) => {
+const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: CalendarViewOptionsProps) => {
+  const iconColor = blueIconColor || "currentColor";
+  
   return (
-    <div className="flex items-center mb-4">
-      <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)}>
-        <ToggleGroupItem value="day" aria-label="Daily View" className="gap-1">
-          <Calendar className="h-4 w-4" />
-          <span className="hidden sm:inline">Day</span>
-        </ToggleGroupItem>
-        <ToggleGroupItem value="week" aria-label="Weekly View" className="gap-1">
-          <Calendar className="h-4 w-4" />
-          <span className="hidden sm:inline">Week</span>
-        </ToggleGroupItem>
-        <ToggleGroupItem value="month" aria-label="Monthly View" className="gap-1">
-          <CalendarDays className="h-4 w-4" />
-          <span className="hidden sm:inline">Month</span>
-        </ToggleGroupItem>
-      </ToggleGroup>
-    </div>
+    <ToggleGroup 
+      type="single" 
+      value={currentView}
+      onValueChange={(value) => {
+        if (value) onViewChange(value as CalendarViewMode);
+      }}
+      className="bg-muted rounded-md p-1 border"
+    >
+      <ToggleGroupItem 
+        value="day" 
+        size="sm"
+        className="data-[state=on]:bg-white data-[state=on]:text-primary"
+        aria-label="Day view"
+      >
+        <Calendar className={`h-3.5 w-3.5 ${currentView === "day" ? `text-[${iconColor}]` : ""}`} />
+        <span className="ml-1 text-xs">Day</span>
+      </ToggleGroupItem>
+      
+      <ToggleGroupItem 
+        value="week" 
+        size="sm"
+        className="data-[state=on]:bg-white data-[state=on]:text-primary"
+        aria-label="Week view"
+      >
+        <CalendarCheck className={`h-3.5 w-3.5 ${currentView === "week" ? `text-[${iconColor}]` : ""}`} />
+        <span className="ml-1 text-xs">Week</span>
+      </ToggleGroupItem>
+      
+      <ToggleGroupItem 
+        value="month" 
+        size="sm"
+        className="data-[state=on]:bg-white data-[state=on]:text-primary"
+        aria-label="Month view"
+      >
+        <ListTodo className={`h-3.5 w-3.5 ${currentView === "month" ? `text-[${iconColor}]` : ""}`} />
+        <span className="ml-1 text-xs">Month</span>
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 };
 
