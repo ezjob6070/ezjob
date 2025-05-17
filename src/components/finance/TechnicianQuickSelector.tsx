@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserIcon, CalendarDaysIcon, CheckIcon, DollarSignIcon } from "lucide-react";
@@ -78,7 +77,7 @@ const TechnicianQuickSelector: React.FC<TechnicianQuickSelectorProps> = ({
                   selectedTechnicians={[]}
                   setSelectedTechnicians={() => {}}
                   technicianNames={[]}
-                  paymentTypeFilter="all" // Changed from empty string to valid default value
+                  paymentTypeFilter="all"
                   setPaymentTypeFilter={() => {}}
                   appliedFilters={false}
                   setAppliedFilters={() => {}}
