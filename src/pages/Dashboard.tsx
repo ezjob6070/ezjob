@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -25,6 +26,7 @@ import {
   BadgeDollarSign,
   ChartBar,
   PhoneCall,
+  Calculator as CalculatorIcon,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -43,7 +45,7 @@ import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import StatCard from "@/components/StatCard";
 import { Badge } from "@/components/ui/badge";
 import JobStatusDialog from "@/components/JobStatusDialog";
-import ProjectsDashboardSection from "@/components/dashboard/ProjectsDashboardSection";
+import ProjectsDashboardSection from "@/components/project/ProjectScheduleAndTasksTab";
 
 import {
   dashboardTaskCounts,
@@ -147,11 +149,13 @@ const Dashboard = () => {
   ];
 
   const jobTypeData = [
-    { name: 'Repair', value: 42 },
-    { name: 'Installation', value: 28 },
-    { name: 'Maintenance', value: 18 },
-    { name: 'Other', value: 12 },
+    { name: 'Repair', value: 42, color: '#4f46e5', gradientFrom: '#6366f1', gradientTo: '#4338ca' },
+    { name: 'Installation', value: 28, color: '#0ea5e9', gradientFrom: '#38bdf8', gradientTo: '#0284c7' },
+    { name: 'Maintenance', value: 18, color: '#10b981', gradientFrom: '#34d399', gradientTo: '#059669' },
+    { name: 'Other', value: 12, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
   ];
+
+  // Removed duplicate jobStatusData definition
 
   const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
     setActiveDialog({
@@ -174,22 +178,210 @@ const Dashboard = () => {
     setStatusDialog({ open: false, status: '' });
   };
 
+  // Create sample performance data for the Statistics tab
+  const performanceData = {
+    revenue: {
+      total: jobRevenue || 178500,
+      previousPeriod: 152000,
+      growth: 17.4,
+      target: 180000,
+      achievement: (jobRevenue || 178500) / 180000 * 100
+    },
+    jobs: {
+      total: totalJobs || 485,
+      completed: completedJobs || 412,
+      conversion: ((completedJobs || 412) / (totalJobs || 485) * 100).toFixed(1),
+      customerSatisfaction: 4.8
+    },
+    technicians: {
+      totalHours: 1872,
+      efficiency: 92,
+      utilization: 87,
+      satisfaction: 4.7
+    }
+  };
+
+  const renderStatisticsContent = () => {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Revenue Performance</CardTitle>
+              <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-2xl font-bold">{formatCurrency(performanceData.revenue.total)}</p>
+                  </div>
+                  <Badge className={`${performanceData.revenue.growth > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {performanceData.revenue.growth > 0 ? '+' : ''}{performanceData.revenue.growth}%
+                  </Badge>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Target: {formatCurrency(performanceData.revenue.target)}</span>
+                    <span>{performanceData.revenue.achievement.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
+                      style={{ width: `${Math.min(100, performanceData.revenue.achievement)}%` }}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                    <p className="text-xs text-blue-700 mb-1">This period</p>
+                    <p className="text-lg font-semibold text-blue-900">{formatCurrency(performanceData.revenue.total)}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                    <p className="text-xs text-gray-600 mb-1">Previous period</p>
+                    <p className="text-lg font-semibold text-gray-800">{formatCurrency(performanceData.revenue.previousPeriod)}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Jobs Analytics</CardTitle>
+              <ClipboardIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Jobs</p>
+                    <p className="text-2xl font-bold">{performanceData.jobs.total}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Completed</p>
+                    <p className="text-xl font-semibold text-green-600">{performanceData.jobs.completed}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Completion Rate</span>
+                    <span>{performanceData.jobs.conversion}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-green-500 h-2 rounded-full"
+                      style={{ width: `${performanceData.jobs.conversion}%` }}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-green-50 rounded-lg p-3 border border-green-100">
+                    <p className="text-xs text-green-700 mb-1">Customer Satisfaction</p>
+                    <div className="flex items-center">
+                      <p className="text-lg font-semibold text-green-900 mr-1">{performanceData.jobs.customerSatisfaction}</p>
+                      <div className="flex text-yellow-500">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className={`text-xs ${i < Math.floor(performanceData.jobs.customerSatisfaction) ? 'text-yellow-500' : 'text-gray-300'}`}>★</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                    <p className="text-xs text-blue-700 mb-1">Avg. Job Value</p>
+                    <p className="text-lg font-semibold text-blue-900">
+                      {formatCurrency(performanceData.jobs.total ? performanceData.revenue.total / performanceData.jobs.total : 0)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Technician Performance</CardTitle>
+              <UsersIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Hours</p>
+                    <p className="text-2xl font-bold">{performanceData.technicians.totalHours}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Satisfaction</p>
+                    <div className="flex items-center justify-end">
+                      <p className="text-xl font-semibold mr-1">{performanceData.technicians.satisfaction}</p>
+                      <div className="text-yellow-500 text-xs">★</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Efficiency</span>
+                      <span>{performanceData.technicians.efficiency}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-indigo-600 h-2 rounded-full"
+                        style={{ width: `${performanceData.technicians.efficiency}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Utilization</span>
+                      <span>{performanceData.technicians.utilization}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-purple-600 h-2 rounded-full"
+                        style={{ width: `${performanceData.technicians.utilization}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="pt-1">
+                  <Button variant="outline" size="sm" className="w-full">
+                    View Detailed Report
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Additional charts and analytics could be added here */}
+      </div>
+    );
+  };
+
+  const renderAnalyticsContent = () => {
+    return (
+      <div>
+        <h2>Analytics Content</h2>
+        {/* Add your analytics content here */}
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
-        return (
-          <div>
-            <h2>Statistics Content</h2>
-            {/* Add your statistics content here */}
-          </div>
-        );
+        return renderStatisticsContent();
       case 'analytics':
-        return (
-          <div>
-            <h2>Analytics Content</h2>
-            {/* Add your analytics content here */}
-          </div>
-        );
+        return renderAnalyticsContent();
       default:
         return (
           <>

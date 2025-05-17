@@ -1,6 +1,5 @@
-
 // Initial technicians data
-export const initialTechnicians = [
+export const technicians = [
   {
     id: "1",
     name: "Mike Johnson",
@@ -62,3 +61,6 @@ export const initialTechnicians = [
     avatar: "/avatars/technician-5.jpg",
   }
 ];
+
+// Keep backwards compatibility
+export const initialTechnicians = technicians;

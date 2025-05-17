@@ -1,5 +1,5 @@
 
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "canceled" | "rescheduled";
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "canceled" | "cancelled" | "rescheduled";
 
 export type JobType = {
   id: string;

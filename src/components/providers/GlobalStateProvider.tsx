@@ -20,6 +20,9 @@ interface GlobalStateContextType {
   dateFilter: DateRange | undefined;
   setDateFilter: (dateFilter: DateRange | undefined) => void;
   getFilteredJobs: () => JobType[];
+  serviceCategory?: string;
+  setServiceCategory?: (category: string) => void;
+  updateTechnician?: (technicianId: string, data: any) => void;
 }
 
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
@@ -28,11 +31,12 @@ export function GlobalStateProvider({ children }: { children: React.ReactNode })
   const [jobs, setJobs] = useState<JobType[]>(initialJobs);
   const [jobSources, setJobSources] = useState(initialJobSources);
   const [technicians, setTechnicians] = useState(initialTechnicians);
-  const [currentIndustry, setCurrentIndustry] = useState<IndustryType>("hvac");
+  const [currentIndustry, setCurrentIndustry] = useState<IndustryType>("hvac" as IndustryType);
   const [dateFilter, setDateFilter] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 7),
   });
+  const [serviceCategory, setServiceCategory] = useState<string>("all");
 
   // Function to get jobs filtered by the current date filter
   const getFilteredJobs = () => {
@@ -54,6 +58,15 @@ export function GlobalStateProvider({ children }: { children: React.ReactNode })
     });
   };
 
+  // Function to update technician data
+  const updateTechnician = (technicianId: string, data: any) => {
+    setTechnicians(prevTechnicians => 
+      prevTechnicians.map(tech => 
+        tech.id === technicianId ? { ...tech, ...data } : tech
+      )
+    );
+  };
+
   return (
     <GlobalStateContext.Provider value={{
       jobs,
@@ -67,6 +80,9 @@ export function GlobalStateProvider({ children }: { children: React.ReactNode })
       dateFilter,
       setDateFilter,
       getFilteredJobs,
+      serviceCategory,
+      setServiceCategory,
+      updateTechnician
     }}>
       {children}
     </GlobalStateContext.Provider>

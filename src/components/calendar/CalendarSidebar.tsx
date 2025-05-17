@@ -7,6 +7,7 @@ import RightSidebarHeader from "./components/RightSidebarHeader";
 import RightCalendarWidget from "./components/RightCalendarWidget";
 import JobsList from "./components/JobsList";
 import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
+import { JobType } from "@/types/jobs";
 
 interface CalendarSidebarProps {
   isOpen: boolean;
@@ -14,13 +15,20 @@ interface CalendarSidebarProps {
 
 const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [jobs, setJobs] = useState<Job[]>(initialJobs);
+  // Convert JobType[] to Job[] by mapping and ensuring required properties are set
+  const convertedJobs: Job[] = initialJobs.map(job => ({
+    ...job,
+    amount: job.amount || 0,
+    date: job.date || new Date(),
+    status: job.status === "canceled" ? "cancelled" as Job["status"] : job.status as any
+  }));
+  const [jobs, setJobs] = useState<Job[]>(convertedJobs);
   const [jobsForSelectedDate, setJobsForSelectedDate] = useState<Job[]>([]);
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
 
   useEffect(() => {
     const filtered = jobs.filter(job => 
-      isSameDay(job.date, selectedDate)
+      isSameDay(new Date(job.date), selectedDate)
     );
     setJobsForSelectedDate(filtered);
   }, [selectedDate, jobs]);
