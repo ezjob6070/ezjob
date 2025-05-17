@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -44,6 +45,7 @@ import StatCard from "@/components/StatCard";
 import { Badge } from "@/components/ui/badge";
 import JobStatusDialog from "@/components/JobStatusDialog";
 import ProjectsDashboardSection from "@/components/dashboard/ProjectsDashboardSection";
+import SearchBar from "@/components/finance/filters/SearchBar";
 
 import {
   dashboardTaskCounts,
@@ -63,6 +65,7 @@ import {
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeDialog, setActiveDialog] = useState<{
     open: boolean;
     type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics';
@@ -108,6 +111,18 @@ const Dashboard = () => {
     scheduled: 37,
     missed: 19,
     conversionRate: 63
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    // In a real app, this would filter data based on search term
+    if (value.length > 0) {
+      toast({
+        title: "Search initiated",
+        description: `Searching for: ${value}`,
+        duration: 3000
+      });
+    }
   };
 
   const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
@@ -412,6 +427,17 @@ const Dashboard = () => {
       default: // Dashboard tab
         return (
           <>            
+            {/* Search Bar */}
+            <div className="mb-4">
+              <SearchBar 
+                searchTerm={searchTerm} 
+                onSearchChange={handleSearchChange} 
+                showIcons={true}
+                placeholder="Search jobs, clients, technicians..."
+                className="bg-white shadow-sm border border-gray-100 rounded-lg"
+              />
+            </div>
+            
             {/* Professional Metric Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
               {/* Revenue Card */}
