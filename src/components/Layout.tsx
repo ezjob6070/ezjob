@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
@@ -43,7 +42,7 @@ const Layout = () => {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50/30">
       <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar is now fixed position with controlled width */}
+        {/* Keep only the main Sidebar component */}
         <Sidebar isMobile={isMobile} />
         
         <main 
