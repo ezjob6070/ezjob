@@ -31,13 +31,15 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
     <aside className="fixed top-0 right-0 z-20 h-screen w-80 flex flex-col bg-card text-card-foreground border-l border-border shadow-lg transition-all duration-300 ease-in-out">
       <RightSidebarHeader />
       <div className="flex-1 py-6 px-4 overflow-auto">
-        <RightCalendarWidget 
-          selectedDate={selectedDate} 
-          setSelectedDate={setSelectedDate} 
-          jobs={jobs}
-          viewMode={viewMode}
-          onViewChange={setViewMode}
-        />
+        <div className="w-full">
+          <RightCalendarWidget 
+            selectedDate={selectedDate} 
+            setSelectedDate={setSelectedDate} 
+            jobs={jobs}
+            viewMode={viewMode}
+            onViewChange={setViewMode}
+          />
+        </div>
         <JobsList 
           selectedDate={selectedDate}
           jobsForSelectedDate={jobsForSelectedDate}

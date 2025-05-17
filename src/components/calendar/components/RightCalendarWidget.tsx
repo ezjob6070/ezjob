@@ -135,46 +135,48 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
   };
 
   const renderMonthView = () => (
-    <Calendar
-      mode="single"
-      selected={selectedDate}
-      onSelect={(date) => date && setSelectedDate(date)}
-      className={cn("p-3 pointer-events-auto border rounded-md")}
-      month={currentMonth}
-      onMonthChange={setCurrentMonth}
-      modifiers={{
-        hasJobs: (date) => jobs.some(job => isSameDay(job.date, date)),
-      }}
-      modifiersClassNames={{
-        hasJobs: "font-bold",
-      }}
-      components={{
-        Day: ({ date, displayMonth, ...props }: DayProps) => {
-          const isSelected = isSameDay(date, selectedDate);
-          const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
-          const dayColor = getDayColor(date);
-          
-          return (
-            <button 
-              type="button"
-              className={cn(
-                "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
-                dayColor,
-                isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                "relative"
-              )}
-              disabled={isOutsideMonth}
-              {...props}
-            >
-              {format(date, "d")}
-              {jobs.some(job => isSameDay(job.date, date)) && (
-                <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div>
-              )}
-            </button>
-          );
-        }
-      }}
-    />
+    <div className="w-full min-w-[240px]">
+      <Calendar
+        mode="single"
+        selected={selectedDate}
+        onSelect={(date) => date && setSelectedDate(date)}
+        className={cn("p-3 pointer-events-auto border rounded-md w-full")}
+        month={currentMonth}
+        onMonthChange={setCurrentMonth}
+        modifiers={{
+          hasJobs: (date) => jobs.some(job => isSameDay(job.date, date)),
+        }}
+        modifiersClassNames={{
+          hasJobs: "font-bold",
+        }}
+        components={{
+          Day: ({ date, displayMonth, ...props }: DayProps) => {
+            const isSelected = isSameDay(date, selectedDate);
+            const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+            const dayColor = getDayColor(date);
+            
+            return (
+              <button 
+                type="button"
+                className={cn(
+                  "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                  dayColor,
+                  isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                  "relative"
+                )}
+                disabled={isOutsideMonth}
+                {...props}
+              >
+                {format(date, "d")}
+                {jobs.some(job => isSameDay(job.date, date)) && (
+                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div>
+                )}
+              </button>
+            );
+          }
+        }}
+      />
+    </div>
   );
 
   return (
@@ -198,9 +200,11 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
         </div>
       </div>
 
-      {viewMode === 'day' && renderDayView()}
-      {viewMode === 'week' && renderWeekView()}
-      {viewMode === 'month' && renderMonthView()}
+      <div className="w-full flex justify-center">
+        {viewMode === 'day' && renderDayView()}
+        {viewMode === 'week' && renderWeekView()}
+        {viewMode === 'month' && renderMonthView()}
+      </div>
     </div>
   );
 };

@@ -254,7 +254,7 @@ const CalendarView = ({
       case 'day':
         return (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 min-w-[600px]">
               {Array.from({ length: 24 }).map((_, hour) => {
                 const timeSlot = setHours(selectedDate, hour);
                 const jobsAtHour = currentViewEvents.jobs.filter(job => {
@@ -322,7 +322,7 @@ const CalendarView = ({
         const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
         
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-[800px]">
             <div className="grid grid-cols-7 gap-2">
               {weekDays.map(day => (
                 <div 
@@ -404,76 +404,78 @@ const CalendarView = ({
         
       case 'month':
         return (
-          <div className="space-y-4">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={handleDateSelect}
-              month={currentMonth}
-              onMonthChange={setCurrentMonth}
-              className="border rounded-md shadow-sm w-full max-w-4xl mx-auto"
-              modifiers={{
-                hasEvents: (date) => 
-                  jobs.some(job => {
-                    const jobDate = ensureValidDate(job.date);
-                    return jobDate && isSameDay(jobDate, date);
-                  }) || 
-                  tasks.some(task => {
-                    const taskDate = ensureValidDate(task.dueDate);
-                    return taskDate && isSameDay(taskDate, date);
-                  }),
-              }}
-              modifiersClassNames={{
-                hasEvents: "font-bold",
-              }}
-              components={{
-                Day: ({ date, displayMonth, ...props }) => {
-                  const isSelected = isSameDay(date, selectedDate);
-                  const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
-                  
-                  return (
-                    <button 
-                      type="button"
-                      className={cn(
-                        "h-12 w-12 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center",
-                        getDayClassName(date),
-                        isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                        isOutsideMonth && "text-muted-foreground opacity-50"
-                      )}
-                      disabled={isOutsideMonth}
-                      onClick={() => handleDateSelect(date)}
-                      {...props}
-                    >
-                      <span className="text-base">{format(date, "d")}</span>
-                      {(jobs.some(job => {
-                        const jobDate = ensureValidDate(job.date);
-                        return jobDate && isSameDay(jobDate, date);
-                      }) || 
-                        tasks.some(task => {
-                          const taskDate = ensureValidDate(task.dueDate);
-                          return taskDate && isSameDay(taskDate, date);
-                        })) && 
-                        !isSelected && (
-                        <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
-                          {jobs.some(job => {
-                            const jobDate = ensureValidDate(job.date);
-                            return jobDate && isSameDay(jobDate, date);
-                          }) && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                          )}
-                          {tasks.some(task => {
+          <div className="space-y-4 w-full">
+            <div className="min-w-[800px] w-full overflow-x-auto">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                month={currentMonth}
+                onMonthChange={setCurrentMonth}
+                className="border rounded-md shadow-sm w-full mx-auto"
+                modifiers={{
+                  hasEvents: (date) => 
+                    jobs.some(job => {
+                      const jobDate = ensureValidDate(job.date);
+                      return jobDate && isSameDay(jobDate, date);
+                    }) || 
+                    tasks.some(task => {
+                      const taskDate = ensureValidDate(task.dueDate);
+                      return taskDate && isSameDay(taskDate, date);
+                    }),
+                }}
+                modifiersClassNames={{
+                  hasEvents: "font-bold",
+                }}
+                components={{
+                  Day: ({ date, displayMonth, ...props }) => {
+                    const isSelected = isSameDay(date, selectedDate);
+                    const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+                    
+                    return (
+                      <button 
+                        type="button"
+                        className={cn(
+                          "h-12 w-12 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center",
+                          getDayClassName(date),
+                          isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                          isOutsideMonth && "text-muted-foreground opacity-50"
+                        )}
+                        disabled={isOutsideMonth}
+                        onClick={() => handleDateSelect(date)}
+                        {...props}
+                      >
+                        <span className="text-base">{format(date, "d")}</span>
+                        {(jobs.some(job => {
+                          const jobDate = ensureValidDate(job.date);
+                          return jobDate && isSameDay(jobDate, date);
+                        }) || 
+                          tasks.some(task => {
                             const taskDate = ensureValidDate(task.dueDate);
                             return taskDate && isSameDay(taskDate, date);
-                          }) && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                          )}
-                        </div>
-                      )}
-                    </button>
-                  );
-                }
-              }}
-            />
+                          })) && 
+                          !isSelected && (
+                          <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
+                            {jobs.some(job => {
+                              const jobDate = ensureValidDate(job.date);
+                              return jobDate && isSameDay(jobDate, date);
+                            }) && (
+                              <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                            )}
+                            {tasks.some(task => {
+                              const taskDate = ensureValidDate(task.dueDate);
+                              return taskDate && isSameDay(taskDate, date);
+                            }) && (
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                            )}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  }
+                }}
+              />
+            </div>
             
             <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
               <div className="flex items-center gap-2">
@@ -504,7 +506,7 @@ const CalendarView = ({
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 overflow-x-auto">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
@@ -520,8 +522,10 @@ const CalendarView = ({
               onViewChange={onViewChange}
             />
           </CardHeader>
-          <CardContent className="pb-8">
-            {renderCalendarView()}
+          <CardContent className="pb-8 overflow-x-auto">
+            <div className="min-w-fit">
+              {renderCalendarView()}
+            </div>
           </CardContent>
         </Card>
         
