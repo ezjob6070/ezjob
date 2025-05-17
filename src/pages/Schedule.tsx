@@ -67,21 +67,21 @@ const Schedule = () => {
   };
 
   return (
-    <div className="space-y-6 px-1 sm:px-2 md:px-4">
+    <div className="space-y-4 sm:space-y-6 px-1 sm:px-2 md:px-4 pb-4 sm:pb-6">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1 sm:mb-2">Schedule</h1>
-          <p className="text-muted-foreground text-sm sm:text-base">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-1 sm:mb-2">Schedule</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
             Manage your appointments, jobs, and tasks in one place.
           </p>
         </div>
         <Button 
           variant="outline" 
           size="sm" 
-          className="gap-2 h-9"
+          className="gap-2 h-8 sm:h-9"
           onClick={() => setActiveTab("calendar")}
         >
-          <CalendarIcon className="h-4 w-4" />
+          <CalendarIcon className="h-3 w-3 sm:h-4 sm:w-4" />
           Show Calendar
         </Button>
       </div>

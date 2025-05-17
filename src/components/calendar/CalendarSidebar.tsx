@@ -30,8 +30,8 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
   return (
     <aside className="fixed top-0 right-0 z-20 h-screen w-full sm:w-96 md:w-80 lg:w-96 flex flex-col bg-card text-card-foreground border-l border-border shadow-lg transition-all duration-300 ease-in-out overflow-hidden">
       <RightSidebarHeader />
-      <div className="flex-1 py-4 px-3 md:px-4 overflow-auto">
-        <div className="w-full overflow-visible">
+      <div className="flex-1 py-2 px-2 md:py-3 md:px-3 overflow-auto">
+        <div className="w-full max-w-full">
           <RightCalendarWidget 
             selectedDate={selectedDate} 
             setSelectedDate={setSelectedDate} 

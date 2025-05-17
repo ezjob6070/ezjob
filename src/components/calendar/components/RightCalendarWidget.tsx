@@ -96,7 +96,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
   };
 
   const renderDayView = () => (
-    <div className="bg-white border rounded-md p-3 mb-4">
+    <div className="bg-white border rounded-md p-2 sm:p-3 mb-4">
       <div className="text-center font-medium mb-2">
         {format(selectedDate, "EEEE, MMMM d")}
       </div>
@@ -112,14 +112,14 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
     return (
-      <div className="bg-white border rounded-md p-2 mb-4">
-        <div className="grid grid-cols-7 gap-1">
+      <div className="bg-white border rounded-md p-1 sm:p-2 mb-4">
+        <div className="grid grid-cols-7 gap-0 sm:gap-1">
           {days.map((day) => (
             <div 
               key={day.toString()} 
               onClick={() => setSelectedDate(day)}
               className={cn(
-                "flex flex-col items-center justify-center p-1 rounded-md cursor-pointer",
+                "flex flex-col items-center justify-center p-1 rounded-md cursor-pointer text-xs sm:text-sm",
                 isSameDay(day, selectedDate) 
                   ? "bg-primary text-primary-foreground" 
                   : "hover:bg-gray-100"
@@ -139,7 +139,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
       mode="single"
       selected={selectedDate}
       onSelect={(date) => date && setSelectedDate(date)}
-      className={cn("p-0 pointer-events-auto w-full overflow-visible")}
+      className="p-0 pointer-events-auto w-full max-w-none"
       month={currentMonth}
       onMonthChange={setCurrentMonth}
       modifiers={{
@@ -158,7 +158,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
             <button 
               type="button"
               className={cn(
-                "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal aria-selected:opacity-100",
                 dayColor,
                 isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                 "relative"
@@ -178,15 +178,15 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
   );
 
   return (
-    <div className="mb-6">
+    <div className="mb-4 sm:mb-6">
       <div className="flex flex-col space-y-2 mb-3">
         <div className="flex items-center justify-between">
-          <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
-            <ChevronLeft className="h-4 w-4" />
+          <Button variant="outline" size="icon" onClick={handlePrevPeriod} className="h-7 w-7 sm:h-8 sm:w-8">
+            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
-          <h2 className="text-sm font-medium">{getViewTitle()}</h2>
-          <Button variant="outline" size="icon" onClick={handleNextPeriod}>
-            <ChevronRight className="h-4 w-4" />
+          <h2 className="text-xs sm:text-sm font-medium truncate">{getViewTitle()}</h2>
+          <Button variant="outline" size="icon" onClick={handleNextPeriod} className="h-7 w-7 sm:h-8 sm:w-8">
+            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
         
@@ -198,14 +198,12 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
         </div>
       </div>
 
-      <div className="w-full overflow-x-auto">
-        {viewMode === 'day' && renderDayView()}
-        {viewMode === 'week' && renderWeekView()}
-        {viewMode === 'month' && (
-          <div className="w-full overflow-visible">
-            {renderMonthView()}
-          </div>
-        )}
+      <div className="flex justify-center">
+        <div className="w-full min-w-0 overflow-visible">
+          {viewMode === 'day' && renderDayView()}
+          {viewMode === 'week' && renderWeekView()}
+          {viewMode === 'month' && renderMonthView()}
+        </div>
       </div>
     </div>
   );
