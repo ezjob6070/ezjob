@@ -89,17 +89,17 @@ const TechnicianFilter = ({
       <ScrollArea className="h-72 pr-4">
         <div className="space-y-1">
           {filteredTechnicians.map((name) => (
-            <div key={name} className="flex items-center">
+            <div key={name || "unnamed"} className="flex items-center">
               <Checkbox
-                id={`technician-${name}`}
+                id={`technician-${name || "unnamed"}`}
                 checked={selectedNames.includes(name)}
                 onCheckedChange={() => onToggle(name)}
               />
               <Label
-                htmlFor={`technician-${name}`}
+                htmlFor={`technician-${name || "unnamed"}`}
                 className="text-sm ml-2"
               >
-                {name}
+                {name || "Unnamed"}
               </Label>
             </div>
           ))}

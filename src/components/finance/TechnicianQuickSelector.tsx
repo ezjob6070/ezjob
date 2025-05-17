@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserIcon, CalendarDaysIcon, CheckIcon, DollarSignIcon } from "lucide-react";
@@ -47,7 +48,7 @@ const TechnicianQuickSelector: React.FC<TechnicianQuickSelectorProps> = ({
       <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
         <div className="flex-1">
           <h3 className="text-sm font-medium mb-2">Select Technician for Quick View</h3>
-          <Select value={selectedTechnicianId} onValueChange={handleTechnicianChange}>
+          <Select value={selectedTechnicianId || "default"} onValueChange={handleTechnicianChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Choose a technician" />
             </SelectTrigger>
@@ -57,6 +58,9 @@ const TechnicianQuickSelector: React.FC<TechnicianQuickSelectorProps> = ({
                   {tech.name} - {tech.specialty}
                 </SelectItem>
               ))}
+              {activeTechnicians.length === 0 && (
+                <SelectItem value="no-techs">No technicians available</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
