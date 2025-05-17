@@ -1,4 +1,4 @@
-import { Calendar } from "@/components/ui/calendar";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
@@ -13,6 +13,7 @@ import { CalendarViewMode } from "./CalendarViewOptions";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 
 interface CalendarViewProps {
   jobs: Job[];
@@ -163,8 +164,6 @@ const CalendarView = ({
       }
       case 'month':
         return format(selectedDate, "MMMM yyyy");
-      case 'home':
-        return "Schedule Overview";
       default:
         return format(selectedDate, "MMMM d, yyyy");
     }
@@ -206,22 +205,6 @@ const CalendarView = ({
         
         return { jobs: monthJobs, tasks: monthTasks };
       }
-      case 'home':
-        // Return upcoming events for the next 7 days
-        const today = new Date();
-        const nextWeek = addDays(today, 7);
-        const weekDays = eachDayOfInterval({ start: today, end: nextWeek });
-        
-        const upcomingJobs = jobs.filter(job => {
-          const jobDate = ensureValidDate(job.date);
-          return jobDate && weekDays.some(day => isSameDay(jobDate, day));
-        });
-        
-        const upcomingTasks = tasks.filter(task => 
-          weekDays.some(day => isSameDay(task.dueDate, day))
-        );
-        
-        return { jobs: upcomingJobs, tasks: upcomingTasks };
       default:
         return { jobs: jobsForSelectedDate, tasks: tasksForSelectedDate };
     }
@@ -538,118 +521,6 @@ const CalendarView = ({
           </div>
         );
 
-      case 'home':
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-7 gap-1">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(dayName => (
-                <div key={dayName} className="text-center font-medium text-sm p-2">
-                  {dayName}
-                </div>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
-              {/* Today's overview */}
-              <Card className="col-span-full">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex justify-between items-center">
-                    Today
-                    <Button variant="outline" size="sm" onClick={() => updateSelectedDateItems(new Date())}>
-                      View Details
-                    </Button>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-medium mb-2">Upcoming Jobs</h4>
-                      {jobsForSelectedDate.length > 0 ? (
-                        <div className="space-y-2">
-                          {jobsForSelectedDate.slice(0, 2).map(job => (
-                            <div key={job.id} className="bg-blue-50 p-2 rounded border border-blue-100">
-                              <p className="font-medium">{job.title}</p>
-                              <p className="text-sm">{job.clientName}</p>
-                            </div>
-                          ))}
-                          {jobsForSelectedDate.length > 2 && (
-                            <p className="text-sm text-blue-600">+{jobsForSelectedDate.length - 2} more</p>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No jobs scheduled</p>
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-medium mb-2">Tasks Due</h4>
-                      {tasksForSelectedDate.length > 0 ? (
-                        <div className="space-y-2">
-                          {tasksForSelectedDate.slice(0, 2).map(task => (
-                            <div key={task.id} className="bg-amber-50 p-2 rounded border border-amber-100">
-                              <p className="font-medium">{task.title}</p>
-                              <p className="text-sm">{task.client?.name}</p>
-                            </div>
-                          ))}
-                          {tasksForSelectedDate.length > 2 && (
-                            <p className="text-sm text-amber-600">+{tasksForSelectedDate.length - 2} more</p>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No tasks due</p>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Next 7 days overview cards */}
-              {Array.from({ length: 7 }).map((_, i) => {
-                const day = addDays(new Date(), i);
-                const dayJobs = jobs.filter(job => {
-                  const jobDate = ensureValidDate(job.date);
-                  return jobDate && isSameDay(jobDate, day);
-                });
-                
-                const dayTasks = tasks.filter(task => 
-                  isSameDay(task.dueDate, day)
-                );
-                
-                const isToday = i === 0;
-                
-                return (
-                  <Card 
-                    key={i} 
-                    className={cn(
-                      "cursor-pointer transition-all hover:shadow-md", 
-                      isToday && "border-primary"
-                    )}
-                    onClick={() => updateSelectedDateItems(day)}
-                  >
-                    <CardHeader className={cn("pb-2", isToday && "bg-primary text-primary-foreground")}>
-                      <CardTitle className="text-base flex flex-col items-center">
-                        <span>{format(day, "EEE")}</span>
-                        <span className="text-2xl font-bold">{format(day, "d")}</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-3">
-                      <div className="space-y-1 text-center">
-                        <p className="flex items-center justify-center gap-1">
-                          <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-                          <span className="text-xs">{dayJobs.length} jobs</span>
-                        </p>
-                        <p className="flex items-center justify-center gap-1">
-                          <span className="h-2 w-2 rounded-full bg-amber-500"></span>
-                          <span className="text-xs">{dayTasks.length} tasks</span>
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        );
-
       default:
         return null;
     }
@@ -737,7 +608,7 @@ const CalendarView = ({
         </Card>
       </div>
       
-      {viewMode === 'home' && <UpcomingEvents events={upcomingEvents} />}
+      <UpcomingEvents events={upcomingEvents} />
     </div>
   );
 };
