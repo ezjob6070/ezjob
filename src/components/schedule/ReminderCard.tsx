@@ -49,32 +49,37 @@ const ReminderCard = ({ reminder, onReminderUpdate }: ReminderCardProps) => {
   };
 
   const getReminderStatusColor = () => {
-    if (reminder.status === "completed") return "bg-green-100 text-green-800";
-    if (isPastDue()) return "bg-red-100 text-red-800";
-    return "bg-purple-100 text-purple-800";
+    if (reminder.status === "completed") return "bg-green-100/70 text-green-800 border-green-200";
+    if (isPastDue()) return "bg-red-50 text-red-700 border-red-200";
+    return "bg-blue-50 text-blue-700 border-blue-200";
   };
 
   return (
-    <div className={`p-4 bg-white rounded-lg shadow-sm border-l-4 ${
+    <div className={`p-4 bg-white rounded-lg border ${
       reminder.status === "completed" 
-        ? "border-l-green-300 opacity-70" 
+        ? "border-green-100 bg-white/80" 
         : isPastDue() 
-          ? "border-l-red-300" 
-          : "border-l-purple-300"
-    }`}>
+          ? "border-red-100" 
+          : "border-blue-100"
+    } hover:shadow-sm transition-all duration-200`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center">
-          <Bell className="h-5 w-5 text-purple-500 mr-2" />
-          <h3 className="font-medium">{reminder.title}</h3>
+          <Bell className={`h-4 w-4 ${
+            reminder.status === "completed" ? "text-green-500" : 
+            isPastDue() ? "text-red-500" : "text-blue-500"
+          } mr-2`} />
+          <h3 className={`font-medium ${
+            reminder.status === "completed" ? "text-gray-500" : "text-gray-800"
+          }`}>{reminder.title}</h3>
         </div>
-        <Badge className={getReminderStatusColor()}>
+        <Badge className={`${getReminderStatusColor()} text-xs font-normal shadow-none`}>
           {reminder.status === "completed" ? "Completed" : isPastDue() ? "Overdue" : "Scheduled"}
         </Badge>
       </div>
 
-      <div className="ml-7 space-y-1 mb-3">
+      <div className="ml-6 space-y-1 mb-3">
         <div className="text-sm text-gray-500 flex items-center">
-          <Clock className="h-4 w-4 mr-1" />
+          <Clock className="h-3.5 w-3.5 mr-1" />
           {formatTime(reminder.dueDate)}
         </div>
 
@@ -83,28 +88,28 @@ const ReminderCard = ({ reminder, onReminderUpdate }: ReminderCardProps) => {
         )}
         
         {reminder.client && (
-          <p className="text-sm text-gray-600">For: {reminder.client.name}</p>
+          <p className="text-sm text-gray-500">For: {reminder.client.name}</p>
         )}
       </div>
 
       {reminder.status !== "completed" && (
-        <div className="ml-7 flex gap-2">
+        <div className="ml-6 flex gap-2">
           <Button 
             size="sm" 
-            variant="outline" 
-            className="border-purple-200 hover:bg-purple-50 text-purple-700"
+            variant="ghost" 
+            className="h-8 text-sm hover:bg-green-50 text-green-600 hover:text-green-700"
             onClick={handleComplete}
           >
-            <CheckCircle className="h-4 w-4 mr-1" />
+            <CheckCircle className="h-3.5 w-3.5 mr-1" />
             Complete
           </Button>
           <Button 
             size="sm" 
-            variant="outline" 
-            className="border-purple-200 hover:bg-purple-50 text-purple-700"
+            variant="ghost" 
+            className="h-8 text-sm hover:bg-blue-50 text-blue-600 hover:text-blue-700"
             onClick={handleSnooze}
           >
-            <Clock className="h-4 w-4 mr-1" />
+            <Clock className="h-3.5 w-3.5 mr-1" />
             Snooze
           </Button>
         </div>

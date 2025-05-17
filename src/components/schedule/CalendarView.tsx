@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval,
@@ -158,7 +157,7 @@ const CalendarView = ({
         mode="single"
         selected={selectedDate}
         onSelect={handleSelectDate}
-        className="rounded-md border w-full max-w-none bg-white shadow-sm"
+        className="rounded-xl border-0 w-full max-w-none bg-transparent shadow-none"
         components={{
           Day: ({ date, ...props }) => {
             const dayJobs = getJobsForDate(date);
@@ -172,31 +171,31 @@ const CalendarView = ({
               <div 
                 className={cn(
                   props.className,
-                  "relative h-16 w-full p-0 font-normal aria-selected:opacity-100 border border-gray-100 hover:bg-gray-50 rounded-sm"
+                  "relative h-16 w-full p-0 font-normal aria-selected:opacity-100 border border-gray-100 rounded-lg hover:bg-gray-50/70 transition-colors"
                 )}
               >
                 <div className="absolute inset-0 flex flex-col h-full w-full p-1">
                   <div className={cn(
                     "flex justify-center items-center h-6 w-6 rounded-full",
-                    isSameDay(date, selectedDate) && "bg-primary text-primary-foreground",
-                    isToday(date) && !isSameDay(date, selectedDate) && "border-2 border-primary"
+                    isSameDay(date, selectedDate) && "bg-blue-600 text-white",
+                    isToday(date) && !isSameDay(date, selectedDate) && "border-2 border-blue-500"
                   )}>
                     {format(date, 'd')}
                   </div>
                   
                   <div className="flex justify-start gap-1 mt-1 overflow-hidden flex-wrap">
                     {hasJobs && (
-                      <div className="text-[0.65rem] px-1 bg-blue-100 text-blue-800 rounded truncate">
+                      <div className="text-[0.65rem] px-1 bg-blue-50 border border-blue-100 text-blue-700 rounded-sm truncate">
                         {dayJobs.length} {dayJobs.length === 1 ? 'job' : 'jobs'}
                       </div>
                     )}
                     {hasTasks && !hasReminders && (
-                      <div className="text-[0.65rem] px-1 bg-amber-100 text-amber-800 rounded truncate">
+                      <div className="text-[0.65rem] px-1 bg-amber-50 border border-amber-100 text-amber-700 rounded-sm truncate">
                         {dayTasks.filter(t => !t.isReminder).length} tasks
                       </div>
                     )}
                     {hasReminders && (
-                      <div className="text-[0.65rem] px-1 bg-purple-100 text-purple-800 rounded truncate">
+                      <div className="text-[0.65rem] px-1 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-sm truncate">
                         {dayTasks.filter(t => t.isReminder).length} reminders
                       </div>
                     )}
@@ -207,13 +206,13 @@ const CalendarView = ({
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="h-6 p-0 px-1 text-[0.65rem] ml-auto hover:bg-gray-200"
+                      className="h-5 p-0 px-1 text-[0.6rem] text-blue-600 hover:text-blue-700 hover:bg-blue-50/80"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleViewDay(date);
                       }}
                     >
-                      <Eye className="h-3 w-3 mr-1" />
+                      <Eye className="h-2.5 w-2.5 mr-0.5" />
                       View
                     </Button>
                   </div>
@@ -239,15 +238,15 @@ const CalendarView = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">Calendar</h2>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg font-medium text-gray-800">Calendar</h2>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             onClick={() => {
               const newDate = viewMode === 'day' 
                 ? addDays(selectedDate, -1) 
@@ -260,9 +259,9 @@ const CalendarView = ({
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="h-8 px-2 text-xs"
+            className="h-8 px-3 text-xs rounded-full border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-gray-900"
             onClick={() => updateSelectedDateItems(new Date())}
           >
             Today
@@ -270,7 +269,7 @@ const CalendarView = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             onClick={() => {
               const newDate = viewMode === 'day' 
                 ? addDays(selectedDate, 1) 
@@ -286,34 +285,53 @@ const CalendarView = ({
       </div>
       
       {/* View toggle inside calendar */}
-      <div className="flex justify-center">
-        <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && onViewChange(value as CalendarViewMode)} className="bg-muted/20 border rounded-md p-1">
-          <ToggleGroupItem value="day" aria-label="Day View" className="gap-1 h-8 px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
-            <span className="text-sm">Day</span>
+      <div className="flex justify-center mb-4">
+        <ToggleGroup 
+          type="single" 
+          value={viewMode} 
+          onValueChange={(value) => value && onViewChange(value as CalendarViewMode)} 
+          className="bg-gray-50/80 border border-gray-200 rounded-full p-0.5 shadow-sm"
+        >
+          <ToggleGroupItem 
+            value="day" 
+            aria-label="Day View" 
+            className="rounded-full gap-1 text-xs h-7 px-3 data-[state=on]:bg-white data-[state=on]:text-gray-800 data-[state=on]:shadow-sm"
+          >
+            Day
           </ToggleGroupItem>
-          <ToggleGroupItem value="week" aria-label="Week View" className="gap-1 h-8 px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
-            <span className="text-sm">Week</span>
+          <ToggleGroupItem 
+            value="week" 
+            aria-label="Week View" 
+            className="rounded-full gap-1 text-xs h-7 px-3 data-[state=on]:bg-white data-[state=on]:text-gray-800 data-[state=on]:shadow-sm"
+          >
+            Week
           </ToggleGroupItem>
-          <ToggleGroupItem value="month" aria-label="Month View" className="gap-1 h-8 px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
-            <span className="text-sm">Month</span>
+          <ToggleGroupItem 
+            value="month" 
+            aria-label="Month View" 
+            className="rounded-full gap-1 text-xs h-7 px-3 data-[state=on]:bg-white data-[state=on]:text-gray-800 data-[state=on]:shadow-sm"
+          >
+            Month
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
       
-      {renderCalendarView()}
+      <div className="bg-white/70 backdrop-blur-sm p-0.5 rounded-xl border border-gray-100 shadow-sm">
+        {renderCalendarView()}
+      </div>
       
       <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-blue-500 opacity-70"></div>
-          <span className="text-xs text-muted-foreground">Jobs</span>
+          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+          <span className="text-xs text-gray-500">Jobs</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-amber-500 opacity-70"></div>
-          <span className="text-xs text-muted-foreground">Tasks</span>
+          <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+          <span className="text-xs text-gray-500">Tasks</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-purple-500 opacity-70"></div>
-          <span className="text-xs text-muted-foreground">Reminders</span>
+          <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+          <span className="text-xs text-gray-500">Reminders</span>
         </div>
       </div>
 

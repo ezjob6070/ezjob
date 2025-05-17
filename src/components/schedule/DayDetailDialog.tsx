@@ -14,7 +14,6 @@ import { Task } from '@/components/calendar/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Briefcase, ClipboardList, Bell } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TaskCard from '@/components/calendar/components/TaskCard';
 import ReminderCard from '@/components/schedule/ReminderCard';
@@ -41,48 +40,48 @@ const DayDetailDialog = ({
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+        <DialogHeader className="p-6 pb-3 border-b border-gray-100">
+          <DialogTitle className="flex items-center gap-2 text-gray-800">
             {formattedDate}
             {isToday(date) && (
-              <Badge className="bg-blue-50 text-blue-800">Today</Badge>
+              <Badge className="bg-blue-50 text-blue-700 border border-blue-200 shadow-none">Today</Badge>
             )}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-500">
             View all scheduled items for this day
           </DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="all" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="all">All Items</TabsTrigger>
-            <TabsTrigger value="jobs">Jobs</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsList className="px-6 pt-2 grid grid-cols-3 bg-transparent gap-2">
+            <TabsTrigger value="all" className="data-[state=active]:bg-gray-100 data-[state=active]:shadow-none">All Items</TabsTrigger>
+            <TabsTrigger value="jobs" className="data-[state=active]:bg-gray-100 data-[state=active]:shadow-none">Jobs</TabsTrigger>
+            <TabsTrigger value="tasks" className="data-[state=active]:bg-gray-100 data-[state=active]:shadow-none">Tasks</TabsTrigger>
           </TabsList>
           
-          <ScrollArea className="flex-1 -mx-6 px-6">
-            <TabsContent value="all" className="mt-0 space-y-4">
+          <ScrollArea className="flex-1 px-6">
+            <TabsContent value="all" className="mt-4 space-y-5">
               {jobs.length > 0 ? (
                 <div>
-                  <h3 className="text-sm font-medium flex items-center mb-2">
-                    <Briefcase className="h-4 w-4 mr-1" /> 
+                  <h3 className="text-sm font-medium flex items-center mb-3 text-gray-700">
+                    <Briefcase className="h-4 w-4 mr-1.5 text-blue-500" /> 
                     Jobs ({jobs.length})
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {jobs.map(job => (
-                      <div key={job.id} className="p-3 bg-white rounded-md border-l-4 border-l-blue-300 shadow-sm">
+                      <div key={job.id} className="p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-200 hover:shadow-sm transition-all">
                         <div className="flex justify-between">
-                          <h4 className="font-medium">{job.title}</h4>
-                          <Badge variant={job.status === "completed" ? "outline" : "default"}>
+                          <h4 className="font-medium text-gray-800">{job.title}</h4>
+                          <Badge variant={job.status === "completed" ? "outline" : "default"} className="shadow-none">
                             {job.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-gray-500 mt-1">
                           Client: {job.clientName}
                         </p>
                         {job.scheduledDate && (
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-xs text-gray-500 mt-1">
                             Time: {typeof job.scheduledDate === 'string' 
                               ? format(new Date(job.scheduledDate), "h:mm a") 
                               : format(job.scheduledDate, "h:mm a")}
@@ -96,11 +95,11 @@ const DayDetailDialog = ({
               
               {regularTasks.length > 0 ? (
                 <div>
-                  <h3 className="text-sm font-medium flex items-center mb-2">
-                    <ClipboardList className="h-4 w-4 mr-1" /> 
+                  <h3 className="text-sm font-medium flex items-center mb-3 text-gray-700">
+                    <ClipboardList className="h-4 w-4 mr-1.5 text-amber-500" /> 
                     Tasks ({regularTasks.length})
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {regularTasks.map(task => (
                       <TaskCard key={task.id} task={task} />
                     ))}
@@ -110,11 +109,11 @@ const DayDetailDialog = ({
               
               {reminders.length > 0 ? (
                 <div>
-                  <h3 className="text-sm font-medium flex items-center mb-2">
-                    <Bell className="h-4 w-4 mr-1" /> 
+                  <h3 className="text-sm font-medium flex items-center mb-3 text-gray-700">
+                    <Bell className="h-4 w-4 mr-1.5 text-blue-500" /> 
                     Reminders ({reminders.length})
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {reminders.map(reminder => (
                       <ReminderCard key={reminder.id} reminder={reminder} />
                     ))}
@@ -123,28 +122,30 @@ const DayDetailDialog = ({
               ) : null}
               
               {jobs.length === 0 && tasks.length === 0 && (
-                <p className="text-center py-4 text-muted-foreground">
-                  No items scheduled for this day
-                </p>
+                <div className="py-10 text-center">
+                  <p className="text-gray-500">
+                    No items scheduled for this day
+                  </p>
+                </div>
               )}
             </TabsContent>
             
-            <TabsContent value="jobs" className="mt-0">
+            <TabsContent value="jobs" className="mt-4">
               {jobs.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {jobs.map(job => (
-                    <div key={job.id} className="p-3 bg-white rounded-md border-l-4 border-l-blue-300 shadow-sm">
+                    <div key={job.id} className="p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-200 hover:shadow-sm transition-all">
                       <div className="flex justify-between">
-                        <h4 className="font-medium">{job.title}</h4>
-                        <Badge variant={job.status === "completed" ? "outline" : "default"}>
+                        <h4 className="font-medium text-gray-800">{job.title}</h4>
+                        <Badge variant={job.status === "completed" ? "outline" : "default"} className="shadow-none">
                           {job.status}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-gray-500 mt-1">
                         Client: {job.clientName}
                       </p>
                       {job.scheduledDate && (
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-gray-500 mt-1">
                           Time: {typeof job.scheduledDate === 'string' 
                             ? format(new Date(job.scheduledDate), "h:mm a") 
                             : format(job.scheduledDate, "h:mm a")}
@@ -154,15 +155,17 @@ const DayDetailDialog = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-center py-4 text-muted-foreground">
-                  No jobs scheduled for this day
-                </p>
+                <div className="py-10 text-center">
+                  <p className="text-gray-500">
+                    No jobs scheduled for this day
+                  </p>
+                </div>
               )}
             </TabsContent>
             
-            <TabsContent value="tasks" className="mt-0">
+            <TabsContent value="tasks" className="mt-4">
               {tasks.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {tasks.map(task => (
                     task.isReminder ? (
                       <ReminderCard key={task.id} reminder={task} />
@@ -172,16 +175,18 @@ const DayDetailDialog = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-center py-4 text-muted-foreground">
-                  No tasks or reminders for this day
-                </p>
+                <div className="py-10 text-center">
+                  <p className="text-gray-500">
+                    No tasks or reminders for this day
+                  </p>
+                </div>
               )}
             </TabsContent>
           </ScrollArea>
         </Tabs>
         
-        <DialogFooter className="sm:justify-start mt-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Close</Button>
+        <DialogFooter className="p-4 border-t border-gray-100">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="shadow-none border-gray-200">Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
