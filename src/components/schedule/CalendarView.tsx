@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
@@ -270,12 +271,14 @@ const CalendarView = ({
                 const jobsAtHour = currentViewEvents.jobs.filter(job => {
                   const jobDate = ensureValidDate(job.date);
                   return jobDate && 
+                    jobDate instanceof Date &&
                     jobDate.getHours() === hour && 
                     isSameDay(jobDate, selectedDate);
                 });
                 
                 const tasksAtHour = currentViewEvents.tasks.filter(task => {
-                  return task.dueDate.getHours() === hour && 
+                  return task.dueDate instanceof Date &&
+                    task.dueDate.getHours() === hour && 
                     isSameDay(task.dueDate, selectedDate);
                 });
                 
