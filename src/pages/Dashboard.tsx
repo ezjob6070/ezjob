@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { addDays, format } from "date-fns";
+import { addDays, format, isWithinInterval } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";
 import {
@@ -25,6 +26,15 @@ import {
   BadgeDollarSign,
   ChartBar,
   PhoneCall,
+  Clock,
+  Settings,
+  Users,
+  Gem,
+  Award,
+  Zap,
+  Gauge,
+  Target,
+  TrendingUp,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -87,7 +97,7 @@ const Dashboard = () => {
     data: []
   });
 
-  const { jobs, currentIndustry } = useGlobalState();
+  const { jobs, currentIndustry, dateFilter } = useGlobalState();
 
   // Use our predefined fake data
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
@@ -109,6 +119,38 @@ const Dashboard = () => {
     missed: 19,
     conversionRate: 63
   };
+
+  // Sample data for KPI bar
+  const kpiMetrics = [
+    { 
+      title: "On-time Completion", 
+      value: "94%", 
+      icon: <Clock className="h-5 w-5 text-white" />,
+      description: "Jobs completed on schedule",
+      bgColor: "from-indigo-400 to-indigo-600"
+    },
+    { 
+      title: "Customer Satisfaction", 
+      value: "4.8/5", 
+      icon: <Award className="h-5 w-5 text-white" />,
+      description: "Based on 317 reviews",
+      bgColor: "from-amber-400 to-amber-600"
+    },
+    { 
+      title: "Team Productivity", 
+      value: "87%", 
+      icon: <Zap className="h-5 w-5 text-white" />,
+      description: "Efficiency rating",
+      bgColor: "from-emerald-400 to-emerald-600"
+    },
+    { 
+      title: "Growth Rate", 
+      value: "+18%", 
+      icon: <TrendingUp className="h-5 w-5 text-white" />,
+      description: "Month over month",
+      bgColor: "from-purple-400 to-purple-600"
+    }
+  ];
 
   const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
     setActiveDialog({
@@ -412,6 +454,29 @@ const Dashboard = () => {
       default: // Dashboard tab
         return (
           <>            
+            {/* KPI Metrics Bar */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+              {kpiMetrics.map((metric, index) => (
+                <Card key={index} className="border-0 shadow-sm overflow-hidden">
+                  <div className={`bg-gradient-to-r ${metric.bgColor} h-1.5`}></div>
+                  <CardContent className="p-4 pt-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <div className={`p-1.5 bg-gradient-to-r ${metric.bgColor} rounded-full`}>
+                            {metric.icon}
+                          </div>
+                          <h3 className="text-sm font-medium text-gray-600">{metric.title}</h3>
+                        </div>
+                        <p className="text-2xl font-bold mt-2 text-gray-900">{metric.value}</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{metric.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
             {/* Professional Metric Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
               {/* Revenue Card */}
