@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { Technician } from "@/types/technician";
-import { Job } from "@/types/job";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface SalesmenDashboardProps {
@@ -34,7 +33,7 @@ const SalesmenDashboard: React.FC<SalesmenDashboardProps> = ({ dateRange, setDat
 
   // Get jobs assigned to salesmen within the date range
   const salesJobs = jobs.filter(job => {
-    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date as string);
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);

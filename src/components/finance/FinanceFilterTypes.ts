@@ -31,6 +31,3 @@ export type FinanceFilterProps = {
 };
 
 export type FilteredTransactionsResult = FinancialTransaction[];
-
-// For OfficeDashboard.tsx
-export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter"; 

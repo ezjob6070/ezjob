@@ -1,3 +1,4 @@
+
 import { Technician } from "@/types/technician";
 import { getInitials } from "@/lib/utils";
 import { additionalTechnicians } from "./additionalTechnicians";
@@ -28,8 +29,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Commercial HVAC", "Refrigeration", "System Design"],
       imageUrl: "/avatars/tech-1.jpg",
       yearsExperience: 8,
-      initials: "JS",
-      role: "technician"
+      initials: "JS"
     },
     {
       id: "tech-2",
@@ -54,8 +54,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Commercial Wiring", "Lighting Systems", "PLC Programming"],
       imageUrl: "/avatars/tech-2.jpg",
       yearsExperience: 10,
-      initials: "SJ",
-      role: "technician"
+      initials: "SJ"
     },
     {
       id: "tech-3",
@@ -80,8 +79,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Commercial Plumbing", "Water Heater Installation", "Leak Detection"],
       imageUrl: "/avatars/tech-3.jpg",
       yearsExperience: 5,
-      initials: "MR",
-      role: "technician"
+      initials: "MR"
     },
     {
       id: "tech-4",
@@ -106,8 +104,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Finish Carpentry", "Cabinet Installation", "Custom Woodworking"],
       imageUrl: "/avatars/tech-4.jpg",
       yearsExperience: 7,
-      initials: "JL",
-      role: "technician"
+      initials: "JL"
     },
     {
       id: "tech-5",
@@ -132,8 +129,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Brick and Stone", "Concrete Work", "Historic Restoration"],
       imageUrl: "/avatars/tech-5.jpg",
       yearsExperience: 12,
-      initials: "DW",
-      role: "technician"
+      initials: "DW"
     },
     {
       id: "tech-6",
@@ -158,8 +154,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Excavator Operation", "Bulldozer", "Crane Operation"],
       imageUrl: "/avatars/tech-6.jpg",
       yearsExperience: 15,
-      initials: "RG",
-      role: "technician"
+      initials: "RG"
     },
     {
       id: "tech-7",
@@ -184,8 +179,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Drywall", "Painting", "Decorative Finishes"],
       imageUrl: "/avatars/tech-7.jpg",
       yearsExperience: 6,
-      initials: "EC",
-      role: "technician"
+      initials: "EC"
     },
     {
       id: "tech-8",
@@ -210,8 +204,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Shingle Roofing", "Metal Roofing", "Commercial Flat Roofs"],
       imageUrl: "/avatars/tech-8.jpg",
       yearsExperience: 9,
-      initials: "WT",
-      role: "technician"
+      initials: "WT"
     },
     {
       id: "tech-9",
@@ -236,8 +229,7 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Preventive Maintenance", "System Diagnostics", "Filter Systems"],
       imageUrl: "/avatars/tech-9.jpg",
       yearsExperience: 7,
-      initials: "OM",
-      role: "technician"
+      initials: "OM"
     },
     {
       id: "tech-10",
@@ -262,13 +254,9 @@ const createSampleTechnicians = (): Technician[] => {
       skills: ["Hardwood Installation", "Tile Work", "Vinyl and Laminate"],
       imageUrl: "/avatars/tech-10.jpg",
       yearsExperience: 8,
-      initials: "JW",
-      role: "technician"
+      initials: "JW"
     }
   ];
-
-  // Each technician entry should include the role property
-  // Ensure all entries in sampleData have role: "technician" added if they don't already have it
 
   // Add more technicians with different roles
   const salesmenData: Technician[] = [

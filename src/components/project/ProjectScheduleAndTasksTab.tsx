@@ -1,25 +1,26 @@
-import React, { useState } from "react";
-import { format, isSameDay, isValid, parseISO } from "date-fns";
-import { v4 as uuid } from "uuid";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
+import { format, addDays, isSameDay } from "date-fns";
+import { toast } from "sonner";
+import { v4 as uuid } from "uuid";
+import { Project, ProjectStaff, ProjectTask, ProjectTaskInspection } from "@/types/project";
+import { 
+  CalendarIcon, Clock, Plus, X, Check, FileText, 
+  Calendar as CalendarIcon2, ListTodo, User, AlertTriangle, MapPin 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Project, ProjectTask } from "@/types/project";
 import TaskDetailDialog from "./TaskDetailDialog";
-import { Plus } from "lucide-react";
-import { Calendar as CalendarIcon } from "lucide-react";
 
-// ScheduleEvent type definition
+// Event types for scheduling
 interface ScheduleEvent {
   id: string;
   title: string;
@@ -28,19 +29,17 @@ interface ScheduleEvent {
   location?: string;
   description?: string;
   assignedTo?: string[];
-  relatedTaskId?: string;
   status: "scheduled" | "completed" | "cancelled";
   type: "meeting" | "deadline" | "milestone" | "task" | "inspection";
+  relatedTaskId?: string; // Reference to a task if this event is linked to one
 }
 
-// Props for the component
-interface ProjectScheduleAndTasksTabProps {
+interface UnifiedViewProps {
   project: Project;
-  projectStaff?: Project['staff'];
-  onUpdateProject: (updatedProject: Project) => void;
+  projectStaff?: ProjectStaff[];
 }
 
-export default function ProjectScheduleAndTasksTab({ project, projectStaff = [], onUpdateProject }: ProjectScheduleAndTasksTabProps) {
+export default function ProjectScheduleAndTasksTab({ project, projectStaff = [] }: UnifiedViewProps) {
   const [activeTab, setActiveTab] = useState("calendar");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -220,8 +219,8 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
         start: taskDueDate,
         end: endDate,
         description: newTask.description || "",
-        status: newTask.status === "completed" ? "completed" : 
-             newTask.status === "blocked" ? "cancelled" : "scheduled",
+        status: task.status === "completed" ? "completed" : 
+             task.status === "blocked" ? "cancelled" : "scheduled",
         type: "task",
         assignedTo: newTask.assignedTo ? [newTask.assignedTo] : [],
         relatedTaskId: newTaskId
@@ -333,14 +332,20 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
 
   // Handle deleting a task
   const handleDeleteTask = (id: string) => {
-    // Fix by referencing tasks correctly
-    const taskToDelete = (project.tasks || []).find(t => t.id === id);
-    if (!taskToDelete) return;
+    const eventForTask = events.find(event => event.relatedTaskId === id);
     
-    onUpdateProject({
-      ...project,
-      tasks: (project.tasks || []).filter(t => t.id !== id)
-    });
+    // If there's a related event, ask if that should be deleted too
+    if (eventForTask) {
+      // For simplicity, we'll just delete both
+      setEvents(prev => prev.filter(event => event.relatedTaskId !== id));
+      setTasks(prev => prev.filter(task => task.id !== id));
+      toast.success("Task and related event deleted successfully");
+    } else {
+      setTasks(prev => prev.filter(task => task.id !== id));
+      toast.success("Task deleted successfully");
+    }
+    
+    setTaskForDetailView(null);
   };
 
   // Add task to calendar by creating a new event
@@ -356,8 +361,8 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
       start: taskDueDate,
       end: endDate,
       description: task.description || "",
-      status: newTask.status === "completed" ? "completed" : 
-             newTask.status === "blocked" ? "cancelled" : "scheduled",
+      status: task.status === "completed" ? "completed" : 
+             task.status === "blocked" ? "cancelled" : "scheduled",
       type: "task",
       assignedTo: task.assignedTo ? [task.assignedTo] : [],
       relatedTaskId: task.id
@@ -385,26 +390,6 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
   const daysWithTasks = tasks
     .filter(task => task.dueDate)
     .map(task => new Date(task.dueDate));
-
-  // Helper function to safely format dates
-  const safeFormatDate = (date: Date | string | undefined, formatStr: string): string => {
-    if (!date) return 'Invalid date';
-    
-    if (typeof date === 'string') {
-      // Try to parse the string to a Date object
-      try {
-        const parsedDate = parseISO(date);
-        if (!isValid(parsedDate)) return 'Invalid date';
-        return format(parsedDate, formatStr);
-      } catch (e) {
-        return 'Invalid date';
-      }
-    }
-    
-    // Check if the date is valid before formatting
-    if (!isValid(date)) return 'Invalid date';
-    return format(date, formatStr);
-  };
 
   // Color coding for calendar days
   const getDayColor = (day: Date) => {
@@ -437,15 +422,6 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
     setTaskDetailDialogOpen(true);
   };
 
-  const handleCompleteTask = (id: string) => {
-    onUpdateProject({
-      ...project,
-      tasks: (project.tasks || []).map(t => 
-        t.id === id ? { ...t, status: "completed" } : t
-      )
-    });
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -455,24 +431,32 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
             onClick={() => setShowAddTaskDialog(true)}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
           >
-            <Plus size={16} /> Add Task
+            <ListTodo size={16} />
+            Add Task
           </Button>
-          <Button onClick={() => setShowAddEventDialog(true)} className="flex items-center gap-2">
-            <Plus size={16} /> Add Event
+          <Button 
+            onClick={() => setShowAddEventDialog(true)} 
+            className="flex items-center gap-2"
+          >
+            <CalendarIcon size={16} />
+            Add Calendar Event
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="calendar" className="w-full">
+      <Tabs defaultValue="unified" className="w-full">
         <TabsList className="bg-muted/50">
+          <TabsTrigger value="unified">Unified View</TabsTrigger>
           <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks List</TabsTrigger>
+          <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="calendar" className="py-4">
+        {/* Unified View Tab - Shows calendar and due tasks for selected date */}
+        <TabsContent value="unified" className="py-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="md:col-span-2">
+            {/* Calendar Widget */}
+            <Card className="col-span-1">
               <CardHeader>
                 <CardTitle>Project Calendar</CardTitle>
               </CardHeader>
@@ -480,98 +464,511 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  className="rounded-md border"
-                  modifiers={{
-                    event: daysWithEvents,
-                    task: daysWithTasks
-                  }}
-                  modifiersClassNames={{
-                    event: "bg-blue-100",
-                    task: "border-red-400 border-2"
-                  }}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  className={cn("p-3 pointer-events-auto border rounded-md")}
+                  month={currentMonth}
+                  onMonthChange={setCurrentMonth}
                   components={{
-                    Day: (props) => {
-                      const colorClass = getDayColor(props.date);
+                    Day: ({ date, displayMonth, ...props }) => {
+                      const isSelected = isSameDay(date, selectedDate);
+                      const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+                      const dayColor = getDayColor(date);
+                      
+                      // Count events and tasks for this day
+                      const eventsCount = events.filter(event => isSameDay(event.start, date)).length;
+                      const tasksCount = tasks.filter(task => {
+                        const dueDate = new Date(task.dueDate);
+                        return isSameDay(dueDate, date);
+                      }).length;
+                      
+                      const hasItems = eventsCount > 0 || tasksCount > 0;
+                      
                       return (
-                        <button
-                          {...props}
+                        <button 
+                          type="button"
                           className={cn(
-                            props.className,
-                            colorClass
+                            "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                            dayColor,
+                            isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                            "relative"
                           )}
+                          disabled={isOutsideMonth}
+                          {...props}
                         >
-                          {isValid(props.date) ? format(props.date, "d") : "?"}
+                          {format(date, "d")}
+                          {hasItems && (
+                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+                              <div className="flex gap-0.5">
+                                {eventsCount > 0 && (
+                                  <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                                )}
+                                {tasksCount > 0 && (
+                                  <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </button>
                       );
                     }
                   }}
                 />
+
+                <div className="mt-4 text-xs text-gray-500 flex items-center justify-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                    <span>Events</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span>Tasks</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {safeFormatDate(selectedDate, "MMMM d, yyyy")}
-                </CardTitle>
+            {/* Day View with Events and Tasks */}
+            <Card className="col-span-1 md:col-span-2">
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-center">
+                  <CardTitle>{format(selectedDate, "EEEE, MMMM d, yyyy")}</CardTitle>
+                  <div className="flex gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedDate(addDays(selectedDate, -1))}
+                    >
+                      Previous
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedDate(addDays(selectedDate, 1))}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                {/* Events for the day */}
+                <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+                  <CalendarIcon2 className="h-5 w-5 text-blue-600" />
+                  Events
+                </h3>
+                <div className="mb-4">
+                  {getEventsForSelectedDate().length > 0 ? (
+                    <div className="space-y-3">
+                      {getEventsForSelectedDate().map(event => (
+                        <Card key={event.id} className="border-l-4 border-l-blue-500">
+                          <CardContent className="p-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-medium">{event.title}</h4>
+                                <div className="text-sm text-muted-foreground">
+                                  {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
+                                </div>
+                                {event.description && (
+                                  <p className="text-sm mt-1">{event.description}</p>
+                                )}
+                              </div>
+                              <div className="flex flex-col items-end gap-2">
+                                <Badge className={
+                                  event.status === "completed" ? "bg-green-100 text-green-800" : 
+                                  event.status === "cancelled" ? "bg-red-100 text-red-800" : 
+                                  "bg-blue-100 text-blue-800"
+                                }>
+                                  {event.status}
+                                </Badge>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setSelectedEvent(event)}
+                                >
+                                  View Details
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No events scheduled for today.</p>
+                  )}
+                </div>
+
+                {/* Tasks for the day */}
+                <h3 className="font-medium text-lg mb-3 mt-6 flex items-center gap-2">
+                  <ListTodo className="h-5 w-5 text-green-600" />
+                  Tasks Due Today
+                </h3>
+                <div>
+                  {getTasksForSelectedDate().length > 0 ? (
+                    <div className="space-y-3">
+                      {getTasksForSelectedDate().map(task => (
+                        <Card key={task.id} className={cn(
+                          "border-l-4",
+                          task.priority === "urgent" ? "border-l-red-600" :
+                          task.priority === "high" ? "border-l-red-500" :
+                          task.priority === "medium" ? "border-l-yellow-500" :
+                          "border-l-green-500"
+                        )}>
+                          <CardContent className="p-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-medium">{task.title}</h4>
+                                <div className="text-sm flex items-center gap-2">
+                                  <Badge className={
+                                    task.status === "completed" ? "bg-green-100 text-green-800" : 
+                                    task.status === "in_progress" ? "bg-blue-100 text-blue-800" : 
+                                    task.status === "blocked" ? "bg-red-100 text-red-800" : 
+                                    "bg-amber-100 text-amber-800"
+                                  }>
+                                    {task.status.replace('_', ' ')}
+                                  </Badge>
+                                  <Badge variant="outline" className="capitalize">
+                                    {task.priority} priority
+                                  </Badge>
+                                </div>
+                                {task.description && (
+                                  <p className="text-sm mt-1">{task.description}</p>
+                                )}
+                              </div>
+                              <div>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleViewTaskDetails(task)}
+                                >
+                                  View Details
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No tasks due today.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Calendar View Tab */}
+        <TabsContent value="calendar" className="py-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Project Calendar</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="flex justify-between items-center mb-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const newDate = new Date(currentMonth);
+                    newDate.setMonth(newDate.getMonth() - 1);
+                    setCurrentMonth(newDate);
+                  }}
+                >
+                  Previous Month
+                </Button>
+                <h3 className="text-lg font-medium">
+                  {format(currentMonth, "MMMM yyyy")}
+                </h3>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const newDate = new Date(currentMonth);
+                    newDate.setMonth(newDate.getMonth() + 1);
+                    setCurrentMonth(newDate);
+                  }}
+                >
+                  Next Month
+                </Button>
+              </div>
+              
+              {/* Full Calendar */}
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => date && setSelectedDate(date)}
+                className={cn("p-3 pointer-events-auto border rounded-md")}
+                month={currentMonth}
+                onMonthChange={setCurrentMonth}
+                components={{
+                  Day: ({ date, displayMonth, ...props }) => {
+                    const isSelected = isSameDay(date, selectedDate);
+                    const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+                    const dayColor = getDayColor(date);
+                    
+                    // Count events and tasks for this day
+                    const eventsCount = events.filter(event => isSameDay(event.start, date)).length;
+                    const tasksCount = tasks.filter(task => {
+                      const dueDate = new Date(task.dueDate);
+                      return isSameDay(dueDate, date);
+                    }).length;
+                    
+                    const hasItems = eventsCount > 0 || tasksCount > 0;
+                    
+                    return (
+                      <button 
+                        type="button"
+                        className={cn(
+                          "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                          dayColor,
+                          isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                          "relative"
+                        )}
+                        disabled={isOutsideMonth}
+                        {...props}
+                      >
+                        {format(date, "d")}
+                        {hasItems && (
+                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+                            <div className="flex gap-0.5">
+                              {eventsCount > 0 && (
+                                <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                              )}
+                              {tasksCount > 0 && (
+                                <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  }
+                }}
+              />
+              
+              <div className="text-xs text-gray-500 flex items-center justify-center gap-4 mt-2">
+                <div className="flex items-center gap-1">
+                  <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                  <span>Events</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <span>Tasks</span>
+                </div>
+              </div>
+              
+              {/* Display Events for Selected Date */}
+              <div className="mt-6">
+                <h3 className="text-lg font-medium mb-3">{format(selectedDate, "EEEE, MMMM d, yyyy")}</h3>
+                <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <h3 className="font-medium mb-2">Events</h3>
+                    <h4 className="text-sm font-medium mb-2 flex items-center gap-1">
+                      <CalendarIcon2 className="h-4 w-4 text-blue-600" />
+                      Events
+                    </h4>
+                    
                     {getEventsForSelectedDate().length > 0 ? (
                       <div className="space-y-2">
                         {getEventsForSelectedDate().map(event => (
-                          <div key={event.id} className="p-2 border rounded-md">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <p className="font-medium">{event.title}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  {safeFormatDate(event.start, "h:mm a")} - {safeFormatDate(event.end, "h:mm a")}
-                                </p>
+                          <Card key={event.id} className="border-l-4 border-l-blue-500">
+                            <CardContent className="p-2">
+                              <div className="flex justify-between">
+                                <div>
+                                  <p className="font-medium text-sm">{event.title}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
+                                  </p>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-6 px-2"
+                                  onClick={() => setSelectedEvent(event)}
+                                >
+                                  View
+                                </Button>
                               </div>
-                              <Badge className={
-                                event.status === "completed" ? "bg-green-100 text-green-800" : 
-                                event.status === "cancelled" ? "bg-red-100 text-red-800" : 
-                                "bg-blue-100 text-blue-800"
-                              }>
-                                {event.status}
-                              </Badge>
-                            </div>
-                          </div>
+                            </CardContent>
+                          </Card>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground">No events scheduled for this day.</p>
+                      <p className="text-sm text-muted-foreground">No events scheduled for this day.</p>
                     )}
                   </div>
-
+                  
                   <div>
-                    <h3 className="font-medium mb-2">Tasks Due</h3>
+                    <h4 className="text-sm font-medium mb-2 flex items-center gap-1">
+                      <ListTodo className="h-4 w-4 text-green-600" />
+                      Tasks Due
+                    </h4>
+                    
                     {getTasksForSelectedDate().length > 0 ? (
                       <div className="space-y-2">
                         {getTasksForSelectedDate().map(task => (
-                          <div key={task.id} className="p-2 border rounded-md">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <p className="font-medium">{task.title}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  Priority: {task.priority}
-                                </p>
+                          <Card key={task.id} className={cn(
+                            "border-l-4",
+                            task.priority === "urgent" ? "border-l-red-600" :
+                            task.priority === "high" ? "border-l-red-500" :
+                            task.priority === "medium" ? "border-l-yellow-500" :
+                            "border-l-green-500"
+                          )}>
+                            <CardContent className="p-2">
+                              <div className="flex justify-between">
+                                <div>
+                                  <p className="font-medium text-sm">{task.title}</p>
+                                  <div className="flex gap-1 mt-0.5">
+                                    <Badge className={cn(
+                                      "text-xs px-1 py-0",
+                                      task.status === "completed" ? "bg-green-100 text-green-800" : 
+                                      task.status === "in_progress" ? "bg-blue-100 text-blue-800" : 
+                                      task.status === "blocked" ? "bg-red-100 text-red-800" : 
+                                      "bg-amber-100 text-amber-800"
+                                    )}>
+                                      {task.status.replace('_', ' ')}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-6 px-2"
+                                  onClick={() => handleViewTaskDetails(task)}
+                                >
+                                  View
+                                </Button>
                               </div>
-                              <Badge className={
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No tasks due on this day.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tasks List Tab */}
+        <TabsContent value="tasks" className="py-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Project Tasks</CardTitle>
+              <div className="flex items-center gap-2">
+                <Select defaultValue="all">
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="blocked">Blocked</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select defaultValue="all">
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="Priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Priority</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {tasks.length > 0 ? (
+                  tasks.map(task => (
+                    <Card key={task.id} className={cn(
+                      "border-l-4",
+                      task.priority === "urgent" ? "border-l-red-600" :
+                      task.priority === "high" ? "border-l-red-500" :
+                      task.priority === "medium" ? "border-l-yellow-500" :
+                      "border-l-green-500"
+                    )}>
+                      <CardContent className="p-3">
+                        <div className="flex flex-col md:flex-row justify-between items-start gap-2">
+                          <div className="flex-grow">
+                            <h3 className="font-medium">{task.title}</h3>
+                            
+                            <div className="flex flex-wrap gap-2 my-2">
+                              <Badge className={cn(
                                 task.status === "completed" ? "bg-green-100 text-green-800" : 
                                 task.status === "in_progress" ? "bg-blue-100 text-blue-800" : 
                                 task.status === "blocked" ? "bg-red-100 text-red-800" : 
                                 "bg-amber-100 text-amber-800"
-                              }>
-                                {task.status}
+                              )}>
+                                {task.status.replace('_', ' ')}
+                              </Badge>
+                              
+                              <Badge variant="outline" className="capitalize">
+                                {task.priority} priority
+                              </Badge>
+                              
+                              <Badge variant="outline" className="bg-gray-100">
+                                Due: {format(new Date(task.dueDate), "MMM d, yyyy")}
                               </Badge>
                             </div>
-                            <div className="mt-2 flex justify-end">
+                            
+                            {task.description && (
+                              <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+                            )}
+                            
+                            {/* Progress bar */}
+                            <div className="w-full mt-2">
+                              <div className="flex justify-between text-xs mb-1">
+                                <span>Progress</span>
+                                <span>{task.progress}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className={cn(
+                                    "h-2 rounded-full",
+                                    task.progress >= 100 ? "bg-green-500" :
+                                    task.progress >= 70 ? "bg-blue-500" :
+                                    task.progress >= 30 ? "bg-yellow-500" :
+                                    "bg-red-500"
+                                  )}
+                                  style={{ width: `${task.progress}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col gap-2">
+                            {/* Show assigned user if any */}
+                            {task.assignedTo && (
+                              <div className="text-sm flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                <span>
+                                  {projectStaff.find(staff => staff.id === task.assignedTo)?.name || "Unassigned"}
+                                </span>
+                              </div>
+                            )}
+                            
+                            <div className="flex gap-2">
+                              {/* Show calendar button if not already on calendar */}
+                              {!events.some(event => event.relatedTaskId === task.id) && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleAddTaskToCalendar(task)}
+                                >
+                                  Add to Calendar
+                                </Button>
+                              )}
+                              
                               <Button 
-                                variant="outline" 
+                                variant="default" 
                                 size="sm"
                                 onClick={() => handleViewTaskDetails(task)}
                               >
@@ -579,226 +976,164 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                               </Button>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-muted-foreground">No tasks due on this day.</p>
-                    )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <ListTodo className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <h3 className="text-lg font-medium mb-1">No tasks added yet</h3>
+                    <p className="text-muted-foreground mb-4">Create tasks to track project progress</p>
+                    <Button onClick={() => setShowAddTaskDialog(true)}>
+                      <Plus size={16} className="mr-1" /> Add Task
+                    </Button>
                   </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Kanban Board Tab */}
+        <TabsContent value="kanban" className="py-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Pending Column */}
+            <Card>
+              <CardHeader className="bg-amber-50 py-3">
+                <CardTitle className="text-sm font-medium text-amber-800">Pending</CardTitle>
+              </CardHeader>
+              <CardContent className="p-2">
+                <div className="space-y-2">
+                  {tasks.filter(t => t.status === "pending").map(task => (
+                    <Card key={task.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleViewTaskDetails(task)}>
+                      <CardContent className="p-2">
+                        <p className="font-medium text-sm">{task.title}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <Badge variant="outline" className="capitalize text-xs">
+                            {task.priority}
+                          </Badge>
+                          <div className="text-xs text-gray-500">
+                            {format(new Date(task.dueDate), "MMM d")}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  
+                  {tasks.filter(t => t.status === "pending").length === 0 && (
+                    <div className="text-center py-8 text-sm text-gray-500">
+                      No pending tasks
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* In Progress Column */}
+            <Card>
+              <CardHeader className="bg-blue-50 py-3">
+                <CardTitle className="text-sm font-medium text-blue-800">In Progress</CardTitle>
+              </CardHeader>
+              <CardContent className="p-2">
+                <div className="space-y-2">
+                  {tasks.filter(t => t.status === "in_progress").map(task => (
+                    <Card key={task.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleViewTaskDetails(task)}>
+                      <CardContent className="p-2">
+                        <p className="font-medium text-sm">{task.title}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <Badge variant="outline" className="capitalize text-xs">
+                            {task.priority}
+                          </Badge>
+                          <div className="text-xs text-gray-500">
+                            {format(new Date(task.dueDate), "MMM d")}
+                          </div>
+                        </div>
+                        {/* Simple progress bar */}
+                        <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                          <div 
+                            className="bg-blue-500 h-1 rounded-full" 
+                            style={{ width: `${task.progress}%` }}
+                          ></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  
+                  {tasks.filter(t => t.status === "in_progress").length === 0 && (
+                    <div className="text-center py-8 text-sm text-gray-500">
+                      No in-progress tasks
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Blocked Column */}
+            <Card>
+              <CardHeader className="bg-red-50 py-3">
+                <CardTitle className="text-sm font-medium text-red-800">Blocked</CardTitle>
+              </CardHeader>
+              <CardContent className="p-2">
+                <div className="space-y-2">
+                  {tasks.filter(t => t.status === "blocked").map(task => (
+                    <Card key={task.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleViewTaskDetails(task)}>
+                      <CardContent className="p-2">
+                        <p className="font-medium text-sm">{task.title}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <Badge variant="outline" className="capitalize text-xs">
+                            {task.priority}
+                          </Badge>
+                          <div className="flex items-center text-xs text-red-600">
+                            <AlertTriangle size={12} className="mr-1" />
+                            Blocked
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  
+                  {tasks.filter(t => t.status === "blocked").length === 0 && (
+                    <div className="text-center py-8 text-sm text-gray-500">
+                      No blocked tasks
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Completed Column */}
+            <Card>
+              <CardHeader className="bg-green-50 py-3">
+                <CardTitle className="text-sm font-medium text-green-800">Completed</CardTitle>
+              </CardHeader>
+              <CardContent className="p-2">
+                <div className="space-y-2">
+                  {tasks.filter(t => t.status === "completed").map(task => (
+                    <Card key={task.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleViewTaskDetails(task)}>
+                      <CardContent className="p-2">
+                        <p className="font-medium text-sm line-through text-gray-500">{task.title}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <Badge variant="outline" className="text-xs bg-green-50">
+                            <Check size={10} className="mr-1" /> Done
+                          </Badge>
+                          <div className="text-xs text-gray-500">
+                            {task.completedAt ? format(new Date(task.completedAt), "MMM d") : ""}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  
+                  {tasks.filter(t => t.status === "completed").length === 0 && (
+                    <div className="text-center py-8 text-sm text-gray-500">
+                      No completed tasks
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="tasks" className="py-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Tasks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardHeader className="bg-amber-50">
-                      <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-2">
-                      {tasks.filter(task => task.status === "pending").length > 0 ? (
-                        <div className="space-y-2">
-                          {tasks
-                            .filter(task => task.status === "pending")
-                            .map(task => (
-                              <div key={task.id} className="p-2 border rounded-md">
-                                <div className="flex justify-between items-start">
-                                  <p className="font-medium">{task.title}</p>
-                                  <Badge className={
-                                    task.priority === "high" || task.priority === "urgent" ? 
-                                    "bg-red-100 text-red-800" : 
-                                    task.priority === "medium" ? 
-                                    "bg-amber-100 text-amber-800" : 
-                                    "bg-blue-100 text-blue-800"
-                                  }>
-                                    {task.priority}
-                                  </Badge>
-                                </div>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  Due: {format(new Date(task.dueDate), "MMM d, yyyy")}
-                                </p>
-                                <div className="mt-2 flex justify-end gap-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleUpdateTaskStatus(task.id, "in_progress")}
-                                  >
-                                    Start
-                                  </Button>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleViewTaskDetails(task)}
-                                  >
-                                    Details
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground p-4 text-center">No pending tasks</p>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="bg-blue-50">
-                      <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-2">
-                      {tasks.filter(task => task.status === "in_progress").length > 0 ? (
-                        <div className="space-y-2">
-                          {tasks
-                            .filter(task => task.status === "in_progress")
-                            .map(task => (
-                              <div key={task.id} className="p-2 border rounded-md">
-                                <div className="flex justify-between items-start">
-                                  <p className="font-medium">{task.title}</p>
-                                  <Badge className={
-                                    task.priority === "high" || task.priority === "urgent" ? 
-                                    "bg-red-100 text-red-800" : 
-                                    task.priority === "medium" ? 
-                                    "bg-amber-100 text-amber-800" : 
-                                    "bg-blue-100 text-blue-800"
-                                  }>
-                                    {task.priority}
-                                  </Badge>
-                                </div>
-                                <div className="mt-2">
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>Progress</span>
-                                    <span>{task.progress}%</span>
-                                  </div>
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div 
-                                      className="bg-blue-600 h-2 rounded-full" 
-                                      style={{ width: `${task.progress}%` }}
-                                    ></div>
-                                  </div>
-                                </div>
-                                <div className="mt-2 flex justify-end gap-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleUpdateTaskStatus(task.id, "completed")}
-                                    className="bg-green-50 text-green-700 hover:bg-green-100"
-                                  >
-                                    Complete
-                                  </Button>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleViewTaskDetails(task)}
-                                  >
-                                    Details
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground p-4 text-center">No tasks in progress</p>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="bg-green-50">
-                      <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-2">
-                      {tasks.filter(task => task.status === "completed").length > 0 ? (
-                        <div className="space-y-2">
-                          {tasks
-                            .filter(task => task.status === "completed")
-                            .map(task => (
-                              <div key={task.id} className="p-2 border rounded-md">
-                                <div className="flex justify-between items-start">
-                                  <p className="font-medium">{task.title}</p>
-                                  <Badge className="bg-green-100 text-green-800">
-                                    Completed
-                                  </Badge>
-                                </div>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  Completed: {task.completedAt ? format(new Date(task.completedAt), "MMM d, yyyy") : "N/A"}
-                                </p>
-                                <div className="mt-2 flex justify-end">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleViewTaskDetails(task)}
-                                  >
-                                    Details
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground p-4 text-center">No completed tasks</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="timeline" className="py-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                <div className="space-y-8 relative ml-12">
-                  {[...events]
-                    .sort((a, b) => a.start.getTime() - b.start.getTime())
-                    .map((event, index) => (
-                      <div key={event.id} className="relative">
-                        <div className="absolute -left-12 mt-1.5 w-4 h-4 rounded-full bg-blue-500"></div>
-                        <div className="mb-1 text-sm text-muted-foreground">
-                          {format(event.start, "MMM d, yyyy")}
-                        </div>
-                        <div className="p-3 border rounded-md">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-medium">{event.title}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
-                              </p>
-                              {event.description && (
-                                <p className="text-sm mt-1">{event.description}</p>
-                              )}
-                            </div>
-                            <Badge className={
-                              event.type === "meeting" ? "bg-blue-100 text-blue-800" :
-                              event.type === "deadline" ? "bg-red-100 text-red-800" :
-                              event.type === "milestone" ? "bg-green-100 text-green-800" :
-                              event.type === "inspection" ? "bg-amber-100 text-amber-800" :
-                              "bg-purple-100 text-purple-800"
-                            }>
-                              {event.type}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
 
@@ -809,24 +1144,6 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
             <DialogTitle>Add New Event</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label htmlFor="event-type" className="text-sm font-medium">
-                Event Type
-              </label>
-              <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value as ScheduleEvent["type"] })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="meeting">Meeting</SelectItem>
-                  <SelectItem value="deadline">Deadline</SelectItem>
-                  <SelectItem value="milestone">Milestone</SelectItem>
-                  <SelectItem value="task">Task</SelectItem>
-                  <SelectItem value="inspection">Inspection</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          
             <div className="grid gap-2">
               <label htmlFor="event-title" className="text-sm font-medium">
                 Event Title
@@ -860,8 +1177,8 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                     <Calendar
                       mode="single"
                       selected={newEvent.start}
-                      onSelect={(date) => setNewEvent({ ...newEvent, start: date || new Date() })}
-                      className="rounded-md border"
+                      onSelect={(date) => date && setNewEvent({ ...newEvent, start: date })}
+                      className="rounded-md border pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
@@ -888,23 +1205,46 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                     <Calendar
                       mode="single"
                       selected={newEvent.end}
-                      onSelect={(date) => setNewEvent({ ...newEvent, end: date || new Date() })}
-                      className="rounded-md border"
+                      onSelect={(date) => date && setNewEvent({ ...newEvent, end: date })}
+                      className="rounded-md border pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
               </div>
             </div>
 
-            <div className="grid gap-2">
-              <label htmlFor="event-location" className="text-sm font-medium">
-                Location
-              </label>
-              <Input
-                id="event-location"
-                value={newEvent.location}
-                onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="event-location" className="text-sm font-medium">
+                  Location
+                </label>
+                <Input
+                  id="event-location"
+                  value={newEvent.location}
+                  onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <label htmlFor="event-type" className="text-sm font-medium">
+                  Event Type
+                </label>
+                <Select onValueChange={(value) => setNewEvent({ 
+                  ...newEvent, 
+                  type: value as ScheduleEvent["type"] 
+                })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="meeting">Meeting</SelectItem>
+                    <SelectItem value="deadline">Deadline</SelectItem>
+                    <SelectItem value="milestone">Milestone</SelectItem>
+                    <SelectItem value="task">Task</SelectItem>
+                    <SelectItem value="inspection">Inspection</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid gap-2">
@@ -918,39 +1258,37 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
                 rows={3}
               />
             </div>
-
+            
+            {/* Assigned staff select */}
             <div className="grid gap-2">
               <label htmlFor="event-assigned" className="text-sm font-medium">
-                Assigned To
+                Assign To
               </label>
-              <Select 
-                value={newEvent.assignedTo?.[0] || ""} 
-                onValueChange={(value) => setNewEvent({ ...newEvent, assignedTo: value ? [value] : [] })}
-              >
+              <Select onValueChange={(value) => setNewEvent({ 
+                ...newEvent, 
+                assignedTo: value ? [value] : [] 
+              })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Assign to staff member" />
+                  <SelectValue placeholder="Assign to staff" />
                 </SelectTrigger>
                 <SelectContent>
                   {projectStaff.map(staff => (
-                    <SelectItem key={staff.id} value={staff.id}>
-                      {staff.name} ({staff.role})
-                    </SelectItem>
+                    <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-
+            
             <div className="flex items-center space-x-2">
-              <Switch
+              <input
+                type="checkbox"
                 id="create-task"
                 checked={createTaskFromEvent}
-                onCheckedChange={setCreateTaskFromEvent}
+                onChange={() => setCreateTaskFromEvent(!createTaskFromEvent)}
+                className="h-4 w-4 rounded border-gray-300"
               />
-              <label
-                htmlFor="create-task"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Create a task from this event
+              <label htmlFor="create-task" className="text-sm font-medium leading-none">
+                Also create a task from this event
               </label>
             </div>
           </div>
@@ -994,106 +1332,83 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="grid gap-2">
+                <label htmlFor="task-due-date" className="text-sm font-medium">
+                  Due Date
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !newTask.dueDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {newTask.dueDate ? format(new Date(newTask.dueDate), "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={new Date(newTask.dueDate)}
+                      onSelect={(date) => date && setNewTask({ ...newTask, dueDate: format(date, "yyyy-MM-dd") })}
+                      className="rounded-md border pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="grid gap-2">
                 <label htmlFor="task-priority" className="text-sm font-medium">
                   Priority
                 </label>
                 <Select 
-                  value={newTask.priority} 
-                  onValueChange={(value) => setNewTask({ ...newTask, priority: value as ProjectTask["priority"] })}
+                  defaultValue="medium"
+                  onValueChange={(value) => setNewTask({ 
+                    ...newTask, 
+                    priority: value as ProjectTask["priority"] 
+                  })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
                     <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="grid gap-2">
-                <label htmlFor="task-status" className="text-sm font-medium">
-                  Status
-                </label>
-                <Select 
-                  value={newTask.status} 
-                  onValueChange={(value) => setNewTask({ ...newTask, status: value as ProjectTask["status"] })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="blocked">Blocked</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <label htmlFor="task-due-date" className="text-sm font-medium">
-                Due Date
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !newTask.dueDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {newTask.dueDate ? format(new Date(newTask.dueDate), "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={new Date(newTask.dueDate)}
-                    onSelect={(date) => setNewTask({ ...newTask, dueDate: format(date || new Date(), "yyyy-MM-dd") })}
-                    className="rounded-md border"
-                  />
-                </PopoverContent>
-              </Popover>
             </div>
 
             <div className="grid gap-2">
               <label htmlFor="task-assigned" className="text-sm font-medium">
-                Assigned To
+                Assign To
               </label>
-              <Select 
-                value={newTask.assignedTo || ""} 
-                onValueChange={(value) => setNewTask({ ...newTask, assignedTo: value })}
-              >
+              <Select onValueChange={(value) => setNewTask({ ...newTask, assignedTo: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Assign to staff member" />
+                  <SelectValue placeholder="Assign to staff" />
                 </SelectTrigger>
                 <SelectContent>
                   {projectStaff.map(staff => (
-                    <SelectItem key={staff.id} value={staff.id}>
-                      {staff.name} ({staff.role})
-                    </SelectItem>
+                    <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-
+            
             <div className="flex items-center space-x-2">
-              <Switch
+              <input
+                type="checkbox"
                 id="create-event"
                 checked={createEventFromTask}
-                onCheckedChange={setCreateEventFromTask}
+                onChange={() => setCreateEventFromTask(!createEventFromTask)}
+                className="h-4 w-4 rounded border-gray-300"
               />
-              <label
-                htmlFor="create-event"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Add this task to calendar
+              <label htmlFor="create-event" className="text-sm font-medium leading-none">
+                Also add this task to the calendar
               </label>
             </div>
           </div>
@@ -1105,22 +1420,154 @@ export default function ProjectScheduleAndTasksTab({ project, projectStaff = [],
         </DialogContent>
       </Dialog>
 
+      {/* Event Details Dialog */}
+      <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+        {selectedEvent && (
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{selectedEvent.title}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <CalendarIcon className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Date & Time</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(selectedEvent.start, "PPP")} • {format(selectedEvent.start, "p")} - {format(selectedEvent.end, "p")}
+                  </p>
+                </div>
+              </div>
+
+              {selectedEvent.location && (
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <MapPin className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Location</p>
+                    <p className="text-sm text-muted-foreground">{selectedEvent.location}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-start gap-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <FileText className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Description</p>
+                  <p className="text-sm text-muted-foreground">{selectedEvent.description || "No description provided"}</p>
+                </div>
+              </div>
+
+              {selectedEvent.assignedTo && selectedEvent.assignedTo.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium">Assigned To</p>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {selectedEvent.assignedTo.map(staffId => {
+                      const staff = projectStaff.find(s => s.id === staffId);
+                      return staff ? (
+                        <Badge key={staff.id} className="bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-1 text-xs">
+                          {staff.name}
+                        </Badge>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* If this event is linked to a task, show task info too */}
+              {selectedEvent.relatedTaskId && (
+                <div className="border-t pt-3 mt-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Linked Task</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-7 px-2 text-xs"
+                      onClick={() => {
+                        const task = tasks.find(t => t.id === selectedEvent.relatedTaskId);
+                        if (task) {
+                          setSelectedEvent(null);
+                          handleViewTaskDetails(task);
+                        }
+                      }}
+                    >
+                      View Task
+                    </Button>
+                  </div>
+                  {tasks.find(t => t.id === selectedEvent.relatedTaskId) && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {tasks.find(t => t.id === selectedEvent.relatedTaskId)?.title}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="sm:justify-between">
+              <div>
+                <Badge className={
+                  selectedEvent.status === "completed" ? "bg-green-100 text-green-800" : 
+                  selectedEvent.status === "cancelled" ? "bg-red-100 text-red-800" : 
+                  "bg-blue-100 text-blue-800"
+                }>
+                  {selectedEvent.status}
+                </Badge>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => handleDeleteEvent(selectedEvent.id)}>
+                  Delete
+                </Button>
+                {selectedEvent.status === "scheduled" && (
+                  <>
+                    <Button variant="outline" onClick={() => handleUpdateEventStatus(selectedEvent.id, "cancelled")} className="border-red-200 text-red-600 hover:bg-red-50">
+                      <X size={16} className="mr-1" /> Cancel
+                    </Button>
+                    <Button onClick={() => handleUpdateEventStatus(selectedEvent.id, "completed")} className="bg-green-600 hover:bg-green-700">
+                      <Check size={16} className="mr-1" /> Complete
+                    </Button>
+                  </>
+                )}
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
+
       {/* Task Detail Dialog */}
       <TaskDetailDialog
         open={taskDetailDialogOpen}
         onOpenChange={setTaskDetailDialogOpen}
-        task={taskForDetailView}
-        projectStaff={projectStaff}
-        onUpdateStatus={(id, status) => {
-          onUpdateProject({
-            ...project,
-            tasks: (project.tasks || []).map(t => 
-              t.id === id ? { ...t, status } : t
+        task={taskForDetailView || tasks[0]} // Fallback to first task if none selected
+        onTaskUpdate={(taskId, updates) => {
+          setTasks(prev =>
+            prev.map(task =>
+              task.id === taskId ? { ...task, ...updates } : task
             )
-          });
+          );
+          
+          // If there's an event related to this task, update it too if needed
+          if (updates.status) {
+            const eventForTask = events.find(event => event.relatedTaskId === taskId);
+            if (eventForTask) {
+              const eventStatus = updates.status === "completed" ? "completed" : 
+                               updates.status === "blocked" ? "cancelled" : "scheduled";
+              
+              setEvents(prev =>
+                prev.map(event =>
+                  event.relatedTaskId === taskId ? { ...event, status: eventStatus } : event
+                )
+              );
+            }
+          }
         }}
-        onDeleteTask={handleDeleteTask}
+        onUpdateStatus={handleUpdateTaskStatus}
+        onDelete={handleDeleteTask}
         onAddToCalendar={handleAddTaskToCalendar}
+        projectStaff={projectStaff || []}
       />
     </div>
   );

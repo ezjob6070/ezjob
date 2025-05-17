@@ -1,90 +1,79 @@
 
-import { DateRange } from "react-day-picker";
 import { Technician } from "@/types/technician";
-import { Job } from "@/components/jobs/JobTypes";
 
-export const ensureCompleteDateRange = (dateRange?: DateRange): DateRange | undefined => {
-  if (!dateRange) {
-    return undefined;
-  }
-  
-  // If no end date, use the start date as the end date
-  if (dateRange.from && !dateRange.to) {
-    return {
-      from: dateRange.from,
-      to: dateRange.from
+/**
+ * Calculate total financial metrics for all technicians
+ */
+export const calculateFinancialMetrics = (displayedTechnicians: Technician[]) => {
+  // Default values if no technicians or empty array
+  if (!displayedTechnicians || displayedTechnicians.length === 0) {
+    return { 
+      totalRevenue: 0, 
+      technicianEarnings: 0, 
+      totalExpenses: 0, 
+      companyProfit: 0 
     };
   }
   
-  return dateRange;
-};
-
-export const calculateTechnicianFinancials = (
-  technicians: Technician[],
-  jobs: Job[],
-  dateRange?: DateRange
-): Technician[] => {
-  const range = ensureCompleteDateRange(dateRange);
+  // Calculate total revenue from technicians
+  const totalRevenue = displayedTechnicians.reduce((sum, tech) => sum + (tech?.totalRevenue || 0), 0);
   
-  return technicians.map(tech => {
-    // Filter jobs for this technician
-    const techJobs = jobs.filter(job => {
-      // Match by technician ID
-      const belongsToTechnician = job.technicianId === tech.id;
-      
-      // Check if job is within date range
-      let inDateRange = true;
-      if (range?.from && range?.to && job.scheduledDate) {
-        const jobDate = new Date(job.scheduledDate);
-        inDateRange = jobDate >= range.from && jobDate <= range.to;
-      }
-      
-      return belongsToTechnician && inDateRange;
-    });
-    
-    // Count jobs by status
-    const completedJobs = techJobs.filter(job => job.status === "completed").length;
-    const cancelledJobs = techJobs.filter(job => job.status === "cancelled" || job.status === "canceled").length;
-    
-    // Calculate revenue from completed jobs
-    const totalRevenue = techJobs
-      .filter(job => job.status === "completed")
-      .reduce((sum, job) => sum + (job.actualAmount || job.amount), 0);
-    
-    // Calculate earnings based on payment type
-    let earnings = 0;
-    if (tech.paymentType === "percentage") {
-      earnings = totalRevenue * (tech.paymentRate / 100);
-    } else if (tech.paymentType === "flat") {
-      earnings = completedJobs * tech.paymentRate;
-    } else if (tech.paymentType === "hourly") {
-      // Assume 2 hours per job for estimation
-      earnings = completedJobs * 2 * (tech.hourlyRate || 0);
-    }
-    
-    return {
-      ...tech,
-      totalRevenue,
-      earnings,
-      jobCount: techJobs.length,
-      completedJobs,
-      cancelledJobs
-    };
-  });
-};
-
-export const getTechnicianFinancialMetrics = (technicians: Technician[]) => {
-  const totalRevenue = technicians.reduce((sum, tech) => sum + (tech.totalRevenue || 0), 0);
-  const totalEarnings = technicians.reduce((sum, tech) => sum + (tech.earnings || 0), 0);
-  const totalJobs = technicians.reduce((sum, tech) => sum + (tech.jobCount || 0), 0);
-  const completedJobs = technicians.reduce((sum, tech) => sum + (tech.completedJobs || 0), 0);
+  // Calculate total technician payments
+  const technicianEarnings = displayedTechnicians.reduce((sum, tech) => {
+    if (!tech) return sum;
+    const rate = tech.paymentType === "percentage" ? tech.paymentRate / 100 : 1;
+    return sum + (tech.totalRevenue || 0) * rate;
+  }, 0);
   
-  return {
-    totalRevenue,
-    totalEarnings,
-    companyProfit: totalRevenue - totalEarnings,
-    totalJobs,
-    completedJobs,
-    averageJobValue: totalJobs > 0 ? totalRevenue / totalJobs : 0
+  // Estimate expenses as 33% of revenue
+  const totalExpenses = totalRevenue * 0.33;
+  
+  // Calculate net profit
+  const companyProfit = totalRevenue - technicianEarnings - totalExpenses;
+  
+  return { 
+    totalRevenue, 
+    technicianEarnings, 
+    totalExpenses, 
+    companyProfit 
   };
+};
+
+/**
+ * Calculate financial metrics for a single technician
+ */
+export const calculateTechnicianMetrics = (technician: Technician | null) => {
+  if (!technician) return null;
+  
+  const revenue = technician.totalRevenue || 0;
+  const earnings = revenue * (technician.paymentType === "percentage" 
+    ? technician.paymentRate / 100 
+    : 1);
+  const expenses = revenue * 0.33;
+  const profit = revenue - earnings - expenses;
+  const partsValue = revenue * 0.2; // Assuming parts are 20% of total revenue
+  
+  return { revenue, earnings, expenses, profit, partsValue };
+};
+
+/**
+ * Format date range for display
+ */
+export const formatDateRangeText = (from?: Date, to?: Date) => {
+  if (!from) return "";
+  
+  return to
+    ? `${formatDate(from)} - ${formatDate(to)}`
+    : formatDate(from);
+};
+
+/**
+ * Format date for display
+ */
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
 };

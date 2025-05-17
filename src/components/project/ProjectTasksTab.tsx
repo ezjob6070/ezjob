@@ -942,15 +942,10 @@ const ProjectTasksTab: React.FC<ProjectTasksTabProps> = ({ project }) => {
           task={selectedTask}
           open={taskDetailOpen}
           onOpenChange={setTaskDetailOpen}
-          onUpdateStatus={handleUpdateTaskStatus}
-          onDeleteTask={(id) => {
-            const updatedTasks = tasks.filter(t => t.id !== id);
-            setTasks(updatedTasks);
-            setTaskDetailOpen(false);
-          }}
-          onAddToCalendar={(task) => {
-            toast.success(`Added "${task.title}" to calendar`);
-          }}
+          onTaskUpdate={handleUpdateTask}
+          onUpdateStatus={(taskId, status) => handleUpdateTaskStatus(taskId, status)}
+          onDelete={() => {}}
+          onAddToCalendar={() => {}}
           projectStaff={project.staff || []}
         />
       )}

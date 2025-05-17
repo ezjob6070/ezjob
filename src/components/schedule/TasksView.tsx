@@ -1,35 +1,23 @@
+
 import { format } from "date-fns";
-import { Calendar, Bell, Search, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
 import ReminderCard from "@/components/schedule/ReminderCard";
 import { useState } from "react";
 import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from "@/components/ui/dropdown-menu";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 interface TasksViewProps {
   selectedDate: Date;
@@ -47,10 +35,9 @@ const TasksView = ({
   onTasksChange
 }: TasksViewProps) => {
   const [filterType, setFilterType] = useState<string>("all");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "a-z" | "z-a">("newest");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"all" | "tasks" | "reminders">("all");
-  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
     if (!onTasksChange) return;
@@ -60,6 +47,34 @@ const TasksView = ({
     );
     
     onTasksChange(updatedTasks);
+  };
+
+  const handleCreateReminder = () => {
+    if (!onTasksChange) return;
+    
+    const reminderTime = new Date(selectedDate);
+    // Default to 9:00 AM for new reminders
+    reminderTime.setHours(9, 0, 0, 0);
+    
+    const newReminder: Task = {
+      id: uuid(),
+      title: "New Reminder",
+      dueDate: reminderTime,
+      start: reminderTime.toISOString(),
+      end: new Date(reminderTime.getTime() + 30 * 60 * 1000).toISOString(),
+      status: "scheduled",
+      priority: "medium",
+      client: { name: "", id: "" },
+      description: "",
+      technician: { name: "", id: "" },
+      color: "#9b87f5", // Purple for reminders
+      type: "reminder",
+      isReminder: true,
+      hasFollowUp: false
+    };
+    
+    onTasksChange([...tasksForSelectedDate, newReminder]);
+    toast.success("Reminder created");
   };
 
   const handleCreateFollowUp = (task: Task) => {
@@ -120,22 +135,8 @@ const TasksView = ({
       filtered = filtered.filter(task => task.status === filterType);
     }
 
-    // Apply date filter
-    if (dateFilter) {
-      filtered = filtered.filter(task => {
-        const taskDate = new Date(task.dueDate);
-        return taskDate.toDateString() === dateFilter.toDateString();
-      });
-    }
-
     // Apply sort order
     filtered.sort((a, b) => {
-      if (sortOrder === "a-z") {
-        return a.title.localeCompare(b.title);
-      } else if (sortOrder === "z-a") {
-        return b.title.localeCompare(a.title);
-      }
-      
       const dateA = new Date(a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate));
       const dateB = new Date(b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate));
       
@@ -149,150 +150,133 @@ const TasksView = ({
     return filtered;
   };
 
-  const clearDateFilter = () => {
-    setDateFilter(undefined);
-    toast.success("Date filter cleared");
-  };
-
   const filteredTasks = filterTasks();
   const tasksCount = tasksForSelectedDate.filter(task => !task.isReminder).length;
   const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
 
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-center mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onPreviousDay}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
         <h3 className="text-lg font-medium">
           {format(selectedDate, "EEEE, MMMM d, yyyy")}
         </h3>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onNextDay}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
       
       <div className="mb-4">
         <div className="flex flex-col gap-3">
-          <Tabs 
-            value={viewMode} 
-            onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
-            className="w-full"
-          >
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="all" className="text-xs">
-                All ({tasksCount + remindersCount})
-              </TabsTrigger>
-              <TabsTrigger value="tasks" className="text-xs">
-                <Calendar className="h-3.5 w-3.5 mr-1" />
-                Tasks ({tasksCount})
-              </TabsTrigger>
-              <TabsTrigger value="reminders" className="text-xs">
-                <Bell className="h-3.5 w-3.5 mr-1" />
-                Reminders ({remindersCount})
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          
-          {/* Search and filter bar in a single row */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search tasks & reminders..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 h-8 text-xs"
-              />
-            </div>
+          <div className="flex gap-2">
+            <Input 
+              placeholder="Search tasks & reminders..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
+            />
             
-            {/* Status Filter */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
-                  <Filter className="h-3.5 w-3.5" />
-                  Status
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuRadioGroup value={filterType} onValueChange={setFilterType}>
-                  <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="scheduled">Scheduled</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="in progress">In Progress</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="completed">Completed</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="overdue">Overdue</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Sort Order */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
-                  {sortOrder === "newest" || sortOrder === "oldest" ? (
-                    sortOrder === "newest" ? (
-                      <SortDesc className="h-3.5 w-3.5" />
-                    ) : (
-                      <SortAsc className="h-3.5 w-3.5" />
-                    )
-                  ) : (
-                    sortOrder === "a-z" ? (
-                      <span className="text-xs font-bold">A→Z</span>
-                    ) : (
-                      <span className="text-xs font-bold">Z→A</span>
-                    )
-                  )}
-                  Sort
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuRadioGroup 
-                  value={sortOrder} 
-                  onValueChange={(value) => setSortOrder(value as "newest" | "oldest" | "a-z" | "z-a")}
+            {onTasksChange && (
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={handleCreateReminder}
+                  title="Add Reminder"
                 >
-                  <DropdownMenuRadioItem value="newest">
-                    <SortDesc className="h-3.5 w-3.5 mr-2" /> Newest First
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="oldest">
-                    <SortAsc className="h-3.5 w-3.5 mr-2" /> Oldest First
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="a-z">A to Z</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="z-a">Z to A</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
+                  <Bell className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-2">
+            <Tabs 
+              value={viewMode} 
+              onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
+              className="w-full"
+            >
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="all" className="text-xs">
+                  All ({tasksCount + remindersCount})
+                </TabsTrigger>
+                <TabsTrigger value="tasks" className="text-xs">
+                  <Calendar className="h-3.5 w-3.5 mr-1" />
+                  Tasks ({tasksCount})
+                </TabsTrigger>
+                <TabsTrigger value="reminders" className="text-xs">
+                  <Bell className="h-3.5 w-3.5 mr-1" />
+                  Reminders ({remindersCount})
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+          
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-1">
+                  {filterType === "all" ? "All Status" : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setFilterType("all")}>
+                  All Status
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("scheduled")}>
+                  Scheduled
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("in progress")}>
+                  In Progress
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("completed")}>
+                  Completed
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType("overdue")}>
+                  Overdue
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* Date Filter */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {dateFilter ? format(dateFilter, "MMM d") : "Date"}
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-1">
+                  {sortOrder === "newest" ? (
+                    <><ArrowDown className="h-4 w-4 mr-1" /> Newest</>
+                  ) : (
+                    <><ArrowUp className="h-4 w-4 mr-1" /> Oldest</>
+                  )}
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-auto p-0">
-                <CalendarComponent
-                  mode="single"
-                  selected={dateFilter}
-                  onSelect={setDateFilter}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-                {dateFilter && (
-                  <div className="p-3 border-t border-border flex justify-end">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={clearDateFilter}
-                      className="text-xs"
-                    >
-                      Clear Filter
-                    </Button>
-                  </div>
-                )}
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSortOrder("newest")}>
+                  <ArrowDown className="h-4 w-4 mr-2" /> Newest First
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
+                  <ArrowUp className="h-4 w-4 mr-2" /> Oldest First
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
       
       <div className="space-y-4">
         <h3 className="font-medium">
-          {viewMode === "all" ? "Items" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
+          {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
         </h3>
         
         {filteredTasks.length === 0 ? (

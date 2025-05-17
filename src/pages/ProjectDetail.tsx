@@ -72,8 +72,7 @@ export default function ProjectDetail() {
     actualSpent: 0,
     clientName: "Unknown",
     revenue: 0,
-    contractors: [],
-    staff: []
+    contractors: []
   };
 
   const handleFileUpload = (type: "document" | "image") => {
@@ -98,12 +97,6 @@ export default function ProjectDetail() {
 
   const handleGoBack = () => {
     navigate(-1);
-  };
-
-  const handleUpdateProject = (updatedProject: Project) => {
-    // In a real application, this would update the project in the database
-    // For now, just display a success toast
-    toast.success("Project updated successfully");
   };
 
   return (
@@ -331,26 +324,18 @@ export default function ProjectDetail() {
         </TabsContent>
         
         <TabsContent value="schedule-tasks" className="py-4">
-          <ProjectScheduleAndTasksTab 
-            project={project} 
-            projectStaff={project.staff || []} 
-            onUpdateProject={handleUpdateProject}
-          />
+          <ProjectScheduleAndTasksTab project={project} projectStaff={project.staff} />
         </TabsContent>
         
         <TabsContent value="staff" className="py-4">
-          <ProjectStaffTab 
-            projectId={project.id} 
-            projectStaff={project.staff || []} 
-            onUpdateProject={handleUpdateProject}
-          />
+          <ProjectStaffTab projectId={project.id} projectStaff={project.staff} />
         </TabsContent>
         
         <TabsContent value="equipment" className="py-4">
           <ProjectEquipmentTab 
             projectId={project.id} 
-            projectEquipment={project.equipment || []} 
-            projectMaterials={project.materials || []} 
+            projectEquipment={project.equipment} 
+            projectMaterials={project.materials} 
           />
         </TabsContent>
         

@@ -1,4 +1,3 @@
-
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -56,12 +55,15 @@ const ensureValidDate = (date: any): Date | null => {
 };
 
 // Helper function to safely get hours from date that could be string or Date
-const getHoursFromDate = (date: string | Date): number => {
+function getHoursFromDate(date: Date | string): number {
+  if (date instanceof Date) {
+    return date.getHours();
+  }
   if (typeof date === 'string') {
     return new Date(date).getHours();
   }
-  return date.getHours();
-};
+  return 0;
+}
 
 // Helper function to safely check if a date is the same day
 function isSameDayHelper(dateA: Date | string | undefined, dateB: Date | string | undefined): boolean {
@@ -288,11 +290,8 @@ const CalendarView = ({
                 });
                 
                 const tasksAtHour = currentViewEvents.tasks.filter(task => {
-                  // Fix: Use our helper function to safely get hours from task.dueDate
-                  const taskDate = ensureValidDate(task.dueDate);
-                  return taskDate && 
-                    getHoursFromDate(task.dueDate) === hour && 
-                    isSameDay(taskDate, selectedDate);
+                  return task.dueDate.getHours() === hour && 
+                    isSameDay(task.dueDate, selectedDate);
                 });
                 
                 const hasItems = jobsAtHour.length > 0 || tasksAtHour.length > 0;
@@ -723,7 +722,7 @@ const CalendarView = ({
                             <p className="text-muted-foreground capitalize">{task.priority} priority</p>
                             {viewMode !== 'day' && (
                               <p className="text-xs text-muted-foreground mt-1">
-                                {format(task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate), "MMM d")}
+                                {format(task.dueDate, "MMM d")}
                               </p>
                             )}
                           </div>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { format } from "date-fns";
 import { 
@@ -40,8 +41,8 @@ const FinancialTransactionsTable = ({
   const filteredTransactions = transactions.filter(transaction => {
     const searchTermLower = searchTerm.toLowerCase();
     return (
-      (transaction.clientName && transaction.clientName.toLowerCase().includes(searchTermLower)) ||
-      (transaction.jobTitle && transaction.jobTitle.toLowerCase().includes(searchTermLower)) ||
+      transaction.clientName?.toLowerCase().includes(searchTermLower) ||
+      transaction.jobTitle?.toLowerCase().includes(searchTermLower) ||
       (transaction.technicianName && transaction.technicianName.toLowerCase().includes(searchTermLower)) ||
       transaction.category.toLowerCase().includes(searchTermLower) ||
       transaction.status.toLowerCase().includes(searchTermLower)
@@ -57,9 +58,9 @@ const FinancialTransactionsTable = ({
       case "amount":
         return factor * (a.amount - b.amount);
       case "clientName":
-        return factor * ((a.clientName || "").localeCompare(b.clientName || ""));
+        return factor * (a.clientName || "").localeCompare(b.clientName || "");
       case "jobTitle":
-        return factor * ((a.jobTitle || "").localeCompare(b.jobTitle || ""));
+        return factor * (a.jobTitle || "").localeCompare(b.jobTitle || "");
       case "category":
         return factor * a.category.localeCompare(b.category);
       case "status":
@@ -97,10 +98,6 @@ const FinancialTransactionsTable = ({
         return "bg-amber-100 text-amber-800";
       case "cancelled":
         return "bg-red-100 text-red-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
-      case "refunded":
-        return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -150,8 +147,8 @@ const FinancialTransactionsTable = ({
                 <TableCell className="font-medium">
                   {format(transaction.date, "MMM d, yyyy")}
                 </TableCell>
-                <TableCell>{transaction.clientName || "—"}</TableCell>
-                <TableCell>{transaction.jobTitle || "—"}</TableCell>
+                <TableCell>{transaction.clientName}</TableCell>
+                <TableCell>{transaction.jobTitle}</TableCell>
                 <TableCell className="text-right">
                   {formatCurrency(transaction.amount)}
                 </TableCell>

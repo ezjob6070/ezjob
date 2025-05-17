@@ -26,10 +26,9 @@ const TechnicianDropdown = ({
         <SelectValue placeholder="Technician" />
       </SelectTrigger>
       <SelectContent>
-        {/* Make sure we have a valid value for each technician */}
         {technicians.map((tech) => (
-          <SelectItem key={tech} value={tech || "unknown-tech"}>
-            {tech || "Unknown Technician"}
+          <SelectItem key={tech} value={tech}>
+            {tech}
           </SelectItem>
         ))}
       </SelectContent>

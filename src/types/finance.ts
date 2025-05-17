@@ -1,76 +1,26 @@
-
-import { DateRange } from "react-day-picker";
-import { Technician } from './technician';
-
-export type TransactionType = "income" | "expense" | "refund" | "payment";
-
-export type PaymentStatus = "pending" | "completed" | "failed" | "refunded" | "cancelled";
-
-export type TransactionCategory = 
-  | "job_payment" 
-  | "materials" 
-  | "equipment" 
-  | "salary" 
-  | "technician_payment"
-  | "contractor_payment"
-  | "office"
-  | "marketing"
-  | "utilities"
-  | "rent"
-  | "fuel"
-  | "vehicle"
-  | "insurance"
-  | "other";
-
-export type TimeFrame = "day" | "week" | "month" | "year" | "custom";
-
-export type DateFilterType = "today" | "week" | "month" | "year" | "custom";
-
-export interface FinancialFilters {
-  dateRange: DateRange | null;
-  technicians: string[];
-  jobSources: string[];
-  categories: string[];
-  searchTerm: string;
-}
+import { JobSource } from "./jobSource";
 
 export interface FinancialTransaction {
   id: string;
   date: Date;
   amount: number;
+  category: "payment" | "expense" | "refund";
   description: string;
-  category: string;
-  type: TransactionType;
-  status: PaymentStatus;
-  reference?: string;
+  status: "pending" | "completed" | "cancelled";
+  clientName?: string;
   jobId?: string;
-  technicianId?: string;
   technicianName?: string;
   technicianRate?: number;
   technicianRateIsPercentage?: boolean;
+  notes?: string;
+  jobTitle?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  paymentMethod?: string;
-  createdAt: Date;
-  updatedAt?: Date;
-  clientName?: string;
-  jobTitle?: string;
-  quoteStatus?: string;
-}
-
-export interface ExpenseCategory {
-  id: string;
-  name: string;
-  icon?: React.ReactNode;
-  color: string;
-  budget?: number;
-  currentSpend?: number;
-  amount: number;
-  percentage: number;
+  quoteStatus?: "pending" | "accepted" | "rejected" | "completed";
 }
 
 export interface FinancialReport {
-  timeFrame: TimeFrame;
+  timeFrame: "day" | "week" | "month" | "year" | "custom";
   startDate: Date;
   endDate: Date;
   totalRevenue: number;
@@ -80,64 +30,118 @@ export interface FinancialReport {
   transactions: FinancialTransaction[];
 }
 
-// Define the JobSource interface
-export interface JobSource {
+// Export the JobSource type
+export type { JobSource } from './jobSource';
+
+export interface JobSourceFinance extends JobSource {
+  // Extending the JobSource type to ensure compatibility
+  type: string;
+}
+
+export interface FinancePage {
+  activeTab: string;
+  dateRange: {
+    from: Date;
+    to: Date;
+  };
+}
+
+// Add types for other finance features
+export type TimeFrame = "day" | "week" | "month" | "year" | "custom";
+
+export interface ExpenseCategory {
   id: string;
   name: string;
-  type?: string;
-  paymentType?: string;
-  paymentValue?: number;
-  isActive?: boolean;
-  totalJobs?: number;
-  totalRevenue: number;
-  expenses: number;
-  companyProfit: number;
-  createdAt?: string;
-  category?: string;
-  website?: string;
+  color: string;
+  amount?: number;
+  percentage?: number;
+  icon?: React.ReactNode;
+  budget?: number;
+  currentSpend?: number;
 }
 
 export interface OfficeExpense {
   id: string;
+  name?: string;
+  amount: number;
   date: Date | string;
   category: string;
-  description: string;
-  amount: number;
-  vendor: string;
-  paymentMethod: string;
-  status: "paid" | "pending" | "overdue";
+  description?: string;
   recurring?: boolean;
+  paidBy?: string;
+  vendor?: string;
+  paymentMethod?: string;
+  status?: string;
   receipt?: string;
 }
 
-export interface SearchBarProps {
-  searchTerm: string;
-  updateFilter?: <K extends keyof FinancialFilters>(key: K, value: FinancialFilters[K]) => void;
-  hidden?: boolean;
-  onSearchChange?: (value: string) => void;
-  placeholder?: string;
-  className?: string;
-  onChange?: (value: any) => void;
-  showIcons?: boolean;
+export type FinanceEntityType = "technician" | "jobSource" | "contractor" | "employee" | "salesman";
+
+// User management types with enhanced permissions
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  lastLogin?: Date;
+  status: "active" | "inactive" | "pending";
+  permissions: UserPermission[];
+  createdAt: Date;
 }
 
-// Align ProjectStaff with project.ts definition - using the proper status type
+export type UserRole = "admin" | "manager" | "staff" | "viewer";
+
+export interface UserPermission {
+  id: string;
+  name: string;
+  description: string;
+  module: PermissionModule;
+  action: PermissionAction;
+  // Add visibility control and data access level
+  visibilityLevel?: VisibilityLevel;
+  dataAccessLevel?: DataAccessLevel;
+}
+
+export type PermissionModule = "jobs" | "technicians" | "clients" | "finance" | "settings" | "reports" | "team" | "payments" | "estimates" | "invoices";
+export type PermissionAction = "view" | "create" | "edit" | "delete" | "approve" | "manage" | "export" | "import" | "viewSensitive";
+
+// New types for enhanced granular permissions
+export type VisibilityLevel = "none" | "limited" | "standard" | "full";
+export type DataAccessLevel = "none" | "personal" | "team" | "department" | "all";
+
+// Feature access control
+export interface FeatureAccess {
+  id: string;
+  name: string;
+  enabled: boolean;
+  description?: string;
+}
+
+// Company profile settings
+export interface CompanyProfile {
+  companyName: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  logo?: string;
+  industry?: string;
+  taxId?: string;
+  description?: string;
+}
+
 export interface ProjectStaff {
   id: string;
   name: string;
   role: string;
+  email?: string;
+  phone?: string;
   hourlyRate?: number;
-  totalHours?: number;
-  totalCost?: number;
   startDate: string;
-  status: "active" | "completed" | "terminated";
   endDate?: string;
+  status: "active" | "completed" | "terminated";
   notes?: string;
   specialty?: string;
   assignedTasks?: string[];
-  email?: string;
-  phone?: string;
 }
-
-// Add OfficeTimeFrame type to fix OfficeDashboard error
-export type OfficeTimeFrame = "all" | "week" | "month" | "year" | "quarter";

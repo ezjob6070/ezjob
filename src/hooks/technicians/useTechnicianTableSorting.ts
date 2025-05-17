@@ -3,70 +3,45 @@ import { useState } from "react";
 import { Technician } from "@/types/technician";
 import { SortOption } from "@/types/sortOptions";
 
-export const useTechnicianTableSorting = (initialTechnicians: Technician[]) => {
-  const [technicians, setTechnicians] = useState(initialTechnicians);
-  const [sortOption, setSortOption] = useState<SortOption>("revenue-high");
-
-  const handleSortChange = (option: SortOption) => {
-    setSortOption(option);
-    let sortedTechnicians = [...technicians];
-    
-    switch (option) {
+export const useTechnicianTableSorting = (technicians: Technician[]) => {
+  const [sortBy, setSortBy] = useState<SortOption>("default");
+  
+  // Ensure we have an array to work with
+  const techsToSort = technicians || [];
+  
+  // Sort technicians based on selected sort option
+  const sortedTechnicians = [...techsToSort].sort((a, b) => {
+    switch (sortBy) {
       case "name-asc":
-        sortedTechnicians.sort((a, b) => a.name.localeCompare(b.name));
-        break;
+        return a.name.localeCompare(b.name);
       case "name-desc":
-        sortedTechnicians.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case "revenue-high":
-        sortedTechnicians.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0));
-        break;
-      case "revenue-low":
-        sortedTechnicians.sort((a, b) => (a.totalRevenue || 0) - (b.totalRevenue || 0));
-        break;
-      case "rating-high":
-        sortedTechnicians.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
-      case "rating-low":
-        sortedTechnicians.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-        break;
-      case "newest":
-        sortedTechnicians.sort((a, b) => new Date(b.hireDate).getTime() - new Date(a.hireDate).getTime());
-        break;
-      case "oldest":
-        sortedTechnicians.sort((a, b) => new Date(a.hireDate).getTime() - new Date(b.hireDate).getTime());
-        break;
+        return b.name.localeCompare(a.name);
       case "profit-high":
-        // Assuming profit calculation
-        sortedTechnicians.sort((a, b) => {
-          const profitA = (a.totalRevenue || 0) * (1 - (a.paymentRate / 100));
-          const profitB = (b.totalRevenue || 0) * (1 - (b.paymentRate / 100));
-          return profitB - profitA;
-        });
-        break;
+        const profitA = (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+        const profitB = (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
+        return profitB - profitA;
       case "profit-low":
-        // Assuming profit calculation
-        sortedTechnicians.sort((a, b) => {
-          const profitA = (a.totalRevenue || 0) * (1 - (a.paymentRate / 100));
-          const profitB = (b.totalRevenue || 0) * (1 - (b.paymentRate / 100));
-          return profitA - profitB;
-        });
-        break;
-      case "jobs-high":
-        sortedTechnicians.sort((a, b) => (b.completedJobs || 0) - (a.completedJobs || 0));
-        break;
-      case "jobs-low":
-        sortedTechnicians.sort((a, b) => (a.completedJobs || 0) - (b.completedJobs || 0));
-        break;
+        const profitC = (a.totalRevenue || 0) - ((a.totalRevenue || 0) * (a.paymentType === "percentage" ? a.paymentRate / 100 : 0.4));
+        const profitD = (b.totalRevenue || 0) - ((b.totalRevenue || 0) * (b.paymentType === "percentage" ? b.paymentRate / 100 : 0.4));
+        return profitC - profitD;
+      case "revenue-high":
+        return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+      case "revenue-low":
+        return (a.totalRevenue || 0) - (b.totalRevenue || 0);
+      case "newest":
+        return new Date(b.hireDate || 0).getTime() - new Date(a.hireDate || 0).getTime();
+      case "oldest":
+        return new Date(a.hireDate || 0).getTime() - new Date(b.hireDate || 0).getTime();
       default:
-        // Default sort by name
-        sortedTechnicians.sort((a, b) => a.name.localeCompare(b.name));
+        return 0;
     }
-    
-    setTechnicians(sortedTechnicians);
-  };
+  });
 
-  return { technicians, sortOption, setSortOption, handleSortChange };
+  return {
+    sortBy,
+    setSortBy,
+    sortedTechnicians
+  };
 };
 
 export default useTechnicianTableSorting;

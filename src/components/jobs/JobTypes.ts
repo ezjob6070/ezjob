@@ -1,7 +1,7 @@
 
 import { DateRange } from "react-day-picker";
 
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "canceled" | "rescheduled" | "estimate" | "pending";
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
 export type JobPriority = "low" | "medium" | "high" | "urgent";
 export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile" | "credit_card" | "zelle" | "venmo" | "paypal";
 
@@ -13,12 +13,12 @@ export interface Job {
   amount: number;
   status: JobStatus;
   actualAmount?: number;
-  technicianId: string;  
+  technicianId?: string;  // Added for the TS errors
   technicianName?: string;
   jobSourceId?: string;
   jobSourceName?: string;
-  date: Date | string;  
-  scheduledDate?: Date | string;
+  date: Date | string;  // Updated to accept Date or string
+  scheduledDate?: Date | string;  // Updated to accept Date or string
   createdAt?: string;
   priority?: JobPriority;
   details?: string;
@@ -38,6 +38,7 @@ export interface Job {
   contractorName?: string;
   contractorId?: string;
   clientId?: string;
+  // Add missing properties that are being used in various components
   parts?: string[];
   signature?: string;
   hasImages?: boolean;
@@ -83,10 +84,4 @@ export interface JobFilters {
 export interface AmountRange {
   min?: number;
   max?: number;
-}
-
-// Add safe date range type
-export interface SafeDateRange {
-  from: Date;
-  to?: Date;
 }
