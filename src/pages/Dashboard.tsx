@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -516,9 +517,9 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Modular Card System Layout */}
+            {/* Modular Card System Layout - with Call Tracking removed */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {/* Left Block - Jobs Status Section - occupies all columns now */}
+              {/* Jobs Status Section - occupies all columns now */}
               <div className="md:col-span-3">
                 <Card className="bg-white border-0 shadow-sm mb-4">
                   <CardHeader className="pb-2">
@@ -600,7 +601,6 @@ const Dashboard = () => {
               </div>
             </div>
             
-            {/* Keep the remaining UI elements unchanged */}
             <JobStatusDialog 
               open={statusDialog.open}
               onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
