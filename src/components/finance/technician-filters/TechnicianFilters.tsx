@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, Filter } from "lucide-react";
@@ -82,9 +81,7 @@ const TechnicianFilters: React.FC<TechnicianFiltersProps> = ({
   
   const toggleTechnician = (technicianName: string) => {
     setSelectedTechnicians(prev => 
-      prev.includes(technicianName) 
-        ? prev.filter(t => t !== technicianName)
-        : [...prev, technicianName]
+      prev.includes(technicianName) ? prev.filter(name => name !== technicianName) : [...prev, technicianName]
     );
   };
 
