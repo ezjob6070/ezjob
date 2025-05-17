@@ -16,9 +16,9 @@ export const createReminder = (selectedDate: Date, existingTasks: Task[]): Task 
     end: new Date(reminderTime.getTime() + 30 * 60 * 1000).toISOString(),
     status: "scheduled",
     priority: "medium",
-    client: { name: "" },
+    client: { name: "", id: "" },
     description: "",
-    technician: { name: "" },
+    technician: { name: "", id: "" },
     color: "#9b87f5", // Purple for reminders
     type: "reminder",
     isReminder: true,
