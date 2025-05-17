@@ -28,16 +28,18 @@ const CalendarSidebar = ({ isOpen }: CalendarSidebarProps) => {
   if (!isOpen) return null;
 
   return (
-    <aside className="fixed top-0 right-0 z-20 h-screen w-80 flex flex-col bg-card text-card-foreground border-l border-border shadow-lg transition-all duration-300 ease-in-out">
+    <aside className="fixed top-0 right-0 z-20 h-screen w-full sm:w-96 md:w-80 lg:w-96 flex flex-col bg-card text-card-foreground border-l border-border shadow-lg transition-all duration-300 ease-in-out overflow-hidden">
       <RightSidebarHeader />
-      <div className="flex-1 py-6 px-4 overflow-auto">
-        <RightCalendarWidget 
-          selectedDate={selectedDate} 
-          setSelectedDate={setSelectedDate} 
-          jobs={jobs}
-          viewMode={viewMode}
-          onViewChange={setViewMode}
-        />
+      <div className="flex-1 py-4 px-3 md:px-4 overflow-auto">
+        <div className="w-full overflow-visible">
+          <RightCalendarWidget 
+            selectedDate={selectedDate} 
+            setSelectedDate={setSelectedDate} 
+            jobs={jobs}
+            viewMode={viewMode}
+            onViewChange={setViewMode}
+          />
+        </div>
         <JobsList 
           selectedDate={selectedDate}
           jobsForSelectedDate={jobsForSelectedDate}

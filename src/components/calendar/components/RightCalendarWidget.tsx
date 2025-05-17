@@ -139,7 +139,7 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
       mode="single"
       selected={selectedDate}
       onSelect={(date) => date && setSelectedDate(date)}
-      className={cn("p-3 pointer-events-auto border rounded-md")}
+      className={cn("p-0 pointer-events-auto w-full overflow-visible")}
       month={currentMonth}
       onMonthChange={setCurrentMonth}
       modifiers={{
@@ -198,9 +198,15 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
         </div>
       </div>
 
-      {viewMode === 'day' && renderDayView()}
-      {viewMode === 'week' && renderWeekView()}
-      {viewMode === 'month' && renderMonthView()}
+      <div className="w-full overflow-x-auto">
+        {viewMode === 'day' && renderDayView()}
+        {viewMode === 'week' && renderWeekView()}
+        {viewMode === 'month' && (
+          <div className="w-full overflow-visible">
+            {renderMonthView()}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

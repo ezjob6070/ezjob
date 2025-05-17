@@ -67,11 +67,11 @@ const Schedule = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 px-1 sm:px-2 md:px-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Schedule</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1 sm:mb-2">Schedule</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Manage your appointments, jobs, and tasks in one place.
           </p>
         </div>
@@ -92,7 +92,7 @@ const Schedule = () => {
         value={activeTab}
         onValueChange={setActiveTab}
       >
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 w-full overflow-x-auto flex-nowrap whitespace-nowrap">
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="jobs">Jobs</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
