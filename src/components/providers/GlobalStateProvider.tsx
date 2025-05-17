@@ -9,8 +9,8 @@ import { initialTechnicians } from "@/data/technicians";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";
 
 interface GlobalStateContextType {
-  jobs: any[];
-  setJobs: (jobs: any[]) => void;
+  jobs: JobType[];
+  setJobs: (jobs: JobType[]) => void;
   jobSources: any[];
   setJobSources: (jobSources: any[]) => void;
   technicians: any[];
@@ -19,13 +19,13 @@ interface GlobalStateContextType {
   setCurrentIndustry: (industry: IndustryType) => void;
   dateFilter: DateRange | undefined;
   setDateFilter: (dateFilter: DateRange | undefined) => void;
-  getFilteredJobs: () => any[];
+  getFilteredJobs: () => JobType[];
 }
 
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
 
 export function GlobalStateProvider({ children }: { children: React.ReactNode }) {
-  const [jobs, setJobs] = useState(initialJobs);
+  const [jobs, setJobs] = useState<JobType[]>(initialJobs);
   const [jobSources, setJobSources] = useState(initialJobSources);
   const [technicians, setTechnicians] = useState(initialTechnicians);
   const [currentIndustry, setCurrentIndustry] = useState<IndustryType>("hvac");

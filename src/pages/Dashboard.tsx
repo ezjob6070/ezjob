@@ -161,37 +161,21 @@ const Dashboard = () => {
     { name: 'Other', value: 12, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
   ];
 
-  // Create job status data for the circular visualization with enhanced colors and gradients
-  const jobStatusData = [
-    { name: 'Completed', value: dashboardTaskCounts.completed, color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a' },
-    { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb' },
-    { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444', gradientFrom: '#f87171', gradientTo: '#dc2626' },
-    { name: 'Rescheduled', value: dashboardTaskCounts.rescheduled, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
-  ];
+  // Helper function to determine date filter label for display
+  const dateFilterLabel = dateFilter?.from 
+    ? (dateFilter.to 
+      ? `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d")}`
+      : format(dateFilter.from, "MMM d, yyyy"))
+    : "All time";
 
-  // Sample analytics data
-  const performanceData = [
-    { month: 'Jan', calls: 64, jobs: 42, revenue: 78000 },
-    { month: 'Feb', calls: 68, jobs: 46, revenue: 82000 },
-    { month: 'Mar', calls: 72, jobs: 52, revenue: 95000 },
-    { month: 'Apr', calls: 75, jobs: 48, revenue: 89000 },
-    { month: 'May', calls: 80, jobs: 55, revenue: 102000 },
-    { month: 'Jun', calls: 87, jobs: 63, revenue: 115000 },
-    { month: 'Jul', calls: 92, jobs: 68, revenue: 128000 },
-    { month: 'Aug', calls: 98, jobs: 74, revenue: 142000 },
-    { month: 'Sep', calls: 90, jobs: 72, revenue: 135000 },
-    { month: 'Oct', calls: 105, jobs: 82, revenue: 152000 },
-    { month: 'Nov', calls: 112, jobs: 88, revenue: 165000 },
-    { month: 'Dec', calls: 124, jobs: 98, revenue: 178000 },
-  ];
-
-  // Today's appointments data
-  const todaysAppointments = [
-    { clientName: "Sarah Johnson", time: "09:30 AM", jobType: "Installation", address: "123 Main St", priority: "high" },
-    { clientName: "James Wilson", time: "11:00 AM", jobType: "Repair", address: "456 Oak Ave", priority: "medium" },
-    { clientName: "Emily Davis", time: "01:15 PM", jobType: "Maintenance", address: "789 Pine Rd", priority: "low" },
-    { clientName: "Michael Brown", time: "03:30 PM", jobType: "Inspection", address: "234 Elm St", priority: "medium" },
-  ];
+  const openStatusDialog = (status: string, title: string, data: any[]) => {
+    setStatusDialog({
+      open: true,
+      status,
+      title,
+      data
+    });
+  };
 
   const renderDashboardStats = () => {
     return (
