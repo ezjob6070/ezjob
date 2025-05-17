@@ -74,17 +74,17 @@ const Dashboard = () => {
     title: '',
     data: []
   });
-
   const [statusDialog, setStatusDialog] = useState<{
     open: boolean;
     status: string;
-    title: string;
-    data: any[];
   }>({
     open: false,
     status: '',
-    title: '',
-    data: []
+  });
+
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: addDays(new Date(), 7),
   });
 
   const { dateFilter, getFilteredJobs, currentIndustry } = useGlobalState();
@@ -98,37 +98,30 @@ const Dashboard = () => {
   
   const totalJobs = completedJobs + rescheduledJobs + inProgressJobs + canceledJobs;
   
-  // Calculate revenue from filtered jobs
-  const jobRevenue = filteredJobs
-    .filter(job => job.status === "completed")
-    .reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
+  // Calculate revenue from jobs
+  const jobRevenue = filteredJobs.reduce((sum, job) => {
+    if (job.status === "completed" && job.actualAmount) {
+      return sum + job.actualAmount;
+    }
+    return sum + (job.amount || 0);
+  }, 0);
   
-  // Use dynamic revenue or fall back to sample data when no filtered jobs available
-  const totalRevenue = jobRevenue > 0 ? jobRevenue : dashboardFinancialMetrics.totalRevenue;
-  
-  // Calculate expenses as 40% of revenue for completed jobs
-  const totalExpenses = totalRevenue * 0.4;
-  
-  // Calculate profit as revenue minus expenses
-  const companyProfit = totalRevenue - totalExpenses;
-  
-  // Calculate average job value
-  const avgJobValue = completedJobs > 0 
-    ? jobRevenue / completedJobs 
-    : dashboardFinancialMetrics.avgJobValue;
-  
-  // Use other metrics from sample data
-  const monthlyGrowth = dashboardFinancialMetrics.monthlyGrowth;
-  const conversionRate = dashboardFinancialMetrics.conversionRate;
+  const totalRevenue = dashboardFinancialMetrics.totalRevenue;
 
-  // Generate call data based on filtered jobs (estimate more calls than jobs)
-  const callsData = {
-    total: Math.max(154, Math.round(totalJobs * 1.6)),
-    converted: Math.max(98, Math.round(completedJobs * 1.3)),
-    scheduled: Math.max(37, Math.round(totalJobs * 0.4)),
-    missed: Math.max(19, Math.round(totalJobs * 0.2)),
-    conversionRate: totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 63
-  };
+  const callsData = [
+    { name: 'Jan', calls: 2400 },
+    { name: 'Feb', calls: 1398 },
+    { name: 'Mar', calls: 9800 },
+    { name: 'Apr', calls: 3908 },
+    { name: 'May', calls: 4800 },
+    { name: 'Jun', calls: 3800 },
+    { name: 'Jul', calls: 4300 },
+    { name: 'Aug', calls: 2400 },
+    { name: 'Sep', calls: 1398 },
+    { name: 'Oct', calls: 9800 },
+    { name: 'Nov', calls: 3908 },
+    { name: 'Dec', calls: 4800 },
+  ];
 
   // Create job status data for the circular visualization
   const jobStatusData = [
@@ -138,485 +131,252 @@ const Dashboard = () => {
     { name: 'Rescheduled', value: rescheduledJobs || dashboardTaskCounts.rescheduled, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
   ];
 
-  // Sample statistics data for charts
   const revenueData = [
-    { name: 'Jan', revenue: 78000, target: 72000 },
-    { name: 'Feb', revenue: 82000, target: 75000 },
-    { name: 'Mar', revenue: 95000, target: 79000 },
-    { name: 'Apr', revenue: 89000, target: 82000 },
-    { name: 'May', revenue: 102000, target: 86000 },
-    { name: 'Jun', revenue: 115000, target: 90000 },
-    { name: 'Jul', revenue: 128000, target: 95000 },
-    { name: 'Aug', revenue: 142000, target: 100000 },
-    { name: 'Sep', revenue: 135000, target: 105000 },
-    { name: 'Oct', revenue: 152000, target: 110000 },
-    { name: 'Nov', revenue: 165000, target: 115000 },
-    { name: 'Dec', revenue: 178000, target: 120000 },
+    { name: 'Jan', revenue: 4000, target: 2400 },
+    { name: 'Feb', revenue: 3000, target: 2800 },
+    { name: 'Mar', revenue: 2000, target: 3200 },
+    { name: 'Apr', revenue: 2780, target: 3500 },
+    { name: 'May', revenue: 1890, target: 3800 },
+    { name: 'Jun', revenue: 2390, target: 4000 },
+    { name: 'Jul', revenue: 3490, target: 4200 },
+    { name: 'Aug', revenue: 4200, target: 4400 },
+    { name: 'Sep', revenue: 4800, target: 4600 },
+    { name: 'Oct', revenue: 5200, target: 4800 },
+    { name: 'Nov', revenue: 5600, target: 5000 },
+    { name: 'Dec', revenue: 6100, target: 5200 },
   ];
 
   const jobTypeData = [
-    { name: 'Repair', value: 42, color: '#4f46e5', gradientFrom: '#6366f1', gradientTo: '#4338ca' },
-    { name: 'Installation', value: 28, color: '#0ea5e9', gradientFrom: '#38bdf8', gradientTo: '#0284c7' },
-    { name: 'Maintenance', value: 18, color: '#10b981', gradientFrom: '#34d399', gradientTo: '#059669' },
-    { name: 'Other', value: 12, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
+    { name: 'Repair', value: 42 },
+    { name: 'Installation', value: 28 },
+    { name: 'Maintenance', value: 18 },
+    { name: 'Other', value: 12 },
   ];
 
-  // Helper function to determine date filter label for display
-  const dateFilterLabel = dateFilter?.from 
-    ? (dateFilter.to 
-      ? `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d")}`
-      : format(dateFilter.from, "MMM d, yyyy"))
-    : "All time";
-
-  const openStatusDialog = (status: string, title: string, data: any[]) => {
-    setStatusDialog({
+  const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
+    setActiveDialog({
       open: true,
-      status,
+      type,
       title,
       data
     });
   };
 
-  const renderDashboardStats = () => {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
-        <StatCard
-          title="Total Active Clients"
-          value="124"
-          icon={<UsersIcon className="h-4 w-4" />}
-          description="5 new this week"
-          trend={{ value: "12% increase", isPositive: true }}
-          className="bg-white"
-        />
-        <StatCard
-          title="Conversion Rate"
-          value={`${conversionRate}%`}
-          icon={<TrendingUpIcon className="h-4 w-4" />}
-          description="From lead to client"
-          trend={{ value: "3.2% increase", isPositive: true }}
-          className="bg-white"
-        />
-        <StatCard
-          title="Average Response Time"
-          value="3.2h"
-          icon={<ClockIcon className="h-4 w-4" />}
-          description="For new service requests"
-          trend={{ value: "0.5h improvement", isPositive: true }}
-          className="bg-white"
-        />
-        <StatCard
-          title="Customer Satisfaction"
-          value="96%"
-          icon={<ActivityIcon className="h-4 w-4" />}
-          description="Based on 482 reviews"
-          trend={{ value: "2% increase", isPositive: true }}
-          className="bg-white"
-        />
-      </div>
-    );
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
   };
 
-  const renderStatisticsContent = () => {
-    return (
-      <div className="space-y-6">
-        {renderDashboardStats()}
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium">Annual Revenue vs Target</CardTitle>
-              <CardDescription>Revenue performance against monthly targets</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="h-80">
-                <div className="flex flex-col h-full justify-center">
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                      <span className="text-sm">Actual Revenue: {formatCurrency(totalRevenue)}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                      <span className="text-sm">Target Revenue: {formatCurrency(totalRevenue * 1.2)}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col space-y-3">
-                    {revenueData.map((month) => (
-                      <div key={month.name} className="space-y-1">
-                        <div className="flex justify-between text-xs text-gray-500">
-                          <span>{month.name}</span>
-                          <span>{formatCurrency(month.revenue)}</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-2.5">
-                          <div
-                            className="bg-blue-500 h-2.5 rounded-full"
-                            style={{ width: `${(month.revenue / (month.target * 1.5)) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium">Job Type Distribution</CardTitle>
-              <CardDescription>Service breakdown by category</CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-center items-center">
-              <EnhancedDonutChart
-                data={jobTypeData}
-                title={`${totalJobs}`}
-                subtitle="Total Jobs"
-                size={220}
-                thickness={30}
-              />
-            </CardContent>
-          </Card>
-        </div>
-        
-        <Card className="bg-white shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Monthly Job Completion Rate</CardTitle>
-            <CardDescription>Tracking job success and efficiency</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-12 gap-2 mt-2">
-              {performanceData.map((data) => (
-                <div key={data.month} className="col-span-1">
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-full mb-1 h-32">
-                      <div 
-                        className="absolute bottom-0 w-full bg-blue-500 rounded-t"
-                        style={{ height: `${(data.jobs / 50) * 100}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-xs text-gray-500">{data.month}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between mt-4">
-              <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                <span className="text-xs text-gray-500">Completed Jobs</span>
-              </div>
-              <div className="text-sm font-medium">Average: 27.5 jobs/month</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  const handleStatusClick = (status: string) => {
+    setStatusDialog({ open: true, status });
   };
 
-  const renderAnalyticsContent = () => {
-    return (
-      <div className="space-y-6">
-        {renderDashboardStats()}
-        
-        <Card className="bg-white shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Performance Metrics</CardTitle>
-            <CardDescription>Key service performance indicators</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-12 gap-2 mt-2">
-              {performanceData.map((data) => (
-                <div key={data.month} className="col-span-1">
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-full mb-1 h-32">
-                      <div 
-                        className="absolute bottom-0 w-full bg-green-400 rounded-t"
-                        style={{ height: `${(data.revenue / 10000) * 100}%` }}
-                      ></div>
-                      <div 
-                        className="absolute bottom-0 w-1/2 bg-blue-500 rounded-t"
-                        style={{ height: `${(data.calls / 50) * 100}%`, left: '25%' }}
-                      ></div>
-                    </div>
-                    <span className="text-xs text-gray-500">{data.month}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between mt-4">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
-                  <span className="text-xs text-gray-500">Revenue</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                  <span className="text-xs text-gray-500">Service Calls</span>
-                </div>
-              </div>
-              <div className="text-sm font-medium">Total Revenue: {formatCurrency(totalRevenue)}</div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <DashboardMetricCard
-            title="Conversion Rate"
-            value="84%"
-            description="Calls to Jobs Conversion"
-            icon={<PieChartIcon size={20} className="text-white" />}
-            trend={{ value: "4.2% from last month", isPositive: true }}
-            className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white"
-            variant="vibrant"
-            valueClassName="text-white text-2xl font-bold"
-          />
-          
-          <DashboardMetricCard
-            title="Avg. Job Value"
-            value={formatCurrency(avgJobValue)}
-            description="Per completed job"
-            icon={<DollarSignIcon size={20} className="text-white" />}
-            trend={{ value: "2.8% from last month", isPositive: true }}
-            className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white"
-            variant="vibrant"
-            valueClassName="text-white text-2xl font-bold"
-          />
-          
-          <DashboardMetricCard
-            title="Technician Efficiency"
-            value="92%"
-            description="On-time completion rate"
-            icon={<ClockIcon size={20} className="text-white" />}
-            trend={{ value: "1.5% from last month", isPositive: true }}
-            className="bg-gradient-to-br from-amber-500 to-amber-600 text-white"
-            variant="vibrant"
-            valueClassName="text-white text-2xl font-bold"
-          />
-        </div>
-      </div>
-    );
+  const closeStatusDialog = () => {
+    setStatusDialog({ open: false, status: '' });
   };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
-        return renderStatisticsContent();
-      case 'analytics':
-        return renderAnalyticsContent();
-      default: // Dashboard tab
         return (
-          <>            
-            {/* Professional Metric Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-              {/* Revenue Card */}
-              <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-blue-100 rounded-full">
-                          <BadgeDollarSign className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <h3 className="text-sm font-medium text-gray-600">Revenue</h3>
-                      </div>
-                      <p className="text-2xl font-bold mt-2 text-gray-900">{formatCurrency(totalRevenue)}</p>
-                    </div>
-                    
-                    <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
-                      {dateFilterLabel}
-                    </span>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
-                    <div className="flex justify-between items-center">
-                      <span>Average per job</span>
-                      <span className="font-medium text-gray-700">{formatCurrency(avgJobValue)}</span>
-                    </div>
-                    <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
-                      <div className="bg-blue-500 h-full rounded-full" style={{ width: '78%' }}></div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Net Profit Card */}
-              <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-green-100 rounded-full">
-                          <ChartBar className="h-5 w-5 text-green-600" />
-                        </div>
-                        <h3 className="text-sm font-medium text-gray-600">Net Profit</h3>
-                      </div>
-                      <p className="text-2xl font-bold mt-2 text-gray-900">{formatCurrency(companyProfit)}</p>
-                    </div>
-                    
-                    <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-600 rounded-full">
-                      {dateFilterLabel}
-                    </span>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
-                    <div className="flex justify-between items-center">
-                      <span>Labor costs</span>
-                      <span className="font-medium text-gray-700">{formatCurrency(totalExpenses * 0.6)}</span>
-                    </div>
-                    <div className="mt-2 grid grid-cols-3 gap-0.5">
-                      <div className="bg-green-500 h-1 rounded-l"></div>
-                      <div className="bg-green-300 h-1"></div>
-                      <div className="bg-green-100 h-1 rounded-r"></div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Total Calls Card */}
-              <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-purple-100 rounded-full">
-                          <PhoneCall className="h-5 w-5 text-purple-600" />
-                        </div>
-                        <h3 className="text-sm font-medium text-gray-600">Total Calls</h3>
-                      </div>
-                      <p className="text-2xl font-bold mt-2 text-gray-900">{callsData.total}</p>
-                    </div>
-                    
-                    <span className="text-xs font-medium px-2 py-1 bg-purple-50 text-purple-600 rounded-full">
-                      {dateFilterLabel}
-                    </span>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
-                    <div className="flex justify-between items-center">
-                      <span>Follow-ups scheduled</span>
-                      <span className="font-medium text-gray-700">{callsData.scheduled}</span>
-                    </div>
-                    <div className="mt-2 flex gap-0.5">
-                      <div 
-                        className="bg-purple-500 h-1 rounded-l" 
-                        style={{ width: `${callsData.converted / callsData.total * 100}%` }}
-                      ></div>
-                      <div 
-                        className="bg-purple-300 h-1 rounded-r"
-                        style={{ width: `${(callsData.total - callsData.converted) / callsData.total * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Jobs Status Section */}
-            <div className="md:col-span-3">
-              <Card className="bg-white border-0 shadow-sm mb-4">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
-                      <CardDescription>Overview of service requests and job status</CardDescription>
-                    </div>
-                    <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
-                      {dateFilterLabel}
-                    </span>
-                  </div>
+          <div>
+            <h2>Statistics Content</h2>
+            {/* Add your statistics content here */}
+          </div>
+        );
+      case 'analytics':
+        return (
+          <div>
+            <h2>Analytics Content</h2>
+            {/* Add your analytics content here */}
+          </div>
+        );
+      default:
+        return (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Job Status</CardTitle>
+                  <BarChartIcon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent className="pb-4">
-                  <div className="flex flex-col md:flex-row items-center">
-                    <div className="flex-1 mb-4 md:mb-0 flex justify-center">
-                      <EnhancedDonutChart 
-                        data={jobStatusData}
-                        title={`${totalJobs}`}
-                        subtitle="Total Jobs"
-                        size={250} 
-                        thickness={50}
-                        gradients={true}
-                        animation={true}
-                        showLegend={false}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="grid grid-cols-2 gap-2">
-                        {jobStatusData.map((status, index) => (
-                          <div 
-                            key={index} 
-                            className="flex flex-col p-2 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                            onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
-                              status.name === 'Completed' ? jobsByStatus.completed :
-                              status.name === 'In Progress' ? jobsByStatus.inProgress :
-                              status.name === 'Cancelled' ? jobsByStatus.canceled :
-                              jobsByStatus.rescheduled
-                            )}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center">
-                                <div 
-                                  className="w-4 h-4 rounded-full mr-2 shadow-sm" 
-                                  style={{ 
-                                    background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
-                                  }}
-                                ></div>
-                                <span className="font-medium text-sm text-gray-700">{status.name}</span>
-                              </div>
-                              <span className="text-sm font-bold text-gray-900">{status.value}</span>
-                            </div>
-                            <div className="w-full h-2 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                              <div 
-                                className="h-2 rounded-full transition-all duration-1000 ease-out"
-                                style={{ 
-                                  width: `${totalJobs > 0 ? (status.value / totalJobs) * 100 : 0}%`,
-                                  background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
-                                  boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
-                                }}
-                              ></div>
-                            </div>
-                            <div className="flex justify-between items-center mt-1">
-                              <Badge
-                                variant="outline"
-                                className="text-xs"
-                                style={{ 
-                                  color: status.color, 
-                                  borderColor: status.color,
-                                  backgroundColor: `${status.color}10`
-                                }}
-                              >
-                                {totalJobs > 0 ? ((status.value / totalJobs) * 100).toFixed(0) : 0}%
-                              </Badge>
-                              <span className="text-xs text-gray-500">
-                                View
-                              </span>
-                            </div>
-                          </div>
-                        ))}
+                <CardContent>
+                  <div className="flex justify-center">
+                    <EnhancedDonutChart data={jobStatusData} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    {jobStatusData.map((item) => (
+                      <div key={item.name} className="flex items-center justify-between p-2 rounded-md border border-gray-200">
+                        <div className="flex items-center">
+                          <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                          <span className="text-sm font-medium">{item.name}</span>
+                        </div>
+                        <span className="text-sm text-gray-500">{item.value}</span>
                       </div>
-                    </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Calls</CardTitle>
+                  <PhoneCall className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <StatCard
+                      title="Total Calls"
+                      value="4,524"
+                      icon={<PhoneIcon className="h-4 w-4" />}
+                      description="Total number of calls received"
+                      trend={{ value: "+12%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Avg. Call Duration"
+                      value="5m 32s"
+                      icon={<ClockIcon className="h-4 w-4" />}
+                      description="Average duration of calls"
+                      trend={{ value: "-3%", isPositive: false }}
+                    />
+                    <StatCard
+                      title="Calls Answered"
+                      value="3,981"
+                      icon={<CheckIcon className="h-4 w-4" />}
+                      description="Number of calls answered"
+                      trend={{ value: "+8%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Calls Missed"
+                      value="543"
+                      icon={<CircleXIcon className="h-4 w-4" />}
+                      description="Number of calls missed"
+                      trend={{ value: "-5%", isPositive: false }}
+                    />
                   </div>
                 </CardContent>
               </Card>
             </div>
-            
-            {/* Projects Section - Simplified and placed right under Job Status */}
+
             <ProjectsDashboardSection />
-            
-            <JobStatusDialog 
-              open={statusDialog.open}
-              onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
-              status={statusDialog.status}
-              title={statusDialog.title}
-              data={statusDialog.data}
-            />
-            
-            <DashboardDetailDialog
-              open={activeDialog.open}
-              onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
-              title={activeDialog.title}
-              type={activeDialog.type}
-              data={activeDialog.data}
-            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+                  <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <StatCard
+                      title="Total Revenue"
+                      value={formatCurrency(totalRevenue)}
+                      icon={<DollarSignIcon className="h-4 w-4" />}
+                      description="Total revenue generated"
+                      trend={{ value: "+15%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Job Revenue"
+                      value={formatCurrency(jobRevenue)}
+                      icon={<ClipboardIcon className="h-4 w-4" />}
+                      description="Revenue from jobs"
+                      trend={{ value: "+10%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Avg. Job Value"
+                      value={formatCurrency(jobRevenue / totalJobs)}
+                      icon={<CalculatorIcon className="h-4 w-4" />}
+                      description="Average value per job"
+                      trend={{ value: "+5%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Profit Margin"
+                      value="65%"
+                      icon={<TrendingUpIcon className="h-4 w-4" />}
+                      description="Profit margin percentage"
+                      trend={{ value: "+2%", isPositive: true }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Leads</CardTitle>
+                  <UsersIcon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <StatCard
+                      title="Total Leads"
+                      value="1,245"
+                      icon={<UserIcon className="h-4 w-4" />}
+                      description="Total number of leads"
+                      trend={{ value: "+8%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Qualified Leads"
+                      value="872"
+                      icon={<CheckIcon className="h-4 w-4" />}
+                      description="Number of qualified leads"
+                      trend={{ value: "+10%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Conversion Rate"
+                      value="70%"
+                      icon={<TrendingUpIcon className="h-4 w-4" />}
+                      description="Lead conversion rate"
+                      trend={{ value: "+3%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Avg. Lead Value"
+                      value={formatCurrency(jobRevenue / 872)}
+                      icon={<DollarSignIcon className="h-4 w-4" />}
+                      description="Average value per lead"
+                      trend={{ value: "+5%", isPositive: true }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Activity</CardTitle>
+                  <ActivityIcon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <StatCard
+                      title="Total Activities"
+                      value="3,456"
+                      icon={<ActivityIcon className="h-4 w-4" />}
+                      description="Total number of activities"
+                      trend={{ value: "+12%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="New Activities"
+                      value="567"
+                      icon={<CalendarIcon className="h-4 w-4" />}
+                      description="Number of new activities"
+                      trend={{ value: "+5%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Completed Activities"
+                      value="2,889"
+                      icon={<CheckIcon className="h-4 w-4" />}
+                      description="Number of completed activities"
+                      trend={{ value: "+15%", isPositive: true }}
+                    />
+                    <StatCard
+                      title="Pending Activities"
+                      value="567"
+                      icon={<ClockIcon className="h-4 w-4" />}
+                      description="Number of pending activities"
+                      trend={{ value: "-3%", isPositive: false }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </>
         );
     }
@@ -624,24 +384,16 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-3 py-3">
-      <DashboardHeader 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
+      <DashboardHeader
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
       />
-      
+
       {renderContent()}
-      
-      <JobStatusDialog
-        open={statusDialog.open}
-        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
-        status={statusDialog.status}
-        title={statusDialog.title}
-        data={statusDialog.data}
-      />
-      
+
       <DashboardDetailDialog
         open={activeDialog.open}
-        onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
+        onOpenChange={(open) => setActiveDialog({ ...activeDialog, open })}
         title={activeDialog.title}
         type={activeDialog.type}
         data={activeDialog.data}
