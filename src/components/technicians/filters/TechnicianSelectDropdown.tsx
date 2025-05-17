@@ -112,20 +112,20 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
         <DropdownMenuSeparator className="my-1" />
         <div className="max-h-60 overflow-y-auto space-y-1 py-1">
           {filteredTechniciansForDropdown.map((tech) => (
-            <div key={tech.id} className="flex items-center space-x-2 px-2 py-1.5 hover:bg-muted rounded-sm cursor-pointer" onClick={() => onTechnicianToggle(tech.id)}>
+            <div key={tech.id || "unknown"} className="flex items-center space-x-2 px-2 py-1.5 hover:bg-muted rounded-sm cursor-pointer" onClick={() => onTechnicianToggle(tech.id)}>
               <div className="flex items-center justify-center">
                 <Checkbox 
-                  id={`tech-checkbox-${tech.id}`}
+                  id={`tech-checkbox-${tech.id || "unknown"}`}
                   checked={selectedTechnicians.includes(tech.id)}
                   onCheckedChange={() => onTechnicianToggle(tech.id)}
                   className="data-[state=checked]:border-primary data-[state=checked]:bg-primary"
                 />
               </div>
               <label 
-                htmlFor={`tech-checkbox-${tech.id}`}
+                htmlFor={`tech-checkbox-${tech.id || "unknown"}`}
                 className="text-sm font-medium leading-none cursor-pointer flex-1"
               >
-                {tech.name}
+                {tech.name || "Unknown"}
               </label>
             </div>
           ))}
@@ -139,11 +139,11 @@ const TechnicianSelectDropdown: React.FC<TechnicianSelectDropdownProps> = ({
               const tech = technicians.find(t => t.id === techId);
               return tech ? (
                 <Badge 
-                  key={tech.id} 
+                  key={tech.id || "unknown"} 
                   variant="secondary" 
                   className="flex items-center gap-1 py-0"
                 >
-                  {tech.name}
+                  {tech.name || "Unknown"}
                   <Button 
                     variant="ghost" 
                     size="sm" 
