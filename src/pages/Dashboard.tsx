@@ -601,10 +601,10 @@ const Dashboard = () => {
                 {/* Revenue Summary section REMOVED as requested */}
               </div>
 
-              {/* Right Block Content - Call Stats and Today's Appointments */}
+              {/* Right Block Content - Call Stats only (Today's Appointments removed) */}
               <div className="md:col-span-1">
                 {/* Call Stats Card with improved colors */}
-                <Card className="bg-white border-0 shadow-md mb-4">
+                <Card className="bg-white border-0 shadow-md">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-medium">Call Tracking</CardTitle>
                     <CardDescription>Client communications overview</CardDescription>
@@ -656,53 +656,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
 
-                {/* Today's Appointments with cleaner schedule list */}
-                <Card className="bg-white border-0 shadow-md h-full">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-medium">Today's Schedule</CardTitle>
-                    <CardDescription>Upcoming appointments</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-4">
-                    <div className="space-y-3">
-                      {todaysAppointments.map((appointment, index) => (
-                        <div 
-                          key={index}
-                          className="p-3 rounded-lg border border-gray-100 bg-white hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="font-medium text-sm">{appointment.clientName}</div>
-                            <div className="text-xs font-medium px-2 py-0.5 rounded-full" style={{
-                              backgroundColor: appointment.priority === 'high' ? '#FEE2E2' : 
-                                              appointment.priority === 'medium' ? '#FEF3C7' : 
-                                              '#ECFDF5',
-                              color: appointment.priority === 'high' ? '#DC2626' : 
-                                     appointment.priority === 'medium' ? '#D97706' : 
-                                     '#059669'
-                            }}>
-                              {appointment.time}
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-500 mt-1">{appointment.jobType}</div>
-                          <div className="text-xs text-gray-500 mt-0.5 flex items-center">
-                            <BuildingIcon className="h-3 w-3 mr-1" />
-                            {appointment.address}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex justify-center mt-4">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="text-xs border-blue-200 text-blue-600 hover:bg-blue-50"
-                      >
-                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
-                        View Full Schedule
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Today's Appointments section removed as requested */}
               </div>
             </div>
             
