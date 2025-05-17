@@ -5,10 +5,17 @@ import { cn } from "@/lib/utils";
 import { Job } from "@/components/jobs/JobTypes";
 import { DayProps } from "react-day-picker";
 import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Dose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import CalendarViewOptions from "@/components/schedule/CalendarViewOptions";
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface CalendarWidgetProps {
   selectedDate: Date;
@@ -20,6 +27,7 @@ interface CalendarWidgetProps {
 
 const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, onViewChange }: CalendarWidgetProps) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [doseFilter, setDoseFilter] = useState<string>("all"); // New dose filter state
 
   const getDayColor = (day: Date) => {
     const dayJobs = jobs.filter(job => isSameDay(job.date, day));
@@ -183,6 +191,53 @@ const RightCalendarWidget = ({ selectedDate, setSelectedDate, jobs, viewMode, on
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+
+        {/* Dose filter dropdown */}
+        <div className="flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2 h-8"
+              >
+                <Dose className="h-4 w-4 text-[#1EAEDB]" />
+                <span className="text-xs font-medium">
+                  {doseFilter === "all" ? "All Doses" : 
+                   doseFilter === "low" ? "Low Dose" : 
+                   doseFilter === "medium" ? "Medium Dose" : "High Dose"}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px]">
+              <DropdownMenuItem 
+                onClick={() => setDoseFilter("all")}
+                className={doseFilter === "all" ? "bg-muted" : ""}
+              >
+                All Doses
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => setDoseFilter("low")}
+                className={doseFilter === "low" ? "bg-muted" : ""}
+              >
+                Low Dose
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setDoseFilter("medium")}
+                className={doseFilter === "medium" ? "bg-muted" : ""}
+              >
+                Medium Dose
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setDoseFilter("high")}
+                className={doseFilter === "high" ? "bg-muted" : ""}
+              >
+                High Dose
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
