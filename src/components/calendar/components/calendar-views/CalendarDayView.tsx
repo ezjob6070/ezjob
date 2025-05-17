@@ -8,12 +8,12 @@ interface CalendarDayViewProps {
 
 const CalendarDayView = ({ selectedDate, onDateClick }: CalendarDayViewProps) => {
   return (
-    <div className="bg-white border rounded-md p-2 sm:p-3 mb-4">
-      <div className="text-center font-medium mb-2">
+    <div className="text-center p-4">
+      <div className="font-medium mb-2">
         {format(selectedDate, "EEEE, MMMM d")}
       </div>
       <div 
-        className="text-center text-3xl font-bold cursor-pointer" 
+        className="text-3xl font-bold cursor-pointer" 
         onClick={() => onDateClick && onDateClick(selectedDate)}
       >
         {format(selectedDate, "d")}

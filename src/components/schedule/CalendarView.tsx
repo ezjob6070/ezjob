@@ -1,4 +1,3 @@
-
 import { 
   format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
   addDays, startOfMonth, endOfMonth, addMonths, subMonths
@@ -44,6 +43,7 @@ const CalendarView = ({
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   
   // Process jobs and tasks to create upcoming events with validated dates
+  
   const jobEvents = jobs
     .map(job => {
       const datetime = ensureValidDate(job.date);
@@ -195,34 +195,25 @@ const CalendarView = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CalendarHeader 
-              selectedDate={selectedDate}
-              viewMode={viewMode}
-              onViewChange={onViewChange}
-              onPrevPeriod={handlePrevPeriod}
-              onNextPeriod={handleNextPeriod}
-            />
-          </CardHeader>
-          <CardContent className="pb-8">
-            {renderCalendarView()}
-          </CardContent>
-        </Card>
-        
-        <CalendarSidebar 
+      {/* Calendar header without card wrapper */}
+      <div>
+        <CalendarHeader 
           selectedDate={selectedDate}
           viewMode={viewMode}
-          jobs={currentViewEvents.jobs}
-          tasks={currentViewEvents.tasks}
+          onViewChange={onViewChange}
+          onPrevPeriod={handlePrevPeriod}
+          onNextPeriod={handleNextPeriod}
         />
+        
+        <div className="pb-8">
+          {renderCalendarView()}
+        </div>
       </div>
       
+      {/* Upcoming events section */}
       <UpcomingEvents events={upcomingEvents} />
     </div>
   );
 };
 
 export default CalendarView;
-
