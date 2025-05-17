@@ -10,10 +10,7 @@ import { Button } from "@/components/ui/button";
 import { 
   Plus, 
   Bell, 
-  Briefcase, 
-  ListTodo, 
-  ClipboardList,
-  Calendar
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
@@ -23,13 +20,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import CalendarView from "@/components/schedule/CalendarView";
-import { Link } from "react-router-dom";
 import TasksView from "@/components/schedule/TasksView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 
 const Schedule = () => {
   const { jobs: globalJobs } = useGlobalState();
@@ -231,60 +225,55 @@ const Schedule = () => {
         </div>
       </div>
 
+      <Separator />
+
       {/* Top Navigation Tabs */}
-      <div className="w-full">
-        <div className="flex justify-center mb-6">
-          <div className="flex gap-2 border-b w-full">
-            <Button 
-              variant={activeTab === "calendar" ? "default" : "ghost"} 
-              onClick={() => setActiveTab("calendar")}
-              className="gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-              data-state={activeTab === "calendar" ? "active" : "inactive"}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="mb-4">
+          <TabsList className="grid w-full grid-cols-3 bg-transparent p-0">
+            <TabsTrigger 
+              value="calendar" 
+              className="rounded-md py-2 px-4 data-[state=active]:bg-background border border-gray-200 
+              data-[state=active]:border-gray-300 data-[state=active]:shadow-sm"
             >
-              <Calendar className="h-4 w-4" />
+              <CalendarIcon className="h-4 w-4 mr-2" />
               Calendar Overview
-            </Button>
-            <Button 
-              variant={activeTab === "tasks" ? "default" : "ghost"} 
-              onClick={() => setActiveTab("tasks")}
-              className="gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-              data-state={activeTab === "tasks" ? "active" : "inactive"}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="tasks"
+              className="rounded-md py-2 px-4 data-[state=active]:bg-background border border-gray-200 
+              data-[state=active]:border-gray-300 data-[state=active]:shadow-sm"
             >
-              <ListTodo className="h-4 w-4" />
               Tasks
-            </Button>
-            <Button 
-              variant={activeTab === "reminders" ? "default" : "ghost"} 
-              onClick={() => setActiveTab("reminders")}
-              className="gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-              data-state={activeTab === "reminders" ? "active" : "inactive"}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="reminders"
+              className="rounded-md py-2 px-4 data-[state=active]:bg-background border border-gray-200 
+              data-[state=active]:border-gray-300 data-[state=active]:shadow-sm"
             >
-              <Bell className="h-4 w-4" />
               Reminders
-            </Button>
-          </div>
+            </TabsTrigger>
+          </TabsList>
         </div>
 
         {/* Main Content Area */}
         <div className="w-full">
           {/* Calendar view */}
-          {activeTab === "calendar" && (
-            <div className="w-full">
-              <CalendarView
-                jobs={jobs}
-                tasks={tasks}
-                selectedDate={selectedDate}
-                jobsForSelectedDate={jobsForSelectedDate}
-                tasksForSelectedDate={tasksForSelectedDate}
-                updateSelectedDateItems={updateSelectedDateItems}
-                viewMode={viewMode}
-                onViewChange={setViewMode}
-              />
-            </div>
-          )}
+          <TabsContent value="calendar" className="m-0">
+            <CalendarView
+              jobs={jobs}
+              tasks={tasks}
+              selectedDate={selectedDate}
+              jobsForSelectedDate={jobsForSelectedDate}
+              tasksForSelectedDate={tasksForSelectedDate}
+              updateSelectedDateItems={updateSelectedDateItems}
+              viewMode={viewMode}
+              onViewChange={setViewMode}
+            />
+          </TabsContent>
 
           {/* Tasks view */}
-          {activeTab === "tasks" && (
+          <TabsContent value="tasks" className="m-0">
             <TasksView
               selectedDate={selectedDate}
               tasksForSelectedDate={tasksForSelectedDate.filter(task => !task.isReminder)}
@@ -296,10 +285,10 @@ const Schedule = () => {
                 setTasks([...updatedTasks, ...reminders]);
               }}
             />
-          )}
+          </TabsContent>
 
           {/* Reminders view */}
-          {activeTab === "reminders" && (
+          <TabsContent value="reminders" className="m-0">
             <TasksView
               selectedDate={selectedDate}
               tasksForSelectedDate={tasksForSelectedDate.filter(task => task.isReminder)}
@@ -311,9 +300,9 @@ const Schedule = () => {
                 setTasks([...nonReminders, ...updatedTasks]);
               }}
             />
-          )}
+          </TabsContent>
         </div>
-      </div>
+      </Tabs>
 
       {/* Add Task Dialog */}
       <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>

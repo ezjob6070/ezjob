@@ -159,9 +159,9 @@ const TasksView = ({
   const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
 
   return (
-    <div className="mb-6 bg-white border rounded-md shadow-sm p-3">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium truncate">
+    <div className="mb-6 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium truncate">
           {format(selectedDate, "MMM d, yyyy")}
         </h3>
         <div className="flex gap-1">
@@ -174,14 +174,14 @@ const TasksView = ({
         </div>
       </div>
       
-      <div className="mb-3">
+      <div className="space-y-3">
         <div className="flex flex-col gap-2">
           <Tabs 
             value={viewMode} 
             onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-3 w-full h-8">
+            <TabsList className="grid grid-cols-3 w-full h-8 shadow-sm">
               <TabsTrigger value="all" className="text-xs">
                 All ({tasksCount + remindersCount})
               </TabsTrigger>
@@ -203,7 +203,7 @@ const TasksView = ({
               placeholder="Search..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-7 h-8 text-xs"
+              className="pl-7 h-8 text-xs shadow-sm"
             />
           </div>
           
@@ -212,7 +212,7 @@ const TasksView = ({
             {/* Status Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 flex-1">
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 flex-1 shadow-sm">
                   <Filter className="h-3.5 w-3.5" />
                   Filter
                 </Button>
@@ -231,7 +231,7 @@ const TasksView = ({
             {/* Sort Order */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 flex-1">
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 flex-1 shadow-sm">
                   {sortOrder === "newest" || sortOrder === "oldest" ? (
                     sortOrder === "newest" ? (
                       <SortDesc className="h-3.5 w-3.5" />
@@ -268,7 +268,7 @@ const TasksView = ({
             {/* Date Filter */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 text-xs flex-1">
+                <Button variant="outline" size="sm" className="h-7 text-xs flex-1 shadow-sm">
                   <Calendar className="h-3.5 w-3.5" />
                 </Button>
               </PopoverTrigger>
@@ -298,8 +298,8 @@ const TasksView = ({
         </div>
       </div>
       
-      <div className="space-y-2">
-        <h3 className="text-xs font-medium">
+      <div className="space-y-2 bg-white p-4 rounded-md shadow-sm">
+        <h3 className="text-sm font-medium">
           {viewMode === "all" ? "Items" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
         </h3>
         

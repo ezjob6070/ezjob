@@ -1,15 +1,24 @@
 
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { format, isToday } from "date-fns";
-import { Job } from "@/types/job";
-import { Task } from "@/components/calendar/types";
-import { Briefcase, ListTodo, Bell } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { format, isToday } from 'date-fns';
+import { Job } from '@/types/job';
+import { Task } from '@/components/calendar/types';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Briefcase, ClipboardList, Bell } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TaskCard from '@/components/calendar/components/TaskCard';
+import ReminderCard from '@/components/schedule/ReminderCard';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface DayDetailDialogProps {
   open: boolean;
@@ -19,266 +28,160 @@ interface DayDetailDialogProps {
   tasks: Task[];
 }
 
-const DayDetailDialog = ({ open, onOpenChange, date, jobs, tasks }: DayDetailDialogProps) => {
+const DayDetailDialog = ({ 
+  open, 
+  onOpenChange, 
+  date, 
+  jobs, 
+  tasks 
+}: DayDetailDialogProps) => {
   const formattedDate = format(date, "MMMM d, yyyy");
-  const isSelectedDateToday = isToday(date);
-  const reminderTasks = tasks.filter(task => task.isReminder);
+  const reminders = tasks.filter(task => task.isReminder);
   const regularTasks = tasks.filter(task => !task.isReminder);
-
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col overflow-hidden">
+      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle className="flex items-center text-xl">
+          <DialogTitle className="flex items-center gap-2">
             {formattedDate}
-            {isSelectedDateToday && (
-              <Badge className="ml-2 bg-blue-50 text-blue-800">Today</Badge>
+            {isToday(date) && (
+              <Badge className="bg-blue-50 text-blue-800">Today</Badge>
             )}
           </DialogTitle>
+          <DialogDescription>
+            View all scheduled items for this day
+          </DialogDescription>
         </DialogHeader>
-
+        
         <Tabs defaultValue="all" className="flex-1 flex flex-col overflow-hidden">
           <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="jobs">Jobs ({jobs.length})</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks ({regularTasks.length + reminderTasks.length})</TabsTrigger>
+            <TabsTrigger value="all">All Items</TabsTrigger>
+            <TabsTrigger value="jobs">Jobs</TabsTrigger>
+            <TabsTrigger value="tasks">Tasks</TabsTrigger>
           </TabsList>
-
-          <ScrollArea className="flex-1 pr-4">
-            <TabsContent value="all" className="space-y-6 mt-0">
-              {/* Jobs Section */}
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <Briefcase className="h-4 w-4 text-gray-500 mr-2" />
-                  <h3 className="text-sm font-medium">Jobs ({jobs.length})</h3>
-                </div>
-                
-                {jobs.length > 0 ? (
+          
+          <ScrollArea className="flex-1 -mx-6 px-6">
+            <TabsContent value="all" className="mt-0 space-y-4">
+              {jobs.length > 0 ? (
+                <div>
+                  <h3 className="text-sm font-medium flex items-center mb-2">
+                    <Briefcase className="h-4 w-4 mr-1" /> 
+                    Jobs ({jobs.length})
+                  </h3>
                   <div className="space-y-2">
                     {jobs.map(job => (
-                      <div key={job.id} className="p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="font-medium text-sm">{job.title || job.description || "Untitled Job"}</h4>
-                          <Badge variant="outline" className="text-xs">
+                      <div key={job.id} className="p-3 bg-white rounded-md border-l-4 border-l-blue-300 shadow-sm">
+                        <div className="flex justify-between">
+                          <h4 className="font-medium">{job.title}</h4>
+                          <Badge variant={job.status === "completed" ? "outline" : "default"}>
                             {job.status}
                           </Badge>
                         </div>
-                        <div className="text-xs text-gray-600">
-                          {job.clientName || "No client"}
-                        </div>
-                        <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-                          <div>${job.amount}</div>
-                          <div>{job.time || "No time specified"}</div>
-                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Client: {job.clientName}
+                        </p>
+                        {job.scheduledDate && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Time: {typeof job.scheduledDate === 'string' 
+                              ? format(new Date(job.scheduledDate), "h:mm a") 
+                              : format(job.scheduledDate, "h:mm a")}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="py-3 text-center text-sm text-gray-500">
-                    No jobs scheduled
-                  </div>
-                )}
-              </div>
-
-              {/* Tasks Section */}
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <ListTodo className="h-4 w-4 text-gray-500 mr-2" />
-                  <h3 className="text-sm font-medium">Tasks ({regularTasks.length})</h3>
                 </div>
-                
-                {regularTasks.length > 0 ? (
+              ) : null}
+              
+              {regularTasks.length > 0 ? (
+                <div>
+                  <h3 className="text-sm font-medium flex items-center mb-2">
+                    <ClipboardList className="h-4 w-4 mr-1" /> 
+                    Tasks ({regularTasks.length})
+                  </h3>
                   <div className="space-y-2">
                     {regularTasks.map(task => (
-                      <div 
-                        key={task.id} 
-                        className={cn(
-                          "p-3 rounded-lg",
-                          task.status === "completed" ? "bg-gray-50" : "bg-gray-50"
-                        )}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="font-medium text-sm">{task.title}</h4>
-                          <Badge 
-                            variant={
-                              task.status === "completed" ? "outline" :
-                              task.status === "overdue" ? "destructive" :
-                              task.status === "in progress" ? "secondary" : 
-                              "default"
-                            }
-                            className="text-xs"
-                          >
-                            {task.status}
-                          </Badge>
-                        </div>
-                        {task.description && (
-                          <p className="mt-1 text-xs text-gray-500">{task.description}</p>
-                        )}
-                      </div>
+                      <TaskCard key={task.id} task={task} />
                     ))}
                   </div>
-                ) : (
-                  <div className="py-3 text-center text-sm text-gray-500">
-                    No tasks scheduled
-                  </div>
-                )}
-              </div>
-              
-              {/* Reminders Section */}
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <Bell className="h-4 w-4 text-gray-500 mr-2" />
-                  <h3 className="text-sm font-medium">Reminders ({reminderTasks.length})</h3>
                 </div>
-                
-                {reminderTasks.length > 0 ? (
+              ) : null}
+              
+              {reminders.length > 0 ? (
+                <div>
+                  <h3 className="text-sm font-medium flex items-center mb-2">
+                    <Bell className="h-4 w-4 mr-1" /> 
+                    Reminders ({reminders.length})
+                  </h3>
                   <div className="space-y-2">
-                    {reminderTasks.map(reminder => (
-                      <div key={reminder.id} className="p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="font-medium text-sm">{reminder.title}</h4>
-                          <div className="text-xs text-gray-500">
-                            {new Date(reminder.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </div>
-                        </div>
-                        {reminder.description && (
-                          <p className="mt-1 text-xs text-gray-500">{reminder.description}</p>
-                        )}
-                      </div>
+                    {reminders.map(reminder => (
+                      <ReminderCard key={reminder.id} reminder={reminder} />
                     ))}
                   </div>
-                ) : (
-                  <div className="py-3 text-center text-sm text-gray-500">
-                    No reminders set
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : null}
+              
+              {jobs.length === 0 && tasks.length === 0 && (
+                <p className="text-center py-4 text-muted-foreground">
+                  No items scheduled for this day
+                </p>
+              )}
             </TabsContent>
-
-            <TabsContent value="jobs" className="space-y-4 mt-0">
+            
+            <TabsContent value="jobs" className="mt-0">
               {jobs.length > 0 ? (
                 <div className="space-y-2">
                   {jobs.map(job => (
-                    <div key={job.id} className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">{job.title || job.description || "Untitled Job"}</h4>
-                        <Badge variant="outline">
+                    <div key={job.id} className="p-3 bg-white rounded-md border-l-4 border-l-blue-300 shadow-sm">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">{job.title}</h4>
+                        <Badge variant={job.status === "completed" ? "outline" : "default"}>
                           {job.status}
                         </Badge>
                       </div>
-                      <div className="space-y-2">
-                        <div className="text-sm text-gray-600">
-                          Client: {job.clientName || "No client"}
-                        </div>
-                        {job.description && (
-                          <div className="text-sm text-gray-600">
-                            Description: {job.description}
-                          </div>
-                        )}
-                        <div className="text-sm text-gray-600">
-                          Amount: ${job.amount}
-                        </div>
-                        {job.time && (
-                          <div className="text-sm text-gray-600">
-                            Time: {job.time}
-                          </div>
-                        )}
-                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Client: {job.clientName}
+                      </p>
+                      {job.scheduledDate && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Time: {typeof job.scheduledDate === 'string' 
+                            ? format(new Date(job.scheduledDate), "h:mm a") 
+                            : format(job.scheduledDate, "h:mm a")}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="py-12 text-center text-gray-500">
+                <p className="text-center py-4 text-muted-foreground">
                   No jobs scheduled for this day
-                </div>
+                </p>
               )}
             </TabsContent>
-
-            <TabsContent value="tasks" className="space-y-4 mt-0">
-              {regularTasks.length > 0 || reminderTasks.length > 0 ? (
-                <div className="space-y-6">
-                  {regularTasks.length > 0 && (
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-medium flex items-center">
-                        <ListTodo className="h-4 w-4 mr-2" />
-                        Tasks
-                      </h3>
-                      <div className="space-y-2">
-                        {regularTasks.map(task => (
-                          <div key={task.id} className="p-4 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium">{task.title}</h4>
-                              <Badge 
-                                variant={
-                                  task.status === "completed" ? "outline" :
-                                  task.status === "overdue" ? "destructive" :
-                                  task.status === "in progress" ? "secondary" : 
-                                  "default"
-                                }
-                              >
-                                {task.status}
-                              </Badge>
-                            </div>
-                            {task.description && (
-                              <div className="text-sm text-gray-600 mt-2">
-                                {task.description}
-                              </div>
-                            )}
-                            {task.client?.name && (
-                              <div className="text-sm text-gray-600 mt-2">
-                                Client: {task.client.name}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {reminderTasks.length > 0 && (
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-medium flex items-center">
-                        <Bell className="h-4 w-4 mr-2" />
-                        Reminders
-                      </h3>
-                      <div className="space-y-2">
-                        {reminderTasks.map(reminder => (
-                          <div key={reminder.id} className="p-4 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium">{reminder.title}</h4>
-                              <div className="text-sm text-gray-500">
-                                {new Date(reminder.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </div>
-                            </div>
-                            {reminder.description && (
-                              <div className="text-sm text-gray-600 mt-2">
-                                {reminder.description}
-                              </div>
-                            )}
-                            {reminder.client?.name && (
-                              <div className="text-sm text-gray-600 mt-2">
-                                Client: {reminder.client.name}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+            
+            <TabsContent value="tasks" className="mt-0">
+              {tasks.length > 0 ? (
+                <div className="space-y-2">
+                  {tasks.map(task => (
+                    task.isReminder ? (
+                      <ReminderCard key={task.id} reminder={task} />
+                    ) : (
+                      <TaskCard key={task.id} task={task} />
+                    )
+                  ))}
                 </div>
               ) : (
-                <div className="py-12 text-center text-gray-500">
+                <p className="text-center py-4 text-muted-foreground">
                   No tasks or reminders for this day
-                </div>
+                </p>
               )}
             </TabsContent>
           </ScrollArea>
         </Tabs>
         
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
+        <DialogFooter className="sm:justify-start mt-2">
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

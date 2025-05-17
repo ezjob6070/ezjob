@@ -55,7 +55,13 @@ const ReminderCard = ({ reminder, onReminderUpdate }: ReminderCardProps) => {
   };
 
   return (
-    <div className={`p-4 border rounded-lg shadow-sm ${reminder.status === "completed" ? "opacity-70" : ""}`}>
+    <div className={`p-4 bg-white rounded-lg shadow-sm border-l-4 ${
+      reminder.status === "completed" 
+        ? "border-l-green-300 opacity-70" 
+        : isPastDue() 
+          ? "border-l-red-300" 
+          : "border-l-purple-300"
+    }`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center">
           <Bell className="h-5 w-5 text-purple-500 mr-2" />
