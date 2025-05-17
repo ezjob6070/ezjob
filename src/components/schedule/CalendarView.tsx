@@ -15,17 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import CalendarViewOptions from "./CalendarViewOptions";
 
-interface CalendarViewProps {
-  jobs: Job[];
-  tasks: Task[];
-  selectedDate: Date;
-  jobsForSelectedDate: Job[];
-  tasksForSelectedDate: Task[];
-  updateSelectedDateItems: (date: Date) => void;
-  viewMode: CalendarViewMode;
-  onViewChange: (view: CalendarViewMode) => void;
-}
-
 // Define the event types more specifically
 interface JobEvent {
   id: string;
@@ -75,6 +64,17 @@ function isSameDayHelper(dateA: Date | string | undefined, dateB: Date | string 
   const dateObjB = typeof dateB === 'string' ? new Date(dateB) : dateB;
   
   return isSameDay(dateObjA, dateObjB);
+}
+
+interface CalendarViewProps {
+  jobs: Job[];
+  tasks: Task[];
+  selectedDate: Date;
+  jobsForSelectedDate: Job[];
+  tasksForSelectedDate: Task[];
+  updateSelectedDateItems: (date: Date) => void;
+  viewMode: CalendarViewMode;
+  onViewChange: (view: CalendarViewMode) => void;
 }
 
 const CalendarView = ({
@@ -254,18 +254,6 @@ const CalendarView = ({
       case 'day':
         return (
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <CardTitle>{getViewTitle()}</CardTitle>
-                <Button variant="outline" size="icon" onClick={handleNextPeriod}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            
             <div className="grid grid-cols-1 gap-4">
               {Array.from({ length: 24 }).map((_, hour) => {
                 const timeSlot = setHours(selectedDate, hour);
@@ -335,18 +323,6 @@ const CalendarView = ({
         
         return (
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <CardTitle>{getViewTitle()}</CardTitle>
-                <Button variant="outline" size="icon" onClick={handleNextPeriod}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            
             <div className="grid grid-cols-7 gap-2">
               {weekDays.map(day => (
                 <div 
