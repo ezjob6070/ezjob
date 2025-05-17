@@ -1,5 +1,5 @@
 
-import { Calendar, CalendarCheck, ListTodo } from "lucide-react";
+import { Calendar, CalendarDays, CalendarWeek } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export type CalendarViewMode = "day" | "week" | "month";
@@ -15,44 +15,49 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
   const iconColor = blueIconColor || "#0077CC";
   
   return (
-    <ToggleGroup 
-      type="single" 
-      value={currentView}
-      onValueChange={(value) => {
-        if (value) onViewChange(value as CalendarViewMode);
-      }}
-      className="flex rounded-md p-1"
-    >
-      <ToggleGroupItem 
-        value="day" 
-        size="sm"
-        className="data-[state=on]:bg-transparent"
-        aria-label="Day view"
+    <div className="inline-flex rounded-lg bg-muted/30 p-1">
+      <button
+        onClick={() => onViewChange("day")}
+        className={`px-3 py-1.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors ${
+          currentView === "day" 
+            ? `text-[${iconColor}]` 
+            : "text-muted-foreground hover:text-foreground"
+        }`}
       >
-        <Calendar className={currentView === "day" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
-        <span className={currentView === "day" ? `ml-1 text-xs font-medium text-[${iconColor}]` : "ml-1 text-xs font-medium"}>Day</span>
-      </ToggleGroupItem>
+        <Calendar className="h-3.5 w-3.5" 
+          style={{color: currentView === "day" ? iconColor : undefined}} 
+        />
+        Day
+      </button>
       
-      <ToggleGroupItem 
-        value="week" 
-        size="sm"
-        className="data-[state=on]:bg-transparent"
-        aria-label="Week view"
+      <button
+        onClick={() => onViewChange("week")}
+        className={`px-3 py-1.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors ${
+          currentView === "week" 
+            ? `text-[${iconColor}]` 
+            : "text-muted-foreground hover:text-foreground"
+        }`}
       >
-        <CalendarCheck className={currentView === "week" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
-        <span className={currentView === "week" ? `ml-1 text-xs font-medium text-[${iconColor}]` : "ml-1 text-xs font-medium"}>Week</span>
-      </ToggleGroupItem>
+        <CalendarWeek className="h-3.5 w-3.5" 
+          style={{color: currentView === "week" ? iconColor : undefined}}
+        />
+        Week
+      </button>
       
-      <ToggleGroupItem 
-        value="month" 
-        size="sm"
-        className="data-[state=on]:bg-transparent"
-        aria-label="Month view"
+      <button
+        onClick={() => onViewChange("month")}
+        className={`px-3 py-1.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors ${
+          currentView === "month" 
+            ? `text-[${iconColor}]` 
+            : "text-muted-foreground hover:text-foreground"
+        }`}
       >
-        <ListTodo className={currentView === "month" ? `h-3.5 w-3.5 text-[${iconColor}]` : "h-3.5 w-3.5"} />
-        <span className={currentView === "month" ? `ml-1 text-xs font-medium text-[${iconColor}]` : "ml-1 text-xs font-medium"}>Month</span>
-      </ToggleGroupItem>
-    </ToggleGroup>
+        <CalendarDays className="h-3.5 w-3.5" 
+          style={{color: currentView === "month" ? iconColor : undefined}} 
+        />
+        Month
+      </button>
+    </div>
   );
 };
 
