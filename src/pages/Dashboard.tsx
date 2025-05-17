@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { addDays, format, isWithinInterval } from "date-fns";
+import { addDays, format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
 import { IndustryType } from "@/components/sidebar/sidebarTypes";
 import {
@@ -26,15 +25,6 @@ import {
   BadgeDollarSign,
   ChartBar,
   PhoneCall,
-  Clock,
-  Settings,
-  Users,
-  Gem,
-  Award,
-  Zap,
-  Gauge,
-  Target,
-  TrendingUp,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -97,80 +87,74 @@ const Dashboard = () => {
     data: []
   });
 
-  const { jobs, currentIndustry, dateFilter } = useGlobalState();
-
-  // Use our predefined fake data
-  const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
-  const completedJobs = dashboardTaskCounts.completed;
-  const rescheduledJobs = dashboardTaskCounts.rescheduled; 
-  const totalRevenue = dashboardFinancialMetrics.totalRevenue;
+  const { dateFilter, jobs, currentIndustry } = useGlobalState();
+  
+  // Filter jobs based on date range
+  const filteredJobs = jobs.filter(job => {
+    if (!dateFilter?.from) return true;
+    
+    // Handle both string dates and Date objects
+    const jobDate = job.scheduledDate ? 
+      (job.scheduledDate instanceof Date ? job.scheduledDate : new Date(job.scheduledDate)) : 
+      job.date instanceof Date ? job.date : new Date(job.date);
+    
+    if (dateFilter.to) {
+      return jobDate >= dateFilter.from && jobDate <= dateFilter.to;
+    }
+    
+    // If only from date is specified, filter for that specific day
+    return jobDate.toDateString() === dateFilter.from.toDateString();
+  });
+  
+  // Calculate metrics based on filtered jobs
+  const completedJobs = filteredJobs.filter(job => job.status === "completed").length;
+  const rescheduledJobs = filteredJobs.filter(job => job.status === "rescheduled").length;
+  const inProgressJobs = filteredJobs.filter(job => job.status === "in_progress").length;
+  const canceledJobs = filteredJobs.filter(job => job.status === "cancelled").length;
+  
+  const totalJobs = completedJobs + rescheduledJobs + inProgressJobs + canceledJobs;
+  
+  // Calculate revenue from filtered jobs
+  const jobRevenue = filteredJobs
+    .filter(job => job.status === "completed")
+    .reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
+  
+  // Use dynamic revenue or fall back to sample data when no filtered jobs available
+  const totalRevenue = jobRevenue > 0 ? jobRevenue : dashboardFinancialMetrics.totalRevenue;
+  
+  // Calculate expenses as 40% of revenue for completed jobs
   const totalExpenses = totalRevenue * 0.4;
+  
+  // Calculate profit as revenue minus expenses
   const companyProfit = totalRevenue - totalExpenses;
-  const avgJobValue = dashboardFinancialMetrics.avgJobValue;
+  
+  // Calculate average job value
+  const avgJobValue = completedJobs > 0 
+    ? jobRevenue / completedJobs 
+    : dashboardFinancialMetrics.avgJobValue;
+  
+  // Use other metrics from sample data
   const monthlyGrowth = dashboardFinancialMetrics.monthlyGrowth;
   const conversionRate = dashboardFinancialMetrics.conversionRate;
-  const totalJobs = totalTasks;
 
-  // Sample data for call tracking section
+  // Generate call data based on filtered jobs (estimate more calls than jobs)
   const callsData = {
-    total: 154,
-    converted: 98,
-    scheduled: 37,
-    missed: 19,
-    conversionRate: 63
+    total: Math.max(154, Math.round(totalJobs * 1.6)),
+    converted: Math.max(98, Math.round(completedJobs * 1.3)),
+    scheduled: Math.max(37, Math.round(totalJobs * 0.4)),
+    missed: Math.max(19, Math.round(totalJobs * 0.2)),
+    conversionRate: totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 63
   };
 
-  // Sample data for KPI bar
-  const kpiMetrics = [
-    { 
-      title: "On-time Completion", 
-      value: "94%", 
-      icon: <Clock className="h-5 w-5 text-white" />,
-      description: "Jobs completed on schedule",
-      bgColor: "from-indigo-400 to-indigo-600"
-    },
-    { 
-      title: "Customer Satisfaction", 
-      value: "4.8/5", 
-      icon: <Award className="h-5 w-5 text-white" />,
-      description: "Based on 317 reviews",
-      bgColor: "from-amber-400 to-amber-600"
-    },
-    { 
-      title: "Team Productivity", 
-      value: "87%", 
-      icon: <Zap className="h-5 w-5 text-white" />,
-      description: "Efficiency rating",
-      bgColor: "from-emerald-400 to-emerald-600"
-    },
-    { 
-      title: "Growth Rate", 
-      value: "+18%", 
-      icon: <TrendingUp className="h-5 w-5 text-white" />,
-      description: "Month over month",
-      bgColor: "from-purple-400 to-purple-600"
-    }
+  // Job status data for visualization
+  const jobStatusData = [
+    { name: 'Completed', value: completedJobs || dashboardTaskCounts.completed, color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a' },
+    { name: 'In Progress', value: inProgressJobs || dashboardTaskCounts.inProgress, color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb' },
+    { name: 'Cancelled', value: canceledJobs || dashboardTaskCounts.canceled, color: '#ef4444', gradientFrom: '#f87171', gradientTo: '#dc2626' },
+    { name: 'Rescheduled', value: rescheduledJobs || dashboardTaskCounts.rescheduled, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
   ];
 
-  const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
-    setActiveDialog({
-      open: true,
-      type,
-      title,
-      data
-    });
-  };
-
-  const openStatusDialog = (status: string, title: string, data: any[]) => {
-    setStatusDialog({
-      open: true,
-      status,
-      title,
-      data
-    });
-  };
-
-  // Sample statistics data
+  // Sample statistics data for charts
   const revenueData = [
     { name: 'Jan', revenue: 78000, target: 72000 },
     { name: 'Feb', revenue: 82000, target: 75000 },
@@ -191,14 +175,6 @@ const Dashboard = () => {
     { name: 'Installation', value: 28, color: '#0ea5e9', gradientFrom: '#38bdf8', gradientTo: '#0284c7' },
     { name: 'Maintenance', value: 18, color: '#10b981', gradientFrom: '#34d399', gradientTo: '#059669' },
     { name: 'Other', value: 12, color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706' },
-  ];
-
-  // Create job status data for the circular visualization with enhanced colors and gradients
-  const jobStatusData = [
-    { name: 'Completed', value: dashboardTaskCounts.completed, color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a' },
-    { name: 'In Progress', value: dashboardTaskCounts.inProgress, color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb' },
-    { name: 'Cancelled', value: dashboardTaskCounts.canceled, color: '#ef4444', gradientFrom: '#f87171', gradientTo: '#dc2626' },
-    { name: 'Rescheduled', value: dashboardTaskCounts.rescheduled, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
   ];
 
   // Sample analytics data
@@ -224,6 +200,38 @@ const Dashboard = () => {
     { clientName: "Emily Davis", time: "01:15 PM", jobType: "Maintenance", address: "789 Pine Rd", priority: "low" },
     { clientName: "Michael Brown", time: "03:30 PM", jobType: "Inspection", address: "234 Elm St", priority: "medium" },
   ];
+
+  const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
+    setActiveDialog({
+      open: true,
+      type,
+      title,
+      data
+    });
+  };
+
+  const openStatusDialog = (status: string, title: string, data: any[]) => {
+    setStatusDialog({
+      open: true,
+      status,
+      title,
+      data
+    });
+  };
+
+  // Format date range for display in metrics
+  const getDateRangeText = () => {
+    if (!dateFilter?.from) return "All time";
+    
+    if (dateFilter.to) {
+      if (dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
+        return format(dateFilter.from, "MMM d, yyyy");
+      }
+      return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d, yyyy")}`;
+    }
+    
+    return format(dateFilter.from, "MMM d, yyyy");
+  };
 
   const renderDashboardStats = () => {
     return (
@@ -454,31 +462,8 @@ const Dashboard = () => {
       default: // Dashboard tab
         return (
           <>            
-            {/* KPI Metrics Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-              {kpiMetrics.map((metric, index) => (
-                <Card key={index} className="border-0 shadow-sm overflow-hidden">
-                  <div className={`bg-gradient-to-r ${metric.bgColor} h-1.5`}></div>
-                  <CardContent className="p-4 pt-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <div className={`p-1.5 bg-gradient-to-r ${metric.bgColor} rounded-full`}>
-                            {metric.icon}
-                          </div>
-                          <h3 className="text-sm font-medium text-gray-600">{metric.title}</h3>
-                        </div>
-                        <p className="text-2xl font-bold mt-2 text-gray-900">{metric.value}</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{metric.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            
             {/* Professional Metric Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
               {/* Revenue Card */}
               <Card className="bg-white border-0 shadow-sm">
                 <CardContent className="p-4">
@@ -493,9 +478,14 @@ const Dashboard = () => {
                       <p className="text-2xl font-bold mt-2 text-gray-900">{formatCurrency(totalRevenue)}</p>
                     </div>
                     
-                    <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
-                      78% of goal
-                    </span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full mb-1">
+                        {getDateRangeText()}
+                      </span>
+                      <span className="text-xs font-medium text-blue-600">
+                        78% of goal
+                      </span>
+                    </div>
                   </div>
                   
                   <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
@@ -524,9 +514,14 @@ const Dashboard = () => {
                       <p className="text-2xl font-bold mt-2 text-gray-900">{formatCurrency(companyProfit)}</p>
                     </div>
                     
-                    <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-600 rounded-full">
-                      {Math.round((companyProfit / totalRevenue) * 100)}% margin
-                    </span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-600 rounded-full mb-1">
+                        {getDateRangeText()}
+                      </span>
+                      <span className="text-xs font-medium text-green-600">
+                        {Math.round((companyProfit / totalRevenue) * 100)}% margin
+                      </span>
+                    </div>
                   </div>
                   
                   <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
@@ -557,113 +552,131 @@ const Dashboard = () => {
                       <p className="text-2xl font-bold mt-2 text-gray-900">{callsData.total}</p>
                     </div>
                     
-                    <span className="text-xs font-medium px-2 py-1 bg-purple-50 text-purple-600 rounded-full">
-                      {callsData.conversionRate}% conversion
-                    </span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-xs font-medium px-2 py-1 bg-purple-50 text-purple-600 rounded-full mb-1">
+                        {getDateRangeText()}
+                      </span>
+                      <span className="text-xs font-medium text-purple-600">
+                        {callsData.conversionRate}% conversion
+                      </span>
+                    </div>
                   </div>
                   
                   <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
                     <div className="flex justify-between items-center">
-                      <span>Follow-ups scheduled</span>
-                      <span className="font-medium text-gray-700">{callsData.scheduled}</span>
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full mr-1"></span>
+                        <span>Converted</span>
+                      </span>
+                      <span className="font-medium text-gray-700">{callsData.converted}</span>
                     </div>
-                    <div className="mt-2 flex gap-0.5">
-                      <div 
-                        className="bg-purple-500 h-1 rounded-l" 
-                        style={{ width: `${callsData.converted / callsData.total * 100}%` }}
-                      ></div>
-                      <div 
-                        className="bg-purple-300 h-1 rounded-r"
-                        style={{ width: `${(callsData.total - callsData.converted) / callsData.total * 100}%` }}
-                      ></div>
+                    <div className="flex justify-between items-center">
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
+                        <span>Missed</span>
+                      </span>
+                      <span className="font-medium text-gray-700">{callsData.missed}</span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Jobs Status Section */}
-            <div className="md:col-span-3">
-              <Card className="bg-white border-0 shadow-sm mb-4">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
-                  <CardDescription>Overview of service requests and job status</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <div className="flex flex-col md:flex-row items-center">
-                    <div className="flex-1 mb-4 md:mb-0 flex justify-center">
-                      <EnhancedDonutChart 
-                        data={jobStatusData}
-                        title={`${totalTasks}`}
-                        subtitle="Total Jobs"
-                        size={250} 
-                        thickness={50}
-                        gradients={true}
-                        animation={true}
-                        showLegend={false}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="grid grid-cols-2 gap-2">
-                        {jobStatusData.map((status, index) => (
-                          <div 
-                            key={index} 
-                            className="flex flex-col p-2 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                            onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
-                              status.name === 'Completed' ? jobsByStatus.completed :
-                              status.name === 'In Progress' ? jobsByStatus.inProgress :
-                              status.name === 'Cancelled' ? jobsByStatus.canceled :
-                              jobsByStatus.rescheduled
-                            )}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center">
-                                <div 
-                                  className="w-4 h-4 rounded-full mr-2 shadow-sm" 
-                                  style={{ 
-                                    background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
-                                  }}
-                                ></div>
-                                <span className="font-medium text-sm text-gray-700">{status.name}</span>
-                              </div>
-                              <span className="text-sm font-bold text-gray-900">{status.value}</span>
-                            </div>
-                            <div className="w-full h-2 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                              <div 
-                                className="h-2 rounded-full transition-all duration-1000 ease-out"
-                                style={{ 
-                                  width: `${(status.value / totalTasks) * 100}%`,
-                                  background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
-                                  boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
-                                }}
-                              ></div>
-                            </div>
-                            <div className="flex justify-between items-center mt-1">
-                              <Badge
-                                variant="outline"
-                                className="text-xs"
-                                style={{ 
-                                  color: status.color, 
-                                  borderColor: status.color,
-                                  backgroundColor: `${status.color}10`
-                                }}
-                              >
-                                {((status.value / totalTasks) * 100).toFixed(0)}%
-                              </Badge>
-                              <span className="text-xs text-gray-500">
-                                View
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                    <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div className="bg-purple-500 h-full rounded-full" style={{ width: `${callsData.conversionRate}%` }}></div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Job Status Overview */}
+            <Card className="bg-white shadow-sm mb-6">
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle className="text-lg font-semibold">Job Status Overview</CardTitle>
+                    <CardDescription>
+                      Job distribution for {getDateRangeText()}
+                    </CardDescription>
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs h-7"
+                    onClick={() => openStatusDialog("all", "All Jobs", jobsByStatus)}
+                  >
+                    View All Jobs
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="flex flex-col md:flex-row items-center justify-around py-6">
+                <div className="w-48 h-48 mb-6 md:mb-0">
+                  <EnhancedDonutChart
+                    data={jobStatusData}
+                    title={`${totalJobs}`}
+                    subtitle="Total Jobs"
+                    size={180}
+                    thickness={30}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-12 gap-y-4">
+                  <div 
+                    className="flex flex-col cursor-pointer hover:bg-green-50 p-3 rounded-lg transition-colors"
+                    onClick={() => openStatusDialog("completed", "Completed Jobs", jobsByStatus.filter(j => j.status === "completed"))}
+                  >
+                    <div className="flex items-center mb-1">
+                      <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                      <span className="text-sm font-medium">Completed</span>
+                    </div>
+                    <div className="text-xl font-bold">{completedJobs}</div>
+                    <div className="text-xs text-gray-500">
+                      {completedJobs > 0 ? `${formatCurrency(jobRevenue)}` : 'No revenue yet'}
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className="flex flex-col cursor-pointer hover:bg-blue-50 p-3 rounded-lg transition-colors"
+                    onClick={() => openStatusDialog("in_progress", "In Progress Jobs", jobsByStatus.filter(j => j.status === "in_progress"))}
+                  >
+                    <div className="flex items-center mb-1">
+                      <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                      <span className="text-sm font-medium">In Progress</span>
+                    </div>
+                    <div className="text-xl font-bold">{inProgressJobs}</div>
+                    <div className="text-xs text-gray-500">
+                      {Math.round(inProgressJobs / (totalJobs || 1) * 100)}% of total
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className="flex flex-col cursor-pointer hover:bg-red-50 p-3 rounded-lg transition-colors"
+                    onClick={() => openStatusDialog("cancelled", "Cancelled Jobs", jobsByStatus.filter(j => j.status === "cancelled"))}
+                  >
+                    <div className="flex items-center mb-1">
+                      <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                      <span className="text-sm font-medium">Cancelled</span>
+                    </div>
+                    <div className="text-xl font-bold">{canceledJobs}</div>
+                    <div className="text-xs text-gray-500">
+                      {Math.round(canceledJobs / (totalJobs || 1) * 100)}% of total
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className="flex flex-col cursor-pointer hover:bg-pink-50 p-3 rounded-lg transition-colors"
+                    onClick={() => openStatusDialog("rescheduled", "Rescheduled Jobs", jobsByStatus.filter(j => j.status === "rescheduled"))}
+                  >
+                    <div className="flex items-center mb-1">
+                      <div className="w-3 h-3 rounded-full bg-pink-500 mr-2"></div>
+                      <span className="text-sm font-medium">Rescheduled</span>
+                    </div>
+                    <div className="text-xl font-bold">{rescheduledJobs}</div>
+                    <div className="text-xs text-gray-500">
+                      {Math.round(rescheduledJobs / (totalJobs || 1) * 100)}% of total
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
-            {/* Projects Section - Simplified and placed right under Job Status */}
             <ProjectsDashboardSection />
             
             <JobStatusDialog 
@@ -695,20 +708,20 @@ const Dashboard = () => {
       
       {renderContent()}
       
-      <JobStatusDialog
-        open={statusDialog.open}
-        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
-        status={statusDialog.status}
-        title={statusDialog.title}
-        data={statusDialog.data}
-      />
-      
       <DashboardDetailDialog
         open={activeDialog.open}
         onOpenChange={(open) => setActiveDialog({...activeDialog, open})}
         title={activeDialog.title}
         type={activeDialog.type}
         data={activeDialog.data}
+      />
+      
+      <JobStatusDialog
+        open={statusDialog.open}
+        onOpenChange={(open) => setStatusDialog({...statusDialog, open})}
+        title={statusDialog.title}
+        status={statusDialog.status}
+        data={statusDialog.data}
       />
     </div>
   );

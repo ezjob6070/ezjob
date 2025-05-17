@@ -1,7 +1,6 @@
-
 import { DateRange } from "react-day-picker";
 
-export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "canceled" | "rescheduled" | "estimate";
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled" | "estimate";
 export type JobPriority = "low" | "medium" | "high" | "urgent";
 export type PaymentMethod = "cash" | "creditCard" | "check" | "bankTransfer" | "mobile" | "credit_card" | "zelle" | "venmo" | "paypal";
 
@@ -43,6 +42,7 @@ export interface Job {
   signature?: string;
   hasImages?: boolean;
   imageCount?: number;
+  images?: string[];
 }
 
 export interface JobTab {

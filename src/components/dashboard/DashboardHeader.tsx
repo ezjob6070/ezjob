@@ -10,6 +10,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { toast } from "@/components/ui/use-toast";
 
 interface DashboardHeaderProps {
   onTabChange?: (tab: string) => void;
@@ -50,6 +51,19 @@ const DashboardHeader = ({
     return format(dateFilter.from, "MMM d");
   };
 
+  const handleDateChange = (newDateFilter: DateRange | undefined) => {
+    setDateFilter(newDateFilter);
+    
+    if (newDateFilter?.from) {
+      toast({
+        description: newDateFilter.to 
+          ? `Dashboard updated for period ${format(newDateFilter.from, "MMM d")} - ${format(newDateFilter.to, "MMM d")}`
+          : `Dashboard updated for ${format(newDateFilter.from, "MMM d")}`,
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-100 shadow-sm rounded-lg -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-5 pt-6 pb-4 md:px-7 md:pt-7 md:pb-2 mb-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4">
@@ -65,6 +79,28 @@ const DashboardHeader = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-9 gap-1.5 border-blue-100 bg-blue-50/80 hover:bg-blue-100 text-blue-700 rounded-lg",
+                  dateFilter && "bg-blue-100"
+                )}
+              >
+                <CalendarRange className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">{formatDateRange()}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <DashboardDateFilter 
+                dateFilter={dateFilter}
+                onDateChange={handleDateChange}
+              />
+            </PopoverContent>
+          </Popover>
+          
           <Button
             variant="ghost"
             size="icon"
@@ -104,41 +140,26 @@ const DashboardHeader = ({
             </TabsList>
           </div>
         </Tabs>
-        
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                "h-9 gap-1.5 border-blue-100 bg-blue-50/80 hover:bg-blue-100 text-blue-700",
-                dateFilter && "bg-blue-100"
-              )}
-            >
-              <CalendarRange className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium">{formatDateRange()}</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
-            <DashboardDateFilter />
-          </PopoverContent>
-        </Popover>
       </div>
     </div>
   );
 };
 
 // Date filter functionality
-const DashboardDateFilter = () => {
-  const { dateFilter, setDateFilter } = useGlobalState();
+interface DashboardDateFilterProps {
+  dateFilter: DateRange | undefined;
+  onDateChange: (date: DateRange | undefined) => void;
+}
+
+const DashboardDateFilter = ({ dateFilter, onDateChange }: DashboardDateFilterProps) => {
   const [date, setDate] = useState<DateRange | undefined>(dateFilter);
 
   // Apply the date filter when it changes
   useEffect(() => {
     if (date) {
-      setDateFilter(date);
+      onDateChange(date);
     }
-  }, [date, setDateFilter]);
+  }, [date, onDateChange]);
 
   // Quick date selection options
   const selectToday = () => {
