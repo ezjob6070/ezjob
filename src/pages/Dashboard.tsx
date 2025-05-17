@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
@@ -87,48 +87,58 @@ const Dashboard = () => {
     data: []
   });
 
-  const { jobs, currentIndustry } = useGlobalState();
-
-  // Use our predefined fake data
-  const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
-  const completedJobs = dashboardTaskCounts.completed;
-  const rescheduledJobs = dashboardTaskCounts.rescheduled; 
-  const totalRevenue = dashboardFinancialMetrics.totalRevenue;
+  const { dateFilter, getFilteredJobs, currentIndustry } = useGlobalState();
+  const filteredJobs = getFilteredJobs();
+  
+  // Calculate metrics based on filtered jobs
+  const completedJobs = filteredJobs.filter(job => job.status === "completed").length;
+  const rescheduledJobs = filteredJobs.filter(job => job.status === "rescheduled").length;
+  const inProgressJobs = filteredJobs.filter(job => job.status === "in_progress").length;
+  const canceledJobs = filteredJobs.filter(job => job.status === "canceled").length;
+  
+  const totalJobs = completedJobs + rescheduledJobs + inProgressJobs + canceledJobs;
+  
+  // Calculate revenue from filtered jobs
+  const jobRevenue = filteredJobs
+    .filter(job => job.status === "completed")
+    .reduce((sum, job) => sum + (job.actualAmount || job.amount || 0), 0);
+  
+  // Use dynamic revenue or fall back to sample data when no filtered jobs available
+  const totalRevenue = jobRevenue > 0 ? jobRevenue : dashboardFinancialMetrics.totalRevenue;
+  
+  // Calculate expenses as 40% of revenue for completed jobs
   const totalExpenses = totalRevenue * 0.4;
+  
+  // Calculate profit as revenue minus expenses
   const companyProfit = totalRevenue - totalExpenses;
-  const avgJobValue = dashboardFinancialMetrics.avgJobValue;
+  
+  // Calculate average job value
+  const avgJobValue = completedJobs > 0 
+    ? jobRevenue / completedJobs 
+    : dashboardFinancialMetrics.avgJobValue;
+  
+  // Use other metrics from sample data
   const monthlyGrowth = dashboardFinancialMetrics.monthlyGrowth;
   const conversionRate = dashboardFinancialMetrics.conversionRate;
-  const totalJobs = totalTasks;
 
-  // Sample data for call tracking section
+  // Generate call data based on filtered jobs (estimate more calls than jobs)
   const callsData = {
-    total: 154,
-    converted: 98,
-    scheduled: 37,
-    missed: 19,
-    conversionRate: 63
+    total: Math.max(154, Math.round(totalJobs * 1.6)),
+    converted: Math.max(98, Math.round(completedJobs * 1.3)),
+    scheduled: Math.max(37, Math.round(totalJobs * 0.4)),
+    missed: Math.max(19, Math.round(totalJobs * 0.2)),
+    conversionRate: totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 63
   };
 
-  const openDetailDialog = (type: 'tasks' | 'leads' | 'clients' | 'revenue' | 'metrics', title: string, data: any[]) => {
-    setActiveDialog({
-      open: true,
-      type,
-      title,
-      data
-    });
-  };
+  // Create job status data for the circular visualization
+  const jobStatusData = [
+    { name: 'Completed', value: completedJobs || dashboardTaskCounts.completed, color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a' },
+    { name: 'In Progress', value: inProgressJobs || dashboardTaskCounts.inProgress, color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb' },
+    { name: 'Cancelled', value: canceledJobs || dashboardTaskCounts.canceled, color: '#ef4444', gradientFrom: '#f87171', gradientTo: '#dc2626' },
+    { name: 'Rescheduled', value: rescheduledJobs || dashboardTaskCounts.rescheduled, color: '#ec4899', gradientFrom: '#f472b6', gradientTo: '#db2777' },
+  ];
 
-  const openStatusDialog = (status: string, title: string, data: any[]) => {
-    setStatusDialog({
-      open: true,
-      status,
-      title,
-      data
-    });
-  };
-
-  // Sample statistics data
+  // Sample statistics data for charts
   const revenueData = [
     { name: 'Jan', revenue: 78000, target: 72000 },
     { name: 'Feb', revenue: 82000, target: 75000 },
@@ -429,7 +439,7 @@ const Dashboard = () => {
                     </div>
                     
                     <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
-                      78% of goal
+                      {dateFilterLabel}
                     </span>
                   </div>
                   
@@ -460,7 +470,7 @@ const Dashboard = () => {
                     </div>
                     
                     <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-600 rounded-full">
-                      {Math.round((companyProfit / totalRevenue) * 100)}% margin
+                      {dateFilterLabel}
                     </span>
                   </div>
                   
@@ -493,7 +503,7 @@ const Dashboard = () => {
                     </div>
                     
                     <span className="text-xs font-medium px-2 py-1 bg-purple-50 text-purple-600 rounded-full">
-                      {callsData.conversionRate}% conversion
+                      {dateFilterLabel}
                     </span>
                   </div>
                   
@@ -521,15 +531,22 @@ const Dashboard = () => {
             <div className="md:col-span-3">
               <Card className="bg-white border-0 shadow-sm mb-4">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
-                  <CardDescription>Overview of service requests and job status</CardDescription>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
+                      <CardDescription>Overview of service requests and job status</CardDescription>
+                    </div>
+                    <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
+                      {dateFilterLabel}
+                    </span>
+                  </div>
                 </CardHeader>
                 <CardContent className="pb-4">
                   <div className="flex flex-col md:flex-row items-center">
                     <div className="flex-1 mb-4 md:mb-0 flex justify-center">
                       <EnhancedDonutChart 
                         data={jobStatusData}
-                        title={`${totalTasks}`}
+                        title={`${totalJobs}`}
                         subtitle="Total Jobs"
                         size={250} 
                         thickness={50}
@@ -567,7 +584,7 @@ const Dashboard = () => {
                               <div 
                                 className="h-2 rounded-full transition-all duration-1000 ease-out"
                                 style={{ 
-                                  width: `${(status.value / totalTasks) * 100}%`,
+                                  width: `${totalJobs > 0 ? (status.value / totalJobs) * 100 : 0}%`,
                                   background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
                                   boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
                                 }}
@@ -583,7 +600,7 @@ const Dashboard = () => {
                                   backgroundColor: `${status.color}10`
                                 }}
                               >
-                                {((status.value / totalTasks) * 100).toFixed(0)}%
+                                {totalJobs > 0 ? ((status.value / totalJobs) * 100).toFixed(0) : 0}%
                               </Badge>
                               <span className="text-xs text-gray-500">
                                 View
