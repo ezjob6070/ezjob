@@ -1,5 +1,5 @@
 
-import { Calendar, CalendarDays, CalendarWeek } from "lucide-react";
+import { Calendar, CalendarDays } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export type CalendarViewMode = "day" | "week" | "month";
@@ -38,7 +38,7 @@ const CalendarViewOptions = ({ currentView, onViewChange, blueIconColor }: Calen
             : "text-muted-foreground hover:text-foreground"
         }`}
       >
-        <CalendarWeek className="h-3.5 w-3.5" 
+        <Calendar className="h-3.5 w-3.5" 
           style={{color: currentView === "week" ? iconColor : undefined}}
         />
         Week
