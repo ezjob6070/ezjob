@@ -7,17 +7,15 @@ export interface ProjectStaff {
 
 // Event types
 export interface ScheduleEvent {
-  id: string | number;
+  id: string;
   title: string;
-  start?: Date;
-  end?: Date;
-  date?: string;
-  time?: string;
+  start: Date;
+  end: Date;
   location?: string;
   description?: string;
   assignedTo?: string[];
   status: "scheduled" | "completed" | "cancelled";
-  type: "meeting" | "deadline" | "milestone" | "task" | "inspection" | "reminder" | "delivery" | "construction";
+  type: "meeting" | "deadline" | "milestone" | "task" | "inspection" | "reminder";
 }
 
 // Add missing job type definitions that are referenced in error messages
