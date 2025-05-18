@@ -1,7 +1,6 @@
-
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus, Search, 
-  ArrowDownAZ, CalendarDays, Filter, FileUp, PlusCircle, Clock, Paperclip } from "lucide-react";
+  ArrowDownAZ, CalendarDays, Filter, FileUp, PlusCircle, Clock, Paperclip, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -108,6 +107,11 @@ const TasksView = ({
   };
 
   const handleOpenTaskDetail = (task: Task) => {
+    setSelectedTask(task);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handleViewTask = (task: Task) => {
     setSelectedTask(task);
     setIsDetailDialogOpen(true);
   };
@@ -278,22 +282,29 @@ const TasksView = ({
         ) : (
           <div className="space-y-3">
             {filteredTasks.map((task) => (
-              task.isReminder ? (
-                <div key={task.id} className="cursor-pointer" onClick={() => handleOpenTaskDetail(task)}>
+              <div key={task.id} className="relative group">
+                {task.isReminder ? (
                   <ReminderCard 
                     reminder={task} 
                     onReminderUpdate={handleUpdateTask}
                   />
-                </div>
-              ) : (
-                <div key={task.id} className="cursor-pointer" onClick={() => handleOpenTaskDetail(task)}>
+                ) : (
                   <TaskCard 
                     task={task} 
                     onTaskUpdate={handleUpdateTask}
                     onCreateFollowUp={handleCreateFollowUp}
                   />
-                </div>
-              )
+                )}
+                
+                <Button
+                  variant="outline" 
+                  size="sm"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 bg-white bg-opacity-90 border-gray-300"
+                  onClick={() => handleViewTask(task)}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </div>
             ))}
           </div>
         )}
