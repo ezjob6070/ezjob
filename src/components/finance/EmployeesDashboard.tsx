@@ -20,15 +20,18 @@ const EmployeesDashboard: React.FC<EmployeesDashboardProps> = ({ dateRange, setD
   const [searchTerm, setSearchTerm] = useState("");
   const { technicians } = useGlobalState();
   
+  // Cast the technician array to ensure it includes the 'role' property
+  const typedTechnicians = technicians as (Technician & { role?: string, subRole?: string })[];
+  
   // Filter technicians that are employed
-  const employees = technicians.filter((tech) => tech.role === "employed");
+  const employees = typedTechnicians.filter((tech) => tech.role === "employed");
 
   // Filter by search term
   const filteredEmployees = employees.filter((employee) =>
     employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.position?.toLowerCase().includes(searchTerm.toLowerCase())
+    (employee.phone?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+    (employee.position?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
   );
 
   // Calculate salary expenditure for each employee
@@ -67,7 +70,8 @@ const EmployeesDashboard: React.FC<EmployeesDashboardProps> = ({ dateRange, setD
     return {
       ...employee,
       periodPayment,
-      monthlySalary
+      monthlySalary,
+      subRole: employee.subRole || null // Ensure subRole exists, even if null
     };
   });
 
@@ -182,7 +186,7 @@ const EmployeesDashboard: React.FC<EmployeesDashboardProps> = ({ dateRange, setD
                       <TableCell>{employee.position || employee.subRole || "Office Staff"}</TableCell>
                       <TableCell className="capitalize">
                         {employee.salaryBasis}
-                        {employee.incentiveType !== "none" && employee.incentiveAmount && (
+                        {employee.incentiveType && employee.incentiveType !== "none" && employee.incentiveAmount && (
                           <span className="text-xs text-blue-600 ml-2">
                             +{employee.incentiveType === "bonus" ? "Bonus" : "Commission"}
                           </span>

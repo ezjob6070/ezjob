@@ -16,24 +16,43 @@ interface ContractorsDashboardProps {
   setDateRange?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
 
+// Define a simplified Job interface with the properties we need
+interface Job {
+  id: string;
+  technicianId?: string;
+  scheduledDate?: Date | string;
+  date?: Date | string;
+  amount: number;
+  actualAmount?: number;
+  status: string;
+}
+
 const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, setDateRange }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { technicians, jobs } = useGlobalState();
   
+  // Cast the technician array to ensure it includes the 'role' property
+  const typedTechnicians = technicians as (Technician & { role?: string })[];
+  
   // Filter technicians that are contractors
-  const contractors = technicians.filter((tech) => tech.role === "contractor");
+  const contractors = typedTechnicians.filter((tech) => tech.role === "contractor");
 
   // Filter by search term
   const filteredContractors = contractors.filter((contractor) =>
     contractor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     contractor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    contractor.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    contractor.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
+    (contractor.phone?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+    (contractor.specialty?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
   );
 
+  // Cast the jobs array to ensure compatibility
+  const typedJobs = jobs as unknown as Job[];
+
   // Get jobs assigned to contractors within the date range
-  const contractorJobs = jobs.filter(job => {
-    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date as string);
+  const contractorJobs = typedJobs.filter(job => {
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : 
+                  job.date ? new Date(job.date) : new Date();
+    
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);
@@ -171,7 +190,7 @@ const ContractorsDashboard: React.FC<ContractorsDashboardProps> = ({ dateRange, 
                 contractorMetrics
                   .filter(contractor => 
                     contractor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    contractor.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
+                    (contractor.specialty?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
                   )
                   .sort((a, b) => b.totalRevenue - a.totalRevenue)
                   .map((contractor) => (

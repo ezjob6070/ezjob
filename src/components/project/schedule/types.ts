@@ -1,54 +1,27 @@
 
-export interface ProjectStaff {
-  id: string;
-  name: string;
-  role: string;
-}
-
-// Event types
 export interface ScheduleEvent {
   id: string;
   title: string;
-  start: Date;
-  end: Date;
+  start?: Date | string;
+  end?: Date | string;
   location?: string;
   description?: string;
-  assignedTo?: string[];
-  status: "scheduled" | "completed" | "cancelled";
-  type: "meeting" | "deadline" | "milestone" | "task" | "inspection" | "reminder";
+  assignedTo: string[];
+  status: string;
+  type: string;
 }
 
-// Add missing job type definitions that are referenced in error messages
-export type Job = {
+export interface Job {
   id: string;
-  date: string;
-  scheduledDate?: string;
-  technicianId: string;
-  status: string;
+  title?: string;
+  description?: string;
+  scheduledDate?: Date | string;
+  date?: Date | string;
   amount: number;
   actualAmount?: number;
-  // Add any other fields that might be needed
-};
-
-// Add sort option type that is referenced
-export type SortOption = string;
-export type DateFilterType = string;
-export type RangeValue = {
-  from?: Date;
-  to?: Date;
-};
-
-// Add DateRange props for components
-export interface DateFilterTabsProps {
-  selectedFilter?: DateFilterType;
-  onFilterChange?: (filter: DateFilterType) => void;
-  customDateRange?: { from: Date; to: Date; };
-  onCustomDateChange?: (range: any) => void;
-}
-
-// Add JobSourceFilterProps
-export interface JobSourceFilterProps {
-  value?: string;
-  onChange?: (value: any) => void;
-  jobSources?: { id: string; name: string; }[];
+  status: string;
+  technicianId?: string;
+  clientName?: string;
+  address?: string;
+  type?: string;
 }

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { Technician } from "@/types/technician";
-import { Job } from "@/components/project/schedule/types";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface SalesmenDashboardProps {
@@ -16,34 +16,53 @@ interface SalesmenDashboardProps {
   setDateRange?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
 
+// Define a simplified Job interface with the properties we need
+interface Job {
+  id: string;
+  technicianId?: string;
+  scheduledDate?: Date | string;
+  date?: Date | string;
+  amount: number;
+  actualAmount?: number;
+  status: string;
+}
+
 const SalesmenDashboard: React.FC<SalesmenDashboardProps> = ({ dateRange, setDateRange }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { technicians, jobs } = useGlobalState();
   
+  // Cast the technician array to ensure it includes the 'role' property
+  const typedTechnicians = technicians as (Technician & { role?: string })[];
+  
   // Filter technicians that are salesmen
-  const salesmen = technicians.filter((tech: Technician) => tech.role === "salesman");
+  const salesmen = typedTechnicians.filter((tech) => tech.role === "salesman");
 
   // Filter by search term
-  const filteredSalesmen = salesmen.filter((salesman: Technician) =>
+  const filteredSalesmen = salesmen.filter((salesman) =>
     salesman.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     salesman.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    salesman.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (salesman.subRole?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
+    (salesman.phone?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+    ((salesman.subRole?.toLowerCase().includes(searchTerm.toLowerCase())) || false)
   );
 
+  // Cast the jobs array to ensure compatibility
+  const typedJobs = jobs as unknown as Job[];
+
   // Get jobs assigned to salesmen within the date range
-  const salesJobs = jobs.filter((job: Job) => {
-    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
+  const salesJobs = typedJobs.filter((job) => {
+    const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : 
+                   job.date ? new Date(job.date) : new Date();
+    
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);
     
-    return isInDateRange && salesmen.some((s: Technician) => s.id === job.technicianId);
+    return isInDateRange && salesmen.some((s) => s.id === job.technicianId);
   });
 
   // Calculate financial metrics for each salesman
-  const salesmenMetrics = salesmen.map((salesman: Technician) => {
-    const salesmanFilteredJobs = salesJobs.filter((job: Job) => job.technicianId === salesman.id);
+  const salesmenMetrics = salesmen.map((salesman) => {
+    const salesmanFilteredJobs = salesJobs.filter((job) => job.technicianId === salesman.id);
     const totalRevenue = salesmanFilteredJobs.reduce(
       (sum, job) => sum + (job.actualAmount || job.amount), 0
     );
