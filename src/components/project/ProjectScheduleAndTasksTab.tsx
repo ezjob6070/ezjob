@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -525,6 +526,39 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           <Calendar className="h-4 w-4" />
           Add Task
         </Button>
+      </div>
+      
+      {/* Only kept metrics cards at the top */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100 shadow-sm">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-sm font-medium text-blue-700">Total Tasks</span>
+            <div className="p-1.5 bg-blue-100 rounded-full">
+              <List className="h-4 w-4 text-blue-600" />
+            </div>
+          </div>
+          <div className="text-xl font-bold text-blue-800">{tasks.length}</div>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-100 shadow-sm">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-sm font-medium text-amber-700">In Progress</span>
+            <div className="p-1.5 bg-amber-100 rounded-full">
+              <Clock className="h-4 w-4 text-amber-600" />
+            </div>
+          </div>
+          <div className="text-xl font-bold text-amber-800">{tasks.filter(t => t.status === "in_progress").length}</div>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-100 shadow-sm">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-sm font-medium text-green-700">Completed</span>
+            <div className="p-1.5 bg-green-100 rounded-full">
+              <BarChart className="h-4 w-4 text-green-600" />
+            </div>
+          </div>
+          <div className="text-xl font-bold text-green-800">{tasks.filter(t => t.status === "completed").length}</div>
+        </Card>
       </div>
       
       {/* Filter section with professional styling */}
