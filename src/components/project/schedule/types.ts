@@ -25,3 +25,14 @@ export interface Job {
   address?: string;
   type?: string;
 }
+
+// Adding ProjectStaff interface that's missing and referenced in several errors
+export interface ProjectStaff {
+  id: string;
+  name: string;
+  role: string;
+  email?: string;
+  phone?: string;
+  assignedTasks?: number;
+  availability?: string;
+}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -91,7 +90,11 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
     discountAmount: existingQuote?.discountAmount || 0
   });
   
-  const [status, setStatus] = useState(existingQuote?.status || "draft");
+  // Fix the type issue with status state
+  const [status, setStatus] = useState<"draft" | "sent" | "accepted" | "rejected" | "expired">(
+    existingQuote?.status as "draft" | "sent" | "accepted" | "rejected" | "expired" || "draft"
+  );
+  
   const [minPriceFilter, setMinPriceFilter] = useState<number>(0);
   const [maxPriceFilter, setMaxPriceFilter] = useState<number>(Number.MAX_SAFE_INTEGER);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -192,6 +195,18 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
     setMaxPriceFilter(max);
   };
   
+  // Modified onValueChange handler to fix type error
+  const handleStatusChange = (value: string) => {
+    // Validate and type-cast the value
+    const validStatus: "draft" | "sent" | "accepted" | "rejected" | "expired" = 
+      (value === "draft" || value === "sent" || value === "accepted" || 
+       value === "rejected" || value === "expired") 
+        ? value 
+        : "draft";
+    
+    setStatus(validStatus);
+  };
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -278,7 +293,7 @@ const ProjectQuoteModal: React.FC<ProjectQuoteModalProps> = ({
               <h3 className="text-md font-semibold">Quote Status</h3>
               <Select 
                 value={status} 
-                onValueChange={(value) => setStatus(value)}
+                onValueChange={handleStatusChange}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />

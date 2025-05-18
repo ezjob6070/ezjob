@@ -74,13 +74,19 @@ const OfficeExpenseList = ({
       return; // Todo: Add validation feedback
     }
 
+    // Ensure we have a string date
+    let dateValue: string;
+    if (typeof newExpense.date === 'string') {
+      dateValue = newExpense.date;
+    } else if (newExpense.date instanceof Date) {
+      dateValue = newExpense.date.toISOString().split('T')[0];
+    } else {
+      dateValue = new Date().toISOString().split('T')[0];
+    }
+
     const expenseData = {
       id: selectedExpense?.id || `expense-${Date.now()}`,
-      date: typeof newExpense.date === 'string' 
-        ? newExpense.date 
-        : (newExpense.date instanceof Date 
-            ? newExpense.date.toISOString().split('T')[0] 
-            : new Date().toISOString().split('T')[0]),
+      date: dateValue,
       category: newExpense.category || "",
       description: newExpense.description || "",
       amount: Number(newExpense.amount),
@@ -406,7 +412,9 @@ const OfficeExpenseList = ({
                   <Input
                     id="date"
                     type="date"
-                    value={newExpense.date}
+                    value={typeof newExpense.date === 'string' ? newExpense.date : 
+                           newExpense.date instanceof Date ? newExpense.date.toISOString().split('T')[0] : 
+                           new Date().toISOString().split('T')[0]}
                     onChange={(e) => setNewExpense({...newExpense, date: e.target.value})}
                     className="pl-10"
                   />

@@ -8,12 +8,13 @@ const TechnicianFinance = () => {
   const { filteredTechnicians } = useTechniciansData();
   const { transactions } = useFinanceData();
   
+  // Add type casting to avoid potential issues
   return (
     <Card className="border-none shadow-sm">
       <CardContent className="p-6">
         <TechniciansFinance 
-          technicians={filteredTechnicians} 
-          transactions={transactions}
+          technicians={filteredTechnicians || []} 
+          transactions={transactions || []}
         />
       </CardContent>
     </Card>
