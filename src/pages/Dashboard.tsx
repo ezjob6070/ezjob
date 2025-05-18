@@ -542,90 +542,93 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Jobs Status Section - Now full width */}
-            <div className="mb-6">
-              <Card className="bg-white border-0 shadow-sm">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
-                  <CardDescription>Overview of service requests and job status</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <div className="flex flex-col md:flex-row items-center">
-                    <div className="flex-1 mb-4 md:mb-0 flex justify-center">
-                      <EnhancedDonutChart 
-                        data={jobStatusData}
-                        title={`${totalTasks}`}
-                        subtitle="Total Jobs"
-                        size={250} 
-                        thickness={50}
-                        gradients={true}
-                        animation={true}
-                        showLegend={false}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="grid grid-cols-2 gap-2">
-                        {jobStatusData.map((status, index) => (
-                          <div 
-                            key={index} 
-                            className="flex flex-col p-2 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                            onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
-                              status.name === 'Completed' ? jobsByStatus.completed :
-                              status.name === 'In Progress' ? jobsByStatus.inProgress :
-                              status.name === 'Cancelled' ? jobsByStatus.canceled :
-                              jobsByStatus.rescheduled
-                            )}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center">
+            {/* Vertical stacking of Jobs Status and Projects sections */}
+            <div className="flex flex-col space-y-6">
+              {/* Jobs Status Section - Now takes top 50% */}
+              <div>
+                <Card className="bg-white border-0 shadow-sm">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
+                    <CardDescription>Overview of service requests and job status</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <div className="flex flex-col md:flex-row items-center">
+                      <div className="flex-1 mb-4 md:mb-0 flex justify-center">
+                        <EnhancedDonutChart 
+                          data={jobStatusData}
+                          title={`${totalTasks}`}
+                          subtitle="Total Jobs"
+                          size={250} 
+                          thickness={50}
+                          gradients={true}
+                          animation={true}
+                          showLegend={false}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="grid grid-cols-2 gap-2">
+                          {jobStatusData.map((status, index) => (
+                            <div 
+                              key={index} 
+                              className="flex flex-col p-2 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                              onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
+                                status.name === 'Completed' ? jobsByStatus.completed :
+                                status.name === 'In Progress' ? jobsByStatus.inProgress :
+                                status.name === 'Cancelled' ? jobsByStatus.canceled :
+                                jobsByStatus.rescheduled
+                              )}
+                            >
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center">
+                                  <div 
+                                    className="w-4 h-4 rounded-full mr-2 shadow-sm" 
+                                    style={{ 
+                                      background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
+                                    }}
+                                  ></div>
+                                  <span className="font-medium text-sm text-gray-700">{status.name}</span>
+                                </div>
+                                <span className="text-sm font-bold text-gray-900">{status.value}</span>
+                              </div>
+                              <div className="w-full h-2 bg-gray-100 rounded-full mt-1 overflow-hidden">
                                 <div 
-                                  className="w-4 h-4 rounded-full mr-2 shadow-sm" 
+                                  className="h-2 rounded-full transition-all duration-1000 ease-out"
                                   style={{ 
-                                    background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
+                                    width: `${(status.value / totalTasks) * 100}%`,
+                                    background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
+                                    boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
                                   }}
                                 ></div>
-                                <span className="font-medium text-sm text-gray-700">{status.name}</span>
                               </div>
-                              <span className="text-sm font-bold text-gray-900">{status.value}</span>
+                              <div className="flex justify-between items-center mt-1">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs"
+                                  style={{ 
+                                    color: status.color, 
+                                    borderColor: status.color,
+                                    backgroundColor: `${status.color}10`
+                                  }}
+                                >
+                                  {((status.value / totalTasks) * 100).toFixed(0)}%
+                                </Badge>
+                                <span className="text-xs text-gray-500">
+                                  View
+                                </span>
+                              </div>
                             </div>
-                            <div className="w-full h-2 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                              <div 
-                                className="h-2 rounded-full transition-all duration-1000 ease-out"
-                                style={{ 
-                                  width: `${(status.value / totalTasks) * 100}%`,
-                                  background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
-                                  boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
-                                }}
-                              ></div>
-                            </div>
-                            <div className="flex justify-between items-center mt-1">
-                              <Badge
-                                variant="outline"
-                                className="text-xs"
-                                style={{ 
-                                  color: status.color, 
-                                  borderColor: status.color,
-                                  backgroundColor: `${status.color}10`
-                                }}
-                              >
-                                {((status.value / totalTasks) * 100).toFixed(0)}%
-                              </Badge>
-                              <span className="text-xs text-gray-500">
-                                View
-                              </span>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Projects Section - Now full width below Jobs section */}
-            <div className="mb-6">
-              <ProjectsDashboardSection />
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Projects Section - Now takes bottom 50% */}
+              <div>
+                <ProjectsDashboardSection />
+              </div>
             </div>
             
             <JobStatusDialog 
