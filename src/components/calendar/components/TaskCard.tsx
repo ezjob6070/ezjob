@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Task } from "../types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -102,10 +101,10 @@ const TaskCard = ({ task, onTaskUpdate, onCreateFollowUp }: TaskCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="p-3 pb-1">
+    <div className="p-3 mb-2 rounded-lg bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm">
+      <div className="pb-1">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-md">{task.title}</CardTitle>
+          <h3 className="text-md font-medium">{task.title}</h3>
           <div className="flex gap-1">
             <Badge className={getPriorityBadgeColor(task.priority)}>
               {task.priority}
@@ -173,8 +172,8 @@ const TaskCard = ({ task, onTaskUpdate, onCreateFollowUp }: TaskCardProps) => {
             </DropdownMenu>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="p-3 pt-1">
+      </div>
+      <div className="pt-1">
         <div className="text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Client:</span>
@@ -209,8 +208,8 @@ const TaskCard = ({ task, onTaskUpdate, onCreateFollowUp }: TaskCardProps) => {
             <p className="text-xs text-gray-600">{task.description}</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

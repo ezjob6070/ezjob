@@ -1,3 +1,4 @@
+
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus, Search, 
   ArrowDownAZ, CalendarDays, Filter, FileUp, PlusCircle, Clock, Paperclip, Eye } from "lucide-react";
@@ -122,7 +123,7 @@ const TasksView = ({
 
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-4 bg-white p-3 rounded-md border shadow-sm">
+      <div className="flex items-center justify-between mb-4 bg-white p-3 rounded-md shadow-sm">
         <Button 
           variant="outline" 
           size="sm" 
@@ -144,7 +145,7 @@ const TasksView = ({
         </Button>
       </div>
       
-      <div className="bg-white rounded-md border shadow-sm mb-4">
+      <div className="bg-white rounded-md shadow-sm mb-4">
         <div className="p-3">
           <Tabs 
             value={viewMode} 
@@ -234,7 +235,7 @@ const TasksView = ({
         </div>
       </div>
       
-      <div className="bg-white rounded-md border shadow-sm p-4">
+      <div className="bg-white rounded-md shadow-sm p-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-medium">
             {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
@@ -280,7 +281,7 @@ const TasksView = ({
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-0">
             {filteredTasks.map((task) => (
               <div key={task.id} className="relative group">
                 {task.isReminder ? (
