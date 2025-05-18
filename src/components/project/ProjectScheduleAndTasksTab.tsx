@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, List, Bell, Clock, BarChart, Search, ArrowDownAZ, CalendarDays, Filter } from "lucide-react";
+import { Calendar, List, Bell, Clock, BarChart, Search, ArrowDownAZ, CalendarDays } from "lucide-react";
 import TasksView from "@/components/schedule/TasksView";
 import { Project, ProjectStaff, ProjectTask } from "@/types/project";
 import { Task } from "@/components/calendar/types";
@@ -19,7 +19,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'calendar' | 'tasks' | 'reminders' | 'timeline' | 'analytics'>('calendar');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortFilter, setSortFilter] = useState<"az" | "date" | "priority">("az");
+  const [sortFilter, setSortFilter] = useState<"az" | "date">("az");
 
   // Sample tasks for the project
   const tasks: Task[] = [
@@ -127,16 +127,6 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       case "date":
         filtered.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
         break;
-      case "priority": {
-        const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-        filtered.sort((a, b) => {
-          const aPriority = a.priority || "low";
-          const bPriority = b.priority || "low";
-          return (priorityOrder[aPriority as keyof typeof priorityOrder] || 3) - 
-                 (priorityOrder[bPriority as keyof typeof priorityOrder] || 3);
-        });
-        break;
-      }
     }
     
     return filtered;
@@ -168,7 +158,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       <div className="space-y-6">
         {/* Task Status Tabs */}
         <div className="bg-gray-100 rounded-lg p-1">
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-4 gap-1">
             <Button 
               variant="ghost" 
               className={`rounded-md ${viewMode === 'tasks' && !searchQuery ? 'bg-white shadow-sm' : ''}`}
@@ -188,6 +178,13 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
             </Button>
             <Button 
               variant="ghost" 
+              className={`rounded-md ${viewMode === 'tasks' && searchQuery === 'status:in_progress' ? 'bg-white shadow-sm' : ''}`}
+              onClick={() => setSearchQuery('status:in_progress')}
+            >
+              In Progress
+            </Button>
+            <Button 
+              variant="ghost" 
               className={`rounded-md ${viewMode === 'tasks' && searchQuery === 'status:completed' ? 'bg-white shadow-sm' : ''}`}
               onClick={() => setSearchQuery('status:completed')}
             >
@@ -196,46 +193,35 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           </div>
         </div>
         
-        {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-20 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 w-8 p-0" 
-                title="Sort A-Z"
-                onClick={() => setSortFilter("az")}
-              >
-                <ArrowDownAZ className={`h-4 w-4 ${sortFilter === 'az' ? 'text-blue-600' : 'text-gray-400'}`} />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 w-8 p-0" 
-                title="Sort by Date"
-                onClick={() => setSortFilter("date")}
-              >
-                <CalendarDays className={`h-4 w-4 ${sortFilter === 'date' ? 'text-blue-600' : 'text-gray-400'}`} />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 w-8 p-0" 
-                title="Sort by Priority"
-                onClick={() => setSortFilter("priority")}
-              >
-                <Filter className={`h-4 w-4 ${sortFilter === 'priority' ? 'text-blue-600' : 'text-gray-400'}`} />
-              </Button>
-            </div>
+        {/* Search input moved below task status tabs */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              title="Sort A-Z"
+              onClick={() => setSortFilter("az")}
+            >
+              <ArrowDownAZ className={`h-4 w-4 ${sortFilter === 'az' ? 'text-blue-600' : 'text-gray-400'}`} />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              title="Sort by Date"
+              onClick={() => setSortFilter("date")}
+            >
+              <CalendarDays className={`h-4 w-4 ${sortFilter === 'date' ? 'text-blue-600' : 'text-gray-400'}`} />
+            </Button>
           </div>
         </div>
         
