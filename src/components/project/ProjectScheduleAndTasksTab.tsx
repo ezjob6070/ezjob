@@ -3,7 +3,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, ArrowLeft, ArrowRight, Clock, BarChart, Calendar, List, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { 
+  ArrowLeft, ArrowRight, Clock, BarChart, List, 
+  ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon 
+} from "lucide-react";
 import { Project, ProjectStaff, ProjectTask } from "@/types/project";
 import { format, addDays, addMonths, subMonths, parseISO, isToday, isSameMonth, isSameDay } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -19,7 +22,7 @@ interface ProjectScheduleAndTasksTabProps {
 const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAndTasksTabProps) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [viewMode, setViewMode] = useState<'calendar' | 'timeline' | 'month' | 'week'>('month');
+  const [viewMode, setViewMode] = useState<'calendar' | 'timeline' | 'month'>('month');
   
   // Sample tasks/events for the project calendar
   const events = [
@@ -365,7 +368,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           <div className="flex justify-between items-center mb-1">
             <span className="text-sm font-medium text-blue-700">Total Events</span>
             <div className="p-1.5 bg-blue-100 rounded-full">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <CalendarIcon className="h-4 w-4 text-blue-600" />
             </div>
           </div>
           <div className="text-xl font-bold text-blue-800">{totalEvents}</div>
@@ -399,12 +402,12 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
             <h3 className="text-sm font-medium text-gray-600 mr-2">View:</h3>
             <Tabs 
               value={viewMode} 
-              onValueChange={(value) => setViewMode(value as 'calendar' | 'timeline' | 'month' | 'week')}
+              onValueChange={(value) => setViewMode(value as 'calendar' | 'timeline' | 'month')}
               className="w-full"
             >
               <TabsList>
                 <TabsTrigger value="month" className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
+                  <CalendarIcon className="h-4 w-4" />
                   Month
                 </TabsTrigger>
                 <TabsTrigger value="calendar" className="flex items-center gap-1">
