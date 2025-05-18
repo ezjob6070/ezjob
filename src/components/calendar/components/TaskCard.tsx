@@ -178,7 +178,7 @@ const TaskCard = ({ task, onTaskUpdate, onCreateFollowUp }: TaskCardProps) => {
         <div className="text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Client:</span>
-            <span className="font-medium">{task.client?.name || 'Not assigned'}</span>
+            <span className="font-medium">{task.client.name}</span>
           </div>
           <div className="flex justify-between mt-1">
             <span className="text-muted-foreground">Status:</span>
@@ -194,20 +194,12 @@ const TaskCard = ({ task, onTaskUpdate, onCreateFollowUp }: TaskCardProps) => {
           )}
           <div className="flex justify-between mt-1">
             <span className="text-muted-foreground">Due:</span>
-            <span className="font-medium">
-              {typeof task.dueDate === 'string' 
-                ? format(new Date(task.dueDate), "MMM d, h:mm a") 
-                : format(task.dueDate, "MMM d, h:mm a")}
-            </span>
+            <span className="font-medium">{format(task.dueDate, "MMM d, h:mm a")}</span>
           </div>
           {task.hasFollowUp && task.followUpDate && (
             <div className="flex justify-between mt-1">
               <span className="text-muted-foreground">Follow-up:</span>
-              <span className="font-medium">
-                {typeof task.followUpDate === 'string'
-                  ? format(new Date(task.followUpDate), "MMM d, h:mm a")
-                  : format(task.followUpDate, "MMM d, h:mm a")}
-              </span>
+              <span className="font-medium">{format(task.followUpDate, "MMM d, h:mm a")}</span>
             </div>
           )}
         </div>

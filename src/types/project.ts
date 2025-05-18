@@ -1,3 +1,4 @@
+
 export interface Project {
   id: number;
   name: string;
@@ -115,32 +116,6 @@ export interface ProjectEquipment {
   status: "active" | "returned" | "owned";
 }
 
-export interface ProjectTaskInspection {
-  id: string;
-  title: string;
-  status: "pending" | "passed" | "failed" | "not_applicable";
-  date?: string;
-  inspector?: string;
-  notes?: string;
-  photos?: string[];
-}
-
-export interface ProjectTaskComment {
-  id: string;
-  text: string;
-  author: string;
-  date: string;
-}
-
-export interface ProjectTaskAttachment {
-  id: string;
-  name: string;
-  type: string;
-  url: string;
-  uploadedAt: string;
-  uploadedBy: string;
-}
-
 export interface ProjectTask {
   id: string;
   title: string;
@@ -166,6 +141,32 @@ export interface ProjectTask {
   lastUpdatedAt?: string;
   comments?: ProjectTaskComment[];
   attachments?: ProjectTaskAttachment[];
+}
+
+export interface ProjectTaskInspection {
+  id: string;
+  title: string;
+  status: "pending" | "passed" | "failed" | "not_applicable";
+  date?: string;
+  inspector?: string;
+  notes?: string;
+  photos?: string[];
+}
+
+export interface ProjectTaskComment {
+  id: string;
+  text: string;
+  author: string;
+  date: string;
+}
+
+export interface ProjectTaskAttachment {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  uploadedAt: string;
+  uploadedBy: string;
 }
 
 // Quote and invoice interfaces - these remain the same

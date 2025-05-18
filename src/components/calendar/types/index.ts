@@ -8,7 +8,7 @@ export interface Task {
   allDay?: boolean;
   priority?: "high" | "medium" | "low" | "urgent";
   status: string;
-  client?: { name: string };
+  client: { name: string };
   location?: string;
   description?: string;
   technician?: string;
@@ -17,9 +17,6 @@ export interface Task {
   followUpDate?: Date | string;
   hasFollowUp?: boolean;
   parentTaskId?: string;
-  assignedTo?: string;
-  createdAt?: string;
-  progress?: number;
   
   // Reminder-specific fields
   isReminder?: boolean;
