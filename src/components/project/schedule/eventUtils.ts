@@ -1,25 +1,22 @@
 
 import { ScheduleEvent } from "./types";
-import { 
-  BellRing, Calendar, Clock, FileText, Check
-} from "lucide-react";
 
 export const getEventTypeIcon = (type: string) => {
   switch (type) {
     case "reminder":
-      return <BellRing className="h-4 w-4" />;
+      return "BellRing";
     case "meeting":
-      return <Calendar className="h-4 w-4" />;
+      return "Calendar";
     case "deadline":
-      return <Clock className="h-4 w-4" />;
+      return "Clock";
     case "milestone":
-      return <Check className="h-4 w-4" />;
+      return "Check";
     case "inspection":
-      return <FileText className="h-4 w-4" />;
+      return "FileText";
     case "task":
-      return <FileText className="h-4 w-4" />;
+      return "FileText";
     default:
-      return <Calendar className="h-4 w-4" />;
+      return "Calendar";
   }
 };
 
