@@ -1,6 +1,4 @@
-
 import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -8,7 +6,7 @@ import { Plus, Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-// Import new components
+// Import components
 import { ProjectStaff, ScheduleEvent } from "./schedule/types";
 import AddEventDialog from "./schedule/AddEventDialog";
 import AddReminderDialog from "./schedule/AddReminderDialog";
