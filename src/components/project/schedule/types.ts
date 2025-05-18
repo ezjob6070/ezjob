@@ -42,7 +42,7 @@ export type RangeValue = {
 export interface DateFilterTabsProps {
   selectedFilter?: DateFilterType;
   onFilterChange?: (filter: DateFilterType) => void;
-  customDateRange?: { from: Date; to: Date };
+  customDateRange?: { from: Date; to: Date; };
   onCustomDateChange?: (range: any) => void;
 }
 

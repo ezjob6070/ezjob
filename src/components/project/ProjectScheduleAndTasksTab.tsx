@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
-  ArrowLeft, ArrowRight, Clock, BarChart, List, 
-  ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon,
+  ArrowLeft, ArrowRight, Calendar as CalendarIcon, List, 
+  ChevronLeft, ChevronRight, Plus, 
   BellRing, Clock3, LayoutList, CheckCircle2, AlertCircle,
   User, MapPin, FileText, ArrowUp, CircleCheck
 } from "lucide-react";
@@ -14,7 +14,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarViewMode } from "@/components/schedule/CalendarViewOptions";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
@@ -346,7 +345,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       case "delivery":
         return <ArrowRight className="h-4 w-4 text-amber-600" />;
       case "construction":
-        return <BarChart className="h-4 w-4 text-green-600" />;
+        return <ArrowUp className="h-4 w-4 text-green-600" />;
       case "inspection":
         return <List className="h-4 w-4 text-purple-600" />;
       case "reminder":
@@ -400,7 +399,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       case "review":
         return <FileText className="h-4 w-4 text-purple-600" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-600" />;
+        return <Clock3 className="h-4 w-4 text-gray-600" />;
     }
   };
 
@@ -496,7 +495,6 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
 
   // Timeline view
   const renderTimeline = () => {
-    // Sort events by date
     const sortedEvents = [...filteredEvents].sort((a, b) => {
       const dateA = new Date(a.date + "T" + a.time.split(" - ")[0]).getTime();
       const dateB = new Date(b.date + "T" + b.time.split(" - ")[0]).getTime();
@@ -583,7 +581,6 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
 
   // List view
   const renderList = () => {
-    // Group events by date
     const eventsByDate: Record<string, ScheduleEvent[]> = {};
     filteredEvents.forEach(event => {
       if (!eventsByDate[event.date]) {
@@ -592,7 +589,6 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       eventsByDate[event.date].push(event);
     });
     
-    // Sort dates
     const sortedDates = Object.keys(eventsByDate).sort((a, b) => {
       return new Date(a).getTime() - new Date(b).getTime();
     });
@@ -1061,124 +1057,69 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
     );
   };
 
-  // Metrics cards
-  const completedEvents = events.filter(event => event.status === "completed").length;
-  const totalEvents = events.length;
-  const scheduledEvents = events.filter(event => event.status === "scheduled").length;
-  const reminderCount = events.filter(event => event.type === "reminder").length;
-  
-  const completedTasks = tasks.filter(task => task.status === "completed").length;
-  const inProgressTasks = tasks.filter(task => task.status === "in_progress").length;
-  const blockedTasks = tasks.filter(task => task.status === "blocked").length;
-
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center pb-4 border-b">
         <h2 className="text-2xl font-bold">Project Schedule & Tasks</h2>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleAddReminder} className="bg-rose-600 text-white hover:bg-rose-700">
+          <Button variant="outline" onClick={handleAddReminder} className="flex items-center gap-1 text-rose-600 border-rose-200 hover:bg-rose-50">
             <BellRing className="h-4 w-4 mr-1" /> Add Reminder
           </Button>
-          <Button variant="outline" onClick={handleAddTask} className="bg-blue-600 text-white hover:bg-blue-700">
+          <Button variant="outline" onClick={handleAddTask} className="flex items-center gap-1 text-blue-600 border-blue-200 hover:bg-blue-50">
             <Plus className="h-4 w-4 mr-1" /> Add Task
           </Button>
-          <Button onClick={handleAddEvent}>
+          <Button onClick={handleAddEvent} className="bg-indigo-600 hover:bg-indigo-700">
             <Plus className="h-4 w-4 mr-1" /> Add Event
           </Button>
         </div>
-      </div>
-      
-      {/* Metrics cards */}
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-        <Card className="md:col-span-2 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100 shadow-sm">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-sm font-medium text-blue-700">Total Events</span>
-            <div className="p-1.5 bg-blue-100 rounded-full">
-              <CalendarIcon className="h-4 w-4 text-blue-600" />
-            </div>
-          </div>
-          <div className="text-xl font-bold text-blue-800">{totalEvents}</div>
-        </Card>
-        
-        <Card className="md:col-span-2 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-100 shadow-sm">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-sm font-medium text-amber-700">Scheduled</span>
-            <div className="p-1.5 bg-amber-100 rounded-full">
-              <Clock className="h-4 w-4 text-amber-600" />
-            </div>
-          </div>
-          <div className="text-xl font-bold text-amber-800">{scheduledEvents}</div>
-        </Card>
-        
-        <Card className="md:col-span-3 border-l-4 border-l-green-500 shadow-sm p-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="text-sm text-gray-500">Tasks Completion</div>
-              <div className="text-xl font-bold">
-                {completedTasks} / {tasks.length}
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="h-8 bg-blue-50 text-blue-700 border-blue-200">
-                {inProgressTasks} In Progress
-              </Button>
-              <Button variant="outline" size="sm" className="h-8 bg-red-50 text-red-700 border-red-200">
-                {blockedTasks} Blocked
-              </Button>
-            </div>
-          </div>
-          <Progress 
-            value={tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0} 
-            className="h-2 mt-2" 
-          />
-        </Card>
       </div>
       
       {/* View selector */}
       <Tabs 
         value={viewMode} 
         onValueChange={(value) => setViewMode(value as 'calendar' | 'timeline' | 'list' | 'reminders' | 'tasks')}
+        className="w-full"
       >
-        <TabsList>
-          <TabsTrigger value="calendar" className="flex items-center gap-1">
-            <CalendarIcon className="h-4 w-4" />
-            Calendar
-          </TabsTrigger>
-          <TabsTrigger value="timeline" className="flex items-center gap-1">
-            <Clock3 className="h-4 w-4" />
-            Timeline
-          </TabsTrigger>
-          <TabsTrigger value="list" className="flex items-center gap-1">
-            <LayoutList className="h-4 w-4" />
-            List View
-          </TabsTrigger>
-          <TabsTrigger value="reminders" className="flex items-center gap-1">
-            <BellRing className="h-4 w-4" />
-            Reminders
-          </TabsTrigger>
-          <TabsTrigger value="tasks" className="flex items-center gap-1">
-            <CheckCircle2 className="h-4 w-4" />
-            Tasks
-          </TabsTrigger>
-        </TabsList>
-        
-        <div className="my-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <TabsList className="bg-muted/50">
+            <TabsTrigger value="calendar" className="flex items-center gap-1">
+              <CalendarIcon className="h-4 w-4" />
+              Calendar
+            </TabsTrigger>
+            <TabsTrigger value="timeline" className="flex items-center gap-1">
+              <Clock3 className="h-4 w-4" />
+              Timeline
+            </TabsTrigger>
+            <TabsTrigger value="list" className="flex items-center gap-1">
+              <LayoutList className="h-4 w-4" />
+              List View
+            </TabsTrigger>
+            <TabsTrigger value="reminders" className="flex items-center gap-1">
+              <BellRing className="h-4 w-4" />
+              Reminders
+            </TabsTrigger>
+            <TabsTrigger value="tasks" className="flex items-center gap-1">
+              <CheckCircle2 className="h-4 w-4" />
+              Tasks
+            </TabsTrigger>
+          </TabsList>
+          
           <Input
-            placeholder="Search events and reminders..."
+            placeholder="Search events and tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="max-w-md"
           />
         </div>
 
-        <TabsContent value="calendar">
-          <Card className="bg-white shadow-sm">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border rounded-lg p-4 bg-white">
+        <TabsContent value="calendar" className="mt-0">
+          <Card className="bg-white border-0 shadow-sm overflow-hidden">
+            <CardContent className="p-0">
+              <div className="grid grid-cols-1 md:grid-cols-2">
+                <div className="p-6 bg-gradient-to-b from-indigo-50/50 to-white border-r border-gray-100">
                   {renderCalendar()}
                 </div>
-                <div className="border rounded-lg p-4 bg-white overflow-auto max-h-[500px]">
+                <div className="p-6 overflow-auto max-h-[500px]">
                   {renderEventsForSelectedDate()}
                 </div>
               </div>
@@ -1186,32 +1127,32 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           </Card>
         </TabsContent>
         
-        <TabsContent value="timeline">
-          <Card className="bg-white shadow-sm">
+        <TabsContent value="timeline" className="mt-0">
+          <Card className="bg-white border-0 shadow-sm overflow-hidden">
             <CardContent className="p-6">
               {renderTimeline()}
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="list">
-          <Card className="bg-white shadow-sm">
+        <TabsContent value="list" className="mt-0">
+          <Card className="bg-white border-0 shadow-sm overflow-hidden">
             <CardContent className="p-6">
               {renderList()}
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="reminders">
-          <Card className="bg-white shadow-sm">
+        <TabsContent value="reminders" className="mt-0">
+          <Card className="bg-white border-0 shadow-sm overflow-hidden">
             <CardContent className="p-6">
               {renderReminders()}
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="tasks">
-          <Card className="bg-white shadow-sm">
+        <TabsContent value="tasks" className="mt-0">
+          <Card className="bg-white border-0 shadow-sm overflow-hidden">
             <CardContent className="p-6">
               {renderTasks()}
             </CardContent>
