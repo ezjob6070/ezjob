@@ -17,6 +17,7 @@ export interface Task {
   followUpDate?: Date | string;
   hasFollowUp?: boolean;
   parentTaskId?: string;
+  assignedTo?: string;
   
   // Reminder-specific fields
   isReminder?: boolean;

@@ -1,9 +1,9 @@
 
 import React from "react";
-import { DateFilterType, FinanceFilters, FinanceFilterProps } from "./FinanceFilterTypes";
-import { SearchBar } from "./filters/SearchBar";
-import { DateFilterTabs } from "./filters/DateFilterTabs";
-import { JobSourceFilter } from "./filters/JobSourceFilter";
+import { DateFilterType, FinanceFilters as FinanceFiltersType, FinanceFilterProps } from "./FinanceFilterTypes";
+import SearchBar from "./filters/SearchBar";
+import DateFilterTabs from "./filters/DateFilterTabs";
+import JobSourceFilter from "./filters/JobSourceFilter";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 
@@ -14,7 +14,7 @@ export const FinanceFilters: React.FC<FinanceFilterProps> = ({
   resetFilters
 }) => {
   // Handler for updating filter values
-  const updateFilter = <K extends keyof FinanceFilters>(key: K, value: FinanceFilters[K]) => {
+  const updateFilter = <K extends keyof FinanceFiltersType>(key: K, value: FinanceFiltersType[K]) => {
     setFilters({
       ...filters,
       [key]: value
@@ -27,7 +27,7 @@ export const FinanceFilters: React.FC<FinanceFilterProps> = ({
         <div className="flex-grow">
           <SearchBar 
             searchTerm={filters.searchTerm} 
-            updateFilter={(value) => updateFilter('searchTerm', value)}
+            onSearchChange={(value) => updateFilter('searchTerm', value)}
             hidden={false}
           />
         </div>

@@ -1,14 +1,14 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, List, Bell, Clock, BarChart } from "lucide-react";
+import { Calendar, List, Bell, Clock, BarChart, Search, ArrowDownAZ, CalendarDays, Filter } from "lucide-react";
 import TasksView from "@/components/schedule/TasksView";
 import { Project, ProjectStaff, ProjectTask } from "@/types/project";
 import { Task } from "@/components/calendar/types";
 import { addDays, format } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ProjectScheduleAndTasksTabProps {
   project: Project;
@@ -18,6 +18,8 @@ interface ProjectScheduleAndTasksTabProps {
 const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAndTasksTabProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'calendar' | 'tasks' | 'reminders' | 'timeline' | 'analytics'>('calendar');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortFilter, setSortFilter] = useState<"az" | "date" | "priority">("az");
 
   // Sample tasks for the project
   const tasks: Task[] = [
@@ -29,6 +31,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       priority: "high",
       dueDate: format(new Date(), "yyyy-MM-dd"),
       assignedTo: "John Doe",
+      client: { name: "ABC Corp" },
       createdAt: format(addDays(new Date(), -5), "yyyy-MM-dd"),
       progress: 100,
       isReminder: false,
@@ -41,6 +44,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       priority: "medium",
       dueDate: format(addDays(new Date(), 2), "yyyy-MM-dd"),
       assignedTo: "Sarah Smith",
+      client: { name: "DEF Inc" },
       createdAt: format(addDays(new Date(), -3), "yyyy-MM-dd"),
       progress: 50,
       isReminder: false,
@@ -53,6 +57,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       priority: "high",
       dueDate: format(addDays(new Date(), 1), "yyyy-MM-dd"),
       assignedTo: "Mark Johnson",
+      client: { name: "GHI Ltd" },
       createdAt: format(addDays(new Date(), -2), "yyyy-MM-dd"),
       progress: 0,
       isReminder: true,
@@ -65,6 +70,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       priority: "medium",
       dueDate: format(addDays(new Date(), 5), "yyyy-MM-dd"),
       assignedTo: "Robert Brown",
+      client: { name: "JKL Co" },
       createdAt: format(addDays(new Date(), -1), "yyyy-MM-dd"),
       progress: 0,
       isReminder: false,
@@ -77,6 +83,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       priority: "high",
       dueDate: format(addDays(new Date(), 10), "yyyy-MM-dd"),
       assignedTo: "Jennifer Lee",
+      client: { name: "MNO Corp" },
       createdAt: format(new Date(), "yyyy-MM-dd"),
       progress: 0,
       isReminder: false,
@@ -97,6 +104,43 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
     const taskDate = new Date(task.dueDate);
     return taskDate.toDateString() === selectedDate.toDateString();
   });
+
+  // Filter and sort tasks based on search query and sort filter
+  const getFilteredTasks = () => {
+    let filtered = [...tasks];
+    
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(task => 
+        task.title.toLowerCase().includes(query) || 
+        (task.description && task.description.toLowerCase().includes(query)) ||
+        (task.assignedTo && task.assignedTo.toLowerCase().includes(query))
+      );
+    }
+    
+    // Apply sorting
+    switch (sortFilter) {
+      case "az":
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "date":
+        filtered.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+        break;
+      case "priority": {
+        const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+        filtered.sort((a, b) => {
+          const aPriority = a.priority || "low";
+          const bPriority = b.priority || "low";
+          return (priorityOrder[aPriority as keyof typeof priorityOrder] || 3) - 
+                 (priorityOrder[bPriority as keyof typeof priorityOrder] || 3);
+        });
+        break;
+      }
+    }
+    
+    return filtered;
+  };
 
   const renderCalendarView = () => {
     return (
@@ -119,14 +163,135 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
   };
 
   const renderTasksView = () => {
+    const filteredTasks = getFilteredTasks();
     return (
-      <TasksView 
-        selectedDate={selectedDate}
-        tasksForSelectedDate={tasksForSelectedDate}
-        onPreviousDay={() => setSelectedDate(addDays(selectedDate, -1))}
-        onNextDay={() => setSelectedDate(addDays(selectedDate, 1))}
-        onTasksChange={handleTasksChange}
-      />
+      <div className="space-y-6">
+        {/* Task Status Tabs */}
+        <div className="bg-gray-100 rounded-lg p-1">
+          <div className="grid grid-cols-3 gap-1">
+            <Button 
+              variant="ghost" 
+              className={`rounded-md ${viewMode === 'tasks' && !searchQuery ? 'bg-white shadow-sm' : ''}`}
+              onClick={() => {
+                setViewMode('tasks');
+                setSearchQuery('');
+              }}
+            >
+              All Tasks
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`rounded-md ${viewMode === 'tasks' && searchQuery === 'status:pending' ? 'bg-white shadow-sm' : ''}`}
+              onClick={() => setSearchQuery('status:pending')}
+            >
+              Pending
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`rounded-md ${viewMode === 'tasks' && searchQuery === 'status:completed' ? 'bg-white shadow-sm' : ''}`}
+              onClick={() => setSearchQuery('status:completed')}
+            >
+              Completed
+            </Button>
+          </div>
+        </div>
+        
+        {/* Search and Filter Bar */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-20 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0" 
+                title="Sort A-Z"
+                onClick={() => setSortFilter("az")}
+              >
+                <ArrowDownAZ className={`h-4 w-4 ${sortFilter === 'az' ? 'text-blue-600' : 'text-gray-400'}`} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0" 
+                title="Sort by Date"
+                onClick={() => setSortFilter("date")}
+              >
+                <CalendarDays className={`h-4 w-4 ${sortFilter === 'date' ? 'text-blue-600' : 'text-gray-400'}`} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0" 
+                title="Sort by Priority"
+                onClick={() => setSortFilter("priority")}
+              >
+                <Filter className={`h-4 w-4 ${sortFilter === 'priority' ? 'text-blue-600' : 'text-gray-400'}`} />
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Tasks List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredTasks.length > 0 ? (
+            filteredTasks.map(task => (
+              <Card key={task.id} className="overflow-hidden">
+                <div className={`h-1 ${
+                  task.status === "completed" ? "bg-green-500" :
+                  task.status === "in_progress" ? "bg-blue-500" :
+                  "bg-gray-300"
+                }`}></div>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium">{task.title}</h3>
+                    <Badge className={`
+                      ${task.status === "completed" ? "bg-green-100 text-green-800" : 
+                        task.status === "in_progress" ? "bg-blue-100 text-blue-800" :
+                        "bg-gray-100 text-gray-800"}
+                    `}>
+                      {task.status}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                  <div className="flex justify-between items-center text-xs text-gray-500">
+                    <span>Due: {format(new Date(task.dueDate), "MMM d, yyyy")}</span>
+                    <span>{task.assignedTo}</span>
+                  </div>
+                  {task.progress !== undefined && (
+                    <div className="mt-2">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>Progress</span>
+                        <span>{task.progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${
+                            task.status === "completed" ? "bg-green-500" :
+                            "bg-blue-500"
+                          }`}
+                          style={{ width: `${task.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-2 text-center py-10 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">No tasks found matching your criteria</p>
+            </div>
+          )}
+        </div>
+      </div>
     );
   };
 
