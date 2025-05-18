@@ -21,6 +21,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getEventTypeIcon, getEventTypeBadgeColor, getEventStatusBadgeColor } from "./schedule/eventUtils";
+import { ScheduleEvent } from "./schedule/types";
 
 interface ProjectScheduleAndTasksTabProps {
   project: Project;
@@ -1127,6 +1129,71 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
         )}
       </div>
     );
+  };
+
+  // Add missing utility functions for task status and priority colors
+  const getTaskStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <CircleCheck className="h-4 w-4 text-green-600" />;
+      case "in_progress":
+        return <Clock3 className="h-4 w-4 text-blue-600" />;
+      case "blocked":
+        return <AlertCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <FileText className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getTaskPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "low":
+        return "bg-gray-100 text-gray-800";
+      case "medium":
+        return "bg-blue-100 text-blue-800";
+      case "high":
+        return "bg-amber-100 text-amber-800";
+      case "urgent":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getTaskStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "blocked":
+        return "bg-red-100 text-red-800";
+      case "not_started":
+        return "bg-gray-100 text-gray-800";
+      case "review":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Add missing function for event status color if not imported
+  const getEventStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-blue-100 text-blue-800";
+    }
+  };
+
+  // Add missing function for task actions
+  const handleTaskAction = (taskId: number, action: string) => {
+    console.log(`Task ${taskId} action: ${action}`);
+    // Implement the action handling logic here
+    toast.info(`Task ${action} action for task #${taskId}`);
   };
 
   return (
