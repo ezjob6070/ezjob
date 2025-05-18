@@ -44,6 +44,7 @@ export interface DateFilterTabsProps {
   onFilterChange?: (filter: DateFilterType) => void;
   customDateRange?: { from: Date; to: Date };
   onCustomDateChange?: (range: any) => void;
+  value?: string; // Added to fix TS error
 }
 
 // Add JobSourceFilterProps
