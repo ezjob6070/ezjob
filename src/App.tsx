@@ -16,6 +16,7 @@ import TechnicianDetail from './pages/TechnicianDetail';
 import Finance from './pages/Finance';
 import { GlobalStateProvider } from './components/providers/GlobalStateProvider';
 import CompanyProfile from './pages/CompanyProfile';
+import TasksAndProgress from './pages/TasksAndProgress';
 
 function App() {
   useEffect(() => {
@@ -40,6 +41,7 @@ function App() {
         { path: "reports", element: <Reports /> },
         { path: "finance", element: <Finance /> },
         { path: "company-profile", element: <CompanyProfile /> },
+        { path: "tasks-and-progress", element: <TasksAndProgress /> },
       ],
     },
   ]);

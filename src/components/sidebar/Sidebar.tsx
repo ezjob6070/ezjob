@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import { 
   Calendar, BarChart2, Users, FileText, 
   Settings, Menu, ChevronRight, ChevronLeft,
-  Home, Briefcase, DollarSign, Tool, ClipboardList, Building
+  Home, Briefcase, DollarSign, Wrench, ClipboardList, Building
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
     { icon: Calendar, label: 'Schedule', path: '/schedule' },
     { icon: Briefcase, label: 'Jobs', path: '/jobs' },
     { icon: Users, label: 'Clients', path: '/clients' },
-    { icon: Tool, label: 'Technicians', path: '/technicians' },
+    { icon: Wrench, label: 'Technicians', path: '/technicians' },
     { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
     { icon: BarChart2, label: 'Reports', path: '/reports' },
     { icon: DollarSign, label: 'Finance', path: '/finance' },
