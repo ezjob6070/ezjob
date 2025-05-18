@@ -22,4 +22,24 @@ export interface Task {
   isReminder?: boolean;
   reminderTime?: string; // Specific time for the reminder
   reminderSent?: boolean;
+  
+  // Document attachments
+  attachments?: {
+    id: string;
+    name: string;
+    type: string;
+    url: string;
+    uploadedAt: string;
+  }[];
+  
+  // Comments
+  comments?: {
+    id: string;
+    text: string;
+    author: string;
+    date: string;
+  }[];
+  
+  // Progress tracking
+  progress?: number;
 }

@@ -17,6 +17,7 @@ import ProjectStaffTab from "@/components/project/ProjectStaffTab";
 import ProjectEquipmentTab from "@/components/project/ProjectEquipmentTab";
 import ProjectTimeScheduleTab from "@/components/project/ProjectTimeScheduleTab";
 import ProjectScheduleAndTasksTab from "@/components/project/ProjectScheduleAndTasksTab";
+import TasksAndProgress from "@/components/project/TasksAndProgress";
 
 interface ProjectFile {
   id: string;
@@ -74,6 +75,8 @@ export default function ProjectDetail() {
     revenue: 0,
     contractors: []
   };
+  
+  const [currentProject, setCurrentProject] = useState<Project>(project);
 
   const handleFileUpload = (type: "document" | "image") => {
     // This would be replaced with actual file upload logic
@@ -99,6 +102,12 @@ export default function ProjectDetail() {
     navigate(-1);
   };
 
+  const handleUpdateProject = (updatedProject: Project) => {
+    setCurrentProject(updatedProject);
+    // In a real app, this would update the backend
+    toast.success("Project updated successfully");
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with back button */}
@@ -114,27 +123,33 @@ export default function ProjectDetail() {
         
         <Badge 
           className={`
-            ${project.status === "In Progress" ? "bg-blue-100 text-blue-800 hover:bg-blue-200" : 
-              project.status === "Completed" ? "bg-green-100 text-green-800 hover:bg-green-200" : 
+            ${currentProject.status === "In Progress" ? "bg-blue-100 text-blue-800 hover:bg-blue-200" : 
+              currentProject.status === "Completed" ? "bg-green-100 text-green-800 hover:bg-green-200" : 
               "bg-amber-100 text-amber-800 hover:bg-amber-200"}
           `}
         >
-          {project.status}
+          {currentProject.status}
         </Badge>
       </div>
       
       <div>
-        <h1 className="text-3xl font-bold">{project.name}</h1>
-        <p className="text-muted-foreground">{project.type}</p>
+        <h1 className="text-3xl font-bold">{currentProject.name}</h1>
+        <p className="text-muted-foreground">{currentProject.type}</p>
       </div>
       
       <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="bg-muted/50">
           <TabsTrigger value="overview" variant="blue">Overview</TabsTrigger>
+          <TabsTrigger value="tasks-and-progress" variant="blue">
+            <span className="flex items-center gap-1">
+              <ListTodo className="h-4 w-4" />
+              Tasks & Progress
+            </span>
+          </TabsTrigger>
           <TabsTrigger value="schedule-tasks" variant="blue">
             <span className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              Schedule & Tasks
+              Schedule
             </span>
           </TabsTrigger>
           <TabsTrigger value="staff" variant="blue">
@@ -182,7 +197,7 @@ export default function ProjectDetail() {
               <CardContent className="space-y-4">
                 <div>
                   <h3 className="font-medium mb-2">Description</h3>
-                  <p className="text-gray-600">{project.description}</p>
+                  <p className="text-gray-600">{currentProject.description}</p>
                 </div>
                 
                 <Separator />
@@ -192,20 +207,20 @@ export default function ProjectDetail() {
                     <h3 className="font-medium mb-2">Location</h3>
                     <div className="flex items-center gap-2 text-gray-600">
                       <MapPin size={16} />
-                      {project.location}
+                      {currentProject.location}
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="font-medium mb-2">Client</h3>
-                    <p className="text-gray-600">{project.clientName}</p>
+                    <p className="text-gray-600">{currentProject.clientName}</p>
                   </div>
                   
                   <div>
                     <h3 className="font-medium mb-2">Start Date</h3>
                     <div className="flex items-center gap-2 text-gray-600">
                       <Calendar size={16} />
-                      {project.startDate}
+                      {currentProject.startDate}
                     </div>
                   </div>
                   
@@ -213,19 +228,19 @@ export default function ProjectDetail() {
                     <h3 className="font-medium mb-2">Expected Completion</h3>
                     <div className="flex items-center gap-2 text-gray-600">
                       <Calendar size={16} />
-                      {project.expectedEndDate}
+                      {currentProject.expectedEndDate}
                     </div>
                   </div>
                 </div>
 
                 {/* Contractors Section */}
-                {project.contractors && project.contractors.length > 0 && (
+                {currentProject.contractors && currentProject.contractors.length > 0 && (
                   <>
                     <Separator />
                     <div>
                       <h3 className="font-medium mb-3">Contractors</h3>
                       <div className="space-y-3">
-                        {project.contractors.map((contractor: ProjectContractor) => (
+                        {currentProject.contractors.map((contractor: ProjectContractor) => (
                           <div key={contractor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md border">
                             <div className="flex items-center gap-3">
                               <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
@@ -257,14 +272,14 @@ export default function ProjectDetail() {
               <CardContent className="space-y-4">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Total Budget</div>
-                  <div className="text-2xl font-bold">{formatCurrency(project.budget)}</div>
+                  <div className="text-2xl font-bold">{formatCurrency(currentProject.budget)}</div>
                 </div>
                 
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Spent So Far</div>
-                  <div className="text-2xl font-bold">{formatCurrency(project.actualSpent)}</div>
+                  <div className="text-2xl font-bold">{formatCurrency(currentProject.actualSpent)}</div>
                   <div className="text-sm text-muted-foreground">
-                    ({Math.round((project.actualSpent / project.budget) * 100)}% of budget)
+                    ({Math.round((currentProject.actualSpent / currentProject.budget) * 100)}% of budget)
                   </div>
                 </div>
                 
@@ -274,10 +289,10 @@ export default function ProjectDetail() {
                     <div className="w-full h-2 bg-gray-100 rounded-full">
                       <div 
                         className="h-full rounded-full bg-blue-500" 
-                        style={{ width: `${project.completion}%` }}
+                        style={{ width: `${currentProject.completion}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium">{project.completion}%</span>
+                    <span className="text-sm font-medium">{currentProject.completion}%</span>
                   </div>
                 </div>
               </CardContent>
@@ -294,7 +309,7 @@ export default function ProjectDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{project.workers}</div>
+                <div className="text-3xl font-bold">{currentProject.workers}</div>
                 <p className="text-sm text-muted-foreground">Currently assigned</p>
               </CardContent>
             </Card>
@@ -307,7 +322,7 @@ export default function ProjectDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{project.vehicles}</div>
+                <div className="text-3xl font-bold">{currentProject.vehicles}</div>
                 <p className="text-sm text-muted-foreground">Currently assigned</p>
               </CardContent>
             </Card>
@@ -323,19 +338,23 @@ export default function ProjectDetail() {
           </div>
         </TabsContent>
         
+        <TabsContent value="tasks-and-progress" className="py-4">
+          <TasksAndProgress project={currentProject} onUpdateProject={handleUpdateProject} />
+        </TabsContent>
+        
         <TabsContent value="schedule-tasks" className="py-4">
-          <ProjectScheduleAndTasksTab project={project} projectStaff={project.staff} />
+          <ProjectScheduleAndTasksTab project={currentProject} projectStaff={currentProject.staff} />
         </TabsContent>
         
         <TabsContent value="staff" className="py-4">
-          <ProjectStaffTab projectId={project.id} projectStaff={project.staff} />
+          <ProjectStaffTab projectId={currentProject.id} projectStaff={currentProject.staff} />
         </TabsContent>
         
         <TabsContent value="equipment" className="py-4">
           <ProjectEquipmentTab 
-            projectId={project.id} 
-            projectEquipment={project.equipment} 
-            projectMaterials={project.materials} 
+            projectId={currentProject.id} 
+            projectEquipment={currentProject.equipment} 
+            projectMaterials={currentProject.materials} 
           />
         </TabsContent>
         
@@ -425,7 +444,7 @@ export default function ProjectDetail() {
         </TabsContent>
         
         <TabsContent value="finance" className="py-4">
-          <ProjectFinanceTab project={project} />
+          <ProjectFinanceTab project={currentProject} />
         </TabsContent>
       </Tabs>
       
@@ -446,7 +465,7 @@ export default function ProjectDetail() {
               </label>
               <input
                 id="project-name"
-                defaultValue={project.name}
+                defaultValue={currentProject.name}
                 className="border rounded-md p-2"
               />
             </div>
@@ -457,7 +476,7 @@ export default function ProjectDetail() {
               </label>
               <textarea
                 id="project-description"
-                defaultValue={project.description}
+                defaultValue={currentProject.description}
                 rows={3}
                 className="border rounded-md p-2"
               />
@@ -470,7 +489,7 @@ export default function ProjectDetail() {
                 </label>
                 <input
                   id="project-location"
-                  defaultValue={project.location}
+                  defaultValue={currentProject.location}
                   className="border rounded-md p-2"
                 />
               </div>
@@ -481,7 +500,7 @@ export default function ProjectDetail() {
                 </label>
                 <input
                   id="project-client"
-                  defaultValue={project.clientName}
+                  defaultValue={currentProject.clientName}
                   className="border rounded-md p-2"
                 />
               </div>
@@ -495,7 +514,7 @@ export default function ProjectDetail() {
                 <input
                   id="project-start"
                   type="date"
-                  defaultValue={project.startDate}
+                  defaultValue={currentProject.startDate}
                   className="border rounded-md p-2"
                 />
               </div>
@@ -507,7 +526,7 @@ export default function ProjectDetail() {
                 <input
                   id="project-end"
                   type="date"
-                  defaultValue={project.expectedEndDate}
+                  defaultValue={currentProject.expectedEndDate}
                   className="border rounded-md p-2"
                 />
               </div>
@@ -521,7 +540,7 @@ export default function ProjectDetail() {
                 <input
                   id="project-budget"
                   type="number"
-                  defaultValue={project.budget}
+                  defaultValue={currentProject.budget}
                   className="border rounded-md p-2"
                 />
               </div>
@@ -532,7 +551,7 @@ export default function ProjectDetail() {
                 </label>
                 <select
                   id="project-status"
-                  defaultValue={project.status}
+                  defaultValue={currentProject.status}
                   className="border rounded-md p-2"
                 >
                   <option value="Not Started">Not Started</option>
