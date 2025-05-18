@@ -18,6 +18,7 @@ export interface Task {
   hasFollowUp?: boolean;
   parentTaskId?: string;
   assignedTo?: string;
+  createdAt?: string; // Added for timeline sorting
   
   // Reminder-specific fields
   isReminder?: boolean;

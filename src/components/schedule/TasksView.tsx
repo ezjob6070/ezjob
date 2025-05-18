@@ -1,5 +1,6 @@
+
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus, Search, ArrowDownAZ, CalendarDays, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -9,7 +10,6 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -75,7 +75,7 @@ const TasksView = ({
 
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 bg-white p-3 rounded-md border shadow-sm">
         <Button 
           variant="outline" 
           size="sm" 
@@ -97,57 +97,71 @@ const TasksView = ({
         </Button>
       </div>
       
-      <div className="mb-4">
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-2">
+      <div className="bg-white rounded-md border shadow-sm mb-4">
+        <div className="p-3">
+          <Tabs 
+            value={viewMode} 
+            onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-3 w-full bg-slate-100">
+              <TabsTrigger value="all" className="text-xs">
+                All ({tasksCount + remindersCount})
+              </TabsTrigger>
+              <TabsTrigger value="tasks" className="text-xs flex items-center">
+                <Calendar className="h-3.5 w-3.5 mr-1 text-[#1EAEDB]" />
+                Tasks ({tasksCount})
+              </TabsTrigger>
+              <TabsTrigger value="reminders" className="text-xs flex items-center">
+                <Bell className="h-3.5 w-3.5 mr-1 text-[#1EAEDB]" />
+                Reminders ({remindersCount})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
+          <div className="mt-3 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Search tasks & reminders..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
+              className="pl-9 pr-24"
             />
-            
-            {onTasksChange && (
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={handleCreateReminder}
-                  title="Add Reminder"
-                >
-                  <Bell className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 w-7 p-0" 
+                title="Sort A-Z"
+                onClick={() => setSortOrder("newest")}
+              >
+                <ArrowDownAZ className={`h-4 w-4 ${sortOrder === 'newest' ? 'text-blue-600' : 'text-muted-foreground'}`} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 w-7 p-0" 
+                title="Sort by Date"
+                onClick={() => setSortOrder("oldest")}
+              >
+                <CalendarDays className={`h-4 w-4 ${sortOrder === 'oldest' ? 'text-blue-600' : 'text-muted-foreground'}`} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 w-7 p-0" 
+                title="Filter Options"
+                onClick={() => {}}
+              >
+                <Filter className={`h-4 w-4 text-muted-foreground`} />
+              </Button>
+            </div>
           </div>
           
-          <div className="flex gap-2">
-            <Tabs 
-              value={viewMode} 
-              onValueChange={(value) => setViewMode(value as "all" | "tasks" | "reminders")}
-              className="w-full"
-            >
-              <TabsList className="grid grid-cols-3 w-full">
-                <TabsTrigger value="all" className="text-xs">
-                  All ({tasksCount + remindersCount})
-                </TabsTrigger>
-                <TabsTrigger value="tasks" className="text-xs flex items-center">
-                  <Calendar className="h-3.5 w-3.5 mr-1 text-[#1EAEDB]" />
-                  Tasks ({tasksCount})
-                </TabsTrigger>
-                <TabsTrigger value="reminders" className="text-xs flex items-center">
-                  <Bell className="h-3.5 w-3.5 mr-1 text-[#1EAEDB]" />
-                  Tasks ({remindersCount})
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-          
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button variant="outline" size="sm" className="flex-1 bg-slate-50">
                   {filterType === "all" ? "All Status" : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
                 </Button>
               </DropdownMenuTrigger>
@@ -169,46 +183,42 @@ const TasksView = ({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex-1">
-                  {sortOrder === "newest" ? (
-                    <><ArrowDown className="h-4 w-4 mr-1" /> Newest</>
-                  ) : (
-                    <><ArrowUp className="h-4 w-4 mr-1" /> Oldest</>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setSortOrder("newest")}>
-                  <ArrowDown className="h-4 w-4 mr-2" /> Newest First
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
-                  <ArrowUp className="h-4 w-4 mr-2" /> Oldest First
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>
       
-      <div className="space-y-4">
-        <h3 className="font-medium">
-          {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Tasks"} ({filteredTasks.length})
-        </h3>
+      <div className="bg-white rounded-md border shadow-sm p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-medium">
+            {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
+          </h3>
+          
+          {onTasksChange && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="bg-blue-600 text-white hover:bg-blue-700"
+              onClick={handleCreateReminder}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Reminder
+            </Button>
+          )}
+        </div>
         
         {filteredTasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            {viewMode === "all" 
-              ? "No tasks or reminders scheduled for this day." 
-              : viewMode === "tasks" 
-                ? "No tasks scheduled for this day."
-                : "No reminders scheduled for this day."
-            }
-          </p>
+          <div className="text-center py-6 bg-slate-50 rounded-md">
+            <p className="text-sm text-muted-foreground">
+              {viewMode === "all" 
+                ? "No tasks or reminders scheduled for this day." 
+                : viewMode === "tasks" 
+                  ? "No tasks scheduled for this day."
+                  : "No reminders scheduled for this day."
+              }
+            </p>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {filteredTasks.map((task) => (
               task.isReminder ? (
                 <ReminderCard 
