@@ -25,4 +25,16 @@ export interface Task {
   isReminder?: boolean;
   reminderTime?: string; // Specific time for the reminder
   reminderSent?: boolean;
+  
+  // Document attachment fields
+  attachments?: TaskAttachment[];
+}
+
+export interface TaskAttachment {
+  id: string;
+  name: string;
+  type: string; // file type/extension
+  size: number;
+  uploadDate: string;
+  url: string;
 }
