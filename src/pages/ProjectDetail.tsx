@@ -18,7 +18,6 @@ import ProjectEquipmentTab from "@/components/project/ProjectEquipmentTab";
 import ProjectTimeScheduleTab from "@/components/project/ProjectTimeScheduleTab";
 import ProjectScheduleAndTasksTab from "@/components/project/ProjectScheduleAndTasksTab";
 import TasksAndProgress from "@/components/project/TasksAndProgress";
-import ProjectScheduleTasks from "@/components/project/ProjectScheduleTasks";
 
 interface ProjectFile {
   id: string;
@@ -344,7 +343,7 @@ export default function ProjectDetail() {
         </TabsContent>
         
         <TabsContent value="schedule-tasks" className="py-4">
-          <ProjectScheduleTasks project={currentProject} projectStaff={currentProject.staff} />
+          <ProjectScheduleAndTasksTab project={currentProject} projectStaff={currentProject.staff} />
         </TabsContent>
         
         <TabsContent value="staff" className="py-4">
