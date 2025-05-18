@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   LayoutDashboard,
@@ -14,7 +15,12 @@ import {
   ListTodo
 } from "lucide-react";
 
-import { NavItem } from "@/types";
+// Define NavItem type locally instead of importing it
+interface NavItem {
+  title: string;
+  href: string;
+  icon: React.ReactNode;
+}
 
 interface SidebarProps {
   isSuperAdmin?: boolean;

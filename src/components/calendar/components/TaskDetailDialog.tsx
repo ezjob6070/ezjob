@@ -30,7 +30,7 @@ const TaskDetailDialog = ({ task, open, onOpenChange, onTaskUpdate }: TaskDetail
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description || "");
   const [status, setStatus] = useState(task.status);
-  const [priority, setPriority] = useState(task.priority || "medium");
+  const [priority, setPriority] = useState<"high" | "medium" | "low" | "urgent">(task.priority || "medium");
   const [assignedTo, setAssignedTo] = useState(task.assignedTo || "");
   const [progress, setProgress] = useState(task.progress || 0);
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -41,7 +41,7 @@ const TaskDetailDialog = ({ task, open, onOpenChange, onTaskUpdate }: TaskDetail
       title,
       description,
       status,
-      priority: priority as "high" | "medium" | "low" | "urgent",
+      priority,
       assignedTo,
       progress,
       attachments
@@ -164,7 +164,10 @@ const TaskDetailDialog = ({ task, open, onOpenChange, onTaskUpdate }: TaskDetail
 
             <div className="grid gap-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
+              <Select 
+                value={priority} 
+                onValueChange={(value: "high" | "medium" | "low" | "urgent") => setPriority(value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>

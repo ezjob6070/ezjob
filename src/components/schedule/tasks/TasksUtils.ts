@@ -1,8 +1,8 @@
 
 import { Task } from "@/components/calendar/types";
-import { v4 as uuidv4 } from 'uuid';
+import { format } from "date-fns";
+import { v4 as uuidv4 } from "uuid";
 
-// Filter tasks based on user selections
 export const filterTasks = (
   tasks: Task[],
   viewMode: "all" | "tasks" | "reminders",
@@ -10,74 +10,76 @@ export const filterTasks = (
   filterType: string,
   sortOrder: "newest" | "oldest"
 ): Task[] => {
-  // Filter by task type first
-  let filtered = tasks;
+  // Filter by view mode (all, tasks, reminders)
+  let filteredTasks = tasks;
   if (viewMode === "tasks") {
-    filtered = tasks.filter(task => !task.isReminder);
+    filteredTasks = tasks.filter(task => !task.isReminder);
   } else if (viewMode === "reminders") {
-    filtered = tasks.filter(task => task.isReminder);
+    filteredTasks = tasks.filter(task => task.isReminder);
   }
   
-  // Then apply status filter if not "all"
-  if (filterType !== "all") {
-    filtered = filtered.filter(task => task.status.toLowerCase() === filterType.toLowerCase());
-  }
-  
-  // Apply search filter if present
+  // Filter by search query
   if (searchQuery) {
-    filtered = filtered.filter(task => 
-      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.client?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.location?.toLowerCase().includes(searchQuery.toLowerCase())
+    const query = searchQuery.toLowerCase();
+    filteredTasks = filteredTasks.filter(task =>
+      task.title.toLowerCase().includes(query) ||
+      (task.description && task.description.toLowerCase().includes(query)) ||
+      (task.client?.name && task.client.name.toLowerCase().includes(query)) ||
+      (task.assignedTo && task.assignedTo.toLowerCase().includes(query))
     );
   }
   
-  // Apply sort order
-  return filtered.sort((a, b) => {
-    const dateA = new Date(a.dueDate).getTime();
-    const dateB = new Date(b.dueDate).getTime();
+  // Filter by status
+  if (filterType !== "all") {
+    filteredTasks = filteredTasks.filter(task => 
+      task.status.toLowerCase() === filterType.toLowerCase()
+    );
+  }
+  
+  // Sort by creation date
+  return filteredTasks.sort((a, b) => {
+    const dateA = new Date(a.createdAt || '').getTime();
+    const dateB = new Date(b.createdAt || '').getTime();
+    
     return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
   });
 };
 
-// Create a new reminder for a specific date
-export const createReminder = (
-  date: Date,
-  existingTasks: Task[]
-): Task => {
-  const newReminder: Task = {
-    id: uuidv4(),
-    title: "New Reminder",
-    dueDate: date,
-    client: { name: "" },
-    status: "scheduled",
-    isReminder: true,
-    reminderTime: "09:00",
-    description: "",
-  };
-  
-  return newReminder;
-};
-
-// Create a follow-up task based on an existing task
-export const createFollowUp = (originalTask: Task): Task => {
-  // Create a new date for follow-up (1 day later)
-  const followUpDate = new Date(originalTask.dueDate);
-  followUpDate.setDate(followUpDate.getDate() + 1);
+export const createReminder = (date: Date, existingTasks: Task[]): Task => {
+  const newId = uuidv4();
+  const formattedDate = format(date, "yyyy-MM-dd");
   
   return {
-    id: uuidv4(),
+    id: newId,
+    title: "New Reminder",
+    dueDate: date,
+    status: "pending",
+    isReminder: true,
+    reminderTime: "09:00",
+    reminderSent: false,
+    createdAt: new Date().toISOString(),
+    client: { name: "Personal" },
+    progress: 0,
+  };
+};
+
+export const createFollowUp = (originalTask: Task): Task => {
+  const newId = uuidv4();
+  // Create due date 3 days after the original task
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 3);
+  
+  return {
+    id: newId,
     title: `Follow-up: ${originalTask.title}`,
-    dueDate: followUpDate,
-    client: originalTask.client,
-    status: "scheduled",
-    description: `Follow-up task for: ${originalTask.description || originalTask.title}`,
-    location: originalTask.location,
-    technician: originalTask.technician,
+    dueDate,
+    status: "pending",
     priority: originalTask.priority,
+    description: `Follow-up task for: ${originalTask.title}`,
+    assignedTo: originalTask.assignedTo,
+    client: originalTask.client,
     parentTaskId: originalTask.id,
-    type: "follow-up",
-    isReminder: false,
+    createdAt: new Date().toISOString(),
+    progress: 0,
   };
 };

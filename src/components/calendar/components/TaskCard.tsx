@@ -1,9 +1,19 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Task } from "../types";
-import { Badge } from "@/components/ui/badge";
+import { 
+  Card, 
+  CardContent, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { 
+  Clock, Calendar, AlertCircle, User, ChevronRight, 
+  MoreVertical, CheckCircle, ArrowRightCircle, Clock3 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -11,214 +21,176 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { 
-  CalendarDays, 
-  Check, 
-  Clock, 
-  MoreHorizontal, 
-  MoveVertical, 
-  ArrowUp, 
-  ArrowDown 
-} from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import TaskDetailDialog from "./TaskDetailDialog";
 
 interface TaskCardProps {
   task: Task;
-  onTaskUpdate?: (taskId: string, updates: Partial<Task>) => void;
+  onTaskUpdate?: (id: string, updates: Partial<Task>) => void;
   onCreateFollowUp?: (task: Task) => void;
 }
 
 const TaskCard = ({ task, onTaskUpdate, onCreateFollowUp }: TaskCardProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const getPriorityBadgeColor = (priority?: string) => {
-    switch (priority) {
-      case "urgent":
-        return "bg-red-600 hover:bg-red-700";
-      case "high":
-        return "bg-red-500 hover:bg-red-600";
-      case "medium":
-        return "bg-yellow-500 hover:bg-yellow-600";
-      case "low":
-        return "bg-green-500 hover:bg-green-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
-    }
-  };
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return "bg-green-500 hover:bg-green-600";
-      case "in progress":
-        return "bg-blue-500 hover:bg-blue-600";
-      case "scheduled":
-        return "bg-purple-500 hover:bg-purple-600";
-      case "overdue":
-        return "bg-red-500 hover:bg-red-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
-    }
-  };
-
+  const [showDetails, setShowDetails] = useState(false);
+  
   const handleStatusChange = (newStatus: string) => {
-    setIsLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      if (onTaskUpdate) {
-        onTaskUpdate(task.id, { status: newStatus });
-        toast.success(`Task status updated to ${newStatus}`);
+    if (onTaskUpdate) {
+      const updates: Partial<Task> = { status: newStatus };
+      
+      // If marking as completed, set progress to 100%
+      if (newStatus === "completed") {
+        updates.progress = 100;
       }
-      setIsLoading(false);
-    }, 500);
-  };
-
-  const handlePriorityChange = (newPriority: "high" | "medium" | "low" | "urgent") => {
-    setIsLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      if (onTaskUpdate) {
-        onTaskUpdate(task.id, { priority: newPriority });
-        toast.success(`Task priority updated to ${newPriority}`);
-      }
-      setIsLoading(false);
-    }, 500);
-  };
-
-  const handleCreateFollowUp = () => {
-    if (onCreateFollowUp) {
-      onCreateFollowUp(task);
-      toast.success("Follow-up task created");
+      
+      onTaskUpdate(task.id, updates);
     }
   };
 
-  const formatDateTime = (dateStr?: string) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return format(date, "MMM d, h:mm a");
+  const statusColor = (status: string): string => {
+    switch(status.toLowerCase()) {
+      case "completed": return "bg-green-100 text-green-800 border-green-200";
+      case "in progress": 
+      case "in_progress": return "bg-blue-100 text-blue-800 border-blue-200";
+      case "pending": return "bg-gray-100 text-gray-800 border-gray-200";
+      case "overdue": return "bg-red-100 text-red-800 border-red-200";
+      case "scheduled": return "bg-purple-100 text-purple-800 border-purple-200";
+      case "blocked": return "bg-red-100 text-red-800 border-red-200";
+      default: return "bg-gray-100 text-gray-800 border-gray-200";
+    }
   };
+  
+  const priorityColor = (priority?: string): string => {
+    switch(priority) {
+      case "urgent": return "bg-red-100 text-red-800 border-red-200";
+      case "high": return "bg-orange-100 text-orange-800 border-orange-200";
+      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low": return "bg-green-100 text-green-800 border-green-200";
+      default: return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+  
+  const formatDate = (date: Date | string) => {
+    if (!date) return "No date";
+    return typeof date === 'string' ? format(new Date(date), "MMM d, yyyy") : format(date, "MMM d, yyyy");
+  };
+
+  // Safe client name to prevent "Cannot read properties of undefined" error
+  const clientName = task.client?.name || "Unassigned";
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="p-3 pb-1">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-md">{task.title}</CardTitle>
-          <div className="flex gap-1">
-            <Badge className={getPriorityBadgeColor(task.priority)}>
-              {task.priority}
-            </Badge>
-            {task.hasFollowUp && (
-              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                Follow-up
-              </Badge>
-            )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={isLoading}>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem 
-                  disabled={task.status === "completed"}
-                  onClick={() => handleStatusChange("completed")}
-                >
-                  <Check className="mr-2 h-4 w-4" />
-                  Mark as Completed
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  disabled={task.status === "in progress"}
-                  onClick={() => handleStatusChange("in progress")}
-                >
-                  <Clock className="mr-2 h-4 w-4" />
-                  Mark as In Progress
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  disabled={task.status === "scheduled"}
-                  onClick={() => handleStatusChange("scheduled")}
-                >
-                  <CalendarDays className="mr-2 h-4 w-4" />
-                  Mark as Scheduled
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem onClick={handleCreateFollowUp}>
-                  <CalendarDays className="mr-2 h-4 w-4" />
-                  Create Follow-Up Task
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem onClick={() => handlePriorityChange("urgent")}>
-                  <ArrowUp className="mr-2 h-4 w-4 text-red-600" />
-                  Set as Urgent
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePriorityChange("high")}>
-                  <ArrowUp className="mr-2 h-4 w-4 text-red-500" />
-                  Set as High Priority
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePriorityChange("medium")}>
-                  <MoveVertical className="mr-2 h-4 w-4 text-yellow-500" />
-                  Set as Medium Priority
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePriorityChange("low")}>
-                  <ArrowDown className="mr-2 h-4 w-4 text-green-500" />
-                  Set as Low Priority
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="p-3 pt-1">
-        <div className="text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Client:</span>
-            <span className="font-medium">{task.client?.name || 'Not assigned'}</span>
-          </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-muted-foreground">Status:</span>
-            <Badge className={`${getStatusBadgeColor(task.status)} text-xs`}>
-              {task.status.replace('-', ' ')}
-            </Badge>
-          </div>
-          {task.technician && (
-            <div className="flex justify-between mt-1">
-              <span className="text-muted-foreground">Technician:</span>
-              <span className="font-medium">{task.technician}</span>
+    <>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-base font-medium">{task.title}</CardTitle>
+            <div className="flex items-center gap-2">
+              {task.priority && (
+                <Badge className={priorityColor(task.priority)}>
+                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                </Badge>
+              )}
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setShowDetails(true)}>
+                    View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => handleStatusChange("pending")}>
+                    Mark as Pending
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleStatusChange("in_progress")}>
+                    Mark as In Progress
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleStatusChange("completed")}>
+                    Mark as Completed
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleStatusChange("blocked")}>
+                    Mark as Blocked
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {onCreateFollowUp && (
+                    <DropdownMenuItem onClick={() => onCreateFollowUp(task)}>
+                      Create Follow-Up Task
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          )}
-          <div className="flex justify-between mt-1">
-            <span className="text-muted-foreground">Due:</span>
-            <span className="font-medium">
-              {typeof task.dueDate === 'string' 
-                ? format(new Date(task.dueDate), "MMM d, h:mm a") 
-                : format(task.dueDate, "MMM d, h:mm a")}
-            </span>
           </div>
-          {task.hasFollowUp && task.followUpDate && (
-            <div className="flex justify-between mt-1">
-              <span className="text-muted-foreground">Follow-up:</span>
-              <span className="font-medium">
-                {typeof task.followUpDate === 'string'
-                  ? format(new Date(task.followUpDate), "MMM d, h:mm a")
-                  : format(task.followUpDate, "MMM d, h:mm a")}
-              </span>
-            </div>
-          )}
-        </div>
+        </CardHeader>
         
-        {task.description && (
-          <div className="mt-2 pt-2 border-t border-gray-100">
-            <p className="text-xs text-gray-600">{task.description}</p>
+        <CardContent className="pb-2">
+          <div className="space-y-2">
+            <div className="flex items-center text-sm text-gray-500 gap-4">
+              <div className="flex items-center gap-1">
+                <User className="h-3.5 w-3.5" />
+                <span>{task.assignedTo || "Unassigned"}</span>
+              </div>
+              
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{formatDate(task.dueDate)}</span>
+              </div>
+            </div>
+
+            {task.description && (
+              <p className="text-sm text-gray-600 line-clamp-2">{task.description}</p>
+            )}
+            
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs">
+                <span>Progress</span>
+                <span>{task.progress || 0}%</span>
+              </div>
+              <Progress value={task.progress || 0} className="h-1.5" />
+            </div>
+            
+            {(task.hasFollowUp && task.followUpDate) && (
+              <div className="flex items-center gap-1.5 text-xs text-blue-600">
+                <ArrowRightCircle className="h-3.5 w-3.5" />
+                <span>Follow-up scheduled for {formatDate(task.followUpDate)}</span>
+              </div>
+            )}
+            
+            {task.attachments && task.attachments.length > 0 && (
+              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                <span>📎 {task.attachments.length} file{task.attachments.length > 1 ? 's' : ''} attached</span>
+              </div>
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+        
+        <CardFooter className="pt-2 flex justify-between items-center">
+          <Badge className={statusColor(task.status)}>
+            {task.status.charAt(0).toUpperCase() + task.status.replace('_', ' ').slice(1)}
+          </Badge>
+          
+          <div className="flex items-center text-xs text-gray-500">
+            <span>Client: {clientName}</span>
+          </div>
+        </CardFooter>
+      </Card>
+      
+      {showDetails && (
+        <TaskDetailDialog 
+          task={task} 
+          open={showDetails} 
+          onOpenChange={setShowDetails}
+          onTaskUpdate={(id, updates) => {
+            if (onTaskUpdate) {
+              onTaskUpdate(id, updates);
+            }
+          }}
+        />
+      )}
+    </>
   );
 };
 

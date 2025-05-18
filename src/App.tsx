@@ -1,45 +1,32 @@
-import { useEffect, useState } from 'react'
+
+import { useState, useEffect } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Dashboard } from './pages/Dashboard'
-import { Login } from './pages/Login'
-import { Register } from './pages/Register'
-import { useAuth } from './context/AuthContext'
-import { ForgotPassword } from './pages/ForgotPassword'
-import { ResetPassword } from './pages/ResetPassword'
-import { Projects } from './pages/Projects'
-import { Clients } from './pages/Clients'
-import { initialClients } from './data/clients'
+import Dashboard from './pages/Dashboard'
+import TasksAndProgress from "./pages/TasksAndProgress"
+import Projects from './pages/Projects'
+import ProjectDetail from './pages/ProjectDetail'
+import ClientDetail from './pages/ClientDetail'
+import Clients from './pages/Clients'
 import { initialProjects } from './data/projects'
-import { ClientDetail } from './pages/ClientDetail'
-import { ProjectDetail } from './pages/ProjectDetail'
-import TasksAndProgress from "./pages/TasksAndProgress";
 
 function App() {
-  const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
-  const [clients, setClients] = useState(initialClients)
   const [projects, setProjects] = useState(initialProjects)
 
   useEffect(() => {
-    const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
-    const authRoutes = ['/', '/projects', '/clients']
+    const authRoutes = ['/', '/projects', '/clients', '/tasks']
 
-    if (!user && authRoutes.includes(location.pathname)) {
-      navigate('/login')
-    }
-
-    if (user && publicRoutes.includes(location.pathname)) {
+    // Simple navigation logic to ensure users can access the main pages
+    if (!authRoutes.includes(location.pathname) && 
+        !location.pathname.includes('/projects/') && 
+        !location.pathname.includes('/clients/')) {
       navigate('/')
     }
-  }, [user, location, navigate])
+  }, [location, navigate])
 
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/" element={<Dashboard />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/projects/:id" element={<ProjectDetail />} />
