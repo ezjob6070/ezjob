@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -543,9 +542,9 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Jobs Status Section */}
-            <div className="md:col-span-3">
-              <Card className="bg-white border-0 shadow-sm mb-4">
+            {/* Jobs Status Section - Now full width */}
+            <div className="mb-6">
+              <Card className="bg-white border-0 shadow-sm">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
                   <CardDescription>Overview of service requests and job status</CardDescription>
@@ -624,8 +623,10 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Projects Section - Simplified and placed right under Job Status */}
-            <ProjectsDashboardSection />
+            {/* Projects Section - Now full width below Jobs section */}
+            <div className="mb-6">
+              <ProjectsDashboardSection />
+            </div>
             
             <JobStatusDialog 
               open={statusDialog.open}
