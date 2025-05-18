@@ -1,7 +1,7 @@
 
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus, Search, 
-  ArrowDownAZ, CalendarDays, Filter, FileUp, PlusCircle, Clock } from "lucide-react";
+  ArrowDownAZ, CalendarDays, Filter, FileUp, PlusCircle, Clock, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -241,11 +241,12 @@ const TasksView = ({
               <Button 
                 variant="outline" 
                 size="sm"
-                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                className="flex items-center gap-2 text-blue-600 border-blue-600 hover:bg-blue-50"
                 onClick={() => setIsCreateDialogOpen(true)}
               >
-                <PlusCircle className="h-4 w-4 mr-1" />
-                New Task
+                <PlusCircle className="h-4 w-4" />
+                <Paperclip className="h-4 w-4" />
+                <span>Create Task</span>
               </Button>
             )}
             

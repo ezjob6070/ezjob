@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Task } from "@/components/calendar/types";
+import { Task, TaskAttachment } from "@/components/calendar/types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,9 +23,11 @@ import {
   AlertTriangle, 
   Bell,
   BellRing,
+  Paperclip,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { v4 as uuidv4 } from "uuid";
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -49,7 +51,13 @@ const CreateTaskDialog = ({
     client: { name: "" },
     progress: 0,
     description: "",
+    attachments: [],
+    estimatedHours: 1,
+    actualHours: 0,
+    comments: []
   });
+  
+  const [files, setFiles] = useState<File[]>([]);
   
   const handleCreateTask = () => {
     if (!newTask.title?.trim()) {
@@ -57,7 +65,22 @@ const CreateTaskDialog = ({
       return;
     }
     
-    onCreateTask(newTask);
+    // Process file attachments
+    const attachments: TaskAttachment[] = files.map(file => ({
+      id: uuidv4(),
+      name: file.name,
+      type: file.type,
+      url: URL.createObjectURL(file),
+      size: file.size,
+      uploadedAt: new Date().toISOString(),
+      uploadedBy: "Current User"
+    }));
+    
+    onCreateTask({
+      ...newTask,
+      attachments: [...(newTask.attachments || []), ...attachments]
+    });
+    
     onOpenChange(false);
     resetForm();
   };
@@ -72,7 +95,12 @@ const CreateTaskDialog = ({
       client: { name: "" },
       progress: 0,
       description: "",
+      attachments: [],
+      estimatedHours: 1,
+      actualHours: 0,
+      comments: []
     });
+    setFiles([]);
   };
   
   const handleToggleReminder = () => {
@@ -83,13 +111,24 @@ const CreateTaskDialog = ({
       reminderTime: !newTask.isReminder ? `${newTask.dueDate}T09:00:00` : undefined
     });
   };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setFiles(prevFiles => [...prevFiles, ...newFiles]);
+    }
+  };
+  
+  const removeFile = (index: number) => {
+    setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+  };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       onOpenChange(isOpen);
       if (!isOpen) resetForm();
     }}>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {newTask.isReminder ? (
@@ -254,17 +293,82 @@ const CreateTaskDialog = ({
                 />
               </div>
               
-              <div className="grid gap-2">
-                <Label htmlFor="estimated-hours">Estimated Hours</Label>
-                <Input 
-                  id="estimated-hours" 
-                  type="number" 
-                  step="0.5"
-                  min="0"
-                  value={newTask.estimatedHours || ""} 
-                  onChange={(e) => setNewTask({...newTask, estimatedHours: parseFloat(e.target.value)})}
-                  placeholder="Estimated hours to complete"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="estimated-hours">Estimated Hours</Label>
+                  <Input 
+                    id="estimated-hours" 
+                    type="number" 
+                    step="0.5"
+                    min="0"
+                    value={newTask.estimatedHours || ""} 
+                    onChange={(e) => setNewTask({...newTask, estimatedHours: parseFloat(e.target.value)})}
+                    placeholder="Estimated hours to complete"
+                  />
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="progress">Progress (%)</Label>
+                  <Input 
+                    id="progress" 
+                    type="number" 
+                    min="0"
+                    max="100"
+                    value={newTask.progress || 0} 
+                    onChange={(e) => setNewTask({...newTask, progress: parseInt(e.target.value)})}
+                  />
+                </div>
+              </div>
+              
+              {/* Attachments section */}
+              <div className="grid gap-2 mt-4">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="attachments" className="text-base font-medium">Attachments</Label>
+                  <Label 
+                    htmlFor="file-upload" 
+                    className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded cursor-pointer hover:bg-blue-100 text-sm font-medium"
+                  >
+                    <Paperclip className="h-3.5 w-3.5" />
+                    Attach Files
+                  </Label>
+                  <Input 
+                    id="file-upload" 
+                    type="file" 
+                    onChange={handleFileChange} 
+                    className="hidden" 
+                    multiple 
+                  />
+                </div>
+                
+                {files.length > 0 ? (
+                  <div className="border rounded-md p-3 space-y-2 mt-2 bg-slate-50">
+                    {files.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between text-sm border-b pb-2 last:border-0 last:pb-0">
+                        <div className="flex items-center gap-2 truncate">
+                          <FileText className="h-4 w-4 text-blue-500" />
+                          <span className="truncate">{file.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">
+                            {(file.size / 1024).toFixed(0)} KB
+                          </span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeFile(index)}
+                            className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-500"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="border border-dashed rounded-md p-4 text-center text-muted-foreground bg-slate-50">
+                    <p className="text-sm">No files attached</p>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -280,8 +384,9 @@ const CreateTaskDialog = ({
           >
             Cancel
           </Button>
-          <Button onClick={handleCreateTask}>
-            {newTask.isReminder ? "Create Reminder" : "Create Task"}
+          <Button onClick={handleCreateTask} className="gap-1">
+            <Paperclip className="h-4 w-4" />
+            {newTask.isReminder ? "Create Reminder" : "Create Professional Task"}
           </Button>
         </DialogFooter>
       </DialogContent>
