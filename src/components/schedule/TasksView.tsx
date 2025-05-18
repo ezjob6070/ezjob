@@ -1,6 +1,7 @@
 
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus, Search, ArrowDownAZ, CalendarDays, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus, Search, 
+  ArrowDownAZ, CalendarDays, Filter, FileUp, PlusCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/components/calendar/types";
 import TaskCard from "@/components/calendar/components/TaskCard";
@@ -16,7 +17,9 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { filterTasks, createReminder, createFollowUp } from "../schedule/tasks/TasksUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import TaskDetailDialog from "../schedule/tasks/TaskDetailDialog";
+import CreateTaskDialog from "../schedule/tasks/CreateTaskDialog";
+import { v4 as uuidv4 } from "uuid";
 
 interface TasksViewProps {
   selectedDate: Date;
@@ -37,6 +40,9 @@ const TasksView = ({
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"all" | "tasks" | "reminders">("all");
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
     if (!onTasksChange) return;
@@ -46,6 +52,38 @@ const TasksView = ({
     );
     
     onTasksChange(updatedTasks);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    if (!onTasksChange) return;
+    
+    const updatedTasks = tasksForSelectedDate.filter(task => task.id !== taskId);
+    onTasksChange(updatedTasks);
+    toast.success("Task deleted successfully");
+  };
+
+  const handleCreateTask = (newTask: Partial<Task>) => {
+    if (!onTasksChange) return;
+    
+    const task: Task = {
+      id: uuidv4(),
+      title: newTask.title || "New Task",
+      dueDate: newTask.dueDate || selectedDate,
+      status: newTask.status || "scheduled",
+      client: newTask.client || { name: "" },
+      isReminder: newTask.isReminder || false,
+      priority: newTask.priority || "medium",
+      description: newTask.description || "",
+      createdAt: new Date().toISOString(),
+      progress: newTask.progress || 0,
+      assignedTo: newTask.assignedTo || "",
+      location: newTask.location || "",
+      technician: newTask.technician || "",
+      ...newTask
+    };
+    
+    onTasksChange([...tasksForSelectedDate, task]);
+    toast.success(task.isReminder ? "Reminder created successfully" : "Task created successfully");
   };
 
   const handleCreateReminder = () => {
@@ -67,6 +105,11 @@ const TasksView = ({
     
     // Add the new follow-up task to the list
     onTasksChange([...updatedTasks, followUpTask]);
+  };
+
+  const handleOpenTaskDetail = (task: Task) => {
+    setSelectedTask(task);
+    setIsDetailDialogOpen(true);
   };
 
   const filteredTasks = filterTasks(tasksForSelectedDate, viewMode, searchQuery, filterType, sortOrder);
@@ -132,7 +175,7 @@ const TasksView = ({
                 variant="ghost" 
                 size="sm" 
                 className="h-7 w-7 p-0" 
-                title="Sort A-Z"
+                title="Sort by Newest First"
                 onClick={() => setSortOrder("newest")}
               >
                 <ArrowDownAZ className={`h-4 w-4 ${sortOrder === 'newest' ? 'text-blue-600' : 'text-muted-foreground'}`} />
@@ -141,7 +184,7 @@ const TasksView = ({
                 variant="ghost" 
                 size="sm" 
                 className="h-7 w-7 p-0" 
-                title="Sort by Date"
+                title="Sort by Oldest First"
                 onClick={() => setSortOrder("oldest")}
               >
                 <CalendarDays className={`h-4 w-4 ${sortOrder === 'oldest' ? 'text-blue-600' : 'text-muted-foreground'}`} />
@@ -193,17 +236,31 @@ const TasksView = ({
             {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
           </h3>
           
-          {onTasksChange && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="bg-blue-600 text-white hover:bg-blue-700"
-              onClick={handleCreateReminder}
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Add Reminder
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {onTasksChange && viewMode !== "reminders" && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                onClick={() => setIsCreateDialogOpen(true)}
+              >
+                <PlusCircle className="h-4 w-4 mr-1" />
+                New Task
+              </Button>
+            )}
+            
+            {onTasksChange && viewMode !== "tasks" && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleCreateReminder}
+              >
+                <Bell className="h-4 w-4 mr-1" />
+                Add Reminder
+              </Button>
+            )}
+          </div>
         </div>
         
         {filteredTasks.length === 0 ? (
@@ -221,23 +278,43 @@ const TasksView = ({
           <div className="space-y-3">
             {filteredTasks.map((task) => (
               task.isReminder ? (
-                <ReminderCard 
-                  key={task.id} 
-                  reminder={task} 
-                  onReminderUpdate={handleUpdateTask}
-                />
+                <div key={task.id} className="cursor-pointer" onClick={() => handleOpenTaskDetail(task)}>
+                  <ReminderCard 
+                    reminder={task} 
+                    onReminderUpdate={handleUpdateTask}
+                  />
+                </div>
               ) : (
-                <TaskCard 
-                  key={task.id} 
-                  task={task} 
-                  onTaskUpdate={handleUpdateTask}
-                  onCreateFollowUp={handleCreateFollowUp}
-                />
+                <div key={task.id} className="cursor-pointer" onClick={() => handleOpenTaskDetail(task)}>
+                  <TaskCard 
+                    task={task} 
+                    onTaskUpdate={handleUpdateTask}
+                    onCreateFollowUp={handleCreateFollowUp}
+                  />
+                </div>
               )
             ))}
           </div>
         )}
       </div>
+      
+      {selectedTask && (
+        <TaskDetailDialog
+          open={isDetailDialogOpen}
+          onOpenChange={setIsDetailDialogOpen}
+          task={selectedTask}
+          onTaskUpdate={handleUpdateTask}
+          onDeleteTask={handleDeleteTask}
+          onCreateFollowUp={handleCreateFollowUp}
+        />
+      )}
+      
+      <CreateTaskDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onCreateTask={handleCreateTask}
+        defaultDate={selectedDate}
+      />
     </div>
   );
 };
