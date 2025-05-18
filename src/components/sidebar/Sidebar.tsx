@@ -1,148 +1,133 @@
 
-import { useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { 
-  LogOutIcon, 
-  MenuIcon, 
+  Calendar, BarChart2, Users, FileText, 
+  Settings, Menu, ChevronRight, ChevronLeft,
+  Home, Briefcase, DollarSign, Tool, ClipboardList, Building
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SidebarProps } from "./sidebarTypes";
-import { getIndustrySpecificNavItems } from "./sidebarConstants";
-import NavItem from "./NavItem";
-import ServiceCategorySelector from "./ServiceCategorySelector";
-import { useGlobalState } from "@/components/providers/GlobalStateProvider";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+interface SidebarProps {
+  isMobile?: boolean;
+}
+
+interface NavItem {
+  icon: React.ElementType;
+  label: string;
+  path: string;
+}
 
 const Sidebar = ({ isMobile }: SidebarProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isHovering, setIsHovering] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
-    "leads-clients": true,
-  });
+  const [expanded, setExpanded] = useState(false);
   
-  // No need for industry selector anymore, we're only using service
-  const toggleExpand = (key: string) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovering(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-  };
-
-  const navItems = getIndustrySpecificNavItems();
-
+  const mainNavItems: NavItem[] = [
+    { icon: Home, label: 'Dashboard', path: '/dashboard' },
+    { icon: Calendar, label: 'Schedule', path: '/schedule' },
+    { icon: Briefcase, label: 'Jobs', path: '/jobs' },
+    { icon: Users, label: 'Clients', path: '/clients' },
+    { icon: Tool, label: 'Technicians', path: '/technicians' },
+    { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
+    { icon: BarChart2, label: 'Reports', path: '/reports' },
+    { icon: DollarSign, label: 'Finance', path: '/finance' },
+    { icon: FileText, label: 'Estimates', path: '/estimates' },
+    { icon: Building, label: 'Projects', path: '/projects' },
+  ];
+  
+  const secondaryNavItems: NavItem[] = [
+    { icon: Settings, label: 'Settings', path: '/settings' },
+    { icon: Building, label: 'Company Profile', path: '/company-profile' },
+  ];
+  
   return (
-    <aside
-      className="fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+    <aside 
+      className={cn(
+        "bg-blue-950 text-white z-10 transition-all duration-300 flex flex-col",
+        expanded ? "w-56" : "w-16",
+        isMobile && !expanded ? "absolute top-0 bottom-0" : ""
+      )}
     >
-      <div 
-        className={cn(
-          "h-full bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg overflow-hidden transition-all duration-300",
-          isHovering ? "w-64" : "w-16"
-        )}
-      >
-        {/* Add the ServiceCategorySelector here */}
-        {isHovering && <ServiceCategorySelector />}
-
-        <div className="mx-2 my-4 border-t border-blue-600/50" />
-
-        <div className={cn("py-3", isHovering ? "px-5" : "px-3")}>
-          {isHovering ? (
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-lg text-white">Uleadz CRM</span>
-              <button 
-                onClick={() => {}}
-                className="p-1.5 rounded-md hover:bg-blue-600 transition-all text-white/90 hover:text-white"
-              >
-                <MenuIcon size={18} />
-              </button>
-            </div>
-          ) : (
-            <div className="flex justify-center">
-              <button
-                onClick={() => {}}
-                className="p-1.5 rounded-md hover:bg-blue-600 transition-colors text-white/90 hover:text-white"
-              >
-                <MenuIcon size={18} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        <nav className={cn("flex-1 py-3", isHovering ? "px-4" : "px-2")}>
-          {isHovering ? (
-            <ul className="space-y-1.5">
-              {navItems.map((item) => (
-                <li key={item.href || item.label}>
-                  <NavItem 
-                    item={item}
-                    isExpanded={expandedItems[item.label?.toLowerCase() || ""]}
-                    onToggleExpand={() => toggleExpand(item.label?.toLowerCase() || "")}
-                    currentPath={location.pathname}
-                  />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ul className="space-y-4 flex flex-col items-center">
-              {navItems.map((item) => (
-                <li key={item.href || item.label} className="w-full flex justify-center">
-                  {!item.children && item.href && (
-                    <Link 
-                      to={item.href} 
-                      className={cn(
-                        "p-2 rounded-lg transition-all duration-200 flex justify-center",
-                        location.pathname === item.href
-                          ? "bg-blue-600 text-white shadow-md"
-                          : "text-white/80 hover:bg-blue-600 hover:text-white"
-                      )}
-                      title={item.label}
-                    >
-                      {item.icon}
-                    </Link>
-                  )}
-                  {item.children && (
-                    <button
-                      className={cn(
-                        "p-2 rounded-lg transition-all duration-200 flex justify-center",
-                        (item.children.some(child => location.pathname === child.href))
-                          ? "bg-blue-600 text-white shadow-md"
-                          : "text-white/80 hover:bg-blue-600 hover:text-white"
-                      )}
-                      title={item.label}
-                    >
-                      {item.icon}
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
+      <div className="flex justify-end p-2">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="text-gray-400 hover:text-white hover:bg-blue-900/50"
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? <ChevronLeft size={18} /> : <Menu size={18} />}
+        </Button>
+      </div>
+      
+      <div className="flex-1 py-4 overflow-y-auto scrollbar-hide">
+        <nav className="px-2 space-y-1">
+          <TooltipProvider delayDuration={0}>
+            {mainNavItems.map((item) => (
+              <Tooltip key={item.path}>
+                <TooltipTrigger asChild>
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      cn(
+                        "flex items-center p-2 rounded-md transition-colors",
+                        isActive 
+                          ? "bg-blue-800/80 text-white" 
+                          : "text-blue-200 hover:bg-blue-900/50 hover:text-white",
+                        !expanded && "justify-center"
+                      )
+                    }
+                  >
+                    <item.icon size={20} className="flex-shrink-0" />
+                    {expanded && <span className="ml-3 text-sm">{item.label}</span>}
+                  </NavLink>
+                </TooltipTrigger>
+                {!expanded && (
+                  <TooltipContent side="right">
+                    <p>{item.label}</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            ))}
+          </TooltipProvider>
         </nav>
-
-        <div className={cn("p-4 mt-auto border-t border-blue-700/50", !isHovering && "flex justify-center")}>
-          {isHovering ? (
-            <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200">
-              <LogOutIcon size={18} />
-              <span>Sign out</span>
-            </button>
-          ) : (
-            <button 
-              className="p-2 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200"
-              title="Sign out"
-            >
-              <LogOutIcon size={18} />
-            </button>
-          )}
+        
+        <div className="mt-8">
+          <div className={cn("px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider", 
+            !expanded && "text-center"
+          )}>
+            {expanded ? "Settings" : "⚙️"}
+          </div>
+          <nav className="mt-2 px-2 space-y-1">
+            <TooltipProvider delayDuration={0}>
+              {secondaryNavItems.map((item) => (
+                <Tooltip key={item.path}>
+                  <TooltipTrigger asChild>
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center p-2 rounded-md transition-colors",
+                          isActive 
+                            ? "bg-blue-800/80 text-white" 
+                            : "text-blue-200 hover:bg-blue-900/50 hover:text-white",
+                          !expanded && "justify-center"
+                        )
+                      }
+                    >
+                      <item.icon size={20} className="flex-shrink-0" />
+                      {expanded && <span className="ml-3 text-sm">{item.label}</span>}
+                    </NavLink>
+                  </TooltipTrigger>
+                  {!expanded && (
+                    <TooltipContent side="right">
+                      <p>{item.label}</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              ))}
+            </TooltipProvider>
+          </nav>
         </div>
       </div>
     </aside>
