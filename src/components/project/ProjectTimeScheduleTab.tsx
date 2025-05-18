@@ -125,7 +125,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
   const [newReminder, setNewReminder] = useState<Omit<ScheduleEvent, "id">>({
     title: "",
     start: new Date(),
-    end: new Date(new Date().getTime() + 30 * 60000), // 30 minutes later
+    end: new Date(new Date().getTime() + 30 * 60000),
     description: "",
     status: "scheduled",
     type: "reminder"
