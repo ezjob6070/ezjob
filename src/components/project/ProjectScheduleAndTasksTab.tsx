@@ -18,6 +18,9 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ProjectScheduleAndTasksTabProps {
   project: Project;
@@ -58,6 +61,35 @@ interface EnhancedTask {
   location?: string;
 }
 
+// New interfaces for dialogs
+interface NewEvent {
+  title: string;
+  date: string;
+  time: string;
+  endTime?: string;
+  type: "meeting" | "delivery" | "construction" | "inspection";
+  description?: string;
+  location?: string;
+  assignedTo?: string[];
+}
+
+interface NewReminder {
+  title: string;
+  date: string;
+  time: string;
+  description?: string;
+}
+
+interface NewTask {
+  title: string;
+  description: string;
+  deadline: string;
+  priority: "low" | "medium" | "high" | "urgent";
+  assignedTo: string[];
+  tags: string[];
+  location?: string;
+}
+
 const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAndTasksTabProps) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -68,8 +100,41 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
   const [taskView, setTaskView] = useState<'kanban' | 'list'>('list');
   const [taskFilter, setTaskFilter] = useState<'all' | 'in_progress' | 'completed' | 'blocked'>('all');
   
+  // States for dialogs
+  const [addEventDialogOpen, setAddEventDialogOpen] = useState<boolean>(false);
+  const [addReminderDialogOpen, setAddReminderDialogOpen] = useState<boolean>(false);
+  const [addTaskDialogOpen, setAddTaskDialogOpen] = useState<boolean>(false);
+  
+  // States for new items
+  const [newEvent, setNewEvent] = useState<NewEvent>({
+    title: "",
+    date: format(new Date(), "yyyy-MM-dd"),
+    time: "09:00 AM",
+    endTime: "10:00 AM",
+    type: "meeting",
+    description: "",
+    location: "",
+    assignedTo: []
+  });
+
+  const [newReminder, setNewReminder] = useState<NewReminder>({
+    title: "",
+    date: format(new Date(), "yyyy-MM-dd"),
+    time: "09:00 AM",
+    description: ""
+  });
+
+  const [newTask, setNewTask] = useState<NewTask>({
+    title: "",
+    description: "",
+    deadline: format(addDays(new Date(), 7), "yyyy-MM-dd"),
+    priority: "medium",
+    assignedTo: [],
+    tags: []
+  });
+  
   // Sample events for the project calendar
-  const events: ScheduleEvent[] = [
+  const [events, setEvents] = useState<ScheduleEvent[]>([
     {
       id: 1,
       title: "Site Inspection",
@@ -156,10 +221,10 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       status: "scheduled",
       description: "Call supplier about delayed materials"
     }
-  ];
+  ]);
 
   // Enhanced tasks for a professional task card design
-  const tasks: EnhancedTask[] = [
+  const [tasks, setTasks] = useState<EnhancedTask[]>([
     {
       id: 1,
       title: "Foundation Planning",
@@ -256,7 +321,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       createdAt: format(addDays(new Date(), -1), "yyyy-MM-dd"),
       tags: ["Inspection", "Quality Control"]
     }
-  ];
+  ]);
 
   const handlePrevMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
@@ -266,20 +331,105 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
     setCurrentDate(addMonths(currentDate, 1));
   };
   
+  // Dialog handler functions
+  const handleAddEventDialogOpen = () => {
+    setNewEvent({
+      title: "",
+      date: format(selectedDate, "yyyy-MM-dd"),
+      time: "09:00 AM",
+      endTime: "10:00 AM",
+      type: "meeting",
+      description: "",
+      location: "",
+      assignedTo: []
+    });
+    setAddEventDialogOpen(true);
+  };
+
+  const handleAddReminderDialogOpen = () => {
+    setNewReminder({
+      title: "",
+      date: format(selectedDate, "yyyy-MM-dd"),
+      time: "09:00 AM",
+      description: ""
+    });
+    setAddReminderDialogOpen(true);
+  };
+
+  const handleAddTaskDialogOpen = () => {
+    setNewTask({
+      title: "",
+      description: "",
+      deadline: format(addDays(selectedDate, 7), "yyyy-MM-dd"),
+      priority: "medium",
+      assignedTo: [],
+      tags: []
+    });
+    setAddTaskDialogOpen(true);
+  };
+  
+  // Action handlers
   const handleAddEvent = () => {
-    toast.success("Add event functionality will be implemented here.");
+    const newEventWithId: ScheduleEvent = {
+      id: events.length + 10,
+      title: newEvent.title,
+      date: newEvent.date,
+      time: `${newEvent.time} - ${newEvent.endTime}`,
+      type: newEvent.type,
+      status: "scheduled",
+      description: newEvent.description,
+      location: newEvent.location,
+      assignedTo: newEvent.assignedTo
+    };
+    
+    setEvents([...events, newEventWithId]);
+    setAddEventDialogOpen(false);
+    toast.success("Event added successfully");
   };
 
   const handleAddReminder = () => {
-    toast.success("Add reminder functionality will be implemented here.");
+    const newReminderWithId: ScheduleEvent = {
+      id: events.length + 10,
+      title: newReminder.title,
+      date: newReminder.date,
+      time: newReminder.time,
+      type: "reminder",
+      status: "scheduled",
+      description: newReminder.description
+    };
+    
+    setEvents([...events, newReminderWithId]);
+    setAddReminderDialogOpen(false);
+    toast.success("Reminder added successfully");
   };
 
   const handleAddTask = () => {
-    toast.success("Add task functionality will be implemented here.");
-  };
-
-  const handleTaskAction = (taskId: number, action: string) => {
-    toast.success(`Task ${taskId}: ${action} action triggered`);
+    const assignedUsers = newTask.assignedTo.map(id => {
+      const staff = projectStaff?.find(staff => staff.id === id);
+      return {
+        id,
+        name: staff?.name || "Unknown",
+        avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70) + 1}`
+      };
+    });
+    
+    const newTaskWithId: EnhancedTask = {
+      id: tasks.length + 1,
+      title: newTask.title,
+      description: newTask.description,
+      status: "not_started",
+      priority: newTask.priority,
+      deadline: newTask.deadline,
+      progress: 0,
+      assignedTo: assignedUsers,
+      createdAt: format(new Date(), "yyyy-MM-dd"),
+      tags: newTask.tags,
+      location: newTask.location
+    };
+    
+    setTasks([...tasks, newTaskWithId]);
+    setAddTaskDialogOpen(false);
+    toast.success("Task added successfully");
   };
 
   // Filter events based on search query
@@ -327,82 +477,6 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
     }
   };
 
-  const getEventStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-blue-100 text-blue-800";
-    }
-  };
-
-  const getEventTypeIcon = (type: string) => {
-    switch (type) {
-      case "meeting":
-        return <CalendarIcon className="h-4 w-4 text-blue-600" />;
-      case "delivery":
-        return <ArrowRight className="h-4 w-4 text-amber-600" />;
-      case "construction":
-        return <ArrowUp className="h-4 w-4 text-green-600" />;
-      case "inspection":
-        return <List className="h-4 w-4 text-purple-600" />;
-      case "reminder":
-        return <BellRing className="h-4 w-4 text-rose-600" />;
-      default:
-        return <CalendarIcon className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
-  // Get color for task priority
-  const getTaskPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "urgent":
-        return "bg-red-500 text-white";
-      case "high":
-        return "bg-orange-500 text-white";
-      case "medium":
-        return "bg-amber-500 text-white";
-      case "low":
-        return "bg-green-500 text-white";
-      default:
-        return "bg-gray-500 text-white";
-    }
-  };
-
-  // Get color for task status
-  const getTaskStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800";
-      case "blocked":
-        return "bg-red-100 text-red-800";
-      case "review":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  // Get icon for task status
-  const getTaskStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CircleCheck className="h-4 w-4 text-green-600" />;
-      case "in_progress":
-        return <Clock3 className="h-4 w-4 text-blue-600" />;
-      case "blocked":
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
-      case "review":
-        return <FileText className="h-4 w-4 text-purple-600" />;
-      default:
-        return <Clock3 className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
   // Calendar view with day indicators showing events
   const renderCalendar = () => {
     return (
@@ -431,7 +505,6 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           className="rounded-md border shadow-sm"
           components={{
             Day: ({ date, ...props }) => {
-              // Check if there are events for this day
               const dateString = format(date, "yyyy-MM-dd");
               const hasEvents = events.some(event => event.date === dateString);
               const hasMeetings = events.some(event => event.date === dateString && event.type === "meeting");
@@ -503,7 +576,6 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
     
     return (
       <div className="relative pl-8">
-        {/* Vertical timeline line */}
         <div className="absolute left-3.5 top-0 bottom-0 w-0.5 bg-gray-200"></div>
         
         <div className="space-y-6">
@@ -677,7 +749,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           <div className="text-center py-10">
             <BellRing className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No reminders found</p>
-            <Button size="sm" variant="outline" className="mt-3" onClick={handleAddReminder}>
+            <Button size="sm" variant="outline" className="mt-3" onClick={handleAddReminderDialogOpen}>
               <Plus className="h-4 w-4 mr-1" /> Add Reminder
             </Button>
           </div>
@@ -736,10 +808,10 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
             <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No events for this date</p>
             <div className="flex justify-center mt-4 gap-2">
-              <Button size="sm" variant="outline" onClick={handleAddEvent}>
+              <Button size="sm" variant="outline" onClick={handleAddEventDialogOpen}>
                 <Plus className="h-4 w-4 mr-1" /> Add Event
               </Button>
-              <Button size="sm" variant="outline" onClick={handleAddReminder}>
+              <Button size="sm" variant="outline" onClick={handleAddReminderDialogOpen}>
                 <BellRing className="h-4 w-4 mr-1" /> Add Reminder
               </Button>
             </div>
@@ -779,7 +851,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
               </Button>
             </div>
             
-            <Button onClick={handleAddTask}>
+            <Button onClick={handleAddTaskDialogOpen}>
               <Plus className="h-4 w-4 mr-1" /> Add Task
             </Button>
           </div>
@@ -824,7 +896,7 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           <div className="text-center py-10 bg-gray-50 border rounded-lg">
             <LayoutList className="h-10 w-10 mx-auto text-gray-400 mb-2" />
             <p className="text-gray-500">No tasks found matching your criteria</p>
-            <Button variant="outline" size="sm" className="mt-3" onClick={handleAddTask}>
+            <Button variant="outline" size="sm" className="mt-3" onClick={handleAddTaskDialogOpen}>
               <Plus className="h-4 w-4 mr-1" /> Add New Task
             </Button>
           </div>
@@ -1062,13 +1134,13 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
       <div className="flex justify-between items-center pb-4 border-b">
         <h2 className="text-2xl font-bold">Project Schedule & Tasks</h2>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleAddReminder} className="flex items-center gap-1 text-rose-600 border-rose-200 hover:bg-rose-50">
+          <Button variant="outline" onClick={handleAddReminderDialogOpen} className="flex items-center gap-1 text-rose-600 border-rose-200 hover:bg-rose-50">
             <BellRing className="h-4 w-4 mr-1" /> Add Reminder
           </Button>
-          <Button variant="outline" onClick={handleAddTask} className="flex items-center gap-1 text-blue-600 border-blue-200 hover:bg-blue-50">
+          <Button variant="outline" onClick={handleAddTaskDialogOpen} className="flex items-center gap-1 text-blue-600 border-blue-200 hover:bg-blue-50">
             <Plus className="h-4 w-4 mr-1" /> Add Task
           </Button>
-          <Button onClick={handleAddEvent} className="bg-indigo-600 hover:bg-indigo-700">
+          <Button onClick={handleAddEventDialogOpen} className="bg-indigo-600 hover:bg-indigo-700">
             <Plus className="h-4 w-4 mr-1" /> Add Event
           </Button>
         </div>
@@ -1159,6 +1231,342 @@ const ProjectScheduleAndTasksTab = ({ project, projectStaff }: ProjectScheduleAn
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Add Event Dialog */}
+      <Dialog open={addEventDialogOpen} onOpenChange={setAddEventDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Event</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="event-type" className="text-sm font-medium">
+                Event Type
+              </label>
+              <Select 
+                value={newEvent.type} 
+                onValueChange={(value) => 
+                  setNewEvent({ ...newEvent, type: value as "meeting" | "delivery" | "construction" | "inspection" })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="meeting">Meeting</SelectItem>
+                  <SelectItem value="delivery">Delivery</SelectItem>
+                  <SelectItem value="construction">Construction</SelectItem>
+                  <SelectItem value="inspection">Inspection</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="event-title" className="text-sm font-medium">
+                Event Title
+              </label>
+              <Input
+                id="event-title"
+                value={newEvent.title}
+                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                placeholder="Enter event title"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="event-date" className="text-sm font-medium">
+                  Date
+                </label>
+                <Input
+                  id="event-date"
+                  type="date"
+                  value={newEvent.date}
+                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="event-time" className="text-sm font-medium">
+                  Start Time
+                </label>
+                <Input
+                  id="event-time"
+                  type="time"
+                  value={newEvent.time}
+                  onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
+                />
+              </div>
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="event-endtime" className="text-sm font-medium">
+                End Time
+              </label>
+              <Input
+                id="event-endtime"
+                type="time"
+                value={newEvent.endTime}
+                onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="event-location" className="text-sm font-medium">
+                Location (optional)
+              </label>
+              <Input
+                id="event-location"
+                value={newEvent.location}
+                onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                placeholder="Enter location"
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="event-description" className="text-sm font-medium">
+                Description (optional)
+              </label>
+              <Textarea
+                id="event-description"
+                value={newEvent.description}
+                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                placeholder="Add more details"
+                rows={3}
+              />
+            </div>
+            
+            {projectStaff && projectStaff.length > 0 && (
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">
+                  Assign Staff (optional)
+                </label>
+                <Select
+                  value={newEvent.assignedTo?.[0]}
+                  onValueChange={(value) => setNewEvent({ ...newEvent, assignedTo: [value] })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Assign staff member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projectStaff.map((staff) => (
+                      <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddEventDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddEvent} disabled={!newEvent.title}>Add Event</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add Reminder Dialog */}
+      <Dialog open={addReminderDialogOpen} onOpenChange={setAddReminderDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BellRing className="h-5 w-5 text-rose-600" />
+              Add New Reminder
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="reminder-title" className="text-sm font-medium">
+                Reminder Title
+              </label>
+              <Input
+                id="reminder-title"
+                placeholder="What do you need to remember?"
+                value={newReminder.title}
+                onChange={(e) => setNewReminder({ ...newReminder, title: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="reminder-date" className="text-sm font-medium">
+                  Date
+                </label>
+                <Input
+                  id="reminder-date"
+                  type="date"
+                  value={newReminder.date}
+                  onChange={(e) => setNewReminder({ ...newReminder, date: e.target.value })}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="reminder-time" className="text-sm font-medium">
+                  Time
+                </label>
+                <Input
+                  id="reminder-time"
+                  type="time"
+                  value={newReminder.time}
+                  onChange={(e) => setNewReminder({ ...newReminder, time: e.target.value })}
+                />
+              </div>
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="reminder-description" className="text-sm font-medium">
+                Description (optional)
+              </label>
+              <Textarea
+                id="reminder-description"
+                placeholder="Add more details about this reminder"
+                value={newReminder.description}
+                onChange={(e) => setNewReminder({ ...newReminder, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddReminderDialogOpen(false)}>Cancel</Button>
+            <Button 
+              className="bg-rose-600 hover:bg-rose-700"
+              onClick={handleAddReminder}
+              disabled={!newReminder.title}
+            >
+              <BellRing className="h-4 w-4 mr-2" /> Add Reminder
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add Task Dialog */}
+      <Dialog open={addTaskDialogOpen} onOpenChange={setAddTaskDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-blue-600" />
+              Add New Task
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="task-title" className="text-sm font-medium">
+                Task Title
+              </label>
+              <Input
+                id="task-title"
+                placeholder="Enter task title"
+                value={newTask.title}
+                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="task-description" className="text-sm font-medium">
+                Description
+              </label>
+              <Textarea
+                id="task-description"
+                placeholder="Describe the task"
+                value={newTask.description}
+                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="task-deadline" className="text-sm font-medium">
+                  Deadline
+                </label>
+                <Input
+                  id="task-deadline"
+                  type="date"
+                  value={newTask.deadline}
+                  onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="task-priority" className="text-sm font-medium">
+                  Priority
+                </label>
+                <Select 
+                  value={newTask.priority} 
+                  onValueChange={(value) => 
+                    setNewTask({ ...newTask, priority: value as "low" | "medium" | "high" | "urgent" })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            {projectStaff && projectStaff.length > 0 && (
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">
+                  Assign Staff
+                </label>
+                <Select
+                  value={newTask.assignedTo[0]}
+                  onValueChange={(value) => setNewTask({ ...newTask, assignedTo: [value] })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Assign staff member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projectStaff.map((staff) => (
+                      <SelectItem key={staff.id} value={staff.id}>{staff.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            <div className="grid gap-2">
+              <label htmlFor="task-location" className="text-sm font-medium">
+                Location (optional)
+              </label>
+              <Input
+                id="task-location"
+                placeholder="Task location"
+                value={newTask.location}
+                onChange={(e) => setNewTask({ ...newTask, location: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="task-tags" className="text-sm font-medium">
+                Tags (comma separated)
+              </label>
+              <Input
+                id="task-tags"
+                placeholder="e.g. Planning, Design, Electrical"
+                value={newTask.tags.join(", ")}
+                onChange={(e) => setNewTask({ 
+                  ...newTask, 
+                  tags: e.target.value.split(",").map(tag => tag.trim()).filter(tag => tag !== "") 
+                })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddTaskDialogOpen(false)}>Cancel</Button>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={handleAddTask}
+              disabled={!newTask.title || !newTask.description}
+            >
+              <Plus className="h-4 w-4 mr-2" /> Add Task
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
