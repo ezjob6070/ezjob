@@ -1,19 +1,62 @@
+import { useState, useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import useWindowSize from "@/hooks/use-window-size";
+import { cn } from "@/lib/utils";
+import { useGlobalState } from "./providers/GlobalStateProvider";
 
-import React from 'react';
-import { Sidebar } from './Sidebar';
+const Layout = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation();
+  const { width } = useWindowSize();
+  
+  // Access GlobalState to verify the provider is available
+  const globalState = useGlobalState();
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
 
-const Layout = ({ children }: LayoutProps) => {
+    // Check for scrolling to add shadow to header
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    // Initial check
+    checkScreenSize();
+    handleScroll();
+
+    // Add event listeners
+    window.addEventListener("resize", checkScreenSize);
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-64 h-full">
-        <Sidebar />
-      </div>
-      <div className="flex-1 overflow-auto p-6">
-        {children}
+    <div className="h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50/30">
+      <div className="flex-1 flex overflow-hidden">
+        {/* Keep only the main Sidebar component */}
+        <Sidebar isMobile={isMobile} />
+        
+        <main 
+          className={cn(
+            "flex-1 overflow-auto p-4 md:p-6 transition-all duration-300 ml-16",
+            isScrolled && "bg-white/80 backdrop-blur-sm"
+          )}
+        >
+          <div className="w-full mx-auto">
+            <div className="max-w-full overflow-x-hidden animate-fade-in">
+              <Outlet />
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );

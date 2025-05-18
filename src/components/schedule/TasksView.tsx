@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, Calendar, ArrowDown, ArrowUp, Bell, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -70,18 +69,9 @@ const TasksView = ({
     onTasksChange([...updatedTasks, followUpTask]);
   };
 
-  // Make sure tasks have the expected properties to avoid undefined errors
-  const safeTasksForSelectedDate = tasksForSelectedDate.map(task => ({
-    ...task,
-    client: task.client || { name: "Unassigned" },
-    progress: task.progress || 0,
-    assignedTo: task.assignedTo || "",
-    createdAt: task.createdAt || new Date().toISOString()
-  }));
-
-  const filteredTasks = filterTasks(safeTasksForSelectedDate, viewMode, searchQuery, filterType, sortOrder);
-  const tasksCount = safeTasksForSelectedDate.filter(task => !task.isReminder).length;
-  const remindersCount = safeTasksForSelectedDate.filter(task => task.isReminder).length;
+  const filteredTasks = filterTasks(tasksForSelectedDate, viewMode, searchQuery, filterType, sortOrder);
+  const tasksCount = tasksForSelectedDate.filter(task => !task.isReminder).length;
+  const remindersCount = tasksForSelectedDate.filter(task => task.isReminder).length;
 
   return (
     <div className="mb-6">
@@ -148,7 +138,7 @@ const TasksView = ({
                 </TabsTrigger>
                 <TabsTrigger value="reminders" className="text-xs flex items-center">
                   <Bell className="h-3.5 w-3.5 mr-1 text-[#1EAEDB]" />
-                  Reminders ({remindersCount})
+                  Tasks ({remindersCount})
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -205,7 +195,7 @@ const TasksView = ({
       
       <div className="space-y-4">
         <h3 className="font-medium">
-          {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Reminders"} ({filteredTasks.length})
+          {viewMode === "all" ? "Tasks & Reminders" : viewMode === "tasks" ? "Tasks" : "Tasks"} ({filteredTasks.length})
         </h3>
         
         {filteredTasks.length === 0 ? (
