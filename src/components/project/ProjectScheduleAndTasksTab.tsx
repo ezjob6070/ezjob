@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { format, addDays, subDays } from 'date-fns';
 import { 
   Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, CircleCheck, 
-  Clock3, AlertCircle, FileText, BellRing, Calendar, Clock, Check
+  Clock3, AlertCircle, FileText, BellRing, Clock, Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -207,7 +207,7 @@ const ProjectScheduleAndTasksTab = ({ project }: ProjectScheduleAndTasksTabProps
       case "BellRing":
         return <BellRing className="h-4 w-4" />;
       case "Calendar":
-        return <Calendar className="h-4 w-4" />;
+        return <CalendarIcon className="h-4 w-4" />;
       case "Clock":
         return <Clock className="h-4 w-4" />;
       case "Check":
@@ -215,7 +215,7 @@ const ProjectScheduleAndTasksTab = ({ project }: ProjectScheduleAndTasksTabProps
       case "FileText":
         return <FileText className="h-4 w-4" />;
       default:
-        return <Calendar className="h-4 w-4" />;
+        return <CalendarIcon className="h-4 w-4" />;
     }
   };
 
