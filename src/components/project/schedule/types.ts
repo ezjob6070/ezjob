@@ -17,3 +17,38 @@ export interface ScheduleEvent {
   status: "scheduled" | "completed" | "cancelled";
   type: "meeting" | "deadline" | "milestone" | "task" | "inspection" | "reminder";
 }
+
+// Add missing job type definitions that are referenced in error messages
+export type Job = {
+  id: string;
+  date: string;
+  scheduledDate?: string;
+  technicianId: string;
+  status: string;
+  amount: number;
+  actualAmount?: number;
+  // Add any other fields that might be needed
+};
+
+// Add sort option type that is referenced
+export type SortOption = string;
+export type DateFilterType = string;
+export type RangeValue = {
+  from?: Date;
+  to?: Date;
+};
+
+// Add DateRange props for components
+export interface DateFilterTabsProps {
+  selectedFilter?: DateFilterType;
+  onFilterChange?: (filter: DateFilterType) => void;
+  customDateRange?: { from: Date; to: Date };
+  onCustomDateChange?: (range: any) => void;
+}
+
+// Add JobSourceFilterProps
+export interface JobSourceFilterProps {
+  value?: string;
+  onChange?: (value: any) => void;
+  jobSources?: { id: string; name: string; }[];
+}

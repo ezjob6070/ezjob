@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Technician, Document } from "@/types/technician";
 import { Button } from "@/components/ui/button";
@@ -48,6 +47,7 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     // Here we're just simulating the addition to the documents list
     const newDocuments: Document[] = Array.from(files).map(file => ({
       id: `doc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      name: file.name,
       title: file.name,
       type: file.type,
       size: file.size,
@@ -59,10 +59,11 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     setDocuments(updatedDocuments);
     
     // Update technician with new documents
-    updateTechnician(technician.id, {
+    const updatedTechnician = {
       ...technician,
       documents: updatedDocuments
-    });
+    };
+    updateTechnician(technician.id, updatedTechnician);
     
     toast({
       title: "Documents Uploaded",
@@ -83,6 +84,7 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     setTimeout(() => {
       const newDocument: Document = {
         id: `doc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name: file.name,
         title: documentTitle || file.name,
         type: documentType,
         size: file.size,
@@ -94,10 +96,11 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
       setDocuments(updatedDocuments);
       
       // Update technician with new documents
-      updateTechnician(technician.id, {
+      const updatedTechnician = {
         ...technician,
         documents: updatedDocuments
-      });
+      };
+      updateTechnician(technician.id, updatedTechnician);
       
       // Reset form
       setDocumentTitle("");
@@ -118,10 +121,11 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
     setDocuments(updatedDocuments);
     
     // Update technician with filtered documents
-    updateTechnician(technician.id, {
+    const updatedTechnician = {
       ...technician,
       documents: updatedDocuments
-    });
+    };
+    updateTechnician(technician.id, updatedTechnician);
     
     toast({
       title: "Document Deleted",
@@ -220,6 +224,17 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
   const otherDocuments = documents.filter(doc => 
     !['id', 'ssn', 'license', 'contract', 'passport', 'visa'].includes(doc.type)
   );
+  
+  // Helper function to safely access driver's license properties
+  const getLicenseProperty = (property: 'number' | 'state' | 'expirationDate'): string => {
+    if (!technician.driverLicense) return "Not provided";
+    
+    if (typeof technician.driverLicense === 'string') {
+      return technician.driverLicense;
+    }
+    
+    return technician.driverLicense[property] || "Not provided";
+  };
 
   return (
     <div className="space-y-6">
@@ -496,19 +511,19 @@ const TechnicianDocumentUpload: React.FC<TechnicianDocumentUploadProps> = ({ tec
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Number</p>
                         <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-                          {maskData(technician.driverLicense.number, showDriverLicense)}
+                          {maskData(getLicenseProperty('number'), showDriverLicense)}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">State</p>
                         <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-                          {showDriverLicense ? technician.driverLicense.state : "••"}
+                          {showDriverLicense ? getLicenseProperty('state') : "••"}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Expiration</p>
                         <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-                          {showDriverLicense ? technician.driverLicense.expirationDate : "••/••/••••"}
+                          {showDriverLicense ? getLicenseProperty('expirationDate') : "••/••/••••"}
                         </p>
                       </div>
                     </div>

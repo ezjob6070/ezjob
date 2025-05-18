@@ -1,7 +1,7 @@
 
-export type SalaryBasis = "hourly" | "weekly" | "biweekly" | "monthly" | "yearly" | "per-project";
+export type SalaryBasis = "hourly" | "weekly" | "bi-weekly" | "biweekly" | "monthly" | "yearly" | "per-project" | "commission" | "annually";
 
-export type TechnicianStatus = "active" | "inactive" | "on_leave" | "training";
+export type TechnicianStatus = "active" | "inactive" | "on_leave" | "onLeave" | "training";
 
 export type TechnicianRole = "technician" | "salesman" | "employed" | "contractor";
 
@@ -44,6 +44,16 @@ export const DEFAULT_SUB_ROLES: TechnicianSubRoles = {
   ]
 };
 
+export interface Document {
+  id: string;
+  name: string;
+  title?: string;
+  type: string;
+  size: number;
+  uploadDate: string;
+  url: string;
+}
+
 export interface Technician {
   id: string;
   name: string;
@@ -74,7 +84,7 @@ export interface Technician {
   employeeId?: string;
   payRate?: number;
   
-  // Add fields that were missing but referenced in finance components
+  // Add these fields that were missing but referenced in various components
   initials?: string;
   role?: TechnicianRole;
   subRole?: string;
@@ -89,16 +99,9 @@ export interface Technician {
   category?: string;
   workContract?: string;
   profit?: number;
-}
-
-export interface Document {
-  id: string;
-  name: string;
-  title?: string;
-  type: string;
-  size: number;
-  uploadDate: string;
-  url: string;
+  skills?: string[];
+  certifications?: string[];
+  yearsExperience?: number;
 }
 
 export interface TechnicianTableProps {

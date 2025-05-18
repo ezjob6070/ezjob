@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -291,6 +290,10 @@ const TasksAndProgress: React.FC<TasksAndProgressProps> = ({ project, onUpdatePr
   const inProgressTasksCount = tasks.filter(task => task.status === "in_progress" && !task.isReminder).length;
   const blockedTasksCount = tasks.filter(task => task.status === "blocked" && !task.isReminder).length;
   const remindersCount = tasks.filter(task => task.isReminder === true).length;
+
+  const isCompleted = (status: string): boolean => {
+    return status === "completed";
+  };
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/components/dashboard/DashboardUtils";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 import { Technician } from "@/types/technician";
+import { Job } from "@/components/project/schedule/types";
 import DateRangeSelector from "./DateRangeSelector";
 
 interface SalesmenDashboardProps {
@@ -21,10 +21,10 @@ const SalesmenDashboard: React.FC<SalesmenDashboardProps> = ({ dateRange, setDat
   const { technicians, jobs } = useGlobalState();
   
   // Filter technicians that are salesmen
-  const salesmen = technicians.filter((tech) => tech.role === "salesman");
+  const salesmen = technicians.filter((tech: Technician) => tech.role === "salesman");
 
   // Filter by search term
-  const filteredSalesmen = salesmen.filter((salesman) =>
+  const filteredSalesmen = salesmen.filter((salesman: Technician) =>
     salesman.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     salesman.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     salesman.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -32,18 +32,18 @@ const SalesmenDashboard: React.FC<SalesmenDashboardProps> = ({ dateRange, setDat
   );
 
   // Get jobs assigned to salesmen within the date range
-  const salesJobs = jobs.filter(job => {
+  const salesJobs = jobs.filter((job: Job) => {
     const jobDate = job.scheduledDate ? new Date(job.scheduledDate) : new Date(job.date);
     const isInDateRange = 
       (!dateRange?.from || jobDate >= dateRange.from) && 
       (!dateRange?.to || jobDate <= dateRange.to);
     
-    return isInDateRange && salesmen.some(s => s.id === job.technicianId);
+    return isInDateRange && salesmen.some((s: Technician) => s.id === job.technicianId);
   });
 
   // Calculate financial metrics for each salesman
-  const salesmenMetrics = salesmen.map(salesman => {
-    const salesmanFilteredJobs = salesJobs.filter(job => job.technicianId === salesman.id);
+  const salesmenMetrics = salesmen.map((salesman: Technician) => {
+    const salesmanFilteredJobs = salesJobs.filter((job: Job) => job.technicianId === salesman.id);
     const totalRevenue = salesmanFilteredJobs.reduce(
       (sum, job) => sum + (job.actualAmount || job.amount), 0
     );
