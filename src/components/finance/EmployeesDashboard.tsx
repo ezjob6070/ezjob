@@ -58,12 +58,13 @@ const EmployeesDashboard: React.FC<EmployeesDashboardProps> = ({ dateRange, setD
       periodPayment = (monthlySalary / 30) * days; // Approximate daily rate
     }
     
-    // Fix the error by properly checking incentiveType against string literals
+    // Fix the error by properly checking incentiveType against the correct union types
     if (employee.incentiveType && employee.incentiveAmount) {
       if (employee.incentiveType === "monthly") {
         periodPayment += employee.incentiveAmount;
-      } else if (employee.incentiveType === "annually" || employee.incentiveType === "yearly") {
-        periodPayment += employee.incentiveAmount / 12;
+      } else if (employee.incentiveType === "bonus") {
+        // Assume bonus is paid monthly for calculation purposes
+        periodPayment += employee.incentiveAmount;
       }
     }
     

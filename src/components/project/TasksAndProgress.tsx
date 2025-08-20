@@ -1052,7 +1052,7 @@ const TasksAndProgress: React.FC<TasksAndProgressProps> = ({ project, onUpdatePr
                           In Progress
                         </Button>
                         <Button 
-                          variant={selectedTask.status === "completed" ? "default" : "outline"}
+                          variant="outline"
                           size="sm"
                           onClick={() => handleUpdateTaskStatus(selectedTask.id, "completed")}
                         >

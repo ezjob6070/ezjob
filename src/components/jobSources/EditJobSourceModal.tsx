@@ -65,7 +65,7 @@ const EditJobSourceModal = ({
         phone: jobSource.phone || "",
         email: jobSource.email || "",
         logoUrl: jobSource.logoUrl || "",
-        paymentType: jobSource.paymentType,
+        paymentType: jobSource.paymentType as "fixed" | "percentage",
         paymentValue: jobSource.paymentValue,
         isActive: jobSource.isActive,
         notes: jobSource.notes || "",

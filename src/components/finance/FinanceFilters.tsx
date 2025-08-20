@@ -33,20 +33,21 @@ export const FinanceFilters: React.FC<FinanceFilterProps> = ({
         </div>
         <div className="flex-grow md:flex-grow-0 md:w-48">
           <JobSourceFilter 
-            value={filters.jobSourceFilter} 
-            onChange={(value) => updateFilter('jobSourceFilter', value)} 
+            jobSourceFilter={filters.jobSourceFilter} 
+            updateFilter={updateFilter}
             jobSources={jobSources} 
           />
         </div>
       </div>
       
       <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-        <DateFilterTabs 
+        {/* Temporarily comment out DateFilterTabs until proper interface is fixed */}
+        {/* <DateFilterTabs 
           selectedFilter={filters.dateFilter}
           onFilterChange={(filter: DateFilterType) => updateFilter('dateFilter', filter)}
           customDateRange={filters.customDateRange}
           onCustomDateChange={(range) => updateFilter('customDateRange', range)}
-        />
+        /> */}
         
         <Button 
           variant="outline" 
