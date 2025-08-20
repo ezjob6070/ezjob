@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import StatisticsTab from "@/components/dashboard/StatisticsTab";
+import AnalyticsTab from "@/components/dashboard/AnalyticsTab";
 import MetricsOverview from "@/components/dashboard/MetricsOverview";
 import StatisticsSection from "@/components/dashboard/StatisticsSection";
 import TicketsStatusCard from "@/components/dashboard/TicketsStatusCard";
@@ -115,76 +117,16 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
-        return <StatisticsSection revenueData={revenueData} jobTypeData={jobTypeData} performanceData={performanceData} formatCurrency={formatCurrency} />;
+        return (
+          <div className="animate-in fade-in-50 duration-200">
+            <StatisticsTab />
+          </div>
+        );
       
       case 'analytics':
         return (
-          <div className="space-y-6">
-            <Card className="bg-white shadow-sm">
-              <CardHeader className="py-4 px-6">
-                <CardTitle className="text-lg font-semibold">Performance Metrics</CardTitle>
-              </CardHeader>
-              <CardContent className="px-6 pb-6">
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={performanceData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                      <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
-                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} tickFormatter={(value) => formatCurrency(Number(value))} />
-                      <Tooltip 
-                        formatter={(value, name) => {
-                          if (name === 'revenue') {
-                            return [formatCurrency(Number(value)), 'Revenue'];
-                          }
-                          return [value, name];
-                        }}
-                        contentStyle={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
-                      />
-                      <Legend wrapperStyle={{ paddingTop: 10, fontSize: 12 }} />
-                      <Line yAxisId="left" type="monotone" dataKey="calls" stroke="#4f46e5" strokeWidth={2} name="Calls" />
-                      <Line yAxisId="left" type="monotone" dataKey="jobs" stroke="#10b981" strokeWidth={2} name="Jobs" />
-                      <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2} name="Revenue" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg">
-                <CardHeader className="py-4 px-6">
-                  <CardTitle className="text-white text-lg font-semibold">Conversion Rate</CardTitle>
-                </CardHeader>
-                <CardContent className="py-3 px-6">
-                  <div className="text-3xl font-bold mb-2">84%</div>
-                  <p className="text-indigo-100 text-sm">Calls to Jobs Conversion</p>
-                  <div className="mt-2 text-green-300 text-sm font-medium">↑ 4.2% from last month</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg">
-                <CardHeader className="py-4 px-6">
-                  <CardTitle className="text-white text-lg font-semibold">Avg. Job Value</CardTitle>
-                </CardHeader>
-                <CardContent className="py-3 px-6">
-                  <div className="text-3xl font-bold mb-2">{formatCurrency(235)}</div>
-                  <p className="text-emerald-100 text-sm">Per completed job</p>
-                  <div className="mt-2 text-green-300 text-sm font-medium">↑ 2.8% from last month</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg">
-                <CardHeader className="py-4 px-6">
-                  <CardTitle className="text-white text-lg font-semibold">Technician Efficiency</CardTitle>
-                </CardHeader>
-                <CardContent className="py-3 px-6">
-                  <div className="text-3xl font-bold mb-2">92%</div>
-                  <p className="text-amber-100 text-sm">On-time completion rate</p>
-                  <div className="mt-2 text-green-300 text-sm font-medium">↑ 1.5% from last month</div>
-                </CardContent>
-              </Card>
-            </div>
+          <div className="animate-in fade-in-50 duration-200">
+            <AnalyticsTab />
           </div>
         );
       
