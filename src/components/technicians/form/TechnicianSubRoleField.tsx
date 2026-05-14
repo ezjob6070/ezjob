@@ -45,8 +45,8 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
         <FormItem className="flex-1">
           <FormLabel>Specialty/Sub-Role</FormLabel>
           <Select
-            value={field.value || ""}
-            onValueChange={field.onChange}
+            value={field.value || "none"}
+            onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
           >
             <FormControl>
               <SelectTrigger>
@@ -54,7 +54,7 @@ export const TechnicianSubRoleField: React.FC<TechnicianSubRoleFieldProps> = ({
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {subRoles.map((subRole) => (
                 <SelectItem key={subRole} value={subRole}>
                   {subRole}
