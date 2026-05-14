@@ -55,20 +55,24 @@ const StatisticsTab = () => {
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
-            <Card key={k.label} className="relative overflow-hidden border-border/60 hover:shadow-md transition-shadow">
-              <div className={cn("absolute inset-0 bg-gradient-to-br pointer-events-none", k.tint)} />
+            <Card
+              key={k.label}
+              className="group relative overflow-hidden border-border/60 cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl hover:border-primary/30"
+            >
+              <div className={cn("absolute inset-0 bg-gradient-to-br pointer-events-none transition-opacity duration-300 group-hover:opacity-150", k.tint)} />
+              <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <CardContent className="p-5 relative">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{k.label}</p>
-                    <p className="text-2xl font-bold mt-2 text-foreground">{k.value}</p>
+                    <p className="text-2xl font-bold mt-2 text-foreground transition-transform duration-300 group-hover:scale-110 origin-left">{k.value}</p>
                   </div>
-                  <div className={cn("p-2 rounded-lg", k.iconClass)}>
+                  <div className={cn("p-2 rounded-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3", k.iconClass)}>
                     <Icon className="h-4 w-4" />
                   </div>
                 </div>
                 <div className={cn("flex items-center gap-1 mt-3 text-xs font-medium", k.up ? "text-emerald-600" : "text-red-600")}>
-                  {k.up ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
+                  {k.up ? <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /> : <ArrowDownRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:translate-y-0.5" />}
                   {k.delta}
                   <span className="text-muted-foreground font-normal ml-1">vs last month</span>
                 </div>
