@@ -420,9 +420,9 @@ const Dashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
-        return renderStatisticsContent();
+        return <div className="animate-in fade-in-50 duration-200"><StatisticsTab /></div>;
       case 'analytics':
-        return renderAnalyticsContent();
+        return <div className="animate-in fade-in-50 duration-200"><AnalyticsTab /></div>;
       default: // Dashboard tab
         return (
           <>            
