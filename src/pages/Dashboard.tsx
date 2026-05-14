@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import StatisticsTab from "@/components/dashboard/StatisticsTab";
+import AnalyticsTab from "@/components/dashboard/AnalyticsTab";
 import MetricsOverview from "@/components/dashboard/MetricsOverview";
 import PerformanceCard from "@/components/dashboard/PerformanceCard";
 import TopTechniciansCard from "@/components/dashboard/TopTechniciansCard";
