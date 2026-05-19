@@ -183,6 +183,44 @@ const LeadsClients = () => {
     });
   };
 
+  const computeInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    return ((parts[0]?.[0] ?? "") + (parts[parts.length - 1]?.[0] ?? "")).toUpperCase() || "?";
+  };
+
+  const performConvert = (lead: Lead) => {
+    const existing = clients.find(c => c.email && lead.email && c.email.toLowerCase() === lead.email.toLowerCase());
+    if (existing) {
+      setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: "converted" } : l));
+      toast({
+        title: "Client already exists",
+        description: `${lead.name} is already a client. Lead marked as converted.`,
+      });
+      setConvertTarget(null);
+      return;
+    }
+    const newClient: Client = {
+      id: `c-${Date.now()}`,
+      name: lead.name,
+      company: lead.company ?? "",
+      email: lead.email ?? "",
+      phone: lead.phone ?? "",
+      status: "active",
+      initials: computeInitials(lead.name),
+      createdAt: new Date(),
+      lastContact: new Date(),
+    };
+    setClients(prev => [newClient, ...prev]);
+    setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: "converted" } : l));
+    toast({
+      title: "Lead converted",
+      description: `${lead.name} has been converted to a client.`,
+    });
+    setConvertTarget(null);
+  };
+
+
+
   const getAddButtonText = () => {
     return activeTab === "leads" ? "Add Lead" : "Add Client";
   };
