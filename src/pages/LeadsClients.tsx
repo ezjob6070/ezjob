@@ -345,15 +345,62 @@ const LeadsClients = () => {
                 </Button>
               </div>
             )}
-            
+
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white border rounded-lg p-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search leads by name, email, phone, source..."
+                  value={leadSearch}
+                  onChange={(e) => setLeadSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <Select value={leadSort} onValueChange={setLeadSort}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date-desc">Newest first</SelectItem>
+                  <SelectItem value="date-asc">Oldest first</SelectItem>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <LeadsTable 
               leads={filteredLeads} 
               onStatusChange={handleLeadStatusChange} 
             />
           </TabsContent>
           
-          <TabsContent value="clients">
-            <ClientsTable clients={clients} />
+          <TabsContent value="clients" className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white border rounded-lg p-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search clients by name, company, email, phone..."
+                  value={clientSearch}
+                  onChange={(e) => setClientSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <Select value={clientSort} onValueChange={setClientSort}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date-desc">Newest first</SelectItem>
+                  <SelectItem value="date-asc">Oldest first</SelectItem>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <ClientsTable clients={filteredClients} />
           </TabsContent>
         </div>
       </Tabs>
