@@ -85,11 +85,6 @@ const commonNavItems: NavItem[] = [
     href: "/job-sources",
   },
   {
-    label: "Employed",
-    icon: <UsersIcon size={18} />,
-    href: "/employed",
-  },
-  {
     label: "Settings",
     icon: <SettingsIcon size={18} />,
     href: "/settings",
