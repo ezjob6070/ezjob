@@ -451,11 +451,18 @@ const LeadsClients = () => {
                   Clear
                 </Button>
               )}
+              <div className="flex items-center gap-2 ml-auto">
+                <Switch id="hide-converted" checked={hideConverted} onCheckedChange={setHideConverted} />
+                <label htmlFor="hide-converted" className="text-sm text-muted-foreground cursor-pointer">
+                  Hide converted
+                </label>
+              </div>
             </div>
 
             <LeadsTable 
               leads={filteredLeads} 
               onStatusChange={handleLeadStatusChange} 
+              onConvert={(lead) => setConvertTarget(lead)}
             />
           </TabsContent>
           
