@@ -64,6 +64,8 @@ const LeadsClients = () => {
   const [leadTo, setLeadTo] = useState<string>("");
   const [clientFrom, setClientFrom] = useState<string>("");
   const [clientTo, setClientTo] = useState<string>("");
+  const [hideConverted, setHideConverted] = useState<boolean>(true);
+  const [convertTarget, setConvertTarget] = useState<Lead | null>(null);
   const { toast } = useToast();
   
   // Sample clients data - reusing from the Clients page
