@@ -34,7 +34,8 @@ import {
   CircleX,
   Briefcase,
   Clock,
-  Filter
+  Filter,
+  UserPlus
 } from "lucide-react";
 import { format } from "date-fns";
 import { Lead, LeadStatus } from "@/types/lead";
