@@ -525,6 +525,37 @@ const LeadsClients = () => {
         onOpenChange={setShowAddLeadModal}
         onAddLead={handleAddLead}
       />
+
+      <AlertDialog open={!!convertTarget} onOpenChange={(open) => !open && setConvertTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Convert lead to client?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will create a new client from{" "}
+              <strong>{convertTarget?.name}</strong>
+              {convertTarget?.company ? ` (${convertTarget.company})` : ""} and
+              mark the lead as converted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {convertTarget && (
+            <div className="rounded-md border bg-gray-50 p-3 text-sm space-y-1">
+              <div><span className="text-muted-foreground">Name:</span> {convertTarget.name}</div>
+              {convertTarget.company && <div><span className="text-muted-foreground">Company:</span> {convertTarget.company}</div>}
+              {convertTarget.email && <div><span className="text-muted-foreground">Email:</span> {convertTarget.email}</div>}
+              {convertTarget.phone && <div><span className="text-muted-foreground">Phone:</span> {convertTarget.phone}</div>}
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => convertTarget && performConvert(convertTarget)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Convert to client
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
