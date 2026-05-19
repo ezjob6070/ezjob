@@ -41,9 +41,6 @@ import ProjectsOverview from "./pages/Projects"; // Main projects page
 import ProjectDetail from "./pages/ProjectDetail"; // Project detail page
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
-import { AuthProvider } from "./hooks/useAuth";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import Auth from "./pages/Auth";
 
 // Import call pages
 import Calls from "./pages/Calls";
@@ -70,22 +67,20 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <GlobalStateProvider>
-            <GlobalDateProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <Routes>
-                  {/* Welcome page as the initial route */}
-                  <Route path="/" element={<Welcome />} />
-                  <Route path="/auth" element={<Auth />} />
-
-                  {/* Main layout with sidebar for all app pages (auth required) */}
-                  <Route path="/" element={
-                    <ProtectedRoute><Layout /></ProtectedRoute>
-                  }>
+      <GlobalStateProvider>
+        <GlobalDateProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Welcome page as the initial route */}
+                <Route path="/" element={<Welcome />} />
+                
+                {/* Main layout with sidebar for all app pages */}
+                <Route path="/" element={
+                  <Layout />
+                }>
                   {/* Dashboard routes for different industries */}
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
@@ -149,13 +144,12 @@ function App() {
                   
                   <Route path="*" element={<NotFound />} />
                 </Route>
-                </Routes>
-                <QuickActions />
-              </TooltipProvider>
-            </GlobalDateProvider>
-          </GlobalStateProvider>
-        </AuthProvider>
-      </BrowserRouter>
+              </Routes>
+              <QuickActions />
+            </BrowserRouter>
+          </TooltipProvider>
+        </GlobalDateProvider>
+      </GlobalStateProvider>
     </QueryClientProvider>
   );
 }
