@@ -258,6 +258,9 @@ const LeadsClients = () => {
     let list = leadStatusFilter.length > 0
       ? leads.filter(lead => leadStatusFilter.includes(lead.status))
       : leads;
+    if (hideConverted && leadStatus !== "converted") {
+      list = list.filter(l => l.status !== "converted");
+    }
     if (leadStatus !== "all") {
       list = list.filter(l => l.status === leadStatus);
     }
