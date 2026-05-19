@@ -202,19 +202,21 @@ const LeadsClients = () => {
     return counts;
   }, [leads]);
 
-  // Filter + search + sort leads
+  // Filter + sort leads
   const filteredLeads = useMemo(() => {
     let list = leadStatusFilter.length > 0
       ? leads.filter(lead => leadStatusFilter.includes(lead.status))
       : leads;
-    if (leadSearch.trim()) {
-      const q = leadSearch.toLowerCase();
-      list = list.filter(l =>
-        l.name.toLowerCase().includes(q) ||
-        l.email?.toLowerCase().includes(q) ||
-        l.phone?.toLowerCase().includes(q) ||
-        l.source?.toLowerCase().includes(q)
-      );
+    if (leadStatus !== "all") {
+      list = list.filter(l => l.status === leadStatus);
+    }
+    if (leadFrom) {
+      const from = new Date(leadFrom).getTime();
+      list = list.filter(l => new Date(l.createdAt).getTime() >= from);
+    }
+    if (leadTo) {
+      const to = new Date(leadTo).getTime() + 24 * 60 * 60 * 1000 - 1;
+      list = list.filter(l => new Date(l.createdAt).getTime() <= to);
     }
     const sorted = [...list];
     switch (leadSort) {
@@ -224,19 +226,21 @@ const LeadsClients = () => {
       case "date-desc": sorted.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
     }
     return sorted;
-  }, [leads, leadStatusFilter, leadSearch, leadSort]);
+  }, [leads, leadStatusFilter, leadStatus, leadFrom, leadTo, leadSort]);
 
-  // Filter + search + sort clients
+  // Filter + sort clients
   const filteredClients = useMemo(() => {
     let list = clients;
-    if (clientSearch.trim()) {
-      const q = clientSearch.toLowerCase();
-      list = list.filter(c =>
-        c.name.toLowerCase().includes(q) ||
-        c.company?.toLowerCase().includes(q) ||
-        c.email?.toLowerCase().includes(q) ||
-        c.phone?.toLowerCase().includes(q)
-      );
+    if (clientStatus !== "all") {
+      list = list.filter(c => c.status === clientStatus);
+    }
+    if (clientFrom) {
+      const from = new Date(clientFrom).getTime();
+      list = list.filter(c => (c.createdAt?.getTime() ?? 0) >= from);
+    }
+    if (clientTo) {
+      const to = new Date(clientTo).getTime() + 24 * 60 * 60 * 1000 - 1;
+      list = list.filter(c => (c.createdAt?.getTime() ?? 0) <= to);
     }
     const sorted = [...list];
     switch (clientSort) {
@@ -246,7 +250,7 @@ const LeadsClients = () => {
       case "date-desc": sorted.sort((a,b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)); break;
     }
     return sorted;
-  }, [clients, clientSearch, clientSort]);
+  }, [clients, clientStatus, clientFrom, clientTo, clientSort]);
 
   return (
     <div className="space-y-8 py-8">
