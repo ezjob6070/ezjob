@@ -71,9 +71,10 @@ import { Separator } from "@/components/ui/separator";
 type LeadsTableProps = {
   leads: Lead[];
   onStatusChange?: (id: string, status: LeadStatus) => void;
+  onConvert?: (lead: Lead) => void;
 };
 
-const LeadsTable = ({ leads: initialLeads, onStatusChange }: LeadsTableProps) => {
+const LeadsTable = ({ leads: initialLeads, onStatusChange, onConvert }: LeadsTableProps) => {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
