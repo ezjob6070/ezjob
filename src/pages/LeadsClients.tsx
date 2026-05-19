@@ -3,7 +3,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientsTable from "@/components/ClientsTable";
 import LeadsTable from "@/components/LeadsTable";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, FilterIcon, SlidersHorizontal } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PlusIcon, FilterIcon, SlidersHorizontal, Search, ArrowUpDown } from "lucide-react";
 import AddClientModal from "@/components/AddClientModal";
 import AddLeadModal from "@/components/AddLeadModal";
 import { Lead, LeadStatus } from "@/types/lead"; 
@@ -43,6 +45,10 @@ const LeadsClients = () => {
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [leadStatusFilter, setLeadStatusFilter] = useState<LeadStatus[]>([]);
+  const [leadSearch, setLeadSearch] = useState("");
+  const [clientSearch, setClientSearch] = useState("");
+  const [leadSort, setLeadSort] = useState("date-desc");
+  const [clientSort, setClientSort] = useState("date-desc");
   const { toast } = useToast();
   
   // Sample clients data - reusing from the Clients page
@@ -192,10 +198,51 @@ const LeadsClients = () => {
     return counts;
   }, [leads]);
 
-  // Filter leads based on selected statuses
-  const filteredLeads = leadStatusFilter.length > 0
-    ? leads.filter(lead => leadStatusFilter.includes(lead.status))
-    : leads;
+  // Filter + search + sort leads
+  const filteredLeads = useMemo(() => {
+    let list = leadStatusFilter.length > 0
+      ? leads.filter(lead => leadStatusFilter.includes(lead.status))
+      : leads;
+    if (leadSearch.trim()) {
+      const q = leadSearch.toLowerCase();
+      list = list.filter(l =>
+        l.name.toLowerCase().includes(q) ||
+        l.email?.toLowerCase().includes(q) ||
+        l.phone?.toLowerCase().includes(q) ||
+        l.source?.toLowerCase().includes(q)
+      );
+    }
+    const sorted = [...list];
+    switch (leadSort) {
+      case "name-asc": sorted.sort((a,b) => a.name.localeCompare(b.name)); break;
+      case "name-desc": sorted.sort((a,b) => b.name.localeCompare(a.name)); break;
+      case "date-asc": sorted.sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()); break;
+      case "date-desc": sorted.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
+    }
+    return sorted;
+  }, [leads, leadStatusFilter, leadSearch, leadSort]);
+
+  // Filter + search + sort clients
+  const filteredClients = useMemo(() => {
+    let list = clients;
+    if (clientSearch.trim()) {
+      const q = clientSearch.toLowerCase();
+      list = list.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.company?.toLowerCase().includes(q) ||
+        c.email?.toLowerCase().includes(q) ||
+        c.phone?.toLowerCase().includes(q)
+      );
+    }
+    const sorted = [...list];
+    switch (clientSort) {
+      case "name-asc": sorted.sort((a,b) => a.name.localeCompare(b.name)); break;
+      case "name-desc": sorted.sort((a,b) => b.name.localeCompare(a.name)); break;
+      case "date-asc": sorted.sort((a,b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0)); break;
+      case "date-desc": sorted.sort((a,b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)); break;
+    }
+    return sorted;
+  }, [clients, clientSearch, clientSort]);
 
   return (
     <div className="space-y-8 py-8">
@@ -298,15 +345,62 @@ const LeadsClients = () => {
                 </Button>
               </div>
             )}
-            
+
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white border rounded-lg p-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search leads by name, email, phone, source..."
+                  value={leadSearch}
+                  onChange={(e) => setLeadSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <Select value={leadSort} onValueChange={setLeadSort}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date-desc">Newest first</SelectItem>
+                  <SelectItem value="date-asc">Oldest first</SelectItem>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <LeadsTable 
               leads={filteredLeads} 
               onStatusChange={handleLeadStatusChange} 
             />
           </TabsContent>
           
-          <TabsContent value="clients">
-            <ClientsTable clients={clients} />
+          <TabsContent value="clients" className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white border rounded-lg p-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search clients by name, company, email, phone..."
+                  value={clientSearch}
+                  onChange={(e) => setClientSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <Select value={clientSort} onValueChange={setClientSort}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date-desc">Newest first</SelectItem>
+                  <SelectItem value="date-asc">Oldest first</SelectItem>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <ClientsTable clients={filteredClients} />
           </TabsContent>
         </div>
       </Tabs>
