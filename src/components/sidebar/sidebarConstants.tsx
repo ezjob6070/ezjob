@@ -40,14 +40,9 @@ const commonNavItems: NavItem[] = [
     href: "/leads-clients",
   },
   {
-    label: "Schedule",
+    label: "Schedule & Tasks",
     icon: <CalendarIcon size={18} />,
     href: "/schedule",
-  },
-  {
-    label: "Tasks",
-    icon: <ClipboardIcon size={18} />,
-    href: "/tasks",
   },
   {
     label: "Calls",
