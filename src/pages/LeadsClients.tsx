@@ -354,28 +354,49 @@ const LeadsClients = () => {
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white border rounded-lg p-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search leads by name, email, phone, source..."
-                  value={leadSearch}
-                  onChange={(e) => setLeadSearch(e.target.value)}
-                  className="pl-9"
-                />
+            <div className="flex flex-wrap gap-3 items-end bg-gray-50 border rounded-lg p-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">Status</label>
+                <Select value={leadStatus} onValueChange={setLeadStatus}>
+                  <SelectTrigger className="w-[160px] bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="converted">Converted</SelectItem>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="contacted">Contacted</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={leadSort} onValueChange={setLeadSort}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date-desc">Newest first</SelectItem>
-                  <SelectItem value="date-asc">Oldest first</SelectItem>
-                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">From</label>
+                <Input type="date" value={leadFrom} onChange={(e) => setLeadFrom(e.target.value)} className="w-[160px] bg-white" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">To</label>
+                <Input type="date" value={leadTo} onChange={(e) => setLeadTo(e.target.value)} className="w-[160px] bg-white" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">Sort by</label>
+                <Select value={leadSort} onValueChange={setLeadSort}>
+                  <SelectTrigger className="w-[180px] bg-white">
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date-desc">Newest first</SelectItem>
+                    <SelectItem value="date-asc">Oldest first</SelectItem>
+                    <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {(leadStatus !== "all" || leadFrom || leadTo) && (
+                <Button variant="ghost" size="sm" onClick={() => { setLeadStatus("all"); setLeadFrom(""); setLeadTo(""); }}>
+                  Clear
+                </Button>
+              )}
             </div>
 
             <LeadsTable 
@@ -385,28 +406,47 @@ const LeadsClients = () => {
           </TabsContent>
           
           <TabsContent value="clients" className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white border rounded-lg p-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search clients by name, company, email, phone..."
-                  value={clientSearch}
-                  onChange={(e) => setClientSearch(e.target.value)}
-                  className="pl-9"
-                />
+            <div className="flex flex-wrap gap-3 items-end bg-gray-50 border rounded-lg p-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">Status</label>
+                <Select value={clientStatus} onValueChange={setClientStatus}>
+                  <SelectTrigger className="w-[160px] bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="lead">Lead</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={clientSort} onValueChange={setClientSort}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date-desc">Newest first</SelectItem>
-                  <SelectItem value="date-asc">Oldest first</SelectItem>
-                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">From</label>
+                <Input type="date" value={clientFrom} onChange={(e) => setClientFrom(e.target.value)} className="w-[160px] bg-white" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">To</label>
+                <Input type="date" value={clientTo} onChange={(e) => setClientTo(e.target.value)} className="w-[160px] bg-white" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">Sort by</label>
+                <Select value={clientSort} onValueChange={setClientSort}>
+                  <SelectTrigger className="w-[180px] bg-white">
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date-desc">Newest first</SelectItem>
+                    <SelectItem value="date-asc">Oldest first</SelectItem>
+                    <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {(clientStatus !== "all" || clientFrom || clientTo) && (
+                <Button variant="ghost" size="sm" onClick={() => { setClientStatus("all"); setClientFrom(""); setClientTo(""); }}>
+                  Clear
+                </Button>
+              )}
             </div>
             <ClientsTable clients={filteredClients} />
           </TabsContent>
