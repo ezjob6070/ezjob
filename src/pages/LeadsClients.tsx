@@ -22,6 +22,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Switch } from "@/components/ui/switch";
 import { initialLeads } from "@/data/leads";
 
 // Import client type from Clients page
@@ -53,6 +64,8 @@ const LeadsClients = () => {
   const [leadTo, setLeadTo] = useState<string>("");
   const [clientFrom, setClientFrom] = useState<string>("");
   const [clientTo, setClientTo] = useState<string>("");
+  const [hideConverted, setHideConverted] = useState<boolean>(true);
+  const [convertTarget, setConvertTarget] = useState<Lead | null>(null);
   const { toast } = useToast();
   
   // Sample clients data - reusing from the Clients page
@@ -170,6 +183,44 @@ const LeadsClients = () => {
     });
   };
 
+  const computeInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    return ((parts[0]?.[0] ?? "") + (parts[parts.length - 1]?.[0] ?? "")).toUpperCase() || "?";
+  };
+
+  const performConvert = (lead: Lead) => {
+    const existing = clients.find(c => c.email && lead.email && c.email.toLowerCase() === lead.email.toLowerCase());
+    if (existing) {
+      setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: "converted" } : l));
+      toast({
+        title: "Client already exists",
+        description: `${lead.name} is already a client. Lead marked as converted.`,
+      });
+      setConvertTarget(null);
+      return;
+    }
+    const newClient: Client = {
+      id: `c-${Date.now()}`,
+      name: lead.name,
+      company: lead.company ?? "",
+      email: lead.email ?? "",
+      phone: lead.phone ?? "",
+      status: "active",
+      initials: computeInitials(lead.name),
+      createdAt: new Date(),
+      lastContact: new Date(),
+    };
+    setClients(prev => [newClient, ...prev]);
+    setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: "converted" } : l));
+    toast({
+      title: "Lead converted",
+      description: `${lead.name} has been converted to a client.`,
+    });
+    setConvertTarget(null);
+  };
+
+
+
   const getAddButtonText = () => {
     return activeTab === "leads" ? "Add Lead" : "Add Client";
   };
@@ -207,6 +258,9 @@ const LeadsClients = () => {
     let list = leadStatusFilter.length > 0
       ? leads.filter(lead => leadStatusFilter.includes(lead.status))
       : leads;
+    if (hideConverted && leadStatus !== "converted") {
+      list = list.filter(l => l.status !== "converted");
+    }
     if (leadStatus !== "all") {
       list = list.filter(l => l.status === leadStatus);
     }
@@ -226,7 +280,7 @@ const LeadsClients = () => {
       case "date-desc": sorted.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
     }
     return sorted;
-  }, [leads, leadStatusFilter, leadStatus, leadFrom, leadTo, leadSort]);
+  }, [leads, leadStatusFilter, leadStatus, leadFrom, leadTo, leadSort, hideConverted]);
 
   // Filter + sort clients
   const filteredClients = useMemo(() => {
@@ -397,11 +451,18 @@ const LeadsClients = () => {
                   Clear
                 </Button>
               )}
+              <div className="flex items-center gap-2 ml-auto">
+                <Switch id="hide-converted" checked={hideConverted} onCheckedChange={setHideConverted} />
+                <label htmlFor="hide-converted" className="text-sm text-muted-foreground cursor-pointer">
+                  Hide converted
+                </label>
+              </div>
             </div>
 
             <LeadsTable 
               leads={filteredLeads} 
               onStatusChange={handleLeadStatusChange} 
+              onConvert={(lead) => setConvertTarget(lead)}
             />
           </TabsContent>
           
@@ -464,6 +525,37 @@ const LeadsClients = () => {
         onOpenChange={setShowAddLeadModal}
         onAddLead={handleAddLead}
       />
+
+      <AlertDialog open={!!convertTarget} onOpenChange={(open) => !open && setConvertTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Convert lead to client?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will create a new client from{" "}
+              <strong>{convertTarget?.name}</strong>
+              {convertTarget?.company ? ` (${convertTarget.company})` : ""} and
+              mark the lead as converted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {convertTarget && (
+            <div className="rounded-md border bg-gray-50 p-3 text-sm space-y-1">
+              <div><span className="text-muted-foreground">Name:</span> {convertTarget.name}</div>
+              {convertTarget.company && <div><span className="text-muted-foreground">Company:</span> {convertTarget.company}</div>}
+              {convertTarget.email && <div><span className="text-muted-foreground">Email:</span> {convertTarget.email}</div>}
+              {convertTarget.phone && <div><span className="text-muted-foreground">Phone:</span> {convertTarget.phone}</div>}
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => convertTarget && performConvert(convertTarget)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Convert to client
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
