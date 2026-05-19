@@ -264,11 +264,11 @@ const LeadsTable = ({ leads: initialLeads, onStatusChange, onConvert }: LeadsTab
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="relative flex-1 min-w-[280px] max-w-xl">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search leads..."
-            className="pl-9"
+            placeholder="Search leads by name, company, email, or source..."
+            className="pl-10 h-11 bg-white border-gray-200 rounded-lg shadow-sm focus-visible:ring-blue-500 focus-visible:border-blue-500"
             value={searchTerm}
             onChange={handleSearch}
           />
