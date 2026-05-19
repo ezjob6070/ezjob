@@ -280,7 +280,7 @@ const LeadsClients = () => {
       case "date-desc": sorted.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
     }
     return sorted;
-  }, [leads, leadStatusFilter, leadStatus, leadFrom, leadTo, leadSort]);
+  }, [leads, leadStatusFilter, leadStatus, leadFrom, leadTo, leadSort, hideConverted]);
 
   // Filter + sort clients
   const filteredClients = useMemo(() => {
