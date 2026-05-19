@@ -423,7 +423,28 @@ const LeadsTable = ({ leads: initialLeads, onStatusChange, onConvert }: LeadsTab
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end">
+                      <div className="flex justify-end gap-1">
+                        {onConvert && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={lead.status === "converted"}
+                                  onClick={(e) => { e.stopPropagation(); onConvert(lead); }}
+                                  className="text-blue-700 border-blue-200 hover:bg-blue-50"
+                                >
+                                  <UserPlus className="h-4 w-4 mr-1" />
+                                  {lead.status === "converted" ? "Converted" : "Convert"}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {lead.status === "converted" ? "Already converted to client" : "Convert this lead to a client"}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
                         <Button
                           size="sm"
                           variant="ghost"
