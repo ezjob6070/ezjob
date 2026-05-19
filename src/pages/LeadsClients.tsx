@@ -45,6 +45,10 @@ const LeadsClients = () => {
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [leadStatusFilter, setLeadStatusFilter] = useState<LeadStatus[]>([]);
+  const [leadSearch, setLeadSearch] = useState("");
+  const [clientSearch, setClientSearch] = useState("");
+  const [leadSort, setLeadSort] = useState("date-desc");
+  const [clientSort, setClientSort] = useState("date-desc");
   const { toast } = useToast();
   
   // Sample clients data - reusing from the Clients page
