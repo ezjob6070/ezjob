@@ -29,7 +29,7 @@
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
-/* Uleadz-inspired gradient buttons */
+/* EZ Job-inspired gradient buttons */
 .gradient-button {
   background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
   color: white;
@@ -99,8 +99,8 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
-/* Uleadz-inspired card */
-.uleadz-card {
+/* EZ Job-inspired card */
+.ezjob-card {
   border-radius: 12px;
   background: white;
   overflow: hidden;
@@ -108,7 +108,7 @@
   border-top: 4px solid #4776E6;
 }
 
-.uleadz-card:hover {
+.ezjob-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
@@ -149,7 +149,7 @@
   background-color: rgba(243, 244, 246, 0.5);
 }
 
-/* Custom scrollbar like Uleadz */
+/* Custom scrollbar like EZ Job */
 ::-webkit-scrollbar {
   width: 8px;
 }

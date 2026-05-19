@@ -18,7 +18,7 @@ const Welcome = () => {
     
     // Show a welcome toast
     toast({
-      title: "Welcome to Uleadz Service CRM",
+      title: "Welcome to EZ Job Service CRM",
       description: "You're now using the service management system",
     });
   }, [navigate, setCurrentIndustry]);

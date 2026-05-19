@@ -58,7 +58,7 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
         <div className={cn("py-3", isHovering ? "px-5" : "px-3")}>
           {isHovering ? (
             <div className="flex items-center justify-between">
-              <span className="font-bold text-lg text-white">Uleadz CRM</span>
+              <span className="font-bold text-lg text-white">EZ Job</span>
               <button 
                 onClick={() => {}}
                 className="p-1.5 rounded-md hover:bg-blue-600 transition-all text-white/90 hover:text-white"
