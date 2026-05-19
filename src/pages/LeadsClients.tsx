@@ -198,10 +198,51 @@ const LeadsClients = () => {
     return counts;
   }, [leads]);
 
-  // Filter leads based on selected statuses
-  const filteredLeads = leadStatusFilter.length > 0
-    ? leads.filter(lead => leadStatusFilter.includes(lead.status))
-    : leads;
+  // Filter + search + sort leads
+  const filteredLeads = useMemo(() => {
+    let list = leadStatusFilter.length > 0
+      ? leads.filter(lead => leadStatusFilter.includes(lead.status))
+      : leads;
+    if (leadSearch.trim()) {
+      const q = leadSearch.toLowerCase();
+      list = list.filter(l =>
+        l.name.toLowerCase().includes(q) ||
+        l.email?.toLowerCase().includes(q) ||
+        l.phone?.toLowerCase().includes(q) ||
+        l.source?.toLowerCase().includes(q)
+      );
+    }
+    const sorted = [...list];
+    switch (leadSort) {
+      case "name-asc": sorted.sort((a,b) => a.name.localeCompare(b.name)); break;
+      case "name-desc": sorted.sort((a,b) => b.name.localeCompare(a.name)); break;
+      case "date-asc": sorted.sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()); break;
+      case "date-desc": sorted.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
+    }
+    return sorted;
+  }, [leads, leadStatusFilter, leadSearch, leadSort]);
+
+  // Filter + search + sort clients
+  const filteredClients = useMemo(() => {
+    let list = clients;
+    if (clientSearch.trim()) {
+      const q = clientSearch.toLowerCase();
+      list = list.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.company?.toLowerCase().includes(q) ||
+        c.email?.toLowerCase().includes(q) ||
+        c.phone?.toLowerCase().includes(q)
+      );
+    }
+    const sorted = [...list];
+    switch (clientSort) {
+      case "name-asc": sorted.sort((a,b) => a.name.localeCompare(b.name)); break;
+      case "name-desc": sorted.sort((a,b) => b.name.localeCompare(a.name)); break;
+      case "date-asc": sorted.sort((a,b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0)); break;
+      case "date-desc": sorted.sort((a,b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)); break;
+    }
+    return sorted;
+  }, [clients, clientSearch, clientSort]);
 
   return (
     <div className="space-y-8 py-8">
