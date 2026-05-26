@@ -657,6 +657,7 @@ const Calls = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      )}
       
       {/* Log Call Modal */}
       <Dialog open={isLogCallModalOpen} onOpenChange={setIsLogCallModalOpen}>
