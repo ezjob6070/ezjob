@@ -1,6 +1,6 @@
 
 import React from "react";
-import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon } from "lucide-react";
+import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, TrendingDown } from "lucide-react";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 import { DateRange } from "react-day-picker";
 import { format, isWithinInterval } from "date-fns";
