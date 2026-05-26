@@ -60,7 +60,7 @@ const DashboardHeader = ({
             </div>
             <div>
               <h1 className="text-lg md:text-xl font-bold text-gray-800">Hello, Alex Johnson</h1>
-              <p className="text-indigo-600 text-sm font-medium">Welcome to your Easy Job dashboard</p>
+              <p className="text-indigo-600 text-sm font-medium">Welcome to your Ez Job dashboard</p>
             </div>
           </div>
         </div>
