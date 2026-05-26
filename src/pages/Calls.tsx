@@ -8,8 +8,11 @@ import {
   PhoneIncomingIcon, 
   PhoneOutgoingIcon, 
   PhoneOffIcon, 
-  UserPlusIcon 
+  UserPlusIcon,
+  MessageSquareIcon,
+  SendIcon,
 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -127,7 +130,8 @@ type CallFormValues = {
   jobSource?: string; // Added job source field
 };
 
-const CallCard = ({ call }: { call: Call }) => {
+const CallCard = ({ call, onText }: { call: Call; onText: (call: Call) => void }) => {
+  const { toast } = useToast();
   const getCallTypeIcon = () => {
     switch (call.type) {
       case "incoming": return <PhoneIncomingIcon className="h-4 w-4 text-green-500" />;
@@ -149,6 +153,11 @@ const CallCard = ({ call }: { call: Call }) => {
       case "not_relevant":
         return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Not Relevant</Badge>;
     }
+  };
+
+  const handleCall = () => {
+    window.location.href = `tel:${call.phoneNumber.replace(/[^\d+]/g, '')}`;
+    toast({ title: "Calling", description: `Dialing ${call.contactName}...` });
   };
 
   return (
@@ -191,6 +200,25 @@ const CallCard = ({ call }: { call: Call }) => {
                 )}
               </div>
             )}
+
+            <div className="mt-3 flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-green-700 border-green-200 hover:bg-green-50"
+                onClick={handleCall}
+              >
+                <PhoneCallIcon className="h-3.5 w-3.5 mr-1.5" /> Call
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-blue-700 border-blue-200 hover:bg-blue-50"
+                onClick={() => onText(call)}
+              >
+                <MessageSquareIcon className="h-3.5 w-3.5 mr-1.5" /> Text
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -204,6 +232,24 @@ const Calls = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [calls, setCalls] = useState<Call[]>(sampleCalls);
   const [isLogCallModalOpen, setIsLogCallModalOpen] = useState(false);
+  const [textTarget, setTextTarget] = useState<Call | null>(null);
+  const [textMessage, setTextMessage] = useState("");
+  const { toast } = useToast();
+
+  const openTextDialog = (call: Call) => {
+    setTextTarget(call);
+    setTextMessage("");
+  };
+
+  const handleSendText = () => {
+    if (!textTarget || !textMessage.trim()) return;
+    toast({
+      title: "Message sent",
+      description: `Text sent to ${textTarget.contactName} (${textTarget.phoneNumber})`,
+    });
+    setTextTarget(null);
+    setTextMessage("");
+  };
   
   // Form for logging a new call
   const form = useForm<CallFormValues>({
@@ -341,7 +387,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
               </div>
             </CardContent>
@@ -359,7 +405,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
@@ -384,7 +430,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
@@ -409,7 +455,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
@@ -434,7 +480,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
@@ -614,6 +660,57 @@ const Calls = () => {
               <Button type="submit">Save Call</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Text Message Dialog */}
+      <Dialog open={!!textTarget} onOpenChange={(open) => !open && setTextTarget(null)}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquareIcon className="h-5 w-5 text-blue-600" />
+              Text {textTarget?.contactName}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="text-sm text-muted-foreground">
+              To: <span className="font-medium text-foreground">{textTarget?.phoneNumber}</span>
+            </div>
+            <Textarea
+              placeholder="Type your message to the customer..."
+              value={textMessage}
+              onChange={(e) => setTextMessage(e.target.value)}
+              rows={5}
+            />
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Hi, this is a follow-up regarding your service request.",
+                "Your technician is on the way.",
+                "Thanks for choosing us! Let us know if you need anything else.",
+              ].map((tpl) => (
+                <Button
+                  key={tpl}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setTextMessage(tpl)}
+                >
+                  {tpl.length > 32 ? tpl.slice(0, 32) + "…" : tpl}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTextTarget(null)}>Cancel</Button>
+            <Button
+              onClick={handleSendText}
+              disabled={!textMessage.trim()}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <SendIcon className="h-4 w-4 mr-2" /> Send Text
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
