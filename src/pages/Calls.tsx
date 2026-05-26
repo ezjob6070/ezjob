@@ -130,7 +130,8 @@ type CallFormValues = {
   jobSource?: string; // Added job source field
 };
 
-const CallCard = ({ call }: { call: Call }) => {
+const CallCard = ({ call, onText }: { call: Call; onText: (call: Call) => void }) => {
+  const { toast } = useToast();
   const getCallTypeIcon = () => {
     switch (call.type) {
       case "incoming": return <PhoneIncomingIcon className="h-4 w-4 text-green-500" />;
@@ -152,6 +153,11 @@ const CallCard = ({ call }: { call: Call }) => {
       case "not_relevant":
         return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Not Relevant</Badge>;
     }
+  };
+
+  const handleCall = () => {
+    window.location.href = `tel:${call.phoneNumber.replace(/[^\d+]/g, '')}`;
+    toast({ title: "Calling", description: `Dialing ${call.contactName}...` });
   };
 
   return (
@@ -194,6 +200,25 @@ const CallCard = ({ call }: { call: Call }) => {
                 )}
               </div>
             )}
+
+            <div className="mt-3 flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-green-700 border-green-200 hover:bg-green-50"
+                onClick={handleCall}
+              >
+                <PhoneCallIcon className="h-3.5 w-3.5 mr-1.5" /> Call
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-blue-700 border-blue-200 hover:bg-blue-50"
+                onClick={() => onText(call)}
+              >
+                <MessageSquareIcon className="h-3.5 w-3.5 mr-1.5" /> Text
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>
