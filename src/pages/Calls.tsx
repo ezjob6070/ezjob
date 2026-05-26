@@ -662,6 +662,57 @@ const Calls = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Text Message Dialog */}
+      <Dialog open={!!textTarget} onOpenChange={(open) => !open && setTextTarget(null)}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquareIcon className="h-5 w-5 text-blue-600" />
+              Text {textTarget?.contactName}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="text-sm text-muted-foreground">
+              To: <span className="font-medium text-foreground">{textTarget?.phoneNumber}</span>
+            </div>
+            <Textarea
+              placeholder="Type your message to the customer..."
+              value={textMessage}
+              onChange={(e) => setTextMessage(e.target.value)}
+              rows={5}
+            />
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Hi, this is a follow-up regarding your service request.",
+                "Your technician is on the way.",
+                "Thanks for choosing us! Let us know if you need anything else.",
+              ].map((tpl) => (
+                <Button
+                  key={tpl}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setTextMessage(tpl)}
+                >
+                  {tpl.length > 32 ? tpl.slice(0, 32) + "…" : tpl}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTextTarget(null)}>Cancel</Button>
+            <Button
+              onClick={handleSendText}
+              disabled={!textMessage.trim()}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <SendIcon className="h-4 w-4 mr-2" /> Send Text
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
