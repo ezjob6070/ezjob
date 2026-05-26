@@ -47,7 +47,7 @@ const commonNavItems: NavItem[] = [
   },
   {
     label: "Calls & Texting",
-    icon: <MessageSquareIcon size={18} />,
+    icon: <PhoneIcon size={18} />,
     href: "/calls",
   },
   {
