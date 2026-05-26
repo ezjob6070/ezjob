@@ -369,7 +369,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
               </div>
             </CardContent>
@@ -387,7 +387,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
@@ -412,7 +412,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
@@ -437,7 +437,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
@@ -462,7 +462,7 @@ const Calls = () => {
             <CardContent>
               <div className="grid gap-4">
                 {getFilteredCalls().map(call => (
-                  <CallCard key={call.id} call={call} />
+                  <CallCard key={call.id} call={call} onText={openTextDialog} />
                 ))}
                 
                 {getFilteredCalls().length === 0 && (
