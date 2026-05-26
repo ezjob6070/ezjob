@@ -8,8 +8,11 @@ import {
   PhoneIncomingIcon, 
   PhoneOutgoingIcon, 
   PhoneOffIcon, 
-  UserPlusIcon 
+  UserPlusIcon,
+  MessageSquareIcon,
+  SendIcon,
 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
