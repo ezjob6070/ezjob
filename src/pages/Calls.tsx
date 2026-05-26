@@ -232,6 +232,24 @@ const Calls = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [calls, setCalls] = useState<Call[]>(sampleCalls);
   const [isLogCallModalOpen, setIsLogCallModalOpen] = useState(false);
+  const [textTarget, setTextTarget] = useState<Call | null>(null);
+  const [textMessage, setTextMessage] = useState("");
+  const { toast } = useToast();
+
+  const openTextDialog = (call: Call) => {
+    setTextTarget(call);
+    setTextMessage("");
+  };
+
+  const handleSendText = () => {
+    if (!textTarget || !textMessage.trim()) return;
+    toast({
+      title: "Message sent",
+      description: `Text sent to ${textTarget.contactName} (${textTarget.phoneNumber})`,
+    });
+    setTextTarget(null);
+    setTextMessage("");
+  };
   
   // Form for logging a new call
   const form = useForm<CallFormValues>({
