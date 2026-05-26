@@ -1,7 +1,18 @@
-## Remove Employed sidebar entry
+## Goal
+On the Dashboard's top metric row, replace the **Period Profit** card with an **Expenses** card styled in red with a minus sign in front of the amount.
 
-**File:** `src/components/sidebar/sidebarConstants.tsx`
+## Change
+File: `src/components/dashboard/MetricsOverview.tsx`
 
-Delete the `Employed` nav item (lines 87–91) from `commonNavItems`. The `/employed` route itself stays in place so any existing links still work, but it is no longer listed in the sidebar.
+- Compute `periodExpenses` = `periodRevenue * 0.4` (inverse of the existing 60% profit assumption, so numbers stay consistent with mock data until real expense data is wired up).
+- Replace the 4th `DashboardMetricCard` (currently "Period Profit", green gradient, DollarSign icon) with:
+  - **title:** "Expenses"
+  - **value:** `-${formatCurrency(periodExpenses)}` (minus sign prefixed)
+  - **icon:** `TrendingDown` (lucide)
+  - **className:** red gradient `bg-gradient-to-br from-red-500 to-red-600` to match the existing vibrant card style of the other 3 cards
+  - **trend:** `{ value: "↓", isPositive: false }`
+  - **onClick:** open the existing `metrics` detail dialog (keeps wiring intact)
 
-No other files need changes.
+## Out of scope
+- The other 3 cards (Completed Jobs, Active Jobs, Period Revenue) stay as-is.
+- No backend / data-model changes; expenses use a derived placeholder until a real expenses source is added.

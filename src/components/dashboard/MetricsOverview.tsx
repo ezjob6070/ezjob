@@ -1,6 +1,6 @@
 
 import React from "react";
-import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, DollarSignIcon } from "lucide-react";
+import { PhoneCallIcon, BriefcaseIcon, CalculatorIcon, TrendingDown } from "lucide-react";
 import DashboardMetricCard from "@/components/DashboardMetricCard";
 import { DateRange } from "react-day-picker";
 import { format, isWithinInterval } from "date-fns";
@@ -111,16 +111,16 @@ const MetricsOverview = ({
         onClick={() => openDetailDialog('revenue', 'Revenue Details', detailedRevenueData)}
       />
       <DashboardMetricCard
-        title="Period Profit"
-        value={formatCurrency(periodProfit)}
-        icon={<DollarSignIcon size={20} className="text-white" />}
+        title="Expenses"
+        value={`-${formatCurrency(periodRevenue * 0.4)}`}
+        icon={<TrendingDown size={20} className="text-white" />}
         description={`For ${getDateRangeText()}`}
-        trend={{ value: "↑", isPositive: true }}
-        className="bg-gradient-to-br from-green-500 to-green-600 cursor-pointer hover:shadow-lg transition-all duration-300"
+        trend={{ value: "↓", isPositive: false }}
+        className="bg-gradient-to-br from-red-500 to-red-600 cursor-pointer hover:shadow-lg transition-all duration-300"
         variant="vibrant"
         valueClassName="text-white text-2xl font-bold"
         dateRangeText={getDateRangeText()}
-        onClick={() => openDetailDialog('metrics', 'Financial Metrics', detailedBusinessMetrics)}
+        onClick={() => openDetailDialog('metrics', 'Expenses', detailedBusinessMetrics)}
       />
     </div>
   );
