@@ -25,6 +25,7 @@ import {
   BadgeDollarSign,
   ChartBar,
   PhoneCall,
+  TrendingDown,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
