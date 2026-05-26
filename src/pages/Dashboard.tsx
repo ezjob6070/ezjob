@@ -25,6 +25,7 @@ import {
   BadgeDollarSign,
   ChartBar,
   PhoneCall,
+  TrendingDown,
 } from "lucide-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -505,39 +506,33 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
               
-              {/* Total Calls Card */}
+              {/* Expenses Card */}
               <Card className="bg-white border-0 shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-purple-100 rounded-full">
-                          <PhoneCall className="h-5 w-5 text-purple-600" />
+                        <div className="p-1.5 bg-red-100 rounded-full">
+                          <TrendingDown className="h-5 w-5 text-red-600" />
                         </div>
-                        <h3 className="text-sm font-medium text-gray-600">Total Calls</h3>
+                        <h3 className="text-sm font-medium text-gray-600">Expenses</h3>
                       </div>
-                      <p className="text-2xl font-bold mt-2 text-gray-900">{callsData.total}</p>
+                      <p className="text-2xl font-bold mt-2 text-red-600">-${totalExpenses.toLocaleString()}</p>
                     </div>
                     
-                    <span className="text-xs font-medium px-2 py-1 bg-purple-50 text-purple-600 rounded-full">
-                      {callsData.conversionRate}% conversion
+                    <span className="text-xs font-medium px-2 py-1 bg-red-50 text-red-600 rounded-full">
+                      40% of revenue
                     </span>
                   </div>
                   
                   <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
                     <div className="flex justify-between items-center">
-                      <span>Follow-ups scheduled</span>
-                      <span className="font-medium text-gray-700">{callsData.scheduled}</span>
+                      <span>Operating costs</span>
+                      <span className="font-medium text-gray-700">${Math.round(totalExpenses).toLocaleString()}</span>
                     </div>
                     <div className="mt-2 flex gap-0.5">
-                      <div 
-                        className="bg-purple-500 h-1 rounded-l" 
-                        style={{ width: `${callsData.converted / callsData.total * 100}%` }}
-                      ></div>
-                      <div 
-                        className="bg-purple-300 h-1 rounded-r"
-                        style={{ width: `${(callsData.total - callsData.converted) / callsData.total * 100}%` }}
-                      ></div>
+                      <div className="bg-red-500 h-1 rounded-l" style={{ width: '40%' }}></div>
+                      <div className="bg-red-200 h-1 rounded-r" style={{ width: '60%' }}></div>
                     </div>
                   </div>
                 </CardContent>
