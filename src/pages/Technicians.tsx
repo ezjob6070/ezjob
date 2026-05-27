@@ -249,7 +249,7 @@ const Technicians = () => {
         <TechnicianFilters 
           status={statusFilter}
           onStatusChange={setStatusFilter}
-          technicians={globalTechnicians}
+          technicians={globalTechnicians as any}
           selectedTechnicians={selectedTechnicians}
           onTechnicianToggle={toggleTechnician}
           searchQuery={searchQuery}
