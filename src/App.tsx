@@ -41,6 +41,9 @@ import ProjectsOverview from "./pages/Projects"; // Main projects page
 import ProjectDetail from "./pages/ProjectDetail"; // Project detail page
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import Auth from "./pages/Auth";
 
 // Import call pages
 import Calls from "./pages/Calls";
