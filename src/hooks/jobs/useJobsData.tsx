@@ -76,6 +76,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [appliedFilters, setAppliedFilters] = useState<number>(0);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState<boolean>(false);
+  const [initialStatusAction, setInitialStatusAction] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<string>("newest");
 
   useEffect(() => {
