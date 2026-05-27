@@ -41,6 +41,8 @@ const JobTabs: React.FC<JobTabsProps> = ({
   isStatusModalOpen,
   openStatusModal,
   closeStatusModal,
+  initialStatusAction,
+  onReopenJob,
   setDatePopoverOpen,
   setTechPopoverOpen,
   setSourcePopoverOpen,
