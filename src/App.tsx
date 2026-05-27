@@ -42,8 +42,7 @@ import ProjectDetail from "./pages/ProjectDetail"; // Project detail page
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import Auth from "./pages/Auth";
+
 
 // Import call pages
 import Calls from "./pages/Calls";
@@ -78,17 +77,10 @@ function App() {
                 <Toaster />
                 <Sonner />
                 <Routes>
-                  <Route path="/auth" element={<Auth />} />
                   <Route path="/" element={<Welcome />} />
 
-                  <Route
-                    path="/"
-                    element={
-                      <ProtectedRoute>
-                        <Layout />
-                      </ProtectedRoute>
-                    }
-                  >
+                  <Route path="/" element={<Layout />}>
+
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
                     <Route path="construction-dashboard" element={<ConstructionDashboard />} />
