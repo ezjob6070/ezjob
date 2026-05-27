@@ -271,6 +271,8 @@ const Jobs = () => {
     isStatusModalOpen,
     openStatusModal,
     closeStatusModal,
+    initialStatusAction,
+    handleReopenJob,
     
     // Job source operations
     toggleJobSourceSidebar: jobSourceData.toggleJobSourceSidebar
