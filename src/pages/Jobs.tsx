@@ -17,7 +17,15 @@ import { Technician } from "@/types/technician";
 
 const Jobs = () => {
   const navigate = useNavigate();
-  const { jobs: globalJobs, technicians: globalTechnicians, jobSources: globalJobSources, addJob, completeJob, cancelJob } = useGlobalState();
+  const {
+    jobs: globalJobs,
+    technicians: globalTechnicians,
+    jobSources: globalJobSources,
+    addJob,
+    completeJob,
+    cancelJob,
+    updateJob,
+  } = useGlobalState();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>(JOB_CATEGORIES);
   const [serviceTypes, setServiceTypes] = useState<string[]>(SERVICE_TYPES);
@@ -29,7 +37,7 @@ const Jobs = () => {
     const completeJobs: Job[] = globalJobs.map(job => ({
       ...job,
       date: job.date || job.scheduledDate || new Date().toISOString(),
-      status: job.status === "canceled" ? "cancelled" as const : job.status as any // Fix "canceled" -> "cancelled"
+      status: job.status,
     }));
     setLocalJobs(completeJobs);
   }, [globalJobs]);
@@ -110,7 +118,7 @@ const Jobs = () => {
   };
 
   const handleAddJob = (job: Job) => {
-    addJob(job);
+    addJob?.(job);
     setIsCreateModalOpen(false); // Close modal after adding
     
     toast({
@@ -120,7 +128,7 @@ const Jobs = () => {
   };
 
   const handleCancelJob = (jobId: string, reason?: string) => {
-    cancelJob(jobId);
+    cancelJob?.(jobId, reason);
     
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
@@ -131,13 +139,18 @@ const Jobs = () => {
     );
   };
 
-  const handleCompleteJob = (jobId: string) => {
-    completeJob(jobId);
+  const handleCompleteJob = (jobId: string, actualAmount?: number) => {
+    completeJob?.(jobId, actualAmount);
     
     setLocalJobs(prevJobs => 
       prevJobs.map(job => 
         job.id === jobId 
-          ? { ...job, status: "completed" as const }
+          ? {
+              ...job,
+              status: "completed" as const,
+              actualAmount: actualAmount ?? job.amount,
+              cancellationReason: undefined,
+            }
           : job
       )
     );
@@ -147,6 +160,14 @@ const Jobs = () => {
   const handleLocalRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
     // Call the handleRescheduleJob function from useJobsData
     handleRescheduleJob(jobId, newDate);
+
+    updateJob?.(jobId, {
+      date: newDate,
+      scheduledDate: newDate,
+      isAllDay,
+      status: "scheduled",
+      cancellationReason: undefined,
+    });
     
     // Update local jobs state
     setLocalJobs(prevJobs => 
@@ -159,6 +180,22 @@ const Jobs = () => {
               isAllDay: isAllDay, 
               status: "scheduled" as const
             }
+          : job
+      )
+    );
+  };
+
+  const handleLocalReopenJob = (jobId: string, newStatus: "scheduled" | "in_progress") => {
+    handleReopenJob(jobId, newStatus);
+    updateJob?.(jobId, {
+      status: newStatus,
+      cancellationReason: undefined,
+    });
+
+    setLocalJobs(prevJobs =>
+      prevJobs.map(job =>
+        job.id === jobId
+          ? { ...job, status: newStatus, cancellationReason: undefined }
           : job
       )
     );
@@ -272,7 +309,7 @@ const Jobs = () => {
     openStatusModal,
     closeStatusModal,
     initialStatusAction,
-    handleReopenJob,
+    handleReopenJob: handleLocalReopenJob,
     
     // Job source operations
     toggleJobSourceSidebar: jobSourceData.toggleJobSourceSidebar
