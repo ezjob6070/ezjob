@@ -8,6 +8,7 @@ interface Job {
   title: string;
   clientName: string;
   scheduledDate?: string;
+  date?: string;
   status: "completed" | "in_progress" | "canceled" | "scheduled" | "rescheduled";
   amount: number;
   actualAmount?: number;
@@ -16,6 +17,7 @@ interface Job {
   technicianPayout?: number;
   jobSourcePayout?: number;
   companyProfit?: number;
+  [key: string]: any;
 }
 
 interface Technician {
@@ -29,12 +31,18 @@ interface Technician {
   paymentType: "percentage" | "flat" | "hourly" | "salary";
   paymentRate: number;
   hourlyRate: number;
+  completedJobs?: number;
+  cancelledJobs?: number;
+  totalRevenue?: number;
+  rating?: number;
+  salaryBasis?: string;
+  [key: string]: any;
 }
 
 interface JobSource {
   id: string;
   name: string;
-  type?: string;
+  type: string;
   paymentType?: string;
   paymentValue?: number;
   isActive?: boolean;
@@ -42,6 +50,7 @@ interface JobSource {
   totalRevenue?: number;
   profit?: number;
   createdAt?: string;
+  [key: string]: any;
 }
 
 interface GlobalStateContextProps {
