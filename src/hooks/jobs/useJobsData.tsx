@@ -424,6 +424,8 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     handleUpdateJobStatus,
     handleCancelJob,
     handleCompleteJob,
+    handleReopenJob,
+    initialStatusAction,
     sortBy,
     setSortBy
   };
