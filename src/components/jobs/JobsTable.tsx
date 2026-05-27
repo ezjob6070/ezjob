@@ -17,7 +17,7 @@ import JobActions from "./JobActions";
 
 interface JobsTableProps {
   jobs: Job[];
-  onUpdateStatus: (job: Job) => void;
+  onUpdateStatus: (job: Job, initialStatus?: string) => void;
   onSendToEstimate?: (job: Job) => void;
   searchTerm?: string; // Make this optional
 }
