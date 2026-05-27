@@ -37,7 +37,7 @@ const JobSources = () => {
       notes: newJobSource.notes || ''
     };
     
-    addJobSource(completeJobSource);
+    addJobSource(completeJobSource as any);
     toast({
       title: "Job Source Created",
       description: "New job source has been added successfully."
