@@ -27,8 +27,8 @@ interface Technician {
   phone?: string;
   specialty?: string;
   hireDate: string;
-  status: "active" | "inactive" | "onLeave";
-  paymentType: "percentage" | "flat" | "hourly" | "salary";
+  status: "active" | "inactive" | "onLeave" | "on_leave" | string;
+  paymentType: "percentage" | "flat" | "hourly" | "salary" | string;
   paymentRate: number;
   hourlyRate: number;
   completedJobs?: number;
