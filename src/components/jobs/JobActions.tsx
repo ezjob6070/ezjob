@@ -37,6 +37,23 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
   const isCancelled = job.status === "cancelled";
   const isActive = !isCompleted && !isCancelled;
 
+  const handleStatusAction = (
+    event: Event,
+    action?: StatusAction,
+    callback?: () => void,
+  ) => {
+    event.preventDefault();
+
+    requestAnimationFrame(() => {
+      if (callback) {
+        callback();
+        return;
+      }
+
+      onUpdateStatus(job, action);
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -49,7 +66,7 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={() => onUpdateStatus(job)}>
+        <DropdownMenuItem onSelect={(event) => handleStatusAction(event)}>
           <Eye className="h-4 w-4 mr-2" />
           View / Update
         </DropdownMenuItem>
@@ -58,18 +75,22 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
           <>
             <DropdownMenuItem
               className="text-emerald-600 focus:text-emerald-700"
-              onClick={() => onUpdateStatus(job, "completed")}
+              onSelect={(event) => handleStatusAction(event, "completed")}
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Mark Complete
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onUpdateStatus(job, "reschedule")}>
+            <DropdownMenuItem onSelect={(event) => handleStatusAction(event, "reschedule")}>
               <CalendarClock className="h-4 w-4 mr-2" />
               Reschedule
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() =>
-                onSendToEstimate ? onSendToEstimate(job) : onUpdateStatus(job, "estimate")
+              onSelect={(event) =>
+                handleStatusAction(
+                  event,
+                  "estimate",
+                  onSendToEstimate ? () => onSendToEstimate(job) : undefined,
+                )
               }
             >
               <ClipboardList className="h-4 w-4 mr-2" />
@@ -78,7 +99,7 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-red-600 focus:text-red-700"
-              onClick={() => onUpdateStatus(job, "cancelled")}
+              onSelect={(event) => handleStatusAction(event, "cancelled")}
             >
               <XCircle className="h-4 w-4 mr-2" />
               Cancel Job
@@ -88,14 +109,14 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
 
         {isCompleted && (
           <>
-            <DropdownMenuItem onClick={() => onUpdateStatus(job, "completed")}>
+            <DropdownMenuItem onSelect={(event) => handleStatusAction(event, "completed")}>
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Edit Amount
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-blue-600 focus:text-blue-700"
-              onClick={() => onUpdateStatus(job, "in_progress")}
+              onSelect={(event) => handleStatusAction(event, "in_progress")}
             >
               <RotateCcw className="h-4 w-4 mr-2" />
               Reopen Job
@@ -108,7 +129,7 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-blue-600 focus:text-blue-700"
-              onClick={() => onUpdateStatus(job, "scheduled")}
+              onSelect={(event) => handleStatusAction(event, "scheduled")}
             >
               <RotateCcw className="h-4 w-4 mr-2" />
               Reopen Job
