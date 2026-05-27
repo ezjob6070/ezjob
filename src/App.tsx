@@ -41,6 +41,9 @@ import ProjectsOverview from "./pages/Projects"; // Main projects page
 import ProjectDetail from "./pages/ProjectDetail"; // Project detail page
 import { GlobalDateProvider } from "./components/GlobalDateRangeFilter";
 import { GlobalStateProvider } from "./components/providers/GlobalStateProvider";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import Auth from "./pages/Auth";
 
 // Import call pages
 import Calls from "./pages/Calls";
@@ -67,89 +70,90 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GlobalStateProvider>
-        <GlobalDateProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                {/* Welcome page as the initial route */}
-                <Route path="/" element={<Welcome />} />
-                
-                {/* Main layout with sidebar for all app pages */}
-                <Route path="/" element={
-                  <Layout />
-                }>
-                  {/* Dashboard routes for different industries */}
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
-                  <Route path="construction-dashboard" element={<ConstructionDashboard />} />
-                  <Route path="general-dashboard" element={<GeneralDashboard />} />
-                  
-                  <Route path="agents" element={<RealEstateAgents />} />
-                  <Route path="properties" element={<Properties />} />
-                  <Route path="listings" element={<Listings />} />
-                  <Route path="clients" element={<Clients />} />
-                  <Route path="clients/:id" element={<ClientDetail />} />
-                  <Route path="leads" element={<Leads />} />
-                  <Route path="leads-clients" element={<LeadsClients />} />
-                  
-                  {/* Project routes - simplified to one main Projects page */}
-                  <Route path="projects" element={<ProjectsOverview />} />
-                  <Route path="project/:id" element={<ProjectDetail />} />
-                  
-                  {/* Call tracking routes */}
-                  <Route path="calls" element={<Calls />} />
-                  <Route path="calls/incoming" element={<IncomingCalls />} />
-                  <Route path="calls/outgoing" element={<OutgoingCalls />} />
-                  <Route path="calls/missed" element={<MissedCalls />} />
-                  <Route path="calls/converted" element={<ConvertedCalls />} />
-                  
-                  <Route path="tasks" element={<Tasks />} />
-                  <Route path="tasks/:id" element={<TaskDetail />} />
-                  <Route path="jobs" element={<Jobs />} />
-                  <Route path="schedule" element={<Schedule />} />
-                  <Route path="payments" element={<Payments />} />
-                  <Route path="technicians" element={<Technicians />} />
-                  <Route path="technicians/analytics" element={<TechnicianAnalytics />} />
-                  <Route path="technicians/:id" element={<TechnicianDetail />} />
-                  <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
-                  <Route path="estimates" element={<Estimates />} />
-                  <Route path="finance" element={<Finance />} />
-                  <Route path="finance/technicians" element={<FinanceTechnicians />} />
-                  <Route path="gps-tracking" element={<GPSTracking />} />
-                  <Route path="job-sources" element={<JobSources />} />
-                  <Route path="employed" element={<Employed />} />
-                  <Route path="employed/employee/:id" element={<EmployeeDetail />} />
-                  <Route path="employed/add" element={<AddEmployee />} />
-                  <Route path="settings" element={<Settings />} />
-                  
-                  {/* Construction Routes */}
-                  <Route path="construction-projects" element={<ConstructionProjects />} />
-                  <Route path="equipment" element={<Equipment />} />
-                  <Route path="materials" element={<Materials />} />
-                  <Route path="contractors" element={<Contractors />} />
-                  <Route path="safety-reports" element={<SafetyReports />} />
-                  <Route path="inspections" element={<Inspections />} />
-                  
-                  {/* General Category Routes */}
-                  <Route path="contacts" element={<Contacts />} />
-                  <Route path="communications" element={<Navigate to="/contacts" replace />} />
-                  <Route path="general-projects" element={<Navigate to="/projects" replace />} />
-                  <Route path="office-management" element={<Navigate to="/contacts" replace />} />
-                  <Route path="customer-support" element={<Navigate to="/contacts" replace />} />
-                  <Route path="marketing" element={<Navigate to="/contacts" replace />} />
-                  <Route path="knowledge-base" element={<Navigate to="/contacts" replace />} />
-                  
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              </Routes>
-              <QuickActions />
-            </BrowserRouter>
-          </TooltipProvider>
-        </GlobalDateProvider>
-      </GlobalStateProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <GlobalStateProvider>
+            <GlobalDateProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={<Welcome />} />
+
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Layout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="real-estate-dashboard" element={<RealEstateDashboard />} />
+                    <Route path="construction-dashboard" element={<ConstructionDashboard />} />
+                    <Route path="general-dashboard" element={<GeneralDashboard />} />
+
+                    <Route path="agents" element={<RealEstateAgents />} />
+                    <Route path="properties" element={<Properties />} />
+                    <Route path="listings" element={<Listings />} />
+                    <Route path="clients" element={<Clients />} />
+                    <Route path="clients/:id" element={<ClientDetail />} />
+                    <Route path="leads" element={<Leads />} />
+                    <Route path="leads-clients" element={<LeadsClients />} />
+
+                    <Route path="projects" element={<ProjectsOverview />} />
+                    <Route path="project/:id" element={<ProjectDetail />} />
+
+                    <Route path="calls" element={<Calls />} />
+                    <Route path="calls/incoming" element={<IncomingCalls />} />
+                    <Route path="calls/outgoing" element={<OutgoingCalls />} />
+                    <Route path="calls/missed" element={<MissedCalls />} />
+                    <Route path="calls/converted" element={<ConvertedCalls />} />
+
+                    <Route path="tasks" element={<Tasks />} />
+                    <Route path="tasks/:id" element={<TaskDetail />} />
+                    <Route path="jobs" element={<Jobs />} />
+                    <Route path="schedule" element={<Schedule />} />
+                    <Route path="payments" element={<Payments />} />
+                    <Route path="technicians" element={<Technicians />} />
+                    <Route path="technicians/analytics" element={<TechnicianAnalytics />} />
+                    <Route path="technicians/:id" element={<TechnicianDetail />} />
+                    <Route path="technician-altercation" element={<Navigate to="/technicians" replace />} />
+                    <Route path="estimates" element={<Estimates />} />
+                    <Route path="finance" element={<Finance />} />
+                    <Route path="finance/technicians" element={<FinanceTechnicians />} />
+                    <Route path="gps-tracking" element={<GPSTracking />} />
+                    <Route path="job-sources" element={<JobSources />} />
+                    <Route path="employed" element={<Employed />} />
+                    <Route path="employed/employee/:id" element={<EmployeeDetail />} />
+                    <Route path="employed/add" element={<AddEmployee />} />
+                    <Route path="settings" element={<Settings />} />
+
+                    <Route path="construction-projects" element={<ConstructionProjects />} />
+                    <Route path="equipment" element={<Equipment />} />
+                    <Route path="materials" element={<Materials />} />
+                    <Route path="contractors" element={<Contractors />} />
+                    <Route path="safety-reports" element={<SafetyReports />} />
+                    <Route path="inspections" element={<Inspections />} />
+
+                    <Route path="contacts" element={<Contacts />} />
+                    <Route path="communications" element={<Navigate to="/contacts" replace />} />
+                    <Route path="general-projects" element={<Navigate to="/projects" replace />} />
+                    <Route path="office-management" element={<Navigate to="/contacts" replace />} />
+                    <Route path="customer-support" element={<Navigate to="/contacts" replace />} />
+                    <Route path="marketing" element={<Navigate to="/contacts" replace />} />
+                    <Route path="knowledge-base" element={<Navigate to="/contacts" replace />} />
+
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
+                </Routes>
+                <QuickActions />
+              </TooltipProvider>
+            </GlobalDateProvider>
+          </GlobalStateProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
