@@ -43,7 +43,7 @@ export default function RemindersTabView({
         <div className="space-y-3">
           {reminderEvents.length > 0 ? (
             reminderEvents
-              .sort((a, b) => a.start.getTime() - b.start.getTime())
+              .sort((a, b) => new Date(a.start ?? 0).getTime() - new Date(b.start ?? 0).getTime())
               .map(event => (
                 <Card key={event.id} className="border-purple-200">
                   <CardContent className="p-4">

@@ -320,10 +320,10 @@ const CustomFilterDialogContent = () => {
                       mode="single"
                       selected={(condition.value as any)?.endDate}
                       onSelect={(date) => updateCondition(index, { 
-                        value: { 
+                        value: ({ 
                           startDate: (condition.value as any)?.startDate || condition.value,
                           endDate: date
-                        } 
+                        } as any)
                       })}
                       initialFocus
                     />
@@ -343,9 +343,7 @@ const CustomFilterDialogContent = () => {
               id={`${field.id}-${index}`}
             />
             <Label htmlFor={`${field.id}-${index}`}>
-              {checked => (
-                <span>{checked ? "Yes" : "No"}</span>
-              )}
+              <span>{condition.value ? "Yes" : "No"}</span>
             </Label>
           </div>
         );

@@ -49,7 +49,6 @@ const TechnicianDetail = () => {
     ...technician,
     certifications: technician.certifications || [],
     skills: technician.skills || [],
-    jobCategories: technician.jobCategories || []
   };
 
   return (

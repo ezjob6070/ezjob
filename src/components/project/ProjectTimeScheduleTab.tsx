@@ -82,6 +82,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
       start: new Date(2024, 5, 25, 10, 0),
       end: new Date(2024, 5, 25, 10, 30),
       description: "Remember to order construction materials for next phase.",
+      assignedTo: [],
       status: "scheduled",
       type: "reminder"
     },
@@ -91,6 +92,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
       start: new Date(2024, 6, 5, 9, 0),
       end: new Date(2024, 6, 5, 9, 30),
       description: "Client invoice is due today.",
+      assignedTo: [],
       status: "scheduled",
       type: "reminder"
     }
@@ -112,6 +114,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
     start: new Date(),
     end: new Date(new Date().getTime() + 30 * 60000),
     description: "",
+    assignedTo: [],
     status: "scheduled",
     type: "reminder"
   });
@@ -152,6 +155,7 @@ export default function ProjectTimeScheduleTab({ projectId, projectStaff = [] }:
       start: new Date(),
       end: new Date(new Date().getTime() + 30 * 60000),
       description: "",
+      assignedTo: [],
       status: "scheduled",
       type: "reminder"
     });
