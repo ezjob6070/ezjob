@@ -322,14 +322,25 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setFilteredJobs(updatedJobs);
   };
 
-  const openStatusModal = (job: Job) => {
+  const openStatusModal = (job: Job, initialStatus?: string) => {
     setSelectedJob(job);
+    setInitialStatusAction(initialStatus);
     setIsStatusModalOpen(true);
   };
 
   const closeStatusModal = () => {
     setIsStatusModalOpen(false);
     setSelectedJob(null);
+    setInitialStatusAction(undefined);
+  };
+
+  const handleReopenJob = (jobId: string, newStatus: "scheduled" | "in_progress") => {
+    const updatedJobs = jobs.map(job =>
+      job.id === jobId ? { ...job, status: newStatus, cancellationReason: undefined } : job
+    ) as Job[];
+    setJobs(updatedJobs);
+    setFilteredJobs(updatedJobs);
+    closeStatusModal();
   };
 
   const handleUpdateJobStatus = (jobId: string, newStatus: string) => {
