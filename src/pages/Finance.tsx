@@ -8,7 +8,7 @@ import JobSourcesDashboard from "@/components/finance/JobSourcesDashboard";
 import TechniciansDashboard from "@/components/finance/TechniciansDashboard";
 import ContractorsDashboard from "@/components/finance/ContractorsDashboard";
 import EmployeesDashboard from "@/components/finance/EmployeesDashboard";
-import SalesmenDashboard from "@/components/finance/SalesmenDashboard";
+
 import TransactionsDashboard from "@/components/finance/TransactionsDashboard";
 import OfficeDashboard from "@/components/finance/OfficeDashboard";
 import SalariesDashboard from "@/components/finance/SalariesDashboard";
@@ -153,12 +153,6 @@ const Finance = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="salesmen" className="mt-0">
-                <SalesmenDashboard 
-                  dateRange={date}
-                  setDateRange={setDate}
-                />
-              </TabsContent>
 
               <TabsContent value="transactions" className="mt-0">
                 <TransactionsDashboard 
