@@ -52,6 +52,8 @@ export interface UseJobsDataResult {
   handleCompleteJob: (jobId: string, actualAmount: number) => void;
   handleRescheduleJob: (jobId: string, newDate: Date, isAllDay: boolean) => void;
   updateJobStatus: (jobId: string, status: any) => void;
-  openStatusModal: (job: Job) => void;
+  openStatusModal: (job: Job, initialStatus?: string) => void;
   closeStatusModal: () => void;
+  handleReopenJob?: (jobId: string, newStatus: "scheduled" | "in_progress") => void;
+  initialStatusAction?: string;
 }
