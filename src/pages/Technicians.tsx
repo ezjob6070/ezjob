@@ -49,7 +49,7 @@ const Technicians = () => {
   useEffect(() => {
     if (globalTechnicians && globalTechnicians.length > 0) {
       // Make sure all required properties are present and have correct types
-      const typedTechnicians: Technician[] = globalTechnicians.map(tech => {
+      const typedTechnicians: Technician[] = globalTechnicians.map((tech: any) => {
         // Generate initials from name if not present
         const nameInitials = tech.name.split(' ').map(n => n[0]).join('').toUpperCase();
         
