@@ -87,6 +87,8 @@ const Jobs = () => {
     openStatusModal,
     closeStatusModal,
     handleUpdateJobStatus,
+    handleReopenJob,
+    initialStatusAction,
     sortBy,
     setSortBy
   } = useJobsData(localJobs, jobSourceNames);
