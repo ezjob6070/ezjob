@@ -22,10 +22,12 @@ const JobsContainer = ({
     handleCompleteJob,
     handleRescheduleJob,
     handleSendToEstimate,
+    handleReopenJob,
     selectedJob,
     isStatusModalOpen,
     openStatusModal,
     closeStatusModal,
+    initialStatusAction,
     datePopoverOpen,
     setDatePopoverOpen,
     techPopoverOpen,
@@ -82,6 +84,8 @@ const JobsContainer = ({
         isStatusModalOpen={isStatusModalOpen}
         openStatusModal={openStatusModal}
         closeStatusModal={closeStatusModal}
+        initialStatusAction={initialStatusAction}
+        onReopenJob={handleReopenJob}
         setDatePopoverOpen={setDatePopoverOpen}
         setTechPopoverOpen={setTechPopoverOpen}
         setContractorPopoverOpen={setContractorPopoverOpen}
