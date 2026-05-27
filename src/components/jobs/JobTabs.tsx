@@ -17,8 +17,10 @@ interface JobTabsProps {
   onSearchChange: (value: string) => void;
   selectedJob: Job | null;
   isStatusModalOpen: boolean;
-  openStatusModal: (job: Job) => void;
+  openStatusModal: (job: Job, initialStatus?: string) => void;
   closeStatusModal: () => void;
+  initialStatusAction?: string;
+  onReopenJob?: (jobId: string, newStatus: "scheduled" | "in_progress") => void;
   setDatePopoverOpen: (open: boolean) => void;
   setTechPopoverOpen: (open: boolean) => void;
   setSourcePopoverOpen: (open: boolean) => void;
