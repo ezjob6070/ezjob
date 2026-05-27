@@ -87,6 +87,8 @@ const Jobs = () => {
     openStatusModal,
     closeStatusModal,
     handleUpdateJobStatus,
+    handleReopenJob,
+    initialStatusAction,
     sortBy,
     setSortBy
   } = useJobsData(localJobs, jobSourceNames);
@@ -269,6 +271,8 @@ const Jobs = () => {
     isStatusModalOpen,
     openStatusModal,
     closeStatusModal,
+    initialStatusAction,
+    handleReopenJob,
     
     // Job source operations
     toggleJobSourceSidebar: jobSourceData.toggleJobSourceSidebar

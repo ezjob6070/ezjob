@@ -17,8 +17,10 @@ interface JobTabsProps {
   onSearchChange: (value: string) => void;
   selectedJob: Job | null;
   isStatusModalOpen: boolean;
-  openStatusModal: (job: Job) => void;
+  openStatusModal: (job: Job, initialStatus?: string) => void;
   closeStatusModal: () => void;
+  initialStatusAction?: string;
+  onReopenJob?: (jobId: string, newStatus: "scheduled" | "in_progress") => void;
   setDatePopoverOpen: (open: boolean) => void;
   setTechPopoverOpen: (open: boolean) => void;
   setSourcePopoverOpen: (open: boolean) => void;
@@ -39,6 +41,8 @@ const JobTabs: React.FC<JobTabsProps> = ({
   isStatusModalOpen,
   openStatusModal,
   closeStatusModal,
+  initialStatusAction,
+  onReopenJob,
   setDatePopoverOpen,
   setTechPopoverOpen,
   setSourcePopoverOpen,
@@ -127,12 +131,14 @@ const JobTabs: React.FC<JobTabsProps> = ({
       {/* Job status modal */}
       <UpdateJobStatusModal
         open={isStatusModalOpen}
-        onOpenChange={closeStatusModal}
+        onOpenChange={(open) => { if (!open) closeStatusModal(); }}
         job={selectedJob}
+        initialStatus={initialStatusAction}
         onCancel={onCancelJob}
         onComplete={onCompleteJob}
         onReschedule={onRescheduleJob}
         onSendToEstimate={onSendToEstimate}
+        onReopen={onReopenJob}
       />
     </div>
   );

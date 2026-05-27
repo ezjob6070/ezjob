@@ -43,11 +43,13 @@ export interface UseJobsDataResult {
   clearFilters: () => void;
   applyFilters: () => void;
   handleRescheduleJob: (jobId: string, newDate: Date | string) => void;
-  openStatusModal: (job: Job) => void;
+  openStatusModal: (job: Job, initialStatus?: string) => void;
   closeStatusModal: () => void;
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount?: number) => void;
+  handleReopenJob: (jobId: string, newStatus: "scheduled" | "in_progress") => void;
+  initialStatusAction?: string;
   // Properties for sorting
   sortBy: string;
   setSortBy: (option: string) => void;
@@ -76,6 +78,7 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
   const [appliedFilters, setAppliedFilters] = useState<number>(0);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState<boolean>(false);
+  const [initialStatusAction, setInitialStatusAction] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<string>("newest");
 
   useEffect(() => {
@@ -321,14 +324,25 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     setFilteredJobs(updatedJobs);
   };
 
-  const openStatusModal = (job: Job) => {
+  const openStatusModal = (job: Job, initialStatus?: string) => {
     setSelectedJob(job);
+    setInitialStatusAction(initialStatus);
     setIsStatusModalOpen(true);
   };
 
   const closeStatusModal = () => {
     setIsStatusModalOpen(false);
     setSelectedJob(null);
+    setInitialStatusAction(undefined);
+  };
+
+  const handleReopenJob = (jobId: string, newStatus: "scheduled" | "in_progress") => {
+    const updatedJobs = jobs.map(job =>
+      job.id === jobId ? { ...job, status: newStatus, cancellationReason: undefined } : job
+    ) as Job[];
+    setJobs(updatedJobs);
+    setFilteredJobs(updatedJobs);
+    closeStatusModal();
   };
 
   const handleUpdateJobStatus = (jobId: string, newStatus: string) => {
@@ -412,6 +426,8 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
     handleUpdateJobStatus,
     handleCancelJob,
     handleCompleteJob,
+    handleReopenJob,
+    initialStatusAction,
     sortBy,
     setSortBy
   };

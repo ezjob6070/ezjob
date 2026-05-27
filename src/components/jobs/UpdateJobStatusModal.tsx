@@ -20,20 +20,24 @@ interface UpdateJobStatusModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   job: Job | null;
+  initialStatus?: string;
   onCancel: (jobId: string, cancellationReason?: string) => void;
   onComplete: (jobId: string, actualAmount: number) => void;
   onReschedule?: (jobId: string, newDate: Date, isAllDay: boolean) => void;
   onSendToEstimate?: (job: Job) => void;
+  onReopen?: (jobId: string, newStatus: "scheduled" | "in_progress") => void;
 }
 
 const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   open,
   onOpenChange,
   job,
+  initialStatus,
   onCancel,
   onComplete,
   onReschedule,
   onSendToEstimate,
+  onReopen,
 }) => {
   const [status, setStatus] = useState<"completed" | "cancelled" | "reschedule" | "in_progress" | "scheduled" | "estimate">("completed");
   const [actualAmount, setActualAmount] = useState<number>(job?.amount || 0);
@@ -48,16 +52,17 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
   const [cancellationReason, setCancellationReason] = useState<string>("");
   
   useEffect(() => {
-    // Set initial status based on current job status
+    // Set initial status based on explicit override or current job status
     if (job) {
-      setStatus(job.status === "in_progress" ? "completed" : 
-               job.status === "rescheduled" ? "reschedule" : job.status);
+      const fallback = job.status === "in_progress" ? "completed" :
+                       job.status === "rescheduled" ? "reschedule" : job.status;
+      setStatus((initialStatus as any) || fallback);
       setActualAmount(job.amount || 0);
       setParts(job.parts ? job.parts.join(", ") : "");
       setCancellationReason(job.cancellationReason || "");
       setRescheduleDate(job.scheduledDate ? new Date(job.scheduledDate as string) : new Date());
     }
-  }, [job]);
+  }, [job, initialStatus, open]);
   
   if (!job) return null;
 
@@ -105,6 +110,8 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
     } else if (status === "estimate" && onSendToEstimate) {
       // Handle sending job to estimate
       onSendToEstimate(job);
+    } else if ((status === "scheduled" || status === "in_progress") && onReopen) {
+      onReopen(job.id, status);
     }
     
     // Close the modal after action is taken

@@ -17,7 +17,7 @@ import JobActions from "./JobActions";
 
 interface JobsTableProps {
   jobs: Job[];
-  onUpdateStatus: (job: Job) => void;
+  onUpdateStatus: (job: Job, initialStatus?: string) => void;
   onSendToEstimate?: (job: Job) => void;
   searchTerm?: string; // Make this optional
 }
@@ -178,9 +178,8 @@ const JobsTable = ({ jobs, onUpdateStatus, onSendToEstimate, searchTerm = '' }: 
                 </Badge>
               </TableCell>
               <TableCell>
-                <JobActions 
-                  job={job} 
-                  onCancelJob={() => {}} 
+                <JobActions
+                  job={job}
                   onUpdateStatus={onUpdateStatus}
                   onSendToEstimate={onSendToEstimate}
                 />

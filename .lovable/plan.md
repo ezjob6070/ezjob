@@ -1,23 +1,40 @@
 ## Goal
-Drop the "Salesmen" concept from two surfaces: the Technicians (Team Management) page and the Finance Report. No backend/data changes — purely UI presentation.
 
-## Changes
+Bring back a fully working **Actions** button on every row of the Jobs table (including completed and cancelled jobs) so the user can always change a job's status: mark complete, cancel, reschedule, reopen, or send to estimate.
 
-### 1. Team Management — `src/pages/Technicians.tsx`
-- Remove the "Salesmen" role filter card (the green Briefcase card).
-- Remove the `salesmanCount` calc and the `salesman` entry from the role color map.
-- Update the page subtitle "Manage your technicians, salesmen, contractors..." → "Manage your technicians, contractors and their payment structures".
-- Leave the underlying technician records with `role: "salesman"` untouched (they just won't have a dedicated filter card). The "All" card still includes them.
+## What's wrong today
 
-### 2. Finance Report — `src/pages/Finance.tsx`
-- Remove the `Salesmen` tab: drop the `<TabsTrigger value="salesmen">` and the `<TabsContent value="salesmen">` block.
-- Remove the `import SalesmenDashboard` line.
-- Adjust the tabs grid column count accordingly.
+- The dropdown trigger renders, but clicking **Update Status** doesn't reliably open the modal (the wiring between `JobActions → JobsTable → JobTabs → JobsContext` is partially broken — `closeStatusModal` is bound to `onOpenChange` with the wrong signature, and `onCancelJob` from the dropdown is a no-op `() => {}`).
+- "Cancel Job" item in the dropdown is wired to an empty function in `JobsTable.tsx` (`onCancelJob={() => {}}`), so cancelling from the row does nothing.
+- Once a job is **completed**, there's no menu item to reopen it or move it back to scheduled / in-progress.
 
-### Out of scope
-- `src/components/finance/SalesmenDashboard.tsx`, role enum in `src/types/technician.ts`, validations, role select in technician forms, table/card role badges, sample data — all kept as-is so nothing else breaks. We're only hiding the entry points the user mentioned.
-- No changes to Job Sources page, Dashboard, or any other surface.
+## What I'll change
 
-### Files touched
-- `src/pages/Technicians.tsx`
-- `src/pages/Finance.tsx`
+### 1. Fix the dropdown wiring (`JobActions.tsx`)
+- Always render the action button regardless of job status (completed and cancelled jobs included).
+- Status-aware menu items:
+  - **Scheduled / In Progress** → Mark Complete, Reschedule, Cancel, Send to Estimate
+  - **Completed** → Reopen (set back to in_progress), Edit Amount, Send to Estimate
+  - **Cancelled** → Reopen (set back to scheduled)
+- Every item triggers the existing `UpdateJobStatusModal` with the right preselected status, so the user lands on the correct form.
+
+### 2. Fix the broken handlers (`JobsTable.tsx`, `JobTabs.tsx`, `JobsContainer.tsx`)
+- Pass real `onCancelJob` / `onCompleteJob` / `onReschedule` from the JobsContext down to `JobActions` (no more `() => {}`).
+- Fix `onOpenChange={closeStatusModal}` so it correctly receives the boolean from the Dialog and closes the modal on outside click / ESC.
+- Add a new `onReopenJob(jobId, newStatus)` handler in `JobsContext` that flips a completed/cancelled job back to scheduled or in_progress.
+
+### 3. Status modal upgrade (`UpdateJobStatusModal.tsx`)
+- Accept an initial status from the trigger so "Reopen" lands on the right form instead of defaulting to "completed".
+- Add a **Reopen** option to the `StatusSelection` component.
+
+### 4. Visual polish (per design memory)
+- Use the existing white-card / blue-accent style for the dropdown — destructive items (Cancel) in red, primary action (Mark Complete) highlighted with the blue accent.
+
+## Out of scope (for now)
+
+- Backend wiring (Supabase persistence + payout auto-calculation) — that's the bigger plan we'll write next, once this row-level action is fixed and you confirm it works.
+
+## Technical notes
+
+- Files touched: `src/components/jobs/JobActions.tsx`, `src/components/jobs/JobsTable.tsx`, `src/components/jobs/JobTabs.tsx`, `src/components/jobs/UpdateJobStatusModal.tsx`, `src/components/jobs/modal/StatusSelection.tsx`, and `src/components/jobs/context/JobsContext.tsx`.
+- No DB or schema changes in this pass — purely frontend wiring fixes.

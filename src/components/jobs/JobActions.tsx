@@ -1,6 +1,13 @@
-
 import { Button } from "@/components/ui/button";
-import { MoreHorizontalIcon, PenLine, ClipboardList } from "lucide-react";
+import {
+  MoreHorizontal,
+  CheckCircle2,
+  CalendarClock,
+  XCircle,
+  ClipboardList,
+  RotateCcw,
+  Eye,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,42 +18,102 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Job } from "./JobTypes";
 
+export type StatusAction =
+  | "completed"
+  | "cancelled"
+  | "reschedule"
+  | "estimate"
+  | "in_progress"
+  | "scheduled";
+
 type JobActionsProps = {
   job: Job;
-  onCancelJob: (jobId: string) => void;
-  onUpdateStatus?: (job: Job) => void;
+  onUpdateStatus: (job: Job, initialStatus?: StatusAction) => void;
   onSendToEstimate?: (job: Job) => void;
 };
 
-const JobActions = ({ job, onCancelJob, onUpdateStatus, onSendToEstimate }: JobActionsProps) => {
+const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) => {
+  const isCompleted = job.status === "completed";
+  const isCancelled = job.status === "cancelled";
+  const isActive = !isCompleted && !isCancelled;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
-          <MoreHorizontalIcon className="h-4 w-4" />
+          <MoreHorizontal className="h-4 w-4" />
+          <span className="sr-only">Open actions</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>View Details</DropdownMenuItem>
-        <DropdownMenuItem>Edit Job</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onUpdateStatus && onUpdateStatus(job)}>
-          <PenLine className="h-4 w-4 mr-2" />
-          Update Status
+
+        <DropdownMenuItem onClick={() => onUpdateStatus(job)}>
+          <Eye className="h-4 w-4 mr-2" />
+          View / Update
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onSendToEstimate && onSendToEstimate(job)}>
-          <ClipboardList className="h-4 w-4 mr-2" />
-          Send to Estimate
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        {job.status !== "cancelled" && (
-          <DropdownMenuItem 
-            className="text-red-600" 
-            onClick={() => onCancelJob(job.id)}
-          >
-            Cancel Job
-          </DropdownMenuItem>
+
+        {isActive && (
+          <>
+            <DropdownMenuItem
+              className="text-emerald-600 focus:text-emerald-700"
+              onClick={() => onUpdateStatus(job, "completed")}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Mark Complete
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onUpdateStatus(job, "reschedule")}>
+              <CalendarClock className="h-4 w-4 mr-2" />
+              Reschedule
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                onSendToEstimate ? onSendToEstimate(job) : onUpdateStatus(job, "estimate")
+              }
+            >
+              <ClipboardList className="h-4 w-4 mr-2" />
+              Send to Estimate
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-700"
+              onClick={() => onUpdateStatus(job, "cancelled")}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Cancel Job
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {isCompleted && (
+          <>
+            <DropdownMenuItem onClick={() => onUpdateStatus(job, "completed")}>
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Edit Amount
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-blue-600 focus:text-blue-700"
+              onClick={() => onUpdateStatus(job, "in_progress")}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reopen Job
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {isCancelled && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-blue-600 focus:text-blue-700"
+              onClick={() => onUpdateStatus(job, "scheduled")}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reopen Job
+            </DropdownMenuItem>
+          </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
