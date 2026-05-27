@@ -178,9 +178,8 @@ const JobsTable = ({ jobs, onUpdateStatus, onSendToEstimate, searchTerm = '' }: 
                 </Badge>
               </TableCell>
               <TableCell>
-                <JobActions 
-                  job={job} 
-                  onCancelJob={() => {}} 
+                <JobActions
+                  job={job}
                   onUpdateStatus={onUpdateStatus}
                   onSendToEstimate={onSendToEstimate}
                 />
