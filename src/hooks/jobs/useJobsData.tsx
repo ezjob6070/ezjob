@@ -43,11 +43,13 @@ export interface UseJobsDataResult {
   clearFilters: () => void;
   applyFilters: () => void;
   handleRescheduleJob: (jobId: string, newDate: Date | string) => void;
-  openStatusModal: (job: Job) => void;
+  openStatusModal: (job: Job, initialStatus?: string) => void;
   closeStatusModal: () => void;
   handleUpdateJobStatus: (jobId: string, newStatus: string) => void;
   handleCancelJob: (jobId: string, cancellationReason?: string) => void;
   handleCompleteJob: (jobId: string, actualAmount?: number) => void;
+  handleReopenJob: (jobId: string, newStatus: "scheduled" | "in_progress") => void;
+  initialStatusAction?: string;
   // Properties for sorting
   sortBy: string;
   setSortBy: (option: string) => void;
