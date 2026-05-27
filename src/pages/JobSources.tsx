@@ -58,7 +58,7 @@ const JobSources = () => {
         : new Date().toISOString()
     };
     
-    updateJobSource(formattedJobSource.id, formattedJobSource);
+    updateJobSource(formattedJobSource.id, formattedJobSource as any);
     toast({
       title: "Job Source Updated",
       description: "Job source has been updated successfully."
