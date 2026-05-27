@@ -331,189 +331,26 @@ const Calls = () => {
     form.reset();
   };
 
-  const [mode, setMode] = useState<"calls" | "texts">("calls");
-
-  // Build mock conversations from contacts
-  const conversations = React.useMemo(() => {
-    const seen = new Map<string, Call>();
-    calls.forEach((c) => {
-      if (!seen.has(c.phoneNumber)) seen.set(c.phoneNumber, c);
-    });
-    return Array.from(seen.values());
-  }, [calls]);
-
-  const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
-  const activeConvo = conversations.find((c) => c.id === activeConvoId) ?? conversations[0];
-  const [convoDraft, setConvoDraft] = useState("");
-
-  const sendConvoMessage = () => {
-    if (!activeConvo || !convoDraft.trim()) return;
-    toast({
-      title: "Message sent",
-      description: `To ${activeConvo.contactName}`,
-    });
-    setConvoDraft("");
-  };
-
   return (
-    <div className="space-y-6 py-8">
+    <div className="space-y-8 py-8">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold leading-tight tracking-tighter">
-            {mode === "calls" ? "Call Tracking" : "Customer Messaging"}
+            Call Tracking
           </h1>
           <p className="text-muted-foreground mt-1">
-            {mode === "calls"
-              ? "Track and manage all your incoming, outgoing, and not answered calls"
-              : "Send and receive text messages with your customers"}
+            Track and manage all your incoming, outgoing, and not answered calls
           </p>
         </div>
         <Button 
           className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-900"
-          onClick={() => mode === "calls" ? setIsLogCallModalOpen(true) : openTextDialog(conversations[0])}
+          onClick={() => setIsLogCallModalOpen(true)}
         >
-          {mode === "calls" ? (
-            <><PhoneCallIcon className="mr-2 h-4 w-4" /> Log New Call</>
-          ) : (
-            <><SendIcon className="mr-2 h-4 w-4" /> New Message</>
-          )}
+          <PhoneCallIcon className="mr-2 h-4 w-4" /> Log New Call
         </Button>
       </div>
 
-      {/* Top mode switcher: Calls vs Texts */}
-      <div className="inline-flex rounded-xl bg-gray-100 p-1 shadow-sm">
-        <button
-          onClick={() => setMode("calls")}
-          className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
-            mode === "calls"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          <PhoneCallIcon className="h-4 w-4" />
-          Calls
-          <Badge variant="outline" className="ml-1 bg-blue-50 text-blue-700 border-blue-200">
-            {calls.length}
-          </Badge>
-        </button>
-        <button
-          onClick={() => setMode("texts")}
-          className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
-            mode === "texts"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          <MessageSquareIcon className="h-4 w-4" />
-          Texts
-          <Badge variant="outline" className="ml-1 bg-green-50 text-green-700 border-green-200">
-            {conversations.length}
-          </Badge>
-        </button>
-      </div>
-
-      {mode === "texts" ? (
-        <Card className="overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] min-h-[520px]">
-            {/* Conversations list */}
-            <div className="border-r bg-gray-50/50">
-              <div className="p-3 border-b bg-white">
-                <Input placeholder="Search conversations..." className="h-9" />
-              </div>
-              <div className="divide-y max-h-[520px] overflow-y-auto">
-                {conversations.map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => setActiveConvoId(c.id)}
-                    className={`w-full text-left p-3 flex items-center gap-3 hover:bg-white transition-colors ${
-                      activeConvo?.id === c.id ? "bg-white shadow-sm" : ""
-                    }`}
-                  >
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-blue-100 text-blue-700">{c.contactInitials}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-sm truncate">{c.contactName}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {c.date.toLocaleDateString([], { month: "short", day: "numeric" })}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {c.notes || c.phoneNumber}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Chat pane */}
-            <div className="flex flex-col">
-              {activeConvo ? (
-                <>
-                  <div className="flex items-center justify-between p-4 border-b bg-white">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-blue-100 text-blue-700">{activeConvo.contactInitials}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-medium">{activeConvo.contactName}</h3>
-                        <p className="text-xs text-muted-foreground">{activeConvo.phoneNumber}</p>
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-green-700 border-green-200 hover:bg-green-50"
-                      onClick={() => window.location.href = `tel:${activeConvo.phoneNumber.replace(/[^\d+]/g, '')}`}
-                    >
-                      <PhoneCallIcon className="h-3.5 w-3.5 mr-1.5" /> Call
-                    </Button>
-                  </div>
-
-                  <div className="flex-1 p-4 space-y-3 bg-gray-50/40 overflow-y-auto">
-                    <div className="flex justify-start">
-                      <div className="max-w-[70%] bg-white border rounded-2xl rounded-tl-sm px-4 py-2 shadow-sm">
-                        <p className="text-sm">{activeConvo.notes || "Hi, I had a quick question about my appointment."}</p>
-                        <span className="text-[10px] text-muted-foreground mt-1 block">
-                          {activeConvo.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <div className="max-w-[70%] bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-2 shadow-sm">
-                        <p className="text-sm">Thanks for reaching out! How can we help?</p>
-                        <span className="text-[10px] text-blue-100 mt-1 block">Just now</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 border-t bg-white flex gap-2">
-                    <Input
-                      placeholder="Type a message..."
-                      value={convoDraft}
-                      onChange={(e) => setConvoDraft(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && sendConvoMessage()}
-                    />
-                    <Button
-                      onClick={sendConvoMessage}
-                      disabled={!convoDraft.trim()}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <SendIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                  Select a conversation to start texting
-                </div>
-              )}
-            </div>
-          </div>
-        </Card>
-      ) : (
+      {/* Make the tabs more prominent since they're the main navigation now */}
       <Tabs 
         value={activeTab} 
         onValueChange={handleTabChange}
@@ -657,7 +494,6 @@ const Calls = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      )}
       
       {/* Log Call Modal */}
       <Dialog open={isLogCallModalOpen} onOpenChange={setIsLogCallModalOpen}>

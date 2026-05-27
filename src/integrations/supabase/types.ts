@@ -68,159 +68,6 @@ export type Database = {
         }
         Relationships: []
       }
-      job_sources: {
-        Row: {
-          contact_person: string | null
-          created_at: string
-          created_by: string | null
-          email: string | null
-          id: string
-          is_active: boolean
-          name: string
-          notes: string | null
-          payment_type: Database["public"]["Enums"]["commission_type"]
-          payment_value: number
-          phone: string | null
-          type: string | null
-          updated_at: string
-          website: string | null
-        }
-        Insert: {
-          contact_person?: string | null
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          id?: string
-          is_active?: boolean
-          name: string
-          notes?: string | null
-          payment_type?: Database["public"]["Enums"]["commission_type"]
-          payment_value?: number
-          phone?: string | null
-          type?: string | null
-          updated_at?: string
-          website?: string | null
-        }
-        Update: {
-          contact_person?: string | null
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          id?: string
-          is_active?: boolean
-          name?: string
-          notes?: string | null
-          payment_type?: Database["public"]["Enums"]["commission_type"]
-          payment_value?: number
-          phone?: string | null
-          type?: string | null
-          updated_at?: string
-          website?: string | null
-        }
-        Relationships: []
-      }
-      jobs: {
-        Row: {
-          actual_amount: number | null
-          address: string | null
-          amount: number
-          cancellation_reason: string | null
-          client_email: string | null
-          client_name: string
-          client_phone: string | null
-          company_profit: number
-          created_at: string
-          created_by: string | null
-          description: string | null
-          id: string
-          job_number: string | null
-          job_source_id: string | null
-          job_source_payout: number
-          notes: string | null
-          payment_method: string | null
-          payment_status:
-            | Database["public"]["Enums"]["job_payment_status"]
-            | null
-          scheduled_date: string | null
-          status: Database["public"]["Enums"]["job_status"]
-          technician_id: string | null
-          technician_payout: number
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          actual_amount?: number | null
-          address?: string | null
-          amount?: number
-          cancellation_reason?: string | null
-          client_email?: string | null
-          client_name: string
-          client_phone?: string | null
-          company_profit?: number
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          job_number?: string | null
-          job_source_id?: string | null
-          job_source_payout?: number
-          notes?: string | null
-          payment_method?: string | null
-          payment_status?:
-            | Database["public"]["Enums"]["job_payment_status"]
-            | null
-          scheduled_date?: string | null
-          status?: Database["public"]["Enums"]["job_status"]
-          technician_id?: string | null
-          technician_payout?: number
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          actual_amount?: number | null
-          address?: string | null
-          amount?: number
-          cancellation_reason?: string | null
-          client_email?: string | null
-          client_name?: string
-          client_phone?: string | null
-          company_profit?: number
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          job_number?: string | null
-          job_source_id?: string | null
-          job_source_payout?: number
-          notes?: string | null
-          payment_method?: string | null
-          payment_status?:
-            | Database["public"]["Enums"]["job_payment_status"]
-            | null
-          scheduled_date?: string | null
-          status?: Database["public"]["Enums"]["job_status"]
-          technician_id?: string | null
-          technician_payout?: number
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "jobs_job_source_id_fkey"
-            columns: ["job_source_id"]
-            isOneToOne: false
-            referencedRelation: "job_sources"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "jobs_technician_id_fkey"
-            columns: ["technician_id"]
-            isOneToOne: false
-            referencedRelation: "technicians"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       leads: {
         Row: {
           address: string | null
@@ -299,66 +146,6 @@ export type Database = {
         }
         Relationships: []
       }
-      technicians: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          email: string | null
-          hire_date: string | null
-          hourly_rate: number | null
-          id: string
-          name: string
-          notes: string | null
-          payment_rate: number
-          payment_type: Database["public"]["Enums"]["payment_type"]
-          phone: string | null
-          profile_image: string | null
-          role: Database["public"]["Enums"]["technician_role"]
-          specialty: string | null
-          status: Database["public"]["Enums"]["technician_status"]
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          hire_date?: string | null
-          hourly_rate?: number | null
-          id?: string
-          name: string
-          notes?: string | null
-          payment_rate?: number
-          payment_type?: Database["public"]["Enums"]["payment_type"]
-          phone?: string | null
-          profile_image?: string | null
-          role?: Database["public"]["Enums"]["technician_role"]
-          specialty?: string | null
-          status?: Database["public"]["Enums"]["technician_status"]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          hire_date?: string | null
-          hourly_rate?: number | null
-          id?: string
-          name?: string
-          notes?: string | null
-          payment_rate?: number
-          payment_type?: Database["public"]["Enums"]["payment_type"]
-          phone?: string | null
-          profile_image?: string | null
-          role?: Database["public"]["Enums"]["technician_role"]
-          specialty?: string | null
-          status?: Database["public"]["Enums"]["technician_status"]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -396,19 +183,8 @@ export type Database = {
     Enums: {
       app_role: "admin" | "manager" | "technician" | "employee"
       client_status: "active" | "inactive" | "lead"
-      commission_type: "percentage" | "fixed"
-      job_payment_status: "unpaid" | "partial" | "paid"
-      job_status:
-        | "scheduled"
-        | "in_progress"
-        | "completed"
-        | "cancelled"
-        | "rescheduled"
       lead_status: "active" | "converted" | "inactive"
       payment_status: "current" | "pending" | "overdue"
-      payment_type: "percentage" | "flat" | "hourly" | "salary"
-      technician_role: "technician" | "contractor" | "employee"
-      technician_status: "active" | "inactive" | "on_leave"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -538,20 +314,8 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "manager", "technician", "employee"],
       client_status: ["active", "inactive", "lead"],
-      commission_type: ["percentage", "fixed"],
-      job_payment_status: ["unpaid", "partial", "paid"],
-      job_status: [
-        "scheduled",
-        "in_progress",
-        "completed",
-        "cancelled",
-        "rescheduled",
-      ],
       lead_status: ["active", "converted", "inactive"],
       payment_status: ["current", "pending", "overdue"],
-      payment_type: ["percentage", "flat", "hourly", "salary"],
-      technician_role: ["technician", "contractor", "employee"],
-      technician_status: ["active", "inactive", "on_leave"],
     },
   },
 } as const

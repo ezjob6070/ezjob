@@ -49,7 +49,7 @@ const Technicians = () => {
   useEffect(() => {
     if (globalTechnicians && globalTechnicians.length > 0) {
       // Make sure all required properties are present and have correct types
-      const typedTechnicians: Technician[] = globalTechnicians.map((tech: any) => {
+      const typedTechnicians: Technician[] = globalTechnicians.map(tech => {
         // Generate initials from name if not present
         const nameInitials = tech.name.split(' ').map(n => n[0]).join('').toUpperCase();
         
@@ -151,6 +151,7 @@ const Technicians = () => {
 
   // Get staff counts by role
   const technicianCount = globalTechnicians.filter(tech => (tech.role || "technician") === "technician").length;
+  const salesmanCount = globalTechnicians.filter(tech => tech.role === "salesman").length;
   const employedCount = globalTechnicians.filter(tech => tech.role === "employed").length;
   const contractorCount = globalTechnicians.filter(tech => tech.role === "contractor").length;
   const totalCount = globalTechnicians.length;
@@ -159,6 +160,7 @@ const Technicians = () => {
   const roleColors = {
     all: "#8B7E2F", // Changed to dark yellow to match the All Staff card
     technician: "#0EA5E9",
+    salesman: "#10B981",
     employed: "#8B5CF6",
     contractor: "#F97316"
   };
@@ -170,12 +172,12 @@ const Technicians = () => {
           Team Members
         </h1>
         <p className="text-muted-foreground mt-1">
-          Manage your technicians, contractors and their payment structures
+          Manage your technicians, salesmen, contractors and their payment structures
         </p>
       </div>
       
       {/* Role Filter Buttons - All Staff card now with light yellow background */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <Button
           variant={roleFilter === "all" ? "default" : "outline"}
           onClick={() => setRoleFilter("all")}
@@ -202,7 +204,18 @@ const Technicians = () => {
           <div className={`text-3xl font-bold mt-2 ${roleFilter === "technician" ? "text-white" : "text-[#0EA5E9]"}`}>{technicianCount}</div>
         </Button>
         
-        
+        <Button
+          variant={roleFilter === "salesman" ? "default" : "outline"}
+          onClick={() => setRoleFilter("salesman")}
+          className={`h-48 text-lg font-medium shadow-md hover:shadow-lg transition-all flex flex-col justify-center items-center
+            ${roleFilter === "salesman" 
+              ? "bg-[#10B981] text-white hover:bg-[#0EA874]" 
+              : "hover:bg-[#ECFDF5] hover:text-[#10B981] border-[#10B981]/30"}`}
+        >
+          <Briefcase className={`h-20 w-20 mb-3 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`} />
+          <div className="text-base font-medium">Salesmen</div>
+          <div className={`text-3xl font-bold mt-2 ${roleFilter === "salesman" ? "text-white" : "text-[#10B981]"}`}>{salesmanCount}</div>
+        </Button>
         
         <Button
           variant={roleFilter === "employed" ? "default" : "outline"}
@@ -249,7 +262,7 @@ const Technicians = () => {
         <TechnicianFilters 
           status={statusFilter}
           onStatusChange={setStatusFilter}
-          technicians={globalTechnicians as any}
+          technicians={globalTechnicians}
           selectedTechnicians={selectedTechnicians}
           onTechnicianToggle={toggleTechnician}
           searchQuery={searchQuery}

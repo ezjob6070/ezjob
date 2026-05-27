@@ -7,12 +7,13 @@ export const financeTabOptions = [
   { id: "technicians", label: "Technicians", icon: <Users className="h-5 w-5" /> },
   { id: "contractors", label: "Contractors", icon: <Wrench className="h-5 w-5" /> },
   { id: "employees", label: "Employees", icon: <UserCircle className="h-5 w-5" /> },
+  { id: "salesmen", label: "Salesmen", icon: <Briefcase className="h-5 w-5" /> },
   { id: "transactions", label: "Transactions", icon: <CreditCard className="h-5 w-5" /> },
   { id: "salaries", label: "Salaries", icon: <BadgeDollarSign className="h-5 w-5" /> },
   { id: "office", label: "Office & Others", icon: <Building className="h-5 w-5" /> },
 ];
 
-export type FinanceTabId = "overview" | "jobSources" | "technicians" | "contractors" | "employees" | "transactions" | "salaries" | "office";
+export type FinanceTabId = "overview" | "jobSources" | "technicians" | "contractors" | "employees" | "salesmen" | "transactions" | "salaries" | "office";
 
 // Quote tab options
 export const quoteTabOptions = [

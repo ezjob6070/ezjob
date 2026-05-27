@@ -1,3 +1,175 @@
-import { Job } from "@/components/jobs/JobTypes";
+import { v4 as uuidv4 } from 'uuid';
+import { Job } from '@/components/jobs/JobTypes';
+import { addDays, subDays, format } from 'date-fns';
 
-export const additionalJobs: Job[] = [];
+// Generate additional job data for demo purposes
+export const additionalJobs: Job[] = (() => {
+  const today = new Date();
+  
+  return [
+    {
+      id: uuidv4(),
+      jobNumber: "JOB-2023-011",
+      title: "Solar Panel Installation",
+      clientName: "GreenLife Properties",
+      clientEmail: "info@greenlife.example.com",
+      clientPhone: "555-123-9876",
+      address: "47 Suncrest Avenue, North Hills",
+      description: "Installation of 24-panel solar array with battery backup system",
+      scheduledDate: addDays(today, 15),
+      date: addDays(today, 15), // Add the required date field
+      technicianId: "tech-11",
+      technicianName: "Thomas Cooper",
+      jobSourceId: "source-1",
+      source: "Website Inquiry",
+      status: "scheduled",
+      priority: "medium",
+      amount: 28500,
+      notes: "Customer is interested in tax credit information. Home has metal roof requiring special mounting hardware.",
+      createdAt: format(subDays(today, 5), "yyyy-MM-dd"),
+      category: "Renewable Energy",
+      serviceType: "Installation"
+    },
+    {
+      id: uuidv4(),
+      jobNumber: "JOB-2023-012",
+      title: "Smart Home Integration",
+      clientName: "Alexandra Reynolds",
+      clientEmail: "alex.reynolds@example.com",
+      clientPhone: "555-987-1234",
+      address: "892 Technology Drive, West Heights",
+      description: "Complete smart home setup including lighting, security, climate control and entertainment systems",
+      scheduledDate: addDays(today, 8),
+      date: addDays(today, 8), // Add the required date field
+      technicianId: "tech-12",
+      technicianName: "Rebecca Wong",
+      jobSourceId: "source-2",
+      source: "Trade Show",
+      status: "scheduled",
+      priority: "high",
+      amount: 12800,
+      estimateId: "est-007",
+      notes: "Client has existing Nest thermostats that need to be integrated. Wants voice control throughout house.",
+      createdAt: format(subDays(today, 11), "yyyy-MM-dd"),
+      category: "Smart Home",
+      serviceType: "Installation"
+    },
+    {
+      id: uuidv4(),
+      jobNumber: "JOB-2023-013",
+      title: "Commercial Landscape Design",
+      clientName: "Eastside Business Park",
+      clientEmail: "facilities@eastsidebp.example.com",
+      clientPhone: "555-567-3210",
+      address: "1500 Commerce Parkway, Eastside",
+      description: "Redesign of main entrance landscaping with water-efficient features",
+      scheduledDate: addDays(today, 20),
+      date: addDays(today, 20), // Add the required date field
+      technicianId: "tech-13",
+      technicianName: "Marcus Johnson",
+      jobSourceId: "source-3",
+      source: "Referral",
+      status: "scheduled",
+      priority: "medium",
+      amount: 18200,
+      notes: "Client wants drought-resistant plants and modern hardscaping. Site visit already completed.",
+      createdAt: format(subDays(today, 15), "yyyy-MM-dd"),
+      category: "Landscape",
+      serviceType: "Design"
+    },
+    {
+      id: uuidv4(),
+      jobNumber: "JOB-2023-014",
+      title: "Office Interior Design Consultation",
+      clientName: "Bright Futures Financial",
+      clientEmail: "operations@brightfutures.example.com",
+      clientPhone: "555-222-8765",
+      address: "350 Market Street, Financial District",
+      description: "Interior design consultation for 5,000 sq ft office space renovation",
+      scheduledDate: addDays(today, 4),
+      date: addDays(today, 4), // Add the required date field
+      technicianId: "tech-14",
+      technicianName: "Sophia Martinez",
+      jobSourceId: "source-4",
+      source: "Website",
+      status: "scheduled",
+      priority: "low",
+      amount: 3500,
+      notes: "Initial consultation only. Client may proceed with full design services afterward.",
+      createdAt: format(subDays(today, 6), "yyyy-MM-dd"),
+      category: "Interior Design",
+      serviceType: "Consultation"
+    },
+    {
+      id: uuidv4(),
+      jobNumber: "JOB-2023-015",
+      title: "Security System Installation",
+      clientName: "Premium Auto Gallery",
+      clientEmail: "security@premiumauto.example.com",
+      clientPhone: "555-876-2345",
+      address: "788 Luxury Avenue, Auto District",
+      description: "Installation of comprehensive security system for high-end auto dealership",
+      scheduledDate: addDays(today, 12),
+      date: addDays(today, 12), // Add the required date field
+      technicianId: "tech-15",
+      technicianName: "Derek Foster",
+      jobSourceId: "source-5",
+      source: "Direct Call",
+      status: "scheduled",
+      priority: "urgent",
+      amount: 32500,
+      estimateId: "est-008",
+      notes: "24/7 monitoring required. System must include perimeter sensors, motion detection, and HD cameras.",
+      createdAt: format(subDays(today, 8), "yyyy-MM-dd"),
+      category: "Security",
+      serviceType: "Installation"
+    },
+    {
+      id: uuidv4(),
+      jobNumber: "JOB-2023-016",
+      title: "Kitchen Remodeling",
+      clientName: "Jennifer and Michael Thompson",
+      clientEmail: "thompsonhome@example.com",
+      clientPhone: "555-345-6789",
+      address: "437 Maple Street, Brookside",
+      description: "Complete kitchen renovation with new appliances, cabinets, countertops, and flooring",
+      scheduledDate: addDays(today, 25),
+      date: addDays(today, 25), // Add the required date field
+      technicianId: "tech-4",
+      technicianName: "Jennifer Lopez",
+      jobSourceId: "source-6",
+      source: "Referral",
+      status: "scheduled",
+      priority: "medium",
+      amount: 42800,
+      estimateId: "est-009",
+      notes: "Homeowners will be on vacation during first week of work. Key will be with neighbor.",
+      createdAt: format(subDays(today, 21), "yyyy-MM-dd"),
+      category: "Remodeling",
+      serviceType: "Renovation"
+    },
+    {
+      id: uuidv4(),
+      jobNumber: "JOB-2023-017",
+      title: "Emergency Plumbing Repair",
+      clientName: "Summit Towers Apartments",
+      clientEmail: "maintenance@summittowers.example.com",
+      clientPhone: "555-999-8888",
+      address: "2700 Highland Avenue, Midtown",
+      description: "Emergency repair of leaking water main in building basement",
+      scheduledDate: today,
+      date: today, // Add the required date field
+      technicianId: "tech-3",
+      technicianName: "Michael Rodriguez",
+      jobSourceId: "source-7",
+      source: "Emergency Call",
+      status: "scheduled",
+      priority: "urgent",
+      amount: 3800,
+      notes: "Water currently shut off to building. Requires immediate attention.",
+      createdAt: format(today, "yyyy-MM-dd"),
+      category: "Plumbing",
+      serviceType: "Repair"
+    }
+  ];
+})();

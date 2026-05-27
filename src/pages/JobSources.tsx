@@ -37,7 +37,7 @@ const JobSources = () => {
       notes: newJobSource.notes || ''
     };
     
-    addJobSource(completeJobSource as any);
+    addJobSource(completeJobSource);
     toast({
       title: "Job Source Created",
       description: "New job source has been added successfully."
@@ -58,7 +58,7 @@ const JobSources = () => {
         : new Date().toISOString()
     };
     
-    updateJobSource(formattedJobSource.id, formattedJobSource as any);
+    updateJobSource(formattedJobSource.id, formattedJobSource);
     toast({
       title: "Job Source Updated",
       description: "Job source has been updated successfully."

@@ -1,23 +1,18 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
+
+import React, { createContext, useState, useContext, ReactNode } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
-import { supabase } from "@/integrations/supabase/client";
 
+// Define mock data types
 interface Job {
   id: string;
   title: string;
   clientName: string;
   scheduledDate?: string;
-  date?: string;
-  status: "completed" | "in_progress" | "canceled" | "cancelled" | "scheduled" | "rescheduled" | string;
+  status: "completed" | "in_progress" | "canceled" | "scheduled" | "rescheduled";
   amount: number;
   actualAmount?: number;
-  technicianId?: string;
-  jobSourceId?: string;
-  technicianPayout?: number;
-  jobSourcePayout?: number;
-  companyProfit?: number;
-  [key: string]: any;
+  // Add other job properties as needed
 }
 
 interface Technician {
@@ -25,24 +20,36 @@ interface Technician {
   name: string;
   email: string;
   phone?: string;
-  specialty?: string;
-  hireDate: string;
-  status: "active" | "inactive" | "onLeave" | "on_leave" | string;
-  paymentType: "percentage" | "flat" | "hourly" | "salary" | string;
+  address?: string;
+  position?: string;
+  department?: string;
+  hireDate: string; // Keep this as string only, not Date
+  startDate?: string;
+  status: "active" | "inactive" | "onLeave";
+  specialty: string;
+  paymentType: "percentage" | "flat" | "hourly" | "salary"; // Add "salary" as valid option
   paymentRate: number;
   hourlyRate: number;
+  salaryBasis?: string;
+  incentiveType?: string;
+  incentiveAmount?: number;
+  rating?: number;
   completedJobs?: number;
   cancelledJobs?: number;
   totalRevenue?: number;
-  rating?: number;
-  salaryBasis?: string;
-  [key: string]: any;
+  notes?: string;
+  profileImage?: string;
+  imageUrl?: string;
+  certifications?: string[];
+  skills?: string[];
+  category?: string;
+  // Add other technician properties as needed
 }
 
 interface JobSource {
   id: string;
   name: string;
-  type: string;
+  type?: string;
   paymentType?: string;
   paymentValue?: number;
   isActive?: boolean;
@@ -50,7 +57,7 @@ interface JobSource {
   totalRevenue?: number;
   profit?: number;
   createdAt?: string;
-  [key: string]: any;
+  // Add other jobSource properties as needed
 }
 
 interface GlobalStateContextProps {
@@ -60,11 +67,10 @@ interface GlobalStateContextProps {
   setDateFilter: (range: DateRange | undefined) => void;
   serviceCategory: string;
   setServiceCategory: (category: string) => void;
+  // Add missing properties that are being used in other components
   jobs: Job[];
   technicians: Technician[];
   jobSources: JobSource[];
-  loading: boolean;
-  refresh: () => Promise<void>;
   addJob?: (job: Job) => void;
   completeJob?: (id: string) => void;
   cancelJob?: (id: string) => void;
@@ -78,7 +84,9 @@ const GlobalStateContext = createContext<GlobalStateContextProps | undefined>(un
 
 export const useGlobalState = () => {
   const context = useContext(GlobalStateContext);
-  if (!context) throw new Error("useGlobalState must be used within a GlobalStateProvider");
+  if (!context) {
+    throw new Error("useGlobalState must be used within a GlobalStateProvider");
+  }
   return context;
 };
 
@@ -86,183 +94,142 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
   const [currentIndustry, setCurrentIndustry] = useState("service");
   const [dateFilter, setDateFilter] = useState<DateRange | undefined>({
     from: new Date(),
-    to: addDays(new Date(), 7),
+    to: addDays(new Date(), 7)
   });
   const [serviceCategory, setServiceCategory] = useState("All Services");
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
-  const [jobSources, setJobSources] = useState<JobSource[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Mock data for jobs
+  const [jobs, setJobs] = useState<Job[]>([
+    {
+      id: "job-1",
+      title: "AC Repair",
+      clientName: "John Doe",
+      scheduledDate: "2023-05-02",
+      status: "completed",
+      amount: 250
+    },
+    {
+      id: "job-2",
+      title: "Plumbing Installation",
+      clientName: "Jane Smith",
+      scheduledDate: "2023-05-03",
+      status: "in_progress",
+      amount: 350
+    },
+    {
+      id: "job-3",
+      title: "Electrical Work",
+      clientName: "Robert Johnson",
+      scheduledDate: "2023-05-04",
+      status: "scheduled",
+      amount: 400
+    }
+  ]);
 
-  const fetchAll = async () => {
-    setLoading(true);
-    const [jobsRes, techRes, srcRes] = await Promise.all([
-      supabase.from("jobs").select("*").order("scheduled_date", { ascending: false, nullsFirst: false }),
-      supabase.from("technicians").select("*").order("name"),
-      supabase.from("job_sources").select("*").order("name"),
-    ]);
+  // Mock data for technicians
+  const [technicians, setTechnicians] = useState<Technician[]>([
+    { 
+      id: "tech-1", 
+      name: "Mike Wilson", 
+      email: "mike@example.com", 
+      specialty: "HVAC",
+      hireDate: "2023-01-15",
+      status: "active",
+      paymentType: "percentage",
+      paymentRate: 25,
+      hourlyRate: 20
+    },
+    { 
+      id: "tech-2", 
+      name: "Sarah Johnson", 
+      email: "sarah@example.com", 
+      specialty: "Plumbing",
+      hireDate: "2023-02-20",
+      status: "active",
+      paymentType: "hourly",
+      paymentRate: 30,
+      hourlyRate: 30
+    }
+  ]);
 
-    const mappedJobs: Job[] = (jobsRes.data || []).map((j: any) => ({
-      id: j.id,
-      title: j.title,
-      clientName: j.client_name,
-      scheduledDate: j.scheduled_date,
-      status: j.status,
-      amount: Number(j.amount) || 0,
-      actualAmount: j.actual_amount != null ? Number(j.actual_amount) : undefined,
-      technicianId: j.technician_id,
-      jobSourceId: j.job_source_id,
-      technicianPayout: Number(j.technician_payout) || 0,
-      jobSourcePayout: Number(j.job_source_payout) || 0,
-      companyProfit: Number(j.company_profit) || 0,
-    }));
+  // Mock data for job sources
+  const [jobSources, setJobSources] = useState<JobSource[]>([
+    { 
+      id: "source-1", 
+      name: "Website",
+      type: "Online",
+      paymentType: "Fixed",
+      paymentValue: 100,
+      isActive: true,
+      totalJobs: 25,
+      totalRevenue: 5000,
+      profit: 2000,
+      createdAt: "2023-01-01"
+    },
+    { 
+      id: "source-2", 
+      name: "Referral",
+      type: "Personal",
+      paymentType: "Percentage",
+      paymentValue: 10,
+      isActive: true,
+      totalJobs: 15,
+      totalRevenue: 3000,
+      profit: 1500,
+      createdAt: "2023-02-01"
+    }
+  ]);
 
-    const mappedTechs: Technician[] = (techRes.data || []).map((t: any) => ({
-      id: t.id,
-      name: t.name,
-      email: t.email || "",
-      phone: t.phone || undefined,
-      specialty: t.specialty || "",
-      hireDate: t.hire_date || "",
-      status: t.status,
-      paymentType: t.payment_type,
-      paymentRate: Number(t.payment_rate) || 0,
-      hourlyRate: Number(t.hourly_rate) || 0,
-    }));
-
-    const mappedSources: JobSource[] = (srcRes.data || []).map((s: any) => {
-      const sourceJobs = mappedJobs.filter((j) => j.jobSourceId === s.id);
-      const totalRevenue = sourceJobs.reduce((sum, j) => sum + (j.actualAmount ?? j.amount ?? 0), 0);
-      const profit = sourceJobs.reduce((sum, j) => sum + (j.companyProfit ?? 0), 0);
-      return {
-        id: s.id,
-        name: s.name,
-        type: s.type || undefined,
-        paymentType: s.payment_type,
-        paymentValue: Number(s.payment_value) || 0,
-        isActive: s.is_active,
-        totalJobs: sourceJobs.length,
-        totalRevenue,
-        profit,
-        createdAt: s.created_at,
-      };
-    });
-
-    setJobs(mappedJobs);
-    setTechnicians(mappedTechs);
-    setJobSources(mappedSources);
-    setLoading(false);
+  // Job management functions
+  const addJob = (job: Job) => {
+    setJobs([...jobs, job]);
   };
 
-  useEffect(() => {
-    fetchAll();
-
-    const channel = supabase
-      .channel("global-state-sync")
-      .on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, fetchAll)
-      .on("postgres_changes", { event: "*", schema: "public", table: "technicians" }, fetchAll)
-      .on("postgres_changes", { event: "*", schema: "public", table: "job_sources" }, fetchAll)
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const techToRow = (t: Partial<Technician>) => ({
-    name: t.name,
-    email: t.email || null,
-    phone: t.phone || null,
-    specialty: t.specialty || null,
-    status: (t.status === "onLeave" ? "on_leave" : t.status) || "active",
-    payment_type: t.paymentType || "percentage",
-    payment_rate: Number(t.paymentRate) || 0,
-    hourly_rate: Number(t.hourlyRate) || 0,
-    role: (t as any).role || "technician",
-    hire_date: (t as any).hireDate || null,
-    notes: (t as any).notes || null,
-  });
-
-  const sourceToRow = (s: Partial<JobSource>) => ({
-    name: s.name,
-    type: s.type || "general",
-    payment_type: (s.paymentType as any) || "percentage",
-    payment_value: Number(s.paymentValue) || 0,
-    is_active: s.isActive !== false,
-    website: (s as any).website || null,
-    phone: (s as any).phone || null,
-    email: (s as any).email || null,
-    notes: (s as any).notes || null,
-  });
-
-  const addTechnician = async (t: Technician) => {
-    const { error } = await supabase.from("technicians").insert(techToRow(t) as any);
-    if (error) console.error("addTechnician:", error);
-    fetchAll();
-  };
-  const updateTechnician = async (id: string, t: Technician) => {
-    const { error } = await supabase.from("technicians").update(techToRow(t) as any).eq("id", id);
-    if (error) console.error("updateTechnician:", error);
-    fetchAll();
-  };
-  const addJobSource = async (s: JobSource) => {
-    const { error } = await supabase.from("job_sources").insert(sourceToRow(s) as any);
-    if (error) console.error("addJobSource:", error);
-    fetchAll();
-  };
-  const updateJobSource = async (id: string, s: JobSource) => {
-    const { error } = await supabase.from("job_sources").update(sourceToRow(s) as any).eq("id", id);
-    if (error) console.error("updateJobSource:", error);
-    fetchAll();
+  const completeJob = (id: string) => {
+    setJobs(jobs.map(job => job.id === id ? {...job, status: "completed"} : job));
   };
 
-  const addJob = async (j: Job) => {
-    const { error } = await supabase.from("jobs").insert({
-      title: j.title,
-      client_name: j.clientName,
-      scheduled_date: j.scheduledDate || null,
-      status: j.status || "scheduled",
-      amount: Number(j.amount) || 0,
-      actual_amount: j.actualAmount != null ? Number(j.actualAmount) : null,
-      technician_id: j.technicianId || null,
-      job_source_id: j.jobSourceId || null,
-    } as any);
-    if (error) console.error("addJob:", error);
-    fetchAll();
+  const cancelJob = (id: string) => {
+    setJobs(jobs.map(job => job.id === id ? {...job, status: "canceled"} : job));
   };
-  const completeJob = async (id: string) => {
-    await supabase.from("jobs").update({ status: "completed" } as any).eq("id", id);
-    fetchAll();
+
+  // Technician management functions
+  const addTechnician = (technician: Technician) => {
+    setTechnicians([...technicians, technician]);
   };
-  const cancelJob = async (id: string) => {
-    await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", id);
-    fetchAll();
+
+  const updateTechnician = (id: string, updatedTechnician: Technician) => {
+    setTechnicians(technicians.map(tech => tech.id === id ? updatedTechnician : tech));
+  };
+
+  // Job source management functions
+  const addJobSource = (jobSource: JobSource) => {
+    setJobSources([...jobSources, jobSource]);
+  };
+
+  const updateJobSource = (id: string, updatedJobSource: JobSource) => {
+    setJobSources(jobSources.map(source => source.id === id ? updatedJobSource : source));
   };
 
   return (
-    <GlobalStateContext.Provider
-      value={{
-        currentIndustry,
-        setCurrentIndustry,
-        dateFilter,
-        setDateFilter,
-        serviceCategory,
-        setServiceCategory,
-        jobs,
-        technicians,
-        jobSources,
-        loading,
-        refresh: fetchAll,
-        addJob,
-        completeJob,
-        cancelJob,
-        addTechnician,
-        updateTechnician,
-        addJobSource,
-        updateJobSource,
-      }}
-    >
+    <GlobalStateContext.Provider value={{
+      currentIndustry,
+      setCurrentIndustry,
+      dateFilter,
+      setDateFilter,
+      serviceCategory,
+      setServiceCategory,
+      jobs,
+      technicians,
+      jobSources,
+      addJob,
+      completeJob,
+      cancelJob,
+      addTechnician,
+      updateTechnician,
+      addJobSource,
+      updateJobSource
+    }}>
       {children}
     </GlobalStateContext.Provider>
   );
