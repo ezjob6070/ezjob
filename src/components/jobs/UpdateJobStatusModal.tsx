@@ -110,6 +110,8 @@ const UpdateJobStatusModal: React.FC<UpdateJobStatusModalProps> = ({
     } else if (status === "estimate" && onSendToEstimate) {
       // Handle sending job to estimate
       onSendToEstimate(job);
+    } else if ((status === "scheduled" || status === "in_progress") && onReopen) {
+      onReopen(job.id, status);
     }
     
     // Close the modal after action is taken
