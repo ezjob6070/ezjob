@@ -25,7 +25,7 @@ interface Technician {
   name: string;
   email: string;
   phone?: string;
-  specialty: string;
+  specialty?: string;
   hireDate: string;
   status: "active" | "inactive" | "onLeave";
   paymentType: "percentage" | "flat" | "hourly" | "salary";
