@@ -65,6 +65,13 @@ interface GlobalStateContextProps {
   jobSources: JobSource[];
   loading: boolean;
   refresh: () => Promise<void>;
+  addJob?: (job: Job) => void;
+  completeJob?: (id: string) => void;
+  cancelJob?: (id: string) => void;
+  addTechnician?: (technician: Technician) => void;
+  updateTechnician?: (id: string, technician: Technician) => void;
+  addJobSource?: (jobSource: JobSource) => void;
+  updateJobSource?: (id: string, jobSource: JobSource) => void;
 }
 
 const GlobalStateContext = createContext<GlobalStateContextProps | undefined>(undefined);
