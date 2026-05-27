@@ -131,12 +131,14 @@ const JobTabs: React.FC<JobTabsProps> = ({
       {/* Job status modal */}
       <UpdateJobStatusModal
         open={isStatusModalOpen}
-        onOpenChange={closeStatusModal}
+        onOpenChange={(open) => { if (!open) closeStatusModal(); }}
         job={selectedJob}
+        initialStatus={initialStatusAction}
         onCancel={onCancelJob}
         onComplete={onCompleteJob}
         onReschedule={onRescheduleJob}
         onSendToEstimate={onSendToEstimate}
+        onReopen={onReopenJob}
       />
     </div>
   );
