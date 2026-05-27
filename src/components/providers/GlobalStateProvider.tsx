@@ -170,6 +170,76 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
+  const techToRow = (t: Partial<Technician>) => ({
+    name: t.name,
+    email: t.email || null,
+    phone: t.phone || null,
+    specialty: t.specialty || null,
+    status: (t.status === "onLeave" ? "on_leave" : t.status) || "active",
+    payment_type: t.paymentType || "percentage",
+    payment_rate: Number(t.paymentRate) || 0,
+    hourly_rate: Number(t.hourlyRate) || 0,
+    role: (t as any).role || "technician",
+    hire_date: (t as any).hireDate || null,
+    notes: (t as any).notes || null,
+  });
+
+  const sourceToRow = (s: Partial<JobSource>) => ({
+    name: s.name,
+    type: s.type || "general",
+    payment_type: (s.paymentType as any) || "percentage",
+    payment_value: Number(s.paymentValue) || 0,
+    is_active: s.isActive !== false,
+    website: (s as any).website || null,
+    phone: (s as any).phone || null,
+    email: (s as any).email || null,
+    notes: (s as any).notes || null,
+  });
+
+  const addTechnician = async (t: Technician) => {
+    const { error } = await supabase.from("technicians").insert(techToRow(t) as any);
+    if (error) console.error("addTechnician:", error);
+    fetchAll();
+  };
+  const updateTechnician = async (id: string, t: Technician) => {
+    const { error } = await supabase.from("technicians").update(techToRow(t) as any).eq("id", id);
+    if (error) console.error("updateTechnician:", error);
+    fetchAll();
+  };
+  const addJobSource = async (s: JobSource) => {
+    const { error } = await supabase.from("job_sources").insert(sourceToRow(s) as any);
+    if (error) console.error("addJobSource:", error);
+    fetchAll();
+  };
+  const updateJobSource = async (id: string, s: JobSource) => {
+    const { error } = await supabase.from("job_sources").update(sourceToRow(s) as any).eq("id", id);
+    if (error) console.error("updateJobSource:", error);
+    fetchAll();
+  };
+
+  const addJob = async (j: Job) => {
+    const { error } = await supabase.from("jobs").insert({
+      title: j.title,
+      client_name: j.clientName,
+      scheduled_date: j.scheduledDate || null,
+      status: j.status || "scheduled",
+      amount: Number(j.amount) || 0,
+      actual_amount: j.actualAmount != null ? Number(j.actualAmount) : null,
+      technician_id: j.technicianId || null,
+      job_source_id: j.jobSourceId || null,
+    } as any);
+    if (error) console.error("addJob:", error);
+    fetchAll();
+  };
+  const completeJob = async (id: string) => {
+    await supabase.from("jobs").update({ status: "completed" } as any).eq("id", id);
+    fetchAll();
+  };
+  const cancelJob = async (id: string) => {
+    await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", id);
+    fetchAll();
+  };
+
   return (
     <GlobalStateContext.Provider
       value={{
@@ -184,6 +254,13 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
         jobSources,
         loading,
         refresh: fetchAll,
+        addJob,
+        completeJob,
+        cancelJob,
+        addTechnician,
+        updateTechnician,
+        addJobSource,
+        updateJobSource,
       }}
     >
       {children}
