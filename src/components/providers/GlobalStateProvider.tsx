@@ -9,7 +9,7 @@ interface Job {
   clientName: string;
   scheduledDate?: string;
   date?: string;
-  status: "completed" | "in_progress" | "canceled" | "scheduled" | "rescheduled";
+  status: "completed" | "in_progress" | "canceled" | "cancelled" | "scheduled" | "rescheduled" | string;
   amount: number;
   actualAmount?: number;
   technicianId?: string;
