@@ -8,10 +8,13 @@ interface Job {
   id: string;
   title: string;
   clientName: string;
-  scheduledDate?: string;
-  status: "completed" | "in_progress" | "canceled" | "scheduled" | "rescheduled";
+  scheduledDate?: string | Date;
+  status: "completed" | "in_progress" | "canceled" | "cancelled" | "scheduled" | "rescheduled";
   amount: number;
   actualAmount?: number;
+  date?: string | Date;
+  cancellationReason?: string;
+  isAllDay?: boolean;
   // Add other job properties as needed
 }
 
@@ -74,6 +77,7 @@ interface GlobalStateContextProps {
   addJob?: (job: Job) => void;
   completeJob?: (id: string) => void;
   cancelJob?: (id: string) => void;
+  updateJob?: (id: string, updates: Partial<Job>) => void;
   addTechnician?: (technician: Technician) => void;
   updateTechnician?: (id: string, technician: Technician) => void;
   addJobSource?: (jobSource: JobSource) => void;
@@ -182,15 +186,19 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
 
   // Job management functions
   const addJob = (job: Job) => {
-    setJobs([...jobs, job]);
+    setJobs((prevJobs) => [...prevJobs, job]);
   };
 
   const completeJob = (id: string) => {
-    setJobs(jobs.map(job => job.id === id ? {...job, status: "completed"} : job));
+    setJobs((prevJobs) => prevJobs.map(job => job.id === id ? {...job, status: "completed"} : job));
   };
 
   const cancelJob = (id: string) => {
-    setJobs(jobs.map(job => job.id === id ? {...job, status: "canceled"} : job));
+    setJobs((prevJobs) => prevJobs.map(job => job.id === id ? {...job, status: "canceled"} : job));
+  };
+
+  const updateJob = (id: string, updates: Partial<Job>) => {
+    setJobs((prevJobs) => prevJobs.map(job => job.id === id ? { ...job, ...updates } : job));
   };
 
   // Technician management functions
@@ -225,6 +233,7 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
       addJob,
       completeJob,
       cancelJob,
+      updateJob,
       addTechnician,
       updateTechnician,
       addJobSource,
