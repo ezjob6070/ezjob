@@ -69,10 +69,10 @@ export default function AddReminderDialog({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={newReminder.start}
+                    selected={newReminder.start ? new Date(newReminder.start) : undefined}
                     onSelect={(date) => {
                       if (date) {
-                        const currentStart = newReminder.start;
+                        const currentStart = new Date(newReminder.start ?? new Date());
                         const hours = currentStart.getHours();
                         const minutes = currentStart.getMinutes();
                         
@@ -94,11 +94,11 @@ export default function AddReminderDialog({
               <div>
                 <Input 
                   type="time"
-                  value={`${newReminder.start.getHours().toString().padStart(2, '0')}:${newReminder.start.getMinutes().toString().padStart(2, '0')}`}
+                  value={`${new Date(newReminder.start ?? new Date()).getHours().toString().padStart(2, '0')}:${new Date(newReminder.start ?? new Date()).getMinutes().toString().padStart(2, '0')}`}
                   onChange={(e) => {
                     const [hours, minutes] = e.target.value.split(':').map(Number);
                     
-                    const newDate = new Date(newReminder.start);
+                    const newDate = new Date(newReminder.start ?? new Date());
                     newDate.setHours(hours, minutes);
                     
                     setNewReminder({

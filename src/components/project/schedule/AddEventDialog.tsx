@@ -84,7 +84,7 @@ export default function AddEventDialog({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={newEvent.start}
+                    selected={newEvent.start ? new Date(newEvent.start) : undefined}
                     onSelect={(date) => setNewEvent({ ...newEvent, start: date || new Date() })}
                     className="rounded-md border"
                   />
@@ -112,7 +112,7 @@ export default function AddEventDialog({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={newEvent.end}
+                    selected={newEvent.end ? new Date(newEvent.end) : undefined}
                     onSelect={(date) => setNewEvent({ ...newEvent, end: date || new Date() })}
                     className="rounded-md border"
                   />

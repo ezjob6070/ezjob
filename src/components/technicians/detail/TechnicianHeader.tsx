@@ -9,9 +9,10 @@ import { CalendarDays, Mail, Phone, MapPin, Star, CheckCircle, XCircle, AlertCir
 
 interface TechnicianHeaderProps {
   technician: Technician;
+  onEditClick?: () => void;
 }
 
-const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({ technician }) => {
+const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({ technician, onEditClick }) => {
   // Convert status to correct format for comparison
   const normalizedStatus = technician.status === "on_leave" ? "onLeave" : technician.status;
   
@@ -134,7 +135,7 @@ const TechnicianHeader: React.FC<TechnicianHeaderProps> = ({ technician }) => {
           </div>
 
           <div className="flex flex-col gap-2 mt-4 md:mt-0">
-            <Button variant="outline">Edit Profile</Button>
+            <Button variant="outline" onClick={onEditClick}>Edit Profile</Button>
             <Button variant="outline">View Schedule</Button>
             <Button variant="outline">Performance</Button>
           </div>
