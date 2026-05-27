@@ -2,66 +2,9 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
-
-// Define mock data types
-interface Job {
-  id: string;
-  title: string;
-  clientName: string;
-  scheduledDate?: string | Date;
-  status: "completed" | "in_progress" | "canceled" | "cancelled" | "scheduled" | "rescheduled";
-  amount: number;
-  actualAmount?: number;
-  date?: string | Date;
-  cancellationReason?: string;
-  isAllDay?: boolean;
-  // Add other job properties as needed
-}
-
-interface Technician {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  position?: string;
-  department?: string;
-  hireDate: string; // Keep this as string only, not Date
-  startDate?: string;
-  status: "active" | "inactive" | "onLeave";
-  specialty: string;
-  paymentType: "percentage" | "flat" | "hourly" | "salary"; // Add "salary" as valid option
-  paymentRate: number;
-  hourlyRate: number;
-  salaryBasis?: string;
-  incentiveType?: string;
-  incentiveAmount?: number;
-  rating?: number;
-  completedJobs?: number;
-  cancelledJobs?: number;
-  totalRevenue?: number;
-  notes?: string;
-  profileImage?: string;
-  imageUrl?: string;
-  certifications?: string[];
-  skills?: string[];
-  category?: string;
-  // Add other technician properties as needed
-}
-
-interface JobSource {
-  id: string;
-  name: string;
-  type?: string;
-  paymentType?: string;
-  paymentValue?: number;
-  isActive?: boolean;
-  totalJobs?: number;
-  totalRevenue?: number;
-  profit?: number;
-  createdAt?: string;
-  // Add other jobSource properties as needed
-}
+import type { Job } from "@/components/jobs/JobTypes";
+import type { Technician } from "@/types/technician";
+import type { JobSource } from "@/types/jobSource";
 
 interface GlobalStateContextProps {
   currentIndustry: string;
@@ -75,8 +18,8 @@ interface GlobalStateContextProps {
   technicians: Technician[];
   jobSources: JobSource[];
   addJob?: (job: Job) => void;
-  completeJob?: (id: string) => void;
-  cancelJob?: (id: string) => void;
+  completeJob?: (id: string, actualAmount?: number) => void;
+  cancelJob?: (id: string, cancellationReason?: string) => void;
   updateJob?: (id: string, updates: Partial<Job>) => void;
   addTechnician?: (technician: Technician) => void;
   updateTechnician?: (id: string, technician: Technician) => void;
@@ -109,24 +52,31 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
       title: "AC Repair",
       clientName: "John Doe",
       scheduledDate: "2023-05-02",
+      date: "2023-05-02",
       status: "completed",
-      amount: 250
+      amount: 250,
+      actualAmount: 250,
+      address: "123 Main St"
     },
     {
       id: "job-2",
       title: "Plumbing Installation",
       clientName: "Jane Smith",
       scheduledDate: "2023-05-03",
+      date: "2023-05-03",
       status: "in_progress",
-      amount: 350
+      amount: 350,
+      address: "456 Oak Ave"
     },
     {
       id: "job-3",
       title: "Electrical Work",
       clientName: "Robert Johnson",
       scheduledDate: "2023-05-04",
+      date: "2023-05-04",
       status: "scheduled",
-      amount: 400
+      amount: 400,
+      address: "789 Pine Rd"
     }
   ]);
 
@@ -139,9 +89,15 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
       specialty: "HVAC",
       hireDate: "2023-01-15",
       status: "active",
+      role: "technician",
       paymentType: "percentage",
       paymentRate: 25,
-      hourlyRate: 20
+      hourlyRate: 20,
+      salaryBasis: "hourly",
+      completedJobs: 12,
+      cancelledJobs: 1,
+      totalRevenue: 18000,
+      rating: 4.8
     },
     { 
       id: "tech-2", 
@@ -150,9 +106,15 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
       specialty: "Plumbing",
       hireDate: "2023-02-20",
       status: "active",
+      role: "contractor",
       paymentType: "hourly",
       paymentRate: 30,
-      hourlyRate: 30
+      hourlyRate: 30,
+      salaryBasis: "hourly",
+      completedJobs: 9,
+      cancelledJobs: 0,
+      totalRevenue: 12600,
+      rating: 4.7
     }
   ]);
 
@@ -189,12 +151,21 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     setJobs((prevJobs) => [...prevJobs, job]);
   };
 
-  const completeJob = (id: string) => {
-    setJobs((prevJobs) => prevJobs.map(job => job.id === id ? {...job, status: "completed"} : job));
+  const completeJob = (id: string, actualAmount?: number) => {
+    setJobs((prevJobs) => prevJobs.map(job => job.id === id ? {
+      ...job,
+      status: "completed",
+      actualAmount: actualAmount ?? job.amount,
+      cancellationReason: undefined,
+    } : job));
   };
 
-  const cancelJob = (id: string) => {
-    setJobs((prevJobs) => prevJobs.map(job => job.id === id ? {...job, status: "canceled"} : job));
+  const cancelJob = (id: string, cancellationReason?: string) => {
+    setJobs((prevJobs) => prevJobs.map(job => job.id === id ? {
+      ...job,
+      status: "cancelled",
+      cancellationReason: cancellationReason ?? "No reason provided",
+    } : job));
   };
 
   const updateJob = (id: string, updates: Partial<Job>) => {
