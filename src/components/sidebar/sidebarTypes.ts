@@ -13,6 +13,7 @@ export type NavItem = {
 
 export type SidebarProps = {
   isMobile: boolean;
+  mobileExpanded?: boolean;
 };
 
 export type NavItemProps = {

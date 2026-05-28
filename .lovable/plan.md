@@ -1,54 +1,63 @@
-# Convert EZ Job into an Installable Web App (PWA)
+# Make EZ Job fit properly on phone screens
 
-Make the app installable on iPhone and Android home screens via the browser's "Add to Home Screen" flow. No app store, no native tooling required.
+## The issue
 
-## What customers will experience
+Right now the app was designed for desktop monitors. When opened on a phone (even installed as a PWA), everything looks tiny because the same wide desktop layout is squeezed into a 375px screen. Tables, sidebars, and dashboards don't reflow — they just shrink.
 
-- They visit your published URL (`ezjob.lovable.app` or your custom domain) on their phone.
-- A prompt (or browser menu → "Add to Home Screen") lets them install it.
-- The app launches fullscreen from their home screen with the EZ Job icon, no browser bar.
-- Works offline for previously viewed pages and loads instantly on repeat visits.
+The fix is to add proper **mobile responsiveness** so the UI rearranges itself based on screen size, instead of just scaling down.
 
-## What I'll build
+## What I'll change
 
-1. **Install `vite-plugin-pwa`** and wire it into `vite.config.ts` with safe defaults:
-   - `registerType: "autoUpdate"` so new releases roll out automatically.
-   - `devOptions.enabled: false` — service worker only runs in production, never inside the Lovable editor preview.
-   - `navigateFallbackDenylist: [/^\/~oauth/]` to keep auth flows untouched.
-   - `NetworkFirst` strategy for HTML so users never get stuck on a stale shell.
+**1. Sidebar → mobile drawer**
+- On phones, hide the fixed left sidebar and replace it with a hamburger menu (top-left) that opens a slide-in drawer.
+- Main content gets the full width back (remove the `ml-16` desktop offset on mobile).
 
-2. **Web App Manifest** (`manifest.webmanifest`) with:
-   - Name: "EZ Job", short name: "EZ Job"
-   - `display: "standalone"`, `theme_color` and `background_color` matching the blue brand
-   - Icons at 192×192, 512×512, and a maskable 512×512 (generated from the existing brand)
-   - `start_url: "/"`, `scope: "/"`
+**2. Header / top bar**
+- Stack title + actions vertically on small screens.
+- Shrink padding (`p-4 md:p-6` → tighter on mobile).
+- Make search bars full-width on mobile.
 
-3. **Update `index.html`** with mobile-optimized meta tags:
-   - `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`
-   - `apple-touch-icon` link (iOS doesn't use the manifest icons for install)
-   - Theme color meta tag
+**3. Tables → cards on mobile**
+- Jobs table, Clients table, Leads table, Technicians table, Estimates list: on screens <768px, render each row as a stacked card (client name, status badge, amount, date, actions) instead of a horizontally-scrolling table.
+- Keeps all info visible without pinch-zoom.
 
-4. **Iframe/preview safety guard** in `src/main.tsx` — unregister any service workers when the app loads inside the Lovable editor preview, so you keep getting fresh builds while developing.
+**4. Dashboard grids**
+- Metric cards: `grid-cols-1` on mobile, `sm:grid-cols-2`, `lg:grid-cols-4`.
+- Charts: full-width, reduced height on mobile.
+- Two-column sections (Tickets + Performance) stack vertically on phones.
 
-5. **`/install` page** — a simple page with platform-aware instructions ("On iPhone: tap Share → Add to Home Screen", "On Android: tap menu → Install app") and an install button that fires the native prompt when available. You can share this link with customers.
+**5. Dialogs and modals**
+- Convert large dialogs (Job details, Add Client, Edit Technician, Job Status) to use a bottom-sheet style on mobile via the existing `Drawer` component, while keeping `Dialog` on desktop.
 
-6. **Generate PWA icons** matching the EZ Job blue brand and drop them in `public/`.
+**6. Forms**
+- Make inputs full-width on mobile, stack label+field vertically, increase tap target sizes (min `h-11`).
 
-## Important caveats
+**7. Touch targets and font sizing**
+- Buttons: minimum `h-10` on mobile.
+- Base font stays readable (no shrinking below 14px).
+- Add viewport meta is already correct in `index.html`.
 
-- **Install prompt only works in the published/deployed site** (`ezjob.lovable.app` or your custom domain), not in the Lovable editor preview. This is a browser security requirement, not a bug.
-- **iOS Safari** doesn't show an automatic install banner — users must use Share → Add to Home Screen. The `/install` page will explain this clearly.
-- Once a user installs, manifest changes (name, start URL) don't update on already-installed devices until they reinstall. We'll get the manifest right the first time.
-- After implementation, you'll need to **republish** the app for the PWA to go live for customers.
+**8. Pages to prioritize (most-used)**
+- `/dashboard` (Index.tsx)
+- `/jobs` (Jobs.tsx + JobsTable + JobActions)
+- `/clients`, `/leads`, `/schedule`, `/technicians`
+- Job/Client/Technician detail pages
 
-## Files I'll touch
+## Technical notes
 
-- `package.json` — add `vite-plugin-pwa`
-- `vite.config.ts` — register the plugin
-- `index.html` — mobile meta tags + apple-touch-icon
-- `src/main.tsx` — iframe/preview unregister guard
-- `src/pages/Install.tsx` — new install instructions page
-- `src/App.tsx` — add `/install` route
-- `public/` — new icon assets (192, 512, maskable, apple-touch-icon)
+- Use the existing `useIsMobile()` hook (already at `src/hooks/use-mobile.tsx`, breakpoint 768px) to conditionally render table vs card layouts and Dialog vs Drawer.
+- Use Tailwind's `sm:`, `md:`, `lg:` prefixes — no new dependencies needed.
+- `Layout.tsx`: change `ml-16` to `lg:ml-16 ml-0` and add a mobile top bar with hamburger.
+- `Sidebar.tsx`: wrap in shadcn `Sheet` component on mobile.
+- Keep all existing functionality and business logic untouched — pure presentation changes.
 
-After I'm done, republish the app and share `https://ezjob.lovable.app/install` with your customers.
+## What this does NOT change
+
+- No backend changes
+- No data model changes
+- No new features — same screens, just laid out properly for phones
+- Desktop view stays exactly as it is today
+
+## After the change
+
+When customers open the installed PWA on their phone, they'll see a proper mobile layout: hamburger menu, stacked cards instead of cramped tables, full-width buttons, and dialogs that slide up from the bottom — like a real mobile app.

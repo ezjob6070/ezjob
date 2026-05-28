@@ -133,7 +133,7 @@ const Index = () => {
       default: // Dashboard tab
         return (
           <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
               <TicketsStatusCard 
                 taskCounts={taskCounts}
                 totalTasks={totalTasks}
@@ -177,7 +177,7 @@ const Index = () => {
   };
 
   return (
-    <div className="space-y-3 py-3">
+    <div className="space-y-3 py-2 md:py-3">
       <DashboardHeader 
         activeTab={activeTab} 
         onTabChange={handleTabChange} 

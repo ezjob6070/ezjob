@@ -12,7 +12,7 @@ import NavItem from "./NavItem";
 import ServiceCategorySelector from "./ServiceCategorySelector";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
-const Sidebar = ({ isMobile }: SidebarProps) => {
+const Sidebar = ({ isMobile, mobileExpanded }: SidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
@@ -38,25 +38,34 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
 
   const navItems = getIndustrySpecificNavItems();
 
+  // When rendered inside the mobile drawer, always show the expanded layout
+  // and let the surrounding Sheet handle positioning.
+  const expanded = mobileExpanded ? true : isHovering;
+  const containerWidth = mobileExpanded ? "w-full" : (isHovering ? "w-64" : "w-16");
+
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className={cn(
+        mobileExpanded
+          ? "relative h-full w-full"
+          : "fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
+      )}
+      onMouseEnter={mobileExpanded ? undefined : handleMouseEnter}
+      onMouseLeave={mobileExpanded ? undefined : handleMouseLeave}
     >
       <div 
         className={cn(
-          "h-full bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg overflow-hidden transition-all duration-300",
-          isHovering ? "w-64" : "w-16"
+          "h-full bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg overflow-y-auto overflow-x-hidden transition-all duration-300",
+          containerWidth
         )}
       >
         {/* Add the ServiceCategorySelector here */}
-        {isHovering && <ServiceCategorySelector />}
+        {expanded && <ServiceCategorySelector />}
 
         <div className="mx-2 my-4 border-t border-blue-600/50" />
 
-        <div className={cn("py-3", isHovering ? "px-5" : "px-3")}>
-          {isHovering ? (
+        <div className={cn("py-3", expanded ? "px-5" : "px-3")}>
+          {expanded ? (
             <div className="flex items-center justify-between">
               <span className="font-bold text-lg text-white">EZ Job</span>
               <button 
@@ -78,8 +87,8 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           )}
         </div>
 
-        <nav className={cn("flex-1 py-3", isHovering ? "px-4" : "px-2")}>
-          {isHovering ? (
+        <nav className={cn("flex-1 py-3", expanded ? "px-4" : "px-2")}>
+          {expanded ? (
             <ul className="space-y-1.5">
               {navItems.map((item) => (
                 <li key={item.href || item.label}>
@@ -129,8 +138,8 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
           )}
         </nav>
 
-        <div className={cn("p-4 mt-auto border-t border-blue-700/50", !isHovering && "flex justify-center")}>
-          {isHovering ? (
+        <div className={cn("p-4 mt-auto border-t border-blue-700/50", !expanded && "flex justify-center")}>
+          {expanded ? (
             <button className="flex items-center w-full gap-3 px-4 py-2.5 rounded-lg text-white/80 hover:bg-blue-600 hover:text-white transition-all duration-200">
               <LogOutIcon size={18} />
               <span>Sign out</span>
