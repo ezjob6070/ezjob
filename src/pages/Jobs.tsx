@@ -336,7 +336,7 @@ const Jobs = () => {
 
   return (
     <JobsProvider value={contextValue}>
-      <div className="space-y-6 py-8">
+      <div className="space-y-4 md:space-y-6 py-2 md:py-8">
         {/* Header Section */}
         <JobsHeader />
 
