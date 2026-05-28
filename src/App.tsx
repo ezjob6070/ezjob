@@ -59,6 +59,7 @@ import Inspections from "./pages/construction/Inspections";
 
 // Import general category pages
 import Contacts from "./pages/general/Contacts";
+import Install from "./pages/Install";
 import React from 'react'; // Add explicit React import
 
 function App() {
@@ -76,6 +77,7 @@ function App() {
               <Routes>
                 {/* Welcome page as the initial route */}
                 <Route path="/" element={<Welcome />} />
+                <Route path="/install" element={<Install />} />
                 
                 {/* Main layout with sidebar for all app pages */}
                 <Route path="/" element={
