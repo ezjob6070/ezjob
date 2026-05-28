@@ -1,40 +1,54 @@
-## Goal
+# Convert EZ Job into an Installable Web App (PWA)
 
-Bring back a fully working **Actions** button on every row of the Jobs table (including completed and cancelled jobs) so the user can always change a job's status: mark complete, cancel, reschedule, reopen, or send to estimate.
+Make the app installable on iPhone and Android home screens via the browser's "Add to Home Screen" flow. No app store, no native tooling required.
 
-## What's wrong today
+## What customers will experience
 
-- The dropdown trigger renders, but clicking **Update Status** doesn't reliably open the modal (the wiring between `JobActions → JobsTable → JobTabs → JobsContext` is partially broken — `closeStatusModal` is bound to `onOpenChange` with the wrong signature, and `onCancelJob` from the dropdown is a no-op `() => {}`).
-- "Cancel Job" item in the dropdown is wired to an empty function in `JobsTable.tsx` (`onCancelJob={() => {}}`), so cancelling from the row does nothing.
-- Once a job is **completed**, there's no menu item to reopen it or move it back to scheduled / in-progress.
+- They visit your published URL (`ezjob.lovable.app` or your custom domain) on their phone.
+- A prompt (or browser menu → "Add to Home Screen") lets them install it.
+- The app launches fullscreen from their home screen with the EZ Job icon, no browser bar.
+- Works offline for previously viewed pages and loads instantly on repeat visits.
 
-## What I'll change
+## What I'll build
 
-### 1. Fix the dropdown wiring (`JobActions.tsx`)
-- Always render the action button regardless of job status (completed and cancelled jobs included).
-- Status-aware menu items:
-  - **Scheduled / In Progress** → Mark Complete, Reschedule, Cancel, Send to Estimate
-  - **Completed** → Reopen (set back to in_progress), Edit Amount, Send to Estimate
-  - **Cancelled** → Reopen (set back to scheduled)
-- Every item triggers the existing `UpdateJobStatusModal` with the right preselected status, so the user lands on the correct form.
+1. **Install `vite-plugin-pwa`** and wire it into `vite.config.ts` with safe defaults:
+   - `registerType: "autoUpdate"` so new releases roll out automatically.
+   - `devOptions.enabled: false` — service worker only runs in production, never inside the Lovable editor preview.
+   - `navigateFallbackDenylist: [/^\/~oauth/]` to keep auth flows untouched.
+   - `NetworkFirst` strategy for HTML so users never get stuck on a stale shell.
 
-### 2. Fix the broken handlers (`JobsTable.tsx`, `JobTabs.tsx`, `JobsContainer.tsx`)
-- Pass real `onCancelJob` / `onCompleteJob` / `onReschedule` from the JobsContext down to `JobActions` (no more `() => {}`).
-- Fix `onOpenChange={closeStatusModal}` so it correctly receives the boolean from the Dialog and closes the modal on outside click / ESC.
-- Add a new `onReopenJob(jobId, newStatus)` handler in `JobsContext` that flips a completed/cancelled job back to scheduled or in_progress.
+2. **Web App Manifest** (`manifest.webmanifest`) with:
+   - Name: "EZ Job", short name: "EZ Job"
+   - `display: "standalone"`, `theme_color` and `background_color` matching the blue brand
+   - Icons at 192×192, 512×512, and a maskable 512×512 (generated from the existing brand)
+   - `start_url: "/"`, `scope: "/"`
 
-### 3. Status modal upgrade (`UpdateJobStatusModal.tsx`)
-- Accept an initial status from the trigger so "Reopen" lands on the right form instead of defaulting to "completed".
-- Add a **Reopen** option to the `StatusSelection` component.
+3. **Update `index.html`** with mobile-optimized meta tags:
+   - `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`
+   - `apple-touch-icon` link (iOS doesn't use the manifest icons for install)
+   - Theme color meta tag
 
-### 4. Visual polish (per design memory)
-- Use the existing white-card / blue-accent style for the dropdown — destructive items (Cancel) in red, primary action (Mark Complete) highlighted with the blue accent.
+4. **Iframe/preview safety guard** in `src/main.tsx` — unregister any service workers when the app loads inside the Lovable editor preview, so you keep getting fresh builds while developing.
 
-## Out of scope (for now)
+5. **`/install` page** — a simple page with platform-aware instructions ("On iPhone: tap Share → Add to Home Screen", "On Android: tap menu → Install app") and an install button that fires the native prompt when available. You can share this link with customers.
 
-- Backend wiring (Supabase persistence + payout auto-calculation) — that's the bigger plan we'll write next, once this row-level action is fixed and you confirm it works.
+6. **Generate PWA icons** matching the EZ Job blue brand and drop them in `public/`.
 
-## Technical notes
+## Important caveats
 
-- Files touched: `src/components/jobs/JobActions.tsx`, `src/components/jobs/JobsTable.tsx`, `src/components/jobs/JobTabs.tsx`, `src/components/jobs/UpdateJobStatusModal.tsx`, `src/components/jobs/modal/StatusSelection.tsx`, and `src/components/jobs/context/JobsContext.tsx`.
-- No DB or schema changes in this pass — purely frontend wiring fixes.
+- **Install prompt only works in the published/deployed site** (`ezjob.lovable.app` or your custom domain), not in the Lovable editor preview. This is a browser security requirement, not a bug.
+- **iOS Safari** doesn't show an automatic install banner — users must use Share → Add to Home Screen. The `/install` page will explain this clearly.
+- Once a user installs, manifest changes (name, start URL) don't update on already-installed devices until they reinstall. We'll get the manifest right the first time.
+- After implementation, you'll need to **republish** the app for the PWA to go live for customers.
+
+## Files I'll touch
+
+- `package.json` — add `vite-plugin-pwa`
+- `vite.config.ts` — register the plugin
+- `index.html` — mobile meta tags + apple-touch-icon
+- `src/main.tsx` — iframe/preview unregister guard
+- `src/pages/Install.tsx` — new install instructions page
+- `src/App.tsx` — add `/install` route
+- `public/` — new icon assets (192, 512, maskable, apple-touch-icon)
+
+After I'm done, republish the app and share `https://ezjob.lovable.app/install` with your customers.
