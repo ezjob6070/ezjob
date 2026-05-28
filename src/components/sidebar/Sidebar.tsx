@@ -12,7 +12,7 @@ import NavItem from "./NavItem";
 import ServiceCategorySelector from "./ServiceCategorySelector";
 import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 
-const Sidebar = ({ isMobile }: SidebarProps) => {
+const Sidebar = ({ isMobile, mobileExpanded }: SidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
@@ -38,20 +38,29 @@ const Sidebar = ({ isMobile }: SidebarProps) => {
 
   const navItems = getIndustrySpecificNavItems();
 
+  // When rendered inside the mobile drawer, always show the expanded layout
+  // and let the surrounding Sheet handle positioning.
+  const expanded = mobileExpanded ? true : isHovering;
+  const containerWidth = mobileExpanded ? "w-full" : (isHovering ? "w-64" : "w-16");
+
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className={cn(
+        mobileExpanded
+          ? "relative h-full w-full"
+          : "fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
+      )}
+      onMouseEnter={mobileExpanded ? undefined : handleMouseEnter}
+      onMouseLeave={mobileExpanded ? undefined : handleMouseLeave}
     >
       <div 
         className={cn(
-          "h-full bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg overflow-hidden transition-all duration-300",
-          isHovering ? "w-64" : "w-16"
+          "h-full bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg overflow-y-auto overflow-x-hidden transition-all duration-300",
+          containerWidth
         )}
       >
         {/* Add the ServiceCategorySelector here */}
-        {isHovering && <ServiceCategorySelector />}
+        {expanded && <ServiceCategorySelector />}
 
         <div className="mx-2 my-4 border-t border-blue-600/50" />
 
