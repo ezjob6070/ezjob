@@ -15,7 +15,7 @@ import { useGlobalState } from "@/components/providers/GlobalStateProvider";
 const Sidebar = ({ isMobile, mobileExpanded }: SidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [expanded, setIsHovering] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
     "leads-clients": true,
   });
@@ -40,8 +40,8 @@ const Sidebar = ({ isMobile, mobileExpanded }: SidebarProps) => {
 
   // When rendered inside the mobile drawer, always show the expanded layout
   // and let the surrounding Sheet handle positioning.
-  const expanded = mobileExpanded ? true : expanded;
-  const containerWidth = mobileExpanded ? "w-full" : (expanded ? "w-64" : "w-16");
+  const expanded = mobileExpanded ? true : isHovering;
+  const containerWidth = mobileExpanded ? "w-full" : (isHovering ? "w-64" : "w-16");
 
   return (
     <aside
