@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import { projects } from "@/data/projects";
 
 type Bucket = {
