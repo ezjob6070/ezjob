@@ -92,7 +92,15 @@ const Dashboard = () => {
     data: []
   });
 
-  const { jobs, currentIndustry } = useGlobalState();
+  const { jobs, currentIndustry, dateFilter } = useGlobalState();
+
+  const financialDateLabel = (() => {
+    if (!dateFilter?.from) return format(new Date(), "MMM d, yyyy");
+    if (!dateFilter.to || dateFilter.from.toDateString() === dateFilter.to.toDateString()) {
+      return format(dateFilter.from, "MMM d, yyyy");
+    }
+    return `${format(dateFilter.from, "MMM d")} - ${format(dateFilter.to, "MMM d, yyyy")}`;
+  })();
 
   // Use our predefined fake data
   const totalTasks = Object.values(dashboardTaskCounts).reduce((sum, count) => sum + count, 0);
