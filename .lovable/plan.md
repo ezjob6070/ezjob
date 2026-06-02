@@ -1,52 +1,27 @@
-## Add more substance to the Projects Overview panel
+## Add today's date to the dashboard header, light cleanup
 
-The Projects panel currently shows 4 progress bar rows and feels a bit empty next to the Jobs donut. Add light, useful content to fill it out without making it noisy.
+The dashboard already shows "Hello, Alex / Welcome back to Ez Job" at the top. Replace the welcome subtitle with today's date in a professional format and add a small date pill above the metrics strip.
 
-### Changes — `src/components/dashboard/ProjectsDashboardSection.tsx`
+### Changes — `src/components/dashboard/DashboardHeader.tsx`
 
-**1. Add a compact stats strip above the bars**
-Three small stat blocks in a single row, separated by subtle dividers:
-- **Total Budget** — sum of `project.budget` across all projects, formatted as `$XXM`
-- **Avg. Progress** — average `completion` across all projects, shown as `XX%`
-- **Active Workers** — sum of `project.workers` across all projects
+- Keep the indigo Home icon and "Hello, Alex" title.
+- Replace the subtitle "Welcome back to Ez Job" with today's date in long format: e.g. **Tuesday, June 2, 2026** (`format(new Date(), "EEEE, MMMM d, yyyy")`).
+- Keep the tabs row (Dashboard / Statistics / Analytics) and the date-range filter button on the right unchanged.
+- Bell button stays.
 
-Small label on top (muted, 11px), bold value below (sm, foreground). Keeps the same white card aesthetic.
+### Changes — `src/pages/Dashboard.tsx`
 
-**2. Add a "Spotlight" mini-row below the 4 progress bars**
-A single highlighted project — the one closest to completion but not yet done (highest `completion` where `completion < 100`). Shows:
-- Project name (truncated) + type as muted subtext
-- Right side: `XX%` badge in the In-Progress/Near-Done gradient
-- Clicking it navigates to `/projects/:id`
+- Just above the **Compact Financial Strip** (the 3 metric cards), add a single small line of text aligned left:
+  - Format: `Today · Tuesday, June 2, 2026`
+  - Styling: `text-xs text-muted-foreground font-medium`, small margin below.
+- No structural changes to the metric cards themselves or the Jobs / Projects panels.
 
-Separated from the bars by a thin `border-t border-border` with `pt-3 mt-1`.
+### Calendar question
 
-**3. Keep everything else the same**
-- 4 bucket rows unchanged
-- Header (title + "View all →") unchanged
-- Dialog unchanged
-- Same `bg-white border border-border shadow-sm rounded-xl` card
-
-### Layout sketch
-
-```text
-┌─ Projects Overview ──────────── View all → ┐
-│  10 total · tap a row to view              │
-│                                            │
-│  $327M     │   58%      │   1,098          │  ← new stats strip
-│  Budget    │  Avg Prog. │  Workers         │
-│ ─────────────────────────────────────────  │
-│  ● Early          2   20%   ▰▰░░░░░░░░     │
-│  ● In Progress    4   40%   ▰▰▰▰░░░░░░     │
-│  ● Near Done      3   30%   ▰▰▰░░░░░░░     │
-│  ● Completed      1   10%   ▰░░░░░░░░░     │
-│ ─────────────────────────────────────────  │
-│  Spotlight                                  │  ← new mini-row
-│  Harbor View Hotel · Hospitality      90%  │
-└────────────────────────────────────────────┘
-```
+You also mentioned "change the calendar in the location." I'm not sure which calendar you mean — the small date-range picker in the header, the upcoming events list, or another one. I'll leave calendars alone in this pass; once you confirm which one and where you want it, I'll move it in a follow-up.
 
 ### Visual notes
-- All values computed from `src/data/projects.ts` (no new data source).
-- Uses existing semantic tokens and the bucket gradients.
-- Stays vertically compact and keeps height aligned with the Jobs donut card.
-- Mobile: still stacks under Jobs.
+
+- Stays within the existing minimalist white-card aesthetic and indigo accent.
+- Uses `date-fns` (already imported in the header) for the long date format.
+- No new dependencies, no new components.
