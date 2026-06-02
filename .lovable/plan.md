@@ -1,13 +1,50 @@
-Move the date filter button from the top-right corner to sit inline with the Dashboard / Statistics / Analytics tabs, and change its label from the current date-range text to "Filter by date" with a calendar icon.
+# Improve Calendar Overview Layout
 
-### What changes
-1. **DashboardHeader.tsx**
-   - Relocate the date filter `Popover` so it appears inside the tab row instead of right-aligned in the header.
-   - Update the button label to "Filter by date" (calendar icon stays).
-   - Adjust spacing so the tabs + filter still fit on mobile without overflow.
+The current month view forces a `min-w-[800px]` calendar with large 48×48px day cells, so users have to scroll horizontally. The selected-day details are pushed below the fold. Goal: shrink the calendar, put a rich day-detail panel beside it, and make hours visible at a glance.
 
-2. **Dashboard.tsx**
-   - Verify no hardcoded date-filter references need updating after the move.
+## New layout (Calendar Overview tab, month mode)
 
-### Why this spot
-Right next to the section tabs makes the filter clearly control the content below it, rather than feeling like a separate top-right action. It also frees up the header right edge for cleaner spacing.
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ Calendar Overview      [Day][Week][Month]   < May 2026 >    │
+├──────────────────────────────┬──────────────────────────────┤
+│  COMPACT MONTH CALENDAR      │  SELECTED DAY PANEL          │
+│  ~ 360px wide                │  Thu, May 7 · 3 jobs · 2 tasks│
+│  36×36 day cells             │  ─────────────────────────── │
+│  Color dots for jobs/tasks   │  ▸ Jobs (2)                  │
+│  Click day → updates panel   │   09:00  AC Repair – Acme    │
+│                              │   14:30  Install – Ortega    │
+│  Legend: ● jobs ● tasks      │  ▸ Tasks (1)                 │
+│                              │   11:00  Call back lead      │
+│                              │  ▸ Reminders (0)             │
+│                              │                              │
+│                              │  [Hourly timeline 8am–8pm]   │
+│                              │  Compact strip with blocks   │
+│                              │  positioned by hour          │
+└──────────────────────────────┴──────────────────────────────┘
+```
+
+- Desktop (≥1024px): two columns, `lg:grid-cols-[360px_1fr]`, no horizontal scroll.
+- Tablet/mobile: stacks vertically, calendar first, panel below.
+- Day and Week modes keep current behavior (timeline / 7-column grid) but get slight sizing tweaks for consistency.
+
+## Changes
+
+1. **`src/components/schedule/CalendarView.tsx`**
+   - Wrap month mode in `grid lg:grid-cols-[360px_1fr] gap-4` (replaces the `min-w-[800px]` wrapper).
+   - Shrink calendar: remove `min-w-[800px]`, drop day-cell size from `h-12 w-12` to `h-9 w-9`, smaller font, keep colored dots underneath.
+   - Right pane: new `SelectedDayPanel` component (inline or extracted) showing:
+     - Header: full date + counts ("3 jobs · 2 tasks").
+     - Jobs section (sorted by hour) with time, title, client, status chip.
+     - Tasks section (sorted by hour) with time, title, priority dot, client.
+     - Empty state when nothing is scheduled.
+     - Compact hourly timeline strip (8am–8pm) at the bottom with colored blocks for each job/task.
+   - Remove the redundant `UpcomingEvents` block below the calendar in month mode (its info now lives in the day panel).
+
+2. **`src/pages/Schedule.tsx`**
+   - No structural change; existing `jobsForSelectedDate` / `tasksForSelectedDate` already feed the panel.
+
+## Out of scope
+- Day and Week views: keep as-is for now (only minor padding tweaks if needed).
+- Jobs / Tasks tabs: unchanged.
+- No backend, data, or filter changes.

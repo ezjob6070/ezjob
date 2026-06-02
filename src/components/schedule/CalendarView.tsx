@@ -404,95 +404,81 @@ const CalendarView = ({
         
       case 'month':
         return (
-          <div className="space-y-4 w-full">
-            <div className="min-w-[800px] w-full overflow-x-auto">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={handleDateSelect}
-                month={currentMonth}
-                onMonthChange={setCurrentMonth}
-                className="border rounded-md shadow-sm w-full mx-auto"
-                modifiers={{
-                  hasEvents: (date) => 
-                    jobs.some(job => {
-                      const jobDate = ensureValidDate(job.date);
-                      return jobDate && isSameDay(jobDate, date);
-                    }) || 
-                    tasks.some(task => {
-                      const taskDate = ensureValidDate(task.dueDate);
-                      return taskDate && isSameDay(taskDate, date);
-                    }),
-                }}
-                modifiersClassNames={{
-                  hasEvents: "font-bold",
-                }}
-                components={{
-                  Day: ({ date, displayMonth, ...props }) => {
-                    const isSelected = isSameDay(date, selectedDate);
-                    const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
-                    
-                    return (
-                      <button 
-                        type="button"
-                        className={cn(
-                          "h-12 w-12 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center",
-                          getDayClassName(date),
-                          isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                          isOutsideMonth && "text-muted-foreground opacity-50"
-                        )}
-                        disabled={isOutsideMonth}
-                        onClick={() => handleDateSelect(date)}
-                        {...props}
-                      >
-                        <span className="text-base">{format(date, "d")}</span>
-                        {(jobs.some(job => {
-                          const jobDate = ensureValidDate(job.date);
-                          return jobDate && isSameDay(jobDate, date);
-                        }) || 
-                          tasks.some(task => {
-                            const taskDate = ensureValidDate(task.dueDate);
-                            return taskDate && isSameDay(taskDate, date);
-                          })) && 
-                          !isSelected && (
-                          <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
-                            {jobs.some(job => {
-                              const jobDate = ensureValidDate(job.date);
-                              return jobDate && isSameDay(jobDate, date);
-                            }) && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                            )}
-                            {tasks.some(task => {
-                              const taskDate = ensureValidDate(task.dueDate);
-                              return taskDate && isSameDay(taskDate, date);
-                            }) && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                            )}
-                          </div>
-                        )}
-                      </button>
-                    );
-                  }
-                }}
-              />
-            </div>
-            
-            <div className="flex justify-center gap-6 mt-4 px-4 w-full flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500"></div>
-                <span className="text-sm">Jobs</span>
+          <div className="w-full">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+              month={currentMonth}
+              onMonthChange={setCurrentMonth}
+              className="border rounded-md shadow-sm w-full pointer-events-auto"
+              modifiers={{
+                hasEvents: (date) =>
+                  jobs.some(job => {
+                    const jobDate = ensureValidDate(job.date);
+                    return jobDate && isSameDay(jobDate, date);
+                  }) ||
+                  tasks.some(task => {
+                    const taskDate = ensureValidDate(task.dueDate);
+                    return taskDate && isSameDay(taskDate, date);
+                  }),
+              }}
+              modifiersClassNames={{ hasEvents: "font-bold" }}
+              components={{
+                Day: ({ date, displayMonth, ...props }) => {
+                  const isSelected = isSameDay(date, selectedDate);
+                  const isOutsideMonth = date.getMonth() !== displayMonth.getMonth();
+                  const hasJobs = jobs.some(job => {
+                    const jobDate = ensureValidDate(job.date);
+                    return jobDate && isSameDay(jobDate, date);
+                  });
+                  const hasTasks = tasks.some(task => {
+                    const taskDate = ensureValidDate(task.dueDate);
+                    return taskDate && isSameDay(taskDate, date);
+                  });
+                  const hasHighPriority = tasks.some(task => {
+                    const taskDate = ensureValidDate(task.dueDate);
+                    return taskDate && isSameDay(taskDate, date) && task.priority === 'high';
+                  });
+
+                  return (
+                    <button
+                      type="button"
+                      className={cn(
+                        "h-9 w-9 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center text-sm",
+                        getDayClassName(date),
+                        isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                        isOutsideMonth && "text-muted-foreground opacity-50"
+                      )}
+                      disabled={isOutsideMonth}
+                      onClick={() => handleDateSelect(date)}
+                      {...props}
+                    >
+                      <span>{format(date, "d")}</span>
+                      {(hasJobs || hasTasks) && !isSelected && (
+                        <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-0.5">
+                          {hasJobs && <div className="w-1 h-1 rounded-full bg-blue-500" />}
+                          {hasTasks && <div className={cn("w-1 h-1 rounded-full", hasHighPriority ? "bg-red-500" : "bg-amber-500")} />}
+                        </div>
+                      )}
+                    </button>
+                  );
+                }
+              }}
+            />
+
+            <div className="flex justify-center gap-4 mt-3 px-2 w-full flex-wrap text-xs">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="text-muted-foreground">Jobs</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-500"></div>
-                <span className="text-sm">Tasks</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="text-muted-foreground">Tasks</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-500"></div>
-                <span className="text-sm">Both</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-100 border border-red-500"></div>
-                <span className="text-sm">High Priority</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <span className="text-muted-foreground">High Priority</span>
               </div>
             </div>
           </div>
@@ -503,103 +489,170 @@ const CalendarView = ({
     }
   };
 
+  // Sort helpers for the selected-day panel
+  const sortedDayJobs = [...jobsForSelectedDate].sort((a, b) => {
+    const da = ensureValidDate(a.date)?.getTime() ?? 0;
+    const db = ensureValidDate(b.date)?.getTime() ?? 0;
+    return da - db;
+  });
+  const sortedDayTasks = [...tasksForSelectedDate].sort((a, b) => {
+    const da = ensureValidDate(a.dueDate)?.getTime() ?? 0;
+    const db = ensureValidDate(b.dueDate)?.getTime() ?? 0;
+    return da - db;
+  });
+
+  // Hours 7am–8pm for the compact timeline
+  const timelineHours = Array.from({ length: 14 }, (_, i) => i + 7);
+
+  const isMonthMode = viewMode === 'month';
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2 overflow-x-auto">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div className="flex items-center gap-2">
+      <div className={cn(
+        "grid grid-cols-1 gap-6",
+        isMonthMode ? "lg:grid-cols-[360px_1fr]" : "md:grid-cols-3"
+      )}>
+        <Card className={cn(!isMonthMode && "md:col-span-2 overflow-x-auto")}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <CardTitle>{getViewTitle()}</CardTitle>
+              <CardTitle className="text-base truncate">{getViewTitle()}</CardTitle>
               <Button variant="outline" size="icon" onClick={handleNextPeriod}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <CalendarViewOptions 
+            <CalendarViewOptions
               currentView={viewMode}
               onViewChange={onViewChange}
             />
           </CardHeader>
-          <CardContent className="pb-8 overflow-x-auto">
-            <div className="min-w-fit">
+          <CardContent className={cn("pb-6", !isMonthMode && "overflow-x-auto")}>
+            <div className={cn(!isMonthMode && "min-w-fit")}>
               {renderCalendarView()}
             </div>
           </CardContent>
         </Card>
-        
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-xl">
-              {getViewTitle()}
+
+        <Card className={cn(!isMonthMode && "md:col-span-1")}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">
+              {format(selectedDate, "EEEE, MMM d")}
             </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              {sortedDayJobs.length} job{sortedDayJobs.length !== 1 && 's'} · {sortedDayTasks.length} task{sortedDayTasks.length !== 1 && 's'}
+            </p>
           </CardHeader>
-          <CardContent className="max-h-[500px] overflow-y-auto">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Jobs ({currentViewEvents.jobs.length})</h3>
-                {currentViewEvents.jobs.length === 0 ? (
-                  <p className="text-muted-foreground">No jobs scheduled for this {viewMode}</p>
-                ) : (
-                  <div className="space-y-3">
-                    {currentViewEvents.jobs.map(job => (
-                      <Card key={job.id} className="p-3 shadow-sm">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <p className="font-medium">{job.title}</p>
-                            <p className="text-sm text-muted-foreground">{job.clientName}</p>
-                          </div>
-                          <div className="text-right text-sm">
-                            <p>${job.amount}</p>
-                            <p className="text-muted-foreground capitalize">{job.status.replace('_', ' ')}</p>
-                            {viewMode !== 'day' && job.date && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {format(job.date instanceof Date ? job.date : new Date(job.date), "MMM d")}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+          <CardContent className="max-h-[560px] overflow-y-auto space-y-5">
+            {/* Hourly timeline strip */}
+            <div className="rounded-md border bg-muted/30 p-2">
+              <div className="grid grid-cols-14 gap-px" style={{ gridTemplateColumns: `repeat(${timelineHours.length}, minmax(0, 1fr))` }}>
+                {timelineHours.map(hour => {
+                  const jobsAtHour = sortedDayJobs.filter(j => {
+                    const d = ensureValidDate(j.date);
+                    return d && d.getHours() === hour;
+                  });
+                  const tasksAtHour = sortedDayTasks.filter(t => {
+                    const td = ensureValidDate(t.dueDate);
+                    return td && td.getHours() === hour;
+                  });
+                  const hasJob = jobsAtHour.length > 0;
+                  const hasTask = tasksAtHour.length > 0;
+                  return (
+                    <div key={hour} className="flex flex-col items-center gap-1">
+                      <div
+                        className={cn(
+                          "h-6 w-full rounded-sm",
+                          hasJob && hasTask ? "bg-purple-400" :
+                          hasJob ? "bg-blue-400" :
+                          hasTask ? "bg-amber-400" :
+                          "bg-muted"
+                        )}
+                        title={`${format(setHours(selectedDate, hour), "h a")}: ${jobsAtHour.length} job(s), ${tasksAtHour.length} task(s)`}
+                      />
+                      <span className="text-[9px] text-muted-foreground leading-none">
+                        {hour === 12 ? '12p' : hour > 12 ? `${hour - 12}p` : `${hour}a`}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Tasks ({currentViewEvents.tasks.length})</h3>
-                {currentViewEvents.tasks.length === 0 ? (
-                  <p className="text-muted-foreground">No tasks due for this {viewMode}</p>
-                ) : (
-                  <div className="space-y-3">
-                    {currentViewEvents.tasks.map(task => (
-                      <Card key={task.id} className="p-3 shadow-sm">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <p className="font-medium">{task.title}</p>
-                            <p className="text-sm text-muted-foreground">{task.client?.name}</p>
-                          </div>
-                          <div className="text-right text-sm">
-                            <p className="capitalize">{task.status}</p>
-                            <p className="text-muted-foreground capitalize">{task.priority} priority</p>
-                            {viewMode !== 'day' && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {format(task.dueDate, "MMM d")}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+            </div>
+
+            {/* Jobs */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                  Jobs ({sortedDayJobs.length})
+                </h3>
               </div>
+              {sortedDayJobs.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-2">No jobs scheduled</p>
+              ) : (
+                <div className="space-y-2">
+                  {sortedDayJobs.map(job => {
+                    const d = ensureValidDate(job.date);
+                    return (
+                      <div key={job.id} className="flex items-start gap-3 p-2.5 rounded-md border bg-blue-50/50 hover:bg-blue-50 transition-colors">
+                        <div className="text-xs font-semibold text-blue-700 w-14 shrink-0 pt-0.5">
+                          {d ? format(d, "h:mm a") : "—"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{job.title}</p>
+                          <p className="text-xs text-muted-foreground truncate">{job.clientName}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs font-medium">${job.amount}</p>
+                          <p className="text-[10px] text-muted-foreground capitalize">{job.status.replace('_', ' ')}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Tasks */}
+            <div>
+              <h3 className="text-sm font-semibold flex items-center gap-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                Tasks ({sortedDayTasks.length})
+              </h3>
+              {sortedDayTasks.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-2">No tasks due</p>
+              ) : (
+                <div className="space-y-2">
+                  {sortedDayTasks.map(task => (
+                    <div key={task.id} className="flex items-start gap-3 p-2.5 rounded-md border bg-amber-50/50 hover:bg-amber-50 transition-colors">
+                      <div className="text-xs font-semibold text-amber-700 w-14 shrink-0 pt-0.5">
+                        {format(task.dueDate, "h:mm a")}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{task.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">{task.client?.name}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className={cn(
+                          "inline-block text-[10px] px-1.5 py-0.5 rounded capitalize",
+                          task.priority === 'high' ? "bg-red-100 text-red-700" :
+                          task.priority === 'medium' ? "bg-amber-100 text-amber-700" :
+                          "bg-gray-100 text-gray-700"
+                        )}>
+                          {task.priority}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
-      
-      <UpcomingEvents events={upcomingEvents} />
+
+      {!isMonthMode && <UpcomingEvents events={upcomingEvents} />}
     </div>
   );
 };
