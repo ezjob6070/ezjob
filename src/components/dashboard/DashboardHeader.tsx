@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Bell, Calendar, BarChart3, Home, CalendarRange } from "lucide-react";
+import { Calendar, BarChart3, Home, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWindowSize } from "@/hooks/use-window-size";
@@ -59,19 +59,11 @@ const DashboardHeader = ({
           </div>
           <div className="min-w-0">
             <h1 className="text-base md:text-lg font-semibold tracking-tight text-gray-900 truncate">
-              Hello, Alex <span className="font-normal text-gray-500">Welcome back</span>
+              Hello, Alex
             </h1>
             <p className="text-indigo-600 text-base font-medium truncate">{format(new Date(), "EEEE, MMMM d, yyyy")}</p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-full h-9 w-9 shrink-0"
-        >
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
-        </Button>
       </div>
       
       <div className="flex flex-row items-center justify-between gap-2 mb-1">
