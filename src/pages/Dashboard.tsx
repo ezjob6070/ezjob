@@ -511,8 +511,8 @@ const Dashboard = () => {
                           data={jobStatusData}
                           title={`${totalTasks}`}
                           subtitle="Total Jobs"
-                          size={250} 
-                          thickness={50}
+                          size={180} 
+                          thickness={36}
                           gradients={true}
                           animation={true}
                           showLegend={false}
