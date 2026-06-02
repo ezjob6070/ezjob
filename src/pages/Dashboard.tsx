@@ -514,7 +514,7 @@ const Dashboard = () => {
                 <CardHeader className="pb-2 pt-4 px-4 sm:px-5">
                   <CardTitle className="text-base font-semibold">Jobs By Status</CardTitle>
                   <CardDescription className="text-xs">Tap a slice to view jobs</CardDescription>
-                  <span className="text-[11px] text-muted-foreground">{financialDateLabel()}</span>
+                  <span className="text-[11px] text-muted-foreground">{financialDateLabel}</span>
                 </CardHeader>
 
                 <CardContent className="pb-6 pt-2 px-4 sm:px-5">
