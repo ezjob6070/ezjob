@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { useJobsContext } from "./context/JobsContext";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronDown, Users, DollarSign, CreditCard, Filter } from "lucide-react";
+import { Check, ChevronDown, Users, DollarSign, CreditCard, Filter, Tag } from "lucide-react";
+import { JOB_CATEGORIES } from "@/components/jobs/constants";
 import { cn } from "@/lib/utils";
 import { 
   Popover, 
@@ -46,13 +47,11 @@ const JobsFilterBar = () => {
     toggleJobSource,
     selectAllJobSources,
     deselectAllJobSources,
-    // Contractor related
-    contractorPopoverOpen,
-    setContractorPopoverOpen,
-    selectedContractors,
-    toggleContractor,
-    selectAllContractors,
-    deselectAllContractors,
+    // Category related
+    categoryPopoverOpen,
+    setCategoryPopoverOpen,
+    selectedCategories,
+    toggleCategory,
     // Amount and Payment method
     amountPopoverOpen,
     setAmountPopoverOpen,
@@ -85,12 +84,10 @@ const JobsFilterBar = () => {
     return [...new Set(sources)].sort();
   }, [jobs]);
 
-  // Get unique contractors from jobs
-  const availableContractors = React.useMemo(() => {
-    const contractors = jobs
-      .map(job => job.contractorName)
-      .filter(Boolean) as string[];
-    return [...new Set(contractors)].sort();
+  // Available categories: union of constants + categories used by existing jobs
+  const availableCategories = React.useMemo(() => {
+    const fromJobs = jobs.map(job => job.category).filter(Boolean) as string[];
+    return [...new Set([...JOB_CATEGORIES, ...fromJobs])].sort();
   }, [jobs]);
 
   return (
@@ -166,66 +163,48 @@ const JobsFilterBar = () => {
           </PopoverContent>
         </Popover>
         
-        {/* Contractor Filter */}
-        <Popover open={contractorPopoverOpen} onOpenChange={setContractorPopoverOpen}>
+        {/* Category Filter */}
+        <Popover open={categoryPopoverOpen} onOpenChange={setCategoryPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              role="combobox" 
-              aria-expanded={contractorPopoverOpen}
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={categoryPopoverOpen}
               className="flex gap-1"
               size="sm"
             >
-              <Users className="h-4 w-4" />
-              {selectedContractors.length > 0 ? (
+              <Tag className="h-4 w-4" />
+              {selectedCategories.length > 0 ? (
                 <span>
-                  {selectedContractors.length} contractor{selectedContractors.length > 1 ? 's' : ''}
+                  {selectedCategories.length} categor{selectedCategories.length > 1 ? 'ies' : 'y'}
                 </span>
               ) : (
-                <span>Contractors</span>
+                <span>Category</span>
               )}
               <ChevronDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[220px] p-0" align="start">
+          <PopoverContent className="w-[240px] p-0" align="start">
             <Command>
-              <CommandInput placeholder="Search contractors..." />
+              <CommandInput placeholder="Search categories..." />
               <CommandList>
-                <CommandEmpty>No contractor found.</CommandEmpty>
+                <CommandEmpty>No category found.</CommandEmpty>
                 <CommandGroup>
-                  {availableContractors.map((contractor) => (
+                  {availableCategories.map((category) => (
                     <CommandItem
-                      key={contractor}
-                      onSelect={() => toggleContractor(contractor)}
+                      key={category}
+                      onSelect={() => toggleCategory(category)}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          selectedContractors.includes(contractor) ? "opacity-100" : "opacity-0"
+                          selectedCategories.includes(category) ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {contractor}
+                      {category}
                     </CommandItem>
                   ))}
                 </CommandGroup>
-                <div className="border-t p-2 flex justify-between">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => selectAllContractors()}
-                    className="text-xs"
-                  >
-                    Select all
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => deselectAllContractors()}
-                    className="text-xs"
-                  >
-                    Clear
-                  </Button>
-                </div>
               </CommandList>
             </Command>
           </PopoverContent>

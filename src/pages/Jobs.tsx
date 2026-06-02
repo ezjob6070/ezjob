@@ -46,6 +46,7 @@ const Jobs = () => {
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
   const [techPopoverOpen, setTechPopoverOpen] = useState(false);
   const [contractorPopoverOpen, setContractorPopoverOpen] = useState(false);
+  const [categoryPopoverOpen, setCategoryPopoverOpen] = useState(false);
   const [sourcePopoverOpen, setSourcePopoverOpen] = useState(false);
   const [amountPopoverOpen, setAmountPopoverOpen] = useState(false);
   const [paymentPopoverOpen, setPaymentPopoverOpen] = useState(false);
@@ -67,6 +68,7 @@ const Jobs = () => {
     setSearchTerm,
     selectedTechnicians,
     selectedContractors,
+    selectedCategories,
     selectedJobSources,
     selectedServiceTypes,
     date,
@@ -78,6 +80,7 @@ const Jobs = () => {
     isStatusModalOpen,
     toggleTechnician,
     toggleContractor,
+    toggleCategory,
     toggleJobSource,
     toggleServiceType,
     setDate,
@@ -256,6 +259,7 @@ const Jobs = () => {
     datePopoverOpen, setDatePopoverOpen,
     techPopoverOpen, setTechPopoverOpen,
     contractorPopoverOpen, setContractorPopoverOpen,
+    categoryPopoverOpen, setCategoryPopoverOpen,
     sourcePopoverOpen, setSourcePopoverOpen,
     amountPopoverOpen, setAmountPopoverOpen,
     paymentPopoverOpen, setPaymentPopoverOpen,
@@ -269,6 +273,7 @@ const Jobs = () => {
     // Filters
     selectedTechnicians,
     selectedContractors,
+    selectedCategories,
     selectedJobSources,
     selectedServiceTypes,
     date: dateRangeValue, // Use the properly typed date value
@@ -283,6 +288,7 @@ const Jobs = () => {
     // Filter operations
     toggleTechnician,
     toggleContractor,
+    toggleCategory,
     toggleJobSource,
     toggleServiceType,
     setDate: handleSetDate, // Use the wrapper function

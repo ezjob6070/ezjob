@@ -22,6 +22,8 @@ interface JobsContextType {
   setTechPopoverOpen: (open: boolean) => void;
   contractorPopoverOpen: boolean;
   setContractorPopoverOpen: (open: boolean) => void;
+  categoryPopoverOpen: boolean;
+  setCategoryPopoverOpen: (open: boolean) => void;
   sourcePopoverOpen: boolean;
   setSourcePopoverOpen: (open: boolean) => void;
   amountPopoverOpen: boolean;
@@ -38,6 +40,7 @@ interface JobsContextType {
   // Filters
   selectedTechnicians: string[];
   selectedContractors: string[];
+  selectedCategories: string[];
   selectedJobSources: string[];
   selectedServiceTypes: string[];
   date: DateRange | undefined;
@@ -48,6 +51,7 @@ interface JobsContextType {
   // Filter operations
   toggleTechnician: (techName: string) => void;
   toggleContractor: (contractorName: string) => void;
+  toggleCategory: (category: string) => void;
   toggleJobSource: (sourceName: string) => void;
   toggleServiceType: (serviceType: string) => void;
   setDate: (date: DateRange | undefined) => void;
@@ -57,6 +61,8 @@ interface JobsContextType {
   deselectAllTechnicians: () => void;
   selectAllContractors: () => void;
   deselectAllContractors: () => void;
+  selectAllCategories?: () => void;
+  deselectAllCategories?: () => void;
   selectAllJobSources: () => void;
   deselectAllJobSources: () => void;
   selectAllServiceTypes?: () => void;
