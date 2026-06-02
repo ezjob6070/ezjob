@@ -504,75 +504,58 @@ const Dashboard = () => {
                     <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
                     <CardDescription>Overview of service requests and job status</CardDescription>
                   </CardHeader>
-                  <CardContent className="pb-4">
-                    <div className="flex flex-col md:flex-row items-center">
-                      <div className="flex-1 mb-4 md:mb-0 flex justify-center">
-                        <EnhancedDonutChart 
-                          data={jobStatusData}
-                          title={`${totalTasks}`}
-                          subtitle="Total Jobs"
-                          size={180} 
-                          thickness={36}
-                          gradients={true}
-                          animation={true}
-                          showLegend={false}
-                        />
+                  <CardContent className="pb-6 pt-2">
+                    <div className="flex flex-col items-center">
+                      <EnhancedDonutChart 
+                        data={jobStatusData}
+                        title={`${totalTasks}`}
+                        subtitle="Total Jobs"
+                        size={220} 
+                        thickness={44}
+                        gradients={true}
+                        animation={true}
+                        showLegend={false}
+                        onCenterClick={() => openStatusDialog('all', 'All Jobs', [
+                          ...jobsByStatus.completed,
+                          ...jobsByStatus.inProgress,
+                          ...jobsByStatus.canceled,
+                          ...jobsByStatus.rescheduled,
+                        ])}
+                        onSegmentClick={(seg) => openStatusDialog(
+                          seg.name.toLowerCase(),
+                          `${seg.name} Jobs`,
+                          seg.name === 'Completed' ? jobsByStatus.completed :
+                          seg.name === 'In Progress' ? jobsByStatus.inProgress :
+                          seg.name === 'Cancelled' ? jobsByStatus.canceled :
+                          jobsByStatus.rescheduled
+                        )}
+                      />
+                      {/* Compact legend chips below the donut */}
+                      <div className="mt-5 flex flex-wrap justify-center gap-2">
+                        {jobStatusData.map((status) => (
+                          <button
+                            key={status.name}
+                            type="button"
+                            onClick={() => openStatusDialog(
+                              status.name.toLowerCase(),
+                              `${status.name} Jobs`,
+                              status.name === 'Completed' ? jobsByStatus.completed :
+                              status.name === 'In Progress' ? jobsByStatus.inProgress :
+                              status.name === 'Cancelled' ? jobsByStatus.canceled :
+                              jobsByStatus.rescheduled
+                            )}
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-white hover:bg-gray-50 text-xs transition-colors"
+                          >
+                            <span
+                              className="w-2.5 h-2.5 rounded-full"
+                              style={{ background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` }}
+                            />
+                            <span className="font-medium text-foreground">{status.name}</span>
+                            <span className="text-muted-foreground tabular-nums">{status.value}</span>
+                          </button>
+                        ))}
                       </div>
-                      <div className="flex-1">
-                        <div className="grid grid-cols-2 gap-2">
-                          {jobStatusData.map((status, index) => (
-                            <div 
-                              key={index} 
-                              className="flex flex-col p-2 rounded-lg bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                              onClick={() => openStatusDialog(status.name.toLowerCase(), `${status.name} Jobs`, 
-                                status.name === 'Completed' ? jobsByStatus.completed :
-                                status.name === 'In Progress' ? jobsByStatus.inProgress :
-                                status.name === 'Cancelled' ? jobsByStatus.canceled :
-                                jobsByStatus.rescheduled
-                              )}
-                            >
-                              <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center">
-                                  <div 
-                                    className="w-4 h-4 rounded-full mr-2 shadow-sm" 
-                                    style={{ 
-                                      background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` 
-                                    }}
-                                  ></div>
-                                  <span className="font-medium text-sm text-gray-700">{status.name}</span>
-                                </div>
-                                <span className="text-sm font-bold text-gray-900">{status.value}</span>
-                              </div>
-                              <div className="w-full h-2 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                                <div 
-                                  className="h-2 rounded-full transition-all duration-1000 ease-out"
-                                  style={{ 
-                                    width: `${(status.value / totalTasks) * 100}%`,
-                                    background: `linear-gradient(90deg, ${status.gradientFrom}, ${status.gradientTo})`,
-                                    boxShadow: 'inset 0px 0px 3px rgba(255, 255, 255, 0.5)'
-                                  }}
-                                ></div>
-                              </div>
-                              <div className="flex justify-between items-center mt-1">
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs"
-                                  style={{ 
-                                    color: status.color, 
-                                    borderColor: status.color,
-                                    backgroundColor: `${status.color}10`
-                                  }}
-                                >
-                                  {((status.value / totalTasks) * 100).toFixed(0)}%
-                                </Badge>
-                                <span className="text-xs text-gray-500">
-                                  View
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                      <p className="mt-3 text-[11px] text-muted-foreground">Tap a slice or chip to view jobs</p>
                     </div>
                   </CardContent>
                 </Card>

@@ -18,6 +18,8 @@ type EnhancedDonutChartProps = {
   showLegend?: boolean;
   legendPosition?: 'bottom' | 'right';
   gradients?: boolean;
+  onSegmentClick?: (segment: { name: string; value: number; color: string }) => void;
+  onCenterClick?: () => void;
 };
 
 export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
@@ -31,6 +33,8 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   showLegend = true,
   legendPosition = 'right',
   gradients = true,
+  onSegmentClick,
+  onCenterClick,
 }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const radius = size / 2;
@@ -164,12 +168,13 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
                     fill={gradients ? `url(#${segment.gradientId})` : segment.color}
                     stroke="white"
                     strokeWidth={2}
+                    onClick={() => onSegmentClick?.({ name: segment.name, value: segment.value, color: segment.color })}
                     style={animation ? {
                       transform: 'scale(1)',
                       opacity: 1,
                       transition: `opacity 0.8s ease-out, transform 0.8s ease-out ${index * 0.1}s`
                     } : undefined}
-                    className="drop-shadow-lg hover:brightness-105 transition-all cursor-pointer"
+                    className="drop-shadow-lg hover:brightness-110 transition-all cursor-pointer"
                   />
                   
                   {/* Job count label inside the segment */}
@@ -213,8 +218,12 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
         </svg>
         
         <div 
-          className="absolute inset-0 flex flex-col items-center justify-center text-center"
+          className={cn(
+            "absolute inset-0 flex flex-col items-center justify-center text-center",
+            onCenterClick && "cursor-pointer"
+          )}
           style={{ margin: thickness }}
+          onClick={onCenterClick}
         >
           <span className="text-3xl font-bold">{title}</span>
           {subtitle && <span className="text-xs text-muted-foreground">{subtitle}</span>}
