@@ -168,12 +168,13 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
                     fill={gradients ? `url(#${segment.gradientId})` : segment.color}
                     stroke="white"
                     strokeWidth={2}
+                    onClick={() => onSegmentClick?.({ name: segment.name, value: segment.value, color: segment.color })}
                     style={animation ? {
                       transform: 'scale(1)',
                       opacity: 1,
                       transition: `opacity 0.8s ease-out, transform 0.8s ease-out ${index * 0.1}s`
                     } : undefined}
-                    className="drop-shadow-lg hover:brightness-105 transition-all cursor-pointer"
+                    className="drop-shadow-lg hover:brightness-110 transition-all cursor-pointer"
                   />
                   
                   {/* Job count label inside the segment */}
