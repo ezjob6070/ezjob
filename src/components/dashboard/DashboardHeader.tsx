@@ -72,29 +72,29 @@ const DashboardHeader = ({
         </Button>
       </div>
       
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
-        <Tabs value={localActiveTab} onValueChange={handleTabChange} className="w-full">
-          <div className="border-b border-gray-100">
-            <TabsList className="bg-transparent p-0 w-full md:w-auto justify-start h-auto">
+      <div className="flex flex-row items-center justify-between gap-2 mb-1">
+        <Tabs value={localActiveTab} onValueChange={handleTabChange} className="flex-1 min-w-0">
+          <div className="border-b border-gray-100 overflow-x-auto scrollbar-none">
+            <TabsList className="bg-transparent p-0 w-auto justify-start h-auto">
               <TabsTrigger 
                 value="dashboard" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 bg-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 px-4 py-3 transition-all duration-200"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 bg-transparent text-gray-600 hover:text-gray-800 px-3 py-2 text-sm transition-colors"
               >
-                <Home className="h-4 w-4 mr-2" />
+                <Home className="h-4 w-4 mr-1.5" />
                 Dashboard
               </TabsTrigger>
               <TabsTrigger 
                 value="statistics" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 bg-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 px-4 py-3 transition-all duration-200"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 bg-transparent text-gray-600 hover:text-gray-800 px-3 py-2 text-sm transition-colors"
               >
-                <BarChart3 className="h-4 w-4 mr-2" />
+                <BarChart3 className="h-4 w-4 mr-1.5" />
                 Statistics
               </TabsTrigger>
               <TabsTrigger 
                 value="analytics" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 bg-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 px-4 py-3 transition-all duration-200"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-indigo-700 bg-transparent text-gray-600 hover:text-gray-800 px-3 py-2 text-sm transition-colors"
               >
-                <Calendar className="h-4 w-4 mr-2" />
+                <Calendar className="h-4 w-4 mr-1.5" />
                 Analytics
               </TabsTrigger>
             </TabsList>
