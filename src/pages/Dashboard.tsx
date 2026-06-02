@@ -440,104 +440,60 @@ const Dashboard = () => {
               />
             </div>
             
-            {/* Professional Metric Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-              {/* Revenue Card */}
-              <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-blue-100 rounded-full">
-                          <BadgeDollarSign className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <h3 className="text-sm font-medium text-gray-600">Revenue</h3>
-                      </div>
-                      <p className="text-2xl font-bold mt-2 text-gray-900">{formatCurrency(totalRevenue)}</p>
+            {/* Compact Financial Strip */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
+              {/* Revenue */}
+              <Card className="bg-white border border-border shadow-sm rounded-xl hover:shadow-md transition-shadow">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="p-1.5 bg-blue-50 rounded-lg shrink-0">
+                      <BadgeDollarSign className="h-4 w-4 text-blue-600" />
                     </div>
-                    
-                    <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
-                      78% of goal
-                    </span>
+                    <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Revenue</h3>
                   </div>
-                  
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
-                    <div className="flex justify-between items-center">
-                      <span>Average per job</span>
-                      <span className="font-medium text-gray-700">{formatCurrency(avgJobValue)}</span>
-                    </div>
-                    <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
-                      <div className="bg-blue-500 h-full rounded-full" style={{ width: '78%' }}></div>
-                    </div>
+                  <p className="text-base sm:text-xl font-semibold tabular-nums text-foreground truncate">{formatCurrency(totalRevenue)}</p>
+                  <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="bg-blue-500 h-full rounded-full" style={{ width: '78%' }} />
                   </div>
+                  <p className="hidden sm:block text-[11px] text-muted-foreground mt-1.5">78% of goal</p>
                 </CardContent>
               </Card>
-              
-              {/* Net Profit Card */}
-              <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-green-100 rounded-full">
-                          <ChartBar className="h-5 w-5 text-green-600" />
-                        </div>
-                        <h3 className="text-sm font-medium text-gray-600">Net Profit</h3>
-                      </div>
-                      <p className="text-2xl font-bold mt-2 text-gray-900">{formatCurrency(companyProfit)}</p>
+
+              {/* Net Profit */}
+              <Card className="bg-white border border-border shadow-sm rounded-xl hover:shadow-md transition-shadow">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="p-1.5 bg-green-50 rounded-lg shrink-0">
+                      <ChartBar className="h-4 w-4 text-green-600" />
                     </div>
-                    
-                    <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-600 rounded-full">
-                      {Math.round((companyProfit / totalRevenue) * 100)}% margin
-                    </span>
+                    <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Profit</h3>
                   </div>
-                  
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
-                    <div className="flex justify-between items-center">
-                      <span>Labor costs</span>
-                      <span className="font-medium text-gray-700">{formatCurrency(totalExpenses * 0.6)}</span>
-                    </div>
-                    <div className="mt-2 grid grid-cols-3 gap-0.5">
-                      <div className="bg-green-500 h-1 rounded-l"></div>
-                      <div className="bg-green-300 h-1"></div>
-                      <div className="bg-green-100 h-1 rounded-r"></div>
-                    </div>
+                  <p className="text-base sm:text-xl font-semibold tabular-nums text-foreground truncate">{formatCurrency(companyProfit)}</p>
+                  <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="bg-green-500 h-full rounded-full" style={{ width: `${Math.round((companyProfit / totalRevenue) * 100)}%` }} />
                   </div>
+                  <p className="hidden sm:block text-[11px] text-muted-foreground mt-1.5">{Math.round((companyProfit / totalRevenue) * 100)}% margin</p>
                 </CardContent>
               </Card>
-              
-              {/* Expenses Card */}
-              <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-red-100 rounded-full">
-                          <TrendingDown className="h-5 w-5 text-red-600" />
-                        </div>
-                        <h3 className="text-sm font-medium text-gray-600">Expenses</h3>
-                      </div>
-                      <p className="text-2xl font-bold mt-2 text-red-600">-${totalExpenses.toLocaleString()}</p>
+
+              {/* Expenses */}
+              <Card className="bg-white border border-border shadow-sm rounded-xl hover:shadow-md transition-shadow">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="p-1.5 bg-red-50 rounded-lg shrink-0">
+                      <TrendingDown className="h-4 w-4 text-red-600" />
                     </div>
-                    
-                    <span className="text-xs font-medium px-2 py-1 bg-red-50 text-red-600 rounded-full">
-                      40% of revenue
-                    </span>
+                    <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Expenses</h3>
                   </div>
-                  
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 mt-2">
-                    <div className="flex justify-between items-center">
-                      <span>Operating costs</span>
-                      <span className="font-medium text-gray-700">${Math.round(totalExpenses).toLocaleString()}</span>
-                    </div>
-                    <div className="mt-2 flex gap-0.5">
-                      <div className="bg-red-500 h-1 rounded-l" style={{ width: '40%' }}></div>
-                      <div className="bg-red-200 h-1 rounded-r" style={{ width: '60%' }}></div>
-                    </div>
+                  <p className="text-base sm:text-xl font-semibold tabular-nums text-red-600 truncate">-{formatCurrency(totalExpenses)}</p>
+                  <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="bg-red-400 h-full rounded-full" style={{ width: '40%' }} />
                   </div>
+                  <p className="hidden sm:block text-[11px] text-muted-foreground mt-1.5">40% of revenue</p>
                 </CardContent>
               </Card>
             </div>
+            
             
             {/* Vertical stacking of Jobs Status and Projects sections */}
             <div className="flex flex-col space-y-6">
