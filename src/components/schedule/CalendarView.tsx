@@ -508,6 +508,16 @@ const CalendarView = ({
 
   const isMonthMode = viewMode === 'month';
 
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [allJobsOpen, setAllJobsOpen] = useState(false);
+
+  const today = startOfDay(new Date());
+  const allUpcomingJobs = jobs
+    .map(j => ({ job: j, d: ensureValidDate(j.date) }))
+    .filter((x): x is { job: Job; d: Date } => !!x.d && !isAfter(today, x.d))
+    .sort((a, b) => a.d.getTime() - b.d.getTime())
+    .map(x => x.job);
+
   return (
     <div className="space-y-6">
       <div className={cn(
