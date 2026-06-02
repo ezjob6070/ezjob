@@ -15,9 +15,9 @@ type Bucket = {
 };
 
 const buckets: Bucket[] = [
-  { name: 'Early',       color: '#94a3b8', gradientFrom: '#cbd5e1', gradientTo: '#64748b', value: 0, match: (c) => c < 33 },
+  { name: 'Planning',    color: '#94a3b8', gradientFrom: '#cbd5e1', gradientTo: '#64748b', value: 0, match: (c) => c < 33 },
   { name: 'In Progress', color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb', value: 0, match: (c) => c >= 33 && c < 67 },
-  { name: 'Near Done',   color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706', value: 0, match: (c) => c >= 67 && c < 100 },
+  { name: 'Finalizing',  color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706', value: 0, match: (c) => c >= 67 && c < 100 },
   { name: 'Completed',   color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a', value: 0, match: (c) => c >= 100 },
 ];
 
