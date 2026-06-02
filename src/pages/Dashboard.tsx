@@ -452,7 +452,6 @@ const Dashboard = () => {
             {/* Compact Financial Strip */}
             <div className="flex items-center justify-between mb-1.5 px-0.5">
               <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Financial Overview</h2>
-              <span className="text-[11px] text-muted-foreground">{financialDateLabel}</span>
             </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
               {/* Revenue */}
@@ -465,6 +464,7 @@ const Dashboard = () => {
                     <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Revenue</h3>
                   </div>
                   <p className="text-base sm:text-xl font-semibold tabular-nums text-foreground truncate">{formatCurrency(totalRevenue)}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{financialDateLabel}</p>
                   <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
                     <div className="bg-blue-500 h-full rounded-full" style={{ width: '78%' }} />
                   </div>
@@ -482,6 +482,7 @@ const Dashboard = () => {
                     <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Profit</h3>
                   </div>
                   <p className="text-base sm:text-xl font-semibold tabular-nums text-foreground truncate">{formatCurrency(companyProfit)}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{financialDateLabel}</p>
                   <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
                     <div className="bg-green-500 h-full rounded-full" style={{ width: `${Math.round((companyProfit / totalRevenue) * 100)}%` }} />
                   </div>
@@ -499,6 +500,7 @@ const Dashboard = () => {
                     <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Expenses</h3>
                   </div>
                   <p className="text-base sm:text-xl font-semibold tabular-nums text-red-600 truncate">-{formatCurrency(totalExpenses)}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{financialDateLabel}</p>
                   <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
                     <div className="bg-red-400 h-full rounded-full" style={{ width: '40%' }} />
                   </div>
@@ -506,6 +508,9 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
+            
+            
+
             
             
             {/* Side-by-side Jobs + Projects donuts */}
