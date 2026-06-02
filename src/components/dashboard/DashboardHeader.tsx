@@ -58,8 +58,10 @@ const DashboardHeader = ({
             <Home className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-base md:text-lg font-semibold tracking-tight text-gray-900 truncate">Hello, Alex</h1>
-            <p className="text-indigo-600 text-sm font-medium truncate">Welcome back · {format(new Date(), "EEEE, MMMM d, yyyy")}</p>
+            <h1 className="text-base md:text-lg font-semibold tracking-tight text-gray-900 truncate">
+              Hello, Alex <span className="font-normal text-gray-500">Welcome back</span>
+            </h1>
+            <p className="text-indigo-600 text-base font-medium truncate">{format(new Date(), "EEEE, MMMM d, yyyy")}</p>
           </div>
         </div>
         <Button
