@@ -512,9 +512,9 @@ const CalendarView = ({
     <div className="space-y-6">
       <div className={cn(
         "grid grid-cols-1 gap-6",
-        isMonthMode ? "lg:grid-cols-[360px_1fr]" : "md:grid-cols-3"
+        isMonthMode ? "lg:grid-cols-2" : "md:grid-cols-3"
       )}>
-        <Card className={cn(!isMonthMode && "md:col-span-2 overflow-x-auto")}>
+        <Card className={cn("flex flex-col", !isMonthMode && "md:col-span-2 overflow-x-auto")}>
           <CardHeader className="flex flex-row items-center justify-between pb-2 gap-2">
             <div className="flex items-center gap-2 min-w-0">
               <Button variant="outline" size="icon" onClick={handlePrevPeriod}>
@@ -530,26 +530,37 @@ const CalendarView = ({
               onViewChange={onViewChange}
             />
           </CardHeader>
-          <CardContent className={cn("pb-6", !isMonthMode && "overflow-x-auto")}>
-            <div className={cn(!isMonthMode && "min-w-fit")}>
+          <CardContent className={cn("pb-6 flex-1", !isMonthMode && "overflow-x-auto")}>
+            <div className={cn("h-full", !isMonthMode && "min-w-fit")}>
               {renderCalendarView()}
             </div>
           </CardContent>
         </Card>
 
-        <Card className={cn(!isMonthMode && "md:col-span-1")}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">
-              {format(selectedDate, "EEEE, MMM d")}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              {sortedDayJobs.length} job{sortedDayJobs.length !== 1 && 's'} · {sortedDayTasks.length} task{sortedDayTasks.length !== 1 && 's'}
-            </p>
+        <Card className={cn("flex flex-col", !isMonthMode && "md:col-span-1")}>
+          <CardHeader className="pb-3 flex flex-row items-start justify-between gap-2">
+            <div>
+              <CardTitle className="text-base">
+                {format(selectedDate, "EEEE, MMM d")}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {sortedDayJobs.length} job{sortedDayJobs.length !== 1 && 's'} · {sortedDayTasks.length} task{sortedDayTasks.length !== 1 && 's'}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs gap-1.5"
+              onClick={() => setAllJobsOpen(true)}
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              All jobs
+            </Button>
           </CardHeader>
-          <CardContent className="max-h-[560px] overflow-y-auto space-y-5">
+          <CardContent className="flex-1 overflow-y-auto space-y-5">
             {/* Hourly timeline strip */}
             <div className="rounded-md border bg-muted/30 p-2">
-              <div className="grid grid-cols-14 gap-px" style={{ gridTemplateColumns: `repeat(${timelineHours.length}, minmax(0, 1fr))` }}>
+              <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${timelineHours.length}, minmax(0, 1fr))` }}>
                 {timelineHours.map(hour => {
                   const jobsAtHour = sortedDayJobs.filter(j => {
                     const d = ensureValidDate(j.date);
@@ -584,12 +595,10 @@ const CalendarView = ({
 
             {/* Jobs */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500" />
-                  Jobs ({sortedDayJobs.length})
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold flex items-center gap-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                Jobs ({sortedDayJobs.length})
+              </h3>
               {sortedDayJobs.length === 0 ? (
                 <p className="text-xs text-muted-foreground py-2">No jobs scheduled</p>
               ) : (
@@ -597,7 +606,12 @@ const CalendarView = ({
                   {sortedDayJobs.map(job => {
                     const d = ensureValidDate(job.date);
                     return (
-                      <div key={job.id} className="flex items-start gap-3 p-2.5 rounded-md border bg-blue-50/50 hover:bg-blue-50 transition-colors">
+                      <button
+                        key={job.id}
+                        type="button"
+                        onClick={() => setSelectedJob(job)}
+                        className="w-full text-left flex items-start gap-3 p-2.5 rounded-md border bg-blue-50/50 hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                      >
                         <div className="text-xs font-semibold text-blue-700 w-14 shrink-0 pt-0.5">
                           {d ? format(d, "h:mm a") : "—"}
                         </div>
@@ -609,7 +623,7 @@ const CalendarView = ({
                           <p className="text-xs font-medium">${job.amount}</p>
                           <p className="text-[10px] text-muted-foreground capitalize">{job.status.replace('_', ' ')}</p>
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -626,27 +640,30 @@ const CalendarView = ({
                 <p className="text-xs text-muted-foreground py-2">No tasks due</p>
               ) : (
                 <div className="space-y-2">
-                  {sortedDayTasks.map(task => (
-                    <div key={task.id} className="flex items-start gap-3 p-2.5 rounded-md border bg-amber-50/50 hover:bg-amber-50 transition-colors">
-                      <div className="text-xs font-semibold text-amber-700 w-14 shrink-0 pt-0.5">
-                        {format(task.dueDate, "h:mm a")}
+                  {sortedDayTasks.map(task => {
+                    const td = ensureValidDate(task.dueDate);
+                    return (
+                      <div key={task.id} className="flex items-start gap-3 p-2.5 rounded-md border bg-amber-50/50 hover:bg-amber-50 transition-colors">
+                        <div className="text-xs font-semibold text-amber-700 w-14 shrink-0 pt-0.5">
+                          {td ? format(td, "h:mm a") : "—"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{task.title}</p>
+                          <p className="text-xs text-muted-foreground truncate">{task.client?.name}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className={cn(
+                            "inline-block text-[10px] px-1.5 py-0.5 rounded capitalize",
+                            task.priority === 'high' ? "bg-red-100 text-red-700" :
+                            task.priority === 'medium' ? "bg-amber-100 text-amber-700" :
+                            "bg-gray-100 text-gray-700"
+                          )}>
+                            {task.priority}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{task.title}</p>
-                        <p className="text-xs text-muted-foreground truncate">{task.client?.name}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className={cn(
-                          "inline-block text-[10px] px-1.5 py-0.5 rounded capitalize",
-                          task.priority === 'high' ? "bg-red-100 text-red-700" :
-                          task.priority === 'medium' ? "bg-amber-100 text-amber-700" :
-                          "bg-gray-100 text-gray-700"
-                        )}>
-                          {task.priority}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -655,6 +672,98 @@ const CalendarView = ({
       </div>
 
       {!isMonthMode && <UpcomingEvents events={upcomingEvents} />}
+
+      {/* Job detail dialog */}
+      <Dialog open={!!selectedJob} onOpenChange={(open) => !open && setSelectedJob(null)}>
+        <DialogContent className="max-w-md">
+          {selectedJob && (() => {
+            const d = ensureValidDate(selectedJob.date);
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle>{selectedJob.title}</DialogTitle>
+                  <DialogDescription>
+                    {selectedJob.clientName}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-muted-foreground">Date & Time</span>
+                    <span className="font-medium">{d ? format(d, "EEE, MMM d · h:mm a") : "—"}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-muted-foreground">Status</span>
+                    <Badge variant="outline" className="capitalize">{selectedJob.status.replace('_', ' ')}</Badge>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-muted-foreground">Amount</span>
+                    <span className="font-medium">${selectedJob.amount}</span>
+                  </div>
+                  {selectedJob.technicianName && (
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-muted-foreground">Technician</span>
+                      <span className="font-medium">{selectedJob.technicianName}</span>
+                    </div>
+                  )}
+                  {selectedJob.address && (
+                    <div className="flex justify-between gap-3">
+                      <span className="text-muted-foreground shrink-0">Address</span>
+                      <span className="font-medium text-right">{selectedJob.address}</span>
+                    </div>
+                  )}
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* All upcoming jobs dialog */}
+      <Dialog open={allJobsOpen} onOpenChange={setAllJobsOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>All Upcoming Jobs</DialogTitle>
+            <DialogDescription>
+              {allUpcomingJobs.length} job{allUpcomingJobs.length !== 1 && 's'} scheduled from today onward
+            </DialogDescription>
+          </DialogHeader>
+          <div className="overflow-y-auto space-y-2 pr-1">
+            {allUpcomingJobs.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-6 text-center">No upcoming jobs.</p>
+            ) : (
+              allUpcomingJobs.map(job => {
+                const d = ensureValidDate(job.date);
+                return (
+                  <button
+                    key={job.id}
+                    type="button"
+                    onClick={() => {
+                      if (d) updateSelectedDateItems(d);
+                      setAllJobsOpen(false);
+                      setSelectedJob(job);
+                    }}
+                    className="w-full text-left flex items-center gap-3 p-3 rounded-md border bg-card hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                  >
+                    <div className="flex flex-col items-center justify-center w-14 shrink-0 bg-blue-50 rounded-md p-1.5 text-blue-700">
+                      <span className="text-[10px] font-semibold uppercase">{d ? format(d, "MMM") : "—"}</span>
+                      <span className="text-lg font-bold leading-none">{d ? format(d, "d") : "—"}</span>
+                      <span className="text-[10px] mt-0.5">{d ? format(d, "h:mma") : ""}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{job.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{job.clientName}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-semibold">${job.amount}</p>
+                      <Badge variant="outline" className="text-[10px] capitalize mt-1">{job.status.replace('_', ' ')}</Badge>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
