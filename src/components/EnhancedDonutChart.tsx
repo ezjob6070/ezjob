@@ -18,6 +18,8 @@ type EnhancedDonutChartProps = {
   showLegend?: boolean;
   legendPosition?: 'bottom' | 'right';
   gradients?: boolean;
+  onSegmentClick?: (segment: { name: string; value: number; color: string }) => void;
+  onCenterClick?: () => void;
 };
 
 export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
@@ -31,6 +33,8 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
   showLegend = true,
   legendPosition = 'right',
   gradients = true,
+  onSegmentClick,
+  onCenterClick,
 }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const radius = size / 2;
