@@ -450,18 +450,19 @@ const Dashboard = () => {
             
 
             {/* Compact Financial Strip */}
+            <div className="flex items-center justify-between mb-1.5 px-0.5">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Financial Overview</h2>
+              <span className="text-[11px] text-muted-foreground">{financialDateLabel}</span>
+            </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
               {/* Revenue */}
               <Card className="bg-white border border-border shadow-sm rounded-xl hover:shadow-md transition-shadow">
                 <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="p-1.5 bg-blue-50 rounded-lg shrink-0">
-                        <BadgeDollarSign className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Revenue</h3>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="p-1.5 bg-blue-50 rounded-lg shrink-0">
+                      <BadgeDollarSign className="h-4 w-4 text-blue-600" />
                     </div>
-                    <span className="text-[10px] text-muted-foreground shrink-0">{financialDateLabel}</span>
+                    <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Revenue</h3>
                   </div>
                   <p className="text-base sm:text-xl font-semibold tabular-nums text-foreground truncate">{formatCurrency(totalRevenue)}</p>
                   <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -474,14 +475,11 @@ const Dashboard = () => {
               {/* Net Profit */}
               <Card className="bg-white border border-border shadow-sm rounded-xl hover:shadow-md transition-shadow">
                 <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="p-1.5 bg-green-50 rounded-lg shrink-0">
-                        <ChartBar className="h-4 w-4 text-green-600" />
-                      </div>
-                      <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Profit</h3>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="p-1.5 bg-green-50 rounded-lg shrink-0">
+                      <ChartBar className="h-4 w-4 text-green-600" />
                     </div>
-                    <span className="text-[10px] text-muted-foreground shrink-0">{financialDateLabel}</span>
+                    <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Profit</h3>
                   </div>
                   <p className="text-base sm:text-xl font-semibold tabular-nums text-foreground truncate">{formatCurrency(companyProfit)}</p>
                   <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -494,14 +492,11 @@ const Dashboard = () => {
               {/* Expenses */}
               <Card className="bg-white border border-border shadow-sm rounded-xl hover:shadow-md transition-shadow">
                 <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="p-1.5 bg-red-50 rounded-lg shrink-0">
-                        <TrendingDown className="h-4 w-4 text-red-600" />
-                      </div>
-                      <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Expenses</h3>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="p-1.5 bg-red-50 rounded-lg shrink-0">
+                      <TrendingDown className="h-4 w-4 text-red-600" />
                     </div>
-                    <span className="text-[10px] text-muted-foreground shrink-0">{financialDateLabel}</span>
+                    <h3 className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">Expenses</h3>
                   </div>
                   <p className="text-base sm:text-xl font-semibold tabular-nums text-red-600 truncate">-{formatCurrency(totalExpenses)}</p>
                   <div className="mt-2 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
