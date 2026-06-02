@@ -553,7 +553,10 @@ const CalendarView = ({
                     const d = ensureValidDate(j.date);
                     return d && d.getHours() === hour;
                   });
-                  const tasksAtHour = sortedDayTasks.filter(t => t.dueDate.getHours() === hour);
+                  const tasksAtHour = sortedDayTasks.filter(t => {
+                    const td = ensureValidDate(t.dueDate);
+                    return td && td.getHours() === hour;
+                  });
                   const hasJob = jobsAtHour.length > 0;
                   const hasTask = tasksAtHour.length > 0;
                   return (
