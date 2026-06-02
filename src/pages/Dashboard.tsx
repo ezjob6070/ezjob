@@ -440,6 +440,11 @@ const Dashboard = () => {
               />
             </div>
             
+            {/* Today's date line */}
+            <div className="mb-2 text-xs font-medium text-muted-foreground">
+              Today · {format(new Date(), "EEEE, MMMM d, yyyy")}
+            </div>
+
             {/* Compact Financial Strip */}
             <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
               {/* Revenue */}

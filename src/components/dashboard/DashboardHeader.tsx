@@ -59,7 +59,7 @@ const DashboardHeader = ({
           </div>
           <div className="min-w-0">
             <h1 className="text-base md:text-lg font-semibold tracking-tight text-gray-900 truncate">Hello, Alex</h1>
-            <p className="text-indigo-600 text-xs font-medium truncate">Welcome back to Ez Job</p>
+            <p className="text-indigo-600 text-xs font-medium truncate">{format(new Date(), "EEEE, MMMM d, yyyy")}</p>
           </div>
         </div>
         <Button
