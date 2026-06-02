@@ -81,7 +81,7 @@ const ProjectsDashboardSection = () => {
             </Link>
           </div>
         </CardHeader>
-        <CardContent className="pt-3 pb-5 px-4 sm:px-5">
+        <CardContent className="pt-3 pb-5 px-4 sm:px-5 flex-1 flex flex-col">
           <div className="grid grid-cols-3 gap-2 mb-4 pb-3 border-b border-border">
             <div className="text-center">
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Budget</div>
@@ -96,7 +96,7 @@ const ProjectsDashboardSection = () => {
               <div className="text-sm font-semibold text-foreground mt-0.5 tabular-nums">{totalWorkers.toLocaleString()}</div>
             </div>
           </div>
-          <div className="space-y-3.5">
+          <div className="flex-1 flex flex-col justify-around gap-3">
             {data.map((b) => {
               const pct = totalProjects > 0 ? Math.round((b.value / totalProjects) * 100) : 0;
               return (
@@ -134,30 +134,6 @@ const ProjectsDashboardSection = () => {
               );
             })}
           </div>
-          {spotlight && (
-            <div className="mt-4 pt-3 border-t border-border">
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium mb-1.5">
-                Spotlight · Closest to completion
-              </div>
-              <Link
-                to={`/projects/${spotlight.id}`}
-                className="flex items-center justify-between gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors group"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-foreground truncate group-hover:text-indigo-600 transition-colors">
-                    {spotlight.name}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground truncate">{spotlight.type}</div>
-                </div>
-                <Badge
-                  className="shrink-0 text-white border-0 tabular-nums"
-                  style={{ background: 'linear-gradient(90deg, #fbbf24, #d97706)' }}
-                >
-                  {spotlight.completion}%
-                </Badge>
-              </Link>
-            </div>
-          )}
         </CardContent>
       </Card>
 
