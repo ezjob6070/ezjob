@@ -447,7 +447,7 @@ const CalendarView = ({
                     <button
                       type="button"
                       className={cn(
-                        "h-9 w-9 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center text-sm",
+                        "h-11 w-11 p-0 aria-selected:opacity-100 rounded-md relative pointer-events-auto flex flex-col items-center justify-center text-sm mx-auto",
                         getDayClassName(date),
                         isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                         isOutsideMonth && "text-muted-foreground opacity-50"
@@ -458,9 +458,9 @@ const CalendarView = ({
                     >
                       <span>{format(date, "d")}</span>
                       {(hasJobs || hasTasks) && !isSelected && (
-                        <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-0.5">
-                          {hasJobs && <div className="w-1 h-1 rounded-full bg-blue-500" />}
-                          {hasTasks && <div className={cn("w-1 h-1 rounded-full", hasHighPriority ? "bg-red-500" : "bg-amber-500")} />}
+                        <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
+                          {hasJobs && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                          {hasTasks && <div className={cn("w-1.5 h-1.5 rounded-full", hasHighPriority ? "bg-red-500" : "bg-amber-500")} />}
                         </div>
                       )}
                     </button>
