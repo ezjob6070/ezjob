@@ -59,7 +59,7 @@ const ProjectsDashboardSection = () => {
 
   return (
     <>
-      <Card className="bg-white border border-border shadow-sm rounded-xl h-full">
+      <Card className="bg-white border border-border shadow-sm rounded-xl h-full flex flex-col">
         <CardHeader className="pb-2 pt-4 px-4 sm:px-5">
           <div className="flex justify-between items-start">
             <div>
