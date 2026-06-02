@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import { projects } from "@/data/projects";
 
 type Bucket = {
@@ -51,49 +50,66 @@ const ProjectsDashboardSection = () => {
         <CardHeader className="pb-2 pt-4 px-4 sm:px-5">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="text-base font-semibold">Projects Overview</CardTitle>
-              <CardDescription className="text-xs">Tap a slice to view projects</CardDescription>
+              <button
+                type="button"
+                onClick={openAll}
+                className="text-left"
+              >
+                <CardTitle className="text-base font-semibold hover:text-indigo-600 transition-colors">
+                  Projects Overview
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {totalProjects} total · tap a row to view
+                </CardDescription>
+              </button>
             </div>
             <Link to="/projects" className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
               View all →
             </Link>
           </div>
         </CardHeader>
-        <CardContent className="pt-2 pb-6 px-4 sm:px-5">
-          <div className="flex flex-col items-center">
-            <EnhancedDonutChart
-              data={data}
-              title={`${totalProjects}`}
-              subtitle="Total Projects"
-              size={220}
-              thickness={44}
-              gradients
-              animation
-              showLegend={false}
-              onCenterClick={openAll}
-              onSegmentClick={(seg) => openBucket(seg.name)}
-            />
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
-              {data.map((b) => (
+        <CardContent className="pt-3 pb-5 px-4 sm:px-5">
+          <div className="space-y-3.5">
+            {data.map((b) => {
+              const pct = totalProjects > 0 ? Math.round((b.value / totalProjects) * 100) : 0;
+              return (
                 <button
                   key={b.name}
                   type="button"
                   onClick={() => openBucket(b.name)}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-white hover:bg-gray-50 text-xs transition-colors"
+                  className="w-full text-left group"
                 >
-                  <span
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ background: `linear-gradient(135deg, ${b.gradientFrom}, ${b.gradientTo})` }}
-                  />
-                  <span className="font-medium text-foreground">{b.name}</span>
-                  <span className="text-muted-foreground tabular-nums">{b.value}</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{ background: `linear-gradient(135deg, ${b.gradientFrom}, ${b.gradientTo})` }}
+                      />
+                      <span className="text-sm font-medium text-foreground group-hover:text-indigo-600 transition-colors">
+                        {b.name}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-sm font-semibold text-foreground tabular-nums">{b.value}</span>
+                      <span className="text-[11px] text-muted-foreground tabular-nums">{pct}%</span>
+                    </div>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-2 rounded-full transition-all duration-500 ease-out"
+                      style={{
+                        width: `${pct}%`,
+                        background: `linear-gradient(90deg, ${b.gradientFrom}, ${b.gradientTo})`,
+                      }}
+                    />
+                  </div>
                 </button>
-              ))}
-            </div>
-            <p className="mt-3 text-[11px] text-muted-foreground">Tap a slice or chip to view projects</p>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
+
 
       <Dialog open={dialog.open} onOpenChange={(open) => setDialog({ ...dialog, open })}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
