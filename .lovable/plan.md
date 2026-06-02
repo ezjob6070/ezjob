@@ -1,24 +1,52 @@
-## Projects panel → horizontal progress bars
+## Add more substance to the Projects Overview panel
 
-Replace the donut chart in the Projects section of the dashboard with a compact horizontal progress bar list, keeping the same side-by-side layout with the Jobs donut.
+The Projects panel currently shows 4 progress bar rows and feels a bit empty next to the Jobs donut. Add light, useful content to fill it out without making it noisy.
 
-### Changes
+### Changes — `src/components/dashboard/ProjectsDashboardSection.tsx`
 
-**`src/components/dashboard/ProjectsDashboardSection.tsx`**
-- Keep the same 4 buckets (Early <33%, In Progress 33–66%, Near Done 67–99%, Completed ≥100%) and their colors/gradients.
-- Remove the `EnhancedDonutChart`.
-- Render a stacked list of 4 rows, one per bucket. Each row:
-  - Colored gradient dot + bucket label on the left
-  - Count + percentage of total on the right
-  - Full-width progress bar below (bg = muted, fill = bucket gradient, width = bucket count / total)
-  - Entire row is a button → opens the existing `Dialog` with that bucket's projects
-- Header stays: title "Projects Overview" + total count, clickable to open all projects (same `onCenterClick` behavior).
-- Keep the existing `Dialog` listing matching projects unchanged.
+**1. Add a compact stats strip above the bars**
+Three small stat blocks in a single row, separated by subtle dividers:
+- **Total Budget** — sum of `project.budget` across all projects, formatted as `$XXM`
+- **Avg. Progress** — average `completion` across all projects, shown as `XX%`
+- **Active Workers** — sum of `project.workers` across all projects
 
-**`src/pages/Dashboard.tsx`**
-- No structural change. The `grid grid-cols-1 lg:grid-cols-2` layout already hosts Jobs (donut) on the left and Projects (now bars) on the right.
+Small label on top (muted, 11px), bold value below (sm, foreground). Keeps the same white card aesthetic.
+
+**2. Add a "Spotlight" mini-row below the 4 progress bars**
+A single highlighted project — the one closest to completion but not yet done (highest `completion` where `completion < 100`). Shows:
+- Project name (truncated) + type as muted subtext
+- Right side: `XX%` badge in the In-Progress/Near-Done gradient
+- Clicking it navigates to `/projects/:id`
+
+Separated from the bars by a thin `border-t border-border` with `pt-3 mt-1`.
+
+**3. Keep everything else the same**
+- 4 bucket rows unchanged
+- Header (title + "View all →") unchanged
+- Dialog unchanged
+- Same `bg-white border border-border shadow-sm rounded-xl` card
+
+### Layout sketch
+
+```text
+┌─ Projects Overview ──────────── View all → ┐
+│  10 total · tap a row to view              │
+│                                            │
+│  $327M     │   58%      │   1,098          │  ← new stats strip
+│  Budget    │  Avg Prog. │  Workers         │
+│ ─────────────────────────────────────────  │
+│  ● Early          2   20%   ▰▰░░░░░░░░     │
+│  ● In Progress    4   40%   ▰▰▰▰░░░░░░     │
+│  ● Near Done      3   30%   ▰▰▰░░░░░░░     │
+│  ● Completed      1   10%   ▰░░░░░░░░░     │
+│ ─────────────────────────────────────────  │
+│  Spotlight                                  │  ← new mini-row
+│  Harbor View Hotel · Hospitality      90%  │
+└────────────────────────────────────────────┘
+```
 
 ### Visual notes
-- Uses existing semantic tokens and the bucket gradients already defined.
-- Vertically compact so the whole dashboard stays above the fold on desktop.
-- Mobile: stacks under Jobs as today.
+- All values computed from `src/data/projects.ts` (no new data source).
+- Uses existing semantic tokens and the bucket gradients.
+- Stays vertically compact and keeps height aligned with the Jobs donut card.
+- Mobile: still stacks under Jobs.
