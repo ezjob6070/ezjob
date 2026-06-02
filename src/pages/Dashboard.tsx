@@ -450,6 +450,10 @@ const Dashboard = () => {
             
 
             {/* Compact Financial Strip */}
+            <div className="flex items-center justify-between mb-1.5 px-0.5">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Financial Overview</h2>
+              <span className="text-[11px] text-muted-foreground">{financialDateLabel}</span>
+            </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
               {/* Revenue */}
               <Card className="bg-white border border-border shadow-sm rounded-xl hover:shadow-md transition-shadow">
