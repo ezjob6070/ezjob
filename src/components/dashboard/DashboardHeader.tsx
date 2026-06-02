@@ -106,7 +106,7 @@ const DashboardHeader = ({
               )}
             >
               <CalendarRange className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium">{formatDateRange()}</span>
+              <span className="text-xs font-medium">Filter by date{dateFilter?.from ? ` · ${formatDateRange()}` : ""}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="end">
