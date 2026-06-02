@@ -33,6 +33,19 @@ const ProjectsDashboardSection = () => {
 
   const totalProjects = projects.length;
 
+  const totalBudget = projects.reduce((s, p) => s + p.budget, 0);
+  const avgProgress = totalProjects > 0
+    ? Math.round(projects.reduce((s, p) => s + p.completion, 0) / totalProjects)
+    : 0;
+  const totalWorkers = projects.reduce((s, p) => s + (p.workers || 0), 0);
+  const formattedBudget = totalBudget >= 1_000_000
+    ? `$${(totalBudget / 1_000_000).toFixed(0)}M`
+    : `$${(totalBudget / 1_000).toFixed(0)}K`;
+
+  const spotlight = [...projects]
+    .filter(p => p.completion < 100)
+    .sort((a, b) => b.completion - a.completion)[0];
+
   const openBucket = (name: string) => {
     const bucket = buckets.find(b => b.name === name);
     if (!bucket) return;
