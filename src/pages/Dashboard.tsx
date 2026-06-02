@@ -508,8 +508,9 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
+            
+            
 
-            </div>
             
             
             {/* Side-by-side Jobs + Projects donuts */}
