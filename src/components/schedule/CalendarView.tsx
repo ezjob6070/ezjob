@@ -495,9 +495,11 @@ const CalendarView = ({
     const db = ensureValidDate(b.date)?.getTime() ?? 0;
     return da - db;
   });
-  const sortedDayTasks = [...tasksForSelectedDate].sort(
-    (a, b) => a.dueDate.getTime() - b.dueDate.getTime()
-  );
+  const sortedDayTasks = [...tasksForSelectedDate].sort((a, b) => {
+    const da = ensureValidDate(a.dueDate)?.getTime() ?? 0;
+    const db = ensureValidDate(b.dueDate)?.getTime() ?? 0;
+    return da - db;
+  });
 
   // Hours 7am–8pm for the compact timeline
   const timelineHours = Array.from({ length: 14 }, (_, i) => i + 7);
