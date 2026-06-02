@@ -495,76 +495,68 @@ const Dashboard = () => {
             </div>
             
             
-            {/* Vertical stacking of Jobs Status and Projects sections */}
-            <div className="flex flex-col space-y-6">
-              {/* Jobs Status Section - Now takes top 50% */}
-              <div>
-                <Card className="bg-white border-0 shadow-sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-medium">Jobs By Status</CardTitle>
-                    <CardDescription>Overview of service requests and job status</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-6 pt-2">
-                    <div className="flex flex-col items-center">
-                      <EnhancedDonutChart 
-                        data={jobStatusData}
-                        title={`${totalTasks}`}
-                        subtitle="Total Jobs"
-                        size={220} 
-                        thickness={44}
-                        gradients={true}
-                        animation={true}
-                        showLegend={false}
-                        onCenterClick={() => openStatusDialog('all', 'All Jobs', [
-                          ...jobsByStatus.completed,
-                          ...jobsByStatus.inProgress,
-                          ...jobsByStatus.canceled,
-                          ...jobsByStatus.rescheduled,
-                        ])}
-                        onSegmentClick={(seg) => openStatusDialog(
-                          seg.name.toLowerCase(),
-                          `${seg.name} Jobs`,
-                          seg.name === 'Completed' ? jobsByStatus.completed :
-                          seg.name === 'In Progress' ? jobsByStatus.inProgress :
-                          seg.name === 'Cancelled' ? jobsByStatus.canceled :
-                          jobsByStatus.rescheduled
-                        )}
-                      />
-                      {/* Compact legend chips below the donut */}
-                      <div className="mt-5 flex flex-wrap justify-center gap-2">
-                        {jobStatusData.map((status) => (
-                          <button
-                            key={status.name}
-                            type="button"
-                            onClick={() => openStatusDialog(
-                              status.name.toLowerCase(),
-                              `${status.name} Jobs`,
-                              status.name === 'Completed' ? jobsByStatus.completed :
-                              status.name === 'In Progress' ? jobsByStatus.inProgress :
-                              status.name === 'Cancelled' ? jobsByStatus.canceled :
-                              jobsByStatus.rescheduled
-                            )}
-                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-white hover:bg-gray-50 text-xs transition-colors"
-                          >
-                            <span
-                              className="w-2.5 h-2.5 rounded-full"
-                              style={{ background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` }}
-                            />
-                            <span className="font-medium text-foreground">{status.name}</span>
-                            <span className="text-muted-foreground tabular-nums">{status.value}</span>
-                          </button>
-                        ))}
-                      </div>
-                      <p className="mt-3 text-[11px] text-muted-foreground">Tap a slice or chip to view jobs</p>
+            {/* Side-by-side Jobs + Projects donuts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card className="bg-white border border-border shadow-sm rounded-xl h-full">
+                <CardHeader className="pb-2 pt-4 px-4 sm:px-5">
+                  <CardTitle className="text-base font-semibold">Jobs By Status</CardTitle>
+                  <CardDescription className="text-xs">Tap a slice to view jobs</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-6 pt-2 px-4 sm:px-5">
+                  <div className="flex flex-col items-center">
+                    <EnhancedDonutChart 
+                      data={jobStatusData}
+                      title={`${totalTasks}`}
+                      subtitle="Total Jobs"
+                      size={220} 
+                      thickness={44}
+                      gradients={true}
+                      animation={true}
+                      showLegend={false}
+                      onCenterClick={() => openStatusDialog('all', 'All Jobs', [
+                        ...jobsByStatus.completed,
+                        ...jobsByStatus.inProgress,
+                        ...jobsByStatus.canceled,
+                        ...jobsByStatus.rescheduled,
+                      ])}
+                      onSegmentClick={(seg) => openStatusDialog(
+                        seg.name.toLowerCase(),
+                        `${seg.name} Jobs`,
+                        seg.name === 'Completed' ? jobsByStatus.completed :
+                        seg.name === 'In Progress' ? jobsByStatus.inProgress :
+                        seg.name === 'Cancelled' ? jobsByStatus.canceled :
+                        jobsByStatus.rescheduled
+                      )}
+                    />
+                    <div className="mt-5 flex flex-wrap justify-center gap-2">
+                      {jobStatusData.map((status) => (
+                        <button
+                          key={status.name}
+                          type="button"
+                          onClick={() => openStatusDialog(
+                            status.name.toLowerCase(),
+                            `${status.name} Jobs`,
+                            status.name === 'Completed' ? jobsByStatus.completed :
+                            status.name === 'In Progress' ? jobsByStatus.inProgress :
+                            status.name === 'Cancelled' ? jobsByStatus.canceled :
+                            jobsByStatus.rescheduled
+                          )}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-white hover:bg-gray-50 text-xs transition-colors"
+                        >
+                          <span
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{ background: `linear-gradient(135deg, ${status.gradientFrom}, ${status.gradientTo})` }}
+                          />
+                          <span className="font-medium text-foreground">{status.name}</span>
+                          <span className="text-muted-foreground tabular-nums">{status.value}</span>
+                        </button>
+                      ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              {/* Projects Section - Now takes bottom 50% */}
-              <div>
-                <ProjectsDashboardSection />
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <ProjectsDashboardSection />
             </div>
             
             <JobStatusDialog 

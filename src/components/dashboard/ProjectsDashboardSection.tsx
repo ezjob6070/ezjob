@@ -1,119 +1,139 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Clock, TrendingUp, Building } from "lucide-react";
 import { Link } from "react-router-dom";
-import { formatCurrency } from "@/components/dashboard/DashboardUtils";
+import { EnhancedDonutChart } from "@/components/EnhancedDonutChart";
 import { projects } from "@/data/projects";
 
+type Bucket = {
+  name: string;
+  value: number;
+  color: string;
+  gradientFrom: string;
+  gradientTo: string;
+  match: (completion: number) => boolean;
+};
+
+const buckets: Bucket[] = [
+  { name: 'Early',       color: '#94a3b8', gradientFrom: '#cbd5e1', gradientTo: '#64748b', value: 0, match: (c) => c < 33 },
+  { name: 'In Progress', color: '#3b82f6', gradientFrom: '#60a5fa', gradientTo: '#2563eb', value: 0, match: (c) => c >= 33 && c < 67 },
+  { name: 'Near Done',   color: '#f59e0b', gradientFrom: '#fbbf24', gradientTo: '#d97706', value: 0, match: (c) => c >= 67 && c < 100 },
+  { name: 'Completed',   color: '#22c55e', gradientFrom: '#4ade80', gradientTo: '#16a34a', value: 0, match: (c) => c >= 100 },
+];
+
 const ProjectsDashboardSection = () => {
-  // Calculate project stats
+  const [dialog, setDialog] = useState<{ open: boolean; title: string; items: typeof projects }>({
+    open: false, title: '', items: []
+  });
+
+  const data = buckets.map(b => ({
+    ...b,
+    value: projects.filter(p => b.match(p.completion)).length,
+  }));
+
   const totalProjects = projects.length;
-  const inProgressProjects = projects.filter(p => p.status === "In Progress").length;
-  const completionRate = totalProjects ? Math.round((projects.reduce((sum, p) => sum + p.completion, 0) / totalProjects)) : 0;
-  
-  // Get the 3 most recent projects
-  const recentProjects = [...projects]
-    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
-    .slice(0, 3);
+
+  const openBucket = (name: string) => {
+    const bucket = buckets.find(b => b.name === name);
+    if (!bucket) return;
+    const items = projects.filter(p => bucket.match(p.completion));
+    setDialog({ open: true, title: `${name} Projects`, items });
+  };
+
+  const openAll = () => {
+    setDialog({ open: true, title: 'All Projects', items: projects });
+  };
 
   return (
-    <Card className="bg-white shadow-sm">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle className="text-base font-medium">Projects Overview</CardTitle>
-            <CardDescription>Current projects status and progress</CardDescription>
-          </div>
-          <Link to="/projects">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-8 text-xs bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
-            >
-              View All Projects
-            </Button>
-          </Link>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0 pb-4">
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-3 border border-purple-100 shadow-sm">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-purple-700">Total Projects</span>
-              <div className="p-1.5 bg-purple-100 rounded-full">
-                <Building className="h-3.5 w-3.5 text-purple-600" />
-              </div>
+    <>
+      <Card className="bg-white border border-border shadow-sm rounded-xl h-full">
+        <CardHeader className="pb-2 pt-4 px-4 sm:px-5">
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-base font-semibold">Projects Overview</CardTitle>
+              <CardDescription className="text-xs">Tap a slice to view projects</CardDescription>
             </div>
-            <div className="text-xl font-bold text-purple-800">{totalProjects}</div>
+            <Link to="/projects" className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
+              View all →
+            </Link>
           </div>
-          
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-3 border border-blue-100 shadow-sm">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-blue-700">In Progress</span>
-              <div className="p-1.5 bg-blue-100 rounded-full">
-                <Clock className="h-3.5 w-3.5 text-blue-600" />
-              </div>
+        </CardHeader>
+        <CardContent className="pt-2 pb-6 px-4 sm:px-5">
+          <div className="flex flex-col items-center">
+            <EnhancedDonutChart
+              data={data}
+              title={`${totalProjects}`}
+              subtitle="Total Projects"
+              size={220}
+              thickness={44}
+              gradients
+              animation
+              showLegend={false}
+              onCenterClick={openAll}
+              onSegmentClick={(seg) => openBucket(seg.name)}
+            />
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              {data.map((b) => (
+                <button
+                  key={b.name}
+                  type="button"
+                  onClick={() => openBucket(b.name)}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-white hover:bg-gray-50 text-xs transition-colors"
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ background: `linear-gradient(135deg, ${b.gradientFrom}, ${b.gradientTo})` }}
+                  />
+                  <span className="font-medium text-foreground">{b.name}</span>
+                  <span className="text-muted-foreground tabular-nums">{b.value}</span>
+                </button>
+              ))}
             </div>
-            <div className="text-xl font-bold text-blue-800">{inProgressProjects}</div>
+            <p className="mt-3 text-[11px] text-muted-foreground">Tap a slice or chip to view projects</p>
           </div>
-          
-          <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-lg p-3 border border-emerald-100 shadow-sm">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-emerald-700">Avg. Completion</span>
-              <div className="p-1.5 bg-emerald-100 rounded-full">
-                <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
-              </div>
-            </div>
-            <div className="text-xl font-bold text-emerald-800">{completionRate}%</div>
-          </div>
-        </div>
-        
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-gray-700">Recent Projects</h3>
-          {recentProjects.map((project) => (
-            <Link key={project.id} to={`/projects/${project.id}`} className="block">
-              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gradient-to-r from-gray-50 to-white hover:from-blue-50 hover:to-indigo-50 transition-colors shadow-sm">
-                <div className="flex-1">
-                  <div className="flex justify-between">
-                    <h4 className="font-medium text-sm">{project.name}</h4>
-                    <Badge
-                      className={`text-xs ${
-                        project.status === "In Progress" ? "bg-blue-100 text-blue-800 hover:bg-blue-200" :
-                        project.status === "Completed" ? "bg-green-100 text-green-800 hover:bg-green-200" :
-                        project.status === "On Hold" ? "bg-amber-100 text-amber-800 hover:bg-amber-200" :
-                        "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                      }`}
-                    >
-                      {project.status}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center mt-1">
-                    <span className="text-xs text-gray-500">{project.type}</span>
-                    <div className="flex items-center">
-                      <span className="text-xs text-gray-500 mr-2">${(project.budget / 1000).toFixed(0)}K budget</span>
-                      <span className="text-xs text-gray-500">{project.completion}% complete</span>
+        </CardContent>
+      </Card>
+
+      <Dialog open={dialog.open} onOpenChange={(open) => setDialog({ ...dialog, open })}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{dialog.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 mt-2">
+            {dialog.items.length === 0 && (
+              <p className="text-sm text-muted-foreground py-6 text-center">No projects in this group.</p>
+            )}
+            {dialog.items.map((project) => (
+              <Link
+                key={project.id}
+                to={`/projects/${project.id}`}
+                className="block p-3 rounded-lg border border-border bg-white hover:bg-gray-50 transition-colors"
+                onClick={() => setDialog({ ...dialog, open: false })}
+              >
+                <div className="flex justify-between items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-medium text-sm text-foreground truncate">{project.name}</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {project.type} · ${(project.budget / 1000).toFixed(0)}K
+                    </p>
+                    <div className="w-full bg-gray-100 rounded-full h-1 mt-2">
+                      <div
+                        className="h-1 rounded-full bg-blue-500"
+                        style={{ width: `${project.completion}%` }}
+                      />
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1.5">
-                    <div
-                      className={`h-1.5 rounded-full ${
-                        project.status === "In Progress" ? "bg-blue-600" :
-                        project.status === "Completed" ? "bg-green-600" :
-                        project.status === "On Hold" ? "bg-amber-500" : "bg-gray-400"
-                      }`}
-                      style={{ width: `${project.completion}%` }}
-                    ></div>
-                  </div>
+                  <Badge variant="outline" className="text-[10px] shrink-0">
+                    {project.completion}%
+                  </Badge>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+              </Link>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
