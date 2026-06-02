@@ -218,8 +218,12 @@ export const EnhancedDonutChart: React.FC<EnhancedDonutChartProps> = ({
         </svg>
         
         <div 
-          className="absolute inset-0 flex flex-col items-center justify-center text-center"
+          className={cn(
+            "absolute inset-0 flex flex-col items-center justify-center text-center",
+            onCenterClick && "cursor-pointer"
+          )}
           style={{ margin: thickness }}
+          onClick={onCenterClick}
         >
           <span className="text-3xl font-bold">{title}</span>
           {subtitle && <span className="text-xs text-muted-foreground">{subtitle}</span>}
