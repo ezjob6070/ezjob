@@ -51,29 +51,25 @@ const DashboardHeader = ({
   };
 
   return (
-    <div className="bg-white border border-gray-100 shadow-sm rounded-lg -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-5 pt-6 pb-4 md:px-7 md:pt-7 md:pb-2 mb-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4">
-        <div>
-          <div className="flex items-center mb-1">
-            <div className="mr-4 bg-white p-3 rounded-xl shadow-md text-indigo-600">
-              <Home className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-lg md:text-xl font-bold text-gray-800">Hello, Alex Johnson</h1>
-              <p className="text-indigo-600 text-sm font-medium">Welcome to your Ez Job dashboard</p>
-            </div>
+    <div className="bg-white border border-gray-100 shadow-sm rounded-lg -mx-4 -mt-4 md:-mx-6 md:-mt-6 px-4 pt-4 pb-2 md:px-6 md:pt-5 md:pb-2 mb-5">
+      <div className="flex flex-row items-center justify-between mb-1 gap-3">
+        <div className="flex items-center min-w-0">
+          <div className="mr-3 bg-indigo-50 p-2 rounded-lg text-indigo-600 shrink-0">
+            <Home className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-base md:text-lg font-semibold tracking-tight text-gray-900 truncate">Hello, Alex</h1>
+            <p className="text-indigo-600 text-xs font-medium truncate">Welcome back to Ez Job</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-full h-10 w-10"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-full h-9 w-9 shrink-0"
+        >
+          <Bell className="h-4 w-4" />
+          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
+        </Button>
       </div>
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
