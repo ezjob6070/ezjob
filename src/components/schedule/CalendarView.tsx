@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, 
+import {
+  format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval,
   addDays, startOfMonth, endOfMonth, addMonths, subMonths,
-  startOfDay, endOfDay, addHours, setHours, setMinutes
+  startOfDay, endOfDay, addHours, setHours, setMinutes, isAfter
 } from "date-fns";
 import { Job } from "@/components/jobs/JobTypes";
 import { Task } from "@/components/calendar/types";
@@ -10,10 +10,12 @@ import { cn } from "@/lib/utils";
 import UpcomingEvents from "@/components/UpcomingEvents";
 import { CalendarViewMode } from "./CalendarViewOptions";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import CalendarViewOptions from "./CalendarViewOptions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
 // Define the event types more specifically
 interface JobEvent {
