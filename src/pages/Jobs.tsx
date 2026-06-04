@@ -129,22 +129,27 @@ const Jobs = () => {
 
   const handleCancelJob = (jobId: string, reason?: string) => {
     cancelJob?.(jobId, reason);
-    
-    setLocalJobs(prevJobs => 
-      prevJobs.map(job => 
-        job.id === jobId 
+
+    setLocalJobs(prevJobs =>
+      prevJobs.map(job =>
+        job.id === jobId
           ? { ...job, status: "cancelled" as const, cancellationReason: reason || "No reason provided" }
           : job
       )
     );
+
+    toast({
+      title: "Job cancelled",
+      description: "The job has been marked as cancelled.",
+    });
   };
 
   const handleCompleteJob = (jobId: string, actualAmount?: number) => {
     completeJob?.(jobId, actualAmount);
-    
-    setLocalJobs(prevJobs => 
-      prevJobs.map(job => 
-        job.id === jobId 
+
+    setLocalJobs(prevJobs =>
+      prevJobs.map(job =>
+        job.id === jobId
           ? {
               ...job,
               status: "completed" as const,
@@ -154,11 +159,15 @@ const Jobs = () => {
           : job
       )
     );
+
+    toast({
+      title: "Job completed",
+      description: "The job has been marked as completed.",
+    });
   };
-  
+
   // Handle job rescheduling locally
   const handleLocalRescheduleJob = (jobId: string, newDate: Date, isAllDay: boolean) => {
-    // Call the handleRescheduleJob function from useJobsData
     handleRescheduleJob(jobId, newDate);
 
     updateJob?.(jobId, {
@@ -168,21 +177,26 @@ const Jobs = () => {
       status: "scheduled",
       cancellationReason: undefined,
     });
-    
-    // Update local jobs state
-    setLocalJobs(prevJobs => 
-      prevJobs.map(job => 
-        job.id === jobId 
-          ? { 
-              ...job, 
-              date: newDate, 
+
+    setLocalJobs(prevJobs =>
+      prevJobs.map(job =>
+        job.id === jobId
+          ? {
+              ...job,
+              date: newDate,
               scheduledDate: newDate,
-              isAllDay: isAllDay, 
-              status: "scheduled" as const
+              isAllDay: isAllDay,
+              status: "scheduled" as const,
+              cancellationReason: undefined,
             }
           : job
       )
     );
+
+    toast({
+      title: "Job rescheduled",
+      description: `Rescheduled to ${newDate.toLocaleDateString()}.`,
+    });
   };
 
   const handleLocalReopenJob = (jobId: string, newStatus: "scheduled" | "in_progress") => {
@@ -199,6 +213,11 @@ const Jobs = () => {
           : job
       )
     );
+
+    toast({
+      title: "Job reopened",
+      description: `Job is now ${newStatus === "in_progress" ? "in progress" : "scheduled"}.`,
+    });
   };
 
   // Handle sending job to estimate
