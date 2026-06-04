@@ -80,6 +80,15 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Mark Complete
             </DropdownMenuItem>
+            {job.status !== "in_progress" && (
+              <DropdownMenuItem
+                className="text-blue-600 focus:text-blue-700"
+                onSelect={(event) => handleStatusAction(event, "in_progress")}
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Mark In Progress
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onSelect={(event) => handleStatusAction(event, "reschedule")}>
               <CalendarClock className="h-4 w-4 mr-2" />
               Reschedule
@@ -116,10 +125,17 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-blue-600 focus:text-blue-700"
+              onSelect={(event) => handleStatusAction(event, "scheduled")}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reopen as Scheduled
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-blue-600 focus:text-blue-700"
               onSelect={(event) => handleStatusAction(event, "in_progress")}
             >
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reopen Job
+              Reopen as In Progress
             </DropdownMenuItem>
           </>
         )}
@@ -132,7 +148,14 @@ const JobActions = ({ job, onUpdateStatus, onSendToEstimate }: JobActionsProps) 
               onSelect={(event) => handleStatusAction(event, "scheduled")}
             >
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reopen Job
+              Reopen as Scheduled
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-blue-600 focus:text-blue-700"
+              onSelect={(event) => handleStatusAction(event, "in_progress")}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reopen as In Progress
             </DropdownMenuItem>
           </>
         )}
