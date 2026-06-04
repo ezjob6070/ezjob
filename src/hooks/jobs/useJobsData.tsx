@@ -87,6 +87,8 @@ export const useJobsData = (initialJobsData: Job[] = [], jobSourceNames: string[
       setJobs(jobsToUse);
       setFilteredJobs(jobsToUse);
       setLoading(false);
+      // Keep selected job in sync with latest data (status badge in modal stays correct)
+      setSelectedJob(prev => prev ? (jobsToUse.find(j => j.id === prev.id) || null) : prev);
     } catch (err) {
       setError(err as Error);
       setLoading(false);
