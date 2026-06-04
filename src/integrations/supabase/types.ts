@@ -119,6 +119,47 @@ export type Database = {
         }
         Relationships: []
       }
+      job_status_history: {
+        Row: {
+          changed_by: string | null
+          changed_by_name: string | null
+          created_at: string
+          id: string
+          job_id: string
+          new_status: Database["public"]["Enums"]["job_status"]
+          note: string | null
+          old_status: Database["public"]["Enums"]["job_status"] | null
+        }
+        Insert: {
+          changed_by?: string | null
+          changed_by_name?: string | null
+          created_at?: string
+          id?: string
+          job_id: string
+          new_status: Database["public"]["Enums"]["job_status"]
+          note?: string | null
+          old_status?: Database["public"]["Enums"]["job_status"] | null
+        }
+        Update: {
+          changed_by?: string | null
+          changed_by_name?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string
+          new_status?: Database["public"]["Enums"]["job_status"]
+          note?: string | null
+          old_status?: Database["public"]["Enums"]["job_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_status_history_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           actual_amount: number | null
